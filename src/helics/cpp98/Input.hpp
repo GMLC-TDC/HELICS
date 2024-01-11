@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_INPUT_HPP_
 #pragma once
 
-#include "helics/helics.h"
 #include "DataBuffer.hpp"
+#include "helics/helics.h"
 #include "helicsExceptions.hpp"
 
 #include <complex>
@@ -222,7 +222,7 @@ class Input {
     /** get a data buffer with the input value*/
     DataBuffer getDataBuffer()
     {
-        return DataBuffer(helicsInputGetDataBuffer(inp,hThrowOnError()));
+        return DataBuffer(helicsInputGetDataBuffer(inp, hThrowOnError()));
     }
     /** Check if an input is updated **/
     bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }

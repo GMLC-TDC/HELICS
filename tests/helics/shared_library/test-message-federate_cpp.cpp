@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../src/helics/cpp98/MessageFederate.hpp"
-
 #include "cpptestFixtures.hpp"
 
 #include "gtest/gtest.h"
@@ -334,12 +333,10 @@ TEST_F(mfed_tests, message_create_from_ept_after)
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
-
 TEST_F(mfed_tests, dataBuffer)
 {
     SetupTest<helicscpp::MessageFederate>("test", 1, 1.0);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate>(0);
-
 
     auto m1 = helicscpp::Message(*mFed1);
 
@@ -353,7 +350,7 @@ TEST_F(mfed_tests, dataBuffer)
     // test the connection between the buffer and message
     EXPECT_EQ(m2.size(), 0);
     EXPECT_FALSE(m2.isValid());
-    auto buffer=m2.dataBuffer();
+    auto buffer = m2.dataBuffer();
 
     EXPECT_TRUE(buffer.isValid());
 

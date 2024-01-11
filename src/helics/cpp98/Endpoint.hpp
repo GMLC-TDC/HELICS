@@ -8,9 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_ENDPOINT_HPP_
 #pragma once
 
+#include "DataBuffer.hpp"
 #include "helics/helics.h"
 #include "helicsExceptions.hpp"
-#include "DataBuffer.hpp"
+
 #include <string>
 #include <vector>
 
@@ -193,9 +194,7 @@ class Message {
     }
     void clear() { helicsMessageClear(mo, HELICS_IGNORE_ERROR); }
     /** get the data buffer from the message */
-    DataBuffer dataBuffer() {
-       return DataBuffer(helicsMessageDataBuffer(mo,HELICS_IGNORE_ERROR));
-    }
+    DataBuffer dataBuffer() { return DataBuffer(helicsMessageDataBuffer(mo, HELICS_IGNORE_ERROR)); }
     /** generate a new message in a federate*/
     Message& newMessageObject(const Federate& fed);
 

@@ -761,8 +761,9 @@ void valueExtract(const data_view& data, DataType baseType, std::complex<double>
             break;
         }
         case DataType::HELICS_INT: {
-            val = std::complex<double>(static_cast<double>(ValueConverter<int64_t>::interpret(data)),
-                                       0.0);
+            val =
+                std::complex<double>(static_cast<double>(ValueConverter<int64_t>::interpret(data)),
+                                     0.0);
             break;
         }
         case DataType::HELICS_TIME: {

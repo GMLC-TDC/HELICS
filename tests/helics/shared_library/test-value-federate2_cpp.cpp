@@ -181,24 +181,23 @@ TEST_F(vfed_tests, json_register_publish)
     vFed->finalize();
 }
 
-
 TEST_F(vfed_tests, data_buffer)
 {
     HelicsTime gtime;
     double val1 = 0;
     const double testValue1{4.565};
     const double testValue2{-2624.262};
-    SetupTest<helicscpp::ValueFederate>("test", 1,1.0);
+    SetupTest<helicscpp::ValueFederate>("test", 1, 1.0);
     auto vFed = GetFederateAs<helicscpp::ValueFederate>(0);
     // register the publications
-    auto pubid =vFed->registerGlobalPublication("pub1", HELICS_DATA_TYPE_DOUBLE, "");
-    auto subid = vFed->registerSubscription( "pub1", "");
+    auto pubid = vFed->registerGlobalPublication("pub1", HELICS_DATA_TYPE_DOUBLE, "");
+    auto subid = vFed->registerSubscription("pub1", "");
 
     vFed->enterExecutingMode();
 
     pubid.publish(testValue1);
 
-    gtime = vFed->requestTime( 1.0);
+    gtime = vFed->requestTime(1.0);
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
@@ -211,7 +210,7 @@ TEST_F(vfed_tests, data_buffer)
         buf1.fill(testValue2);
         pubid.publish(buf1);
     }
-    val1=subid.getDouble();
+    val1 = subid.getDouble();
 
     EXPECT_EQ(val1, testValue1);
 
@@ -220,7 +219,6 @@ TEST_F(vfed_tests, data_buffer)
         EXPECT_TRUE(buffer.isValid());
         EXPECT_EQ(buffer.type(), HELICS_DATA_TYPE_DOUBLE);
         EXPECT_EQ(buffer.toDouble(), testValue1);
-
     }
     // advance time
     gtime = vFed->requestTime(2.0);
