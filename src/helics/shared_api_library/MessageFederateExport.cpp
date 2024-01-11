@@ -968,6 +968,15 @@ void* helicsMessageGetBytesPointer(HelicsMessage message)
     return mess->data.data();
 }
 
+HelicsDataBuffer helicsMessageDataBuffer(HelicsMessage message, HelicsError* err)
+{
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return nullptr;
+    }
+    return message;
+}
+
 HelicsBool helicsMessageIsValid(HelicsMessage message)
 {
     auto* mess = getMessageObj(message, nullptr);

@@ -152,7 +152,7 @@ TEST_F(vfed_tests, test_file_load)
     vFed.finalize();
 }
 
-TEST_F(vfed_tests, test_json_register_publish)
+TEST_F(vfed_tests, json_register_publish)
 {
     SetupTest<helicscpp::ValueFederate>("test", 1);
     auto vFed = GetFederateAs<helicscpp::ValueFederate>(0);
@@ -177,6 +177,58 @@ TEST_F(vfed_tests, test_json_register_publish)
     EXPECT_EQ(s2.getString(), "items");
     EXPECT_EQ(s3.getDouble(), 15.0);
     EXPECT_EQ(s4.getString(), "count2");
+
+    vFed->finalize();
+}
+
+
+TEST_F(vfed_tests, data_buffer)
+{
+    HelicsTime gtime;
+    double val1 = 0;
+    const double testValue1{4.565};
+    const double testValue2{-2624.262};
+    SetupTest<helicscpp::ValueFederate>("test", 1,1.0);
+    auto vFed = GetFederateAs<helicscpp::ValueFederate>(0);
+    // register the publications
+    auto pubid =vFed->registerGlobalPublication("pub1", HELICS_DATA_TYPE_DOUBLE, "");
+    auto subid = vFed->registerSubscription( "pub1", "");
+
+    vFed->enterExecutingMode();
+
+    pubid.publish(testValue1);
+
+    gtime = vFed->requestTime( 1.0);
+    EXPECT_EQ(gtime, 1.0);
+
+    // get the value
+    val1 = subid.getDouble();
+    // make sure the string is what we expect
+    EXPECT_EQ(val1, testValue1);
+    {
+        // publish a second value
+        helicscpp::DataBuffer buf1(20);
+        buf1.fill(testValue2);
+        pubid.publish(buf1);
+    }
+    val1=subid.getDouble();
+
+    EXPECT_EQ(val1, testValue1);
+
+    {
+        auto buffer = subid.getDataBuffer();
+        EXPECT_TRUE(buffer.isValid());
+        EXPECT_EQ(buffer.type(), HELICS_DATA_TYPE_DOUBLE);
+        EXPECT_EQ(buffer.toDouble(), testValue1);
+
+    }
+    // advance time
+    gtime = vFed->requestTime(2.0);
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 2.0);
+
+    val1 = subid.getDouble();
+    EXPECT_EQ(val1, testValue2);
 
     vFed->finalize();
 }

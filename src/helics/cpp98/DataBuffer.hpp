@@ -19,7 +19,11 @@ class DataBuffer {
   public:
     DataBuffer() HELICS_NOTHROW: buff(helicsCreateDataBuffer(0)) {}
     explicit DataBuffer(int capacity): buff(helicsCreateDataBuffer(capacity)) {}
+    /** create a dataBuffer object from an existing C API buffer*/
+    explicit DataBuffer(HelicsDataBuffer buffer) :buff(buffer) {}
 
+    /** destructor*/
+    ~DataBuffer() { helicsDataBufferFree(buff); }
     void fill(double val) { helicsDataBufferFillFromDouble(buff, val); }
     void fill(int64_t val) { helicsDataBufferFillFromInteger(buff, val); }
     void fill(const std::string& val) { helicsDataBufferFillFromString(buff, val.c_str()); }
@@ -47,7 +51,12 @@ class DataBuffer {
 
     /** get the size of the value as a string */
     int stringSize() { return helicsDataBufferStringSize(buff); }
-
+    /** get the type of data contained in the buffer*/
+    int type() const {return helicsDataBufferType(buff); }
+    /** check if the buffer is valid*/
+    bool isValid() const {
+        return (helicsDataBufferIsValid(buff)==HELICS_TRUE);
+    }
     /** get the current value as a string*/
     std::string toString()
     {
@@ -134,7 +143,11 @@ class DataBuffer {
         // maxlen contains the actual length now
         return maxlen;
     }
-
+    /** get the C API dataobject */
+    HelicsDataBuffer getCApiObject()
+    {
+        return buff;
+    }
   private:
     HelicsDataBuffer buff;
 };

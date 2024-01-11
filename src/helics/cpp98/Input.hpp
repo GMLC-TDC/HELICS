@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "helics/helics.h"
+#include "DataBuffer.hpp"
 #include "helicsExceptions.hpp"
 
 #include <complex>
@@ -212,13 +213,17 @@ class Input {
         helicsInputGetComplexVector(inp,
                                     reinterpret_cast<double*>(data.data()),
                                     actualSize,
-                                    HELICS_NULL_POINTER,
+                                    HELICS_IGNORE_ERROR,
                                     hThrowOnError());
     }
 #if defined(__GNUC__)
 #    pragma GCC diagnostic pop
 #endif
-
+    /** get a data buffer with the input value*/
+    DataBuffer getDataBuffer()
+    {
+        return DataBuffer(helicsInputGetDataBuffer(inp,hThrowOnError()));
+    }
     /** Check if an input is updated **/
     bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }
 
