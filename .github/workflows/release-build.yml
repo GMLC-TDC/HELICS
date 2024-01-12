@@ -38,7 +38,7 @@ jobs:
       run: |
         unset DEPTH
         if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
-        echo "::set-output name=DEPTH::${DEPTH}"
+        echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -101,7 +101,7 @@ jobs:
       run: |
         unset DEPTH
         if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
-        echo "::set-output name=DEPTH::${DEPTH}"
+        echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -188,7 +188,7 @@ jobs:
       run: |
         unset DEPTH
         if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
-        echo "::set-output name=DEPTH::${DEPTH}"
+        echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -287,7 +287,7 @@ jobs:
       run: |
         unset DEPTH
         if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
-        echo "::set-output name=DEPTH::${DEPTH}"
+        echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
       uses: actions/checkout@v4
