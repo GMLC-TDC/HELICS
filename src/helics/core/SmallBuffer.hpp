@@ -94,13 +94,11 @@ class SmallBuffer {
         if (locked) {
             // if locked then use the copy operation not move
             const SmallBuffer& buf = sb;
-            try
-            {
+            try {
                 return operator=(buf);
             }
-            catch (std::bad_alloc&)
-            {
-                errorCondition=2;
+            catch (std::bad_alloc&) {
+                errorCondition = 2;
                 return *this;
             }
         }
@@ -325,7 +323,7 @@ class SmallBuffer {
 
     bool isLocked() const { return locked; }
     /** get the error condition*/
-    std::int8_t errorState() const{return errorCondition; }
+    std::int8_t errorState() const { return errorCondition; }
     /** check if the buffer is empty*/
     bool empty() const { return (bufferSize == 0); }
     /** get the current size of the buffer*/
