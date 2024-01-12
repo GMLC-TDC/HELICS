@@ -854,7 +854,7 @@ received
     */
     void registerConnectorInterfacesToml(const std::string& tomlString);
     /** check if a filter type and operation is valid
-    */
+     */
     bool
         checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation) const;
 };
