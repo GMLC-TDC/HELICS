@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_INPUT_HPP_
 #pragma once
 
+#include "DataBuffer.hpp"
 #include "helics/helics.h"
 #include "helicsExceptions.hpp"
 
@@ -218,7 +219,11 @@ class Input {
 #if defined(__GNUC__)
 #    pragma GCC diagnostic pop
 #endif
-
+    /** get a data buffer with the input value*/
+    DataBuffer getDataBuffer()
+    {
+        return DataBuffer(helicsInputGetDataBuffer(inp, hThrowOnError()));
+    }
     /** Check if an input is updated **/
     bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }
 

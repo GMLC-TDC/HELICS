@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
 #include "ValueFederate.h"
+#include "helicsData.h"
 #include "internal/api_objects.h"
 
 #include <algorithm>
@@ -681,6 +682,27 @@ void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* str, 
     }
 }
 
+void helicsPublicationPublishDataBuffer(HelicsPublication pub, HelicsDataBuffer buffer, HelicsError* err)
+{
+    auto* pubObj = verifyPublication(pub, err);
+    if (pubObj == nullptr) {
+        return;
+    }
+    try {
+        auto* buff = getBuffer(buffer);
+        if (buff == nullptr) {
+            pubObj->pubPtr->publish("");
+            return;
+        }
+        helics::defV pubVal;
+        helics::valueExtract(helics::data_view(*buff), helics::DataType::HELICS_UNKNOWN, pubVal);
+        pubObj->pubPtr->publish(pubVal);
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
 void helicsPublicationAddTarget(HelicsPublication pub, const char* target, HelicsError* err)
 {
     auto* pubObj = verifyPublication(pub, err);
@@ -737,6 +759,17 @@ bool checkOutputArgString(const char* outputString, int maxlen, HelicsError* err
         return false;
     }
     return true;
+}
+
+HelicsDataBuffer helicsInputGetDataBuffer(HelicsInput inp, HelicsError* err)
+{
+    auto* inpObj = verifyInput(inp, err);
+    if (inpObj == nullptr) {
+        return (nullptr);
+    }
+    helics::data_view dv = inpObj->inputPtr->getBytes();
+    auto* ptr = new helics::SmallBuffer(dv.string_view());
+    return createAPIDataBuffer(*ptr);
 }
 
 void helicsInputGetBytes(HelicsInput inp, void* data, int maxDatalen, int* actualSize, HelicsError* err)

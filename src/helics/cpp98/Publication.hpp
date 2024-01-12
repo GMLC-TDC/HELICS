@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_PUBLICATION_HPP_
 #pragma once
 
+#include "DataBuffer.hpp"
 #include "helics/helics.h"
 #include "helicsExceptions.hpp"
 
@@ -116,6 +117,11 @@ class Publication {
     void publish(bool val)
     {
         helicsPublicationPublishBoolean(pub, val ? HELICS_TRUE : HELICS_FALSE, HELICS_IGNORE_ERROR);
+    }
+    /** publish a data buffer value*/
+    void publish(DataBuffer& buffer)
+    {
+        helicsPublicationPublishDataBuffer(pub, buffer.getHelicsDataBuffer(), hThrowOnError());
     }
     /** get the name of the publication*/
     const char* getName() const { return helicsPublicationGetName(pub); }

@@ -19,35 +19,55 @@ class DataBuffer {
   public:
     DataBuffer() HELICS_NOTHROW: buff(helicsCreateDataBuffer(0)) {}
     explicit DataBuffer(int capacity): buff(helicsCreateDataBuffer(capacity)) {}
-
-    void toBytes(double val) { helicsDoubleToBytes(val, buff); }
-    void toBytes(int64_t val) { helicsIntegerToBytes(val, buff); }
-    void toBytes(const std::string& val) { helicsStringToBytes(val.c_str(), buff); }
-    void toBytes(const std::vector<double>& val)
+    /** create a dataBuffer object from an existing C API buffer*/
+    explicit DataBuffer(HelicsDataBuffer buffer): buff(buffer) {}
+    DataBuffer(void* buffer, int32_t datasize, int32_t capacity):
+        buff(helicsWrapDataInBuffer(buffer, datasize, capacity))
     {
-        helicsVectorToBytes(val.data(), static_cast<int>(val.size()), buff);
     }
-    void toBytes(const std::complex<double> val)
+    /** destructor*/
+    ~DataBuffer() { helicsDataBufferFree(buff); }
+    void fill(double val) { helicsDataBufferFillFromDouble(buff, val); }
+    void fill(int64_t val) { helicsDataBufferFillFromInteger(buff, val); }
+    void fill(const std::string& val) { helicsDataBufferFillFromString(buff, val.c_str()); }
+    void fill(const char* val) { helicsDataBufferFillFromString(buff, val); }
+    void fill(const std::vector<double>& val)
     {
-        helicsComplexToBytes(val.real(), val.imag(), buff);
+        helicsDataBufferFillFromVector(buff, val.data(), static_cast<int>(val.size()));
     }
-    void toBytes(const double* vals, int size) { helicsVectorToBytes(vals, size, buff); }
-    void toBytes(const std::string& name, double val)
+    void fill(const std::complex<double> val)
     {
-        helicsNamedPointToBytes(name.c_str(), val, buff);
+        helicsDataBufferFillFromComplex(buff, val.real(), val.imag());
     }
-    void toBytes(bool val) { helicsBooleanToBytes(val ? HELICS_TRUE : HELICS_FALSE, buff); }
-    void toBytes(char val) { helicsCharToBytes(val, buff); }
-
+    void fill(const double* vals, int size) { helicsDataBufferFillFromVector(buff, vals, size); }
+    void fill(const std::string& name, double val)
+    {
+        helicsDataBufferFillFromNamedPoint(buff, name.c_str(), val);
+    }
+    void fill(bool val) { helicsDataBufferFillFromBoolean(buff, val ? HELICS_TRUE : HELICS_FALSE); }
+    void fill(char val) { helicsDataBufferFillFromChar(buff, val); }
+    /** make a deep copy of the buffer*/
+    DataBuffer clone() { return DataBuffer(helicsDataBufferClone(buff)); }
     /** get the size of the raw value */
     int size() { return helicsDataBufferSize(buff); }
 
     /** get the size of the raw value */
     int capacity() { return helicsDataBufferCapacity(buff); }
-
+    /** get a pointer to the raw data*/
+    void* data() { return helicsDataBufferData(buff); }
+    /** reserve a capacity in the buffer*/
+    bool reserve(int32_t newCapacity)
+    {
+        return helicsDataBufferReserve(buff, newCapacity) == HELICS_TRUE;
+    }
     /** get the size of the value as a string */
     int stringSize() { return helicsDataBufferStringSize(buff); }
-
+    /** get the size of the value as a vector */
+    int vectorSize() { return helicsDataBufferVectorSize(buff); }
+    /** get the type of data contained in the buffer*/
+    int type() const { return helicsDataBufferType(buff); }
+    /** check if the buffer is valid*/
+    bool isValid() const { return (helicsDataBufferIsValid(buff) == HELICS_TRUE); }
     /** get the current value as a string*/
     std::string toString()
     {
@@ -134,6 +154,15 @@ class DataBuffer {
         // maxlen contains the actual length now
         return maxlen;
     }
+    /** convert the data in a data buffer to a different type representation
+    @param newDataType the type that it is desired for the buffer to be converted to
+    @return true if the conversion was successful*/
+    bool convertToType(int newDataType)
+    {
+        return (helicsDataBufferConvertToType(buff, newDataType) == HELICS_TRUE);
+    }
+    /** get the C API dataobject */
+    HelicsDataBuffer getHelicsDataBuffer() { return buff; }
 
   private:
     HelicsDataBuffer buff;

@@ -518,3 +518,43 @@ TEST(message_object, copy)
     helicsFederateFinalize(fed, nullptr);
     helicsBrokerDisconnect(brk, nullptr);
 }
+
+TEST(message_object, dataBuffer)
+{
+    auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
+
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
+    auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
+
+    helicsFederateInfoFree(fi);
+    auto m1 = helicsFederateCreateMessage(fed, nullptr);
+    EXPECT_NE(m1, nullptr);
+
+    auto m2 = helicsFederateCreateMessage(fed, nullptr);
+    EXPECT_NE(m2, nullptr);
+
+    helicsMessageSetString(m1, "raw data", nullptr);
+
+    auto err = helicsErrorInitialize();
+
+    EXPECT_EQ(helicsDataBufferIsValid(m1), HELICS_TRUE);
+
+    char data[20];
+    int actSize{10};
+
+    EXPECT_EQ(helicsDataBufferSize(m1), 8);
+    helicsDataBufferToRawString(m1, data, 20, &actSize);
+    EXPECT_EQ(actSize, 8);
+    EXPECT_EQ(std::string(data, data + actSize), "raw data");
+
+    helicsMessageClear(m2, &err);
+    // test the connection between the buffer and message
+    EXPECT_EQ(helicsDataBufferSize(m2), 0);
+    EXPECT_EQ(helicsMessageIsValid(m2), HELICS_FALSE);
+    EXPECT_EQ(helicsDataBufferIsValid(m2), HELICS_TRUE);
+
+    helicsFederateEnterExecutingMode(fed, nullptr);
+    helicsFederateFinalize(fed, nullptr);
+    helicsBrokerDisconnect(brk, nullptr);
+}

@@ -641,44 +641,94 @@ HELICS_EXPORT void* helicsDataBufferData(HelicsDataBuffer data);
 @return HELICS_TRUE if the reservation was successful HELICS_FALSE otherwise*/
 HELICS_EXPORT HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity);
 
-/** create a new data buffer and copy an existing buffer*/
+/** create a new data buffer and copy an existing buffer
+@return a data buffer object with a copy of the data
+*/
 HELICS_EXPORT HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data);
 
-/** convert an integer to serialized bytes*/
-HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data);
+/** convert an integer to serialized bytes in a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromInteger(HelicsDataBuffer data, int64_t value);
 
-/** convert a double to serialized bytes*/
-HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
+/** convert a double to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromDouble(HelicsDataBuffer data, double value);
 
-/** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char* value, HelicsDataBuffer data);
+/** convert a string to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromString(HelicsDataBuffer data, const char* value);
 
-/** convert a raw string (may contain nulls) to serialized bytes*/
-HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data);
+/** convert a raw string (may contain nulls) to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromRawString(HelicsDataBuffer data, const char* str, int stringSize);
 
-/** convert a bool to serialized bytes*/
-HELICS_EXPORT int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data);
+/** convert a bool to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromBoolean(HelicsDataBuffer data, HelicsBool value);
 
-/** convert a char to serialized bytes*/
-HELICS_EXPORT int32_t helicsCharToBytes(char value, HelicsDataBuffer data);
+/** convert a char to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromChar(HelicsDataBuffer data, char value);
 
-/** convert a time to serialized bytes*/
-HELICS_EXPORT int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data);
+/** convert a time to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromTime(HelicsDataBuffer data, HelicsTime value);
 
-/** convert a complex pair to serialized bytes*/
-HELICS_EXPORT int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data);
+/** convert a complex pair to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromComplex(HelicsDataBuffer data, double real, double imag);
 
-/** convert a complex object to serialized bytes*/
-HELICS_EXPORT int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsDataBuffer data);
+/** convert a complex object to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromComplexObject(HelicsDataBuffer data, HelicsComplex value);
 
-/** convert a real vector to serialized bytes*/
-HELICS_EXPORT int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
+/** convert a real vector to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromVector(HelicsDataBuffer data, const double* value, int dataSize);
 
-/** convert a named point to serialized bytes*/
-HELICS_EXPORT int32_t helicsNamedPointToBytes(const char* name, double value, HelicsDataBuffer data);
+/** convert a named point to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromNamedPoint(HelicsDataBuffer data, const char* name, double value);
 
-/** convert a complex vector to serialized bytes*/
-HELICS_EXPORT int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
+/** convert a complex vector to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromComplexVector(HelicsDataBuffer data, const double* value, int dataSize);
 
 /** extract the data type from the data buffer, if the type isn't recognized UNKNOWN is returned*/
 HELICS_EXPORT int helicsDataBufferType(HelicsDataBuffer data);
@@ -2980,6 +3030,17 @@ HELICS_EXPORT void
 HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* field, double val, HelicsError* err);
 
 /**
+* Publish the contents of a helicsDataBuffer.
+*
+* @param pub The publication to publish for.
+* @param buffer a HelicsDataBuffer object containing the data to publish
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+
+*/
+HELICS_EXPORT void helicsPublicationPublishDataBuffer(HelicsPublication pub, HelicsDataBuffer buffer, HelicsError* err);
+
+/**
  * Add a named input to the list of targets a publication publishes to.
  *
  * @param pub The publication to add the target for.
@@ -3037,6 +3098,16 @@ HELICS_EXPORT int helicsInputGetByteCount(HelicsInput ipt);
  * @param[in,out] err A pointer to an error object for catching errors.
  */
 HELICS_EXPORT void helicsInputGetBytes(HelicsInput ipt, void* data, int maxDataLength, int* actualSize, HelicsError* err);
+
+/**
+ * Get a copy of the raw data in a HelicsDataBuffer
+ *
+ * @param inp The input to get the data for.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @return A HelicsDataBuffer object containing the data
+ */
+HELICS_EXPORT HelicsDataBuffer helicsInputGetDataBuffer(HelicsInput inp, HelicsError* err);
 
 /**
  * Get the size of a value for an input assuming return as a string.
@@ -4177,6 +4248,15 @@ HELICS_EXPORT void helicsMessageGetBytes(HelicsMessage message, void* data, int 
 HELICS_EXPORT void* helicsMessageGetBytesPointer(HelicsMessage message);
 
 /**
+ * Get a data buffer to the message object
+ *
+ * @param message A message object to get the dataBuffer for
+ *
+ * @return A HelicsDataBuffer object to the data in a message.  Modifying the buffer will directly modify the message contents.
+ */
+HELICS_EXPORT HelicsDataBuffer helicsMessageDataBuffer(HelicsMessage message, HelicsError* err);
+
+/**
  * A check if the message contains a valid payload.
  *
  * @param message The message object in question.
@@ -4310,6 +4390,16 @@ HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* dat
  * @param[in,out] err An error object to fill out in case of an error.
  */
 HELICS_EXPORT void helicsMessageSetData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err);
+
+/**
+ * Set the data payload of a message from a HelicsDataBuffer Object
+ *
+ * @param message The message object in question.
+ * @param data the dataBuffer containing the appropriate data, if null will clear the message payload
+ *
+ * @param[in,out] err An error object to fill out in case of an error.
+ */
+HELICS_EXPORT void helicsMessageSetDataBuffer(HelicsMessage message, HelicsDataBuffer data, HelicsError* err);
 
 /**
  * Append data to the payload.

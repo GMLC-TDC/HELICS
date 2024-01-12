@@ -968,6 +968,15 @@ void* helicsMessageGetBytesPointer(HelicsMessage message)
     return mess->data.data();
 }
 
+HelicsDataBuffer helicsMessageDataBuffer(HelicsMessage message, HelicsError* err)
+{
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return nullptr;
+    }
+    return message;
+}
+
 HelicsBool helicsMessageIsValid(HelicsMessage message)
 {
     auto* mess = getMessageObj(message, nullptr);
@@ -1100,6 +1109,20 @@ void helicsMessageSetData(HelicsMessage message, const void* data, int inputData
         return;
     }
     mess->data = std::string_view(static_cast<const char*>(data), inputDataLength);
+}
+
+void helicsMessageSetDataBuffer(HelicsMessage message, HelicsDataBuffer data, HelicsError* err)
+{
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return;
+    }
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        mess->data.clear();
+        return;
+    }
+    mess->data = *ptr;
 }
 
 void helicsMessageAppendData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err)
