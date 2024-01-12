@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       packages:
-        description: 'List of packages to build (everything, archive, msvc, installer, sharedlib)'
+        description: 'List of packages to build'
         required: true
         default: 'everything'
         type: choice
