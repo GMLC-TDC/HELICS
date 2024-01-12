@@ -121,7 +121,7 @@ class Publication {
     /** publish a data buffer value*/
     void publish(DataBuffer& buffer)
     {
-        helicsPublicationPublishDataBuffer(pub, buffer.getCApiObject(), hThrowOnError());
+        helicsPublicationPublishDataBuffer(pub, buffer.getHelicsDataBuffer(), hThrowOnError());
     }
     /** get the name of the publication*/
     const char* getName() const { return helicsPublicationGetName(pub); }

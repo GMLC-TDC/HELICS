@@ -213,7 +213,7 @@ class Input {
         helicsInputGetComplexVector(inp,
                                     reinterpret_cast<double*>(data.data()),
                                     actualSize,
-                                    HELICS_IGNORE_ERROR,
+                                    HELICS_NULL_POINTER,
                                     hThrowOnError());
     }
 #if defined(__GNUC__)

@@ -140,7 +140,7 @@ class Message {
     /** set the data a data buffer object*/
     Message& data(DataBuffer buffer)
     {
-        helicsMessageSetDataBuffer(mo, buffer.getCApiObject(), hThrowOnError());
+        helicsMessageSetDataBuffer(mo, buffer.getHelicsDataBuffer(), hThrowOnError());
         return *this;
     }
     /** append data to the message data field*/
