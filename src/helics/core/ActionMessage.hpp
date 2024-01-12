@@ -53,7 +53,7 @@ class ActionMessage {
     ActionMessage() noexcept {}
     /** construct from an action type
     @details this is intended to be an implicit constructor
-    @param startingAction from an action multiMessage definition
+    @param startingAction from an action message definition
     */
     /* implicit */ ActionMessage(action_message_def::action_t startingAction);  // NOLINT
     /** construct from action, source and destination id's
@@ -63,7 +63,7 @@ class ActionMessage {
                   GlobalFederateId destId);
     /** move constructor*/
     ActionMessage(ActionMessage&& act) noexcept;
-    /** build an action multiMessage from a multiMessage*/
+    /** build an action message from a message*/
     explicit ActionMessage(std::unique_ptr<Message> message);
     /** construct from a string*/
     explicit ActionMessage(const std::string& bytes);
@@ -79,10 +79,10 @@ class ActionMessage {
     ActionMessage& operator=(const ActionMessage& act);
     /** move assignment*/
     ActionMessage& operator=(ActionMessage&& act) noexcept;
-    /** move assignment from multiMessage data into the actionMessage
-    @details take ownership of the multiMessage and move the contents out then destroy the
-    multiMessage shell
-    @param multiMessage the multiMessage to move.
+    /** move assignment from message data into the actionMessage
+    @details take ownership of the message and move the contents out then destroy the
+    message shell
+    @param message the message to move.
     */
     ActionMessage& operator=(std::unique_ptr<Message> message) noexcept;
     /** get the action of the multiMessage*/

@@ -189,11 +189,11 @@ class FederateState {
     */
     int32_t getCurrentIteration() const;
     /** get the next available message for an endpoint
-    @param id the handle of an endpoint or filter
+    @param hid the handle of an endpoint or filter
     @return a pointer to a message -the ownership of the message is transferred to the caller*/
     std::unique_ptr<Message> receive(InterfaceHandle hid);
     /** get any message ready for reception
-    @param[out] id the endpoint related to the message*/
+    @param[out] hid the endpoint related to the message*/
     std::unique_ptr<Message> receiveAny(InterfaceHandle& hid);
     /**
      * Return the data for the specified handle or the latest input
