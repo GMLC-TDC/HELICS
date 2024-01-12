@@ -128,7 +128,8 @@ public class helics implements helicsConstants {
   }
 
   /**
-   *  create a new data buffer and copy an existing buffer
+   *  create a new data buffer and copy an existing buffer<br>
+   * @return a data buffer object with a copy of the data
    */
   public static SWIGTYPE_p_void helicsDataBufferClone(SWIGTYPE_p_void data) {
     long cPtr = helicsJNI.helicsDataBufferClone(SWIGTYPE_p_void.getCPtr(data));
@@ -136,87 +137,121 @@ public class helics implements helicsConstants {
   }
 
   /**
-   *  convert an integer to serialized bytes
+   *  convert an integer to serialized bytes in a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsIntegerToBytes(long value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsIntegerToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromInteger(SWIGTYPE_p_void data, long value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromInteger(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a double to serialized bytes
+   *  convert a double to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsDoubleToBytes(double value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDoubleToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromDouble(SWIGTYPE_p_void data, double value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromDouble(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a string to serialized bytes
+   *  convert a string to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsStringToBytes(String value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsStringToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromString(SWIGTYPE_p_void data, String value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromString(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a raw string (may contain nulls) to serialized bytes
+   *  convert a raw string (may contain nulls) to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsRawStringToBytes(String str, int stringSize, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsRawStringToBytes(str, stringSize, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromRawString(SWIGTYPE_p_void data, String str, int stringSize) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromRawString(SWIGTYPE_p_void.getCPtr(data), str, stringSize), true);
   }
 
   /**
-   *  convert a bool to serialized bytes
+   *  convert a bool to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsBooleanToBytes(int value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsBooleanToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromBoolean(SWIGTYPE_p_void data, int value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromBoolean(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a char to serialized bytes
+   *  convert a char to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsCharToBytes(char value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsCharToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromChar(SWIGTYPE_p_void data, char value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromChar(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a time to serialized bytes
+   *  convert a time to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsTimeToBytes(double value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsTimeToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromTime(SWIGTYPE_p_void data, double value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromTime(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a complex pair to serialized bytes
+   *  convert a complex pair to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsComplexToBytes(double real, double imag, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsComplexToBytes(real, imag, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromComplex(SWIGTYPE_p_void data, double real, double imag) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromComplex(SWIGTYPE_p_void.getCPtr(data), real, imag), true);
   }
 
   /**
-   *  convert a complex object to serialized bytes
+   *  convert a complex object to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsComplexObjectToBytes(HelicsComplex value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsComplexObjectToBytes(HelicsComplex.getCPtr(value), value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromComplexObject(SWIGTYPE_p_void data, HelicsComplex value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromComplexObject(SWIGTYPE_p_void.getCPtr(data), HelicsComplex.getCPtr(value), value), true);
   }
 
   /**
-   *  convert a real vector to serialized bytes
+   *  convert a real vector to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsVectorToBytes(double[] value, int dataSize, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsVectorToBytes(value, dataSize, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromVector(SWIGTYPE_p_void data, double[] value, int dataSize) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromVector(SWIGTYPE_p_void.getCPtr(data), value, dataSize), true);
   }
 
   /**
-   *  convert a named point to serialized bytes
+   *  convert a named point to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsNamedPointToBytes(String name, double value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsNamedPointToBytes(name, value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromNamedPoint(SWIGTYPE_p_void data, String name, double value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromNamedPoint(SWIGTYPE_p_void.getCPtr(data), name, value), true);
   }
 
   /**
-   *  convert a complex vector to serialized bytes
+   *  convert a complex vector to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsComplexVectorToBytes(double[] value, int dataSize, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsComplexVectorToBytes(value, dataSize, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromComplexVector(SWIGTYPE_p_void data, double[] value, int dataSize) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromComplexVector(SWIGTYPE_p_void.getCPtr(data), value, dataSize), true);
   }
 
   /**
@@ -2903,6 +2938,18 @@ public class helics implements helicsConstants {
   }
 
   /**
+   * Publish the contents of a helicsDataBuffer.<br>
+   * <br>
+   * @param pub The publication to publish for.<br>
+   * @param buffer a HelicsDataBuffer object containing the data to publish<br>
+   * <br>
+   * ,out] err A pointer to an error object for catching errors.
+   */
+  public static void helicsPublicationPublishDataBuffer(SWIGTYPE_p_void pub, SWIGTYPE_p_void buffer) {
+    helicsJNI.helicsPublicationPublishDataBuffer(SWIGTYPE_p_void.getCPtr(pub), SWIGTYPE_p_void.getCPtr(buffer));
+  }
+
+  /**
    * Add a named input to the list of targets a publication publishes to.<br>
    * <br>
    * @param pub The publication to add the target for.<br>
@@ -2959,6 +3006,19 @@ public class helics implements helicsConstants {
    */
   public static void helicsInputGetBytes(SWIGTYPE_p_void ipt, SWIGTYPE_p_void data, int maxDataLength, int[] actualSize) {
     helicsJNI.helicsInputGetBytes(SWIGTYPE_p_void.getCPtr(ipt), SWIGTYPE_p_void.getCPtr(data), maxDataLength, actualSize);
+  }
+
+  /**
+   * Get a copy of the raw data in a HelicsDataBuffer<br>
+   * <br>
+   * @param inp The input to get the data for.<br>
+   * <br>
+   * ,out] err A pointer to an error object for catching errors.<br>
+   * @return A HelicsDataBuffer object containing the data
+   */
+  public static SWIGTYPE_p_void helicsInputGetDataBuffer(SWIGTYPE_p_void inp) {
+    long cPtr = helicsJNI.helicsInputGetDataBuffer(SWIGTYPE_p_void.getCPtr(inp));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
   /**
@@ -4278,6 +4338,18 @@ public class helics implements helicsConstants {
   }
 
   /**
+   * Get a data buffer to the message object<br>
+   * <br>
+   * @param message A message object to get the dataBuffer for<br>
+   * <br>
+   * @return A HelicsDataBuffer object to the data in a message.  Modifying the buffer will directly modify the message contents.
+   */
+  public static SWIGTYPE_p_void helicsMessageDataBuffer(SWIGTYPE_p_void message) {
+    long cPtr = helicsJNI.helicsMessageDataBuffer(SWIGTYPE_p_void.getCPtr(message));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
    * A check if the message contains a valid payload.<br>
    * <br>
    * @param message The message object in question.<br>
@@ -4421,6 +4493,18 @@ public class helics implements helicsConstants {
    */
   public static void helicsMessageSetData(SWIGTYPE_p_void message, SWIGTYPE_p_void data, int inputDataLength) {
     helicsJNI.helicsMessageSetData(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  }
+
+  /**
+   * Set the data payload of a message from a HelicsDataBuffer Object<br>
+   * <br>
+   * @param message The message object in question.<br>
+   * @param data the dataBuffer containing the appropriate data, if null will clear the message payload<br>
+   * <br>
+   * ,out] err An error object to fill out in case of an error.
+   */
+  public static void helicsMessageSetDataBuffer(SWIGTYPE_p_void message, SWIGTYPE_p_void data) {
+    helicsJNI.helicsMessageSetDataBuffer(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_void.getCPtr(data));
   }
 
   /**
