@@ -14,6 +14,7 @@ mark_as_advanced(BOOST_INSTALL_PATH)
 if(WIN32 AND NOT UNIX_LIKE)
 
     set(boost_versions
+        boost_1_84_0
         boost_1_83_0
         boost_1_82_0
         boost_1_81_0
@@ -69,16 +70,16 @@ if(WIN32 AND NOT UNIX_LIKE)
     )
 
     if(BOOST_TEST_PATH)
-        set(BOOST_ROOT ${BOOST_TEST_PATH})
+        set(Boost_ROOT ${BOOST_TEST_PATH})
     endif(BOOST_TEST_PATH)
 else()
-    if(NOT BOOST_ROOT)
+    if(NOT Boost_ROOT)
         if(BOOST_INSTALL_PATH)
-            set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
+            set(Boost_ROOT "${BOOST_INSTALL_PATH}")
         elseif($ENV{BOOST_INSTALL_PATH})
-            set(BOOST_ROOT "$ENV{BOOST_INSTALL_PATH}")
+            set(Boost_ROOT "$ENV{BOOST_INSTALL_PATH}")
         else()
-            set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+            set(Boost_ROOT "$ENV{BOOST_ROOT}")
         endif()
     endif()
 endif()
