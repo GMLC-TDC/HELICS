@@ -457,17 +457,17 @@ TEST_F(TranslatorFixture, translator_connections10)
 
     auto cFed1 = GetFederateAs<helics::CombinationFederate>(0);
 
-    auto& end1 = cFed1->registerGlobalTargetedEndpoint("e1", "any");
+    auto& endpoint1 = cFed1->registerGlobalTargetedEndpoint("e1", "any");
     auto& input1 = cFed1->registerGlobalInput<double>("i1");
     auto& pub1 = cFed1->registerGlobalPublication<double>("p1");
     pub1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
-    end1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    endpoint1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     input1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
 
-    end1.addSourceTarget("t1");
+    endpoint1.addSourceTarget("t1");
     pub1.addDestinationTarget("t1");
     input1.addSourceTarget("t1");
-    end1.addDestinationTarget("t1");
+    endpoint1.addDestinationTarget("t1");
 
     cFed1->registerGlobalTranslator("t1");
 
