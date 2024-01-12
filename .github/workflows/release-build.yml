@@ -8,6 +8,13 @@ on:
         description: 'List of packages to build (everything, archive, msvc, installer, sharedlib)'
         required: true
         default: 'everything'
+        type: choice
+        options:
+          - everything
+          - archive
+          - msvc
+          - installer
+          - sharedlib
       commit:
         description: 'Commit-ish (tag, branchname, sha) for code to build (uses scripts from the same branch as the workflow)'
         default: ''
