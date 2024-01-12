@@ -91,10 +91,9 @@ class SmallBuffer {
     }
     SmallBuffer& operator=(SmallBuffer&& sb) noexcept
     {
-        if (locked)
-        {
-            //if locked then use the copy operation not move
-            const SmallBuffer &buf=sb;
+        if (locked) {
+            // if locked then use the copy operation not move
+            const SmallBuffer& buf = sb;
             return operator=(buf);
         }
         if (usingAllocatedBuffer) {
@@ -112,7 +111,7 @@ class SmallBuffer {
                 delete[] heap;
             }
         }
-        
+
         if (sb.usingAllocatedBuffer) {
             heap = sb.heap;
             bufferCapacity = sb.bufferCapacity;

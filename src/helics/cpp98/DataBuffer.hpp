@@ -21,13 +21,16 @@ class DataBuffer {
     explicit DataBuffer(int capacity): buff(helicsCreateDataBuffer(capacity)) {}
     /** create a dataBuffer object from an existing C API buffer*/
     explicit DataBuffer(HelicsDataBuffer buffer): buff(buffer) {}
-    DataBuffer(void* buffer, int32_t datasize, int32_t capacity) :buff(helicsWrapDataInBuffer(buffer,datasize, capacity)) {}
+    DataBuffer(void* buffer, int32_t datasize, int32_t capacity):
+        buff(helicsWrapDataInBuffer(buffer, datasize, capacity))
+    {
+    }
     /** destructor*/
     ~DataBuffer() { helicsDataBufferFree(buff); }
     void fill(double val) { helicsDataBufferFillFromDouble(buff, val); }
     void fill(int64_t val) { helicsDataBufferFillFromInteger(buff, val); }
     void fill(const std::string& val) { helicsDataBufferFillFromString(buff, val.c_str()); }
-    void fill(const char *val){ helicsDataBufferFillFromString(buff, val); }
+    void fill(const char* val) { helicsDataBufferFillFromString(buff, val); }
     void fill(const std::vector<double>& val)
     {
         helicsDataBufferFillFromVector(buff, val.data(), static_cast<int>(val.size()));
@@ -44,18 +47,18 @@ class DataBuffer {
     void fill(bool val) { helicsDataBufferFillFromBoolean(buff, val ? HELICS_TRUE : HELICS_FALSE); }
     void fill(char val) { helicsDataBufferFillFromChar(buff, val); }
     /** make a deep copy of the buffer*/
-    DataBuffer clone(){return DataBuffer(helicsDataBufferClone(buff)); }
+    DataBuffer clone() { return DataBuffer(helicsDataBufferClone(buff)); }
     /** get the size of the raw value */
     int size() { return helicsDataBufferSize(buff); }
 
     /** get the size of the raw value */
     int capacity() { return helicsDataBufferCapacity(buff); }
     /** get a pointer to the raw data*/
-    void *data(){return helicsDataBufferData(buff); }
+    void* data() { return helicsDataBufferData(buff); }
     /** reserve a capacity in the buffer*/
     bool reserve(int32_t newCapacity)
     {
-        return helicsDataBufferReserve(buff,newCapacity)==HELICS_TRUE;
+        return helicsDataBufferReserve(buff, newCapacity) == HELICS_TRUE;
     }
     /** get the size of the value as a string */
     int stringSize() { return helicsDataBufferStringSize(buff); }
@@ -154,8 +157,9 @@ class DataBuffer {
     /** convert the data in a data buffer to a different type representation
     @param newDataType the type that it is desired for the buffer to be converted to
     @return true if the conversion was successful*/
-    bool convertToType(int newDataType) {
-        return (helicsDataBufferConvertToType(buff,newDataType)==HELICS_TRUE);
+    bool convertToType(int newDataType)
+    {
+        return (helicsDataBufferConvertToType(buff, newDataType) == HELICS_TRUE);
     }
     /** get the C API dataobject */
     HelicsDataBuffer getHelicsDataBuffer() { return buff; }

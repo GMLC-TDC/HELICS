@@ -361,54 +361,55 @@ TEST_F(mfed_tests, dataBuffer)
 TEST(dataBuffer, buffer)
 {
     helicscpp::DataBuffer buf1(345);
-    EXPECT_GE(buf1.capacity(),345);
+    EXPECT_GE(buf1.capacity(), 345);
     EXPECT_TRUE(buf1.reserve(1024));
-    EXPECT_GE(buf1.capacity(),1024);
+    EXPECT_GE(buf1.capacity(), 1024);
     EXPECT_FALSE(buf1.reserve(-456));
     std::string str1("this is a long string that I want to put in a buffer");
-    const char *str2="this is another string, that is fairly long that I want to put in a buffer";
+    const char* str2 = "this is another string, that is fairly long that I want to put in a buffer";
     buf1.fill(str1);
     // +1 is to account for newline stringSize is the size required to hold the string
-    EXPECT_EQ(buf1.stringSize(),str1.size()+1);
-    EXPECT_EQ(buf1.toString(),str1);
+    EXPECT_EQ(buf1.stringSize(), str1.size() + 1);
+    EXPECT_EQ(buf1.toString(), str1);
     buf1.fill(str2);
-    EXPECT_EQ(buf1.toString(),str2);
+    EXPECT_EQ(buf1.toString(), str2);
 
-    EXPECT_EQ(buf1.type(),HELICS_DATA_TYPE_STRING);
+    EXPECT_EQ(buf1.type(), HELICS_DATA_TYPE_STRING);
 
-    auto buf2=buf1.clone();
-    EXPECT_EQ(buf1.toString(),buf2.toString());
+    auto buf2 = buf1.clone();
+    EXPECT_EQ(buf1.toString(), buf2.toString());
 
-    double tValue=45.626525;
+    double tValue = 45.626525;
     buf2.fill(tValue);
-    EXPECT_EQ(buf2.type(),HELICS_DATA_TYPE_DOUBLE);
+    EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_DOUBLE);
 
     buf2.convertToType(HELICS_DATA_TYPE_NAMED_POINT);
 
-    EXPECT_EQ(buf2.type(),HELICS_DATA_TYPE_NAMED_POINT);
+    EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_NAMED_POINT);
 
     buf2.convertToType(HELICS_DATA_TYPE_VECTOR);
-    EXPECT_EQ(buf2.vectorSize(),1);
+    EXPECT_EQ(buf2.vectorSize(), 1);
 
-    EXPECT_EQ(buf2.toDouble(),tValue);
+    EXPECT_EQ(buf2.toDouble(), tValue);
 }
-
 
 TEST(dataBuffer, bufferMemory)
 {
     std::string v1;
     v1.resize(1024, '\0');
-    helicscpp::DataBuffer buf1(v1.data(),0,static_cast<int>(v1.size()));
-    EXPECT_EQ(buf1.capacity(),v1.size());
-    EXPECT_EQ(buf1.size(),0);
-    buf1.fill(std::vector<double>{34.673,19.1514,1e-45});
-    helicscpp::DataBuffer buf2(v1.data(),static_cast<int>(buf1.size()), static_cast<int>(v1.capacity()));
+    helicscpp::DataBuffer buf1(v1.data(), 0, static_cast<int>(v1.size()));
+    EXPECT_EQ(buf1.capacity(), v1.size());
+    EXPECT_EQ(buf1.size(), 0);
+    buf1.fill(std::vector<double>{34.673, 19.1514, 1e-45});
+    helicscpp::DataBuffer buf2(v1.data(),
+                               static_cast<int>(buf1.size()),
+                               static_cast<int>(v1.capacity()));
 
-    EXPECT_EQ(buf2.type(),HELICS_DATA_TYPE_VECTOR);
+    EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_VECTOR);
 
     EXPECT_FALSE(buf1.reserve(2048));
     buf2.convertToType(HELICS_DATA_TYPE_STRING);
-    //checking linkage here
-    EXPECT_EQ(buf2.type(),HELICS_DATA_TYPE_STRING);
-    EXPECT_EQ(buf1.type(),HELICS_DATA_TYPE_STRING);
+    // checking linkage here
+    EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_STRING);
+    EXPECT_EQ(buf1.type(), HELICS_DATA_TYPE_STRING);
 }
