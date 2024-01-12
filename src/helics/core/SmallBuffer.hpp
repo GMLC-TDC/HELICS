@@ -94,7 +94,15 @@ class SmallBuffer {
         if (locked) {
             // if locked then use the copy operation not move
             const SmallBuffer& buf = sb;
-            return operator=(buf);
+            try
+            {
+                return operator=(buf);
+            }
+            catch (std::bad_alloc&)
+            {
+                errorCondition=2;
+                return *this;
+            }
         }
         if (usingAllocatedBuffer) {
             if (nonOwning) {
@@ -316,6 +324,8 @@ class SmallBuffer {
     void lock(bool lockStatus = true) { locked = lockStatus; }
 
     bool isLocked() const { return locked; }
+    /** get the error condition*/
+    std::int8_t errorState() const{return errorCondition; }
     /** check if the buffer is empty*/
     bool empty() const { return (bufferSize == 0); }
     /** get the current size of the buffer*/
@@ -386,6 +396,7 @@ class SmallBuffer {
     bool nonOwning{false};
     bool locked{false};
     bool usingAllocatedBuffer{false};
+    std::int8_t errorCondition{0};
 
   public:
     std::uint32_t userKey{0};  // 32 bits of user data for whatever purpose is desired has no impact
