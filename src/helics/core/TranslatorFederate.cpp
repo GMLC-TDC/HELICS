@@ -69,8 +69,7 @@ void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInf
             if (targets.empty()) {
                 break;
             }
-            auto m = createMessageFromCommand(command);
-            auto val = trans->tranOp->convertToValue(std::move(m));
+            auto val = trans->tranOp->convertToValue(createMessageFromCommand(command));
             if (!val.empty()) {
                 if (targets.size() == 1) {
                     ActionMessage sendM(CMD_PUB);
@@ -85,8 +84,8 @@ void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInf
                     sendM.setSource(trans->id);
                     sendM.actionTime = trans->tranOp->computeNewValueTime(command.actionTime);
                     sendM.payload = std::move(val);
-                    for (const auto& tg : targets) {
-                        sendM.setDestination(tg.first);
+                    for (const auto& target : targets) {
+                        sendM.setDestination(target.first);
                         mSendMessage(sendM);
                     }
                 }
@@ -111,10 +110,10 @@ void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInf
                     sendM.setDestination(targets.front().first);
                     mDeliverMessage(sendM);
                 } else {
-                    for (const auto& tg : targets) {
+                    for (const auto& target : targets) {
                         auto messageCopy(sendM);
-                        messageCopy.setString(targetStringLoc, tg.second);
-                        messageCopy.setDestination(tg.first);
+                        messageCopy.setString(targetStringLoc, target.second);
+                        messageCopy.setDestination(target.first);
                         mDeliverMessage(messageCopy);
                     }
                 }
@@ -266,10 +265,11 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
             if (command.messageID == UPDATE_TRANSLATOR_OPERATOR) {
                 auto* tranI = getTranslatorInfo(mFedID, command.source_handle);
                 if (tranI != nullptr) {
-                    auto op = mGetAirLock(command.counter).try_unload();
-                    if (op) {
-                        auto M = std::any_cast<std::shared_ptr<TranslatorOperator>>(std::move(*op));
-                        tranI->tranOp = std::move(M);
+                    auto locker = mGetAirLock(command.counter).try_unload();
+                    if (locker) {
+                        auto operation =
+                            std::any_cast<std::shared_ptr<TranslatorOperator>>(std::move(*locker));
+                        tranI->tranOp = std::move(operation);
                     }
                 }
             }
@@ -293,7 +293,7 @@ TranslatorInfo* TranslatorFederate::createTranslator(GlobalBrokerId dest,
                                                      std::string_view units)
 {
     auto tran = std::make_unique<TranslatorInfo>(
-        GlobalHandle{(dest == parent_broker_id || dest == mCoreID) ? GlobalBrokerId(mFedID) : dest,
+        GlobalHandle{(dest == parent_broker_id || dest == mCoreID) ? GlobalBrokerId{mFedID} : dest,
                      handle},
         key,
         endpointType,
@@ -319,9 +319,9 @@ TranslatorInfo* TranslatorFederate::createTranslator(GlobalBrokerId dest,
     return retTarget;
 }
 
-TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalHandle id)
+TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalHandle gid)
 {
-    return translators.find(id);
+    return translators.find(gid);
 }
 
 TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle)
@@ -430,17 +430,12 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
                 Json::Value tran;
                 tran["id"] = trans->id.handle.baseValue();
                 tran["name"] = trans->key;
-                /*
-                tran["source_targets"] = generateStringVector(filt->sourceTargets, [](auto& dep) {
-                    return std::to_string(dep.fed_id.baseValue()) +
-                        "::" + std::to_string(dep.handle.baseValue());
-                });
-                tran["dest_targets"] = generateStringVector(filt->destTargets, [](auto& dep) {
-                    return std::to_string(dep.fed_id.baseValue()) +
-                        "::" + std::to_string(dep.handle.baseValue());
-                });
-                */
-                tran["translators"].append(std::move(tran));
+
+                tran["source_endpoints"] = trans->getEndpointInfo()->getSourceTargets();
+                tran["destination_endpoints"] = trans->getEndpointInfo()->getDestinationTargets();
+                tran["source_publications"] = trans->getPubInfo()->getTargets();
+                tran["destination_inputs"] = trans->getInputInfo()->getTargets();
+                base["translators"].append(std::move(tran));
             }
         }
         return fileops::generateJsonString(base);

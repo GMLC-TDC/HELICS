@@ -1,0 +1,61 @@
+# configuration test for toml
+name="transtest_toml"
+core_type="test"
+time_delta= 1
+terminate_on_error= true
+defaultglobal=true
+[[translators]]
+      "name"= "EV_1_translator"
+      "type"= "json"
+      "info"= ""
+      "source_endpoint"= "Charger/EV1.soc"
+      "destination_input"= "Controller/EV1.soc"
+[[translators]]
+      "name"="EV_2_translator"
+      "type"= "json"
+      "info"= ""
+      "source_endpoint"= "Charger/EV2.soc"
+      "destination_input"= "Controller/EV2.soc"
+[[translators]]
+      "name"= "EV_3_translator"
+      "type"= "binary"
+      "info"= ""
+      "source_endpoint"= "Charger/EV3.soc"
+      "destination_input"= "Controller/EV3.soc"
+[[translators]]
+      "name"= "EV_4_translator"
+      "type"= "json"
+      "info"= ""
+      "source_endpoint"= "Charger/EV4.soc"
+      "destination_input"= "Controller/EV4.soc"
+[[translators]]
+      "name"= "EV_5_translator"
+      "type"= "json"
+      "info"= ""
+      "source_endpoint"= "Charger/EV5.soc"
+      "destination_input"= "Controller/EV5.soc"
+[[inputs]]
+      "key"="Controller/EV1.soc"
+      "type"="double"
+[[inputs]]
+      "key"="Controller/EV2.soc"
+      "type"="double"
+[[inputs]]
+      "key"="Controller/EV3.soc"
+      "type"= "double"
+[[inputs]]
+      "key"="Controller/EV4.soc"
+      "type"="double"
+[[inputs]]
+      "key"="Controller/EV5.soc"
+      "type"="double"
+[[endpoints]]
+      "name"="Charger/EV1.soc"
+[[endpoints]]
+      "name"="Charger/EV2.soc"
+[[endpoints]]
+      "name"="Charger/EV3.soc"
+[[endpoints]]
+      "name"="Charger/EV4.soc"
+[[endpoints]]
+    "name"="Charger/EV5.soc"

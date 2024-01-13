@@ -8,13 +8,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "configFileHelpers.hpp"
 
+#include <cctype>
 #include <string>
 #include <type_traits>
 
 namespace helics {
+
 template<typename Callable>
-void addTargets(const toml::value& section, std::string targetName, Callable callback)
+bool addTargets(const toml::value& section, std::string targetName, Callable callback)
 {
+    bool found{false};
     toml::value uval;
     // There should probably be a static_assert here but there isn't a nice type trait to check that
     auto targets = toml::find_or(section, targetName, uval);
@@ -27,20 +30,24 @@ void addTargets(const toml::value& section, std::string targetName, Callable cal
         } else {
             callback(static_cast<const std::string&>(targets.as_string()));
         }
+        found = true;
     }
     if (targetName.back() == 's') {
         targetName.pop_back();
         std::string target;
         target = toml::find_or(section, targetName, target);
         if (!target.empty()) {
+            found = true;
             callback(target);
         }
     }
+    return found;
 }
 
 template<typename Callable>
-void addTargets(const Json::Value& section, std::string targetName, Callable callback)
+bool addTargets(const Json::Value& section, std::string targetName, Callable callback)
 {
+    bool found{false};
     // There should probably be a static_assert here but there isn't a nice type trait to check that
     if (section.isMember(targetName)) {
         auto targets = section[targetName];
@@ -51,12 +58,31 @@ void addTargets(const Json::Value& section, std::string targetName, Callable cal
         } else {
             callback(targets.asString());
         }
+        found = true;
     }
     if (targetName.back() == 's') {
         targetName.pop_back();
         if (section.isMember(targetName)) {
             callback(section[targetName].asString());
+            found = true;
         }
+    }
+    return found;
+}
+
+template<typename Block, typename Callable>
+void addTargetVariations(const Block& section,
+                         const std::string& name1,
+                         std::string name2,
+                         Callable callback)
+{
+    bool found = addTargets(section, name1 + "_" + name2, callback);
+    if (!found) {
+        found = addTargets(section, name1 + name2, callback);
+    }
+    if (!found) {
+        name2.front() = std::toupper(name2.front());
+        addTargets(section, name1 + name2, callback);
     }
 }
 
