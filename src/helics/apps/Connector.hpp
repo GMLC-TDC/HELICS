@@ -89,9 +89,10 @@ external protection, that will result in undefined behavior
         virtual void runTo(Time stopTime_input) override;
 
         /** add a connection to a connector
-    @param name the identifier of the first interface
-    @param type the type of the publication
-    @param pubUnits the units associated with the publication
+    @param interface1 the identifier of the first interface
+    @param interface2 the identifier of the second interface
+    @param direction the directionality of the interface
+    @param tags any string tags associated with the connection
     */
         void addConnection(std::string_view interface1,
                             std::string_view interface2,

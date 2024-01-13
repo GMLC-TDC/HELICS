@@ -73,10 +73,14 @@ std::optional<InterfaceDirection> getDirection(std::string_view direction)
 std::unique_ptr<helicsCLI11App> Connector::generateParser()
 {
     auto app = std::make_unique<helicsCLI11App>("Command line options for the Connector App");
-    auto *opt=app->add_option(
+    app->add_option_function<std::vector<std::vector<std::string>>>(
         "--connection",
-        [this](CLI::results_t res) {
-           addConnectionVector(res);
+        [this](const std::vector<std::vector<std::string>> &args) {
+            for (auto& conn : args)
+            {
+                addConnectionVector(conn);
+            }
+           
         },
         "specify connections to make in the cosimulation")->expected(2,CLI::detail::expected_max_vector_size)->type_name("[INTERFACE1,INTERFACE2,DIRECTIONALITY,TXT...]");
 
@@ -115,39 +119,43 @@ std::string_view Connector::addTag(const std::string &tagName)
 
 bool Connector::addConnectionVector(const std::vector<std::string>& v1)
 {
+    if (v1.size() <= 1)
+    {
+        return false;
+    }
     if (v1.size() == 2)
     {
         addConnection(v1[0],v1[1]);
+        return true;
     }
-    else
-    {
+
         InterfaceDirection direction{ InterfaceDirection::BIDIRECTIONAL };
-        std::vector<std::string> tags;
+        std::vector<std::string> newTags;
         auto d = getDirection(v1[2]);
         if (d)
         {
             direction=*d;
         }
         else {
-            tags.push_back(v1[2]);
+            newTags.push_back(v1[2]);
         }
 
         for (int ii = 3; ii < v1.size(); ++ii)
         {
-            tags.push_back(v1[ii]);
+            newTags.push_back(v1[ii]);
         }
-        addConnection(v1[0],v1[1],direction,tags);
-    }
+        addConnection(v1[0],v1[1],direction,newTags);
+    return true;
 }
 
 void Connector::addConnection(std::string_view interface1,
     std::string_view interface2,
     InterfaceDirection direction,
-    std::vector<std::string> tags)
+    std::vector<std::string> connectionTags)
 {
     std::vector<std::string_view> svtags;
-    svtags.reserve(tags.size());
-    for (const auto& t1 : tags)
+    svtags.reserve(connectionTags.size());
+    for (const auto& t1 : connectionTags)
     {
         svtags.push_back(addTag(t1));
     }
@@ -210,8 +218,6 @@ void Connector::loadTextFile(const std::string& filename)
     // now start over and actual do the loading
     infile.close();
     infile.open(filename);
-
-    int lcount = 0;
     while (std::getline(infile, str)) {
         if (str.empty()) {
             continue;
@@ -288,7 +294,7 @@ void Connector::initialize()
 }
 
 
-void Connector::runTo(Time stopTime_input)
+void Connector::runTo([[maybe_unused]] Time stopTime_input)
 {
     auto md = fed->getCurrentMode();
     if (md == Federate::Modes::STARTUP) {
