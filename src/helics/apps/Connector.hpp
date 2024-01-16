@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "helicsApp.hpp"
+#include "CoreApp.hpp"
 
 #include <string_view>
 #include <string>
@@ -23,12 +24,13 @@ namespace helics::apps {
     };
 
     struct Connection {
-        std::string interface1;
-        std::string interface2;
+        std::string_view interface1;
+        std::string_view interface2;
         InterfaceDirection direction;
         std::vector<std::string_view> tags;
     };
 
+    class ConnectionsList;
     /** class implementing a Connector object, which is capable of automatically connecting interfaces in HELICS
 @details  the Conncector class is not thread-safe,  don't try to use it from multiple threads without
 external protection, that will result in undefined behavior
@@ -100,11 +102,15 @@ external protection, that will result in undefined behavior
             std::vector<std::string> tags = {});
 
         /** add a tag for later reference return a string_view reference for the tag*/
-        std::string_view Connector::addTag(const std::string &tagName);
-        /** get the number of points loaded*/
+        std::string_view addTag(std::string_view tagName);
+
+        /** add a interface name for later reference return a string_view reference for the interface name*/
+        std::string_view addInterface(std::string_view interfaceName);
+
+        /** get the number of connections*/
         auto connectionCount() const { return connections.size(); }
-        /** get the number of messages loaded*/
-        auto madeConnections() const { return 0; }
+        /** get the number of made connections*/
+        auto madeConnections() const { return matchCount; }
         
       private:
         std::unique_ptr<helicsCLI11App> generateParser();
@@ -117,13 +123,23 @@ external protection, that will result in undefined behavior
         /** load a text file*/
         virtual void loadTextFile(const std::string& filename) override;
 
-        virtual bool addConnectionVector(const std::vector<std::string> &v1);
+        bool addConnectionVector(const std::vector<std::string> &v1);
+        /** actually go through and make connections*/
+        void makeConnections(ConnectionsList &possibleConnections);
+        /** try to make a connection for an input*/
+        int makeTargetConnection(std::string_view origin, std::unordered_set<std::string_view>& possibleConnections,const std::unordered_multimap<std::string_view, std::string_view>& aliases, const std::function<void(std::string_view origin,std::string_view target)> &callback);
+        /** get a list of the possible connections to based on the database*/
+        std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface) const;
       private:
+        CoreApp core;
         std::unordered_multimap<std::string_view, Connection> connections;  //!< the connections descriptors
         std::vector<Connection> matchers;
         std::unordered_set<std::string> tags;
+        std::unordered_set<std::string> interfaces;
         std::uint64_t matchCount{0};
-        bool prematch{false};
+        bool matchTargetEndpoints{false}; //!< indicator to match unconnected target endpoints default{false}
+        bool matchMultiple{false}; //!< indicator to do multiple matches [default is to stop at first match]
+        
         
     };
 }  

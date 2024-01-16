@@ -3810,6 +3810,23 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
                 }
                 base["tags"]=tagBlock;
             }
+            const auto &aliases=handles.getAliases();
+            if (!aliases.empty())
+            {
+                base["aliases"]=Json::arrayValue;
+                for (const auto& alias : aliases)
+                {
+                    std::string_view interfaceName=alias.first;
+                    const auto &aliasNames=alias.second;
+                    for (const auto& aliasName : aliasNames)
+                    {
+                        Json::Value aliasSet=Json::arrayValue;
+                        aliasSet.append(std::string(interfaceName));
+                        aliasSet.append(std::string(aliasName));
+                        base["aliases"].append(std::move(aliasSet));
+                    }
+                }
+            }
             break;
     }
 }

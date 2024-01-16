@@ -356,17 +356,29 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
 
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
-        base["unconnected_endpoints"] = Json::arrayValue;
+        base["unconnected_source_endpoints"] = Json::arrayValue;
+        base["unconnected_destination_endpoints"] = Json::arrayValue;
         base["connected_endpoints"] = Json::arrayValue;
         for (const auto& ept : ehandle) {
-            if (!ept->key.empty() && ept->targetedEndpoint) {
-                if (!ept->hasConnection()) {
-                    base["unconnected_endpoints"].append(ept->key);
+            if (!ept->key.empty()) {
+                if (ept->targetedEndpoint)
+                {
+                    if (!ept->hasSource()) {
+                        base["unconnected_target_endpoints"].append(ept->key);
+                    }
+                    if (!ept->hasTarget()) {
+                        base["unconnected_source_endpoints"].append(ept->key);
+                    }
+                    if (ept->hasConnection())
+                    {
+                        base["connected_endpoints"].append(ept->key);
+                    }
                 }
                 else
                 {
                     base["connected_endpoints"].append(ept->key);
                 }
+                
             }
         }
     }

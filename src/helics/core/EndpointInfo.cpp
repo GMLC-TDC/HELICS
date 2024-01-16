@@ -138,6 +138,17 @@ bool EndpointInfo::hasConnection() const
     return !(targetInformation.empty() && sourceInformation.empty());
 }
 
+bool EndpointInfo::hasSource() const
+{
+    return !(sourceInformation.empty());
+}
+
+bool EndpointInfo::hasTarget() const
+{
+    return !(targetInformation.empty());
+}
+
+
 int32_t EndpointInfo::queueSize(Time maxTime) const
 {
     auto handle = message_queue.lock_shared();

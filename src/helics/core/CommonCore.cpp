@@ -3633,7 +3633,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_CORE_TAG:
             if (command.source_id == global_broker_id_local &&
                 command.dest_id == global_broker_id_local) {
-                auto keyTag = command.getString(0);
+                const auto &keyTag = command.getString(0);
                 for (auto& tag : tags) {
                     if (tag.first == keyTag) {
                         tag.second = command.getString(1);

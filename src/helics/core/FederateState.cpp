@@ -1511,7 +1511,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_FED_ACK:
             if (state != FederateStates::CREATED) {
                 break;
-            }
+                }
             if (cmd.name() == name) {
                 if (checkActionFlag(cmd, error_flag)) {
                     setState(FederateStates::ERRORED);
@@ -1526,15 +1526,15 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                         addDependent(gRootBrokerID);
                         addDependency(gRootBrokerID);
                         timeCoord->setAsParent(gRootBrokerID);
-                    }
-                    timeCoord->globalTime = true;
                 }
+                    timeCoord->globalTime = true;
+            }
                 global_id = cmd.dest_id;
                 interfaceInformation.setGlobalId(cmd.dest_id);
                 timeCoord->setSourceId(global_id);
                 return MessageProcessingResult::NEXT_STEP;
-            }
-            break;
+                    }
+                break;
         case CMD_FED_CONFIGURE_TIME:
             setProperty(cmd.messageID, cmd.actionTime);
             break;
@@ -1564,60 +1564,60 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             queryResp.payload = processQueryActual(cmd.payload.to_string());
             routeMessage(std::move(queryResp));
         } break;
-    }
+                }
     return MessageProcessingResult::CONTINUE_PROCESSING;
 }
 
 void FederateState::timeoutCheck(ActionMessage& cmd)
 {
-    if (timeGranted_mode && cmd.actionTime != Time::maxVal()) {
+            if (timeGranted_mode && cmd.actionTime != Time::maxVal()) {
         return;
-    }
-    if (mGrantCount != static_cast<std::uint32_t>(cmd.getExtraData())) {
-        // time has been granted since this was triggered
+            }
+            if (mGrantCount != static_cast<std::uint32_t>(cmd.getExtraData())) {
+                // time has been granted since this was triggered
         return;
-    }
-    if (cmd.counter == 0) {
-        auto blockFed = timeCoord->getMinGrantedDependency();
-        if (blockFed.first.isValid()) {
-            LOG_WARNING(fmt::format("grant timeout exceeded sim time {} waiting on {}",
-                                    static_cast<double>(time_granted),
-                                    blockFed.first.baseValue()));
-        } else {
-            LOG_WARNING(fmt::format("grant timeout exceeded sim time {}",
-                                    static_cast<double>(time_granted)));
-        }
+            }
+            if (cmd.counter == 0) {
+                auto blockFed = timeCoord->getMinGrantedDependency();
+                if (blockFed.first.isValid()) {
+                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {} waiting on {}",
+                                            static_cast<double>(time_granted),
+                                            blockFed.first.baseValue()));
+                } else {
+                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {}",
+                                            static_cast<double>(time_granted)));
+                }
 
-    } else if (cmd.counter == 3) {
-        LOG_WARNING("grant timeout stage 2 requesting time resend");
-        timeCoord->requestTimeCheck();
-    } else if (cmd.counter == 6) {
-        LOG_WARNING("grant timeout stage 3 diagnostics");
-        auto qres = processQueryActual("global_time_debugging");
-        qres.insert(0, "TIME DEBUGGING::");
-        LOG_WARNING(qres);
-        auto parentID = timeCoord->getParent();
-        if (parentID.isValid()) {
-            auto brokerTimeoutCheck = cmd;
-            brokerTimeoutCheck.source_id = global_id.load();
-            brokerTimeoutCheck.dest_id = parentID;
-            routeMessage(brokerTimeoutCheck);
+            } else if (cmd.counter == 3) {
+                LOG_WARNING("grant timeout stage 2 requesting time resend");
+                timeCoord->requestTimeCheck();
+            } else if (cmd.counter == 6) {
+                LOG_WARNING("grant timeout stage 3 diagnostics");
+                auto qres = processQueryActual("global_time_debugging");
+                qres.insert(0, "TIME DEBUGGING::");
+                LOG_WARNING(qres);
+                auto parentID = timeCoord->getParent();
+                if (parentID.isValid()) {
+                    ActionMessage brokerTimeoutCheck{ cmd };
+                    brokerTimeoutCheck.source_id = global_id.load();
+                    brokerTimeoutCheck.dest_id = parentID;
+                    routeMessage(brokerTimeoutCheck);
             LOG_WARNING(fmt::format("sending grant time out check to {}", parentID.baseValue()));
-        }
-    } else if (cmd.counter == 10) {
-        if (cmd.actionTime == Time::maxVal()) {
-            LOG_WARNING("finalize blocking");
-        } else {
-            LOG_WARNING("grant timeout stage 4 error actions (none available)");
-        }
-    }
+                }
+            } else if (cmd.counter == 10) {
+                if (cmd.actionTime == Time::maxVal()) {
+                    LOG_WARNING("finalize blocking");
+                } else {
+                    LOG_WARNING("grant timeout stage 4 error actions (none available)");
+                }
+            }
 #ifndef HELICS_DISABLE_ASIO
-    if (mTimer) {
-        ++cmd.counter;
-        mTimer->updateTimerFromNow(grantTimeoutTimeIndex,
-                                   grantTimeOutPeriod.to_ms(),
-                                   std::move(cmd));
-    }
+            if (mTimer) {
+                ++cmd.counter;
+                mTimer->updateTimerFromNow(grantTimeoutTimeIndex,
+                                           grantTimeOutPeriod.to_ms(),
+                                           std::move(cmd));
+            }
 #endif
 }
 void FederateState::processDataConnectionMessage(ActionMessage& cmd)
@@ -1779,15 +1779,15 @@ void FederateState::processDataMessage(ActionMessage& cmd)
                         timeCoord->processTimeMessage(cmd);
                     }
                 }
-                break;
+            break;
             }
             for (auto& src : subI->input_sources) {
                 auto valueTime = cmd.actionTime;
                 if (timeMethod == TimeSynchronizationMethod::ASYNC) {
                     if (valueTime < time_granted) {
                         valueTime = time_granted;
-                    }
                 }
+                    }
                 if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
                     if (subI->addData(src,
                                       valueTime,
@@ -1797,11 +1797,11 @@ void FederateState::processDataMessage(ActionMessage& cmd)
                         if (!subI->not_interruptible) {
                             timeCoord->updateValueTime(valueTime, !timeGranted_mode);
                             LOG_TRACE(timeCoord->printTimeStatus());
-                        }
+                }
                         LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
                                              prettyPrintString(cmd),
                                              subI->getSourceName(src)));
-                    }
+            }
                 }
             }
             if (state <= FederateStates::EXECUTING) {
@@ -2640,6 +2640,16 @@ std::string FederateState::processQueryActual(std::string_view query) const
                 tagBlock[tg.first] = tg.second;
             }
             base["tags"]=tagBlock;
+        }
+        if (queryCallback)
+        {
+            auto potential = queryCallback("potential_interfaces");
+            auto json=fileops::loadJsonStr(potential);
+
+            if (!json.isMember("error"))
+            {
+                base["potential_interfaces"]=json;
+            }
         }
         return fileops::generateJsonString(base);
     }
