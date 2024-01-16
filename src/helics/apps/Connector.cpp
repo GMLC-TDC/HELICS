@@ -19,12 +19,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <memory>
+#include <utility>
 
 namespace helics::apps {
 
 /** data class for information from queries*/
-class ConnectionsList {
-  public:
+struct ConnectionsList {
     std::unordered_multimap<std::string_view, std::string_view> aliases;
     std::vector<std::string_view> unconnectedPubs;
     std::vector<std::string_view> unconnectedInputs;
@@ -42,8 +43,8 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
     auto json = fileops::loadJsonStr(connectionData);
     if (json.isMember("aliases")) {
         for (auto& alias : json["aliases"]) {
-            std::string_view alias1 = connections.interfaces.emplace_back(alias[0].asString());
-            std::string_view alias2 = connections.interfaces.emplace_back(alias[1].asString());
+            const std::string_view alias1 = connections.interfaces.emplace_back(alias[0].asString());
+            const std::string_view alias2 = connections.interfaces.emplace_back(alias[1].asString());
             connections.aliases.emplace(alias1, alias2);
         }
     }
@@ -52,20 +53,20 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
             for (auto& fed : core["federates"]) {
                 if (fed.isMember("connected_inputs")) {
                     for (auto& input : fed["connected_inputs"]) {
-                        std::string_view input1 =
+                        const std::string_view input1 =
                             connections.interfaces.emplace_back(input.asString());
                         connections.inputs.insert(input1);
                     }
                 }
                 if (fed.isMember("connected_publications")) {
                     for (auto& pub : fed["connected_publications"]) {
-                        std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
+                        const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
                         connections.pubs.insert(pub1);
                     }
                 }
                 if (fed.isMember("unconnected_inputs")) {
                     for (auto& input : fed["unconnected_inputs"]) {
-                        std::string_view input1 =
+                        const std::string_view input1 =
                             connections.interfaces.emplace_back(input.asString());
                         connections.unconnectedInputs.push_back(input1);
                         connections.inputs.insert(input1);
@@ -73,7 +74,7 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
                 }
                 if (fed.isMember("unconnected_publications")) {
                     for (auto& pub : fed["unconnected_publications"]) {
-                        std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
+                        const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
                         connections.unconnectedPubs.push_back(pub1);
                         connections.pubs.insert(pub1);
                     }
@@ -81,7 +82,7 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
 
                 if (fed.isMember("unconnected_target_endpoints")) {
                     for (auto& endpoint : fed["unconnected_target_endpoints"]) {
-                        std::string_view end1 =
+                        const std::string_view end1 =
                             connections.interfaces.emplace_back(endpoint.asString());
                         connections.unconnectedTargetEndpoints.push_back(end1);
                         connections.endpoints.insert(end1);
@@ -89,7 +90,7 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
                 }
                 if (fed.isMember("unconnected_source_endpoints")) {
                     for (auto& endpoint : fed["unconnected_source_endpoints"]) {
-                        std::string_view end1 =
+                        const std::string_view end1 =
                             connections.interfaces.emplace_back(endpoint.asString());
                         connections.unconnectedSourceEndpoints.push_back(end1);
                         connections.endpoints.insert(end1);
@@ -97,7 +98,7 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
                 }
                 if (fed.isMember("connected_endpoints")) {
                     for (auto& endpoint : fed["connected_endpoints"]) {
-                        std::string_view end1 =
+                        const std::string_view end1 =
                             connections.interfaces.emplace_back(endpoint.asString());
                         connections.endpoints.insert(end1);
                     }
@@ -164,7 +165,7 @@ std::unique_ptr<helicsCLI11App> Connector::generateParser()
     app->add_option_function<std::vector<std::vector<std::string>>>(
            "--connection",
            [this](const std::vector<std::vector<std::string>>& args) {
-               for (auto& conn : args) {
+               for (const auto& conn : args) {
                    addConnectionVector(conn);
                }
            },
@@ -205,14 +206,14 @@ Connector::Connector(std::string_view appName, const std::string& configString):
 
 std::string_view Connector::addTag(std::string_view tagName)
 {
-    auto it = tags.insert(std::string(tagName));
-    return std::string_view(*(it.first));
+    auto tagIterator = tags.insert(std::string(tagName));
+    return { *(tagIterator.first) };
 }
 
 std::string_view Connector::addInterface(std::string_view interfaceName)
 {
-    auto it = interfaces.insert(std::string(interfaceName));
-    return std::string_view(*(it.first));
+    auto interfaceIterator = interfaces.insert(std::string(interfaceName));
+    return { *(interfaceIterator.first) };
 }
 
 bool Connector::addConnectionVector(const std::vector<std::string>& v1)
@@ -227,9 +228,9 @@ bool Connector::addConnectionVector(const std::vector<std::string>& v1)
 
     InterfaceDirection direction{InterfaceDirection::BIDIRECTIONAL};
     std::vector<std::string> newTags;
-    auto d = getDirection(v1[2]);
-    if (d) {
-        direction = *d;
+    auto directionValue = getDirection(v1[2]);
+    if (directionValue) {
+        direction = *directionValue;
     } else {
         newTags.push_back(v1[2]);
     }
@@ -244,12 +245,12 @@ bool Connector::addConnectionVector(const std::vector<std::string>& v1)
 void Connector::addConnection(std::string_view interface1,
                               std::string_view interface2,
                               InterfaceDirection direction,
-                              std::vector<std::string> connectionTags)
+                              const std::vector<std::string> &connectionTags)
 {
     std::vector<std::string_view> svtags;
     svtags.reserve(connectionTags.size());
-    for (const auto& t1 : connectionTags) {
-        svtags.push_back(addTag(t1));
+    for (const auto& tag : connectionTags) {
+        svtags.push_back(addTag(tag));
     }
     auto iview1 = addInterface(interface1);
     auto iview2 = addInterface(interface2);
@@ -284,27 +285,27 @@ void Connector::loadTextFile(const std::string& filename)
         if (str.empty()) {
             continue;
         }
-        auto fc = str.find_first_not_of(" \t\n\r\0");
-        if (fc == std::string::npos) {
+        auto firstChar = str.find_first_not_of(" \t\n\r\0");
+        if (firstChar == std::string::npos) {
             continue;
         }
         if (mlineComment) {
-            if (fc + 2 < str.size()) {
-                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']')) {
+            if (firstChar + 2 < str.size()) {
+                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') && (str[firstChar + 2] == ']')) {
                     mlineComment = false;
                 }
             }
             continue;
         }
-        if (str[fc] == '#') {
-            if (fc + 2 < str.size()) {
-                if ((str[fc + 1] == '#') && (str[fc + 2] == '[')) {
+        if (str[firstChar] == '#') {
+            if (firstChar + 2 < str.size()) {
+                if ((str[firstChar + 1] == '#') && (str[firstChar + 2] == '[')) {
                     mlineComment = true;
                 }
             }
             continue;
         }
-        if ((str[fc] == 'm') || (str[fc] == 'M')) {
+        if ((str[firstChar] == 'm') || (str[firstChar] == 'M')) {
             ++ccnt;
         }
     }
@@ -316,23 +317,23 @@ void Connector::loadTextFile(const std::string& filename)
         if (str.empty()) {
             continue;
         }
-        auto fc = str.find_first_not_of(" \t\n\r\0");
-        if (fc == std::string::npos) {
+        auto firstChar = str.find_first_not_of(" \t\n\r\0");
+        if (firstChar == std::string::npos) {
             continue;
         }
         if (mlineComment) {
-            if (fc + 2 < str.size()) {
-                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']')) {
+            if (firstChar + 2 < str.size()) {
+                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') && (str[firstChar + 2] == ']')) {
                     mlineComment = false;
                 }
             }
             continue;
         }
-        if (str[fc] == '#') {
-            if (fc + 2 < str.size()) {
-                if ((str[fc + 1] == '#') && (str[fc + 2] == '[')) {
+        if (str[firstChar] == '#') {
+            if (firstChar + 2 < str.size()) {
+                if ((str[firstChar + 1] == '#') && (str[firstChar + 2] == '[')) {
                     mlineComment = true;
-                } else if (str[fc + 1] == '!') {
+                } else if (str[firstChar + 1] == '!') {
                     /*  //allow configuration inside the regular text file
                      */
                 }
@@ -446,7 +447,7 @@ int Connector::makeTargetConnection(
 {
     int matched{0};
     auto connectionOptions = buildPossibleConnectionList(origin);
-    for (auto& option : connectionOptions) {
+    for (const auto& option : connectionOptions) {
         auto located = possibleConnections.find(option.interface2);
         if (located != possibleConnections.end()) {
             /* source, target*/
@@ -459,7 +460,7 @@ int Connector::makeTargetConnection(
         } else {
             if (!aliases.empty()) {
                 auto aliasList = generateAliases(option.interface2, aliases);
-                for (auto& alias : aliasList) {
+                for (const auto& alias : aliasList) {
                     located = possibleConnections.find(alias);
                     if (located != possibleConnections.end()) {
                         callback(origin, option.interface2);
@@ -475,12 +476,12 @@ int Connector::makeTargetConnection(
     }
     if (!aliases.empty()) {
         auto aliasList = generateAliases(origin, aliases);
-        for (auto& alias : aliasList) {
+        for (const auto& alias : aliasList) {
             if (alias == origin) {
                 continue;
             }
             auto aliasOptions = buildPossibleConnectionList(alias);
-            for (auto& option : aliasOptions) {
+            for (const auto& option : aliasOptions) {
                 auto located = possibleConnections.find(option.interface2);
                 if (located != possibleConnections.end()) {
                     /* source, target*/
@@ -493,7 +494,7 @@ int Connector::makeTargetConnection(
                 } else {
                     if (!aliases.empty()) {
                         auto interfaceAliasList = generateAliases(option.interface2, aliases);
-                        for (auto& interfaceAlias : interfaceAliasList) {
+                        for (const auto& interfaceAlias : interfaceAliasList) {
                             located = possibleConnections.find(interfaceAlias);
                             if (located != possibleConnections.end()) {
                                 callback(origin, option.interface2);
@@ -514,8 +515,8 @@ int Connector::makeTargetConnection(
 
 void Connector::makeConnections(ConnectionsList& possibleConnections)
 {
-    auto inputConnector = [this](std::string_view origin, std::string_view target) {
-        core.dataLink(target, origin);
+    auto inputConnector = [this](std::string_view origin, std::string_view source) {
+        core.dataLink(source, origin);
     };
     auto pubConnector = [this](std::string_view origin, std::string_view target) {
         core.dataLink(origin, target);
@@ -523,8 +524,8 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
     auto sourceEndpointConnector = [this](std::string_view origin, std::string_view target) {
         core.linkEndpoints(origin, target);
     };
-    auto targetEndpointConnector = [this](std::string_view origin, std::string_view target) {
-        core.linkEndpoints(target, origin);
+    auto targetEndpointConnector = [this](std::string_view origin, std::string_view source) {
+        core.linkEndpoints(source, origin);
     };
     /** unconnected inputs*/
     for (const auto& uInp : possibleConnections.unconnectedInputs) {
@@ -562,8 +563,8 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
 
 void Connector::initialize()
 {
-    auto md = fed->getCurrentMode();
-    if (md == Federate::Modes::STARTUP) {
+    auto cmode = fed->getCurrentMode();
+    if (cmode == Federate::Modes::STARTUP) {
         fed->enterInitializingModeIterative();
 
         auto connectionsData =
@@ -575,11 +576,11 @@ void Connector::initialize()
 
 void Connector::runTo([[maybe_unused]] Time stopTime_input)
 {
-    auto md = fed->getCurrentMode();
-    if (md == Federate::Modes::STARTUP) {
+    auto cmode = fed->getCurrentMode();
+    if (cmode == Federate::Modes::STARTUP) {
         initialize();
     }
-    if (md < Federate::Modes::EXECUTING) {
+    if (cmode < Federate::Modes::EXECUTING) {
         fed->enterExecutingMode();
     } else {
         fed->disconnect();

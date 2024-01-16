@@ -2634,8 +2634,8 @@ std::string FederateState::processQueryActual(std::string_view query) const
 
         if (!tags.empty()) {
             Json::Value tagBlock = Json::objectValue;
-            for (const auto& tg : tags) {
-                tagBlock[tg.first] = tg.second;
+            for (const auto& tag : tags) {
+                tagBlock[tag.first] = tag.second;
             }
             base["tags"] = tagBlock;
         }
@@ -2749,10 +2749,10 @@ int FederateState::loggingLevel() const
 void FederateState::setTag(std::string_view tag, std::string_view value)
 {
     spinlock();
-    for (auto& existingTag : tags) {
-        if (existingTag.first == tag) {
+    for (auto& testTag : tags) {
+        if (testTag.first == tag) {
             unlock();
-            existingTag.second = value;
+            testTag.second = value;
             return;
         }
     }

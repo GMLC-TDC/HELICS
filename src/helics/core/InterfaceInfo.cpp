@@ -98,9 +98,9 @@ void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)
 {
     if (updateFlag != only_update_on_change) {
         only_update_on_change = updateFlag;
-        // ip is a reference to a unique_ptr
-        for (auto& ip : inputs.lock()) {  // NOLINT(readability-qualified-auto)
-            ip->only_update_on_change = updateFlag;
+        // input is a reference to a unique_ptr
+        for (auto& input : inputs.lock()) {  // NOLINT(readability-qualified-auto)
+            input->only_update_on_change = updateFlag;
         }
     }
 }
@@ -165,9 +165,9 @@ EndpointInfo* InterfaceInfo::getEndpoint(InterfaceHandle handle)
     return endpoints.lock()->find(handle);
 }
 
-bool InterfaceInfo::setInputProperty(InterfaceHandle id, int32_t option, int32_t value)
+bool InterfaceInfo::setInputProperty(InterfaceHandle hid, int32_t option, int32_t value)
 {
-    auto* ipt = getInput(id);
+    auto* ipt = getInput(hid);
     if (ipt == nullptr) {
         return false;
     }
@@ -175,9 +175,9 @@ bool InterfaceInfo::setInputProperty(InterfaceHandle id, int32_t option, int32_t
     return true;
 }
 
-bool InterfaceInfo::setPublicationProperty(InterfaceHandle id, int32_t option, int32_t value)
+bool InterfaceInfo::setPublicationProperty(InterfaceHandle hid, int32_t option, int32_t value)
 {
-    auto* pub = getPublication(id);
+    auto* pub = getPublication(hid);
     if (pub == nullptr) {
         return false;
     }
@@ -185,9 +185,9 @@ bool InterfaceInfo::setPublicationProperty(InterfaceHandle id, int32_t option, i
     return true;
 }
 
-bool InterfaceInfo::setEndpointProperty(InterfaceHandle id, int32_t option, int32_t value)
+bool InterfaceInfo::setEndpointProperty(InterfaceHandle hid, int32_t option, int32_t value)
 {
-    auto* ept = getEndpoint(id);
+    auto* ept = getEndpoint(hid);
     if (ept == nullptr) {
         return false;
     }
@@ -196,27 +196,27 @@ bool InterfaceInfo::setEndpointProperty(InterfaceHandle id, int32_t option, int3
     return true;
 }
 
-int32_t InterfaceInfo::getInputProperty(InterfaceHandle id, int32_t option) const
+int32_t InterfaceInfo::getInputProperty(InterfaceHandle hid, int32_t option) const
 {
-    const auto* ipt = getInput(id);
+    const auto* ipt = getInput(hid);
     if (ipt == nullptr) {
         return 0;
     }
     return ipt->getProperty(option);
 }
 
-int32_t InterfaceInfo::getPublicationProperty(InterfaceHandle id, int32_t option) const
+int32_t InterfaceInfo::getPublicationProperty(InterfaceHandle hid, int32_t option) const
 {
-    const auto* pub = getPublication(id);
+    const auto* pub = getPublication(hid);
     if (pub == nullptr) {
         return 0;
     }
     return pub->getProperty(option);
 }
 
-int32_t InterfaceInfo::getEndpointProperty(InterfaceHandle id, int32_t option) const
+int32_t InterfaceInfo::getEndpointProperty(InterfaceHandle hid, int32_t option) const
 {
-    const auto* ept = getEndpoint(id);
+    const auto* ept = getEndpoint(hid);
     if (ept == nullptr) {
         return 0;
     }

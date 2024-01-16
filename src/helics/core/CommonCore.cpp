@@ -2826,8 +2826,8 @@ void CommonCore::initializeMapBuilder(std::string_view request,
         case UNCONNECTED_INTERFACES:
             if (!tags.empty()) {
                 Json::Value tagBlock = Json::objectValue;
-                for (const auto& tg : tags) {
-                    tagBlock[tg.first] = tg.second;
+                for (const auto& tag : tags) {
+                    tagBlock[tag.first] = tag.second;
                 }
                 base["tags"] = tagBlock;
             }

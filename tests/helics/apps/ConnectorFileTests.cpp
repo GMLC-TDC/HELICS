@@ -17,20 +17,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
-static const std::string testdir = std::string(TEST_DIR) + "/connector/";
+static constexpr std::string_view testdir = TEST_DIR "/connector/";
 
 TEST(connector_file_tests, simple_connector)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
-    conn1.loadFile(testdir + "simple.txt");
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+    conn1.loadFile(std::string(testdir) + "simple.txt");
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
@@ -50,16 +50,16 @@ TEST(connector_file_tests, simple_connector)
 
 TEST(connector_file_tests, simple_connector_reverse)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
-    conn1.loadFile(testdir + "simple.json");
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+    conn1.loadFile(std::string(testdir) + "simple.json");
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
@@ -78,16 +78,16 @@ TEST(connector_file_tests, simple_connector_reverse)
 
 TEST(connector_file_tests, connector_cascade)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
-    conn1.loadFile(testdir + "cascade.txt");
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+    conn1.loadFile(std::string(testdir) + "cascade.txt");
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     auto& inp2 = vfed.registerGlobalInput<double>("inp2");

@@ -19,16 +19,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(connector_tests, simple_connector)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
@@ -48,16 +48,16 @@ TEST(connector_tests, simple_connector)
 
 TEST(connector_tests, simple_connector_reverse)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("pub1", "inp1", InterfaceDirection::FROM_TO);
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
@@ -76,19 +76,19 @@ TEST(connector_tests, simple_connector_reverse)
 
 TEST(connector_tests, connector_multiple)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
     conn1.addConnection("inp1", "pubA", InterfaceDirection::FROM_TO);
     conn1.addConnection("inp2", "pub1", InterfaceDirection::FROM_TO);
     conn1.addConnection("inp2", "pubA", InterfaceDirection::FROM_TO);
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     auto& inp2 = vfed.registerGlobalInput<double>("inp2");
@@ -109,13 +109,13 @@ TEST(connector_tests, connector_multiple)
 
 TEST(connector_tests, connector_cascade)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "intermediate1", InterfaceDirection::FROM_TO);
     conn1.addConnection("intermediate1", "intermediate1", InterfaceDirection::BIDIRECTIONAL);
     conn1.addConnection("intermediate1", "intermediate2", InterfaceDirection::FROM_TO);
@@ -123,7 +123,7 @@ TEST(connector_tests, connector_cascade)
     conn1.addConnection("intermediate3", "pub1", InterfaceDirection::BIDIRECTIONAL);
     conn1.addConnection("inp2", "intermediate2", InterfaceDirection::FROM_TO);
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     auto& inp2 = vfed.registerGlobalInput<double>("inp2");
@@ -144,16 +144,16 @@ TEST(connector_tests, connector_cascade)
 
 TEST(connector_tests, endpoint_connector)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("ept1", "ept12", InterfaceDirection::FROM_TO);
 
-    helics::MessageFederate vfed("c1", fi);
+    helics::MessageFederate vfed("c1", fedInfo);
     auto& ept1 = vfed.registerGlobalTargetedEndpoint("ept1");
     auto& ept12 = vfed.registerGlobalTargetedEndpoint("ept12");
 
@@ -172,16 +172,16 @@ TEST(connector_tests, endpoint_connector)
 
 TEST(connector_tests, endpoint_connector_no_connection)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("ept1", "ept12", InterfaceDirection::FROM_TO);
 
-    helics::MessageFederate vfed("c1", fi);
+    helics::MessageFederate vfed("c1", fedInfo);
     auto& ept1 = vfed.registerGlobalTargetedEndpoint("ept1");
     auto& ept12 = vfed.registerGlobalTargetedEndpoint("ept12");
 
@@ -199,16 +199,16 @@ TEST(connector_tests, endpoint_connector_no_connection)
 
 TEST(connector_tests, endpoint_connector_bidirectional)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("ept1", "ept12", InterfaceDirection::BIDIRECTIONAL);
 
-    helics::MessageFederate vfed("c1", fi);
+    helics::MessageFederate vfed("c1", fedInfo);
     auto& ept1 = vfed.registerGlobalTargetedEndpoint("ept1");
     auto& ept12 = vfed.registerGlobalTargetedEndpoint("ept12");
 
@@ -233,16 +233,16 @@ TEST(connector_tests, endpoint_connector_bidirectional)
 
 TEST(connector_tests, simple_connector_alias)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "publication1", InterfaceDirection::FROM_TO);
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     pub1.addAlias("publication1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
@@ -262,16 +262,16 @@ TEST(connector_tests, simple_connector_alias)
 
 TEST(connector_tests, simple_connector_alias_reverse)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("pub1", "input1", InterfaceDirection::FROM_TO);
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
 
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
@@ -291,16 +291,16 @@ TEST(connector_tests, simple_connector_alias_reverse)
 
 TEST(connector_tests, dual_alias)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("input1", "publication1", InterfaceDirection::FROM_TO);
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     pub1.addAlias("publication1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
@@ -321,16 +321,16 @@ TEST(connector_tests, dual_alias)
 
 TEST(connector_tests, dual_alias_reverse)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("publication1", "input1", InterfaceDirection::FROM_TO);
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     pub1.addAlias("publication1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
@@ -350,16 +350,16 @@ TEST(connector_tests, dual_alias_reverse)
 
 TEST(connector_tests, cascade_dual_alias)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inputA", "publicationA", InterfaceDirection::FROM_TO);
 
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     pub1.addAlias("publication1");
     helics::CoreApp core(vfed.getCorePointer());
@@ -385,17 +385,17 @@ TEST(connector_tests, cascade_dual_alias)
 
 TEST(connector_tests, cascade_dual_alias_intermediary)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("publicationA", "inputC", InterfaceDirection::FROM_TO);
     conn1.addConnection("inputC", "inputE", InterfaceDirection::FROM_TO);
     conn1.addConnection("inputE", "inputA", InterfaceDirection::FROM_TO);
-    helics::ValueFederate vfed("c1", fi);
+    helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     pub1.addAlias("publication1");
     helics::CoreApp core(vfed.getCorePointer());
@@ -421,16 +421,16 @@ TEST(connector_tests, cascade_dual_alias_intermediary)
 
 TEST(connector_tests, endpoint_connector_alias1)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fi.coreName = "ccore1";
-    fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector1", fi);
+    fedInfo.coreName = "ccore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("eptA", "eptB", InterfaceDirection::FROM_TO);
 
-    helics::MessageFederate vfed("c1", fi);
+    helics::MessageFederate vfed("c1", fedInfo);
     auto& ept1 = vfed.registerGlobalTargetedEndpoint("ept1");
     ept1.addAlias("eptA");
     auto& ept12 = vfed.registerGlobalTargetedEndpoint("ept12");
