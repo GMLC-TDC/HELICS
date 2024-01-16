@@ -14,13 +14,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <deque>
+#include <memory>
 #include <optional>
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
-#include <memory>
 #include <utility>
+#include <vector>
 
 namespace helics::apps {
 
@@ -43,8 +43,10 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
     auto json = fileops::loadJsonStr(connectionData);
     if (json.isMember("aliases")) {
         for (auto& alias : json["aliases"]) {
-            const std::string_view alias1 = connections.interfaces.emplace_back(alias[0].asString());
-            const std::string_view alias2 = connections.interfaces.emplace_back(alias[1].asString());
+            const std::string_view alias1 =
+                connections.interfaces.emplace_back(alias[0].asString());
+            const std::string_view alias2 =
+                connections.interfaces.emplace_back(alias[1].asString());
             connections.aliases.emplace(alias1, alias2);
         }
     }
@@ -60,7 +62,8 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
                 }
                 if (fed.isMember("connected_publications")) {
                     for (auto& pub : fed["connected_publications"]) {
-                        const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
+                        const std::string_view pub1 =
+                            connections.interfaces.emplace_back(pub.asString());
                         connections.pubs.insert(pub1);
                     }
                 }
@@ -74,7 +77,8 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
                 }
                 if (fed.isMember("unconnected_publications")) {
                     for (auto& pub : fed["unconnected_publications"]) {
-                        const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
+                        const std::string_view pub1 =
+                            connections.interfaces.emplace_back(pub.asString());
                         connections.unconnectedPubs.push_back(pub1);
                         connections.pubs.insert(pub1);
                     }
@@ -207,13 +211,13 @@ Connector::Connector(std::string_view appName, const std::string& configString):
 std::string_view Connector::addTag(std::string_view tagName)
 {
     auto tagIterator = tags.insert(std::string(tagName));
-    return { *(tagIterator.first) };
+    return {*(tagIterator.first)};
 }
 
 std::string_view Connector::addInterface(std::string_view interfaceName)
 {
     auto interfaceIterator = interfaces.insert(std::string(interfaceName));
-    return { *(interfaceIterator.first) };
+    return {*(interfaceIterator.first)};
 }
 
 bool Connector::addConnectionVector(const std::vector<std::string>& v1)
@@ -245,7 +249,7 @@ bool Connector::addConnectionVector(const std::vector<std::string>& v1)
 void Connector::addConnection(std::string_view interface1,
                               std::string_view interface2,
                               InterfaceDirection direction,
-                              const std::vector<std::string> &connectionTags)
+                              const std::vector<std::string>& connectionTags)
 {
     std::vector<std::string_view> svtags;
     svtags.reserve(connectionTags.size());
@@ -291,7 +295,8 @@ void Connector::loadTextFile(const std::string& filename)
         }
         if (mlineComment) {
             if (firstChar + 2 < str.size()) {
-                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') && (str[firstChar + 2] == ']')) {
+                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') &&
+                    (str[firstChar + 2] == ']')) {
                     mlineComment = false;
                 }
             }
@@ -323,7 +328,8 @@ void Connector::loadTextFile(const std::string& filename)
         }
         if (mlineComment) {
             if (firstChar + 2 < str.size()) {
-                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') && (str[firstChar + 2] == ']')) {
+                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') &&
+                    (str[firstChar + 2] == ']')) {
                     mlineComment = false;
                 }
             }

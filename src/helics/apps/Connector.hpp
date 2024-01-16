@@ -95,7 +95,7 @@ necessary
     void addConnection(std::string_view interface1,
                        std::string_view interface2,
                        InterfaceDirection direction = InterfaceDirection::BIDIRECTIONAL,
-                       const std::vector<std::string> &tags = {});
+                       const std::vector<std::string>& tags = {});
 
     /** add a tag for later reference return a string_view reference for the tag*/
     std::string_view addTag(std::string_view tagName);
