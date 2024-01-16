@@ -110,9 +110,11 @@ class HandleManager {
     std::vector<GlobalHandle> regexSearch(const std::string& regexExpression,
                                           InterfaceType type) const;
     /** get all the aliases*/
-    const std::unordered_map<std::string_view, std::vector<std::string_view>> &getAliases() const {
+    const std::unordered_map<std::string_view, std::vector<std::string_view>>& getAliases() const
+    {
         return aliases;
     }
+
   private:
     void addSearchFields(const BasicHandleInfo& handle, int32_t index);
     std::string generateName(InterfaceType what) const;

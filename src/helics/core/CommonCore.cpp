@@ -2584,7 +2584,7 @@ static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> ma
     {"barriers", {BARRIERS, QueryReuse::DISABLED}},
     {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
     {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
-    {"unconnected_interfaces",{UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
+    {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
     {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
 
 void CommonCore::setQueryCallback(LocalFederateId federateID,
@@ -2824,13 +2824,12 @@ void CommonCore::initializeMapBuilder(std::string_view request,
             }
             break;
         case UNCONNECTED_INTERFACES:
-            if (!tags.empty())
-            {
+            if (!tags.empty()) {
                 Json::Value tagBlock = Json::objectValue;
                 for (const auto& tg : tags) {
                     tagBlock[tg.first] = tg.second;
                 }
-                base["tags"]=tagBlock;
+                base["tags"] = tagBlock;
             }
             break;
         default:
@@ -3633,7 +3632,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_CORE_TAG:
             if (command.source_id == global_broker_id_local &&
                 command.dest_id == global_broker_id_local) {
-                const auto &keyTag = command.getString(0);
+                const auto& keyTag = command.getString(0);
                 for (auto& tag : tags) {
                     if (tag.first == keyTag) {
                         tag.second = command.getString(1);

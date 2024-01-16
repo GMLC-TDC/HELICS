@@ -1,9 +1,3 @@
 {
-    "connections": [
-        [
-            "inp1",
-            "pub1",
-            "TO_FROM"
-        ]
-    ]
+  "connections": [["inp1", "pub1", "TO_FROM"]]
 }

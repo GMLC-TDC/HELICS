@@ -115,13 +115,13 @@ if(HELICS_BUILD_APP_LIBRARY)
         install(TARGETS helics_recorder ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
                 COMPONENT applications
         )
-        
+
         add_executable(helics_connector connectorMain.cpp)
         target_link_libraries(helics_connector PUBLIC HELICS::apps)
         target_link_libraries(helics_connector PRIVATE compile_flags_target)
         set_target_properties(helics_connector PROPERTIES FOLDER apps)
-        install(TARGETS helics_connector ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
-                COMPONENT applications
+        install(TARGETS helics_connector ${HELICS_EXPORT_COMMAND}
+                DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications
         )
 
         add_executable(helics_broker helics-broker.cpp)

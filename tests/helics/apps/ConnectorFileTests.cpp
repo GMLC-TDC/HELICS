@@ -11,13 +11,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 
 #include "helics/apps/BrokerApp.hpp"
-#include "helics/apps/CoreApp.hpp"
 #include "helics/apps/Connector.hpp"
+#include "helics/apps/CoreApp.hpp"
 
 #include <future>
 #include <thread>
 
-static const std::string testdir=std::string(TEST_DIR)+"/connector/";
+static const std::string testdir = std::string(TEST_DIR) + "/connector/";
 
 TEST(connector_file_tests, simple_connector)
 {
@@ -26,17 +26,17 @@ TEST(connector_file_tests, simple_connector)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.loadFile(testdir+"simple.txt");
-    
+    conn1.loadFile(testdir + "simple.txt");
+
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -45,9 +45,8 @@ TEST(connector_file_tests, simple_connector)
 
     vfed.finalize();
     fut.get();
-    EXPECT_EQ(conn1.madeConnections(),1);
+    EXPECT_EQ(conn1.madeConnections(), 1);
 }
-
 
 TEST(connector_file_tests, simple_connector_reverse)
 {
@@ -56,9 +55,9 @@ TEST(connector_file_tests, simple_connector_reverse)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.loadFile(testdir+"simple.json");
+    conn1.loadFile(testdir + "simple.json");
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
@@ -66,7 +65,7 @@ TEST(connector_file_tests, simple_connector_reverse)
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -77,7 +76,6 @@ TEST(connector_file_tests, simple_connector_reverse)
     fut.get();
 }
 
-
 TEST(connector_file_tests, connector_cascade)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
@@ -85,9 +83,9 @@ TEST(connector_file_tests, connector_cascade)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.loadFile(testdir+"cascade.txt");
+    conn1.loadFile(testdir + "cascade.txt");
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
@@ -96,7 +94,7 @@ TEST(connector_file_tests, connector_cascade)
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -107,4 +105,3 @@ TEST(connector_file_tests, connector_cascade)
     vfed.finalize();
     fut.get();
 }
-

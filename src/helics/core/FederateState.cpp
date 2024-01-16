@@ -1598,7 +1598,7 @@ void FederateState::timeoutCheck(ActionMessage& cmd)
                 LOG_WARNING(qres);
                 auto parentID = timeCoord->getParent();
                 if (parentID.isValid()) {
-                    ActionMessage brokerTimeoutCheck{ cmd };
+                    ActionMessage brokerTimeoutCheck{cmd};
                     brokerTimeoutCheck.source_id = global_id.load();
                     brokerTimeoutCheck.dest_id = parentID;
                     routeMessage(brokerTimeoutCheck);
@@ -2543,8 +2543,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
     };
 
     auto qres = generateInterfaceQueryResults(query, interfaceInformation, addHeader);
-    if (!qres.empty())
-    {
+    if (!qres.empty()) {
         return qres;
     }
     if (query == "global_flush") {
@@ -2633,22 +2632,19 @@ std::string FederateState::processQueryActual(std::string_view query) const
         addHeader(base);
         interfaceInformation.getUnconnectedInterfaces(base);
 
-        if (!tags.empty())
-        {
+        if (!tags.empty()) {
             Json::Value tagBlock = Json::objectValue;
             for (const auto& tg : tags) {
                 tagBlock[tg.first] = tg.second;
             }
-            base["tags"]=tagBlock;
+            base["tags"] = tagBlock;
         }
-        if (queryCallback)
-        {
+        if (queryCallback) {
             auto potential = queryCallback("potential_interfaces");
-            auto json=fileops::loadJsonStr(potential);
+            auto json = fileops::loadJsonStr(potential);
 
-            if (!json.isMember("error"))
-            {
-                base["potential_interfaces"]=json;
+            if (!json.isMember("error")) {
+                base["potential_interfaces"] = json;
             }
         }
         return fileops::generateJsonString(base);

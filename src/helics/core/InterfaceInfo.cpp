@@ -327,9 +327,7 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
             if (!ipt->key.empty()) {
                 if (!ipt->has_target) {
                     base["unconnected_inputs"].append(ipt->key);
-                }
-                else
-                {
+                } else {
                     base["connected_inputs"].append(ipt->key);
                 }
             }
@@ -344,9 +342,7 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
             if (!pub->key.empty()) {
                 if (pub->subscribers.empty()) {
                     base["unconnected_publications"].append(pub->key);
-                }
-                else
-                {
+                } else {
                     base["connected_publications"].append(pub->key);
                 }
             }
@@ -361,24 +357,19 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
         base["connected_endpoints"] = Json::arrayValue;
         for (const auto& ept : ehandle) {
             if (!ept->key.empty()) {
-                if (ept->targetedEndpoint)
-                {
+                if (ept->targetedEndpoint) {
                     if (!ept->hasSource()) {
                         base["unconnected_target_endpoints"].append(ept->key);
                     }
                     if (!ept->hasTarget()) {
                         base["unconnected_source_endpoints"].append(ept->key);
                     }
-                    if (ept->hasConnection())
-                    {
+                    if (ept->hasConnection()) {
                         base["connected_endpoints"].append(ept->key);
                     }
-                }
-                else
-                {
+                } else {
                     base["connected_endpoints"].append(ept->key);
                 }
-                
             }
         }
     }

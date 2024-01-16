@@ -6,140 +6,143 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "helicsApp.hpp"
 #include "CoreApp.hpp"
+#include "helicsApp.hpp"
 
-#include <string_view>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 namespace helics::apps {
-    enum class InterfaceDirection
-    {
-        TO_FROM=-1,
-        BIDIRECTIONAL=0,
-        FROM_TO=1
-    };
+enum class InterfaceDirection { TO_FROM = -1, BIDIRECTIONAL = 0, FROM_TO = 1 };
 
-    struct Connection {
-        std::string_view interface1;
-        std::string_view interface2;
-        InterfaceDirection direction;
-        std::vector<std::string_view> tags;
-    };
+struct Connection {
+    std::string_view interface1;
+    std::string_view interface2;
+    InterfaceDirection direction;
+    std::vector<std::string_view> tags;
+};
 
-    class ConnectionsList;
-    /** class implementing a Connector object, which is capable of automatically connecting interfaces in HELICS
-@details  the Conncector class is not thread-safe,  don't try to use it from multiple threads without
-external protection, that will result in undefined behavior
+class ConnectionsList;
+/** class implementing a Connector object, which is capable of automatically connecting interfaces
+in HELICS
+@details  the Conncector class is not thread-safe,  don't try to use it from multiple threads
+without external protection, that will result in undefined behavior
 */
-    class HELICS_CXX_EXPORT Connector: public App {
-      public:
-        /** default constructor*/
-        Connector() = default;
-        /** construct from command line arguments in a vector
-   @param args the command line arguments to pass in a reverse vector
-   */
-        explicit Connector(std::vector<std::string> args);
-        /** construct from command line arguments
-    @param argc the number of arguments
-    @param argv the strings in the input
-    */
-        Connector(int argc, char* argv[]);
-        /** construct from a federate info object
-    @param name the name of the federate (can be empty to use defaults from fi)
-    @param fi a pointer info object containing information on the desired federate configuration
-    */
-        explicit Connector(std::string_view name, const FederateInfo& fi);
-        /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate (can be empty to use defaults from fi)
-    @param core a pointer to core object which the federate can join
-    @param fi  a federate information structure
-    */
-        Connector(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
-        /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate (can be empty to use defaults from fi)
-    @param core a coreApp object that can be joined
-    @param fi  a federate information structure
-    */
-        Connector(std::string_view name, CoreApp& core, const FederateInfo& fi);
-        /**constructor taking a file with the required information
-    @param appName the name of the app
-    @param configString JSON, TOML or text file or JSON string defining the federate information and
-    other configuration
-    */
-        Connector(std::string_view appName, const std::string& configString);
+class HELICS_CXX_EXPORT Connector: public App {
+  public:
+    /** default constructor*/
+    Connector() = default;
+    /** construct from command line arguments in a vector
+@param args the command line arguments to pass in a reverse vector
+*/
+    explicit Connector(std::vector<std::string> args);
+    /** construct from command line arguments
+@param argc the number of arguments
+@param argv the strings in the input
+*/
+    Connector(int argc, char* argv[]);
+    /** construct from a federate info object
+@param name the name of the federate (can be empty to use defaults from fi)
+@param fi a pointer info object containing information on the desired federate configuration
+*/
+    explicit Connector(std::string_view name, const FederateInfo& fi);
+    /**constructor taking a federate information structure and using the given core
+@param name the name of the federate (can be empty to use defaults from fi)
+@param core a pointer to core object which the federate can join
+@param fi  a federate information structure
+*/
+    Connector(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+    /**constructor taking a federate information structure and using the given core
+@param name the name of the federate (can be empty to use defaults from fi)
+@param core a coreApp object that can be joined
+@param fi  a federate information structure
+*/
+    Connector(std::string_view name, CoreApp& core, const FederateInfo& fi);
+    /**constructor taking a file with the required information
+@param appName the name of the app
+@param configString JSON, TOML or text file or JSON string defining the federate information and
+other configuration
+*/
+    Connector(std::string_view appName, const std::string& configString);
 
-        /** move construction*/
-        Connector(Connector&& other_player) = default;
-        /** move assignment*/
-        Connector& operator=(Connector&& fed) = default;
+    /** move construction*/
+    Connector(Connector&& other_player) = default;
+    /** move assignment*/
+    Connector& operator=(Connector&& fed) = default;
 
-        /** initialize the Player federate
-    @details generate all the publications and organize the points, the final publication count will
-    be available after this time and the Player will enter the initialization mode, which means it
-    will not be possible to add more publications calling run will automatically do this if
-    necessary
-    */
-        virtual void initialize() override;
+    /** initialize the Player federate
+@details generate all the publications and organize the points, the final publication count will
+be available after this time and the Player will enter the initialization mode, which means it
+will not be possible to add more publications calling run will automatically do this if
+necessary
+*/
+    virtual void initialize() override;
 
-        /** run the Player until the specified time
-    @param stopTime_input the desired stop time
-    */
-        virtual void runTo(Time stopTime_input) override;
+    /** run the Player until the specified time
+@param stopTime_input the desired stop time
+*/
+    virtual void runTo(Time stopTime_input) override;
 
-        /** add a connection to a connector
-    @param interface1 the identifier of the first interface
-    @param interface2 the identifier of the second interface
-    @param direction the directionality of the interface
-    @param tags any string tags associated with the connection
-    */
-        void addConnection(std::string_view interface1,
-                            std::string_view interface2,
-                            InterfaceDirection direction=InterfaceDirection::BIDIRECTIONAL,
-            std::vector<std::string> tags = {});
+    /** add a connection to a connector
+@param interface1 the identifier of the first interface
+@param interface2 the identifier of the second interface
+@param direction the directionality of the interface
+@param tags any string tags associated with the connection
+*/
+    void addConnection(std::string_view interface1,
+                       std::string_view interface2,
+                       InterfaceDirection direction = InterfaceDirection::BIDIRECTIONAL,
+                       std::vector<std::string> tags = {});
 
-        /** add a tag for later reference return a string_view reference for the tag*/
-        std::string_view addTag(std::string_view tagName);
+    /** add a tag for later reference return a string_view reference for the tag*/
+    std::string_view addTag(std::string_view tagName);
 
-        /** add a interface name for later reference return a string_view reference for the interface name*/
-        std::string_view addInterface(std::string_view interfaceName);
+    /** add a interface name for later reference return a string_view reference for the interface
+     * name*/
+    std::string_view addInterface(std::string_view interfaceName);
 
-        /** get the number of connections*/
-        auto connectionCount() const { return connections.size(); }
-        /** get the number of made connections*/
-        auto madeConnections() const { return matchCount; }
-        
-      private:
-        std::unique_ptr<helicsCLI11App> generateParser();
-        /** process remaining command line arguments*/
-        void processArgs();
-        /** load from a jsonString
-    @param jsonString either a JSON filename or a string containing JSON
-    */
-        virtual void loadJsonFile(const std::string& jsonString) override;
-        /** load a text file*/
-        virtual void loadTextFile(const std::string& filename) override;
+    /** get the number of connections*/
+    auto connectionCount() const { return connections.size(); }
+    /** get the number of made connections*/
+    auto madeConnections() const { return matchCount; }
 
-        bool addConnectionVector(const std::vector<std::string> &v1);
-        /** actually go through and make connections*/
-        void makeConnections(ConnectionsList &possibleConnections);
-        /** try to make a connection for an input*/
-        int makeTargetConnection(std::string_view origin, std::unordered_set<std::string_view>& possibleConnections,const std::unordered_multimap<std::string_view, std::string_view>& aliases, const std::function<void(std::string_view origin,std::string_view target)> &callback);
-        /** get a list of the possible connections to based on the database*/
-        std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface) const;
-      private:
-        CoreApp core;
-        std::unordered_multimap<std::string_view, Connection> connections;  //!< the connections descriptors
-        std::vector<Connection> matchers;
-        std::unordered_set<std::string> tags;
-        std::unordered_set<std::string> interfaces;
-        std::uint64_t matchCount{0};
-        bool matchTargetEndpoints{false}; //!< indicator to match unconnected target endpoints default{false}
-        bool matchMultiple{false}; //!< indicator to do multiple matches [default is to stop at first match]
-        
-        
-    };
-}  
+  private:
+    std::unique_ptr<helicsCLI11App> generateParser();
+    /** process remaining command line arguments*/
+    void processArgs();
+    /** load from a jsonString
+@param jsonString either a JSON filename or a string containing JSON
+*/
+    virtual void loadJsonFile(const std::string& jsonString) override;
+    /** load a text file*/
+    virtual void loadTextFile(const std::string& filename) override;
+
+    bool addConnectionVector(const std::vector<std::string>& v1);
+    /** actually go through and make connections*/
+    void makeConnections(ConnectionsList& possibleConnections);
+    /** try to make a connection for an input*/
+    int makeTargetConnection(
+        std::string_view origin,
+        std::unordered_set<std::string_view>& possibleConnections,
+        const std::unordered_multimap<std::string_view, std::string_view>& aliases,
+        const std::function<void(std::string_view origin, std::string_view target)>& callback);
+    /** get a list of the possible connections to based on the database*/
+    std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface) const;
+
+  private:
+    CoreApp core;
+    std::unordered_multimap<std::string_view, Connection>
+        connections;  //!< the connections descriptors
+    std::vector<Connection> matchers;
+    std::unordered_set<std::string> tags;
+    std::unordered_set<std::string> interfaces;
+    std::uint64_t matchCount{0};
+    bool matchTargetEndpoints{
+        false};  //!< indicator to match unconnected target endpoints default{false}
+    bool matchMultiple{
+        false};  //!< indicator to do multiple matches [default is to stop at first match]
+};
+}  // namespace helics::apps

@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 
 #include "helics/apps/BrokerApp.hpp"
-#include "helics/apps/CoreApp.hpp"
 #include "helics/apps/Connector.hpp"
+#include "helics/apps/CoreApp.hpp"
 
 #include <future>
 #include <thread>
@@ -24,17 +24,17 @@ TEST(connector_tests, simple_connector)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("inp1","pub1",InterfaceDirection::FROM_TO);
-    
+    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
+
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -43,7 +43,7 @@ TEST(connector_tests, simple_connector)
 
     vfed.finalize();
     fut.get();
-    EXPECT_EQ(conn1.madeConnections(),1);
+    EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
 TEST(connector_tests, simple_connector_reverse)
@@ -53,9 +53,9 @@ TEST(connector_tests, simple_connector_reverse)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("pub1","inp1",InterfaceDirection::FROM_TO);
+    conn1.addConnection("pub1", "inp1", InterfaceDirection::FROM_TO);
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
@@ -63,7 +63,7 @@ TEST(connector_tests, simple_connector_reverse)
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -73,7 +73,6 @@ TEST(connector_tests, simple_connector_reverse)
     vfed.finalize();
     fut.get();
 }
-
 
 TEST(connector_tests, connector_multiple)
 {
@@ -82,12 +81,12 @@ TEST(connector_tests, connector_multiple)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("inp1","pub1",InterfaceDirection::FROM_TO);
-    conn1.addConnection("inp1","pubA",InterfaceDirection::FROM_TO);
-    conn1.addConnection("inp2","pub1",InterfaceDirection::FROM_TO);
-    conn1.addConnection("inp2","pubA",InterfaceDirection::FROM_TO);
+    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
+    conn1.addConnection("inp1", "pubA", InterfaceDirection::FROM_TO);
+    conn1.addConnection("inp2", "pub1", InterfaceDirection::FROM_TO);
+    conn1.addConnection("inp2", "pubA", InterfaceDirection::FROM_TO);
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
@@ -96,7 +95,7 @@ TEST(connector_tests, connector_multiple)
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -107,7 +106,6 @@ TEST(connector_tests, connector_multiple)
     vfed.finalize();
     fut.get();
 }
-
 
 TEST(connector_tests, connector_cascade)
 {
@@ -116,14 +114,14 @@ TEST(connector_tests, connector_cascade)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("inp1","intermediate1",InterfaceDirection::FROM_TO);
-    conn1.addConnection("intermediate1","intermediate1",InterfaceDirection::BIDIRECTIONAL);
-    conn1.addConnection("intermediate1","intermediate2",InterfaceDirection::FROM_TO);
-    conn1.addConnection("intermediate2","intermediate3",InterfaceDirection::FROM_TO);
-    conn1.addConnection("intermediate3","pub1",InterfaceDirection::BIDIRECTIONAL);
-    conn1.addConnection("inp2","intermediate2",InterfaceDirection::FROM_TO);
+    conn1.addConnection("inp1", "intermediate1", InterfaceDirection::FROM_TO);
+    conn1.addConnection("intermediate1", "intermediate1", InterfaceDirection::BIDIRECTIONAL);
+    conn1.addConnection("intermediate1", "intermediate2", InterfaceDirection::FROM_TO);
+    conn1.addConnection("intermediate2", "intermediate3", InterfaceDirection::FROM_TO);
+    conn1.addConnection("intermediate3", "pub1", InterfaceDirection::BIDIRECTIONAL);
+    conn1.addConnection("inp2", "intermediate2", InterfaceDirection::FROM_TO);
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
@@ -132,7 +130,7 @@ TEST(connector_tests, connector_cascade)
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -144,8 +142,6 @@ TEST(connector_tests, connector_cascade)
     fut.get();
 }
 
-
-
 TEST(connector_tests, endpoint_connector)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
@@ -153,9 +149,9 @@ TEST(connector_tests, endpoint_connector)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("ept1","ept12",InterfaceDirection::FROM_TO);
+    conn1.addConnection("ept1", "ept12", InterfaceDirection::FROM_TO);
 
     helics::MessageFederate vfed("c1", fi);
     auto& ept1 = vfed.registerGlobalTargetedEndpoint("ept1");
@@ -168,8 +164,8 @@ TEST(connector_tests, endpoint_connector)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     EXPECT_TRUE(ept12.hasMessage());
-    auto message=ept12.getMessage();
-    EXPECT_EQ(message->to_string(),testValue);
+    auto message = ept12.getMessage();
+    EXPECT_EQ(message->to_string(), testValue);
     vfed.finalize();
     fut.get();
 }
@@ -181,9 +177,9 @@ TEST(connector_tests, endpoint_connector_no_connection)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("ept1","ept12",InterfaceDirection::FROM_TO);
+    conn1.addConnection("ept1", "ept12", InterfaceDirection::FROM_TO);
 
     helics::MessageFederate vfed("c1", fi);
     auto& ept1 = vfed.registerGlobalTargetedEndpoint("ept1");
@@ -201,7 +197,6 @@ TEST(connector_tests, endpoint_connector_no_connection)
     fut.get();
 }
 
-
 TEST(connector_tests, endpoint_connector_bidirectional)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
@@ -209,9 +204,9 @@ TEST(connector_tests, endpoint_connector_bidirectional)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("ept1","ept12",InterfaceDirection::BIDIRECTIONAL);
+    conn1.addConnection("ept1", "ept12", InterfaceDirection::BIDIRECTIONAL);
 
     helics::MessageFederate vfed("c1", fi);
     auto& ept1 = vfed.registerGlobalTargetedEndpoint("ept1");
@@ -227,15 +222,14 @@ TEST(connector_tests, endpoint_connector_bidirectional)
     EXPECT_EQ(retTime, 1.0);
     EXPECT_TRUE(ept1.hasMessage());
     EXPECT_TRUE(ept12.hasMessage());
-    auto message=ept12.getMessage();
-    EXPECT_EQ(message->to_string(),testValue1);
+    auto message = ept12.getMessage();
+    EXPECT_EQ(message->to_string(), testValue1);
 
-    message=ept1.getMessage();
-    EXPECT_EQ(message->to_string(),testValue2);
+    message = ept1.getMessage();
+    EXPECT_EQ(message->to_string(), testValue2);
     vfed.finalize();
     fut.get();
 }
-
 
 TEST(connector_tests, simple_connector_alias)
 {
@@ -244,9 +238,9 @@ TEST(connector_tests, simple_connector_alias)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("inp1","publication1",InterfaceDirection::FROM_TO);
+    conn1.addConnection("inp1", "publication1", InterfaceDirection::FROM_TO);
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
@@ -255,7 +249,7 @@ TEST(connector_tests, simple_connector_alias)
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -273,18 +267,18 @@ TEST(connector_tests, simple_connector_alias_reverse)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("pub1","input1",InterfaceDirection::FROM_TO);
+    conn1.addConnection("pub1", "input1", InterfaceDirection::FROM_TO);
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
-    
+
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     inp1.addAlias("input1");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -295,8 +289,6 @@ TEST(connector_tests, simple_connector_alias_reverse)
     fut.get();
 }
 
-
-
 TEST(connector_tests, dual_alias)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
@@ -304,9 +296,9 @@ TEST(connector_tests, dual_alias)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("input1","publication1",InterfaceDirection::FROM_TO);
+    conn1.addConnection("input1", "publication1", InterfaceDirection::FROM_TO);
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
@@ -316,7 +308,7 @@ TEST(connector_tests, dual_alias)
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -334,9 +326,9 @@ TEST(connector_tests, dual_alias_reverse)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("publication1","input1",InterfaceDirection::FROM_TO);
+    conn1.addConnection("publication1", "input1", InterfaceDirection::FROM_TO);
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
@@ -345,7 +337,7 @@ TEST(connector_tests, dual_alias_reverse)
     inp1.addAlias("input1");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -356,8 +348,6 @@ TEST(connector_tests, dual_alias_reverse)
     fut.get();
 }
 
-
-
 TEST(connector_tests, cascade_dual_alias)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
@@ -365,24 +355,24 @@ TEST(connector_tests, cascade_dual_alias)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("inputA","publicationA",InterfaceDirection::FROM_TO);
+    conn1.addConnection("inputA", "publicationA", InterfaceDirection::FROM_TO);
 
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     pub1.addAlias("publication1");
     helics::CoreApp core(vfed.getCorePointer());
-    core.addAlias("publication1","pubsbb");
-    core.addAlias("pubsbb","publicationA");
+    core.addAlias("publication1", "pubsbb");
+    core.addAlias("pubsbb", "publicationA");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     inp1.addAlias("input1");
-    core.addAlias("input1","inpsbb");
-    core.addAlias("inpsbb","inputA");
+    core.addAlias("input1", "inpsbb");
+    core.addAlias("inpsbb", "inputA");
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -400,25 +390,25 @@ TEST(connector_tests, cascade_dual_alias_intermediary)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("publicationA","inputC",InterfaceDirection::FROM_TO);
-    conn1.addConnection("inputC","inputE",InterfaceDirection::FROM_TO);
-    conn1.addConnection("inputE","inputA",InterfaceDirection::FROM_TO);
+    conn1.addConnection("publicationA", "inputC", InterfaceDirection::FROM_TO);
+    conn1.addConnection("inputC", "inputE", InterfaceDirection::FROM_TO);
+    conn1.addConnection("inputE", "inputA", InterfaceDirection::FROM_TO);
     helics::ValueFederate vfed("c1", fi);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     pub1.addAlias("publication1");
     helics::CoreApp core(vfed.getCorePointer());
-    core.addAlias("publication1","pubsbb");
-    core.addAlias("pubsbb","publicationA");
+    core.addAlias("publication1", "pubsbb");
+    core.addAlias("pubsbb", "publicationA");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     inp1.addAlias("input1");
     inp1.addAlias("input1");
-    core.addAlias("input1","inpsbb");
-    core.addAlias("inpsbb","inputA");
+    core.addAlias("input1", "inpsbb");
+    core.addAlias("inpsbb", "inputA");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    const double testValue=3452.562;
+    const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -429,7 +419,6 @@ TEST(connector_tests, cascade_dual_alias_intermediary)
     fut.get();
 }
 
-
 TEST(connector_tests, endpoint_connector_alias1)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
@@ -437,9 +426,9 @@ TEST(connector_tests, endpoint_connector_alias1)
 
     fi.coreName = "ccore1";
     fi.coreInitString = "-f2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fi);
-    conn1.addConnection("eptA","eptB",InterfaceDirection::FROM_TO);
+    conn1.addConnection("eptA", "eptB", InterfaceDirection::FROM_TO);
 
     helics::MessageFederate vfed("c1", fi);
     auto& ept1 = vfed.registerGlobalTargetedEndpoint("ept1");
@@ -453,8 +442,8 @@ TEST(connector_tests, endpoint_connector_alias1)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     EXPECT_TRUE(ept12.hasMessage());
-    auto message=ept12.getMessage();
-    EXPECT_EQ(message->to_string(),testValue);
+    auto message = ept12.getMessage();
+    EXPECT_EQ(message->to_string(), testValue);
     vfed.finalize();
     fut.get();
 }
