@@ -6,36 +6,33 @@
 
 ## Dockerfile
 
-This `Dockerfile` will build and install HELICS in Ubuntu 18.04 with
+This `Dockerfile` will build and install HELICS in Ubuntu 22.04 with
 Python support.
 
 ```dockerfile
-FROM ubuntu:18.04 as builder
-
-RUN apt update && apt install -y \
-  libboost-dev \
-  libboost-filesystem-dev \
-  libboost-program-options-dev \
-  libboost-test-dev \
-  libzmq5-dev python3-dev \
-  build-essential swig cmake git
+FROM ubuntu:22.04 as builder
 
 WORKDIR /root/develop
 
-RUN git clone https://github.com/GMLC-TDC/HELICS.git helics
+RUN apt update && apt install -y \
+  libzmq5-dev python3-dev \
+  libboost-all-dev \
+  build-essential swig cmake git
 
-WORKDIR /root/develop/helics/build
+RUN git clone --recurse-submodules \
+  https://github.com/GMLC-TDC/HELICS.git helics
+
+WORKDIR /root/develop/helics
 
 RUN cmake \
   -DCMAKE_INSTALL_PREFIX=/helics \
-  ..
-RUN make -j8 && make install
+  -DCMAKE_BUILD_TYPE=Release \
+  -B build
 
-FROM ubuntu:18.04
+RUN cmake --build build -j -t install
 
-RUN apt update && apt install -y --no-install-recommends \
-  libboost-filesystem1.65.1 libboost-program-options1.65.1 \
-  libboost-test1.65.1 libzmq5
+
+FROM ubuntu:22.04
 
 COPY --from=builder /helics /usr/local/
 
@@ -43,8 +40,9 @@ ENV PYTHONPATH /usr/local/python
 
 # Python must be installed after the PYTHONPATH is set above for it to
 # recognize and import libhelicsSharedLib.so.
-RUN apt install -y --no-install-recommends python3-dev \
-  && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y --no-install-recommends \
+  libboost-filesystem1.74.0 libboost-program-options1.74.0 \
+  libboost-test1.74.0 libzmq5 pip python3-dev
 
 RUN pip install helics
 
