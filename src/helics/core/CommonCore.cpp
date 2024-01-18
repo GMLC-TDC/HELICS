@@ -4623,6 +4623,8 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                     if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
                         loopFederates.apply([&cmd](auto& fed) {
                             if (fed->initIterating.load()) {
+                                fed->initIterating.store(false);
+                                fed->init_transmitted=false;
                                 fed->addAction(cmd);
                             }
                         });

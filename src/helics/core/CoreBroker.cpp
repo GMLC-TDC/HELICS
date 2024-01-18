@@ -3823,6 +3823,30 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
                     }
                 }
             }
+            if (unknownHandles.hasUnknowns())
+            {
+                base["unknown_publications"]=Json::arrayValue;
+                base["unknown_inputs"]=Json::arrayValue;
+                base["unknown_endpoints"]=Json::arrayValue;
+                auto unknownProcessor=[&base](const std::string& name, InterfaceType type, UnknownHandleManager::TargetInfo /*target*/)
+                {
+                    switch (type)
+                    {
+                    case InterfaceType::INPUT:
+                        base["unknown_inputs"].append(name);
+                        break;
+                    case InterfaceType::PUBLICATION:
+                        base["unknown_publications"].append(name);
+                        break;
+                    case InterfaceType::ENDPOINT:
+                        base["unknown_endpoints"].append(name);
+                        break;
+                    default:
+                        break;
+                    }
+                };
+                unknownHandles.processUnknowns(unknownProcessor);
+            }
             break;
     }
 }

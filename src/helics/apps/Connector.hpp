@@ -25,10 +25,12 @@ struct Connection {
     std::vector<std::string_view> tags;
 };
 
-class ConnectionsList;
+struct ConnectionsList;
+struct PotentialConnections;
+
 /** class implementing a Connector object, which is capable of automatically connecting interfaces
 in HELICS
-@details  the Conncector class is not thread-safe,  don't try to use it from multiple threads
+@details  the Connector class is not thread-safe,  don't try to use it from multiple threads
 without external protection, that will result in undefined behavior
 */
 class HELICS_CXX_EXPORT Connector: public App {
@@ -122,6 +124,8 @@ necessary
 
     bool addConnectionVector(const std::vector<std::string>& v1);
     /** actually go through and make connections*/
+    void establishPotentialInterfaces(ConnectionsList& possibleConnections);
+    /** actually go through and make connections*/
     void makeConnections(ConnectionsList& possibleConnections);
     /** try to make a connection for an input*/
     int makeTargetConnection(
@@ -129,6 +133,8 @@ necessary
         std::unordered_set<std::string_view>& possibleConnections,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases,
         const std::function<void(std::string_view origin, std::string_view target)>& callback);
+    bool makePotentialConnection(std::string_view interface, std::unordered_map<std::string_view, PotentialConnections>& potentials,
+        const std::unordered_multimap<std::string_view, std::string_view>& aliases);
     /** get a list of the possible connections to based on the database*/
     std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface) const;
 
