@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <memory>
 
 namespace helics::apps {
 enum class InterfaceDirection { TO_FROM = -1, BIDIRECTIONAL = 0, FROM_TO = 1 };

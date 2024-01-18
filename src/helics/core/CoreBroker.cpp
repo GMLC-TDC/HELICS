@@ -1954,7 +1954,7 @@ bool CoreBroker::checkInterfaceCreation(ActionMessage& message, InterfaceType ty
                 propagateError(std::move(eret));
                 return false;
             }
-            if (!(fed->observer || (fed->dynamic && fed->state == ConnectionState::CONNECTED))) {
+            if (!(fed->observer && (!fed->dynamic || fed->state != ConnectionState::CONNECTED))) {
                 ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, message.source_id);
                 eret.dest_handle = message.source_handle;
                 eret.messageID = defs::Errors::REGISTRATION_FAILURE;
@@ -3647,7 +3647,7 @@ std::string CoreBroker::generateGlobalStatus(fileops::JsonMapBuilder& builder)
             }
         }
     }
-    std::string tste =
+    const std::string tste =
         (minTime >= timeZero) ? std::string("operating") : std::string("init_requested");
 
     Json::Value json;
@@ -3804,8 +3804,8 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
         case UNCONNECTED_INTERFACES:
             if (!global_values.empty()) {
                 Json::Value tagBlock = Json::objectValue;
-                for (const auto& tg : global_values) {
-                    tagBlock[tg.first] = tg.second;
+                for (const auto& global : global_values) {
+                    tagBlock[global.first] = global.second;
                 }
                 base["tags"] = tagBlock;
             }
@@ -3813,7 +3813,7 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
             if (!aliases.empty()) {
                 base["aliases"] = Json::arrayValue;
                 for (const auto& alias : aliases) {
-                    std::string_view interfaceName = alias.first;
+                    const std::string_view interfaceName = alias.first;
                     const auto& aliasNames = alias.second;
                     for (const auto& aliasName : aliasNames) {
                         Json::Value aliasSet = Json::arrayValue;
