@@ -4624,7 +4624,7 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                         loopFederates.apply([&cmd](auto& fed) {
                             if (fed->initIterating.load()) {
                                 fed->initIterating.store(false);
-                                fed->init_transmitted=false;
+                                fed->init_transmitted = false;
                                 fed->addAction(cmd);
                             }
                         });

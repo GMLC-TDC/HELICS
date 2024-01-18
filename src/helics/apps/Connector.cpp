@@ -17,17 +17,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <optional>
 #include <set>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include <type_traits>
 
 namespace helics::apps {
 
 /** dataclass for potential connections*/
-struct PotentialConnections
-{
+struct PotentialConnections {
     std::string_view federate;
     std::string_view key;
     bool used{false};
@@ -68,24 +67,18 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
             connections.aliases.emplace(alias1, alias2);
         }
     }
-    if (json.isMember("unknown_inputs"))
-    {
-        for (const auto& input : json["unknown_inputs"])
-        {
+    if (json.isMember("unknown_inputs")) {
+        for (const auto& input : json["unknown_inputs"]) {
             connections.unknownInputs.push_back(input.asString());
         }
     }
-    if (json.isMember("unknown_publications"))
-    {
-        for (const auto& pub : json["unknown_publications"])
-        {
+    if (json.isMember("unknown_publications")) {
+        for (const auto& pub : json["unknown_publications"]) {
             connections.unknownPubs.push_back(pub.asString());
         }
     }
-    if (json.isMember("unknown_endpoints"))
-    {
-        for (const auto& ept : json["unknown_endpoints"])
-        {
+    if (json.isMember("unknown_endpoints")) {
+        for (const auto& ept : json["unknown_endpoints"]) {
             connections.unknownEndpoints.push_back(ept.asString());
         }
     }
@@ -146,36 +139,36 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
                         connections.endpoints.insert(end1);
                     }
                 }
-                if (fed.isMember("potential_interfaces"))
-                {
-                    connections.hasPotentialInterfaces=true;
+                if (fed.isMember("potential_interfaces")) {
+                    connections.hasPotentialInterfaces = true;
                     const std::string_view federateName =
-                        connections.federatesWithPotentialInterfaces.emplace_back(fed["attributes"]["name"].asString());
-                   const auto &potInterfaces=fed["potential_interfaces"];
-                   if (potInterfaces.isMember("inputs")) {
-                       for (auto& input : potInterfaces["inputs"]) {
-                           const std::string_view input1 =
-                               connections.interfaces.emplace_back(input.asString());
-                           connections.potentialInputs.emplace(input1,PotentialConnections{federateName,input1,false});
-                           
-                       }
-                   }
-                   if (potInterfaces.isMember("publications")) {
-                       for (auto& pub : potInterfaces["publications"]) {
-                           const std::string_view pub1 =
-                               connections.interfaces.emplace_back(pub.asString());
-                           connections.potentialPubs.emplace(pub1,PotentialConnections{federateName,pub1,false});
-
-                       }
-                   }
-                   if (potInterfaces.isMember("endpoints")) {
-                       for (auto& endpoint : potInterfaces["endpoints"]) {
-                           const std::string_view endpoint1 =
-                               connections.interfaces.emplace_back(endpoint.asString());
-                           connections.potentialEndpoints.emplace(endpoint1,PotentialConnections{federateName,endpoint1,false});
-
-                       }
-                   }
+                        connections.federatesWithPotentialInterfaces.emplace_back(
+                            fed["attributes"]["name"].asString());
+                    const auto& potInterfaces = fed["potential_interfaces"];
+                    if (potInterfaces.isMember("inputs")) {
+                        for (auto& input : potInterfaces["inputs"]) {
+                            const std::string_view input1 =
+                                connections.interfaces.emplace_back(input.asString());
+                            connections.potentialInputs.emplace(
+                                input1, PotentialConnections{federateName, input1, false});
+                        }
+                    }
+                    if (potInterfaces.isMember("publications")) {
+                        for (auto& pub : potInterfaces["publications"]) {
+                            const std::string_view pub1 =
+                                connections.interfaces.emplace_back(pub.asString());
+                            connections.potentialPubs.emplace(
+                                pub1, PotentialConnections{federateName, pub1, false});
+                        }
+                    }
+                    if (potInterfaces.isMember("endpoints")) {
+                        for (auto& endpoint : potInterfaces["endpoints"]) {
+                            const std::string_view endpoint1 =
+                                connections.interfaces.emplace_back(endpoint.asString());
+                            connections.potentialEndpoints.emplace(
+                                endpoint1, PotentialConnections{federateName, endpoint1, false});
+                        }
+                    }
                 }
             }
         }
@@ -515,26 +508,25 @@ static std::set<std::string_view>
     return matches;
 }
 
-bool Connector::makePotentialConnection(std::string_view interface, std::unordered_map<std::string_view, PotentialConnections>& potentials,
+bool Connector::makePotentialConnection(
+    std::string_view interface,
+    std::unordered_map<std::string_view, PotentialConnections>& potentials,
     const std::unordered_multimap<std::string_view, std::string_view>& aliases)
 {
-
     auto connectionOptions = buildPossibleConnectionList(interface);
     for (const auto& option : connectionOptions) {
         auto located = potentials.find(option.interface2);
         if (located != potentials.end()) {
             /* source, target*/
-           located->second.used=true;
+            located->second.used = true;
             return true;
-        }
-        else
-        {
-            auto aliasList=generateAliases(option.interface2,aliases);
+        } else {
+            auto aliasList = generateAliases(option.interface2, aliases);
             for (const auto& alias : aliasList) {
                 located = potentials.find(alias);
                 if (located != potentials.end()) {
                     /* source, target*/
-                    located->second.used=true;
+                    located->second.used = true;
                     return true;
                 }
             }
@@ -665,35 +657,34 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
     }
 }
 
-
 void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnections)
 {
     auto nullConnector = [this](std::string_view, std::string_view) {};
     /** potential inputs*/
     for (auto& pInp : possibleConnections.potentialInputs) {
-
-        std::string_view inputName=pInp.first;
+        std::string_view inputName = pInp.first;
 
         auto matched = makeTargetConnection(inputName,
-            possibleConnections.pubs,
-            possibleConnections.aliases,
-            nullConnector);
-        if (matched > 0)
-        {
-            pInp.second.used=true;
+                                            possibleConnections.pubs,
+                                            possibleConnections.aliases,
+                                            nullConnector);
+        if (matched > 0) {
+            pInp.second.used = true;
             continue;
         }
-        if (makePotentialConnection(inputName, possibleConnections.potentialPubs,possibleConnections.aliases))
-        {
-            pInp.second.used=true;
+        if (makePotentialConnection(inputName,
+                                    possibleConnections.potentialPubs,
+                                    possibleConnections.aliases)) {
+            pInp.second.used = true;
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(inputName, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (makePotentialConnection(alias, possibleConnections.potentialPubs,possibleConnections.aliases))
-                {
-                    pInp.second.used=true;
+                if (makePotentialConnection(alias,
+                                            possibleConnections.potentialPubs,
+                                            possibleConnections.aliases)) {
+                    pInp.second.used = true;
                     break;
                 }
             }
@@ -701,34 +692,33 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
     }
     /* potential publications*/
     for (auto& pPub : possibleConnections.potentialPubs) {
-
-        if (pPub.second.used)
-        {
+        if (pPub.second.used) {
             continue;
         }
-        std::string_view pubName=pPub.first;
+        std::string_view pubName = pPub.first;
         /** check for match with existing inputs*/
         auto matched = makeTargetConnection(pubName,
-            possibleConnections.inputs,
-            possibleConnections.aliases,
-            nullConnector);
-        if (matched > 0)
-        {
-            pPub.second.used=true;
+                                            possibleConnections.inputs,
+                                            possibleConnections.aliases,
+                                            nullConnector);
+        if (matched > 0) {
+            pPub.second.used = true;
             continue;
         }
         /** check for match with potential inputs*/
-        if (makePotentialConnection(pubName, possibleConnections.potentialInputs,possibleConnections.aliases))
-        {
-            pPub.second.used=true;
+        if (makePotentialConnection(pubName,
+                                    possibleConnections.potentialInputs,
+                                    possibleConnections.aliases)) {
+            pPub.second.used = true;
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(pubName, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (makePotentialConnection(alias, possibleConnections.potentialInputs,possibleConnections.aliases))
-                {
-                    pPub.second.used=true;
+                if (makePotentialConnection(alias,
+                                            possibleConnections.potentialInputs,
+                                            possibleConnections.aliases)) {
+                    pPub.second.used = true;
                     break;
                 }
             }
@@ -737,34 +727,33 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
 
     /* potential endpoints*/
     for (auto& pEnd : possibleConnections.potentialEndpoints) {
-
-        if (pEnd.second.used)
-        {
+        if (pEnd.second.used) {
             continue;
         }
-        std::string_view endpointName=pEnd.first;
+        std::string_view endpointName = pEnd.first;
         /** check for match with existing inputs*/
         auto matched = makeTargetConnection(endpointName,
-            possibleConnections.endpoints,
-            possibleConnections.aliases,
-            nullConnector);
-        if (matched > 0)
-        {
-            pEnd.second.used=true;
+                                            possibleConnections.endpoints,
+                                            possibleConnections.aliases,
+                                            nullConnector);
+        if (matched > 0) {
+            pEnd.second.used = true;
             continue;
         }
         /** check for match with potential inputs*/
-        if (makePotentialConnection(endpointName, possibleConnections.potentialEndpoints,possibleConnections.aliases))
-        {
-            pEnd.second.used=true;
+        if (makePotentialConnection(endpointName,
+                                    possibleConnections.potentialEndpoints,
+                                    possibleConnections.aliases)) {
+            pEnd.second.used = true;
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(endpointName, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (makePotentialConnection(alias, possibleConnections.potentialEndpoints,possibleConnections.aliases))
-                {
-                    pEnd.second.used=true;
+                if (makePotentialConnection(alias,
+                                            possibleConnections.potentialEndpoints,
+                                            possibleConnections.aliases)) {
+                    pEnd.second.used = true;
                     break;
                 }
             }
@@ -773,15 +762,17 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
     /** now try to match unconnected interfaces to some of the potential ones*/
     /** unconnected inputs*/
     for (const auto& uInp : possibleConnections.unconnectedInputs) {
-        if (makePotentialConnection(uInp, possibleConnections.potentialPubs,possibleConnections.aliases))
-        {
+        if (makePotentialConnection(uInp,
+                                    possibleConnections.potentialPubs,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uInp, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (makePotentialConnection(alias, possibleConnections.potentialPubs,possibleConnections.aliases))
-                {
+                if (makePotentialConnection(alias,
+                                            possibleConnections.potentialPubs,
+                                            possibleConnections.aliases)) {
                     break;
                 }
             }
@@ -790,15 +781,17 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
 
     /** unconnected publications*/
     for (const auto& uPub : possibleConnections.unconnectedPubs) {
-        if (makePotentialConnection(uPub, possibleConnections.potentialInputs,possibleConnections.aliases))
-        {
+        if (makePotentialConnection(uPub,
+                                    possibleConnections.potentialInputs,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uPub, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (makePotentialConnection(alias, possibleConnections.potentialInputs,possibleConnections.aliases))
-                {
+                if (makePotentialConnection(alias,
+                                            possibleConnections.potentialInputs,
+                                            possibleConnections.aliases)) {
                     break;
                 }
             }
@@ -807,15 +800,17 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
 
     /** unconnected source endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedSourceEndpoints) {
-        if (makePotentialConnection(uEnd, possibleConnections.potentialEndpoints,possibleConnections.aliases))
-        {
+        if (makePotentialConnection(uEnd,
+                                    possibleConnections.potentialEndpoints,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uEnd, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (makePotentialConnection(alias, possibleConnections.potentialEndpoints,possibleConnections.aliases))
-                {
+                if (makePotentialConnection(alias,
+                                            possibleConnections.potentialEndpoints,
+                                            possibleConnections.aliases)) {
                     break;
                 }
             }
@@ -824,109 +819,116 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
 
     /** unconnected source endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedTargetEndpoints) {
-        if (makePotentialConnection(uEnd, possibleConnections.potentialEndpoints,possibleConnections.aliases))
-        {
+        if (makePotentialConnection(uEnd,
+                                    possibleConnections.potentialEndpoints,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uEnd, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (makePotentialConnection(alias, possibleConnections.potentialEndpoints,possibleConnections.aliases))
-                {
+                if (makePotentialConnection(alias,
+                                            possibleConnections.potentialEndpoints,
+                                            possibleConnections.aliases)) {
                     break;
                 }
             }
         }
     }
 
-    for (const auto& uInp : possibleConnections.unknownInputs)
-    {
-       auto fnd=possibleConnections.potentialInputs.find(uInp);
-       if (fnd != possibleConnections.potentialInputs.end())
-       {
-           fnd->second.used=true;
-       }
-       auto aliasList = generateAliases(uInp, possibleConnections.aliases);
-       for (const auto& alias : aliasList) {
-           fnd=possibleConnections.potentialInputs.find(alias);
-           if (fnd != possibleConnections.potentialInputs.end())
-           {
-               fnd->second.used=true;
-           }
-       }
+    for (const auto& uInp : possibleConnections.unknownInputs) {
+        auto fnd = possibleConnections.potentialInputs.find(uInp);
+        if (fnd != possibleConnections.potentialInputs.end()) {
+            fnd->second.used = true;
+        }
+        auto aliasList = generateAliases(uInp, possibleConnections.aliases);
+        for (const auto& alias : aliasList) {
+            fnd = possibleConnections.potentialInputs.find(alias);
+            if (fnd != possibleConnections.potentialInputs.end()) {
+                fnd->second.used = true;
+            }
+        }
     }
 
-    for (const auto& uPub : possibleConnections.unknownPubs)
-    {
-        auto fnd=possibleConnections.potentialPubs.find(uPub);
-        if (fnd != possibleConnections.potentialPubs.end())
-        {
-            fnd->second.used=true;
+    for (const auto& uPub : possibleConnections.unknownPubs) {
+        auto fnd = possibleConnections.potentialPubs.find(uPub);
+        if (fnd != possibleConnections.potentialPubs.end()) {
+            fnd->second.used = true;
         }
         auto aliasList = generateAliases(uPub, possibleConnections.aliases);
         for (const auto& alias : aliasList) {
-            fnd=possibleConnections.potentialPubs.find(alias);
-            if (fnd != possibleConnections.potentialPubs.end())
-            {
-                fnd->second.used=true;
+            fnd = possibleConnections.potentialPubs.find(alias);
+            if (fnd != possibleConnections.potentialPubs.end()) {
+                fnd->second.used = true;
             }
         }
     }
 
-    for (const auto& uEpt : possibleConnections.unknownEndpoints)
-    {
-        auto fnd=possibleConnections.potentialEndpoints.find(uEpt);
-        if (fnd != possibleConnections.potentialEndpoints.end())
-        {
-            fnd->second.used=true;
+    for (const auto& uEpt : possibleConnections.unknownEndpoints) {
+        auto fnd = possibleConnections.potentialEndpoints.find(uEpt);
+        if (fnd != possibleConnections.potentialEndpoints.end()) {
+            fnd->second.used = true;
         }
         auto aliasList = generateAliases(uEpt, possibleConnections.aliases);
         for (const auto& alias : aliasList) {
-            fnd=possibleConnections.potentialEndpoints.find(alias);
-            if (fnd != possibleConnections.potentialEndpoints.end())
-            {
-                fnd->second.used=true;
+            fnd = possibleConnections.potentialEndpoints.find(alias);
+            if (fnd != possibleConnections.potentialEndpoints.end()) {
+                fnd->second.used = true;
             }
         }
     }
 
-
-    for (auto& possibleFed : possibleConnections.federatesWithPotentialInterfaces)
-    {
+    for (auto& possibleFed : possibleConnections.federatesWithPotentialInterfaces) {
         Json::Value establishInterfaces;
-        establishInterfaces["command"]="register_interfaces";
-        std::vector<std::remove_reference_t<decltype(*possibleConnections.potentialInputs.begin())>> enabledInputs;
-        std::copy_if(possibleConnections.potentialInputs.begin(), possibleConnections.potentialInputs.end(), std::back_inserter(enabledInputs), [possibleFed](auto& pInterface) {return (pInterface.second.federate == possibleFed && pInterface.second.used == true); });
-        if (!enabledInputs.empty())
-        {
-            establishInterfaces["inputs"]=Json::arrayValue;
-            for (const auto& input : enabledInputs)
-            {
+        establishInterfaces["command"] = "register_interfaces";
+        std::vector<std::remove_reference_t<decltype(*possibleConnections.potentialInputs.begin())>>
+            enabledInputs;
+        std::copy_if(possibleConnections.potentialInputs.begin(),
+                     possibleConnections.potentialInputs.end(),
+                     std::back_inserter(enabledInputs),
+                     [possibleFed](auto& pInterface) {
+                         return (pInterface.second.federate == possibleFed &&
+                                 pInterface.second.used == true);
+                     });
+        if (!enabledInputs.empty()) {
+            establishInterfaces["inputs"] = Json::arrayValue;
+            for (const auto& input : enabledInputs) {
                 establishInterfaces["inputs"].append(std::string(input.first));
             }
         }
-        std::vector<std::remove_reference_t<decltype(*possibleConnections.potentialPubs.begin())>> enabledPublications;
-        std::copy_if(possibleConnections.potentialPubs.begin(), possibleConnections.potentialPubs.end(), std::back_inserter(enabledPublications), [possibleFed](auto& pInterface) {return (pInterface.second.federate == possibleFed && pInterface.second.used == true); });
-        if (!enabledPublications.empty())
-        {
-            establishInterfaces["publications"]=Json::arrayValue;
-            for (const auto& pub : enabledPublications)
-            {
+        std::vector<std::remove_reference_t<decltype(*possibleConnections.potentialPubs.begin())>>
+            enabledPublications;
+        std::copy_if(possibleConnections.potentialPubs.begin(),
+                     possibleConnections.potentialPubs.end(),
+                     std::back_inserter(enabledPublications),
+                     [possibleFed](auto& pInterface) {
+                         return (pInterface.second.federate == possibleFed &&
+                                 pInterface.second.used == true);
+                     });
+        if (!enabledPublications.empty()) {
+            establishInterfaces["publications"] = Json::arrayValue;
+            for (const auto& pub : enabledPublications) {
                 establishInterfaces["publications"].append(std::string(pub.first));
             }
         }
 
-        std::vector<std::remove_reference_t<decltype(*possibleConnections.potentialEndpoints.begin())>> enabledEndpoints;
-        std::copy_if(possibleConnections.potentialEndpoints.begin(), possibleConnections.potentialEndpoints.end(), std::back_inserter(enabledEndpoints), [possibleFed](auto& pInterface) {return (pInterface.second.federate == possibleFed && pInterface.second.used == true); });
-        if (!enabledEndpoints.empty())
-        {
+        std::vector<
+            std::remove_reference_t<decltype(*possibleConnections.potentialEndpoints.begin())>>
+            enabledEndpoints;
+        std::copy_if(possibleConnections.potentialEndpoints.begin(),
+                     possibleConnections.potentialEndpoints.end(),
+                     std::back_inserter(enabledEndpoints),
+                     [possibleFed](auto& pInterface) {
+                         return (pInterface.second.federate == possibleFed &&
+                                 pInterface.second.used == true);
+                     });
+        if (!enabledEndpoints.empty()) {
             establishInterfaces["endpoints"] = Json::arrayValue;
-            for (const auto& ept : enabledEndpoints)
-            {
+            for (const auto& ept : enabledEndpoints) {
                 establishInterfaces["endpoints"].append(std::string(ept.first));
             }
         }
-        fed->sendCommand(possibleFed,fileops::generateJsonString(establishInterfaces));
+        fed->sendCommand(possibleFed, fileops::generateJsonString(establishInterfaces));
     }
 }
 
@@ -938,14 +940,12 @@ void Connector::initialize()
 
         auto connectionsData =
             generateConnectionsList(fed->query("root", "unconnected_interfaces"));
-        if (connectionsData.hasPotentialInterfaces)
-        {
+        if (connectionsData.hasPotentialInterfaces) {
             establishPotentialInterfaces(connectionsData);
             fed->enterInitializingModeIterative();
-            //need to do this twice to sync enverything
+            // need to do this twice to sync enverything
             fed->enterInitializingModeIterative();
-            connectionsData =
-                generateConnectionsList(fed->query("root", "unconnected_interfaces"));
+            connectionsData = generateConnectionsList(fed->query("root", "unconnected_interfaces"));
         }
         makeConnections(connectionsData);
         fed->enterInitializingMode();

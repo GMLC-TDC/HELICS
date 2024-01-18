@@ -133,7 +133,9 @@ necessary
         std::unordered_set<std::string_view>& possibleConnections,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases,
         const std::function<void(std::string_view origin, std::string_view target)>& callback);
-    bool makePotentialConnection(std::string_view interface, std::unordered_map<std::string_view, PotentialConnections>& potentials,
+    bool makePotentialConnection(
+        std::string_view interface,
+        std::unordered_map<std::string_view, PotentialConnections>& potentials,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
     /** get a list of the possible connections to based on the database*/
     std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface) const;
