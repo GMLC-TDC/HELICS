@@ -427,3 +427,109 @@ TEST(connector_tests2, multibroker_connector_regex2)
 
     EXPECT_EQ(conn1.madeConnections(), 6);
 }
+
+
+TEST(connector_tests2, multibroker_connector_regex_default_tag)
+{
+    helics::cleanupHelicsLibrary();
+    using helics::apps::InterfaceDirection;
+    /** setup brokers and cores*/
+    helics::BrokerApp brokerA(helics::CoreType::TEST, "brokerA", "-f7");
+
+    helics::BrokerApp subBroker1(helics::CoreType::TEST, "subBroker1", "--broker=brokerA");
+    helics::BrokerApp subBroker2(helics::CoreType::TEST, "subBroker2", "--broker=brokerA");
+
+    helics::BrokerApp subsubBroker2(helics::CoreType::TEST, "subsubBroker2", "--broker=subBroker2");
+
+    helics::CoreApp coreA(helics::CoreType::TEST, "--name=coreA --broker=brokerA");
+    helics::CoreApp core_sub1(helics::CoreType::TEST, "--name=core_sub1 --broker=subBroker1");
+    helics::CoreApp core_sub1B(helics::CoreType::TEST, "--name=core_sub1B --broker=subBroker1");
+
+    helics::CoreApp core_sub2(helics::CoreType::TEST, "--name=core_sub2 --broker=subBroker2");
+
+    helics::CoreApp core_subsub1(helics::CoreType::TEST,
+        "--name=core_subsub1 --broker=subsubBroker2");
+    /** setup the federates*/
+    helics::FederateInfo fedInfo;
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+
+    auto fedA = helics::ValueFederate("fedA", coreA, fedInfo);
+    fedA.registerGlobalInput<double>("inputA");
+    fedA.registerGlobalPublication<double>("pubD");
+
+    auto fedSubA = helics::ValueFederate("fedSubA", core_sub1, fedInfo);
+
+    fedSubA.registerGlobalInput<double>("inputB");
+    fedSubA.registerGlobalPublication<double>("pubF");
+
+    auto fedSubA2 = helics::ValueFederate("fedSubA2", core_sub1, fedInfo);
+    fedSubA2.registerGlobalInput<double>("inputC");
+    fedSubA2.registerGlobalPublication<double>("pubA");
+
+    auto fedSubA2b = helics::ValueFederate("fedSubA2b", core_sub1B, fedInfo);
+
+    fedSubA2b.registerGlobalInput<double>("inputD");
+    fedSubA2b.registerGlobalPublication<double>("pubE");
+
+    auto fedSubB = helics::ValueFederate("fedSubB", core_sub2, fedInfo);
+    fedSubB.registerGlobalInput<double>("inputE");
+    fedSubB.registerGlobalPublication<double>("pubB");
+    auto fedSubSub1 = helics::ValueFederate("fedSubSub1", core_subsub1, fedInfo);
+    fedSubSub1.registerGlobalInput<double>("inputF");
+    fedSubSub1.registerGlobalPublication<double>("pubC");
+
+    helics::apps::Connector conn1("connector1", coreA, fedInfo);
+    conn1.addConnection("REGEX:publication(?<value>.)",
+        "REGEX:inp(?<value>.)",
+        InterfaceDirection::FROM_TO,{"default"});
+
+    brokerA.addAlias("publicationA", "pubA");
+    brokerA.addAlias("publicationB", "pubB");
+    brokerA.addAlias("publicationC", "pubC");
+    brokerA.addAlias("publicationD", "pubD");
+    brokerA.addAlias("publicationE", "pubE");
+    brokerA.addAlias("publicationF", "pubF");
+
+    brokerA.addAlias("inputA", "inpA");
+    brokerA.addAlias("inputB", "inpB");
+    brokerA.addAlias("inputC", "inpC");
+    brokerA.addAlias("inputD", "inpD");
+    brokerA.addAlias("inputE", "inpE");
+    brokerA.addAlias("inputF", "inpF");
+
+    auto futA = std::async(std::launch::async, [&fedA]() {
+        fedA.enterExecutingMode();
+        fedA.finalize();
+        });
+    auto futSubA = std::async(std::launch::async, [&fedSubA]() {
+        fedSubA.enterExecutingMode();
+        fedSubA.finalize();
+        });
+    auto futSubA2 = std::async(std::launch::async, [&fedSubA2]() {
+        fedSubA2.enterExecutingMode();
+        fedSubA2.finalize();
+        });
+    auto futSubB = std::async(std::launch::async, [&fedSubB]() {
+        fedSubB.enterExecutingMode();
+        fedSubB.finalize();
+        });
+    auto futSubA2b = std::async(std::launch::async, [&fedSubA2b]() {
+        fedSubA2b.enterExecutingMode();
+        fedSubA2b.finalize();
+        });
+    auto futSubSub1 = std::async(std::launch::async, [&fedSubSub1]() {
+        fedSubSub1.enterExecutingMode();
+        fedSubSub1.finalize();
+        });
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+
+    fut.get();
+    futSubSub1.get();
+    futSubA2b.get();
+    futSubB.get();
+    futSubA2.get();
+    futSubA.get();
+    futA.get();
+
+    EXPECT_EQ(conn1.madeConnections(), 6);
+}

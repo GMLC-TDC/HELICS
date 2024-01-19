@@ -52,13 +52,41 @@ struct ConnectionsList {
     std::vector<std::string> unknownPubs;
     std::vector<std::string> unknownInputs;
     std::vector<std::string> unknownEndpoints;
+    std::vector<std::string> tagStrings;
+    std::vector<std::size_t> tagCodes;
     bool hasPotentialInterfaces{false};
 };
 
+static void loadTags(ConnectionsList& connections, const Json::Value& tags)
+{
+    for( Json::Value::const_iterator itr = tags.begin() ; itr != tags.end() ; itr++ ) {
+            if (itr.key().asString() == "tags")
+            {
+                auto tagVect=gmlc::utilities::stringOps::splitlineQuotes(itr->asString());
+                connections.tagStrings.insert(connections.tagStrings.end(),tagVect.begin(),tagVect.end());
+            }
+            else
+            {
+                if (!itr->isString() || std::strcmp("false", itr->asCString()) != 0)
+                {
+                    connections.tagStrings.emplace_back(itr.key().asString());
+                }
+            }
+        
+    }
+}
 static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
 {
+    if (core.isMember("tags"))
+    {
+        loadTags(connections,core["tags"]);
+    }
     if (core.isMember("federates")) {
         for (const auto& fed : core["federates"]) {
+            if (fed.isMember("tags"))
+            {
+                loadTags(connections,fed["tags"]);
+            }
             if (fed.isMember("connected_inputs")) {
                 for (const auto& input : fed["connected_inputs"]) {
                     const std::string_view input1 =
@@ -171,6 +199,10 @@ static ConnectionsList generateConnectionsList(const std::string& connectionData
             connections.aliases.emplace(alias1, alias2);
         }
     }
+    if (json.isMember("tags"))
+    {
+        loadTags(connections,json["tags"]);
+    }
     if (json.isMember("unknown_inputs")) {
         for (const auto& input : json["unknown_inputs"]) {
             connections.unknownInputs.push_back(input.asString());
@@ -192,6 +224,9 @@ static ConnectionsList generateConnectionsList(const std::string& connectionData
     for (auto& core : json["cores"]) {
         coreConnectionList(connections, core);
     }
+    connections.tagStrings.push_back("default");
+        connections.tagCodes.reserve(connections.tagStrings.size());
+        std::transform(connections.tagStrings.begin(),connections.tagStrings.end(),std::back_inserter(connections.tagCodes),std::hash<std::string>());
     return connections;
 }
 
@@ -383,6 +418,7 @@ class RegexMatcher {
     std::vector<std::string> keys;
     std::string_view interface1;
     std::string_view interface2;
+    std::vector<std::size_t> tags;
     std::string generateMatch(std::string_view testString)
     {
         std::match_results<typename decltype(testString)::const_iterator> matchResults{};
@@ -510,7 +546,7 @@ void Connector::loadJsonFile(const std::string& jsonString)
 
 std::vector<Connection>
     Connector::buildPossibleConnectionList(std::string_view startingInterface,
-                                           const std::vector<std::size_t>& tags) const
+                                           const std::vector<std::size_t>& tagList) const
 {
     std::vector<Connection> matches;
     auto [first, last] = connections.equal_range(startingInterface);
@@ -519,9 +555,12 @@ std::vector<Connection>
         searched.insert(startingInterface);
 
         for (auto match = first; match != last; ++match) {
-            matches.emplace_back(match->second);
-            if (matches.back().interface1 != startingInterface) {
-                std::swap(matches.back().interface1, matches.back().interface2);
+            if (match->second.tags.empty() || std::find_first_of(tagList.begin(), tagList.end(), match->second.tags.begin(), match->second.tags.end()) != tagList.end())
+            {
+                matches.emplace_back(match->second);
+                if (matches.back().interface1 != startingInterface) {
+                    std::swap(matches.back().interface1, matches.back().interface2);
+                }
             }
         }
         std::size_t cascadeIndex{0};
@@ -534,13 +573,16 @@ std::vector<Connection>
             std::tie(first, last) = connections.equal_range(matches[cascadeIndex].interface2);
             if (first != connections.end()) {
                 for (auto match = first; match != last; ++match) {
-                    matches.emplace_back(match->second);
-                    if (matches.back().interface1 != matches[cascadeIndex].interface2) {
-                        std::swap(matches.back().interface1, matches.back().interface2);
-                    }
-                    if (searched.find(matches.back().interface2) != searched.end()) {
-                        // this would already be references and create a cyclic reference
-                        matches.pop_back();
+                    if (match->second.tags.empty() || std::find_first_of(tagList.begin(), tagList.end(), match->second.tags.begin(), match->second.tags.end()) != tagList.end())
+                    {
+                        matches.emplace_back(match->second);
+                        if (matches.back().interface1 != matches[cascadeIndex].interface2) {
+                            std::swap(matches.back().interface1, matches.back().interface2);
+                        }
+                        if (searched.find(matches.back().interface2) != searched.end()) {
+                            // this would already be references and create a cyclic reference
+                            matches.pop_back();
+                        }
                     }
                 }
             }
@@ -550,14 +592,18 @@ std::vector<Connection>
     if (matches.empty()) {
         if (!regexMatchers.empty()) {
             for (const auto& rmatcher : regexMatchers) {
-                auto mstring = rmatcher->generateMatch(startingInterface);
-                if (!mstring.empty()) {
-                    Connection connection;
-                    connection.stringBuffer = std::make_shared<std::string>(mstring);
-                    connection.interface1 = rmatcher->interface1;
-                    connection.interface2 = *connection.stringBuffer;
-                    connection.direction = InterfaceDirection::FROM_TO;
-                    matches.push_back(std::move(connection));
+                if (rmatcher->tags.empty() || std::find_first_of(tagList.begin(), tagList.end(), rmatcher->tags.begin(), rmatcher->tags.end()) != tagList.end())
+                {
+                    auto mstring = rmatcher->generateMatch(startingInterface);
+                    if (!mstring.empty()) {
+                        Connection connection;
+                        connection.stringBuffer = std::make_shared<std::string>(mstring);
+                        connection.interface1 = rmatcher->interface1;
+                        connection.tags=rmatcher->tags;
+                        connection.interface2 = *connection.stringBuffer;
+                        connection.direction = InterfaceDirection::FROM_TO;
+                        matches.push_back(std::move(connection));
+                    }
                 }
             }
         }
@@ -596,11 +642,11 @@ static std::set<std::string_view>
 
 bool Connector::makePotentialConnection(
     std::string_view interface,
-    const std::vector<std::size_t>& tags,
+    const std::vector<std::size_t>& tagList,
     std::unordered_map<std::string_view, PotentialConnections>& potentials,
     const std::unordered_multimap<std::string_view, std::string_view>& aliases)
 {
-    auto connectionOptions = buildPossibleConnectionList(interface, tags);
+    auto connectionOptions = buildPossibleConnectionList(interface, tagList);
     for (const auto& option : connectionOptions) {
         auto located = potentials.find(option.interface2);
         if (located != potentials.end()) {
@@ -623,7 +669,7 @@ bool Connector::makePotentialConnection(
 
 bool Connector::checkPotentialConnection(
     std::string_view interfaceName,
-    const std::vector<std::size_t>& tags,
+    const std::vector<std::size_t>& tagList,
     std::unordered_set<std::string_view>& possibleConnections,
     std::unordered_map<std::string_view, PotentialConnections>& potentials,
     const std::unordered_multimap<std::string_view, std::string_view>& aliases)
@@ -631,11 +677,11 @@ bool Connector::checkPotentialConnection(
     static auto nullConnector = [this](std::string_view, std::string_view) {};
     /** potential inputs*/
     auto matched =
-        makeTargetConnection(interfaceName, tags, possibleConnections, aliases, nullConnector);
+        makeTargetConnection(interfaceName, tagList, possibleConnections, aliases, nullConnector);
     if (matched > 0) {
         return true;
     }
-    if (makePotentialConnection(interfaceName, tags, potentials, aliases)) {
+    if (makePotentialConnection(interfaceName, tagList, potentials, aliases)) {
         return true;
     }
     if (!aliases.empty()) {
@@ -644,7 +690,7 @@ bool Connector::checkPotentialConnection(
             if (alias == interfaceName) {
                 continue;
             }
-            if (makePotentialConnection(alias, tags, potentials, aliases)) {
+            if (makePotentialConnection(alias, tagList, potentials, aliases)) {
                 return true;
             }
         }
@@ -654,13 +700,13 @@ bool Connector::checkPotentialConnection(
 
 int Connector::makeTargetConnection(
     std::string_view origin,
-    const std::vector<std::size_t>& tags,
+    const std::vector<std::size_t>& tagList,
     std::unordered_set<std::string_view>& possibleConnections,
     const std::unordered_multimap<std::string_view, std::string_view>& aliases,
     const std::function<void(std::string_view, std::string_view)>& callback)
 {
     int matched{0};
-    auto connectionOptions = buildPossibleConnectionList(origin, tags);
+    auto connectionOptions = buildPossibleConnectionList(origin, tagList);
     for (const auto& option : connectionOptions) {
         auto located = possibleConnections.find(option.interface2);
         if (located != possibleConnections.end()) {
@@ -697,7 +743,7 @@ int Connector::makeTargetConnection(
             if (alias == origin) {
                 continue;
             }
-            auto aliasOptions = buildPossibleConnectionList(alias, tags);
+            auto aliasOptions = buildPossibleConnectionList(alias, tagList);
             for (const auto& option : aliasOptions) {
                 auto located = possibleConnections.find(option.interface2);
                 if (located != possibleConnections.end()) {
@@ -748,7 +794,7 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
         core.linkEndpoints(source, origin);
     };
 
-    std::vector<std::size_t> tagList;
+    auto tagList=possibleConnections.tagCodes;
     /** unconnected inputs*/
     for (const auto& uInp : possibleConnections.unconnectedInputs) {
         matchCount += makeTargetConnection(
@@ -784,7 +830,7 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
 void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnections)
 {
     auto nullConnector = [this](std::string_view, std::string_view) {};
-    std::vector<std::size_t> tagList;
+    auto tagList=possibleConnections.tagCodes;
     /** potential inputs*/
     for (auto& pInp : possibleConnections.potentialInputs) {
         if (checkPotentialConnection(pInp.first,
@@ -1031,8 +1077,10 @@ void Connector::generateRegexMatchers()
             rmatcher->keys.push_back(rstring.substr(nvloc + 1, finishloc - nvloc));
             rstring.erase(rstring.begin() + nvloc + 1, rstring.begin() + finishloc + 1);
             nvloc = rstring.find("(?<");
-            rmatcher->interface2 = rmatch.interface2;
+            
         }
+        rmatcher->interface2 = rmatch.interface2;
+        rmatcher->tags=rmatch.tags;
         try {
             rmatcher->rmatch = std::regex(rstring);
             regexMatchers.push_back(std::move(rmatcher));
