@@ -913,12 +913,48 @@ TEST(connector_2stage, two_sided_broker_connection)
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
 
+TEST(connector_2stage, two_sided_broker_connection_alias)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = "ccore16";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+
+    fedInfo.coreInitString = "";
+    CheckFed cfed1("c1", fedInfo);
+    cfed1.addPotentialInputs({"inp1", "inp2"});
+    cfed1.addPotentialPubs({"pub1", "pub2", "pub3"});
+
+    helics::CoreApp core("ccore16");
+    core.addAlias("pub1","publication1");
+    core.addAlias("inp1","input1");
+    core.addAlias("pub2","publication2");
+    core.addAlias("inp2","input2");
+    core.dataLink("publication1", "input1");
+    core.dataLink("publication2", "input2");
+
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    cfed1.initialize();
+    cfed1.executing();
+    cfed1.run(5);
+    cfed1.finalize();
+    fut.get();
+    ASSERT_EQ(cfed1.getValues().size(), 2);
+    EXPECT_FALSE(cfed1.getValues()[0].empty());
+    EXPECT_FALSE(cfed1.getValues()[1].empty());
+    // not making any connections
+    EXPECT_EQ(conn1.madeConnections(), 0);
+}
+
 TEST(connector_2stage, two_sided_broker_connection_endpoints)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore15";
+    fedInfo.coreName = "ccore17";
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -927,7 +963,7 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
     CheckFed cfed1("c1", fedInfo);
     cfed1.addPotentialEndpoints({"e1", "e2", "e3", "e4"});
 
-    helics::CoreApp core("ccore15");
+    helics::CoreApp core("ccore17");
     core.linkEndpoints("e1", "e2");
     core.linkEndpoints("e3", "e4");
 
@@ -951,7 +987,7 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore15";
+    fedInfo.coreName = "ccore18";
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -960,7 +996,7 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
     CheckFed cfed1("c1", fedInfo);
     cfed1.addPotentialEndpoints({"e1", "e2", "e3", "e4"});
 
-    helics::CoreApp core("ccore15");
+    helics::CoreApp core("ccore18");
     core.linkEndpoints("end1", "end2");
     core.linkEndpoints("end3", "end4");
     core.addAlias("e1", "end1");

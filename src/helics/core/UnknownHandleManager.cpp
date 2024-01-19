@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "UnknownHandleManager.hpp"
 
 #include "flagOperations.hpp"
+#include <algorithm>
 
 namespace helics {
 /** add a missingPublication*/
@@ -65,12 +66,12 @@ static auto
                const std::string& target)
 {
     std::vector<UnknownHandleManager::TargetInfo> targets;
-    auto rp = tmap.equal_range(target);
-    if (rp.first != tmap.end()) {
-        auto it = rp.first;
-        while (it != rp.second) {
-            targets.push_back(it->second);
-            ++it;
+    auto [firstTarget,lastTarget] = tmap.equal_range(target);
+    if (firstTarget != tmap.end()) {
+        auto currentTarget = firstTarget;
+        while (currentTarget != lastTarget) {
+            targets.push_back(currentTarget->second);
+            ++currentTarget;
         }
     }
     return targets;
@@ -80,12 +81,12 @@ static auto getTargets(const std::unordered_multimap<std::string, std::string>& 
                        const std::string& target)
 {
     std::vector<std::string> targets;
-    auto rp = tmap.equal_range(target);
-    if (rp.first != tmap.end()) {
-        auto it = rp.first;
-        while (it != rp.second) {
-            targets.push_back(it->second);
-            ++it;
+    auto [firstTarget,lastTarget] = tmap.equal_range(target);
+    if (firstTarget != tmap.end()) {
+        auto currentTarget = firstTarget;
+        while (currentTarget != lastTarget) {
+            targets.push_back(currentTarget->second);
+            ++currentTarget;
         }
     }
     return targets;
@@ -154,58 +155,23 @@ bool UnknownHandleManager::hasNonOptionalUnknowns() const
           unknown_src_filters.empty())) {
         return true;
     }
-    for (const auto& upub : unknown_publications) {
-        if ((upub.second.second & make_flags(optional_flag)) != 0) {
-            continue;
-        }
-        return true;
-    }
-    for (const auto& uept : unknown_endpoints) {
-        if ((uept.second.second & make_flags(optional_flag)) != 0) {
-            continue;
-        }
-        return true;
-    }
-    for (const auto& uinp : unknown_inputs) {
-        if ((uinp.second.second & make_flags(optional_flag)) != 0) {
-            continue;
-        }
-        return true;
-    }
 
-    for (const auto& ufilt : unknown_filters) {
-        if ((ufilt.second.second & make_flags(optional_flag)) != 0) {
-            continue;
-        }
-        return true;
-    }
-    return false;
+    auto optionalCheck = [](const auto& uInterface) {return ((uInterface.second.second & make_flags(optional_flag)) != 0); };
+    return (!((std::all_of(unknown_publications.begin(), unknown_publications.end(), optionalCheck))||
+        (std::all_of(unknown_inputs.begin(), unknown_inputs.end(), optionalCheck))||
+        (std::all_of(unknown_endpoints.begin(), unknown_endpoints.end(), optionalCheck))||
+        (std::all_of(unknown_filters.begin(), unknown_filters.end(), optionalCheck))));
+
 }
 
 bool UnknownHandleManager::hasRequiredUnknowns() const
 {
-    for (const auto& upub : unknown_publications) {
-        if ((upub.second.second & make_flags(required_flag)) != 0) {
-            return true;
-        }
-    }
-    for (const auto& uept : unknown_endpoints) {
-        if ((uept.second.second & make_flags(required_flag)) != 0) {
-            return true;
-        }
-    }
-    for (const auto& uinp : unknown_inputs) {
-        if ((uinp.second.second & make_flags(required_flag)) != 0) {
-            return true;
-        }
-    }
+    auto requiredCheck = [](const auto& uInterface) {return ((uInterface.second.second & make_flags(required_flag)) != 0); };
+    return ((std::any_of(unknown_publications.begin(), unknown_publications.end(), requiredCheck))||
+        (std::any_of(unknown_inputs.begin(), unknown_inputs.end(), requiredCheck))||
+        (std::any_of(unknown_endpoints.begin(), unknown_endpoints.end(), requiredCheck))||
+        (std::any_of(unknown_filters.begin(), unknown_filters.end(), requiredCheck)));
 
-    for (const auto& ufilt : unknown_filters) {
-        if ((ufilt.second.second & make_flags(required_flag)) != 0) {
-            return true;
-        }
-    }
-    return false;
 }
 
 void UnknownHandleManager::processUnknowns(
@@ -333,34 +299,36 @@ template<typename ContainerT, typename PredicateT>
 void maperase_if(ContainerT& items, const PredicateT& predicate)
 {
     for (auto it = items.begin(); it != items.end();) {
-        if (predicate(*it))
+        if (predicate(*it)) {
             it = items.erase(it);
-        else
+        }
+        else {
             ++it;
+        }
     }
 }
 
-void UnknownHandleManager::clearFederateUnknowns(GlobalFederateId id)
+void UnknownHandleManager::clearFederateUnknowns(GlobalFederateId gid)
 {
-    auto ck = [id](const auto& it) { return it.second.first.fed_id == id; };
-    maperase_if(unknown_publications, ck);
-    maperase_if(unknown_endpoints, ck);
-    maperase_if(unknown_filters, ck);
-    maperase_if(unknown_inputs, ck);
+    auto clearCall = [gid](const auto& it) { return it.second.first.fed_id == gid; };
+    maperase_if(unknown_publications, clearCall);
+    maperase_if(unknown_endpoints, clearCall);
+    maperase_if(unknown_filters, clearCall);
+    maperase_if(unknown_inputs, clearCall);
 }
 
 void UnknownHandleManager::clearUnknownsIf(
     const std::function<bool(const std::string& name, InterfaceType, TargetInfo)>& cfunc)
 {
     InterfaceType type = InterfaceType::PUBLICATION;
-    auto ck = [&cfunc, &type](const auto& it) { return cfunc(it.first, type, it.second); };
-    maperase_if(unknown_publications, ck);
+    auto clearCall = [&cfunc, &type](const auto& it) { return cfunc(it.first, type, it.second); };
+    maperase_if(unknown_publications, clearCall);
     type = InterfaceType::ENDPOINT;
-    maperase_if(unknown_endpoints, ck);
+    maperase_if(unknown_endpoints, clearCall);
     type = InterfaceType::FILTER;
-    maperase_if(unknown_filters, ck);
+    maperase_if(unknown_filters, clearCall);
     type = InterfaceType::INPUT;
-    maperase_if(unknown_inputs, ck);
+    maperase_if(unknown_inputs, clearCall);
 }
 
 }  // namespace helics

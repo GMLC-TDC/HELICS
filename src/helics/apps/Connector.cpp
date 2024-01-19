@@ -60,7 +60,7 @@ static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
     if (core.isMember("federates")) {
         for (const auto& fed : core["federates"]) {
             if (fed.isMember("connected_inputs")) {
-                for (auto& input : fed["connected_inputs"]) {
+                for (const auto& input : fed["connected_inputs"]) {
                     const std::string_view input1 =
                         connections.interfaces.emplace_back(input.asString());
                     connections.inputs.insert(input1);
@@ -262,8 +262,8 @@ std::unique_ptr<helicsCLI11App> Connector::generateParser()
     return app;
 }
 
-Connector::Connector(std::string_view appName, const FederateInfo& fi):
-    App(appName, fi), core(fed->getCorePointer())
+Connector::Connector(std::string_view appName, const FederateInfo& fedInfo):
+    App(appName, fedInfo), core(fed->getCorePointer())
 {
     fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
 }
@@ -404,7 +404,7 @@ class RegexMatcher {
 
             return matcher;
         }
-        return std::string();
+        return {};
     }
 };
 
@@ -618,6 +618,38 @@ bool Connector::makePotentialConnection(
     return false;
 }
 
+bool Connector::checkPotentialConnection(
+    std::string_view interfaceName,
+    std::unordered_set<std::string_view>& possibleConnections,
+    std::unordered_map<std::string_view, PotentialConnections>& potentials,
+    const std::unordered_multimap<std::string_view, std::string_view>& aliases)
+{
+    static auto nullConnector = [this](std::string_view, std::string_view) {};
+    /** potential inputs*/
+        auto matched = makeTargetConnection(interfaceName,
+            possibleConnections,
+            aliases,
+            nullConnector);
+        if (matched > 0) {
+            return true;
+        }
+        if (makePotentialConnection(interfaceName,potentials,aliases)) {
+            return true;
+        }
+        if (!aliases.empty()) {
+            auto aliasList = generateAliases(interfaceName, aliases);
+            for (const auto& alias : aliasList) {
+                if (alias == interfaceName) {
+                    continue;
+                }
+                if (makePotentialConnection(alias,potentials,aliases)) {
+                    return true;
+                }
+            }
+        }
+    return false;
+}
+
 int Connector::makeTargetConnection(
     std::string_view origin,
     std::unordered_set<std::string_view>& possibleConnections,
@@ -751,35 +783,9 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
     auto nullConnector = [this](std::string_view, std::string_view) {};
     /** potential inputs*/
     for (auto& pInp : possibleConnections.potentialInputs) {
-        const std::string_view inputName = pInp.first;
-
-        auto matched = makeTargetConnection(inputName,
-                                            possibleConnections.pubs,
-                                            possibleConnections.aliases,
-                                            nullConnector);
-        if (matched > 0) {
-            pInp.second.used = true;
-            continue;
-        }
-        if (makePotentialConnection(inputName,
-                                    possibleConnections.potentialPubs,
-                                    possibleConnections.aliases)) {
-            pInp.second.used = true;
-            continue;
-        }
-        if (!possibleConnections.aliases.empty()) {
-            auto aliasList = generateAliases(inputName, possibleConnections.aliases);
-            for (const auto& alias : aliasList) {
-                if (alias == inputName) {
-                    continue;
-                }
-                if (makePotentialConnection(alias,
-                                            possibleConnections.potentialPubs,
-                                            possibleConnections.aliases)) {
-                    pInp.second.used = true;
-                    break;
-                }
-            }
+        if (checkPotentialConnection(pInp.first, possibleConnections.pubs, possibleConnections.potentialPubs, possibleConnections.aliases))
+        {
+            pInp.second.used=true;
         }
     }
     /* potential publications*/
@@ -787,36 +793,9 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (pPub.second.used) {
             continue;
         }
-        const std::string_view pubName = pPub.first;
-        /** check for match with existing inputs*/
-        auto matched = makeTargetConnection(pubName,
-                                            possibleConnections.inputs,
-                                            possibleConnections.aliases,
-                                            nullConnector);
-        if (matched > 0) {
-            pPub.second.used = true;
-            continue;
-        }
-        /** check for match with potential inputs*/
-        if (makePotentialConnection(pubName,
-                                    possibleConnections.potentialInputs,
-                                    possibleConnections.aliases)) {
-            pPub.second.used = true;
-            continue;
-        }
-        if (!possibleConnections.aliases.empty()) {
-            auto aliasList = generateAliases(pubName, possibleConnections.aliases);
-            for (const auto& alias : aliasList) {
-                if (alias == pubName) {
-                    continue;
-                }
-                if (makePotentialConnection(alias,
-                                            possibleConnections.potentialInputs,
-                                            possibleConnections.aliases)) {
-                    pPub.second.used = true;
-                    break;
-                }
-            }
+        if (checkPotentialConnection(pPub.first, possibleConnections.inputs, possibleConnections.potentialInputs, possibleConnections.aliases))
+        {
+            pPub.second.used=true;
         }
     }
 
@@ -825,36 +804,9 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (pEnd.second.used) {
             continue;
         }
-        const std::string_view endpointName = pEnd.first;
-        /** check for match with existing inputs*/
-        auto matched = makeTargetConnection(endpointName,
-                                            possibleConnections.endpoints,
-                                            possibleConnections.aliases,
-                                            nullConnector);
-        if (matched > 0) {
-            pEnd.second.used = true;
-            continue;
-        }
-        /** check for match with potential inputs*/
-        if (makePotentialConnection(endpointName,
-                                    possibleConnections.potentialEndpoints,
-                                    possibleConnections.aliases)) {
-            pEnd.second.used = true;
-            continue;
-        }
-        if (!possibleConnections.aliases.empty()) {
-            auto aliasList = generateAliases(endpointName, possibleConnections.aliases);
-            for (const auto& alias : aliasList) {
-                if (alias == endpointName) {
-                    continue;
-                }
-                if (makePotentialConnection(alias,
-                                            possibleConnections.potentialEndpoints,
-                                            possibleConnections.aliases)) {
-                    pEnd.second.used = true;
-                    break;
-                }
-            }
+        if (checkPotentialConnection(pEnd.first, possibleConnections.endpoints, possibleConnections.potentialEndpoints, possibleConnections.aliases))
+        {
+            pEnd.second.used=true;
         }
     }
     /** now try to match unconnected interfaces to some of the potential ones*/

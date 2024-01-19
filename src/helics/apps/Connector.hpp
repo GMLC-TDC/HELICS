@@ -50,22 +50,22 @@ class HELICS_CXX_EXPORT Connector: public App {
 */
     Connector(int argc, char* argv[]);
     /** construct from a federate info object
-@param name the name of the federate (can be empty to use defaults from fi)
-@param fi a pointer info object containing information on the desired federate configuration
+@param name the name of the federate (can be empty to use defaults from fedInfo)
+@param fedInfo a pointer info object containing information on the desired federate configuration
 */
-    explicit Connector(std::string_view name, const FederateInfo& fi);
+    explicit Connector(std::string_view name, const FederateInfo& fedInfo);
     /**constructor taking a federate information structure and using the given core
-@param name the name of the federate (can be empty to use defaults from fi)
+@param name the name of the federate (can be empty to use defaults from fedInfo)
 @param core a pointer to core object which the federate can join
-@param fi  a federate information structure
+@param fedInfo  a federate information structure
 */
-    Connector(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+    Connector(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo);
     /**constructor taking a federate information structure and using the given core
-@param name the name of the federate (can be empty to use defaults from fi)
+@param name the name of the federate (can be empty to use defaults from fedInfo)
 @param core a coreApp object that can be joined
-@param fi  a federate information structure
+@param fedInfo  a federate information structure
 */
-    Connector(std::string_view name, CoreApp& core, const FederateInfo& fi);
+    Connector(std::string_view name, CoreApp& core, const FederateInfo& fedInfo);
     /**constructor taking a file with the required information
 @param appName the name of the app
 @param configString JSON, TOML or text file or JSON string defining the federate information and
@@ -127,7 +127,7 @@ necessary
     /** load a text file*/
     virtual void loadTextFile(const std::string& filename) override;
 
-    bool addConnectionVector(const std::vector<std::string>& v1);
+    bool addConnectionVector(const std::vector<std::string>& connection);
     /** actually go through and make connections*/
     void establishPotentialInterfaces(ConnectionsList& possibleConnections);
     /** actually go through and make connections*/
@@ -139,7 +139,13 @@ necessary
         const std::unordered_multimap<std::string_view, std::string_view>& aliases,
         const std::function<void(std::string_view origin, std::string_view target)>& callback);
     bool makePotentialConnection(
+        std::string_view interfaceName,
+        std::unordered_map<std::string_view, PotentialConnections>& potentials,
+        const std::unordered_multimap<std::string_view, std::string_view>& aliases);
+
+    bool checkPotentialConnection(
         std::string_view interface,
+        std::unordered_set<std::string_view>& possibleConnections,
         std::unordered_map<std::string_view, PotentialConnections>& potentials,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
     /** get a list of the possible connections to based on the database*/
