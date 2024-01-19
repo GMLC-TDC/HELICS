@@ -791,7 +791,6 @@ TEST(connector_2stage, three_fed_unknown_pub_alias)
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
 
-
 TEST(connector_2stage, three_fed_endpoint_bi_alias)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -812,7 +811,7 @@ TEST(connector_2stage, three_fed_endpoint_bi_alias)
     helics::CoreApp core(mFed2.getCorePointer());
     auto& ept1 = mFed2.registerGlobalTargetedEndpoint("oept1");
     ept1.addAlias("origin");
-    core.addAlias("ept1","bigEndpoint");
+    core.addAlias("ept1", "bigEndpoint");
     mFed2.enterExecutingModeAsync();
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
@@ -821,7 +820,7 @@ TEST(connector_2stage, three_fed_endpoint_bi_alias)
         cfed1.executing();
         cfed1.run(5);
         cfed1.finalize();
-        });
+    });
     mFed2.enterExecutingModeComplete();
     ept1.send("string1");
     mFed2.requestTime(2.0);
@@ -835,7 +834,6 @@ TEST(connector_2stage, three_fed_endpoint_bi_alias)
     EXPECT_EQ(cfed1.getMessages()[0].size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 2);
 }
-
 
 TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
 {
@@ -858,8 +856,8 @@ TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
     helics::CoreApp core(mFed2.getCorePointer());
     auto& ept1 = mFed2.registerGlobalTargetedEndpoint("oept1");
     ept1.addAlias("origin");
-    core.addAlias("ept1","bigEndpoint");
-    core.addAlias("ept2","secondary");
+    core.addAlias("ept1", "bigEndpoint");
+    core.addAlias("ept2", "secondary");
     mFed2.enterExecutingModeAsync();
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
@@ -868,7 +866,7 @@ TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
         cfed1.executing();
         cfed1.run(5);
         cfed1.finalize();
-        });
+    });
     mFed2.enterExecutingModeComplete();
     ept1.send("string1");
     mFed2.requestTime(2.0);
@@ -883,7 +881,6 @@ TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
     EXPECT_EQ(conn1.madeConnections(), 6);
 }
 
-
 TEST(connector_2stage, two_sided_broker_connection)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -897,11 +894,11 @@ TEST(connector_2stage, two_sided_broker_connection)
     fedInfo.coreInitString = "";
     CheckFed cfed1("c1", fedInfo);
     cfed1.addPotentialInputs({"inp1", "inp2"});
-    cfed1.addPotentialPubs({"pub1", "pub2","pub3"});
+    cfed1.addPotentialPubs({"pub1", "pub2", "pub3"});
 
     helics::CoreApp core("ccore15");
-    core.dataLink("pub1","inp1");
-    core.dataLink("pub2","inp2");
+    core.dataLink("pub1", "inp1");
+    core.dataLink("pub2", "inp2");
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
@@ -912,10 +909,9 @@ TEST(connector_2stage, two_sided_broker_connection)
     ASSERT_EQ(cfed1.getValues().size(), 2);
     EXPECT_FALSE(cfed1.getValues()[0].empty());
     EXPECT_FALSE(cfed1.getValues()[1].empty());
-    //not making any connections
+    // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
-
 
 TEST(connector_2stage, two_sided_broker_connection_endpoints)
 {
@@ -929,11 +925,11 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
 
     fedInfo.coreInitString = "";
     CheckFed cfed1("c1", fedInfo);
-    cfed1.addPotentialEndpoints({"e1", "e2","e3","e4"});
+    cfed1.addPotentialEndpoints({"e1", "e2", "e3", "e4"});
 
     helics::CoreApp core("ccore15");
-    core.linkEndpoints("e1","e2");
-    core.linkEndpoints("e3","e4");
+    core.linkEndpoints("e1", "e2");
+    core.linkEndpoints("e3", "e4");
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
@@ -946,11 +942,9 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
     EXPECT_FALSE(cfed1.getMessages()[1].empty());
     EXPECT_TRUE(cfed1.getMessages()[2].empty());
     EXPECT_FALSE(cfed1.getMessages()[3].empty());
-    //not making any connections
+    // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
-
-
 
 TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
 {
@@ -964,15 +958,15 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
 
     fedInfo.coreInitString = "";
     CheckFed cfed1("c1", fedInfo);
-    cfed1.addPotentialEndpoints({"e1", "e2","e3","e4"});
+    cfed1.addPotentialEndpoints({"e1", "e2", "e3", "e4"});
 
     helics::CoreApp core("ccore15");
-    core.linkEndpoints("end1","end2");
-    core.linkEndpoints("end3","end4");
-    core.addAlias("e1","end1");
-    core.addAlias("e2","end2");
-    core.addAlias("e3","end3");
-    core.addAlias("e4","end4");
+    core.linkEndpoints("end1", "end2");
+    core.linkEndpoints("end3", "end4");
+    core.addAlias("e1", "end1");
+    core.addAlias("e2", "end2");
+    core.addAlias("e3", "end3");
+    core.addAlias("e4", "end4");
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
@@ -985,6 +979,6 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
     EXPECT_FALSE(cfed1.getMessages()[1].empty());
     EXPECT_TRUE(cfed1.getMessages()[2].empty());
     EXPECT_FALSE(cfed1.getMessages()[3].empty());
-    //not making any connections
+    // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }

@@ -226,19 +226,21 @@ void UnknownHandleManager::processUnknowns(
 }
 
 void UnknownHandleManager::processUnknownLinks(
-    const std::function<void(const std::string& origin, InterfaceType, const std::string& target, InterfaceType)>& cfunc) const
+    const std::function<
+        void(const std::string& origin, InterfaceType, const std::string& target, InterfaceType)>&
+        cfunc) const
 {
     for (const auto& dlink : unknown_links) {
-        cfunc(dlink.first, InterfaceType::PUBLICATION, dlink.second,InterfaceType::INPUT);
+        cfunc(dlink.first, InterfaceType::PUBLICATION, dlink.second, InterfaceType::INPUT);
     }
     for (const auto& uept : unknown_endpoint_links) {
         cfunc(uept.first, InterfaceType::ENDPOINT, uept.second, InterfaceType::ENDPOINT);
     }
     for (const auto& ufilt : unknown_dest_filters) {
-        cfunc(ufilt.first, InterfaceType::FILTER, ufilt.second,InterfaceType::ENDPOINT);
+        cfunc(ufilt.first, InterfaceType::FILTER, ufilt.second, InterfaceType::ENDPOINT);
     }
     for (const auto& ufilt : unknown_src_filters) {
-        cfunc(ufilt.first, InterfaceType::FILTER, ufilt.second,InterfaceType::ENDPOINT);
+        cfunc(ufilt.first, InterfaceType::FILTER, ufilt.second, InterfaceType::ENDPOINT);
     }
 }
 

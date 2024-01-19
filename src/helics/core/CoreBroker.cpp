@@ -2684,34 +2684,30 @@ void CoreBroker::executeInitializationOperations(bool iterating)
         loadTimeMonitor(true, std::string_view{});
     }
     if (unknownHandles.hasUnknowns()) {
-        unknownHandles.processUnknownLinks(
-            [this](const std::string& origin, InterfaceType originType, const std::string& target, InterfaceType targetType)
-            {
-                const auto* originHandle = handles.getInterfaceHandle(origin, originType);
-                if (originHandle != nullptr)
-                {
-                    const auto *targetHandle = handles.getInterfaceHandle(target,targetType);
-                    if (targetHandle != nullptr)
-                    {
-                        if (originType == InterfaceType::PUBLICATION)
-                        {
-                            ActionMessage datalink(CMD_DATA_LINK);
-                            datalink.name(originHandle->key);
-                            datalink.setString(targetStringLoc,targetHandle->key);
-                            linkInterfaces(datalink);
-                        }
-                        else if (originType == InterfaceType::ENDPOINT && targetType == InterfaceType::ENDPOINT)
-                        {
-                            ActionMessage eptlink(CMD_ENDPOINT_LINK);
-                            eptlink.name(originHandle->key);
-                            eptlink.setString(targetStringLoc,targetHandle->key);
-                            linkInterfaces(eptlink);
-                        }
-                        //TODO(PT):: make this work for filters
+        unknownHandles.processUnknownLinks([this](const std::string& origin,
+                                                  InterfaceType originType,
+                                                  const std::string& target,
+                                                  InterfaceType targetType) {
+            const auto* originHandle = handles.getInterfaceHandle(origin, originType);
+            if (originHandle != nullptr) {
+                const auto* targetHandle = handles.getInterfaceHandle(target, targetType);
+                if (targetHandle != nullptr) {
+                    if (originType == InterfaceType::PUBLICATION) {
+                        ActionMessage datalink(CMD_DATA_LINK);
+                        datalink.name(originHandle->key);
+                        datalink.setString(targetStringLoc, targetHandle->key);
+                        linkInterfaces(datalink);
+                    } else if (originType == InterfaceType::ENDPOINT &&
+                               targetType == InterfaceType::ENDPOINT) {
+                        ActionMessage eptlink(CMD_ENDPOINT_LINK);
+                        eptlink.name(originHandle->key);
+                        eptlink.setString(targetStringLoc, targetHandle->key);
+                        linkInterfaces(eptlink);
                     }
+                    // TODO(PT):: make this work for filters
                 }
             }
-        );
+        });
         std::vector<std::vector<std::string>> foundAliasHandles;
         foundAliasHandles.resize(4);
         bool useRegex{false};
@@ -2912,7 +2908,7 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
                                              CMD_ADD_ENDPOINT :
                                              CMD_ADD_FILTER));
     }
-   
+
     auto eptTargets = unknownHandles.checkForEndpointLinks(key);
     for (const auto& ept : eptTargets) {
         ActionMessage link(CMD_ADD_NAMED_ENDPOINT);
@@ -3877,22 +3873,23 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
                 };
                 unknownHandles.processUnknowns(unknownProcessor);
                 auto unknownLinkProcessor = [&base](const std::string& origin,
-                    InterfaceType type1,const std::string &target, InterfaceType type2) {
-                        switch (type2) {
+                                                    InterfaceType type1,
+                                                    const std::string& target,
+                                                    InterfaceType type2) {
+                    switch (type2) {
                         case InterfaceType::INPUT:
                             base["unknown_inputs"].append(target);
                             base["unknown_publications"].append(origin);
                             break;
                         case InterfaceType::ENDPOINT:
                             base["unknown_endpoints"].append(target);
-                            if (type1 == InterfaceType::ENDPOINT)
-                            {
+                            if (type1 == InterfaceType::ENDPOINT) {
                                 base["unknown_endpoints"].append(origin);
                             }
                             break;
                         default:
                             break;
-                        }
+                    }
                 };
                 unknownHandles.processUnknownLinks(unknownLinkProcessor);
             }

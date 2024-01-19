@@ -16,13 +16,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <deque>
 #include <memory>
 #include <optional>
+#include <regex>
 #include <set>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include <regex>
 
 namespace helics::apps {
 
@@ -150,12 +150,11 @@ static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
 
 static void brokerConnectionList(ConnectionsList& connections, Json::Value& broker)
 {
-    for (auto& subBroker : broker["brokers"])
-    {
-        brokerConnectionList(connections,subBroker);
+    for (auto& subBroker : broker["brokers"]) {
+        brokerConnectionList(connections, subBroker);
     }
     for (auto& core : broker["cores"]) {
-        coreConnectionList(connections,core);
+        coreConnectionList(connections, core);
     }
 }
 
@@ -187,12 +186,11 @@ static ConnectionsList generateConnectionsList(const std::string& connectionData
             connections.unknownEndpoints.push_back(ept.asString());
         }
     }
-    for (auto& broker : json["brokers"])
-    {
-        brokerConnectionList(connections,broker);
+    for (auto& broker : json["brokers"]) {
+        brokerConnectionList(connections, broker);
     }
     for (auto& core : json["cores"]) {
-        coreConnectionList(connections,core);
+        coreConnectionList(connections, core);
     }
     return connections;
 }
@@ -343,47 +341,42 @@ void Connector::addConnection(std::string_view interface1,
     auto iview1 = addInterface(interface1);
     auto iview2 = addInterface(interface2);
     Connection conn{iview1, iview2, direction, std::move(svtags)};
-    if (iview1.compare(0, 6, "REGEX:") == 0)
-    {
+    if (iview1.compare(0, 6, "REGEX:") == 0) {
         switch (direction) {
-        case InterfaceDirection::TO_FROM:
-            std::swap(conn.interface1,conn.interface2);
-            matchers.emplace_back(std::move(conn));
-            break;
-        case InterfaceDirection::FROM_TO:
-            matchers.emplace_back(std::move(conn));
-            break;
-        case InterfaceDirection::BIDIRECTIONAL:
-            matchers.emplace_back(conn);
-            std::swap(conn.interface1,conn.interface2);
-            matchers.emplace_back(std::move(conn));
-            break;
+            case InterfaceDirection::TO_FROM:
+                std::swap(conn.interface1, conn.interface2);
+                matchers.emplace_back(std::move(conn));
+                break;
+            case InterfaceDirection::FROM_TO:
+                matchers.emplace_back(std::move(conn));
+                break;
+            case InterfaceDirection::BIDIRECTIONAL:
+                matchers.emplace_back(conn);
+                std::swap(conn.interface1, conn.interface2);
+                matchers.emplace_back(std::move(conn));
+                break;
         }
-    }
-    else
-    {
+    } else {
         switch (direction) {
-        case InterfaceDirection::TO_FROM:
-            connections.emplace(iview2, std::move(conn));
-            break;
-        case InterfaceDirection::FROM_TO:
-            connections.emplace(iview1, std::move(conn));
-            break;
-        case InterfaceDirection::BIDIRECTIONAL:
-            connections.emplace(iview2, conn);
-            if (iview1 != iview2) {
+            case InterfaceDirection::TO_FROM:
+                connections.emplace(iview2, std::move(conn));
+                break;
+            case InterfaceDirection::FROM_TO:
                 connections.emplace(iview1, std::move(conn));
-            }
-            break;
+                break;
+            case InterfaceDirection::BIDIRECTIONAL:
+                connections.emplace(iview2, conn);
+                if (iview1 != iview2) {
+                    connections.emplace(iview1, std::move(conn));
+                }
+                break;
         }
     }
-    
 }
 
-class RegexMatcher
-{
-public:
-    RegexMatcher()=default;
+class RegexMatcher {
+  public:
+    RegexMatcher() = default;
 
     std::regex rmatch;
     std::vector<std::string> keys;
@@ -392,31 +385,28 @@ public:
     std::string generateMatch(std::string_view testString)
     {
         std::match_results<typename decltype(testString)::const_iterator> matchResults{};
-        if (std::regex_match(testString.begin(), testString.end(), matchResults, rmatch))
-        {
+        if (std::regex_match(testString.begin(), testString.end(), matchResults, rmatch)) {
             std::string matcher(interface2);
-            if (matcher.compare(0, 6, "REGEX:") == 0)
-            {
-                matcher.erase(0,6);
-                for (std::size_t ii = 0; ii<keys.size(); ++ii)
-                {
-                    auto keyloc=matcher.find(keys[ii]);
-                    while (keyloc != std::string::npos)
-                    {
-                        auto endloc=matcher.find_first_of(')',keyloc);
-                        matcher.replace(matcher.begin()+keyloc-1,matcher.begin()+endloc+1, matchResults[ii+1].first,matchResults[ii+1].second);
-                        keyloc=matcher.find(keys[ii]);
+            if (matcher.compare(0, 6, "REGEX:") == 0) {
+                matcher.erase(0, 6);
+                for (std::size_t ii = 0; ii < keys.size(); ++ii) {
+                    auto keyloc = matcher.find(keys[ii]);
+                    while (keyloc != std::string::npos) {
+                        auto endloc = matcher.find_first_of(')', keyloc);
+                        matcher.replace(matcher.begin() + keyloc - 1,
+                                        matcher.begin() + endloc + 1,
+                                        matchResults[ii + 1].first,
+                                        matchResults[ii + 1].second);
+                        keyloc = matcher.find(keys[ii]);
                     }
-
                 }
             }
-            
+
             return matcher;
         }
         return std::string();
     }
 };
-
 
 void Connector::loadTextFile(const std::string& filename)
 {
@@ -555,20 +545,16 @@ std::vector<Connection>
             ++cascadeIndex;
         }
     }
-    if (matches.empty())
-    {
-        if (!regexMatchers.empty())
-        {
-            for (const auto& rmatcher : regexMatchers)
-            {
-                auto mstring=rmatcher->generateMatch(startingInterface);
-                if (!mstring.empty())
-                {
+    if (matches.empty()) {
+        if (!regexMatchers.empty()) {
+            for (const auto& rmatcher : regexMatchers) {
+                auto mstring = rmatcher->generateMatch(startingInterface);
+                if (!mstring.empty()) {
                     Connection connection;
-                    connection.stringBuffer=std::make_shared<std::string>(mstring);
-                    connection.interface1=rmatcher->interface1;
-                    connection.interface2=*connection.stringBuffer;
-                    connection.direction=InterfaceDirection::FROM_TO;
+                    connection.stringBuffer = std::make_shared<std::string>(mstring);
+                    connection.interface1 = rmatcher->interface1;
+                    connection.interface2 = *connection.stringBuffer;
+                    connection.direction = InterfaceDirection::FROM_TO;
                     matches.push_back(std::move(connection));
                 }
             }
@@ -654,8 +640,7 @@ int Connector::makeTargetConnection(
             if (!aliases.empty()) {
                 auto aliasList = generateAliases(option.interface2, aliases);
                 for (const auto& alias : aliasList) {
-                    if (alias == option.interface2)
-                    {
+                    if (alias == option.interface2) {
                         continue;
                     }
                     located = possibleConnections.find(alias);
@@ -692,8 +677,7 @@ int Connector::makeTargetConnection(
                     if (!aliases.empty()) {
                         auto interfaceAliasList = generateAliases(option.interface2, aliases);
                         for (const auto& interfaceAlias : interfaceAliasList) {
-                            if (alias == option.interface2)
-                            {
+                            if (alias == option.interface2) {
                                 continue;
                             }
                             located = possibleConnections.find(interfaceAlias);
@@ -786,8 +770,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(inputName, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (alias == inputName)
-                {
+                if (alias == inputName) {
                     continue;
                 }
                 if (makePotentialConnection(alias,
@@ -824,8 +807,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(pubName, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (alias == pubName)
-                {
+                if (alias == pubName) {
                     continue;
                 }
                 if (makePotentialConnection(alias,
@@ -863,8 +845,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(endpointName, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (alias == endpointName)
-                {
+                if (alias == endpointName) {
                     continue;
                 }
                 if (makePotentialConnection(alias,
@@ -887,8 +868,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uInp, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (alias == uInp)
-                {
+                if (alias == uInp) {
                     continue;
                 }
                 if (makePotentialConnection(alias,
@@ -910,8 +890,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uPub, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (alias == uPub)
-                {
+                if (alias == uPub) {
                     continue;
                 }
                 if (makePotentialConnection(alias,
@@ -933,8 +912,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uEnd, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (alias == uEnd)
-                {
+                if (alias == uEnd) {
                     continue;
                 }
                 if (makePotentialConnection(alias,
@@ -956,8 +934,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uEnd, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
-                if (alias == uEnd)
-                {
+                if (alias == uEnd) {
                     continue;
                 }
                 if (makePotentialConnection(alias,
@@ -976,8 +953,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         }
         auto aliasList = generateAliases(uInp, possibleConnections.aliases);
         for (const auto& alias : aliasList) {
-            if (alias == uInp)
-            {
+            if (alias == uInp) {
                 continue;
             }
             fnd = possibleConnections.potentialInputs.find(alias);
@@ -994,8 +970,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         }
         auto aliasList = generateAliases(uPub, possibleConnections.aliases);
         for (const auto& alias : aliasList) {
-            if (alias == uPub)
-            {
+            if (alias == uPub) {
                 continue;
             }
             fnd = possibleConnections.potentialPubs.find(alias);
@@ -1012,8 +987,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         }
         auto aliasList = generateAliases(uEpt, possibleConnections.aliases);
         for (const auto& alias : aliasList) {
-            if (alias == uEpt)
-            {
+            if (alias == uEpt) {
                 continue;
             }
             fnd = possibleConnections.potentialEndpoints.find(alias);
@@ -1077,30 +1051,25 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
     }
 }
 
-
 void Connector::generateRegexMatchers()
 {
-    for (auto& rmatch : matchers)
-    {
-        auto rmatcher=std::make_unique<RegexMatcher>();
-        std::string rstring{rmatch.interface1.substr(6,std::string_view::npos)};
-        auto nvloc=rstring.find("(?<");
-        while (nvloc != std::string::npos)
-        {
-            auto finishloc=rstring.find_first_of('>',nvloc+2);
-            rmatcher->keys.push_back(rstring.substr(nvloc+1,finishloc-nvloc));
-            rstring.erase(rstring.begin()+nvloc+1,rstring.begin()+finishloc+1);
-            nvloc=rstring.find("(?<");
-            rmatcher->interface2=rmatch.interface2;
+    for (auto& rmatch : matchers) {
+        auto rmatcher = std::make_unique<RegexMatcher>();
+        std::string rstring{rmatch.interface1.substr(6, std::string_view::npos)};
+        auto nvloc = rstring.find("(?<");
+        while (nvloc != std::string::npos) {
+            auto finishloc = rstring.find_first_of('>', nvloc + 2);
+            rmatcher->keys.push_back(rstring.substr(nvloc + 1, finishloc - nvloc));
+            rstring.erase(rstring.begin() + nvloc + 1, rstring.begin() + finishloc + 1);
+            nvloc = rstring.find("(?<");
+            rmatcher->interface2 = rmatch.interface2;
         }
-        try
-        {
-            rmatcher->rmatch=std::regex(rstring);
+        try {
+            rmatcher->rmatch = std::regex(rstring);
             regexMatchers.push_back(std::move(rmatcher));
         }
-        catch (const std::regex_error& e)
-        {
-            fed->localError(-101,e.what());
+        catch (const std::regex_error& e) {
+            fed->localError(-101, e.what());
         }
     }
 }
@@ -1109,8 +1078,7 @@ void Connector::initialize()
 {
     auto cmode = fed->getCurrentMode();
     if (cmode == Federate::Modes::STARTUP) {
-        if (!matchers.empty())
-        {
+        if (!matchers.empty()) {
             generateRegexMatchers();
         }
         fed->enterInitializingModeIterative();

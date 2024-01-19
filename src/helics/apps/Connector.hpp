@@ -9,12 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreApp.hpp"
 #include "helicsApp.hpp"
 
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <memory>
 
 namespace helics::apps {
 enum class InterfaceDirection { TO_FROM = -1, BIDIRECTIONAL = 0, FROM_TO = 1 };
@@ -115,6 +115,7 @@ necessary
     auto madeConnections() const { return matchCount; }
     void allowMultipleConnections(bool value = true) { matchMultiple = value; }
     void matchEndpointTargets(bool value = true) { matchTargetEndpoints = value; }
+
   private:
     std::unique_ptr<helicsCLI11App> generateParser();
     /** process remaining command line arguments*/
@@ -145,10 +146,11 @@ necessary
     std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface) const;
     /** load the regex matchers */
     void generateRegexMatchers();
+
   private:
     CoreApp core;
     /// the connections descriptors
-    std::unordered_multimap<std::string_view, Connection> connections;  
+    std::unordered_multimap<std::string_view, Connection> connections;
     std::vector<Connection> matchers;
     std::vector<std::shared_ptr<RegexMatcher>> regexMatchers;
     std::unordered_set<std::string> tags;
@@ -157,6 +159,6 @@ necessary
     /// indicator to match unconnected target endpoints default{false}
     bool matchTargetEndpoints{false};
     /// indicator to do multiple matches [default is to stop at first match]
-    bool matchMultiple{false};  
+    bool matchMultiple{false};
 };
 }  // namespace helics::apps

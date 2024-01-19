@@ -122,8 +122,10 @@ class UnknownHandleManager {
     @param cfunc a callback function with the signature of the name of the interface, a
     character with the interface type , the name of the target, and type of the target.
     */
-    void processUnknownLinks(
-        const std::function<void(const std::string& origin, InterfaceType, const std::string& target, InterfaceType)>& cfunc) const;
+    void processUnknownLinks(const std::function<void(const std::string& origin,
+                                                      InterfaceType,
+                                                      const std::string& target,
+                                                      InterfaceType)>& cfunc) const;
 };
 
 }  // namespace helics
