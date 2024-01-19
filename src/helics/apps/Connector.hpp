@@ -23,7 +23,7 @@ struct Connection {
     std::string_view interface1;
     std::string_view interface2;
     InterfaceDirection direction;
-    std::vector<std::string_view> tags;
+    std::vector<std::size_t> tags;
     std::shared_ptr<std::string> stringBuffer;
 };
 
@@ -103,7 +103,7 @@ necessary
                        const std::vector<std::string>& tags = {});
 
     /** add a tag for later reference return a string_view reference for the tag*/
-    std::string_view addTag(std::string_view tagName);
+    std::size_t addTag(std::string_view tagName);
 
     /** add a interface name for later reference return a string_view reference for the interface
      * name*/
@@ -135,21 +135,24 @@ necessary
     /** try to make a connection for an input*/
     int makeTargetConnection(
         std::string_view origin,
+        const std::vector<std::size_t> &tags,
         std::unordered_set<std::string_view>& possibleConnections,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases,
         const std::function<void(std::string_view origin, std::string_view target)>& callback);
     bool makePotentialConnection(
         std::string_view interfaceName,
+        const std::vector<std::size_t> &tags,
         std::unordered_map<std::string_view, PotentialConnections>& potentials,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
 
     bool checkPotentialConnection(
         std::string_view interface,
+        const std::vector<std::size_t> &tags,
         std::unordered_set<std::string_view>& possibleConnections,
         std::unordered_map<std::string_view, PotentialConnections>& potentials,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
     /** get a list of the possible connections to based on the database*/
-    std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface) const;
+    std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface,const std::vector<std::size_t> &tags) const;
     /** load the regex matchers */
     void generateRegexMatchers();
 
@@ -159,7 +162,7 @@ necessary
     std::unordered_multimap<std::string_view, Connection> connections;
     std::vector<Connection> matchers;
     std::vector<std::shared_ptr<RegexMatcher>> regexMatchers;
-    std::unordered_set<std::string> tags;
+    std::unordered_map<std::size_t,std::string> tags;
     std::unordered_set<std::string> interfaces;
     std::uint64_t matchCount{0};
     /// indicator to match unconnected target endpoints default{false}

@@ -290,10 +290,11 @@ Connector::Connector(std::string_view appName, const std::string& configString):
     Connector::loadJsonFile(configString);
 }
 
-std::string_view Connector::addTag(std::string_view tagName)
+std::size_t Connector::addTag(std::string_view tagName)
 {
-    auto tagIterator = tags.insert(std::string(tagName));
-    return {*(tagIterator.first)};
+    std::size_t hash=std::hash<std::string_view>()(tagName);
+    tags.emplace(hash,tagName);
+    return hash;
 }
 
 std::string_view Connector::addInterface(std::string_view interfaceName)
@@ -333,7 +334,7 @@ void Connector::addConnection(std::string_view interface1,
                               InterfaceDirection direction,
                               const std::vector<std::string>& connectionTags)
 {
-    std::vector<std::string_view> svtags;
+    std::vector<std::size_t> svtags;
     svtags.reserve(connectionTags.size());
     for (const auto& tag : connectionTags) {
         svtags.push_back(addTag(tag));
@@ -508,7 +509,7 @@ void Connector::loadJsonFile(const std::string& jsonString)
 }
 
 std::vector<Connection>
-    Connector::buildPossibleConnectionList(std::string_view startingInterface) const
+    Connector::buildPossibleConnectionList(std::string_view startingInterface, const std::vector<std::size_t> &tags) const
 {
     std::vector<Connection> matches;
     auto [first, last] = connections.equal_range(startingInterface);
@@ -593,11 +594,11 @@ static std::set<std::string_view>
 }
 
 bool Connector::makePotentialConnection(
-    std::string_view interface,
+    std::string_view interface, const std::vector<std::size_t> &tags,
     std::unordered_map<std::string_view, PotentialConnections>& potentials,
     const std::unordered_multimap<std::string_view, std::string_view>& aliases)
 {
-    auto connectionOptions = buildPossibleConnectionList(interface);
+    auto connectionOptions = buildPossibleConnectionList(interface,tags);
     for (const auto& option : connectionOptions) {
         auto located = potentials.find(option.interface2);
         if (located != potentials.end()) {
@@ -619,21 +620,21 @@ bool Connector::makePotentialConnection(
 }
 
 bool Connector::checkPotentialConnection(
-    std::string_view interfaceName,
+    std::string_view interfaceName, const std::vector<std::size_t> &tags,
     std::unordered_set<std::string_view>& possibleConnections,
     std::unordered_map<std::string_view, PotentialConnections>& potentials,
     const std::unordered_multimap<std::string_view, std::string_view>& aliases)
 {
     static auto nullConnector = [this](std::string_view, std::string_view) {};
     /** potential inputs*/
-        auto matched = makeTargetConnection(interfaceName,
+        auto matched = makeTargetConnection(interfaceName,tags,
             possibleConnections,
             aliases,
             nullConnector);
         if (matched > 0) {
             return true;
         }
-        if (makePotentialConnection(interfaceName,potentials,aliases)) {
+        if (makePotentialConnection(interfaceName,tags,potentials,aliases)) {
             return true;
         }
         if (!aliases.empty()) {
@@ -642,7 +643,7 @@ bool Connector::checkPotentialConnection(
                 if (alias == interfaceName) {
                     continue;
                 }
-                if (makePotentialConnection(alias,potentials,aliases)) {
+                if (makePotentialConnection(alias,tags,potentials,aliases)) {
                     return true;
                 }
             }
@@ -651,13 +652,13 @@ bool Connector::checkPotentialConnection(
 }
 
 int Connector::makeTargetConnection(
-    std::string_view origin,
+    std::string_view origin, const std::vector<std::size_t> &tags,
     std::unordered_set<std::string_view>& possibleConnections,
     const std::unordered_multimap<std::string_view, std::string_view>& aliases,
     const std::function<void(std::string_view, std::string_view)>& callback)
 {
     int matched{0};
-    auto connectionOptions = buildPossibleConnectionList(origin);
+    auto connectionOptions = buildPossibleConnectionList(origin,tags);
     for (const auto& option : connectionOptions) {
         auto located = possibleConnections.find(option.interface2);
         if (located != possibleConnections.end()) {
@@ -694,7 +695,7 @@ int Connector::makeTargetConnection(
             if (alias == origin) {
                 continue;
             }
-            auto aliasOptions = buildPossibleConnectionList(alias);
+            auto aliasOptions = buildPossibleConnectionList(alias,tags);
             for (const auto& option : aliasOptions) {
                 auto located = possibleConnections.find(option.interface2);
                 if (located != possibleConnections.end()) {
@@ -744,16 +745,18 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
     auto targetEndpointConnector = [this](std::string_view origin, std::string_view source) {
         core.linkEndpoints(source, origin);
     };
+
+    std::vector<std::size_t> tagList;
     /** unconnected inputs*/
     for (const auto& uInp : possibleConnections.unconnectedInputs) {
-        matchCount += makeTargetConnection(uInp,
+        matchCount += makeTargetConnection(uInp,tagList,
                                            possibleConnections.pubs,
                                            possibleConnections.aliases,
                                            inputConnector);
     }
     /** unconnected publications*/
     for (const auto& uPub : possibleConnections.unconnectedPubs) {
-        matchCount += makeTargetConnection(uPub,
+        matchCount += makeTargetConnection(uPub,tagList,
                                            possibleConnections.inputs,
                                            possibleConnections.aliases,
                                            pubConnector);
@@ -761,7 +764,7 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
 
     /** unconnected source endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedSourceEndpoints) {
-        matchCount += makeTargetConnection(uEnd,
+        matchCount += makeTargetConnection(uEnd,tagList,
                                            possibleConnections.endpoints,
                                            possibleConnections.aliases,
                                            sourceEndpointConnector);
@@ -770,7 +773,7 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
     if (matchTargetEndpoints) {
         /** unconnected target endpoints*/
         for (const auto& uEnd : possibleConnections.unconnectedTargetEndpoints) {
-            matchCount += makeTargetConnection(uEnd,
+            matchCount += makeTargetConnection(uEnd,tagList,
                                                possibleConnections.endpoints,
                                                possibleConnections.aliases,
                                                targetEndpointConnector);
@@ -781,9 +784,10 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
 void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnections)
 {
     auto nullConnector = [this](std::string_view, std::string_view) {};
+    std::vector<std::size_t> tagList;
     /** potential inputs*/
     for (auto& pInp : possibleConnections.potentialInputs) {
-        if (checkPotentialConnection(pInp.first, possibleConnections.pubs, possibleConnections.potentialPubs, possibleConnections.aliases))
+        if (checkPotentialConnection(pInp.first,tagList, possibleConnections.pubs, possibleConnections.potentialPubs, possibleConnections.aliases))
         {
             pInp.second.used=true;
         }
@@ -793,7 +797,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (pPub.second.used) {
             continue;
         }
-        if (checkPotentialConnection(pPub.first, possibleConnections.inputs, possibleConnections.potentialInputs, possibleConnections.aliases))
+        if (checkPotentialConnection(pPub.first,tagList, possibleConnections.inputs, possibleConnections.potentialInputs, possibleConnections.aliases))
         {
             pPub.second.used=true;
         }
@@ -804,7 +808,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (pEnd.second.used) {
             continue;
         }
-        if (checkPotentialConnection(pEnd.first, possibleConnections.endpoints, possibleConnections.potentialEndpoints, possibleConnections.aliases))
+        if (checkPotentialConnection(pEnd.first,tagList, possibleConnections.endpoints, possibleConnections.potentialEndpoints, possibleConnections.aliases))
         {
             pEnd.second.used=true;
         }
@@ -812,7 +816,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
     /** now try to match unconnected interfaces to some of the potential ones*/
     /** unconnected inputs*/
     for (const auto& uInp : possibleConnections.unconnectedInputs) {
-        if (makePotentialConnection(uInp,
+        if (makePotentialConnection(uInp,tagList,
                                     possibleConnections.potentialPubs,
                                     possibleConnections.aliases)) {
             continue;
@@ -823,7 +827,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
                 if (alias == uInp) {
                     continue;
                 }
-                if (makePotentialConnection(alias,
+                if (makePotentialConnection(alias,tagList,
                                             possibleConnections.potentialPubs,
                                             possibleConnections.aliases)) {
                     break;
@@ -834,7 +838,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
 
     /** unconnected publications*/
     for (const auto& uPub : possibleConnections.unconnectedPubs) {
-        if (makePotentialConnection(uPub,
+        if (makePotentialConnection(uPub,tagList,
                                     possibleConnections.potentialInputs,
                                     possibleConnections.aliases)) {
             continue;
@@ -845,7 +849,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
                 if (alias == uPub) {
                     continue;
                 }
-                if (makePotentialConnection(alias,
+                if (makePotentialConnection(alias,tagList,
                                             possibleConnections.potentialInputs,
                                             possibleConnections.aliases)) {
                     break;
@@ -856,7 +860,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
 
     /** unconnected source endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedSourceEndpoints) {
-        if (makePotentialConnection(uEnd,
+        if (makePotentialConnection(uEnd,tagList,
                                     possibleConnections.potentialEndpoints,
                                     possibleConnections.aliases)) {
             continue;
@@ -867,7 +871,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
                 if (alias == uEnd) {
                     continue;
                 }
-                if (makePotentialConnection(alias,
+                if (makePotentialConnection(alias,tagList,
                                             possibleConnections.potentialEndpoints,
                                             possibleConnections.aliases)) {
                     break;
@@ -878,7 +882,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
 
     /** unconnected source endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedTargetEndpoints) {
-        if (makePotentialConnection(uEnd,
+        if (makePotentialConnection(uEnd,tagList,
                                     possibleConnections.potentialEndpoints,
                                     possibleConnections.aliases)) {
             continue;
@@ -889,7 +893,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
                 if (alias == uEnd) {
                     continue;
                 }
-                if (makePotentialConnection(alias,
+                if (makePotentialConnection(alias,tagList,
                                             possibleConnections.potentialEndpoints,
                                             possibleConnections.aliases)) {
                     break;
