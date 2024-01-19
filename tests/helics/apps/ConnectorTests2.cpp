@@ -428,7 +428,6 @@ TEST(connector_tests2, multibroker_connector_regex2)
     EXPECT_EQ(conn1.madeConnections(), 6);
 }
 
-
 TEST(connector_tests2, multibroker_connector_regex_default_tag)
 {
     helics::cleanupHelicsLibrary();
@@ -448,7 +447,7 @@ TEST(connector_tests2, multibroker_connector_regex_default_tag)
     helics::CoreApp core_sub2(helics::CoreType::TEST, "--name=core_sub2 --broker=subBroker2");
 
     helics::CoreApp core_subsub1(helics::CoreType::TEST,
-        "--name=core_subsub1 --broker=subsubBroker2");
+                                 "--name=core_subsub1 --broker=subsubBroker2");
     /** setup the federates*/
     helics::FederateInfo fedInfo;
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
@@ -480,8 +479,9 @@ TEST(connector_tests2, multibroker_connector_regex_default_tag)
 
     helics::apps::Connector conn1("connector1", coreA, fedInfo);
     conn1.addConnection("REGEX:publication(?<value>.)",
-        "REGEX:inp(?<value>.)",
-        InterfaceDirection::FROM_TO,{"default"});
+                        "REGEX:inp(?<value>.)",
+                        InterfaceDirection::FROM_TO,
+                        {"default"});
 
     brokerA.addAlias("publicationA", "pubA");
     brokerA.addAlias("publicationB", "pubB");
@@ -500,27 +500,27 @@ TEST(connector_tests2, multibroker_connector_regex_default_tag)
     auto futA = std::async(std::launch::async, [&fedA]() {
         fedA.enterExecutingMode();
         fedA.finalize();
-        });
+    });
     auto futSubA = std::async(std::launch::async, [&fedSubA]() {
         fedSubA.enterExecutingMode();
         fedSubA.finalize();
-        });
+    });
     auto futSubA2 = std::async(std::launch::async, [&fedSubA2]() {
         fedSubA2.enterExecutingMode();
         fedSubA2.finalize();
-        });
+    });
     auto futSubB = std::async(std::launch::async, [&fedSubB]() {
         fedSubB.enterExecutingMode();
         fedSubB.finalize();
-        });
+    });
     auto futSubA2b = std::async(std::launch::async, [&fedSubA2b]() {
         fedSubA2b.enterExecutingMode();
         fedSubA2b.finalize();
-        });
+    });
     auto futSubSub1 = std::async(std::launch::async, [&fedSubSub1]() {
         fedSubSub1.enterExecutingMode();
         fedSubSub1.finalize();
-        });
+    });
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
 
     fut.get();

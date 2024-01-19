@@ -48,7 +48,6 @@ TEST(connector_tags, no_match_tag)
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
 
-
 TEST(connector_tags, match_tag)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -61,7 +60,7 @@ TEST(connector_tags, match_tag)
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1"});
 
     helics::ValueFederate vfed("c1", fedInfo);
-    vfed.setTag("tag1","ON");
+    vfed.setTag("tag1", "ON");
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
@@ -78,7 +77,6 @@ TEST(connector_tags, match_tag)
     fut.get();
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
-
 
 TEST(connector_tags, match_tag2)
 {
@@ -89,10 +87,10 @@ TEST(connector_tags, match_tag2)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1","tag2"});
+    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1", "tag2"});
 
     helics::ValueFederate vfed("c1", fedInfo);
-    vfed.setTag("tag1","ON");
+    vfed.setTag("tag1", "ON");
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
@@ -110,7 +108,6 @@ TEST(connector_tags, match_tag2)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
-
 TEST(connector_tags, match_tag_core)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -120,10 +117,10 @@ TEST(connector_tags, match_tag_core)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1","tag2"});
+    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1", "tag2"});
 
     helics::ValueFederate vfed("c1", fedInfo);
-    
+
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
@@ -143,8 +140,6 @@ TEST(connector_tags, match_tag_core)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
-
-
 TEST(connector_tags, match_tag_global)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -154,7 +149,7 @@ TEST(connector_tags, match_tag_global)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1","tag2"});
+    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1", "tag2"});
 
     helics::ValueFederate vfed("c1", fedInfo);
 
@@ -177,7 +172,6 @@ TEST(connector_tags, match_tag_global)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
-
 TEST(connector_tags, false_tag)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -190,7 +184,7 @@ TEST(connector_tags, false_tag)
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1"});
 
     helics::ValueFederate vfed("c1", fedInfo);
-    vfed.setGlobal("tag1","false");
+    vfed.setGlobal("tag1", "false");
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
@@ -208,7 +202,6 @@ TEST(connector_tags, false_tag)
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
 
-
 TEST(connector_tags, match_tag_tags)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -218,7 +211,7 @@ TEST(connector_tags, match_tag_tags)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1","tag2"});
+    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1", "tag2"});
 
     helics::ValueFederate vfed("c1", fedInfo);
 
@@ -226,7 +219,7 @@ TEST(connector_tags, match_tag_tags)
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
 
     helics::CoreApp core("ccoret7");
-    core.setGlobal("tags","tag2,test,mode, single");
+    core.setGlobal("tags", "tag2,test,mode, single");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
     const double testValue = 3452.562;
@@ -241,7 +234,6 @@ TEST(connector_tags, match_tag_tags)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
-
 TEST(connector_tags, match_tag_discriminate)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -254,7 +246,7 @@ TEST(connector_tags, match_tag_discriminate)
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1"});
     conn1.addConnection("inp2", "pub1", InterfaceDirection::FROM_TO, {"tag2"});
     helics::ValueFederate vfed("c1", fedInfo);
-    vfed.setTag("tag2","ON");
+    vfed.setTag("tag2", "ON");
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     auto& inp2 = vfed.registerGlobalInput<double>("inp2");
@@ -267,7 +259,7 @@ TEST(connector_tags, match_tag_discriminate)
     auto val = inp1.getDouble();
     EXPECT_EQ(val, helics::invalidDouble);
     val = inp2.getDouble();
-    EXPECT_EQ(val,testValue);
+    EXPECT_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -286,7 +278,7 @@ TEST(connector_tags, match_tag_discriminate2)
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1"});
     conn1.addConnection("inp2", "pub1", InterfaceDirection::FROM_TO, {"tag2"});
     helics::ValueFederate vfed("c1", fedInfo);
-    vfed.setTag("tag1","ON");
+    vfed.setTag("tag1", "ON");
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     auto& inp2 = vfed.registerGlobalInput<double>("inp2");
@@ -297,8 +289,8 @@ TEST(connector_tags, match_tag_discriminate2)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val,testValue);
-   
+    EXPECT_EQ(val, testValue);
+
     val = inp2.getDouble();
     EXPECT_EQ(val, helics::invalidDouble);
 

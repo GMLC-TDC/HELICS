@@ -125,7 +125,7 @@ class HELICS_CXX_EXPORT CoreApp {
   queryable through a "tags" query or "tag/<tagname>"
   @param tag the name of the tag to set the value for
   @param value the value for the given tag*/
-    void setTag(std::string_view tag, std::string_view value="true");
+    void setTag(std::string_view tag, std::string_view value = "true");
     /** get the value of a specific tag (key-value pair) for a core
     @details the tag is an arbitrary user defined string and value; the tags for a core are
     queryable
@@ -141,7 +141,7 @@ class HELICS_CXX_EXPORT CoreApp {
     @param valueName the name of the global to set
     @param value the value of the global
     */
-    void setGlobal(std::string_view valueName, std::string_view value="true");
+    void setGlobal(std::string_view valueName, std::string_view value = "true");
 
     /** send a command to a specific target
    @details the format is somewhat unspecified; target is the name of an object, typically one of

@@ -106,7 +106,6 @@ TEST(connector_file_tests, connector_cascade)
     fut.get();
 }
 
-
 TEST(connector_file_tests, simple_connector_tags)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -122,7 +121,7 @@ TEST(connector_file_tests, simple_connector_tags)
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     auto& inp2 = vfed.registerGlobalInput<double>("inp2");
-    vfed.setGlobal("tag1","true");
+    vfed.setGlobal("tag1", "true");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
     const double testValue = 3452.562;
@@ -131,14 +130,12 @@ TEST(connector_file_tests, simple_connector_tags)
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
     EXPECT_EQ(val, testValue);
-    val=inp2.getDouble();
-    EXPECT_EQ(val,helics::invalidDouble);
+    val = inp2.getDouble();
+    EXPECT_EQ(val, helics::invalidDouble);
     vfed.finalize();
     fut.get();
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
-
-
 
 TEST(connector_file_tests, simple_connector_tags_alt)
 {
@@ -155,7 +152,7 @@ TEST(connector_file_tests, simple_connector_tags_alt)
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
     auto& inp1 = vfed.registerGlobalInput<double>("inp1");
     auto& inp2 = vfed.registerGlobalInput<double>("inp2");
-    vfed.setGlobal("tag2","true");
+    vfed.setGlobal("tag2", "true");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
     const double testValue = 3452.562;
@@ -163,9 +160,9 @@ TEST(connector_file_tests, simple_connector_tags_alt)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val,helics::invalidDouble);
-    
-    val=inp2.getDouble();
+    EXPECT_EQ(val, helics::invalidDouble);
+
+    val = inp2.getDouble();
     EXPECT_EQ(val, testValue);
     vfed.finalize();
     fut.get();
