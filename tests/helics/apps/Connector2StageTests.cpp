@@ -790,3 +790,95 @@ TEST(connector_2stage, three_fed_unknown_pub_alias)
     EXPECT_GE(data.size(), 1);
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
+
+
+TEST(connector_2stage, three_fed_endpoint_bi_alias)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = "ccoree7";
+    fedInfo.coreInitString = "-f3 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connectore7", fedInfo);
+    conn1.addConnection("bigEndpoint", "origin", InterfaceDirection::BIDIRECTIONAL);
+
+    fedInfo.coreInitString = "";
+    CheckFed cfed1("c1", fedInfo);
+    cfed1.addPotentialEndpoints({"ept1", "ept2", "ept3"});
+
+    helics::MessageFederate mFed2("m2", fedInfo);
+
+    helics::CoreApp core(mFed2.getCorePointer());
+    auto& ept1 = mFed2.registerGlobalTargetedEndpoint("oept1");
+    ept1.addAlias("origin");
+    core.addAlias("ept1","bigEndpoint");
+    mFed2.enterExecutingModeAsync();
+
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    auto fut2 = std::async(std::launch::async, [&cfed1]() {
+        cfed1.initialize();
+        cfed1.executing();
+        cfed1.run(5);
+        cfed1.finalize();
+        });
+    mFed2.enterExecutingModeComplete();
+    ept1.send("string1");
+    mFed2.requestTime(2.0);
+    ept1.send("string2");
+    mFed2.requestTime(3.0);
+    ept1.send("string3");
+    mFed2.disconnect();
+    fut.get();
+    fut2.get();
+    ASSERT_EQ(cfed1.getMessages().size(), 1);
+    EXPECT_EQ(cfed1.getMessages()[0].size(), 3);
+    EXPECT_EQ(conn1.madeConnections(), 2);
+}
+
+
+TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = "ccoree8";
+    fedInfo.coreInitString = "-f3 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connectore8", fedInfo);
+    conn1.addConnection("bigEndpoint", "origin", InterfaceDirection::BIDIRECTIONAL);
+    conn1.addConnection("origin", "secondary", InterfaceDirection::BIDIRECTIONAL);
+    conn1.allowMultipleConnections();
+    fedInfo.coreInitString = "";
+    CheckFed cfed1("c1", fedInfo);
+    cfed1.addPotentialEndpoints({"ept1", "ept2", "ept3"});
+
+    helics::MessageFederate mFed2("m2", fedInfo);
+
+    helics::CoreApp core(mFed2.getCorePointer());
+    auto& ept1 = mFed2.registerGlobalTargetedEndpoint("oept1");
+    ept1.addAlias("origin");
+    core.addAlias("ept1","bigEndpoint");
+    core.addAlias("ept2","secondary");
+    mFed2.enterExecutingModeAsync();
+
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    auto fut2 = std::async(std::launch::async, [&cfed1]() {
+        cfed1.initialize();
+        cfed1.executing();
+        cfed1.run(5);
+        cfed1.finalize();
+        });
+    mFed2.enterExecutingModeComplete();
+    ept1.send("string1");
+    mFed2.requestTime(2.0);
+    ept1.send("string2");
+    mFed2.requestTime(3.0);
+    ept1.send("string3");
+    mFed2.disconnect();
+    fut.get();
+    fut2.get();
+    ASSERT_EQ(cfed1.getMessages().size(), 2);
+    EXPECT_EQ(cfed1.getMessages()[0].size(), 7);
+    EXPECT_EQ(conn1.madeConnections(), 6);
+}

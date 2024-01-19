@@ -22,6 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <regex>
 
 namespace helics::apps {
 
@@ -54,7 +55,111 @@ struct ConnectionsList {
     bool hasPotentialInterfaces{false};
 };
 
-ConnectionsList generateConnectionsList(const std::string& connectionData)
+static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
+{
+    if (core.isMember("federates")) {
+        for (const auto& fed : core["federates"]) {
+            if (fed.isMember("connected_inputs")) {
+                for (auto& input : fed["connected_inputs"]) {
+                    const std::string_view input1 =
+                        connections.interfaces.emplace_back(input.asString());
+                    connections.inputs.insert(input1);
+                }
+            }
+            if (fed.isMember("connected_publications")) {
+                for (const auto& pub : fed["connected_publications"]) {
+                    const std::string_view pub1 =
+                        connections.interfaces.emplace_back(pub.asString());
+                    connections.pubs.insert(pub1);
+                }
+            }
+            if (fed.isMember("unconnected_inputs")) {
+                for (const auto& input : fed["unconnected_inputs"]) {
+                    const std::string_view input1 =
+                        connections.interfaces.emplace_back(input.asString());
+                    connections.unconnectedInputs.push_back(input1);
+                    connections.inputs.insert(input1);
+                }
+            }
+            if (fed.isMember("unconnected_publications")) {
+                for (const auto& pub : fed["unconnected_publications"]) {
+                    const std::string_view pub1 =
+                        connections.interfaces.emplace_back(pub.asString());
+                    connections.unconnectedPubs.push_back(pub1);
+                    connections.pubs.insert(pub1);
+                }
+            }
+
+            if (fed.isMember("unconnected_target_endpoints")) {
+                for (const auto& endpoint : fed["unconnected_target_endpoints"]) {
+                    const std::string_view end1 =
+                        connections.interfaces.emplace_back(endpoint.asString());
+                    connections.unconnectedTargetEndpoints.push_back(end1);
+                    connections.endpoints.insert(end1);
+                }
+            }
+            if (fed.isMember("unconnected_source_endpoints")) {
+                for (const auto& endpoint : fed["unconnected_source_endpoints"]) {
+                    const std::string_view end1 =
+                        connections.interfaces.emplace_back(endpoint.asString());
+                    connections.unconnectedSourceEndpoints.push_back(end1);
+                    connections.endpoints.insert(end1);
+                }
+            }
+            if (fed.isMember("connected_endpoints")) {
+                for (const auto& endpoint : fed["connected_endpoints"]) {
+                    const std::string_view end1 =
+                        connections.interfaces.emplace_back(endpoint.asString());
+                    connections.endpoints.insert(end1);
+                }
+            }
+            if (fed.isMember("potential_interfaces")) {
+                connections.hasPotentialInterfaces = true;
+                const std::string_view federateName =
+                    connections.federatesWithPotentialInterfaces.emplace_back(
+                        fed["attributes"]["name"].asString());
+                const auto& potInterfaces = fed["potential_interfaces"];
+                if (potInterfaces.isMember("inputs")) {
+                    for (const auto& input : potInterfaces["inputs"]) {
+                        const std::string_view input1 =
+                            connections.interfaces.emplace_back(input.asString());
+                        connections.potentialInputs.emplace(
+                            input1, PotentialConnections{federateName, input1, false});
+                    }
+                }
+                if (potInterfaces.isMember("publications")) {
+                    for (const auto& pub : potInterfaces["publications"]) {
+                        const std::string_view pub1 =
+                            connections.interfaces.emplace_back(pub.asString());
+                        connections.potentialPubs.emplace(
+                            pub1, PotentialConnections{federateName, pub1, false});
+                    }
+                }
+                if (potInterfaces.isMember("endpoints")) {
+                    for (const auto& endpoint : potInterfaces["endpoints"]) {
+                        const std::string_view endpoint1 =
+                            connections.interfaces.emplace_back(endpoint.asString());
+                        connections.potentialEndpoints.emplace(
+                            endpoint1, PotentialConnections{federateName, endpoint1, false});
+                    }
+                }
+            }
+        }
+    }
+}
+
+static void brokerConnectionList(ConnectionsList& connections, Json::Value& broker)
+{
+    for (auto& subBroker : broker["brokers"])
+    {
+        brokerConnectionList(connections,subBroker);
+    }
+    for (auto& core : broker["cores"]) {
+        coreConnectionList(connections,core);
+    }
+}
+
+static ConnectionsList generateConnectionsList(const std::string& connectionData)
 {
     ConnectionsList connections;
     auto json = fileops::loadJsonStr(connectionData);
@@ -82,96 +187,12 @@ ConnectionsList generateConnectionsList(const std::string& connectionData)
             connections.unknownEndpoints.push_back(ept.asString());
         }
     }
+    for (auto& broker : json["brokers"])
+    {
+        brokerConnectionList(connections,broker);
+    }
     for (auto& core : json["cores"]) {
-        if (core.isMember("federates")) {
-            for (const auto& fed : core["federates"]) {
-                if (fed.isMember("connected_inputs")) {
-                    for (auto& input : fed["connected_inputs"]) {
-                        const std::string_view input1 =
-                            connections.interfaces.emplace_back(input.asString());
-                        connections.inputs.insert(input1);
-                    }
-                }
-                if (fed.isMember("connected_publications")) {
-                    for (const auto& pub : fed["connected_publications"]) {
-                        const std::string_view pub1 =
-                            connections.interfaces.emplace_back(pub.asString());
-                        connections.pubs.insert(pub1);
-                    }
-                }
-                if (fed.isMember("unconnected_inputs")) {
-                    for (const auto& input : fed["unconnected_inputs"]) {
-                        const std::string_view input1 =
-                            connections.interfaces.emplace_back(input.asString());
-                        connections.unconnectedInputs.push_back(input1);
-                        connections.inputs.insert(input1);
-                    }
-                }
-                if (fed.isMember("unconnected_publications")) {
-                    for (const auto& pub : fed["unconnected_publications"]) {
-                        const std::string_view pub1 =
-                            connections.interfaces.emplace_back(pub.asString());
-                        connections.unconnectedPubs.push_back(pub1);
-                        connections.pubs.insert(pub1);
-                    }
-                }
-
-                if (fed.isMember("unconnected_target_endpoints")) {
-                    for (const auto& endpoint : fed["unconnected_target_endpoints"]) {
-                        const std::string_view end1 =
-                            connections.interfaces.emplace_back(endpoint.asString());
-                        connections.unconnectedTargetEndpoints.push_back(end1);
-                        connections.endpoints.insert(end1);
-                    }
-                }
-                if (fed.isMember("unconnected_source_endpoints")) {
-                    for (const auto& endpoint : fed["unconnected_source_endpoints"]) {
-                        const std::string_view end1 =
-                            connections.interfaces.emplace_back(endpoint.asString());
-                        connections.unconnectedSourceEndpoints.push_back(end1);
-                        connections.endpoints.insert(end1);
-                    }
-                }
-                if (fed.isMember("connected_endpoints")) {
-                    for (const auto& endpoint : fed["connected_endpoints"]) {
-                        const std::string_view end1 =
-                            connections.interfaces.emplace_back(endpoint.asString());
-                        connections.endpoints.insert(end1);
-                    }
-                }
-                if (fed.isMember("potential_interfaces")) {
-                    connections.hasPotentialInterfaces = true;
-                    const std::string_view federateName =
-                        connections.federatesWithPotentialInterfaces.emplace_back(
-                            fed["attributes"]["name"].asString());
-                    const auto& potInterfaces = fed["potential_interfaces"];
-                    if (potInterfaces.isMember("inputs")) {
-                        for (const auto& input : potInterfaces["inputs"]) {
-                            const std::string_view input1 =
-                                connections.interfaces.emplace_back(input.asString());
-                            connections.potentialInputs.emplace(
-                                input1, PotentialConnections{federateName, input1, false});
-                        }
-                    }
-                    if (potInterfaces.isMember("publications")) {
-                        for (const auto& pub : potInterfaces["publications"]) {
-                            const std::string_view pub1 =
-                                connections.interfaces.emplace_back(pub.asString());
-                            connections.potentialPubs.emplace(
-                                pub1, PotentialConnections{federateName, pub1, false});
-                        }
-                    }
-                    if (potInterfaces.isMember("endpoints")) {
-                        for (const auto& endpoint : potInterfaces["endpoints"]) {
-                            const std::string_view endpoint1 =
-                                connections.interfaces.emplace_back(endpoint.asString());
-                            connections.potentialEndpoints.emplace(
-                                endpoint1, PotentialConnections{federateName, endpoint1, false});
-                        }
-                    }
-                }
-            }
-        }
+        coreConnectionList(connections,core);
     }
     return connections;
 }
@@ -322,7 +343,26 @@ void Connector::addConnection(std::string_view interface1,
     auto iview1 = addInterface(interface1);
     auto iview2 = addInterface(interface2);
     Connection conn{iview1, iview2, direction, std::move(svtags)};
-    switch (direction) {
+    if (iview1.compare(0, 6, "REGEX:") == 0)
+    {
+        switch (direction) {
+        case InterfaceDirection::TO_FROM:
+            std::swap(conn.interface1,conn.interface2);
+            matchers.emplace_back(std::move(conn));
+            break;
+        case InterfaceDirection::FROM_TO:
+            matchers.emplace_back(std::move(conn));
+            break;
+        case InterfaceDirection::BIDIRECTIONAL:
+            matchers.emplace_back(conn);
+            std::swap(conn.interface1,conn.interface2);
+            matchers.emplace_back(std::move(conn));
+            break;
+        }
+    }
+    else
+    {
+        switch (direction) {
         case InterfaceDirection::TO_FROM:
             connections.emplace(iview2, std::move(conn));
             break;
@@ -335,8 +375,48 @@ void Connector::addConnection(std::string_view interface1,
                 connections.emplace(iview1, std::move(conn));
             }
             break;
+        }
     }
+    
 }
+
+class RegexMatcher
+{
+public:
+    RegexMatcher()=default;
+
+    std::regex rmatch;
+    std::vector<std::string> keys;
+    std::string_view interface1;
+    std::string_view interface2;
+    std::string generateMatch(std::string_view testString)
+    {
+        std::match_results<typename decltype(testString)::const_iterator> matchResults{};
+        if (std::regex_match(testString.begin(), testString.end(), matchResults, rmatch))
+        {
+            std::string matcher(interface2);
+            if (matcher.compare(0, 6, "REGEX:") == 0)
+            {
+                matcher.erase(0,6);
+                for (std::size_t ii = 0; ii<keys.size(); ++ii)
+                {
+                    auto keyloc=matcher.find(keys[ii]);
+                    while (keyloc != std::string::npos)
+                    {
+                        auto endloc=matcher.find_first_of(')',keyloc);
+                        matcher.replace(matcher.begin()+keyloc-1,matcher.begin()+endloc+1, matchResults[ii+1].first,matchResults[ii+1].second);
+                        keyloc=matcher.find(keys[ii]);
+                    }
+
+                }
+            }
+            
+            return matcher;
+        }
+        return std::string();
+    }
+};
+
 
 void Connector::loadTextFile(const std::string& filename)
 {
@@ -442,39 +522,57 @@ std::vector<Connection>
 {
     std::vector<Connection> matches;
     auto [first, last] = connections.equal_range(startingInterface);
-    if (first == connections.end()) {
-        return matches;
-    }
-    std::set<std::string_view> searched;
-    searched.insert(startingInterface);
+    if (first != connections.end()) {
+        std::set<std::string_view> searched;
+        searched.insert(startingInterface);
 
-    for (auto match = first; match != last; ++match) {
-        matches.emplace_back(match->second);
-        if (matches.back().interface1 != startingInterface) {
-            std::swap(matches.back().interface1, matches.back().interface2);
+        for (auto match = first; match != last; ++match) {
+            matches.emplace_back(match->second);
+            if (matches.back().interface1 != startingInterface) {
+                std::swap(matches.back().interface1, matches.back().interface2);
+            }
+        }
+        std::size_t cascadeIndex{0};
+        while (cascadeIndex < matches.size()) {
+            if (searched.find(matches[cascadeIndex].interface2) != searched.end()) {
+                ++cascadeIndex;
+                continue;
+            }
+            searched.insert(matches[cascadeIndex].interface2);
+            std::tie(first, last) = connections.equal_range(matches[cascadeIndex].interface2);
+            if (first != connections.end()) {
+                for (auto match = first; match != last; ++match) {
+                    matches.emplace_back(match->second);
+                    if (matches.back().interface1 != matches[cascadeIndex].interface2) {
+                        std::swap(matches.back().interface1, matches.back().interface2);
+                    }
+                    if (searched.find(matches.back().interface2) != searched.end()) {
+                        // this would already be references and create a cyclic reference
+                        matches.pop_back();
+                    }
+                }
+            }
+            ++cascadeIndex;
         }
     }
-    std::size_t cascadeIndex{0};
-    while (cascadeIndex < matches.size()) {
-        if (searched.find(matches[cascadeIndex].interface2) != searched.end()) {
-            ++cascadeIndex;
-            continue;
-        }
-        searched.insert(matches[cascadeIndex].interface2);
-        std::tie(first, last) = connections.equal_range(matches[cascadeIndex].interface2);
-        if (first != connections.end()) {
-            for (auto match = first; match != last; ++match) {
-                matches.emplace_back(match->second);
-                if (matches.back().interface1 != matches[cascadeIndex].interface2) {
-                    std::swap(matches.back().interface1, matches.back().interface2);
-                }
-                if (searched.find(matches.back().interface2) != searched.end()) {
-                    // this would already be references and create a cyclic reference
-                    matches.pop_back();
+    if (matches.empty())
+    {
+        if (!regexMatchers.empty())
+        {
+            for (const auto& rmatcher : regexMatchers)
+            {
+                auto mstring=rmatcher->generateMatch(startingInterface);
+                if (!mstring.empty())
+                {
+                    Connection connection;
+                    connection.stringBuffer=std::make_shared<std::string>(mstring);
+                    connection.interface1=rmatcher->interface1;
+                    connection.interface2=*connection.stringBuffer;
+                    connection.direction=InterfaceDirection::FROM_TO;
+                    matches.push_back(std::move(connection));
                 }
             }
         }
-        ++cascadeIndex;
     }
     return matches;
 }
@@ -556,6 +654,10 @@ int Connector::makeTargetConnection(
             if (!aliases.empty()) {
                 auto aliasList = generateAliases(option.interface2, aliases);
                 for (const auto& alias : aliasList) {
+                    if (alias == option.interface2)
+                    {
+                        continue;
+                    }
                     located = possibleConnections.find(alias);
                     if (located != possibleConnections.end()) {
                         callback(origin, option.interface2);
@@ -590,6 +692,10 @@ int Connector::makeTargetConnection(
                     if (!aliases.empty()) {
                         auto interfaceAliasList = generateAliases(option.interface2, aliases);
                         for (const auto& interfaceAlias : interfaceAliasList) {
+                            if (alias == option.interface2)
+                            {
+                                continue;
+                            }
                             located = possibleConnections.find(interfaceAlias);
                             if (located != possibleConnections.end()) {
                                 callback(origin, option.interface2);
@@ -680,6 +786,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(inputName, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
+                if (alias == inputName)
+                {
+                    continue;
+                }
                 if (makePotentialConnection(alias,
                                             possibleConnections.potentialPubs,
                                             possibleConnections.aliases)) {
@@ -714,6 +824,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(pubName, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
+                if (alias == pubName)
+                {
+                    continue;
+                }
                 if (makePotentialConnection(alias,
                                             possibleConnections.potentialInputs,
                                             possibleConnections.aliases)) {
@@ -749,6 +863,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(endpointName, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
+                if (alias == endpointName)
+                {
+                    continue;
+                }
                 if (makePotentialConnection(alias,
                                             possibleConnections.potentialEndpoints,
                                             possibleConnections.aliases)) {
@@ -769,6 +887,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uInp, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
+                if (alias == uInp)
+                {
+                    continue;
+                }
                 if (makePotentialConnection(alias,
                                             possibleConnections.potentialPubs,
                                             possibleConnections.aliases)) {
@@ -788,6 +910,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uPub, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
+                if (alias == uPub)
+                {
+                    continue;
+                }
                 if (makePotentialConnection(alias,
                                             possibleConnections.potentialInputs,
                                             possibleConnections.aliases)) {
@@ -807,6 +933,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uEnd, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
+                if (alias == uEnd)
+                {
+                    continue;
+                }
                 if (makePotentialConnection(alias,
                                             possibleConnections.potentialEndpoints,
                                             possibleConnections.aliases)) {
@@ -826,6 +956,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         if (!possibleConnections.aliases.empty()) {
             auto aliasList = generateAliases(uEnd, possibleConnections.aliases);
             for (const auto& alias : aliasList) {
+                if (alias == uEnd)
+                {
+                    continue;
+                }
                 if (makePotentialConnection(alias,
                                             possibleConnections.potentialEndpoints,
                                             possibleConnections.aliases)) {
@@ -842,6 +976,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         }
         auto aliasList = generateAliases(uInp, possibleConnections.aliases);
         for (const auto& alias : aliasList) {
+            if (alias == uInp)
+            {
+                continue;
+            }
             fnd = possibleConnections.potentialInputs.find(alias);
             if (fnd != possibleConnections.potentialInputs.end()) {
                 fnd->second.used = true;
@@ -856,6 +994,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         }
         auto aliasList = generateAliases(uPub, possibleConnections.aliases);
         for (const auto& alias : aliasList) {
+            if (alias == uPub)
+            {
+                continue;
+            }
             fnd = possibleConnections.potentialPubs.find(alias);
             if (fnd != possibleConnections.potentialPubs.end()) {
                 fnd->second.used = true;
@@ -870,6 +1012,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         }
         auto aliasList = generateAliases(uEpt, possibleConnections.aliases);
         for (const auto& alias : aliasList) {
+            if (alias == uEpt)
+            {
+                continue;
+            }
             fnd = possibleConnections.potentialEndpoints.find(alias);
             if (fnd != possibleConnections.potentialEndpoints.end()) {
                 fnd->second.used = true;
@@ -931,10 +1077,42 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
     }
 }
 
+
+void Connector::generateRegexMatchers()
+{
+    for (auto& rmatch : matchers)
+    {
+        auto rmatcher=std::make_unique<RegexMatcher>();
+        std::string rstring{rmatch.interface1.substr(6,std::string_view::npos)};
+        auto nvloc=rstring.find("(?<");
+        while (nvloc != std::string::npos)
+        {
+            auto finishloc=rstring.find_first_of('>',nvloc+2);
+            rmatcher->keys.push_back(rstring.substr(nvloc+1,finishloc-nvloc));
+            rstring.erase(rstring.begin()+nvloc+1,rstring.begin()+finishloc+1);
+            nvloc=rstring.find("(?<");
+            rmatcher->interface2=rmatch.interface2;
+        }
+        try
+        {
+            rmatcher->rmatch=std::regex(rstring);
+            regexMatchers.push_back(std::move(rmatcher));
+        }
+        catch (const std::regex_error& e)
+        {
+            fed->localError(-101,e.what());
+        }
+    }
+}
+
 void Connector::initialize()
 {
     auto cmode = fed->getCurrentMode();
     if (cmode == Federate::Modes::STARTUP) {
+        if (!matchers.empty())
+        {
+            generateRegexMatchers();
+        }
         fed->enterInitializingModeIterative();
 
         auto connectionsData =

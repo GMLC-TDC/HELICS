@@ -24,10 +24,12 @@ struct Connection {
     std::string_view interface2;
     InterfaceDirection direction;
     std::vector<std::string_view> tags;
+    std::shared_ptr<std::string> stringBuffer;
 };
 
 struct ConnectionsList;
 struct PotentialConnections;
+class RegexMatcher;
 
 /** class implementing a Connector object, which is capable of automatically connecting interfaces
 in HELICS
@@ -111,7 +113,8 @@ necessary
     auto connectionCount() const { return connections.size(); }
     /** get the number of made connections*/
     auto madeConnections() const { return matchCount; }
-
+    void allowMultipleConnections(bool value = true) { matchMultiple = value; }
+    void matchEndpointTargets(bool value = true) { matchTargetEndpoints = value; }
   private:
     std::unique_ptr<helicsCLI11App> generateParser();
     /** process remaining command line arguments*/
@@ -140,18 +143,20 @@ necessary
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
     /** get a list of the possible connections to based on the database*/
     std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface) const;
-
+    /** load the regex matchers */
+    void generateRegexMatchers();
   private:
     CoreApp core;
-    std::unordered_multimap<std::string_view, Connection>
-        connections;  //!< the connections descriptors
+    /// the connections descriptors
+    std::unordered_multimap<std::string_view, Connection> connections;  
     std::vector<Connection> matchers;
+    std::vector<std::shared_ptr<RegexMatcher>> regexMatchers;
     std::unordered_set<std::string> tags;
     std::unordered_set<std::string> interfaces;
     std::uint64_t matchCount{0};
-    bool matchTargetEndpoints{
-        false};  //!< indicator to match unconnected target endpoints default{false}
-    bool matchMultiple{
-        false};  //!< indicator to do multiple matches [default is to stop at first match]
+    /// indicator to match unconnected target endpoints default{false}
+    bool matchTargetEndpoints{false};
+    /// indicator to do multiple matches [default is to stop at first match]
+    bool matchMultiple{false};  
 };
 }  // namespace helics::apps
