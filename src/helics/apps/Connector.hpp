@@ -59,7 +59,9 @@ class HELICS_CXX_EXPORT Connector: public App {
 @param core a pointer to core object which the federate can join
 @param fedInfo  a federate information structure
 */
-    Connector(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo);
+    Connector(std::string_view name,
+              const std::shared_ptr<Core>& core,
+              const FederateInfo& fedInfo);
     /**constructor taking a federate information structure and using the given core
 @param name the name of the federate (can be empty to use defaults from fedInfo)
 @param core a coreApp object that can be joined
@@ -135,24 +137,25 @@ necessary
     /** try to make a connection for an input*/
     int makeTargetConnection(
         std::string_view origin,
-        const std::vector<std::size_t> &tags,
+        const std::vector<std::size_t>& tags,
         std::unordered_set<std::string_view>& possibleConnections,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases,
         const std::function<void(std::string_view origin, std::string_view target)>& callback);
     bool makePotentialConnection(
         std::string_view interfaceName,
-        const std::vector<std::size_t> &tags,
+        const std::vector<std::size_t>& tags,
         std::unordered_map<std::string_view, PotentialConnections>& potentials,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
 
     bool checkPotentialConnection(
         std::string_view interface,
-        const std::vector<std::size_t> &tags,
+        const std::vector<std::size_t>& tags,
         std::unordered_set<std::string_view>& possibleConnections,
         std::unordered_map<std::string_view, PotentialConnections>& potentials,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
     /** get a list of the possible connections to based on the database*/
-    std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface,const std::vector<std::size_t> &tags) const;
+    std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface,
+                                                        const std::vector<std::size_t>& tags) const;
     /** load the regex matchers */
     void generateRegexMatchers();
 
@@ -162,7 +165,7 @@ necessary
     std::unordered_multimap<std::string_view, Connection> connections;
     std::vector<Connection> matchers;
     std::vector<std::shared_ptr<RegexMatcher>> regexMatchers;
-    std::unordered_map<std::size_t,std::string> tags;
+    std::unordered_map<std::size_t, std::string> tags;
     std::unordered_set<std::string> interfaces;
     std::uint64_t matchCount{0};
     /// indicator to match unconnected target endpoints default{false}

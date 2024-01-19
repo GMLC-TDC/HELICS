@@ -929,10 +929,10 @@ TEST(connector_2stage, two_sided_broker_connection_alias)
     cfed1.addPotentialPubs({"pub1", "pub2", "pub3"});
 
     helics::CoreApp core("ccore16");
-    core.addAlias("pub1","publication1");
-    core.addAlias("inp1","input1");
-    core.addAlias("pub2","publication2");
-    core.addAlias("inp2","input2");
+    core.addAlias("pub1", "publication1");
+    core.addAlias("inp1", "input1");
+    core.addAlias("pub2", "publication2");
+    core.addAlias("inp2", "input2");
     core.dataLink("publication1", "input1");
     core.dataLink("publication2", "input2");
 

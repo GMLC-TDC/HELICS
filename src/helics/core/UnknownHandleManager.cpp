@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "UnknownHandleManager.hpp"
 
 #include "flagOperations.hpp"
+
 #include <algorithm>
 
 namespace helics {
@@ -66,7 +67,7 @@ static auto
                const std::string& target)
 {
     std::vector<UnknownHandleManager::TargetInfo> targets;
-    auto [firstTarget,lastTarget] = tmap.equal_range(target);
+    auto [firstTarget, lastTarget] = tmap.equal_range(target);
     if (firstTarget != tmap.end()) {
         auto currentTarget = firstTarget;
         while (currentTarget != lastTarget) {
@@ -81,7 +82,7 @@ static auto getTargets(const std::unordered_multimap<std::string, std::string>& 
                        const std::string& target)
 {
     std::vector<std::string> targets;
-    auto [firstTarget,lastTarget] = tmap.equal_range(target);
+    auto [firstTarget, lastTarget] = tmap.equal_range(target);
     if (firstTarget != tmap.end()) {
         auto currentTarget = firstTarget;
         while (currentTarget != lastTarget) {
@@ -156,22 +157,26 @@ bool UnknownHandleManager::hasNonOptionalUnknowns() const
         return true;
     }
 
-    auto optionalCheck = [](const auto& uInterface) {return ((uInterface.second.second & make_flags(optional_flag)) != 0); };
-    return (!((std::all_of(unknown_publications.begin(), unknown_publications.end(), optionalCheck))||
-        (std::all_of(unknown_inputs.begin(), unknown_inputs.end(), optionalCheck))||
-        (std::all_of(unknown_endpoints.begin(), unknown_endpoints.end(), optionalCheck))||
-        (std::all_of(unknown_filters.begin(), unknown_filters.end(), optionalCheck))));
-
+    auto optionalCheck = [](const auto& uInterface) {
+        return ((uInterface.second.second & make_flags(optional_flag)) != 0);
+    };
+    return (
+        !((std::all_of(unknown_publications.begin(), unknown_publications.end(), optionalCheck)) ||
+          (std::all_of(unknown_inputs.begin(), unknown_inputs.end(), optionalCheck)) ||
+          (std::all_of(unknown_endpoints.begin(), unknown_endpoints.end(), optionalCheck)) ||
+          (std::all_of(unknown_filters.begin(), unknown_filters.end(), optionalCheck))));
 }
 
 bool UnknownHandleManager::hasRequiredUnknowns() const
 {
-    auto requiredCheck = [](const auto& uInterface) {return ((uInterface.second.second & make_flags(required_flag)) != 0); };
-    return ((std::any_of(unknown_publications.begin(), unknown_publications.end(), requiredCheck))||
-        (std::any_of(unknown_inputs.begin(), unknown_inputs.end(), requiredCheck))||
-        (std::any_of(unknown_endpoints.begin(), unknown_endpoints.end(), requiredCheck))||
+    auto requiredCheck = [](const auto& uInterface) {
+        return ((uInterface.second.second & make_flags(required_flag)) != 0);
+    };
+    return (
+        (std::any_of(unknown_publications.begin(), unknown_publications.end(), requiredCheck)) ||
+        (std::any_of(unknown_inputs.begin(), unknown_inputs.end(), requiredCheck)) ||
+        (std::any_of(unknown_endpoints.begin(), unknown_endpoints.end(), requiredCheck)) ||
         (std::any_of(unknown_filters.begin(), unknown_filters.end(), requiredCheck)));
-
 }
 
 void UnknownHandleManager::processUnknowns(
@@ -301,8 +306,7 @@ void maperase_if(ContainerT& items, const PredicateT& predicate)
     for (auto it = items.begin(); it != items.end();) {
         if (predicate(*it)) {
             it = items.erase(it);
-        }
-        else {
+        } else {
             ++it;
         }
     }

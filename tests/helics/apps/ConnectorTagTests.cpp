@@ -28,7 +28,7 @@ TEST(connector_tags, no_match_tag)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO,{"tag1"});
+    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO, {"tag1"});
 
     helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
