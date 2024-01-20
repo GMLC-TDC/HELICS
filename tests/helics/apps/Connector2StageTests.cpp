@@ -476,7 +476,6 @@ TEST(connector_2stage, three_fed_input)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
-
 TEST(connector_2stage, three_fed_input_regex)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -486,7 +485,9 @@ TEST(connector_2stage, three_fed_input_regex)
     fedInfo.coreInitString = "-f3 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector4", fedInfo);
-    conn1.addConnection("REGEX:Battery/EV(?<ev_num>.)_input_voltage", "REGEX:Charger/EV(?<ev_num>.)_output_voltage", InterfaceDirection::FROM_TO);
+    conn1.addConnection("REGEX:Battery/EV(?<ev_num>.)_input_voltage",
+                        "REGEX:Charger/EV(?<ev_num>.)_output_voltage",
+                        InterfaceDirection::FROM_TO);
     fedInfo.coreInitString = "";
     CheckFed cfed1("c1", fedInfo);
     cfed1.addPotentialPubs({"Charger/EV1_output_voltage", "pub2"});
@@ -501,7 +502,7 @@ TEST(connector_2stage, three_fed_input_regex)
         cfed1.executing();
         cfed1.run(5);
         cfed1.finalize();
-        });
+    });
     vFed2.enterExecutingModeComplete();
     std::vector<double> data;
     if (inp1.isUpdated()) {
