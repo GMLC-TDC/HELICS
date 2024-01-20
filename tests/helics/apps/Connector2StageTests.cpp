@@ -15,16 +15,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/CoreApp.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 
+#include <atomic>
 #include <future>
 #include <thread>
-#include <atomic>
 
 static std::string newCoreName(std::string_view baseName)
 {
-    static std::atomic<int> count=1;
-    int value=++count;
-    
-    return std::string(baseName)+std::to_string(value);
+    static std::atomic<int> count = 1;
+    int value = ++count;
+
+    return std::string(baseName) + std::to_string(value);
 }
 
 class CheckFed {

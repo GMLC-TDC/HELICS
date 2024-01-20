@@ -18,28 +18,35 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
-
-class MultibrokerFixture: public ::testing::Test { 
-public: 
-    MultibrokerFixture( ) { 
+class MultibrokerFixture: public ::testing::Test {
+  public:
+    MultibrokerFixture()
+    {
         //** setup brokers and cores*/
         brokerA = helics::BrokerApp(helics::CoreType::TEST, "-f7");
 
-        subBroker1=helics::BrokerApp (helics::CoreType::TEST, std::string("--broker=")+brokerA.getIdentifier());
-        subBroker2=helics::BrokerApp (helics::CoreType::TEST, std::string("--broker=")+brokerA.getIdentifier());
+        subBroker1 = helics::BrokerApp(helics::CoreType::TEST,
+                                       std::string("--broker=") + brokerA.getIdentifier());
+        subBroker2 = helics::BrokerApp(helics::CoreType::TEST,
+                                       std::string("--broker=") + brokerA.getIdentifier());
 
-        subsubBroker2=helics::BrokerApp (helics::CoreType::TEST, std::string("--broker=")+subBroker2.getIdentifier());
+        subsubBroker2 = helics::BrokerApp(helics::CoreType::TEST,
+                                          std::string("--broker=") + subBroker2.getIdentifier());
 
-        coreA=helics::CoreApp (helics::CoreType::TEST, std::string("--broker=")+brokerA.getIdentifier());
-        core_sub1=helics::CoreApp (helics::CoreType::TEST, std::string("--broker=")+subBroker1.getIdentifier());
-        core_sub1B=helics::CoreApp (helics::CoreType::TEST, std::string("--broker=")+subBroker1.getIdentifier());
+        coreA = helics::CoreApp(helics::CoreType::TEST,
+                                std::string("--broker=") + brokerA.getIdentifier());
+        core_sub1 = helics::CoreApp(helics::CoreType::TEST,
+                                    std::string("--broker=") + subBroker1.getIdentifier());
+        core_sub1B = helics::CoreApp(helics::CoreType::TEST,
+                                     std::string("--broker=") + subBroker1.getIdentifier());
 
-        core_sub2=helics::CoreApp (helics::CoreType::TEST, std::string("--broker=")+subBroker2.getIdentifier());
+        core_sub2 = helics::CoreApp(helics::CoreType::TEST,
+                                    std::string("--broker=") + subBroker2.getIdentifier());
 
-        core_subsub1=helics::CoreApp (helics::CoreType::TEST,
-            std::string("--broker=")+subsubBroker2.getIdentifier());
+        core_subsub1 = helics::CoreApp(helics::CoreType::TEST,
+                                       std::string("--broker=") + subsubBroker2.getIdentifier());
         /** setup the federates*/
-        
+
         fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
         fedA = std::make_shared<helics::ValueFederate>("fedA", coreA, fedInfo);
@@ -67,46 +74,45 @@ public:
         fedSubSub1->registerGlobalInput<double>("inputF");
         fedSubSub1->registerGlobalPublication<double>("pubC");
 
-        conn1=std::make_shared<helics::apps::Connector>("connector1", coreA, fedInfo);
-    } 
-
-    void SetUp( ) { 
-        // code here will execute just before the test ensues 
+        conn1 = std::make_shared<helics::apps::Connector>("connector1", coreA, fedInfo);
     }
 
-    void TearDown( ) { 
-        helics::cleanupHelicsLibrary();
+    void SetUp()
+    {
+        // code here will execute just before the test ensues
     }
+
+    void TearDown() { helics::cleanupHelicsLibrary(); }
 
     void launchThreads()
     {
         threads.resize(7);
-        threads[0]=std::thread([this]() {
+        threads[0] = std::thread([this]() {
             fedA->enterExecutingMode();
             fedA->finalize();
-            });
+        });
 
-        threads[1]=std::thread([this]() {
+        threads[1] = std::thread([this]() {
             fedSubA->enterExecutingMode();
             fedSubA->finalize();
-            });
-        threads[2]=std::thread([this]() {
+        });
+        threads[2] = std::thread([this]() {
             fedSubA2->enterExecutingMode();
             fedSubA2->finalize();
-            });
-        threads[3]=std::thread([this]() {
+        });
+        threads[3] = std::thread([this]() {
             fedSubA2b->enterExecutingMode();
             fedSubA2b->finalize();
-            });
-        threads[4]=std::thread([this]() {
+        });
+        threads[4] = std::thread([this]() {
             fedSubB->enterExecutingMode();
             fedSubB->finalize();
-            });
-        threads[5]=std::thread([this]() {
+        });
+        threads[5] = std::thread([this]() {
             fedSubSub1->enterExecutingMode();
             fedSubSub1->finalize();
-            });
-        threads[6]=std::thread([this](){ conn1->run();});
+        });
+        threads[6] = std::thread([this]() { conn1->run(); });
     }
 
     void closeThreads()
@@ -121,9 +127,7 @@ public:
         threads[5].join();
     }
 
-    ~MultibrokerFixture( )  { 
-        
-    }
+    ~MultibrokerFixture() {}
 
     helics::BrokerApp brokerA;
     helics::BrokerApp subBroker1;
@@ -165,7 +169,7 @@ TEST_F(MultibrokerFixture, multibroker_connector)
 TEST_F(MultibrokerFixture, multibroker_connector_aliases)
 {
     using helics::apps::InterfaceDirection;
-   
+
     conn1->addConnection("publicationA", "inpA", InterfaceDirection::FROM_TO);
     conn1->addConnection("publicationB", "inpB", InterfaceDirection::FROM_TO);
     conn1->addConnection("publicationC", "inpC", InterfaceDirection::FROM_TO);
@@ -196,10 +200,10 @@ TEST_F(MultibrokerFixture, multibroker_connector_aliases)
 TEST_F(MultibrokerFixture, multibroker_connector_regex)
 {
     using helics::apps::InterfaceDirection;
-    
+
     conn1->addConnection("REGEX:publication(?<value>.)",
-                        "REGEX:inp(?<value>.)",
-                        InterfaceDirection::FROM_TO);
+                         "REGEX:inp(?<value>.)",
+                         InterfaceDirection::FROM_TO);
 
     brokerA.addAlias("publicationA", "pubA");
     brokerA.addAlias("publicationB", "pubB");
@@ -224,8 +228,8 @@ TEST_F(MultibrokerFixture, multibroker_connector_regex2)
 {
     using helics::apps::InterfaceDirection;
     conn1->addConnection("REGEX:(?<letter>.)publication(?<value>.)",
-                        "REGEX:inp(?<value>.)(?<letter>.)",
-                        InterfaceDirection::FROM_TO);
+                         "REGEX:inp(?<value>.)(?<letter>.)",
+                         InterfaceDirection::FROM_TO);
 
     brokerA.addAlias("pubA", "Apublication1");
     brokerA.addAlias("pubB", "Bpublication2");
@@ -250,11 +254,11 @@ TEST_F(MultibrokerFixture, multibroker_connector_regex2)
 TEST_F(MultibrokerFixture, multibroker_connector_regex_default_tag)
 {
     using helics::apps::InterfaceDirection;
-    
+
     conn1->addConnection("REGEX:publication(?<value>.)",
-                        "REGEX:inp(?<value>.)",
-                        InterfaceDirection::FROM_TO,
-                        {"default"});
+                         "REGEX:inp(?<value>.)",
+                         InterfaceDirection::FROM_TO,
+                         {"default"});
 
     brokerA.addAlias("publicationA", "pubA");
     brokerA.addAlias("publicationB", "pubB");
