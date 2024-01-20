@@ -161,9 +161,9 @@ bool UnknownHandleManager::hasNonOptionalUnknowns() const
         return ((uInterface.second.second & make_flags(optional_flag)) != 0);
     };
     return (
-        !((std::all_of(unknown_publications.begin(), unknown_publications.end(), optionalCheck)) ||
-          (std::all_of(unknown_inputs.begin(), unknown_inputs.end(), optionalCheck)) ||
-          (std::all_of(unknown_endpoints.begin(), unknown_endpoints.end(), optionalCheck)) ||
+        !((std::all_of(unknown_publications.begin(), unknown_publications.end(), optionalCheck)) &&
+          (std::all_of(unknown_inputs.begin(), unknown_inputs.end(), optionalCheck)) &&
+          (std::all_of(unknown_endpoints.begin(), unknown_endpoints.end(), optionalCheck)) &&
           (std::all_of(unknown_filters.begin(), unknown_filters.end(), optionalCheck))));
 }
 

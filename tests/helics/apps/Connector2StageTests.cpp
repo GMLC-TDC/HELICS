@@ -476,6 +476,52 @@ TEST(connector_2stage, three_fed_input)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
+
+TEST(connector_2stage, three_fed_input_regex)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = "ccore4r";
+    fedInfo.coreInitString = "-f3 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector4", fedInfo);
+    conn1.addConnection("REGEX:Battery/EV(?<ev_num>.)_input_voltage", "REGEX:Charger/EV(?<ev_num>.)_output_voltage", InterfaceDirection::FROM_TO);
+    fedInfo.coreInitString = "";
+    CheckFed cfed1("c1", fedInfo);
+    cfed1.addPotentialPubs({"Charger/EV1_output_voltage", "pub2"});
+
+    helics::ValueFederate vFed2("Battery", fedInfo);
+    auto& inp1 = vFed2.registerInput<double>("EV1_input_voltage");
+    vFed2.enterExecutingModeAsync();
+
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    auto fut2 = std::async(std::launch::async, [&cfed1]() {
+        cfed1.initialize();
+        cfed1.executing();
+        cfed1.run(5);
+        cfed1.finalize();
+        });
+    vFed2.enterExecutingModeComplete();
+    std::vector<double> data;
+    if (inp1.isUpdated()) {
+        data.push_back(inp1.getDouble());
+    }
+    vFed2.requestTime(2.0);
+    if (inp1.isUpdated()) {
+        data.push_back(inp1.getDouble());
+    }
+    vFed2.requestTime(3.0);
+    if (inp1.isUpdated()) {
+        data.push_back(inp1.getDouble());
+    }
+    vFed2.disconnect();
+    fut.get();
+    fut2.get();
+    EXPECT_GE(data.size(), 1);
+    EXPECT_EQ(conn1.madeConnections(), 1);
+}
+
 TEST(connector_2stage, three_fed_input_alias)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
