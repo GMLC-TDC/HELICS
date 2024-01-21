@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <deque>
+#include <fmt/format.h>
 #include <memory>
 #include <optional>
 #include <regex>
@@ -23,7 +24,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include <fmt/format.h>
 
 namespace helics::apps {
 
@@ -229,13 +229,13 @@ static ConnectionsList generateConnectionsList(const std::string& connectionData
 }
 
 Connector::Connector(std::vector<std::string> args):
-    App("connector", std::move(args)), core((fed)?fed->getCorePointer():nullptr)
+    App("connector", std::move(args)), core((fed) ? fed->getCorePointer() : nullptr)
 {
     processArgs();
 }
 
 Connector::Connector(int argc, char* argv[]):
-    App("connector", argc, argv), core((fed)?fed->getCorePointer():nullptr)
+    App("connector", argc, argv), core((fed) ? fed->getCorePointer() : nullptr)
 {
     processArgs();
 }
@@ -291,15 +291,24 @@ std::unique_ptr<helicsCLI11App> Connector::generateParser()
            "specify connections to make in the cosimulation")
         ->expected(2, CLI::detail::expected_max_vector_size)
         ->type_name("[INTERFACE1,INTERFACE2,DIRECTIONALITY,TXT...]");
-    app->add_flag("--match_target_endpoints",matchTargetEndpoints,"set to true to enable connection of unconnected target endpoints")->ignore_underscore();
-    app->add_flag("--match_multiple",matchMultiple,"set to true to enable matching of multiple connections (default false)")->ignore_underscore();
-    app->add_flag("--always_check_regex",alwaysCheckRegex,"set to true to enable regex matching even if other matches are defined")->ignore_underscore();
+    app->add_flag("--match_target_endpoints",
+                  matchTargetEndpoints,
+                  "set to true to enable connection of unconnected target endpoints")
+        ->ignore_underscore();
+    app->add_flag("--match_multiple",
+                  matchMultiple,
+                  "set to true to enable matching of multiple connections (default false)")
+        ->ignore_underscore();
+    app->add_flag("--always_check_regex",
+                  alwaysCheckRegex,
+                  "set to true to enable regex matching even if other matches are defined")
+        ->ignore_underscore();
 
     return app;
 }
 
 Connector::Connector(std::string_view appName, const FederateInfo& fedInfo):
-    App(appName, fedInfo), core((fed)?fed->getCorePointer():nullptr)
+    App(appName, fedInfo), core((fed) ? fed->getCorePointer() : nullptr)
 {
     fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
 }
@@ -308,19 +317,19 @@ Connector::Connector(std::string_view appName,
                      const std::shared_ptr<Core>& core,
                      const FederateInfo& fedInfo):
     App(appName, core, fedInfo),
-    core((fed)?fed->getCorePointer():nullptr)
+    core((fed) ? fed->getCorePointer() : nullptr)
 {
     fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
 }
 
 Connector::Connector(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
-    App(appName, core, fedInfo), core((fed)?fed->getCorePointer():nullptr)
+    App(appName, core, fedInfo), core((fed) ? fed->getCorePointer() : nullptr)
 {
     fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
 }
 
 Connector::Connector(std::string_view appName, const std::string& configString):
-    App(appName, configString), core((fed)?fed->getCorePointer():nullptr)
+    App(appName, configString), core((fed) ? fed->getCorePointer() : nullptr)
 {
     fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     Connector::loadJsonFile(configString);
@@ -596,7 +605,7 @@ std::vector<Connection>
             ++cascadeIndex;
         }
     }
-    if (matches.empty()||alwaysCheckRegex) {
+    if (matches.empty() || alwaysCheckRegex) {
         if (!regexMatchers.empty()) {
             for (const auto& rmatcher : regexMatchers) {
                 if (rmatcher->tags.empty() ||
@@ -791,33 +800,39 @@ int Connector::makeTargetConnection(
 
 void Connector::makeConnections(ConnectionsList& possibleConnections)
 {
-    int logLevel=fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
-    auto inputConnector = [this,logLevel](std::string_view origin, std::string_view source) {
+    int logLevel = fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
+    auto inputConnector = [this, logLevel](std::string_view origin, std::string_view source) {
         core.dataLink(source, origin);
-        if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS)
-        {
-            fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,fmt::format("connecting input {} to publication {}",origin,source));
+        if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
+            fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
+                            fmt::format("connecting input {} to publication {}", origin, source));
         }
     };
-    auto pubConnector = [this,logLevel](std::string_view origin, std::string_view target) {
+    auto pubConnector = [this, logLevel](std::string_view origin, std::string_view target) {
         core.dataLink(origin, target);
-        if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS)
-        {
-            fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,fmt::format("connection publication {} to input {}",origin,target));
+        if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
+            fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
+                            fmt::format("connection publication {} to input {}", origin, target));
         }
     };
-    auto sourceEndpointConnector = [this,logLevel](std::string_view origin, std::string_view target) {
+    auto sourceEndpointConnector = [this, logLevel](std::string_view origin,
+                                                    std::string_view target) {
         core.linkEndpoints(origin, target);
-        if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS)
-        {
-            fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,fmt::format("connection source endpoint {} to target endpoint {}",origin,target));
+        if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
+            fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
+                            fmt::format("connection source endpoint {} to target endpoint {}",
+                                        origin,
+                                        target));
         }
     };
-    auto targetEndpointConnector = [this,logLevel](std::string_view origin, std::string_view source) {
+    auto targetEndpointConnector = [this, logLevel](std::string_view origin,
+                                                    std::string_view source) {
         core.linkEndpoints(source, origin);
-        if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS)
-        {
-            fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,fmt::format("connection target endpoint {} to source endpoint {}",origin,source));
+        if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
+            fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
+                            fmt::format("connection target endpoint {} to source endpoint {}",
+                                        origin,
+                                        source));
         }
     };
 
@@ -852,9 +867,8 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
                                                targetEndpointConnector);
         }
     }
-    if (logLevel >= HELICS_LOG_LEVEL_SUMMARY)
-    {
-        fed->logInfoMessage(fmt::format("{} connections made",matchCount));
+    if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
+        fed->logInfoMessage(fmt::format("{} connections made", matchCount));
     }
 }
 
@@ -1042,7 +1056,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
             }
         }
     }
-    int logLevel=fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
+    int logLevel = fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
     for (auto& possibleFed : possibleConnections.federatesWithPotentialInterfaces) {
         Json::Value establishInterfaces;
         establishInterfaces["command"] = "register_interfaces";
@@ -1060,9 +1074,11 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
             for (const auto& input : enabledInputs) {
                 establishInterfaces["inputs"].append(std::string(input.first));
                 ++interfacesRequested;
-                if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS)
-                {
-                    fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,fmt::format("federate {} request input {}",possibleFed,input.first));
+                if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
+                    fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
+                                    fmt::format("federate {} request input {}",
+                                                possibleFed,
+                                                input.first));
                 }
             }
         }
@@ -1080,9 +1096,11 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
             for (const auto& pub : enabledPublications) {
                 establishInterfaces["publications"].append(std::string(pub.first));
                 ++interfacesRequested;
-                if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS)
-                {
-                    fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,fmt::format("federate {} request publication {}",possibleFed,pub.first));
+                if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
+                    fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
+                                    fmt::format("federate {} request publication {}",
+                                                possibleFed,
+                                                pub.first));
                 }
             }
         }
@@ -1102,16 +1120,17 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
             for (const auto& ept : enabledEndpoints) {
                 establishInterfaces["endpoints"].append(std::string(ept.first));
                 ++interfacesRequested;
-                if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS)
-                {
-                    fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,fmt::format("federate {} request input {}",possibleFed,ept.first));
+                if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
+                    fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
+                                    fmt::format("federate {} request input {}",
+                                                possibleFed,
+                                                ept.first));
                 }
             }
         }
         fed->sendCommand(possibleFed, fileops::generateJsonString(establishInterfaces));
-        if (logLevel >= HELICS_LOG_LEVEL_SUMMARY)
-        {
-            fed->logInfoMessage(fmt::format("{} interfaces requested",interfacesRequested));
+        if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
+            fed->logInfoMessage(fmt::format("{} interfaces requested", interfacesRequested));
         }
     }
 }

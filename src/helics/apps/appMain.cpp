@@ -9,13 +9,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "Clone.hpp"
+#include "Connector.hpp"
 #include "Echo.hpp"
 #include "Player.hpp"
 #include "Probe.hpp"
 #include "Recorder.hpp"
 #include "Source.hpp"
 #include "Tracer.hpp"
-#include "Connector.hpp"
 
 #include <iostream>
 #include <spdlog/logger.h>
@@ -63,17 +63,17 @@ int main(int argc, char* argv[])
             return std::string{};
         });
     app.add_subcommand("connector", "Helics Connector App")
-            ->callback([&app]() {
+        ->callback([&app]() {
             helics::apps::Connector connector(app.remaining_for_passthrough(true));
             std::cout << "clone subcommand\n";
             if (connector.isActive()) {
                 connector.run();
             }
-                })
-            ->footer([] {
-                    helics::apps::Connector conn({"-?"});
-                    return std::string{};
-                });
+        })
+        ->footer([] {
+            helics::apps::Connector conn({"-?"});
+            return std::string{};
+        });
     app.add_subcommand("echo", "Helics Echo App")
         ->callback([&app]() {
             std::cout << "echo subcommand\n";
