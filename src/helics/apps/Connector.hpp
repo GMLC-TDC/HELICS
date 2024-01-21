@@ -168,9 +168,12 @@ necessary
     std::unordered_map<std::size_t, std::string> tags;
     std::unordered_set<std::string> interfaces;
     std::uint64_t matchCount{0};
+    std::uint64_t interfacesRequested{0};
     /// indicator to match unconnected target endpoints default{false}
     bool matchTargetEndpoints{false};
     /// indicator to do multiple matches [default is to stop at first match]
     bool matchMultiple{false};
+    /// indicator that regex matches should always be checked
+    bool alwaysCheckRegex{false};
 };
 }  // namespace helics::apps
