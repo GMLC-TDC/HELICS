@@ -3646,7 +3646,6 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_INIT_GRANT:
             processInitRequest(command);
             break;
-
         case CMD_SEND_MESSAGE:
             if (checkActionFlag(command, filter_processing_required_flag) ||
                 ((command.dest_id == parent_broker_id) && (isLocal(command.source_id)))) {
