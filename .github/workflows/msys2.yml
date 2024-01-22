@@ -59,6 +59,7 @@ jobs:
         CMAKE_GENERATOR: ${{matrix.gen}}
         DISABLE_INTERFACES: "Java"
         DISABLE_EXAMPLES: "true"
+        CXX_STANDARD: 20
         #ZMQ_SUBPROJECT: "true"
         #ZMQ_FORCE_SUBPROJECT: "true"
       run: |
