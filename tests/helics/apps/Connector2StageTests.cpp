@@ -160,16 +160,28 @@ class CheckFed {
                                   potEndpoints.end());
     }
     /** get the values array*/
-    const auto& getValues(const std::string& input) const {
+    const auto& getValues(const std::string& input) const
+    {
         static const std::vector<double> emptyVals;
 
-        for (int ii = 0; ii < valueNames.size(); ++ii) { if (valueNames[ii] == input) { return values[ii]; } } return emptyVals;
+        for (int ii = 0; ii < valueNames.size(); ++ii) {
+            if (valueNames[ii] == input) {
+                return values[ii];
+            }
+        }
+        return emptyVals;
     }
     /** get the values array*/
-    const auto& getMessages(const std::string& endpoint) {
+    const auto& getMessages(const std::string& endpoint)
+    {
         static const std::vector<std::string> emptyVals;
 
-        for (int ii = 0; ii < messageNames.size(); ++ii) { if (messageNames[ii] == endpoint) { return messages[ii]; } } return emptyVals;
+        for (int ii = 0; ii < messageNames.size(); ++ii) {
+            if (messageNames[ii] == endpoint) {
+                return messages[ii];
+            }
+        }
+        return emptyVals;
     }
 
     const auto& getValueNames() { return valueNames; }
