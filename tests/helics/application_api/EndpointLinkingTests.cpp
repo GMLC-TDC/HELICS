@@ -618,11 +618,11 @@ TEST_P(mfed_permutation_tests, endpoint_linking_order_permutations)
     for (int kk = 0; kk < permutations; ++kk) {
         std::next_permutation(exOrder.begin(), exOrder.end());
     }
-    exList[0] = [&mFed1]() {  mFed1->registerGlobalTargetedEndpoint("dest_endpoint"); };
-    exList[1] = [&mFed1]() {  mFed1->registerGlobalTargetedEndpoint("source_endpoint"); };
-    exList[2] = [&core]() {  core->addAlias("dest_endpoint",  "dest"); };
-    exList[3] = [&core]() {  core->addAlias("source_endpoint",  "source"); };
-    exList[4] = [&core]() {  core->linkEndpoints("source",  "dest"); };
+    exList[0] = [&mFed1]() { mFed1->registerGlobalTargetedEndpoint("dest_endpoint"); };
+    exList[1] = [&mFed1]() { mFed1->registerGlobalTargetedEndpoint("source_endpoint"); };
+    exList[2] = [&core]() { core->addAlias("dest_endpoint", "dest"); };
+    exList[3] = [&core]() { core->addAlias("source_endpoint", "source"); };
+    exList[4] = [&core]() { core->linkEndpoints("source", "dest"); };
 
     for (int ii = 0; ii < 5; ++ii) {
         exList[exOrder[ii]]();

@@ -29,7 +29,8 @@ static std::string newCoreName(std::string_view baseName)
 
 class CheckFed {
   public:
-    CheckFed(std::string_view name, const helics::FederateInfo& fedInfo):vFed(std::make_shared<helics::CombinationFederate>(name, fedInfo))
+    CheckFed(std::string_view name, const helics::FederateInfo& fedInfo):
+        vFed(std::make_shared<helics::CombinationFederate>(name, fedInfo))
     {
     }
     void initialize()
@@ -163,8 +164,9 @@ class CheckFed {
     /** get the values array*/
     const auto& getMessages() { return messages; }
 
-    const auto& getValueNames(){return valueNames;}
-    const auto& getMessageNames(){return messageNames;}
+    const auto& getValueNames() { return valueNames; }
+    const auto& getMessageNames() { return messageNames; }
+
   private:
     std::shared_ptr<helics::CombinationFederate> vFed;
     std::vector<std::string> potentialInputs;
@@ -1035,10 +1037,10 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessages().size(), 4);
-    EXPECT_TRUE(cfed1.getMessages()[0].empty()) <<" endpoint "<<cfed1.getMessageNames()[0];
-    EXPECT_FALSE(cfed1.getMessages()[1].empty())<<" endpoint "<<cfed1.getMessageNames()[1];
-    EXPECT_TRUE(cfed1.getMessages()[2].empty())<<" endpoint "<<cfed1.getMessageNames()[2];
-    EXPECT_FALSE(cfed1.getMessages()[3].empty())<<" endpoint "<<cfed1.getMessageNames()[3];
+    EXPECT_TRUE(cfed1.getMessages()[0].empty()) << " endpoint " << cfed1.getMessageNames()[0];
+    EXPECT_FALSE(cfed1.getMessages()[1].empty()) << " endpoint " << cfed1.getMessageNames()[1];
+    EXPECT_TRUE(cfed1.getMessages()[2].empty()) << " endpoint " << cfed1.getMessageNames()[2];
+    EXPECT_FALSE(cfed1.getMessages()[3].empty()) << " endpoint " << cfed1.getMessageNames()[3];
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
