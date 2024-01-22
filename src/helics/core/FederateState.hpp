@@ -313,6 +313,14 @@ class FederateState {
     @return a convergence state value with an indicator of return reason and state of convergence
     */
     MessageProcessingResult processActionMessage(ActionMessage& cmd);
+
+    /** process a data connection management message
+    */
+    void processDataConnectionMessage(ActionMessage& cmd);
+
+    /** process a message containing data
+    */
+    void processDataMessage(ActionMessage& cmd);
     /** fill event list
     @param currentTime the time of the update
     */
