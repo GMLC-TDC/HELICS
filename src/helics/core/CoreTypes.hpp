@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 #include <string_view>
+#include <cstdint>
 
 /** @file
 @details definitions of types an enumerations used in helics

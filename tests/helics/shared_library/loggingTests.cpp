@@ -51,14 +51,14 @@ TEST(logging_tests, check_log_message)
     EXPECT_EQ(err.error_code, 0);
     auto llock = mlog.lock();
     bool found = false;
-    for (auto& m : llock) {
+    for (auto& m : *llock) {
         if (m.second.find("MEXAGE") != std::string::npos) {
             found = true;
         }
     }
     EXPECT_TRUE(found);
     if (!found) {
-        for (auto& m : llock) {
+        for (auto& m : *llock) {
             std::cout << "message (" << m.first << ") ::" << m.second << std::endl;
         }
     }
@@ -101,7 +101,7 @@ TEST(logging_tests, check_log_message_levels)
     auto llock = mlog.lock();
     bool found_low = false;
     bool found_high = false;
-    for (auto& m : llock) {
+    for (auto& m : *llock) {
         if (m.second.find("MEXAGE1") != std::string::npos) {
             found_low = true;
         }
@@ -150,7 +150,7 @@ TEST(logging_tests, check_log_message_levels_high)
     auto llock = mlog.lock();
     bool found_low = false;
     bool found_high = false;
-    for (auto& m : llock) {
+    for (auto& m : *llock) {
         if (m.second.find("MEXAGE1") != std::string::npos) {
             found_low = true;
         }

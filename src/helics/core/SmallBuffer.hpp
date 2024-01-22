@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <string_view>
 #include <utility>
+#include <cstdint>
 
 #if defined(__clang__)
 #    pragma clang diagnostic push
