@@ -1485,7 +1485,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             }
             break;
 
-        case CMD_SEND_MESSAGE: 
+        case CMD_SEND_MESSAGE:
         case CMD_PUB:
             processDataMessage(cmd);
             break;
@@ -1554,9 +1554,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_ADD_PUBLISHER:
         case CMD_ADD_SUBSCRIBER:
         case CMD_ADD_ENDPOINT:
-        case CMD_REMOVE_NAMED_PUBLICATION: 
-        case CMD_REMOVE_PUBLICATION: 
-        case CMD_REMOVE_SUBSCRIBER: 
+        case CMD_REMOVE_NAMED_PUBLICATION:
+        case CMD_REMOVE_PUBLICATION:
+        case CMD_REMOVE_SUBSCRIBER:
         case CMD_REMOVE_ENDPOINT:
             processDataConnectionMessage(cmd);
             break;
@@ -1627,141 +1627,106 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
     return MessageProcessingResult::CONTINUE_PROCESSING;
 }
 
-
 void FederateState::processDataConnectionMessage(ActionMessage& cmd)
 {
-    switch (cmd.action())
-    {
-    case CMD_ADD_PUBLISHER: {
-        auto* subI = interfaceInformation.getInput(cmd.dest_handle);
-        if (subI != nullptr) {
-            if (subI->addSource(cmd.getSource(),
-                cmd.name(),
-                cmd.getString(typeStringLoc),
-                cmd.getString(unitStringLoc))) {
-                if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
-                    addDependency(cmd.source_id);
-                }
-            }
-        }
-        else {
-            auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
-            if (eptI != nullptr) {
-                eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
-                if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
-                    addDependency(cmd.source_id);
-                }
-            }
-        }
-    } break;
-    case CMD_ADD_SUBSCRIBER: {
-        auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
-        if (pubI != nullptr) {
-            if (pubI->addSubscriber(cmd.getSource(), cmd.name())) {
-                if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
-                    addDependent(cmd.source_id);
-                }
-            }
-            if (getState() > FederateStates::CREATED) {
-                if (!pubI->data.empty() && pubI->lastPublishTime > Time::minVal()) {
-                    ActionMessage pub(CMD_PUB);
-                    pub.setSource(pubI->id);
-                    pub.setDestination(cmd.getSource());
-                    pub.counter = static_cast<uint16_t>(getCurrentIteration());
-                    pub.payload = pubI->data;
-                    pub.actionTime = pubI->lastPublishTime;
-                    routeMessage(std::move(pub));
-                }
-            }
-        }
-    } break;
-    case CMD_ADD_ENDPOINT: {
-        auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
-        if (eptI != nullptr) {
-            if (checkActionFlag(cmd, destination_target)) {
-                eptI->addDestination(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
-                if (eptI->targetedEndpoint) {
+    switch (cmd.action()) {
+        case CMD_ADD_PUBLISHER: {
+            auto* subI = interfaceInformation.getInput(cmd.dest_handle);
+            if (subI != nullptr) {
+                if (subI->addSource(cmd.getSource(),
+                                    cmd.name(),
+                                    cmd.getString(typeStringLoc),
+                                    cmd.getString(unitStringLoc))) {
                     if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
-                        addDependent(cmd.source_id);
+                        addDependency(cmd.source_id);
                     }
                 }
-            }
-            else {
-                eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
-                if (eptI->targetedEndpoint) {
+            } else {
+                auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
+                if (eptI != nullptr) {
+                    eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
                     if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependency(cmd.source_id);
                     }
                 }
             }
+        } break;
+        case CMD_ADD_SUBSCRIBER: {
+            auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
+            if (pubI != nullptr) {
+                if (pubI->addSubscriber(cmd.getSource(), cmd.name())) {
+                    if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
+                        addDependent(cmd.source_id);
+                    }
+                }
+                if (getState() > FederateStates::CREATED) {
+                    if (!pubI->data.empty() && pubI->lastPublishTime > Time::minVal()) {
+                        ActionMessage pub(CMD_PUB);
+                        pub.setSource(pubI->id);
+                        pub.setDestination(cmd.getSource());
+                        pub.counter = static_cast<uint16_t>(getCurrentIteration());
+                        pub.payload = pubI->data;
+                        pub.actionTime = pubI->lastPublishTime;
+                        routeMessage(std::move(pub));
+                    }
+                }
+            }
+        } break;
+        case CMD_ADD_ENDPOINT: {
+            auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
+            if (eptI != nullptr) {
+                if (checkActionFlag(cmd, destination_target)) {
+                    eptI->addDestination(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
+                    if (eptI->targetedEndpoint) {
+                        if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
+                            addDependent(cmd.source_id);
+                        }
+                    }
+                } else {
+                    eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
+                    if (eptI->targetedEndpoint) {
+                        if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
+                            addDependency(cmd.source_id);
+                        }
+                    }
+                }
+            }
+        } break;
+        case CMD_REMOVE_NAMED_PUBLICATION: {
+            auto* subI = interfaceInformation.getInput(cmd.source_handle);
+            if (subI != nullptr) {
+                subI->removeSource(std::string(cmd.name()),
+                                   (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
+            }
+            break;
         }
-    } break;
-    case CMD_REMOVE_NAMED_PUBLICATION: {
-        auto* subI = interfaceInformation.getInput(cmd.source_handle);
-        if (subI != nullptr) {
-            subI->removeSource(std::string(cmd.name()),
-                (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
+        case CMD_REMOVE_PUBLICATION: {
+            auto* subI = interfaceInformation.getInput(cmd.dest_handle);
+            if (subI != nullptr) {
+                subI->removeSource(cmd.getSource(),
+                                   (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
+            }
+            break;
         }
-        break;
+        case CMD_REMOVE_SUBSCRIBER: {
+            auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
+            if (pubI != nullptr) {
+                pubI->removeSubscriber(cmd.getSource());
+            }
+        } break;
+        case CMD_REMOVE_ENDPOINT:
+            break;
+        default:
+            break;
     }
-    case CMD_REMOVE_PUBLICATION: {
-        auto* subI = interfaceInformation.getInput(cmd.dest_handle);
-        if (subI != nullptr) {
-            subI->removeSource(cmd.getSource(),
-                (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
-        }
-        break;
-    }
-    case CMD_REMOVE_SUBSCRIBER: {
-        auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
-        if (pubI != nullptr) {
-            pubI->removeSubscriber(cmd.getSource());
-        }
-    } break;
-    case CMD_REMOVE_ENDPOINT:
-        break;
-    default:
-        break;
-    }
-
 }
-
 
 void FederateState::processDataMessage(ActionMessage& cmd)
 {
-    switch (cmd.action())
-    {
-    case CMD_SEND_MESSAGE: {
-        auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
-        if (epi != nullptr && !epi->sourceOnly) {
-            // if (!epi->not_interruptible)
-            {
-                timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
-            }
-            LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
-            if (cmd.actionTime < time_granted &&
-                timeMethod != TimeSynchronizationMethod::ASYNC) {
-                LOG_WARNING(
-                    fmt::format("received message {} at time({}) earlier than granted time({})",
-                        prettyPrintString(cmd),
-                        static_cast<double>(cmd.actionTime),
-                        static_cast<double>(time_granted)));
-                auto qres = processQueryActual("global_time_debugging");
-                qres.insert(0, "TIME DEBUGGING::");
-                LOG_WARNING(qres);
-            }
-
-            if (state <= FederateStates::EXECUTING) {
-                timeCoord->processTimeMessage(cmd);
-            }
-            epi->addMessage(createMessageFromCommand(std::move(cmd)));
-        }
-    } break;
-    case CMD_PUB: {
-        auto* subI = interfaceInformation.getInput(InterfaceHandle(cmd.dest_handle));
-        if (subI == nullptr) {
-            auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
-            if (eptI != nullptr) {
+    switch (cmd.action()) {
+        case CMD_SEND_MESSAGE: {
+            auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
+            if (epi != nullptr && !epi->sourceOnly) {
                 // if (!epi->not_interruptible)
                 {
                     timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
@@ -1769,56 +1734,84 @@ void FederateState::processDataMessage(ActionMessage& cmd)
                 LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
                 if (cmd.actionTime < time_granted &&
                     timeMethod != TimeSynchronizationMethod::ASYNC) {
-                    LOG_WARNING(fmt::format(
-                        "received message {} at time({}) earlier than granted time({})",
-                        prettyPrintString(cmd),
-                        static_cast<double>(cmd.actionTime),
-                        static_cast<double>(time_granted)));
+                    LOG_WARNING(
+                        fmt::format("received message {} at time({}) earlier than granted time({})",
+                                    prettyPrintString(cmd),
+                                    static_cast<double>(cmd.actionTime),
+                                    static_cast<double>(time_granted)));
+                    auto qres = processQueryActual("global_time_debugging");
+                    qres.insert(0, "TIME DEBUGGING::");
+                    LOG_WARNING(qres);
                 }
-                auto mess = std::make_unique<Message>();
-                mess->data = std::move(cmd.payload);
-                mess->dest = eptI->key;
-                mess->flags = cmd.flags;
-                mess->time = cmd.actionTime;
-                mess->counter = cmd.counter;
-                mess->messageID = cmd.messageID;
-                mess->original_dest = eptI->key;
-                eptI->addMessage(std::move(mess));
+
                 if (state <= FederateStates::EXECUTING) {
                     timeCoord->processTimeMessage(cmd);
                 }
+                epi->addMessage(createMessageFromCommand(std::move(cmd)));
             }
-            break;
-        }
-        for (auto& src : subI->input_sources) {
-            auto valueTime = cmd.actionTime;
-            if (timeMethod == TimeSynchronizationMethod::ASYNC) {
-                if (valueTime < time_granted) {
-                    valueTime = time_granted;
-                }
-            }
-            if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
-                if (subI->addData(src,
-                    valueTime,
-                    cmd.counter,
-                    std::make_shared<const SmallBuffer>(
-                        std::move(cmd.payload)))) {
-                    if (!subI->not_interruptible) {
-                        timeCoord->updateValueTime(valueTime, !timeGranted_mode);
-                        LOG_TRACE(timeCoord->printTimeStatus());
+        } break;
+        case CMD_PUB: {
+            auto* subI = interfaceInformation.getInput(InterfaceHandle(cmd.dest_handle));
+            if (subI == nullptr) {
+                auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
+                if (eptI != nullptr) {
+                    // if (!epi->not_interruptible)
+                    {
+                        timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
                     }
-                    LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
-                        prettyPrintString(cmd),
-                        subI->getSourceName(src)));
+                    LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
+                    if (cmd.actionTime < time_granted &&
+                        timeMethod != TimeSynchronizationMethod::ASYNC) {
+                        LOG_WARNING(fmt::format(
+                            "received message {} at time({}) earlier than granted time({})",
+                            prettyPrintString(cmd),
+                            static_cast<double>(cmd.actionTime),
+                            static_cast<double>(time_granted)));
+                    }
+                    auto mess = std::make_unique<Message>();
+                    mess->data = std::move(cmd.payload);
+                    mess->dest = eptI->key;
+                    mess->flags = cmd.flags;
+                    mess->time = cmd.actionTime;
+                    mess->counter = cmd.counter;
+                    mess->messageID = cmd.messageID;
+                    mess->original_dest = eptI->key;
+                    eptI->addMessage(std::move(mess));
+                    if (state <= FederateStates::EXECUTING) {
+                        timeCoord->processTimeMessage(cmd);
+                    }
+                }
+                break;
+            }
+            for (auto& src : subI->input_sources) {
+                auto valueTime = cmd.actionTime;
+                if (timeMethod == TimeSynchronizationMethod::ASYNC) {
+                    if (valueTime < time_granted) {
+                        valueTime = time_granted;
+                    }
+                }
+                if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
+                    if (subI->addData(src,
+                                      valueTime,
+                                      cmd.counter,
+                                      std::make_shared<const SmallBuffer>(
+                                          std::move(cmd.payload)))) {
+                        if (!subI->not_interruptible) {
+                            timeCoord->updateValueTime(valueTime, !timeGranted_mode);
+                            LOG_TRACE(timeCoord->printTimeStatus());
+                        }
+                        LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
+                                             prettyPrintString(cmd),
+                                             subI->getSourceName(src)));
+                    }
                 }
             }
-        }
-        if (state <= FederateStates::EXECUTING) {
-            timeCoord->processTimeMessage(cmd);
-        }
-    } break;
-    default:
-        break;
+            if (state <= FederateStates::EXECUTING) {
+                timeCoord->processTimeMessage(cmd);
+            }
+        } break;
+        default:
+            break;
     }
 }
 void FederateState::setProperties(const ActionMessage& cmd)
