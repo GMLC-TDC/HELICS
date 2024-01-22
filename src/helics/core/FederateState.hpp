@@ -159,7 +159,7 @@ class FederateState {
     void setState(FederateStates newState);
 
     /** check if a message should be delayed*/
-    bool messageShouldBeDelayed(const ActionMessage& cmd) const;
+    bool messageShouldBeDelayed(const ActionMessage& cmd) const noexcept;
     /** add a federate to the delayed list*/
     void addFederateToDelay(GlobalFederateId gid);
     /** generate a component of json config string*/
@@ -276,7 +276,7 @@ class FederateState {
     /** set a tag (key-value pair)*/
     void setTag(std::string_view tag, std::string_view value);
     /** search for a tag by name*/
-    const std::string& getTag(std::string_view keyTag) const;
+    const std::string& getTag(std::string_view tag) const;
     /** get a tag (key-value pair) by index*/
     const std::pair<std::string, std::string>& getTagByIndex(size_t index) const
     {
@@ -321,6 +321,8 @@ class FederateState {
     /** process a message containing data
      */
     void processDataMessage(ActionMessage& cmd);
+
+    void timeoutCheck(ActionMessage &cmd);
     /** fill event list
     @param currentTime the time of the update
     */
