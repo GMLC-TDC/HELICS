@@ -199,11 +199,10 @@ void FederateState::generateConfig(Json::Value& base) const
     base["source_only"] = mSourceOnly;
     base["strict_input_type_checking"] = strict_input_type_checking;
     base["slow_responding"] = mSlowResponding;
-    if (!mAllowRemoteControl)
-    {
-        base["disable_remote_control"]=!mAllowRemoteControl;
+    if (!mAllowRemoteControl) {
+        base["disable_remote_control"] = !mAllowRemoteControl;
     }
-    
+
     if (rt_lag > timeZero) {
         base["rt_lag"] = static_cast<double>(rt_lag);
     }

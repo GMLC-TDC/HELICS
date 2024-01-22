@@ -130,7 +130,7 @@ void CoreBroker::setLoggingCallback(
 
     actionQueue.push(loggerUpdate);
 }
- 
+
 uint16_t CoreBroker::getNextAirlockIndex()
 {
     uint16_t index = nextAirLock++;
