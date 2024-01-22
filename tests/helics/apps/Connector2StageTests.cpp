@@ -160,9 +160,17 @@ class CheckFed {
                                   potEndpoints.end());
     }
     /** get the values array*/
-    const auto& getValues() { return values; }
+    const auto& getValues(const std::string& input) const {
+        static const std::vector<double> emptyVals;
+
+        for (int ii = 0; ii < valueNames.size(); ++ii) { if (valueNames[ii] == input) { return values[ii]; } } return emptyVals;
+    }
     /** get the values array*/
-    const auto& getMessages() { return messages; }
+    const auto& getMessages(const std::string& endpoint) {
+        static const std::vector<std::string> emptyVals;
+
+        for (int ii = 0; ii < messageNames.size(); ++ii) { if (messageNames[ii] == endpoint) { return messages[ii]; } } return emptyVals;
+    }
 
     const auto& getValueNames() { return valueNames; }
     const auto& getMessageNames() { return messageNames; }
@@ -200,8 +208,8 @@ TEST(connector_2stage, simple_connector)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getValues().size(), 1);
-    EXPECT_FALSE(cfed1.getValues()[0].empty());
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -226,9 +234,9 @@ TEST(connector_2stage, simple_endpoint_connector)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getMessages().size(), 2);
-    EXPECT_FALSE(cfed1.getMessages()[0].empty());
-    EXPECT_FALSE(cfed1.getMessages()[1].empty());
+    ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_FALSE(cfed1.getMessages("ept1").empty());
+    EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 2);
 }
 
@@ -253,9 +261,9 @@ TEST(connector_2stage, simple_endpoint_connector_one_way)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getMessages().size(), 2);
-    EXPECT_TRUE(cfed1.getMessages()[0].empty());
-    EXPECT_FALSE(cfed1.getMessages()[1].empty());
+    ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.getMessages("ept1").empty());
+    EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -280,9 +288,9 @@ TEST(connector_2stage, simple_endpoint_connector_one_way_reverse)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getMessages().size(), 2);
-    EXPECT_FALSE(cfed1.getMessages()[0].empty());
-    EXPECT_TRUE(cfed1.getMessages()[1].empty());
+    ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_FALSE(cfed1.getMessages("ept1").empty());
+    EXPECT_TRUE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -321,8 +329,8 @@ TEST(connector_2stage, three_fed)
     vFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getValues().size(), 1);
-    EXPECT_EQ(cfed1.getValues()[0].size(), 3);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -361,8 +369,8 @@ TEST(connector_2stage, three_fed_endpoint)
     mFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getMessages().size(), 1);
-    EXPECT_EQ(cfed1.getMessages()[0].size(), 3);
+    ASSERT_EQ(cfed1.getMessageNames().size(), 1);
+    EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -401,8 +409,8 @@ TEST(connector_2stage, three_fed_endpoint_bi)
     mFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getMessages().size(), 1);
-    EXPECT_EQ(cfed1.getMessages()[0].size(), 3);
+    ASSERT_EQ(cfed1.getMessageNames().size(), 1);
+    EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 2);
 }
 
@@ -441,8 +449,8 @@ TEST(connector_2stage, three_fed_reverse)
     vFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getValues().size(), 1);
-    EXPECT_EQ(cfed1.getValues()[0].size(), 3);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -621,8 +629,8 @@ TEST(connector_2stage, three_fed_alias_reverse)
     vFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getValues().size(), 1);
-    EXPECT_EQ(cfed1.getValues()[0].size(), 3);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -665,8 +673,8 @@ TEST(connector_2stage, three_fed_potential_alias)
     vFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getValues().size(), 1);
-    EXPECT_EQ(cfed1.getValues()[0].size(), 3);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -709,8 +717,8 @@ TEST(connector_2stage, three_fed_potential_alias_reverse)
     vFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getValues().size(), 1);
-    EXPECT_EQ(cfed1.getValues()[0].size(), 3);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -755,8 +763,8 @@ TEST(connector_2stage, three_fed_potential_cascade_alias_reverse)
     vFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getValues().size(), 1);
-    EXPECT_EQ(cfed1.getValues()[0].size(), 3);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -798,8 +806,8 @@ TEST(connector_2stage, three_fed_alias_unmatched_connection)
     vFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getValues().size(), 1);
-    EXPECT_EQ(cfed1.getValues()[0].size(), 3);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     // no connections through the connector made
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
@@ -893,8 +901,8 @@ TEST(connector_2stage, three_fed_endpoint_bi_alias)
     mFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getMessages().size(), 1);
-    EXPECT_EQ(cfed1.getMessages()[0].size(), 3);
+    ASSERT_EQ(cfed1.getMessageNames().size(), 1);
+    EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
     EXPECT_EQ(conn1.madeConnections(), 2);
 }
 
@@ -939,8 +947,8 @@ TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
     mFed2.disconnect();
     fut.get();
     fut2.get();
-    ASSERT_EQ(cfed1.getMessages().size(), 2);
-    EXPECT_EQ(cfed1.getMessages()[0].size(), 7);
+    ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_EQ(cfed1.getMessages("ept1").size(), 7);
     EXPECT_EQ(conn1.madeConnections(), 6);
 }
 
@@ -969,9 +977,9 @@ TEST(connector_2stage, two_sided_broker_connection)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getValues().size(), 2);
-    EXPECT_FALSE(cfed1.getValues()[0].empty());
-    EXPECT_FALSE(cfed1.getValues()[1].empty());
+    ASSERT_EQ(cfed1.getValueNames().size(), 2);
+    EXPECT_FALSE(cfed1.getValues("inp1").empty());
+    EXPECT_FALSE(cfed1.getValues("inp2").empty());
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
@@ -1005,9 +1013,9 @@ TEST(connector_2stage, two_sided_broker_connection_alias)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getValues().size(), 2);
-    EXPECT_FALSE(cfed1.getValues()[0].empty());
-    EXPECT_FALSE(cfed1.getValues()[1].empty());
+    ASSERT_EQ(cfed1.getValueNames().size(), 2);
+    EXPECT_FALSE(cfed1.getValues("inp1").empty());
+    EXPECT_FALSE(cfed1.getValues("inp2").empty());
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
@@ -1036,11 +1044,11 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getMessages().size(), 4);
-    EXPECT_TRUE(cfed1.getMessages()[0].empty()) << " endpoint " << cfed1.getMessageNames()[0];
-    EXPECT_FALSE(cfed1.getMessages()[1].empty()) << " endpoint " << cfed1.getMessageNames()[1];
-    EXPECT_TRUE(cfed1.getMessages()[2].empty()) << " endpoint " << cfed1.getMessageNames()[2];
-    EXPECT_FALSE(cfed1.getMessages()[3].empty()) << " endpoint " << cfed1.getMessageNames()[3];
+    ASSERT_EQ(cfed1.getMessageNames().size(), 4);
+    EXPECT_TRUE(cfed1.getMessages("e1").empty()) << " endpoint " << cfed1.getMessageNames()[0];
+    EXPECT_FALSE(cfed1.getMessages("e2").empty()) << " endpoint " << cfed1.getMessageNames()[1];
+    EXPECT_TRUE(cfed1.getMessages("e3").empty()) << " endpoint " << cfed1.getMessageNames()[2];
+    EXPECT_FALSE(cfed1.getMessages("e4").empty()) << " endpoint " << cfed1.getMessageNames()[3];
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
@@ -1073,11 +1081,11 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getMessages().size(), 4);
-    EXPECT_TRUE(cfed1.getMessages()[0].empty());
-    EXPECT_FALSE(cfed1.getMessages()[1].empty());
-    EXPECT_TRUE(cfed1.getMessages()[2].empty());
-    EXPECT_FALSE(cfed1.getMessages()[3].empty());
+    ASSERT_EQ(cfed1.getMessageNames().size(), 4);
+    EXPECT_TRUE(cfed1.getMessages("e1").empty());
+    EXPECT_FALSE(cfed1.getMessages("e2").empty());
+    EXPECT_TRUE(cfed1.getMessages("e3").empty());
+    EXPECT_FALSE(cfed1.getMessages("e4").empty());
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
