@@ -60,7 +60,7 @@ struct ConnectionsList {
 
 static void loadTags(ConnectionsList& connections, const Json::Value& tags)
 {
-    for (Json::Value::const_iterator itr = tags.begin(); itr != tags.end(); itr++) {
+    for (Json::Value::const_iterator itr = tags.begin(); itr != tags.end(); ++itr) {
         if (itr.key().asString() == "tags") {
             auto tagVect = gmlc::utilities::stringOps::splitlineQuotes(itr->asString());
             connections.tagStrings.insert(connections.tagStrings.end(),

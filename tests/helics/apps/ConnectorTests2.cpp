@@ -20,10 +20,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 class MultibrokerFixture: public ::testing::Test {
   public:
-    MultibrokerFixture()
+    MultibrokerFixture():brokerA(helics::CoreType::TEST, "-f7")
     {
         //** setup brokers and cores*/
-        brokerA = helics::BrokerApp(helics::CoreType::TEST, "-f7");
 
         subBroker1 = helics::BrokerApp(helics::CoreType::TEST,
                                        std::string("--broker=") + brokerA.getIdentifier());

@@ -2205,10 +2205,21 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
             }
         } break;
         case CMD_ADD_ALIAS:
-            handles.addAlias(command.payload.to_string(), command.getString(targetStringLoc));
-            if (!isRootc) {
-                routeMessage(std::move(command), parent_broker_id);
+            try
+            {
+                handles.addAlias(command.payload.to_string(), command.getString(targetStringLoc));
+                if (!isRootc) {
+                    routeMessage(std::move(command), parent_broker_id);
+                }
             }
+            catch (const std::invalid_argument& iarg)
+            {
+                ActionMessage error(CMD_ERROR);
+               error.setDestination(command.getSource());
+               error.source_id=global_broker_id_local;
+               error.payload=iarg.what();
+               routeMessage(std::move(error));
+           }
             break;
         default:
             break;
