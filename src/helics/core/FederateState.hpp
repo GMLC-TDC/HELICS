@@ -322,7 +322,7 @@ class FederateState {
      */
     void processDataMessage(ActionMessage& cmd);
 
-    void timeoutCheck(ActionMessage &cmd);
+    void timeoutCheck(ActionMessage& cmd);
     /** fill event list
     @param currentTime the time of the update
     */
