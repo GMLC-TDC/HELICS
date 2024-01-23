@@ -324,7 +324,7 @@ class FederateState {
     /** run a timeout check*/
     void timeoutCheck(ActionMessage& cmd);
     /** process a logging message*/
-    void processLoggingMessage(ActionMessage & cmd);
+    void processLoggingMessage(ActionMessage& cmd);
     /** fill event list
     @param currentTime the time of the update
     */

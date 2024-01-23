@@ -1414,7 +1414,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_IGNORE:
         default:
             break;
-        
+
         case CMD_EXEC_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
                 checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
@@ -1802,39 +1802,37 @@ void FederateState::processDataMessage(ActionMessage& cmd)
     }
 }
 
-
 void FederateState::processLoggingMessage(ActionMessage& cmd)
 {
-    switch (cmd.action())
-    {
-    case CMD_LOG:
-    case CMD_REMOTE_LOG:
-        logMessage(cmd.messageID,
-            cmd.getString(0),
-            cmd.payload.to_string(),
-            cmd.action() == CMD_REMOTE_LOG);
-        break;
+    switch (cmd.action()) {
+        case CMD_LOG:
+        case CMD_REMOTE_LOG:
+            logMessage(cmd.messageID,
+                       cmd.getString(0),
+                       cmd.payload.to_string(),
+                       cmd.action() == CMD_REMOTE_LOG);
+            break;
 
-    case CMD_WARNING:
-        if (cmd.payload.empty()) {
-            cmd.payload = commandErrorString(cmd.messageID);
-            if (cmd.payload.to_string() == "unknown") {
-                cmd.payload.append(" code:");
-                cmd.payload.append(std::to_string(cmd.messageID));
+        case CMD_WARNING:
+            if (cmd.payload.empty()) {
+                cmd.payload = commandErrorString(cmd.messageID);
+                if (cmd.payload.to_string() == "unknown") {
+                    cmd.payload.append(" code:");
+                    cmd.payload.append(std::to_string(cmd.messageID));
+                }
             }
-        }
-        LOG_WARNING(cmd.payload.to_string());
-        break;
-    case CMD_SET_PROFILER_FLAG:
-        setOptionFlag(defs::PROFILING, checkActionFlag(cmd, indicator_flag));
-        break;
-    case CMD_TIMEOUT_DISCONNECT: {
-        auto qres = processQueryActual("global_time_debugging");
-        qres.insert(0, "TIME DEBUGGING::");
-        LOG_WARNING(qres);
-    } break;
-    default:
-        break;
+            LOG_WARNING(cmd.payload.to_string());
+            break;
+        case CMD_SET_PROFILER_FLAG:
+            setOptionFlag(defs::PROFILING, checkActionFlag(cmd, indicator_flag));
+            break;
+        case CMD_TIMEOUT_DISCONNECT: {
+            auto qres = processQueryActual("global_time_debugging");
+            qres.insert(0, "TIME DEBUGGING::");
+            LOG_WARNING(qres);
+        } break;
+        default:
+            break;
     }
 }
 
