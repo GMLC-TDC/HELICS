@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
 #include "gmlc/utilities/stringOps.h"
+#include "../application_api/HelicsPrimaryTypes.hpp"
 
 #include <algorithm>
 #include <deque>
@@ -67,7 +68,7 @@ static void loadTags(ConnectionsList& connections, const Json::Value& tags)
                                           tagVect.begin(),
                                           tagVect.end());
         } else {
-            if (!itr->isString() || std::strcmp("false", itr->asCString()) != 0) {
+            if (!itr->isString() || isTrueString(itr->asCString())) {
                 connections.tagStrings.emplace_back(itr.key().asString());
             }
         }
@@ -528,6 +529,10 @@ void Connector::loadTextFile(const std::string& filename)
         }
         /* time key type value units*/
         auto blk = splitlineBracket(str, ",\t ", default_bracket_chars, delimiter_compression::on);
+        for (auto& seq : blk)
+        {
+            CLI::detail::remove_quotes(seq);
+        }
         addConnectionVector(blk);
     }
 }

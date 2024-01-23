@@ -48,6 +48,35 @@ TEST(connector_file_tests, simple_connector)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
+TEST(connector_file_tests, simple_connector_quotes)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = "ccoref1q";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+    conn1.loadFile(std::string(testdir) + "simple-quotes.txt");
+
+    helics::ValueFederate vfed("c1", fedInfo);
+    auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
+    auto& inp1 = vfed.registerGlobalInput<double>("inp1");
+
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    vfed.enterExecutingMode();
+    const double testValue = 3452.562;
+    pub1.publish(testValue);
+    auto retTime = vfed.requestTime(5);
+    EXPECT_EQ(retTime, 1.0);
+    auto val = inp1.getDouble();
+    EXPECT_EQ(val, testValue);
+
+    vfed.finalize();
+    fut.get();
+    EXPECT_EQ(conn1.madeConnections(), 1);
+}
+
 TEST(connector_file_tests, simple_connector_reverse)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
