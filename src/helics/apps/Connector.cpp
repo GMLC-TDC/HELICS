@@ -7,11 +7,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Connector.hpp"
 
+#include "../application_api/HelicsPrimaryTypes.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
 #include "gmlc/utilities/stringOps.h"
-#include "../application_api/HelicsPrimaryTypes.hpp"
 
 #include <algorithm>
 #include <deque>
@@ -529,8 +529,7 @@ void Connector::loadTextFile(const std::string& filename)
         }
         /* time key type value units*/
         auto blk = splitlineBracket(str, ",\t ", default_bracket_chars, delimiter_compression::on);
-        for (auto& seq : blk)
-        {
+        for (auto& seq : blk) {
             CLI::detail::remove_quotes(seq);
         }
         addConnectionVector(blk);
