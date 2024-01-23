@@ -241,7 +241,7 @@ workflows:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - gcc12:
+      - gcc13:
           filters:
             branches:
               ignore: /pre-commit\/.*/
