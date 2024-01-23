@@ -119,11 +119,10 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
             target_link_libraries(build_flags_target INTERFACE "stdc++fs")
 
         endif()
-        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
-         target_compile_options(
-            compile_flags_target
-            INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wparentheses>
-        )
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
+            target_compile_options(
+                compile_flags_target INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wparentheses>
+            )
         endif()
     endif()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

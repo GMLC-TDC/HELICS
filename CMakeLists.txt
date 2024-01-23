@@ -408,7 +408,7 @@ if(MSYS OR CYGWIN)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
     endif()
-    #setting to windows 10 for all compilation
+    # setting to windows 10 for all compilation
     add_compile_definitions(_WIN32_WINNT=0x0A00)
 endif()
 

@@ -66,8 +66,8 @@ else()
         endif()
     elseif(CMAKE_CXX_STANDARD EQUAL 17)
         if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
-                #HELICS won't compile on GCC13 without C++20 flags set
+            if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
+                # HELICS won't compile on GCC13 without C++20 flags set
                 set(CXX_STANDARD_FLAG -std=c++20)
             elseif(CYGWIN)
                 set(CXX_STANDARD_FLAG -std=gnu++17)
