@@ -25,7 +25,7 @@ API and core
 namespace helics {
 
 /** detect if a string is not a string that represents false*/
-bool isTrueString(const std::string_view str);
+HELICS_CXX_EXPORT bool isTrueString(std::string_view str);
 
 /** define a variant with the different types*/
 using defV = std::variant<double,

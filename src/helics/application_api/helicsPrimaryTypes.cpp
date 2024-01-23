@@ -41,13 +41,13 @@ static const std::set<std::string_view> falseString{"0",        "",         "fal
 
 bool isTrueString(const std::string_view str)
 {
-    if (str == "1") {
+    if (str.size() == 1 && str[0]=='1') {
         return true;
     }
-    if (str == "0") {
+    if (str.size() == 1 && str[0]=='0') {
         return false;
     }
-    return (falseString.find(str) != falseString.end());
+    return (falseString.find(str) == falseString.end());
 }
 
 bool changeDetected(const defV& prevValue, bool val, double /*deltaV*/)
