@@ -34,6 +34,13 @@ static const std::set<std::string> falseString{"0",
                                                "false",
                                                "False",
                                                "FALSE",
+                                               "OFF",
+    "Disabled",
+    "disable",
+    "disabled",
+    "DISABLE",
+    "off"
+    "DISABLED",
                                                "f",
                                                "F",
                                                "0",
@@ -581,6 +588,7 @@ defV readJsonValue(const data_view& data)
             case DataType::HELICS_NAMED_POINT:
                 result = NamedPoint(jv["name"].asCString(), jv["value"].asDouble());
                 break;
+            case DataType::HELICS_MULTI:
             default:
                 result = data.string();
         }
@@ -613,6 +621,7 @@ void valueExtract(const data_view& data, DataType baseType, std::string& val)
             break;
         case DataType::HELICS_UNKNOWN:
         case DataType::HELICS_CUSTOM:
+        case DataType::HELICS_MULTI:
             val = data.string();
             break;
         case DataType::HELICS_NAMED_POINT: {
@@ -1090,6 +1099,7 @@ void valueExtract(const data_view& data, DataType baseType, char& val)
             valueExtract(readJsonValue(data), val);
             break;
         case DataType::HELICS_CUSTOM:
+        case DataType::HELICS_MULTI:
             throw(std::invalid_argument("unrecognized helics type"));
     }
 }
@@ -1115,6 +1125,7 @@ void valueExtract(const data_view& data, DataType baseType, defV& val)
             break;
         case DataType::HELICS_UNKNOWN:
         case DataType::HELICS_CUSTOM:
+        case DataType::HELICS_MULTI:
             val = data.string();
             break;
         case DataType::HELICS_VECTOR:

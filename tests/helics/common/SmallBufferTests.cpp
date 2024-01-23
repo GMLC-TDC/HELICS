@@ -273,7 +273,16 @@ TEST(small_buffer_tests, move_assign_self)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wself-move"
 #endif
+
+#if defined(__GNUC__) && (__GNUC__ >= 13)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+#endif
     sb1 = std::move(sb1);
+
+#if defined(__GNUC__) && (__GNUC__ >= 13)
+#pragma GCC diagnostic pop
+#endif
 
 #if defined(__clang__)
 #    pragma clang diagnostic pop
