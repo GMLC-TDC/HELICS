@@ -177,7 +177,7 @@ jobs:
     docker:
       - image: helics/buildenv:gcc13-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DCMAKE_CXX_FLAGS="-pedantic-errors" -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON'
+      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DCMAKE_CXX_FLAGS="-pedantic-errors" -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
     steps:
       - checkout
       - run: *setup_helics
