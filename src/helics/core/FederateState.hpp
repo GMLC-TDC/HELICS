@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <utility>
 #include <vector>
+#include <tuple>
 
 namespace helics {
 class SubscriptionInfo;

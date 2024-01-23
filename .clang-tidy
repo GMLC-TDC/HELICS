@@ -63,7 +63,7 @@ WarningsAsErrors: "
   bugprone-*,
   -bugprone-narrowing-conversions,
   -bugprone-easily-swappable-parameters,
-  -bugprone-exception_escape,
+  -bugprone-exception-escape,
   misc-*,
   -misc-non-private-member-variables-in-classes,
   -misc-no-recursion,
