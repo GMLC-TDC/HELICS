@@ -41,10 +41,10 @@ static const std::set<std::string_view> falseString{"0",        "",         "fal
 
 bool isTrueString(const std::string_view str)
 {
-    if (str.size() == 1 && str[0]=='1') {
+    if (str.size() == 1 && str[0] == '1') {
         return true;
     }
-    if (str.size() == 1 && str[0]=='0') {
+    if (str.size() == 1 && str[0] == '0') {
         return false;
     }
     return (falseString.find(str) == falseString.end());
