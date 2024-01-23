@@ -1319,73 +1319,73 @@ MessageProcessingResult FederateState::processQueue() noexcept
     return ret_code;
 }
 
-
-std::optional<MessageProcessingResult> FederateState::checkProcResult(std::tuple<FederateStates, MessageProcessingResult, bool>& proc_result, ActionMessage& cmd)
+std::optional<MessageProcessingResult> FederateState::checkProcResult(
+    std::tuple<FederateStates, MessageProcessingResult, bool>& proc_result,
+    ActionMessage& cmd)
 {
-
     timeGranted_mode = std::get<2>(proc_result);
 
     if (getState() != std::get<0>(proc_result)) {
         setState(std::get<0>(proc_result));
         switch (std::get<0>(proc_result)) {
-        case FederateStates::INITIALIZING:
-            LOG_TIMING("Granting Initialization");
-            if (checkInterfaces() != defs::Errors::OK) {
-                setState(FederateStates::ERRORED);
-                return MessageProcessingResult::ERROR_RESULT;
-            }
-            timeCoord->enterInitialization();
-            break;
-        case FederateStates::EXECUTING:
-            timeCoord->updateTimeFactors();
-            LOG_TIMING("Granting Execution");
-            break;
-        case FederateStates::FINISHED:
-            LOG_TIMING("Terminating");
-            break;
-        case FederateStates::ERRORED:
-            if (cmd.payload.empty()) {
-                errorString = commandErrorString(cmd.messageID);
-                if (errorString == "unknown") {
-                    errorString += " code:" + std::to_string(cmd.messageID);
+            case FederateStates::INITIALIZING:
+                LOG_TIMING("Granting Initialization");
+                if (checkInterfaces() != defs::Errors::OK) {
+                    setState(FederateStates::ERRORED);
+                    return MessageProcessingResult::ERROR_RESULT;
                 }
-            } else {
-                errorString = cmd.payload.to_string();
-            }
-            errorCode = cmd.messageID;
-            LOG_ERROR(errorString);
-            break;
-        default:
-            break;
+                timeCoord->enterInitialization();
+                break;
+            case FederateStates::EXECUTING:
+                timeCoord->updateTimeFactors();
+                LOG_TIMING("Granting Execution");
+                break;
+            case FederateStates::FINISHED:
+                LOG_TIMING("Terminating");
+                break;
+            case FederateStates::ERRORED:
+                if (cmd.payload.empty()) {
+                    errorString = commandErrorString(cmd.messageID);
+                    if (errorString == "unknown") {
+                        errorString += " code:" + std::to_string(cmd.messageID);
+                    }
+                } else {
+                    errorString = cmd.payload.to_string();
+                }
+                errorCode = cmd.messageID;
+                LOG_ERROR(errorString);
+                break;
+            default:
+                break;
         }
     }
 
     switch (std::get<1>(proc_result)) {
-    case MessageProcessingResult::CONTINUE_PROCESSING:
-        break;
-    case MessageProcessingResult::REPROCESS_MESSAGE:
-        if (cmd.dest_id != global_id.load()) {
-            routeMessage(cmd);
-            return MessageProcessingResult::CONTINUE_PROCESSING;
-        }
-        return processActionMessage(cmd);
-    case MessageProcessingResult::DELAY_MESSAGE:
-        addFederateToDelay(GlobalFederateId(cmd.source_id));
-        return MessageProcessingResult::DELAY_MESSAGE;
-    default:
-        if (timeGranted_mode) {
-            time_granted = timeCoord->getGrantedTime();
-            allowed_send_time = timeCoord->allowedSendTime();
-            if (cmd.action() == CMD_FORCE_TIME_GRANT) {
-                if (!ignore_time_mismatch_warnings) {
-                    LOG_WARNING(fmt::format("forced Granted Time={}",
-                        static_cast<double>(time_granted)));
-                }
-            } else {
-                LOG_TIMING(fmt::format("Granted Time={}", static_cast<double>(time_granted)));
+        case MessageProcessingResult::CONTINUE_PROCESSING:
+            break;
+        case MessageProcessingResult::REPROCESS_MESSAGE:
+            if (cmd.dest_id != global_id.load()) {
+                routeMessage(cmd);
+                return MessageProcessingResult::CONTINUE_PROCESSING;
             }
-        }
-        return (std::get<1>(proc_result));
+            return processActionMessage(cmd);
+        case MessageProcessingResult::DELAY_MESSAGE:
+            addFederateToDelay(GlobalFederateId(cmd.source_id));
+            return MessageProcessingResult::DELAY_MESSAGE;
+        default:
+            if (timeGranted_mode) {
+                time_granted = timeCoord->getGrantedTime();
+                allowed_send_time = timeCoord->allowedSendTime();
+                if (cmd.action() == CMD_FORCE_TIME_GRANT) {
+                    if (!ignore_time_mismatch_warnings) {
+                        LOG_WARNING(fmt::format("forced Granted Time={}",
+                                                static_cast<double>(time_granted)));
+                    }
+                } else {
+                    LOG_TIMING(fmt::format("Granted Time={}", static_cast<double>(time_granted)));
+                }
+            }
+            return (std::get<1>(proc_result));
     }
     return std::nullopt;
 }
@@ -1416,9 +1416,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
     auto proc_result = processCoordinatorMessage(
         cmd, timeCoord.get(), getState(), timeGranted_mode, global_id.load());
 
-    auto result=checkProcResult(proc_result,cmd);
-    if (result)
-    {
+    auto result = checkProcResult(proc_result, cmd);
+    if (result) {
         return *result;
     }
 
