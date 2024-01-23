@@ -1414,14 +1414,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_IGNORE:
         default:
             break;
-        case CMD_LOG:
-        case CMD_REMOTE_LOG:
-            logMessage(cmd.messageID,
-                       cmd.getString(0),
-                       cmd.payload.to_string(),
-                       cmd.action() == CMD_REMOTE_LOG);
-            break;
-
+        
         case CMD_EXEC_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
                 checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
@@ -1483,15 +1476,12 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_PUB:
             processDataMessage(cmd);
             break;
+        case CMD_LOG:
+        case CMD_REMOTE_LOG:
         case CMD_WARNING:
-            if (cmd.payload.empty()) {
-                cmd.payload = commandErrorString(cmd.messageID);
-                if (cmd.payload.to_string() == "unknown") {
-                    cmd.payload.append(" code:");
-                    cmd.payload.append(std::to_string(cmd.messageID));
-                }
-            }
-            LOG_WARNING(cmd.payload.to_string());
+        case CMD_SET_PROFILER_FLAG:
+        case CMD_TIMEOUT_DISCONNECT:
+            processLoggingMessage(cmd);
             break;
         case CMD_GRANT_TIMEOUT_CHECK:
             timeoutCheck(cmd);
@@ -1506,9 +1496,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_CLOSE_INTERFACE:
             processDataConnectionMessage(cmd);
             break;
-        case CMD_SET_PROFILER_FLAG:
-            setOptionFlag(defs::PROFILING, checkActionFlag(cmd, indicator_flag));
-            break;
+
         case CMD_FED_ACK:
             if (state != FederateStates::CREATED) {
                 break;
@@ -1552,11 +1540,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_SEND_COMMAND_ORDERED:
             sendCommand(cmd);
             break;
-        case CMD_TIMEOUT_DISCONNECT: {
-            auto qres = processQueryActual("global_time_debugging");
-            qres.insert(0, "TIME DEBUGGING::");
-            LOG_WARNING(qres);
-        } break;
+
         case CMD_QUERY_ORDERED:
         case CMD_QUERY: {
             ActionMessage queryResp(cmd.action() == CMD_QUERY ? CMD_QUERY_REPLY :
@@ -1719,7 +1703,6 @@ void FederateState::processDataConnectionMessage(ActionMessage& cmd)
             break;
 
         case CMD_REMOVE_ENDPOINT:
-            break;
         default:
             break;
     }
@@ -1818,6 +1801,43 @@ void FederateState::processDataMessage(ActionMessage& cmd)
             break;
     }
 }
+
+
+void FederateState::processLoggingMessage(ActionMessage& cmd)
+{
+    switch (cmd.action())
+    {
+    case CMD_LOG:
+    case CMD_REMOTE_LOG:
+        logMessage(cmd.messageID,
+            cmd.getString(0),
+            cmd.payload.to_string(),
+            cmd.action() == CMD_REMOTE_LOG);
+        break;
+
+    case CMD_WARNING:
+        if (cmd.payload.empty()) {
+            cmd.payload = commandErrorString(cmd.messageID);
+            if (cmd.payload.to_string() == "unknown") {
+                cmd.payload.append(" code:");
+                cmd.payload.append(std::to_string(cmd.messageID));
+            }
+        }
+        LOG_WARNING(cmd.payload.to_string());
+        break;
+    case CMD_SET_PROFILER_FLAG:
+        setOptionFlag(defs::PROFILING, checkActionFlag(cmd, indicator_flag));
+        break;
+    case CMD_TIMEOUT_DISCONNECT: {
+        auto qres = processQueryActual("global_time_debugging");
+        qres.insert(0, "TIME DEBUGGING::");
+        LOG_WARNING(qres);
+    } break;
+    default:
+        break;
+    }
+}
+
 void FederateState::setProperties(const ActionMessage& cmd)
 {
     if (state == FederateStates::CREATED) {
