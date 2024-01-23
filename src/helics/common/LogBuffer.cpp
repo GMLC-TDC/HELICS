@@ -52,9 +52,8 @@ void LogBuffer::process(
         return;
     }
     auto block = mBuffer.lock_shared();
-    const auto& data = *block;
-    for (const auto& lm : data) {
-        procFunc(std::get<0>(lm), std::get<1>(lm), std::get<2>(lm));
+    for (const auto& logMessage : *block) {
+        procFunc(std::get<0>(logMessage), std::get<1>(logMessage), std::get<2>(logMessage));
     }
 }
 

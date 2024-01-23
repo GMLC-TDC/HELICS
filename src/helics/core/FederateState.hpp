@@ -24,6 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <utility>
 #include <vector>
+#include <optional>
 
 namespace helics {
 class SubscriptionInfo;
@@ -309,6 +310,8 @@ class FederateState {
     @return a convergence state value with an indicator of return reason and state of convergence
     */
     MessageProcessingResult processDelayQueue() noexcept;
+
+    std::optional<MessageProcessingResult> checkProcResult(std::tuple<FederateStates, MessageProcessingResult, bool> &proc_result, ActionMessage &cmd);
     /** process a single message
     @return a convergence state value with an indicator of return reason and state of convergence
     */

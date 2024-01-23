@@ -118,16 +118,16 @@ TEST(logging_tests, check_log_message_levels)
 
 TEST(logging_tests, check_log_message_levels_high)
 {
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi,
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
+    helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
                                          HELICS_LOG_LEVEL_TRACE + 6,
                                          &err);
 
-    auto fed = helicsCreateValueFederate("test1", fi, &err);
+    auto fed = helicsCreateValueFederate("test1", fedInfo, &err);
 
     logblocktype mlog;
 
@@ -160,7 +160,7 @@ TEST(logging_tests, check_log_message_levels_high)
     }
     EXPECT_TRUE(found_low && found_high);
     helicsFederateFree(fed);
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
 }
 
 TEST(logging_tests, core_logging)
@@ -172,8 +172,8 @@ TEST(logging_tests, core_logging)
     logblocktype mlog;
 
     auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
-        auto* mp = reinterpret_cast<logblocktype*>(udata);
-        mp->lock()->emplace_back(level, message);
+        auto* messageLock = reinterpret_cast<logblocktype*>(udata);
+        messageLock->lock()->emplace_back(level, message);
     };
     auto err = helicsErrorInitialize();
     helicsCoreSetLoggingCallback(core, logg, &mlog, &err);
