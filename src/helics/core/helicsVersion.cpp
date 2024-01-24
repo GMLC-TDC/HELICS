@@ -229,4 +229,4 @@ std::string systemInfo()
     return fileops::generateJsonString(base);
 }
 
-}  // namespace helics
+}  // namespace helics::core

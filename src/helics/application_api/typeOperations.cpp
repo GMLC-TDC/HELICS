@@ -5,9 +5,9 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "typeOperations.hpp"
-#include "../core/helicsVersion.hpp"
 
 #include "../core/coreTypeOperations.hpp"
+#include "../core/helicsVersion.hpp"
 
 namespace helics {
 std::string to_string(CoreType type)

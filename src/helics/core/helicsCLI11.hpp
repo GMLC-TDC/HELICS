@@ -24,16 +24,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::coreTypeFromString;
 using helics::loadTimeFromString;
-using helics::to_string;
 using helics::systemInfo;
+using helics::to_string;
 
 #else
 #    include "../utilities/timeStringOps.hpp"
 #    include "coreTypeOperations.hpp"
 
 using helics::core::coreTypeFromString;
-using helics::core::to_string;
 using helics::core::systemInfo;
+using helics::core::to_string;
 /** generate a local function that uses the utilities library*/
 inline helics::Time loadTimeFromString(std::string_view str, time_units defUnit)
 {
