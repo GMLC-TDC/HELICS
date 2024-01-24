@@ -25,12 +25,15 @@ SPDX-License-Identifier: BSD-3-Clause
 using helics::coreTypeFromString;
 using helics::loadTimeFromString;
 using helics::to_string;
+using helics::systemInfo;
+
 #else
 #    include "../utilities/timeStringOps.hpp"
 #    include "coreTypeOperations.hpp"
 
 using helics::core::coreTypeFromString;
 using helics::core::to_string;
+using helics::core::systemInfo;
 /** generate a local function that uses the utilities library*/
 inline helics::Time loadTimeFromString(std::string_view str, time_units defUnit)
 {
@@ -143,7 +146,7 @@ class helicsCLI11App: public CLI::App {
         add_flag_callback(
             "--system",
             []() {
-                std::cout << helics::systemInfo() << std::endl;
+                std::cout << systemInfo() << std::endl;
                 throw CLI::Success{};
             },
             "display system information details");

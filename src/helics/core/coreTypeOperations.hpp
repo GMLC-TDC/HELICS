@@ -36,4 +36,8 @@ bool isCoreTypeAvailable(CoreType type) noexcept;
 @return true if the types are compatible with each other
 */
 bool matchingTypes(std::string_view type1, std::string_view type2);
+
+/** generate an extended version and system info string in json format*/
+std::string systemInfo();
+
 }  // namespace helics::core

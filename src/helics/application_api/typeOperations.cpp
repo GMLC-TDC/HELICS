@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "typeOperations.hpp"
+#include "../core/helicsVersion.hpp"
 
 #include "../core/coreTypeOperations.hpp"
 
@@ -23,4 +24,10 @@ bool isCoreTypeAvailable(CoreType type) noexcept
 {
     return core::isCoreTypeAvailable(type);
 }
+
+std::string systemInfo()
+{
+    return core::systemInfo();
+}
+
 }  // namespace helics

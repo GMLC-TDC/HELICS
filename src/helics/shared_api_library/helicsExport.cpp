@@ -45,7 +45,7 @@ const char* helicsGetCompilerVersion(void)
 
 const char* helicsGetSystemInfo(void)
 {
-    static const std::string systemInfo{helics::systemInfo()};
+    static const std::string systemInfo{helics::core::systemInfo()};
     return systemInfo.c_str();
 }
 

@@ -128,3 +128,4 @@ constexpr auto NO_ITERATION = helics::IterationRequest::NO_ITERATIONS;
 constexpr auto FORCE_ITERATION = helics::IterationRequest::FORCE_ITERATION;
 /// simplified alias to indicate that helics should iterate if warranted
 constexpr auto ITERATE_IF_NEEDED = helics::IterationRequest::ITERATE_IF_NEEDED;
+

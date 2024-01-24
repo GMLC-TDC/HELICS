@@ -80,6 +80,7 @@ hide_variable(gtest_hide_internal_symbols)
 hide_variable(BUILD_GMOCK)
 hide_variable(BUILD_GTEST)
 hide_variable(INSTALL_GTEST)
+hide_variable(GTEST_HAS_ABSL)
 
 set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER "Extern")
 

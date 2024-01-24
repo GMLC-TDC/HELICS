@@ -190,7 +190,7 @@ std::string getHostName()
     return computerName;
 }
 
-namespace helics {
+namespace helics::core {
 
 std::string systemInfo()
 {

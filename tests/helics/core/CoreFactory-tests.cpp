@@ -167,7 +167,7 @@ TEST(CoreFactory, availableCores)
 
 TEST(core, systemInfo)
 {
-    auto eVers = helics::systemInfo();
+    auto eVers = helics::core::systemInfo();
 
     auto jv = helics::fileops::loadJsonStr(eVers);
     EXPECT_FALSE(jv.isNull());
