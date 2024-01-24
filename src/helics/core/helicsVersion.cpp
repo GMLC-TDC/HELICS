@@ -133,8 +133,8 @@ std::string os_info()
 
 std::uint64_t getTotalSystemMemory()
 {
-    std::uint64_t pages = sysconf(_SC_PHYS_PAGES);
-    std::uint64_t page_size = sysconf(_SC_PAGE_SIZE);
+    const std::uint64_t pages = sysconf(_SC_PHYS_PAGES);
+    const std::uint64_t page_size = sysconf(_SC_PAGE_SIZE);
     return pages * page_size;
 }
 
@@ -143,7 +143,7 @@ std::string os_info()
     std::string osInfo;
     utsname details = {};
 
-    int ret = uname(&details);
+    const int ret = uname(&details);
 
     if (ret == 0) {
         osInfo.append(details.sysname);

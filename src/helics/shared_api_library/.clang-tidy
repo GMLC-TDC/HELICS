@@ -47,6 +47,7 @@ WarningsAsErrors: "
   clang-analyzer-*,
   bugprone-*,
   -bugprone-narrowing-conversions,
+  -bugprone-easily-swappable-parameters,
   misc-*,
   -misc-non-private-member-variables-in-classes,
   portability-*,
