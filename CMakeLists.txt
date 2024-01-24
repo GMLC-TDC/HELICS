@@ -409,7 +409,7 @@ if(MSYS OR CYGWIN)
         set(ENABLE_IPC_CORE FALSE)
     endif()
     # setting to windows 10 for all compilation
-    if (WIN32_WINNT)
+    if(WIN32_WINNT)
         add_compile_definitions("_WIN32_WINNT=${WIN32_WINNT}")
     else()
         add_compile_definitions(_WIN32_WINNT=0x0A00)
