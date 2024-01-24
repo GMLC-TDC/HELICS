@@ -413,7 +413,7 @@ if(MSYS OR CYGWIN)
         add_compile_definitions("_WIN32_WINNT=${WIN32_WINNT}")
     else()
         add_compile_definitions(_WIN32_WINNT=0x0A00)
-    end()
+    endif()
 endif()
 
 if(MINGW AND NOT UNIX_LIKE)
