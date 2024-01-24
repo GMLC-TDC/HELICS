@@ -23,7 +23,7 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
     if(CMAKE_CXX_STANDARD LESS 20)
-        message(FATAL_ERROR " if using gcc>=13.0 {$PROJECT_NAME} requires C++20 or greater")
+        message(FATAL_ERROR " using gcc>=13.0 {$PROJECT_NAME} requires setting C++ standard to C++20 or greater")
     endif()
 endif()
 
