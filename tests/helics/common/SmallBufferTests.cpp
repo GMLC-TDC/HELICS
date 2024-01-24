@@ -139,12 +139,12 @@ TEST(small_buffer_tests, iterators)
     SmallBuffer buffer1(tstring, 9);
 
     std::string string2(reinterpret_cast<const char*>(buffer1.begin()),
-                   reinterpret_cast<const char*>(buffer1.end()));
+                        reinterpret_cast<const char*>(buffer1.end()));
     EXPECT_EQ(string2.size(), 9U);
 
     const SmallBuffer& buffer2 = buffer1;
     std::string string3(reinterpret_cast<const char*>(buffer2.begin()),
-                   reinterpret_cast<const char*>(buffer2.end()));
+                        reinterpret_cast<const char*>(buffer2.end()));
     EXPECT_EQ(string3.size(), 9U);
     // first 9 elements of the string
     EXPECT_EQ(string3, "string te");

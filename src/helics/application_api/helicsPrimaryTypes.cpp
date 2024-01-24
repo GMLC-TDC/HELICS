@@ -544,7 +544,8 @@ defV readJsonValue(const data_view& data)
                 result = json["value"].asDouble();
                 break;
             case DataType::HELICS_COMPLEX:
-                result = std::complex<double>(json["value"][0].asDouble(), json["value"][1].asDouble());
+                result =
+                    std::complex<double>(json["value"][0].asDouble(), json["value"][1].asDouble());
                 break;
             case DataType::HELICS_BOOL:
                 result = static_cast<std::int64_t>(json["value"].asBool());
@@ -1077,9 +1078,10 @@ void valueExtract(const data_view& data, DataType baseType, char& val)
         }
         case DataType::HELICS_COMPLEX_VECTOR: {
             auto cvec = ValueConverter<std::vector<std::complex<double>>>::interpret(data);
-            val = static_cast<char>((cvec.size() == 1) ?
-                                        ((cvec[0].imag() == 0.0) ? cvec[0].real() : std::abs(cvec[0])) :
-                                        vectorNorm(cvec));
+            val = static_cast<char>(
+                (cvec.size() == 1) ?
+                    ((cvec[0].imag() == 0.0) ? cvec[0].real() : std::abs(cvec[0])) :
+                    vectorNorm(cvec));
             break;
         }
         case DataType::HELICS_JSON:
