@@ -14,9 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/Connector.hpp"
 #include "helics/apps/CoreApp.hpp"
 
+#include <fmt/format.h>
 #include <future>
 #include <thread>
-#include <fmt/format.h>
 
 static constexpr std::string_view testdir = TEST_DIR "/connector/";
 
@@ -58,7 +58,9 @@ TEST(connector_file_tests, simple_connector_cmd)
     fedInfo.coreName = "ccorefile1";
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Connector conn1("connector2", fmt::format("--corename={} --coretype=TEST --coreinitstring='{}' --period=1.0 --input={}simple.txt",fedInfo.coreName,fedInfo.coreInitString,testdir));
+    helics::apps::Connector conn1("connector2", fmt::format("--corename={} --coretype=TEST
+--coreinitstring='{}' --period=1.0
+--input={}simple.txt",fedInfo.coreName,fedInfo.coreInitString,testdir));
 
     helics::ValueFederate vfed("c1", fedInfo);
     auto& pub1 = vfed.registerGlobalPublication<double>("pub1");
@@ -79,7 +81,6 @@ TEST(connector_file_tests, simple_connector_cmd)
 }
 
 */
-
 
 TEST(connector_file_tests, simple_connector_quotes)
 {

@@ -48,7 +48,7 @@ class CheckFed {
                 auto json = helics::fileops::loadJsonStr(cmd.first);
                 if (json.isMember("command")) {
                     if (json["command"] == "register_interfaces") {
-                        receivedCommand=true;
+                        receivedCommand = true;
                         if (json.isMember("publications")) {
                             for (const auto& pub : json["publications"]) {
                                 const std::string pubName = pub.asString();
@@ -187,7 +187,7 @@ class CheckFed {
 
     const auto& getValueNames() { return valueNames; }
     const auto& getMessageNames() { return messageNames; }
-    bool hasReceivedCommand() const {return receivedCommand;}
+    bool hasReceivedCommand() const { return receivedCommand; }
 
   private:
     std::shared_ptr<helics::CombinationFederate> vFed;
@@ -198,7 +198,7 @@ class CheckFed {
     std::vector<std::vector<double>> values;
     std::vector<std::vector<std::string>> messages;
     std::vector<std::string> messageNames;
-    bool receivedCommand=true;
+    bool receivedCommand = true;
 };
 
 TEST(connector_2stage, simple_connector)
