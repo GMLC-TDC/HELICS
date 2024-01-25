@@ -142,12 +142,12 @@ static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
                 connections.hasPotentialInterfaces = true;
                 const std::string_view federateName =
                     connections.federatesWithPotentialInterfaces.emplace_back(
-                        fed["attributes"]["name"].asString());
+                        fed["attributes"]["name"].asCString());
                 const auto& potInterfaces = fed["potential_interfaces"];
                 if (potInterfaces.isMember("inputs")) {
                     for (const auto& input : potInterfaces["inputs"]) {
                         const std::string_view input1 =
-                            connections.interfaces.emplace_back(input.asString());
+                            connections.interfaces.emplace_back(input.asCString());
                         connections.potentialInputs.emplace(
                             input1, PotentialConnections{federateName, input1, false});
                     }
@@ -155,7 +155,7 @@ static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
                 if (potInterfaces.isMember("publications")) {
                     for (const auto& pub : potInterfaces["publications"]) {
                         const std::string_view pub1 =
-                            connections.interfaces.emplace_back(pub.asString());
+                            connections.interfaces.emplace_back(pub.asCString());
                         connections.potentialPubs.emplace(
                             pub1, PotentialConnections{federateName, pub1, false});
                     }
@@ -163,7 +163,7 @@ static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
                 if (potInterfaces.isMember("endpoints")) {
                     for (const auto& endpoint : potInterfaces["endpoints"]) {
                         const std::string_view endpoint1 =
-                            connections.interfaces.emplace_back(endpoint.asString());
+                            connections.interfaces.emplace_back(endpoint.asCString());
                         connections.potentialEndpoints.emplace(
                             endpoint1, PotentialConnections{federateName, endpoint1, false});
                     }

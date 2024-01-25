@@ -48,6 +48,7 @@ class CheckFed {
                 auto json = helics::fileops::loadJsonStr(cmd.first);
                 if (json.isMember("command")) {
                     if (json["command"] == "register_interfaces") {
+                        receivedCommand=true;
                         if (json.isMember("publications")) {
                             for (const auto& pub : json["publications"]) {
                                 const std::string pubName = pub.asString();
@@ -186,6 +187,7 @@ class CheckFed {
 
     const auto& getValueNames() { return valueNames; }
     const auto& getMessageNames() { return messageNames; }
+    bool hasReceivedCommand() const {return receivedCommand;}
 
   private:
     std::shared_ptr<helics::CombinationFederate> vFed;
@@ -196,6 +198,7 @@ class CheckFed {
     std::vector<std::vector<double>> values;
     std::vector<std::vector<std::string>> messages;
     std::vector<std::string> messageNames;
+    bool receivedCommand=true;
 };
 
 TEST(connector_2stage, simple_connector)
@@ -277,6 +280,32 @@ TEST(connector_2stage, simple_endpoint_connector_one_way)
     EXPECT_TRUE(cfed1.getMessages("ept1").empty());
     EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
+}
+
+TEST(connector_2stage, no_connections)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = newCoreName("core2stage");
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connectore1", fedInfo);
+    conn1.addConnection("ept1", "ept2", InterfaceDirection::FROM_TO);
+
+    fedInfo.coreInitString = "";
+    CheckFed cfed1("c1", fedInfo);
+    cfed1.addPotentialEndpoints({"ept10", "ept20"});
+
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    cfed1.initialize();
+    cfed1.executing();
+    cfed1.run(5);
+    cfed1.finalize();
+    fut.get();
+    ASSERT_EQ(cfed1.getMessageNames().size(), 0);
+    EXPECT_EQ(conn1.madeConnections(), 0);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
 }
 
 TEST(connector_2stage, simple_endpoint_connector_one_way_reverse)
