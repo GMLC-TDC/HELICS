@@ -80,15 +80,13 @@ MessageFederate& MessageFederate::operator=(MessageFederate&& mFed) noexcept
 
 MessageFederate::~MessageFederate() = default;
 
-
 void MessageFederate::loadFederateData()
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-        this,
-        getID(),
-        singleThreadFederate);
-    if (!configFile.empty())
-    {
+                                                         this,
+                                                         getID(),
+                                                         singleThreadFederate);
+    if (!configFile.empty()) {
         MessageFederate::registerMessageInterfaces(configFile);
     }
 }

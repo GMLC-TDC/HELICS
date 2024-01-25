@@ -78,7 +78,6 @@ Federate::Federate(std::string_view fedName,
 Federate::Federate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
-
 }
 
 Federate::Federate(const std::string& configString): Federate(std::string_view{}, configString) {}
@@ -231,7 +230,7 @@ void Federate::registerFederate(const FederateInfo& fedInfo)
 
     useJsonSerialization = fedInfo.useJsonSerialization;
     observerMode = fedInfo.observer;
-    configFile=fedInfo.fileInUse;
+    configFile = fedInfo.fileInUse;
     mCurrentTime = coreObject->getCurrentTime(fedID);
     if (!singleThreadFederate) {
         asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
@@ -240,8 +239,7 @@ void Federate::registerFederate(const FederateInfo& fedInfo)
                                                           this,
                                                           fedID,
                                                           singleThreadFederate);
-    if (!configFile.empty())
-    {
+    if (!configFile.empty()) {
         registerConnectorInterfaces(configFile);
     }
 }

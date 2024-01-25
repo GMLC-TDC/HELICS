@@ -18,15 +18,13 @@ namespace helics::fileops {
 
 bool looksLikeCommandLine(std::string_view testString)
 {
-    if (testString.empty())
-    {
+    if (testString.empty()) {
         return false;
     }
-    if (testString.front() == '-')
-    {
+    if (testString.front() == '-') {
         return true;
     }
-    return testString.find("--")!=std::string::npos;
+    return testString.find("--") != std::string::npos;
 }
 
 bool hasJsonExtension(std::string_view jsonString)

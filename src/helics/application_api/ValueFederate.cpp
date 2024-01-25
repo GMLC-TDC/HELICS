@@ -71,16 +71,14 @@ ValueFederate::ValueFederate(ValueFederate&&) noexcept = default;
 
 ValueFederate::~ValueFederate() = default;
 
-
 void ValueFederate::loadFederateData()
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
-        this,
-        getID(),
-        singleThreadFederate);
+                                                       this,
+                                                       getID(),
+                                                       singleThreadFederate);
     vfManager->useJsonSerialization = useJsonSerialization;
-    if (!configFile.empty())
-    {
+    if (!configFile.empty()) {
         ValueFederate::registerValueInterfaces(configFile);
     }
 }
