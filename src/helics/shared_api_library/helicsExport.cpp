@@ -966,7 +966,7 @@ HelicsBool helicsBrokerWaitForDisconnect(HelicsBroker broker, int msToWait, Heli
         return HELICS_TRUE;
     }
     try {
-        bool res = brk->waitForDisconnect(std::chrono::milliseconds(msToWait));
+        const bool res = brk->waitForDisconnect(std::chrono::milliseconds(msToWait));
         return res ? HELICS_TRUE : HELICS_FALSE;
     }
     // LCOV_EXCL_START
@@ -984,7 +984,7 @@ HelicsBool helicsCoreWaitForDisconnect(HelicsCore core, int msToWait, HelicsErro
         return HELICS_TRUE;
     }
     try {
-        bool res = cppcore->waitForDisconnect(std::chrono::milliseconds(msToWait));
+        const bool res = cppcore->waitForDisconnect(std::chrono::milliseconds(msToWait));
         return res ? HELICS_TRUE : HELICS_FALSE;
     }
     // LCOV_EXCL_START
@@ -1421,13 +1421,13 @@ void MasterObjectHolder::clearBroker(int index)
 
 void MasterObjectHolder::clearCore(int index)
 {
-    auto core = cores.lock();
-    if ((index < static_cast<int>(core->size())) && (index >= 0)) {
-        (*core)[index]->valid = 0;
-        (*core)[index] = nullptr;
-        if (core->size() > 10) {
-            if (std::none_of(core->begin(), core->end(), [](const auto& cr) { return static_cast<bool>(cr); })) {
-                core->clear();
+    auto coreList = cores.lock();
+    if ((index < static_cast<int>(coreList->size())) && (index >= 0)) {
+        (*coreList)[index]->valid = 0;
+        (*coreList)[index] = nullptr;
+        if (coreList->size() > 10) {
+            if (std::none_of(coreList->begin(), coreList->end(), [](const auto& core) { return static_cast<bool>(core); })) {
+                coreList->clear();
             }
         }
     }
@@ -1435,13 +1435,13 @@ void MasterObjectHolder::clearCore(int index)
 
 void MasterObjectHolder::clearFed(int index)
 {
-    auto fed = feds.lock();
-    if ((index < static_cast<int>(fed->size())) && (index >= 0)) {
-        (*fed)[index]->valid = 0;
-        (*fed)[index] = nullptr;
-        if (fed->size() > 10) {
-            if (std::none_of(fed->begin(), fed->end(), [](const auto& fd) { return static_cast<bool>(fd); })) {
-                fed->clear();
+    auto fedList = feds.lock();
+    if ((index < static_cast<int>(fedList->size())) && (index >= 0)) {
+        (*fedList)[index]->valid = 0;
+        (*fedList)[index] = nullptr;
+        if (fedList->size() > 10) {
+            if (std::none_of(fedList->begin(), fedList->end(), [](const auto& federate) { return static_cast<bool>(federate); })) {
+                fedList->clear();
             }
         }
     }
@@ -1479,10 +1479,10 @@ void MasterObjectHolder::deleteAll()
     }
     {
         auto coreHandle = cores.lock();
-        for (auto& cr : coreHandle) {
-            if ((cr) && (cr->coreptr)) {
-                cr->valid = 0;
-                cr->coreptr->disconnect();
+        for (auto& core : coreHandle) {
+            if ((core) && (core->coreptr)) {
+                core->valid = 0;
+                core->coreptr->disconnect();
             }
         }
         coreHandle->clear();
@@ -1502,16 +1502,16 @@ void MasterObjectHolder::deleteAll()
 
 const char* MasterObjectHolder::addErrorString(std::string_view newError)
 {
-    auto estring = errorStrings.lock();
-    estring->emplace_back(newError);
-    auto& v = estring->back();
-    return v.c_str();
+    auto estrings = errorStrings.lock();
+    estrings->emplace_back(newError);
+    auto& estring = estrings->back();
+    return estring.c_str();
 }
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder()
 {
     static auto instance = std::make_shared<MasterObjectHolder>();
-    static gmlc::concurrency::TripWireTrigger tripTriggerholder;
+    static const gmlc::concurrency::TripWireTrigger tripTriggerholder;
     return instance;
 }
 
