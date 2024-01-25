@@ -21,20 +21,14 @@ namespace helics {
 MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& fedInfo):
     Federate(fedName, fedInfo)
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
+    loadFederateData();
 }
 MessageFederate::MessageFederate(std::string_view fedName,
                                  const std::shared_ptr<Core>& core,
                                  const FederateInfo& fedInfo):
     Federate(fedName, core, fedInfo)
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
+    loadFederateData();
 }
 
 MessageFederate::MessageFederate(std::string_view fedName,
@@ -42,22 +36,13 @@ MessageFederate::MessageFederate(std::string_view fedName,
                                  const FederateInfo& fedInfo):
     Federate(fedName, core, fedInfo)
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
+    loadFederateData();
 }
 
 MessageFederate::MessageFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
-    if (looksLikeFile(configString)) {
-        MessageFederate::registerInterfaces(configString);
-    }
+    loadFederateData();
 }
 
 MessageFederate::MessageFederate(const std::string& configString):
@@ -79,10 +64,7 @@ MessageFederate::MessageFederate(bool /*unused*/)
 {  // this constructor should only be called by child class that has already constructed the
    // underlying federate in
     // a virtual inheritance
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
+    loadFederateData();
 }
 MessageFederate::MessageFederate(MessageFederate&&) noexcept = default;
 
@@ -98,6 +80,18 @@ MessageFederate& MessageFederate::operator=(MessageFederate&& mFed) noexcept
 
 MessageFederate::~MessageFederate() = default;
 
+
+void MessageFederate::loadFederateData()
+{
+    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
+        this,
+        getID(),
+        singleThreadFederate);
+    if (!configFile.empty())
+    {
+        MessageFederate::registerMessageInterfaces(configFile);
+    }
+}
 void MessageFederate::disconnect()
 {
     Federate::disconnect();

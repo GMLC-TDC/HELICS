@@ -153,6 +153,8 @@ class HELICS_CXX_EXPORT MessageFederate:
     void registerMessageInterfaces(const std::string& configString);
 
   private:
+  /** function to register the federate with the core*/
+  void loadFederateData();
     /** register a set Message interfaces from JSON
  @details call is only valid in startup mode it is a protected call to add an
  @param jsonString  the location of the file or JSON String to load to generate the interfaces

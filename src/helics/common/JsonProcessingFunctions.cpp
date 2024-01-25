@@ -16,6 +16,19 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics::fileops {
 
+bool looksLikeCommandLine(std::string_view testString)
+{
+    if (testString.empty())
+    {
+        return false;
+    }
+    if (testString.front() == '-')
+    {
+        return true;
+    }
+    return testString.find("--")!=std::string::npos;
+}
+
 bool hasJsonExtension(std::string_view jsonString)
 {
     auto ext = jsonString.substr(jsonString.length() - 4);

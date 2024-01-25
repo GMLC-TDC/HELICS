@@ -96,6 +96,7 @@ class HELICS_CXX_EXPORT Federate {
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time mCurrentTime = Time::minVal();  //!< the current simulation time
     Time mStopTime = Time::maxVal();  //!< the stopping time for the federate
+    std::string configFile;  //!< any config file used
   private:
     /// pointer to a class defining the async call information
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>> asyncCallInfo;

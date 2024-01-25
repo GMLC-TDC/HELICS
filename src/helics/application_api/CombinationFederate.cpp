@@ -35,13 +35,11 @@ CombinationFederate::CombinationFederate(const std::string& configString):
     Federate(std::string_view{}, loadFederateInfo(configString)), ValueFederate(true),
     MessageFederate(true)
 {
-    CombinationFederate::registerInterfaces(configString);
 }
 
 CombinationFederate::CombinationFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString)), ValueFederate(true), MessageFederate(true)
 {
-    CombinationFederate::registerInterfaces(configString);
 }
 
 CombinationFederate::CombinationFederate(CombinationFederate&&) noexcept = default;

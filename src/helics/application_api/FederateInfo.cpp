@@ -749,7 +749,7 @@ FederateInfo loadFederateInfo(const std::string& configString)
         ret.fileInUse = configString;
     } else if (configString.find_first_of('{') != std::string::npos) {
         ret.loadInfoFromJson(configString);
-    } else if (configString.find("--") != std::string::npos) {
+    } else if (fileops::looksLikeCommandLine(configString)) {
         ret.loadInfoFromArgsIgnoreOutput(configString);
     } else if (configString.find('=') != std::string::npos) {
         ret.loadInfoFromToml(configString);
