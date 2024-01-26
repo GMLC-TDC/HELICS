@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "typeOperations.hpp"
 
 #include "../core/coreTypeOperations.hpp"
+#include "../core/helicsVersion.hpp"
 
 namespace helics {
 std::string to_string(CoreType type)
@@ -23,4 +24,10 @@ bool isCoreTypeAvailable(CoreType type) noexcept
 {
     return core::isCoreTypeAvailable(type);
 }
+
+std::string systemInfo()
+{
+    return core::systemInfo();
+}
+
 }  // namespace helics

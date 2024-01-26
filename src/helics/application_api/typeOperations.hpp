@@ -29,4 +29,8 @@ HELICS_CXX_EXPORT CoreType coreTypeFromString(std::string_view type) noexcept;
  * Returns true if core/broker type specified is available in current compilation.
  */
 HELICS_CXX_EXPORT bool isCoreTypeAvailable(CoreType type) noexcept;
+
+/** get a string with the system info*/
+HELICS_CXX_EXPORT std::string systemInfo();
+
 }  // namespace helics
