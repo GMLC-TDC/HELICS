@@ -83,13 +83,11 @@ namespace apps {
     {
         if (!deactivated) {
             fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
-            if (!configFileName.empty())
-            {
-                loadFile(configFileName,false);
+            if (!configFileName.empty()) {
+                loadFile(configFileName, false);
             }
-            if (!inputFileName.empty())
-            {
-                loadFile(inputFileName,true);
+            if (!inputFileName.empty()) {
+                loadFile(inputFileName, true);
             }
         }
     }
@@ -114,7 +112,8 @@ namespace apps {
         }
     }
 
-    void Source::loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration)
+    void Source::loadJsonFile(const std::string& jsonString,
+                              bool enableFederateInterfaceRegistration)
     {
         // we want to load the default period before constructing the interfaces so the default
         // period works
@@ -127,7 +126,7 @@ namespace apps {
             }
         }
 
-        loadJsonFileConfiguration("source", jsonString,enableFederateInterfaceRegistration);
+        loadJsonFileConfiguration("source", jsonString, enableFederateInterfaceRegistration);
         auto pubCount = fed->getPublicationCount();
         for (int ii = 0; ii < pubCount; ++ii) {
             sources.emplace_back(fed->getPublication(ii), defaultPeriod);

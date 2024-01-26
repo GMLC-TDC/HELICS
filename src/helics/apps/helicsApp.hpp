@@ -43,7 +43,8 @@ threads without external protection, that will result in undefined behavior
         App(std::string_view defaultAppName, int argc, char* argv[]);
         /** construct from a federate info object
     @param appName the name of the application, can be left empty to use a name specified in fedInfo
-    @param fedInfo a pointer info object containing information on the desired federate configuration
+    @param fedInfo a pointer info object containing information on the desired federate
+    configuration
     */
         App(std::string_view appName, const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given core
@@ -51,7 +52,9 @@ threads without external protection, that will result in undefined behavior
     @param core a pointer to core object which the federate can join
     @param fedInfo  a federate information structure
     */
-        App(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo);
+        App(std::string_view appName,
+            const std::shared_ptr<Core>& core,
+            const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given coreApp
     @param appName the name of the application, can be left empty to use a name specified in fedInfo
     @param core a pointer to core object which the federate can join
@@ -61,7 +64,8 @@ threads without external protection, that will result in undefined behavior
         /**constructor taking a file with the required information
     @param appName the name of the application, can be left empty to use a name specified in
     configString
-    @param configString file or JSON string defining the federate information and other configuration
+    @param configString file or JSON string defining the federate information and other
+    configuration
     */
         App(std::string_view appName, const std::string& configString);
 
@@ -77,10 +81,12 @@ threads without external protection, that will result in undefined behavior
         virtual ~App();
 
         /** load a file containing interface information
-    @param filename the file containing the configuration and App data  accepted format are JSON, and a App format which is tab delimited or comma delimited
-    toml file can be used load interfaces but not app configuration
-    @param enableFederateInterfaceRegistration default true, if set to false will not load federate information*/
-        void loadFile(const std::string& filename,bool enableFederateInterfaceRegistration=true);
+    @param filename the file containing the configuration and App data  accepted format are JSON,
+    and a App format which is tab delimited or comma delimited toml file can be used load interfaces
+    but not app configuration
+    @param enableFederateInterfaceRegistration default true, if set to false will not load federate
+    information*/
+        void loadFile(const std::string& filename, bool enableFederateInterfaceRegistration = true);
         /** initialize the App federate
     @details generate all the publications and organize the points, the final publication count will
     be available after this time and the App will enter the initialization mode, which means it
@@ -108,13 +114,16 @@ threads without external protection, that will result in undefined behavior
         /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
-        virtual void loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration);
+        virtual void loadJsonFile(const std::string& jsonString,
+                                  bool enableFederateInterfaceRegistration);
         /** load from a jsonString and check a field named appName for configuration options
     @param appName the name of the app which may be used in section of the JSON for some local
     configuration
     @param jsonString either a JSON filename or a string containing JSON
     */
-        void loadJsonFileConfiguration(const std::string& appName, const std::string& jsonString,bool enableFederateInterfaceRegistration);
+        void loadJsonFileConfiguration(const std::string& appName,
+                                       const std::string& jsonString,
+                                       bool enableFederateInterfaceRegistration);
         /** load a text file*/
         virtual void loadTextFile(const std::string& textFile);
 

@@ -277,7 +277,7 @@ TEST_P(tracer_message_file_tests, message_files_cmd)
     std::this_thread::sleep_for(300ms);
     helics::apps::BrokerApp brk(helics::CoreType::IPC, "ipc_broker", "-f 2");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
-    std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", "--input="+exampleFile};
+    std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", "--input=" + exampleFile};
 
     char* argv[4];
     argv[0] = &(args[0][0]);
@@ -673,7 +673,8 @@ TEST_P(tracer_message_file_tests, message_files_exe)
     helics::apps::BrokerApp brk(helics::CoreType::ZMQ, "z_broker", "-f 2");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
 
-    std::string cmdArg("--name=tracer --coretype=zmq --stop=4s --print --skiplog --input=" + exampleFile);
+    std::string cmdArg("--name=tracer --coretype=zmq --stop=4s --print --skiplog --input=" +
+                       exampleFile);
     exeTestRunner tracerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_app");
     ASSERT_TRUE(tracerExe.isActive());
     auto out = tracerExe.runCaptureOutputAsync(std::string("tracer " + cmdArg));

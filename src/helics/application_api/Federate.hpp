@@ -732,7 +732,8 @@ received
     /** get the number of translators registered through this federate*/
     int getTranslatorCount() const;
     /** get the primary config file actually used by the federate for setup*/
-    const std::string &getConfigFile() const{return configFile;}
+    const std::string& getConfigFile() const { return configFile; }
+
   protected:
     /** function to run required operations for entering initializingMode*/
     void enteringInitializingMode(IterationResult iterating);

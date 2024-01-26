@@ -83,13 +83,11 @@ void Player::initialSetup()
 {
     if (!deactivated) {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
-        if (!configFileName.empty())
-        {
-            loadFile(configFileName,false);
+        if (!configFileName.empty()) {
+            loadFile(configFileName, false);
         }
-        if (!inputFileName.empty())
-        {
-            loadFile(inputFileName,true);
+        if (!inputFileName.empty()) {
+            loadFile(inputFileName, true);
         }
     }
 }
@@ -137,7 +135,9 @@ Player::Player(std::string_view appName, const FederateInfo& fedInfo): App(appNa
     initialSetup();
 }
 
-Player::Player(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo):
+Player::Player(std::string_view appName,
+               const std::shared_ptr<Core>& core,
+               const FederateInfo& fedInfo):
     App(appName, core, fedInfo)
 {
     initialSetup();
@@ -400,9 +400,9 @@ void Player::loadTextFile(const std::string& filename)
     }
 }
 
-void Player::loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration)
+void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInterfaceRegistration)
 {
-    loadJsonFileConfiguration("player", jsonString,enableFederateInterfaceRegistration);
+    loadJsonFileConfiguration("player", jsonString, enableFederateInterfaceRegistration);
 
     auto pubCount = fed->getPublicationCount();
     for (int ii = 0; ii < pubCount; ++ii) {

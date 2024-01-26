@@ -38,13 +38,11 @@ namespace apps {
     {
         if (!deactivated) {
             fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
-            if (!configFileName.empty())
-            {
-                loadFile(configFileName,false);
+            if (!configFileName.empty()) {
+                loadFile(configFileName, false);
             }
-            if (!inputFileName.empty())
-            {
-                loadFile(inputFileName,true);
+            if (!inputFileName.empty()) {
+                loadFile(inputFileName, true);
             }
         }
     }
@@ -139,9 +137,9 @@ namespace apps {
             [this](const Endpoint& ept, Time messageTime) { echoMessage(ept, messageTime); });
     }
 
-    void Echo::loadJsonFile(const std::string& jsonFile,bool enableFederateInterfaceRegistration)
+    void Echo::loadJsonFile(const std::string& jsonFile, bool enableFederateInterfaceRegistration)
     {
-        loadJsonFileConfiguration("echo", jsonFile,enableFederateInterfaceRegistration);
+        loadJsonFileConfiguration("echo", jsonFile, enableFederateInterfaceRegistration);
         auto eptCount = fed->getEndpointCount();
         for (int ii = 0; ii < eptCount; ++ii) {
             endpoints.emplace_back(fed->getEndpoint(ii));

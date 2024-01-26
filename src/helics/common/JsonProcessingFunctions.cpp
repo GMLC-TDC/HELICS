@@ -65,7 +65,8 @@ Json::Value loadJsonStr(std::string_view jsonString)
     const Json::CharReaderBuilder rbuilder;
     std::string errs;
     auto reader = std::unique_ptr<Json::CharReader>(rbuilder.newCharReader());
-    const bool ok = reader->parse(jsonString.data(), jsonString.data() + jsonString.size(), &doc, &errs);
+    const bool ok =
+        reader->parse(jsonString.data(), jsonString.data() + jsonString.size(), &doc, &errs);
     if (!ok) {
         throw(std::invalid_argument(errs.c_str()));
     }

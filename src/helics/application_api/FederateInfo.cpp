@@ -487,28 +487,30 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     fmtr->maxLayers(0);
     app->add_option("--name,-n", defName, "name of the federate");
     auto* networking = app->add_option_group("network type")->immediate_callback();
-    networking->add_option_function<std::string>(
-          "--core",
-          [this](const std::string& val) {
-              coreType = coreTypeFromString(val);
-              if (coreType == CoreType::UNRECOGNIZED) {
-                  coreName = val;
-              }
-          },
-          "type or name of the core to connect to")
+    networking
+        ->add_option_function<std::string>(
+            "--core",
+            [this](const std::string& val) {
+                coreType = coreTypeFromString(val);
+                if (coreType == CoreType::UNRECOGNIZED) {
+                    coreName = val;
+                }
+            },
+            "type or name of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
     networking->add_flag("--force_new_core",
-                 forceNewCore,
-                 "if set to true will force the federate to generate a new core");
-    networking->add_option_function<std::string>(
-          "--coretype,-t",
-          [this](const std::string& val) {
-              coreType = coreTypeFromString(val);
-              if (coreType == CoreType::UNRECOGNIZED) {
-                  throw CLI::ValidationError(val + " is NOT a recognized core type");
-              }
-          },
-          "type  of the core to connect to")
+                         forceNewCore,
+                         "if set to true will force the federate to generate a new core");
+    networking
+        ->add_option_function<std::string>(
+            "--coretype,-t",
+            [this](const std::string& val) {
+                coreType = coreTypeFromString(val);
+                if (coreType == CoreType::UNRECOGNIZED) {
+                    throw CLI::ValidationError(val + " is NOT a recognized core type");
+                }
+            },
+            "type  of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")")
         ->envname("HELICS_CORE_TYPE");
     app->add_option("--corename", coreName, "the name of the core to create or find");
@@ -742,8 +744,7 @@ FederateInfo loadFederateInfo(const std::string& configString)
     FederateInfo ret;
     if (fileops::looksLikeCommandLine(configString)) {
         ret.loadInfoFromArgsIgnoreOutput(configString);
-    }
-    else if (fileops::hasTomlExtension(configString)) {
+    } else if (fileops::hasTomlExtension(configString)) {
         ret.loadInfoFromToml(configString);
         ret.fileInUse = configString;
     } else if (fileops::hasJsonExtension(configString)) {
@@ -800,7 +801,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
     }
 
     const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
-                                                                    Time arg) {
+                                                                          Time arg) {
         setProperty(propStringsTranslations.at(fname), arg);
     };
 
@@ -846,7 +847,7 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
     }
 
     const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
-                                                                    Time arg) {
+                                                                          Time arg) {
         setProperty(propStringsTranslations.at(fname), arg);
     };
 

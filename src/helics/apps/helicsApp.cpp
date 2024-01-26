@@ -78,31 +78,31 @@ void App::processArgs(std::unique_ptr<helicsCLI11App>& app,
     }
 
     fed = std::make_shared<CombinationFederate>("", fedInfo);
-    configFileName=fed->getConfigFile();
+    configFileName = fed->getConfigFile();
 }
 
 App::App(std::string_view appName, const FederateInfo& fedInfo):
     fed(std::make_shared<CombinationFederate>(appName, fedInfo))
 {
-    configFileName=fed->getConfigFile();
+    configFileName = fed->getConfigFile();
 }
 
 App::App(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo):
     fed(std::make_shared<CombinationFederate>(appName, core, fedInfo))
 {
-    configFileName=fed->getConfigFile();
+    configFileName = fed->getConfigFile();
 }
 
 App::App(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
     fed(std::make_shared<CombinationFederate>(appName, core, fedInfo))
 {
-    configFileName=fed->getConfigFile();
+    configFileName = fed->getConfigFile();
 }
 
 App::App(std::string_view appName, const std::string& jsonString):
     fed(std::make_shared<CombinationFederate>(appName, jsonString))
 {
-   configFileName=fed->getConfigFile();
+    configFileName = fed->getConfigFile();
 }
 
 App::~App() = default;
@@ -123,18 +123,14 @@ std::unique_ptr<helicsCLI11App> App::generateParser()
     return app;
 }
 
-void App::loadFile(const std::string& filename,bool enableFederateInterfaceRegistration )
+void App::loadFile(const std::string& filename, bool enableFederateInterfaceRegistration)
 {
     if (fileops::hasJsonExtension(filename)) {
-        loadJsonFile(filename,enableFederateInterfaceRegistration);
-    } else if (fileops::hasTomlExtension(filename))
-    {
-        if (enableFederateInterfaceRegistration)
-        {
+        loadJsonFile(filename, enableFederateInterfaceRegistration);
+    } else if (fileops::hasTomlExtension(filename)) {
+        if (enableFederateInterfaceRegistration) {
             fed->registerInterfaces(filename);
-        }
-        else
-        {
+        } else {
             fed->logWarningMessage("Toml files are not support for app configuration");
         }
     } else {
@@ -162,15 +158,16 @@ void App::loadTextFile(const std::string& textFile)
     }
 }
 
-void App::loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration)
+void App::loadJsonFile(const std::string& jsonString, bool enableFederateInterfaceRegistration)
 {
-    loadJsonFileConfiguration("application", jsonString,enableFederateInterfaceRegistration);
+    loadJsonFileConfiguration("application", jsonString, enableFederateInterfaceRegistration);
 }
 
-void App::loadJsonFileConfiguration(const std::string& appName, const std::string& jsonString, bool enableFederateInterfaceRegistration)
+void App::loadJsonFileConfiguration(const std::string& appName,
+                                    const std::string& jsonString,
+                                    bool enableFederateInterfaceRegistration)
 {
-    if (enableFederateInterfaceRegistration)
-    {
+    if (enableFederateInterfaceRegistration) {
         fed->registerInterfaces(jsonString);
     }
     auto doc = fileops::loadJson(jsonString);

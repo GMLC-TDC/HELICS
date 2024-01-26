@@ -354,7 +354,7 @@ TEST_P(player_file_tests, test_files_cmd)
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
 
     std::vector<std::string> args{
-        "", "--name=player", "--broker=ipc_broker", "--coretype=ipc", "--input="+ exampleFile};
+        "", "--name=player", "--broker=ipc_broker", "--coretype=ipc", "--input=" + exampleFile};
     char* argv[5];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -422,7 +422,8 @@ TEST_P(player_file_tests, test_files_exe)
     ASSERT_TRUE(brokerExe.isActive());
     auto res = brokerExe.runAsync("-f 2 --coretype=zmq --name=zmq_broker");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
-    auto res2 = playerExe.runCaptureOutputAsync("--name=player --coretype=zmq --input=" + exampleFile);
+    auto res2 =
+        playerExe.runCaptureOutputAsync("--name=player --coretype=zmq --input=" + exampleFile);
 
     helics::FederateInfo fi(helics::CoreType::ZMQ);
     fi.coreInitString = "";

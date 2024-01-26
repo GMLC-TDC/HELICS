@@ -84,20 +84,18 @@ void Tracer::initialSetup()
 {
     if (!deactivated) {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
-        if (!configFileName.empty())
-        {
-            loadFile(configFileName,false);
+        if (!configFileName.empty()) {
+            loadFile(configFileName, false);
         }
-        if (!inputFileName.empty())
-        {
-            loadFile(inputFileName,true);
+        if (!inputFileName.empty()) {
+            loadFile(inputFileName, true);
         }
     }
 }
 
-void Tracer::loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration)
+void Tracer::loadJsonFile(const std::string& jsonString, bool enableFederateInterfaceRegistration)
 {
-    loadJsonFileConfiguration("tracer", jsonString,enableFederateInterfaceRegistration);
+    loadJsonFileConfiguration("tracer", jsonString, enableFederateInterfaceRegistration);
 
     auto subCount = fed->getInputCount();
     for (int ii = 0; ii < subCount; ++ii) {

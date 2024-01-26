@@ -107,12 +107,13 @@ namespace apps {
         void disableTextOutput() { printMessage = false; }
 
       private:
-          /** run any initial setup operations including file loading*/
-          void initialSetup();
+        /** run any initial setup operations including file loading*/
+        void initialSetup();
         /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
-        virtual void loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration) override;
+        virtual void loadJsonFile(const std::string& jsonString,
+                                  bool enableFederateInterfaceRegistration) override;
         /** load a text file*/
         virtual void loadTextFile(const std::string& textFile) override;
 

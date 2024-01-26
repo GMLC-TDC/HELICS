@@ -84,8 +84,9 @@ Recorder::Recorder(std::string_view appName, CoreApp& core, const FederateInfo& 
 
 Recorder::Recorder(std::string_view appName, const std::string& jsonString):
     App(appName, jsonString)
-{ processArgs();
-initialSetup();
+{
+    processArgs();
+    initialSetup();
 }
 
 Recorder::~Recorder()
@@ -101,20 +102,18 @@ void Recorder::initialSetup()
 {
     if (!deactivated) {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
-        if (!configFileName.empty())
-        {
-            loadFile(configFileName,false);
+        if (!configFileName.empty()) {
+            loadFile(configFileName, false);
         }
-        if (!inputFileName.empty())
-        {
-            loadFile(inputFileName,true);
+        if (!inputFileName.empty()) {
+            loadFile(inputFileName, true);
         }
     }
 }
 
-void Recorder::loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration)
+void Recorder::loadJsonFile(const std::string& jsonString, bool enableFederateInterfaceRegistration)
 {
-    loadJsonFileConfiguration("recorder", jsonString,enableFederateInterfaceRegistration);
+    loadJsonFileConfiguration("recorder", jsonString, enableFederateInterfaceRegistration);
 
     auto subCount = fed->getInputCount();
     for (int ii = 0; ii < subCount; ++ii) {
