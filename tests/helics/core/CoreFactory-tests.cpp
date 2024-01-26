@@ -39,7 +39,7 @@ TEST(CoreFactory, ZmqCore)
 
 TEST(CoreFactory,MpiCore)
 {
-    EXPECT_EQ (helics::coretype::isCoreTypeAvailable (helics::CoreType::MPI), true);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::CoreType::MPI), true);
     auto coretype = helics::CoreFactory::create (helics::CoreType::MPI, "");
     ASSERT_TRUE (coretype != nullptr);
     helics::CoreFactory::unregisterCore (coretype->getIdentifier ());
