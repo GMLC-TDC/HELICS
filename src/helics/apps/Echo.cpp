@@ -25,11 +25,28 @@ namespace apps {
     Echo::Echo(std::vector<std::string> args): App("echo", std::move(args))
     {
         processArgs();
+        initialSetup();
     }
 
     Echo::Echo(int argc, char* argv[]): App("echo", argc, argv)
     {
         processArgs();
+        initialSetup();
+    }
+
+    void Echo::initialSetup()
+    {
+        if (!deactivated) {
+            fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
+            if (!configFileName.empty())
+            {
+                loadFile(configFileName,false);
+            }
+            if (!inputFileName.empty())
+            {
+                loadFile(inputFileName,true);
+            }
+        }
     }
 
     void Echo::processArgs()
@@ -37,11 +54,7 @@ namespace apps {
         helicsCLI11App app("Options specific to the Echo App");
         app.add_option("--delay", delayTime, "the delay with which the echo app will echo message");
         if (!deactivated) {
-            fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
             app.parse(remArgs);
-            if (!masterFileName.empty()) {
-                loadFile(masterFileName);
-            }
         } else if (helpMode) {
             app.remove_helics_specifics();
             std::cout << app.help();
@@ -50,24 +63,24 @@ namespace apps {
 
     Echo::Echo(std::string_view name, const FederateInfo& fi): App(name, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
+        initialSetup();
     }
 
     Echo::Echo(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi):
         App(name, core, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
+        initialSetup();
     }
 
     Echo::Echo(std::string_view name, CoreApp& core, const FederateInfo& fi): App(name, core, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
+        initialSetup();
     }
 
     Echo::Echo(std::string_view name, const std::string& jsonString): App(name, jsonString)
     {
-        fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
-        Echo::loadJsonFile(jsonString);
+        processArgs();
+        initialSetup();
     }
 
     Echo::Echo(Echo&& other_echo) noexcept:
@@ -126,9 +139,9 @@ namespace apps {
             [this](const Endpoint& ept, Time messageTime) { echoMessage(ept, messageTime); });
     }
 
-    void Echo::loadJsonFile(const std::string& jsonFile)
+    void Echo::loadJsonFile(const std::string& jsonFile,bool enableFederateInterfaceRegistration)
     {
-        loadJsonFileConfiguration("echo", jsonFile);
+        loadJsonFileConfiguration("echo", jsonFile,enableFederateInterfaceRegistration);
         auto eptCount = fed->getEndpointCount();
         for (int ii = 0; ii < eptCount; ++ii) {
             endpoints.emplace_back(fed->getEndpoint(ii));

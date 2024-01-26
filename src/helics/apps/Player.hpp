@@ -198,10 +198,13 @@ external protection, that will result in undefined behavior
         std::unique_ptr<helicsCLI11App> generateParser();
         /** process remaining command line arguments*/
         void processArgs();
+
+        /** run any initial setup operations including file loading*/
+        void initialSetup();
         /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
-        virtual void loadJsonFile(const std::string& jsonString) override;
+        virtual void loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration) override;
         /** load a text file*/
         virtual void loadTextFile(const std::string& filename) override;
         /** helper function to sort through the tags*/

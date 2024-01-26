@@ -23,7 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std::literals::chrono_literals;
 
-TEST(tracer_tests, simple_tracer_test)
+TEST(tracer_tests, simple_tracer)
 {
     std::atomic<double> lastVal{-1e49};
     std::atomic<double> lastTime{0.0};
@@ -72,7 +72,7 @@ TEST(tracer_tests, simple_tracer_test)
     trace1.finalize();
 }
 
-TEST(tracer_tests, tracer_test_message)
+TEST(tracer_tests, tracer_message)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
@@ -146,7 +146,7 @@ static constexpr const char* simple_files[] = {"example1.recorder",
 
 class tracer_file_tests: public ::testing::TestWithParam<const char*> {};
 
-TEST_P(tracer_file_tests, simple_tracer_test_files)
+TEST_P(tracer_file_tests, simple_tracer_files)
 {
     static char indx = 'a';
     helics::FederateInfo fi(helics::CoreType::TEST);
@@ -207,7 +207,7 @@ static constexpr const char* simple_message_files[] = {"example4.recorder",
 
 class tracer_message_file_tests: public ::testing::TestWithParam<const char*> {};
 
-TEST_P(tracer_message_file_tests, test_message_files)
+TEST_P(tracer_message_file_tests, message_files)
 {
     static char indx = 'a';
     helics::FederateInfo fi(helics::CoreType::TEST);
@@ -272,12 +272,12 @@ TEST_P(tracer_message_file_tests, test_message_files)
 }
 
 #ifdef HELICS_ENABLE_IPC_CORE
-TEST_P(tracer_message_file_tests, test_message_files_cmd)
+TEST_P(tracer_message_file_tests, message_files_cmd)
 {
     std::this_thread::sleep_for(300ms);
     helics::apps::BrokerApp brk(helics::CoreType::IPC, "ipc_broker", "-f 2");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
-    std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", exampleFile};
+    std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", "--input="+exampleFile};
 
     char* argv[4];
     argv[0] = &(args[0][0]);
@@ -342,7 +342,7 @@ INSTANTIATE_TEST_SUITE_P(tracer_tests,
                          tracer_message_file_tests,
                          ::testing::ValuesIn(simple_message_files));
 
-TEST(tracer_tests, tracer_test_destendpoint_clone)
+TEST(tracer_tests, tracer_destendpoint_clone)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
@@ -490,7 +490,7 @@ TEST(tracer_tests, srcendpoint_clone)
     }
 }
 
-TEST(tracer_tests, tracer_test_endpoint_clone)
+TEST(tracer_tests, tracer_endpoint_clone)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
@@ -576,7 +576,7 @@ static constexpr const char* simple_clone_test_files[] = {"clone_example1.txt",
 
 class tracer_clone_file_tests: public ::testing::TestWithParam<const char*> {};
 
-TEST_P(tracer_clone_file_tests, simple_clone_test_file)
+TEST_P(tracer_clone_file_tests, simple_clone_file)
 {
     static char indx = 'a';
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
@@ -667,13 +667,13 @@ INSTANTIATE_TEST_SUITE_P(tracer_tests,
 // TODO(PT): I think the EXE tests need to be moved to a different structure.  The EXE runner
 // doesn't always work right for some reason
 
-TEST_P(tracer_message_file_tests, test_message_files_exe)
+TEST_P(tracer_message_file_tests, message_files_exe)
 {
     std::this_thread::sleep_for(300ms);
     helics::apps::BrokerApp brk(helics::CoreType::ZMQ, "z_broker", "-f 2");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
 
-    std::string cmdArg("--name=tracer --coretype=zmq --stop=4s --print --skiplog " + exampleFile);
+    std::string cmdArg("--name=tracer --coretype=zmq --stop=4s --print --skiplog --input=" + exampleFile);
     exeTestRunner tracerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_app");
     ASSERT_TRUE(tracerExe.isActive());
     auto out = tracerExe.runCaptureOutputAsync(std::string("tracer " + cmdArg));

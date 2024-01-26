@@ -326,28 +326,28 @@ static const std::unordered_map<std::string, int> log_level_map{
     /** all internal messages*/
     {"trace", HELICS_LOG_LEVEL_TRACE}};
 
-static void loadFlags(FederateInfo& fi, const std::string& flags)
+static void loadFlags(FederateInfo& fedInfo, const std::string& flags)
 {
     auto sflgs = gmlc::utilities::stringOps::splitline(flags);
     for (auto& flg : sflgs) {
         if (flg == "autobroker") {
-            fi.autobroker = true;
+            fedInfo.autobroker = true;
             continue;
         }
         if (flg == "debugging") {
-            fi.debugging = true;
+            fedInfo.debugging = true;
             continue;
         }
         if (flg == "json") {
-            fi.useJsonSerialization = true;
+            fedInfo.useJsonSerialization = true;
             // purposely not continuing here so the setFlagOption gets called
         }
         if (flg == "profiling") {
-            fi.profilerFileName = "log";
+            fedInfo.profilerFileName = "log";
             // purposely not continuing here so the setFlagOption gets called
         }
         if (flg == "observer") {
-            fi.observer = true;
+            fedInfo.observer = true;
             // purposely not continuing here so the setFlagOption gets called
         }
         if (flg.empty()) {
@@ -355,12 +355,12 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         }
         const auto* loc = flagStringsTranslations.find(flg);
         if (loc != flagStringsTranslations.end()) {
-            fi.setFlagOption(loc->second, true);
+            fedInfo.setFlagOption(loc->second, true);
         } else {
             if (flg.front() == '-') {
                 loc = flagStringsTranslations.find(flg.substr(1));
                 if (loc != flagStringsTranslations.end()) {
-                    fi.setFlagOption(loc->second, false);
+                    fedInfo.setFlagOption(loc->second, false);
                 }
                 continue;
             }
@@ -369,7 +369,7 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
             auto [ptr, ec] = std::from_chars(flg.data(), flg.data() + flg.size(), val);
 
             if (ec == std::errc()) {
-                fi.setFlagOption(std::abs(val), (val > 0));
+                fedInfo.setFlagOption(std::abs(val), (val > 0));
             } else if (ec == std::errc::invalid_argument) {
                 std::cerr << "unrecognized flag " << std::quoted(flg) << std::endl;
             } else if (ec == std::errc::result_out_of_range) {
@@ -486,8 +486,8 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     auto* fmtr = addJsonConfig(app.get());
     fmtr->maxLayers(0);
     app->add_option("--name,-n", defName, "name of the federate");
-    auto* og = app->add_option_group("network type")->immediate_callback();
-    og->add_option_function<std::string>(
+    auto* networking = app->add_option_group("network type")->immediate_callback();
+    networking->add_option_function<std::string>(
           "--core",
           [this](const std::string& val) {
               coreType = coreTypeFromString(val);
@@ -497,10 +497,10 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           },
           "type or name of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
-    og->add_flag("--force_new_core",
+    networking->add_flag("--force_new_core",
                  forceNewCore,
                  "if set to true will force the federate to generate a new core");
-    og->add_option_function<std::string>(
+    networking->add_option_function<std::string>(
           "--coretype,-t",
           [this](const std::string& val) {
               coreType = coreTypeFromString(val);
@@ -740,8 +740,10 @@ void FederateInfo::config_additional(helicsCLI11App* app)
 FederateInfo loadFederateInfo(const std::string& configString)
 {
     FederateInfo ret;
-
-    if (fileops::hasTomlExtension(configString)) {
+    if (fileops::looksLikeCommandLine(configString)) {
+        ret.loadInfoFromArgsIgnoreOutput(configString);
+    }
+    else if (fileops::hasTomlExtension(configString)) {
         ret.loadInfoFromToml(configString);
         ret.fileInUse = configString;
     } else if (fileops::hasJsonExtension(configString)) {
@@ -749,8 +751,6 @@ FederateInfo loadFederateInfo(const std::string& configString)
         ret.fileInUse = configString;
     } else if (configString.find_first_of('{') != std::string::npos) {
         ret.loadInfoFromJson(configString);
-    } else if (fileops::looksLikeCommandLine(configString)) {
-        ret.loadInfoFromArgsIgnoreOutput(configString);
     } else if (configString.find('=') != std::string::npos) {
         ret.loadInfoFromToml(configString);
     } else {
@@ -761,9 +761,9 @@ FederateInfo loadFederateInfo(const std::string& configString)
 
 Time FederateInfo::checkTimeProperty(int propId, Time defVal) const
 {
-    for (const auto& tp : timeProps) {
-        if (tp.first == propId) {
-            return tp.second;
+    for (const auto& prop : timeProps) {
+        if (prop.first == propId) {
+            return prop.second;
         }
     }
     return defVal;
@@ -771,9 +771,9 @@ Time FederateInfo::checkTimeProperty(int propId, Time defVal) const
 
 bool FederateInfo::checkFlagProperty(int propId, bool defVal) const
 {
-    for (const auto& tp : flagProps) {
-        if (tp.first == propId) {
-            return tp.second;
+    for (const auto& prop : flagProps) {
+        if (prop.first == propId) {
+            return prop.second;
         }
     }
     return defVal;
@@ -781,9 +781,9 @@ bool FederateInfo::checkFlagProperty(int propId, bool defVal) const
 
 int FederateInfo::checkIntProperty(int propId, int defVal) const
 {
-    for (const auto& tp : intProps) {
-        if (tp.first == propId) {
-            return tp.second;
+    for (const auto& prop : intProps) {
+        if (prop.first == propId) {
+            return prop.second;
         }
     }
     return defVal;
@@ -795,11 +795,11 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
     try {
         doc = fileops::loadJson(jsonString);
     }
-    catch (const std::invalid_argument& ia) {
-        throw(helics::InvalidParameter(ia.what()));
+    catch (const std::invalid_argument& iarg) {
+        throw(helics::InvalidParameter(iarg.what()));
     }
 
-    std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
+    const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
                                                                     Time arg) {
         setProperty(propStringsTranslations.at(fname), arg);
     };
@@ -829,8 +829,8 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
                 app->parse_from_stream(file);
             }
         }
-        catch (const CLI::Error& e) {
-            throw(InvalidIdentifier(e.what()));
+        catch (const CLI::Error& clierror) {
+            throw(InvalidIdentifier(clierror.what()));
         }
     }
 }
@@ -841,11 +841,11 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
     try {
         doc = fileops::loadToml(tomlString);
     }
-    catch (const std::invalid_argument& ia) {
-        throw(helics::InvalidParameter(ia.what()));
+    catch (const std::invalid_argument& iarg) {
+        throw(helics::InvalidParameter(iarg.what()));
     }
 
-    std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
+    const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
                                                                     Time arg) {
         setProperty(propStringsTranslations.at(fname), arg);
     };
@@ -885,58 +885,58 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
     }
 }
 
-std::string generateFullCoreInitString(const FederateInfo& fi)
+std::string generateFullCoreInitString(const FederateInfo& fedInfo)
 {
-    auto res = fi.coreInitString;
-    if (!fi.broker.empty()) {
+    auto res = fedInfo.coreInitString;
+    if (!fedInfo.broker.empty()) {
         res.append(" --broker=");
-        res.append(fi.broker);
+        res.append(fedInfo.broker);
     }
-    if (fi.brokerPort >= 0) {
+    if (fedInfo.brokerPort >= 0) {
         res.append(" --brokerport=");
-        res.append(std::to_string(fi.brokerPort));
+        res.append(std::to_string(fedInfo.brokerPort));
     }
-    if (!fi.localport.empty()) {
+    if (!fedInfo.localport.empty()) {
         res.append(" --localport=");
-        res.append(fi.localport);
+        res.append(fedInfo.localport);
     }
-    if (fi.autobroker) {
+    if (fedInfo.autobroker) {
         res.append(" --autobroker");
     }
-    if (fi.debugging) {
+    if (fedInfo.debugging) {
         res.append(" --debugging");
     }
-    if (fi.observer) {
+    if (fedInfo.observer) {
         res.append(" --observer");
     }
-    if (fi.useJsonSerialization) {
+    if (fedInfo.useJsonSerialization) {
         res.append(" --json");
     }
-    if (fi.encrypted) {
+    if (fedInfo.encrypted) {
         res.append(" --encrypted");
     }
-    if (!fi.encryptionConfig.empty()) {
+    if (!fedInfo.encryptionConfig.empty()) {
         res.append(" --encryption_config \"");
-        res.append(fi.encryptionConfig);
+        res.append(fedInfo.encryptionConfig);
         res.append("\"");
     }
-    if (!fi.profilerFileName.empty()) {
+    if (!fedInfo.profilerFileName.empty()) {
         res.append(" --profiler \"");
-        res.append(fi.profilerFileName);
+        res.append(fedInfo.profilerFileName);
         res.append("\"");
     }
-    if (!fi.brokerInitString.empty()) {
+    if (!fedInfo.brokerInitString.empty()) {
         res.append(" --broker_init_string \"");
-        res.append(fi.brokerInitString);
+        res.append(fedInfo.brokerInitString);
         res.append("\"");
     }
-    if (!fi.key.empty()) {
+    if (!fedInfo.key.empty()) {
         res += " --broker_key=";
-        res.append(fi.key);
+        res.append(fedInfo.key);
     }
-    if (!fi.fileInUse.empty()) {  // we used the file, specify a core section
+    if (!fedInfo.fileInUse.empty()) {  // we used the file, specify a core section
         res += " --config_section=core --config-file='";
-        res.append(fi.fileInUse);
+        res.append(fedInfo.fileInUse);
         res.push_back('\'');
     }
     return res;

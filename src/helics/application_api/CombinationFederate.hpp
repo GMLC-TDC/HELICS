@@ -21,28 +21,28 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     CombinationFederate();
 
     /**constructor taking a federate information structure and using the default core
-    @param fedName the name of the federate, may be left empty to use a default or one found in fi
-    @param fi  a federate information structure
+    @param fedName the name of the federate, may be left empty to use a default or one found in fedInfo
+    @param fedInfo  a federate information structure
     */
-    explicit CombinationFederate(std::string_view fedName, const FederateInfo& fi);
+    explicit CombinationFederate(std::string_view fedName, const FederateInfo& fedInfo);
 
     /**constructor taking a federate information structure and using the given core
-    @param fedName the name of the federate, may be left empty to use a default or one found in fi
+    @param fedName the name of the federate, may be left empty to use a default or one found in fedInfo
     @param core a pointer to core object which the federate can join
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
     CombinationFederate(std::string_view fedName,
                         const std::shared_ptr<Core>& core,
-                        const FederateInfo& fi = FederateInfo{});
+                        const FederateInfo& fedInfo = FederateInfo{});
 
     /**constructor taking a federate information structure and using the given CoreApp
-    @param fedName the name of the federate, may be left empty to use a default or one found in fi
+    @param fedName the name of the federate, may be left empty to use a default or one found in fedInfo
     @param core a CoreApp object representing the core to connect to
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
     CombinationFederate(std::string_view fedName,
                         CoreApp& core,
-                        const FederateInfo& fi = FederateInfo{});
+                        const FederateInfo& fedInfo = FederateInfo{});
 
     /**constructor taking a federate name and a file with the required information
     @param fedName the name of the federate, can be empty to use the name from the configString

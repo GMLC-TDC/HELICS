@@ -58,11 +58,13 @@ static inline bool mComp(const MessageHolder& m1, const MessageHolder& m2)
 Player::Player(std::vector<std::string> args): App("player_${#}", std::move(args))
 {
     processArgs();
+    initialSetup();
 }
 
 Player::Player(int argc, char* argv[]): App("player_${#}", argc, argv)
 {
     processArgs();
+    initialSetup();
 }
 
 void Player::processArgs()
@@ -70,14 +72,25 @@ void Player::processArgs()
     auto app = generateParser();
 
     if (!deactivated) {
-        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
         app->helics_parse(remArgs);
-        if (!masterFileName.empty()) {
-            loadFile(masterFileName);
-        }
     } else if (helpMode) {
         app->remove_helics_specifics();
         std::cout << app->help();
+    }
+}
+
+void Player::initialSetup()
+{
+    if (!deactivated) {
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+        if (!configFileName.empty())
+        {
+            loadFile(configFileName,false);
+        }
+        if (!inputFileName.empty())
+        {
+            loadFile(inputFileName,true);
+        }
     }
 }
 
@@ -119,28 +132,28 @@ std::unique_ptr<helicsCLI11App> Player::generateParser()
     return app;
 }
 
-Player::Player(std::string_view appName, const FederateInfo& fi): App(appName, fi)
+Player::Player(std::string_view appName, const FederateInfo& fedInfo): App(appName, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+    initialSetup();
 }
 
-Player::Player(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Player::Player(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+    initialSetup();
 }
 
-Player::Player(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Player::Player(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+    initialSetup();
 }
 
 Player::Player(std::string_view appName, const std::string& configString):
     App(appName, configString)
 {
-    fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
-    Player::loadJsonFile(configString);
+    processArgs();
+    initialSetup();
 }
 
 void Player::addMessage(Time sendTime,
@@ -387,9 +400,9 @@ void Player::loadTextFile(const std::string& filename)
     }
 }
 
-void Player::loadJsonFile(const std::string& jsonString)
+void Player::loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration)
 {
-    loadJsonFileConfiguration("player", jsonString);
+    loadJsonFileConfiguration("player", jsonString,enableFederateInterfaceRegistration);
 
     auto pubCount = fed->getPublicationCount();
     for (int ii = 0; ii < pubCount; ++ii) {

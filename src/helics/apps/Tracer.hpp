@@ -55,7 +55,7 @@ namespace apps {
     @param name the name of the app may be empty to pull name from the file
     @param file a file defining the federate information
     */
-        Tracer(std::string_view name, const std::string& file);
+        Tracer(std::string_view name, const std::string& configString);
         /** move construction*/
         Tracer(Tracer&& other_tracer) = default;
         /** move assignment*/
@@ -107,10 +107,12 @@ namespace apps {
         void disableTextOutput() { printMessage = false; }
 
       private:
+          /** run any initial setup operations including file loading*/
+          void initialSetup();
         /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
-        virtual void loadJsonFile(const std::string& jsonString) override;
+        virtual void loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration) override;
         /** load a text file*/
         virtual void loadTextFile(const std::string& textFile) override;
 

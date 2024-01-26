@@ -98,10 +98,12 @@ namespace apps {
         std::unique_ptr<Message> getMessage(std::size_t index) const;
 
       private:
+          /** run any initial setup operations including file loading*/
+          void initialSetup();
         /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
-        virtual void loadJsonFile(const std::string& jsonString) override;
+        virtual void loadJsonFile(const std::string& jsonString,bool enableFederateInterfaceRegistration) override;
         /** load a text file*/
         virtual void loadTextFile(const std::string& textFile) override;
         /** helper function to write the date to a JSON file*/

@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
-TEST(player_tests, simple_player_test)
+TEST(player_tests, simple_player)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
 
@@ -54,7 +54,7 @@ TEST(player_tests, simple_player_test)
     fut.get();
 }
 
-TEST(player_tests, simple_player_test_diff_inputs)
+TEST(player_tests, simple_player_diff_inputs)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore2";
@@ -96,7 +96,7 @@ TEST(player_tests, simple_player_test_diff_inputs)
     fut.get();
 }
 
-TEST(player_tests, simple_player_test_iterative)
+TEST(player_tests, simple_player_iterative)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore3";
@@ -137,7 +137,7 @@ TEST(player_tests, simple_player_test_iterative)
     fut.get();
 }
 
-TEST(player_tests, simple_player_test2)
+TEST(player_tests, simple_player2)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore4";
@@ -196,7 +196,7 @@ static constexpr const char* simple_files[] = {"example1.player",
 
 class player_file_tests: public ::testing::TestWithParam<const char*> {};
 
-TEST_P(player_file_tests, test_files)
+TEST_P(player_file_tests, files)
 {
     static char indx = 'a';
     helics::FederateInfo fi(helics::CoreType::TEST);
@@ -354,7 +354,7 @@ TEST_P(player_file_tests, test_files_cmd)
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
 
     std::vector<std::string> args{
-        "", "--name=player", "--broker=ipc_broker", "--coretype=ipc", exampleFile};
+        "", "--name=player", "--broker=ipc_broker", "--coretype=ipc", "--input="+ exampleFile};
     char* argv[5];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -422,7 +422,7 @@ TEST_P(player_file_tests, test_files_exe)
     ASSERT_TRUE(brokerExe.isActive());
     auto res = brokerExe.runAsync("-f 2 --coretype=zmq --name=zmq_broker");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
-    auto res2 = playerExe.runCaptureOutputAsync("--name=player --coretype=zmq " + exampleFile);
+    auto res2 = playerExe.runCaptureOutputAsync("--name=player --coretype=zmq --input=" + exampleFile);
 
     helics::FederateInfo fi(helics::CoreType::ZMQ);
     fi.coreInitString = "";
