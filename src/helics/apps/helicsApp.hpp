@@ -128,6 +128,7 @@ threads without external protection, that will result in undefined behavior
         virtual void loadTextFile(const std::string& textFile);
         /** actively load the specified files from the configuration*/
         void loadInputFiles();
+
       private:
         void loadConfigOptions(const Json::Value& element);
         /** generate the command line parser*/

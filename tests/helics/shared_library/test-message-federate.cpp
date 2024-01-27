@@ -368,7 +368,7 @@ TEST(message_object, test1_nosan)
     auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
 
     auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetBroker(fi,"brk1",nullptr);
+    helicsFederateInfoSetBroker(fi, "brk1", nullptr);
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
 
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
@@ -459,7 +459,7 @@ TEST(message_object, copy)
 
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
-    helicsFederateInfoSetBroker(fi,"brk_mcpy",nullptr);
+    helicsFederateInfoSetBroker(fi, "brk_mcpy", nullptr);
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
 
     helicsFederateInfoFree(fi);
