@@ -461,7 +461,7 @@ TEST(message_object, copy)
     auto fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
     helicsFederateInfoSetBroker(fedInfo, "brk_mcpy", nullptr);
-    helicsFederateInfoLoadFromString(fedInfo,"--force_new_core",nullptr);
+    helicsFederateInfoLoadFromString(fedInfo, "--force_new_core", nullptr);
     auto fed = helicsCreateMessageFederate("fed1", fedInfo, nullptr);
 
     helicsFederateInfoFree(fedInfo);
@@ -529,9 +529,9 @@ TEST(message_object, dataBuffer)
 
     auto fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
-    
+
     helicsFederateInfoSetBroker(fedInfo, "brk_db", nullptr);
-    helicsFederateInfoLoadFromString(fedInfo,"--force_new_core",nullptr);
+    helicsFederateInfoLoadFromString(fedInfo, "--force_new_core", nullptr);
 
     auto fed = helicsCreateMessageFederate("fed1", fedInfo, nullptr);
     helicsFederateInfoFree(fedInfo);
