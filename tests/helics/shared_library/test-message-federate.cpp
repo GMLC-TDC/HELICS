@@ -164,7 +164,7 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
-TEST_F(mfed_tests, message_object_tests)
+TEST_F(mfed_tests, message_object)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
@@ -368,6 +368,7 @@ TEST(message_object, test1_nosan)
     auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
 
     auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetBroker(fi,"brk1",nullptr);
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
 
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
@@ -454,10 +455,11 @@ TEST(message_object, test1_nosan)
 
 TEST(message_object, copy)
 {
-    auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
+    auto brk = helicsCreateBroker("test", "brk_mcpy", "", nullptr);
 
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
+    helicsFederateInfoSetBroker(fi,"brk_mcpy",nullptr);
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
 
     helicsFederateInfoFree(fi);

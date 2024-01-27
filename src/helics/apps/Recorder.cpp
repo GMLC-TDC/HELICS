@@ -102,12 +102,7 @@ void Recorder::initialSetup()
 {
     if (!deactivated) {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
-        if (!configFileName.empty()) {
-            loadFile(configFileName, false);
-        }
-        if (!inputFileName.empty()) {
-            loadFile(inputFileName, true);
-        }
+        loadInputFiles();
     }
 }
 

@@ -115,9 +115,9 @@ std::unique_ptr<helicsCLI11App> App::generateParser()
     app->add_flag("--local",
                   useLocal,
                   "Specify otherwise unspecified endpoints and publications as local "
-                  "(i.e. the names will be prepended with the player name)");
+                  "(i.e. the names will be prepended with the app name)");
     app->add_option("--stop", stopTime, "The time to stop the app");
-    app->add_option("--input", inputFileName, "The primary input file containing app configuration")
+    app->add_option("--input,input", inputFileName, "The primary input file containing app configuration")
         ->check(CLI::ExistingFile);
     app->allow_extras()->validate_positionals();
     return app;
@@ -155,6 +155,17 @@ void App::loadTextFile(const std::string& textFile)
         }
         if (str[fc] == '!') {
         }
+    }
+}
+
+void App::loadInputFiles()
+{
+    if (!configFileName.empty()) {
+        /** this one would have been loaded through the federate already*/
+        loadFile(configFileName, false);
+    }
+    if (!inputFileName.empty()) {
+        loadFile(inputFileName, true);
     }
 }
 

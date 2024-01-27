@@ -83,12 +83,7 @@ void Player::initialSetup()
 {
     if (!deactivated) {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
-        if (!configFileName.empty()) {
-            loadFile(configFileName, false);
-        }
-        if (!inputFileName.empty()) {
-            loadFile(inputFileName, true);
-        }
+        loadInputFiles();
     }
 }
 

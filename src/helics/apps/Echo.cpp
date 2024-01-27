@@ -38,12 +38,7 @@ namespace apps {
     {
         if (!deactivated) {
             fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
-            if (!configFileName.empty()) {
-                loadFile(configFileName, false);
-            }
-            if (!inputFileName.empty()) {
-                loadFile(inputFileName, true);
-            }
+            loadInputFiles();
         }
     }
 
