@@ -3,6 +3,7 @@ Created on 5/27/2020
 
 @author: bearcub
 """
+
 # export DYLD_LIBRARY_PATH="/Users/camp426/helics_install/lib"
 # or put in bashrc file
 import helics as h
