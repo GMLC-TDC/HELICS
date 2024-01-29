@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
+#include <sstream>
 // static const std::regex creg
 // (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
@@ -140,24 +141,121 @@ void App::loadFile(const std::string& filename, bool enableFederateInterfaceRegi
     }
 }
 
-void App::loadTextFile(const std::string& textFile)
-{
-    // using namespace gmlc::utilities::stringOps;
-    std::ifstream infile(textFile);
-    std::string str;
 
+AppTextParser::AppTextParser(const std::string& filename) :filePtr(filename),mFileName(filename) {}
+
+std::vector<int> AppTextParser::preParseFile(const std::vector<char> &klines)
+{
+    reset();
+    std::vector<int> counts(1+klines.size());
+    std::string str;
+    bool inMline{false};
     // count the lines
-    while (std::getline(infile, str)) {
+    while (std::getline(filePtr, str)) {
         if (str.empty()) {
             continue;
         }
         auto fc = str.find_first_not_of(" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#')) {
+        if (fc == std::string::npos) {
+            continue;
+        }
+        if (inMline) {
+            if (fc + 2 < str.size()) {
+                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']')) {
+                    inMline = false;
+                }
+            }
+            continue;
+        }
+        if (str[fc] == '#') {
+            if (fc + 2 < str.size()) {
+                if ((str[fc + 1] == '#') && (str[fc + 2] == '[')) {
+                    inMline = true;
+                }
+            }
             continue;
         }
         if (str[fc] == '!') {
+            configStr+=str.substr(fc+1);
+            configStr.push_back('\n');
+            continue;
         }
+
+        ++counts[0];
+        for (int ii = 0; ii < klines.size(); ++ii)
+        {
+            if (str[fc] == klines[ii])
+            {
+                ++counts[ii+1];
+            }
+        }
+
+
     }
+    return counts;
+}
+
+bool AppTextParser::loadNextLine(std::string& line,int &lineNumber)
+{
+    while (std::getline(filePtr, line)) {
+        ++currentLineNumber;
+        if (line.empty()) {
+            continue;
+        }
+        auto fc = line.find_first_not_of(" \t\n\r\0");
+        if (fc == std::string::npos) {
+            continue;
+        }
+        if (mLineComment) {
+            if (fc + 2 < line.size()) {
+                if ((line[fc] == '#') && (line[fc + 1] == '#') && (line[fc + 2] == ']')) {
+                    mLineComment = false;
+                }
+            }
+            continue;
+        }
+        if (line[fc] == '#') {
+            if (fc + 2 < line.size()) {
+                if ((line[fc + 1] == '#') && (line[fc + 2] == '[')) {
+                    mLineComment = true;
+                }
+            }
+            continue;
+        }
+        if (line[fc] == '!') {
+            continue;
+        }
+        lineNumber=currentLineNumber;
+        return true;
+    }
+    return false;
+}
+
+void AppTextParser::reset()
+    {
+    filePtr.close();
+    filePtr.open(mFileName);
+    mLineComment=false;
+    }
+
+
+void  App::loadConfigOptions(AppTextParser& aparser)
+{
+    if (!aparser.configString().empty())
+    {
+        auto app=generateParser();
+        std::istringstream sstr(aparser.configString());
+        app->parse_from_stream(sstr);
+
+    }
+}
+
+void App::loadTextFile(const std::string& textFile)
+{
+    AppTextParser aparser(textFile);
+    aparser.preParseFile({});
+    loadConfigOptions(aparser);
+    
 }
 
 void App::loadInputFiles()

@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <string_view>
 #include <vector>
+#include <fstream>
 
 namespace CLI {
 class App;
@@ -20,8 +21,10 @@ namespace Json {
 class Value;
 }  // namespace Json
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
+
+    class AppTextParser;
+
     /** class defining a basic helics App
 @details  the App class is not thread-safe in non-const methods,  don't try to use it from multiple
 threads without external protection, that will result in undefined behavior
@@ -128,7 +131,8 @@ threads without external protection, that will result in undefined behavior
         virtual void loadTextFile(const std::string& textFile);
         /** actively load the specified files from the configuration*/
         void loadInputFiles();
-
+        /** load the config options from a text parser*/
+        void loadConfigOptions(AppTextParser &aparser);
       private:
         void loadConfigOptions(const Json::Value& element);
         /** generate the command line parser*/
@@ -150,5 +154,23 @@ threads without external protection, that will result in undefined behavior
         bool helpMode{false};
         std::vector<std::string> remArgs;
     };
+
+    class AppTextParser
+    {
+    public:
+        explicit AppTextParser(const std::string &filename);
+        /** run a preparse on the counting lines and extracting command strings*/
+        std::vector<int> preParseFile(const std::vector<char> &klines);
+
+        const std::string &configString() const{return configStr;}
+        /** load the next meaningful line and its linenumber*/
+        bool loadNextLine(std::string &line,int &lineNumber);
+        void reset();
+    private:
+        bool mLineComment{false};
+        std::ifstream filePtr;
+        std::string configStr;
+        std::string mFileName;
+        int currentLineNumber{ 0 };
+    };
 }  // namespace apps
-}  // namespace helics

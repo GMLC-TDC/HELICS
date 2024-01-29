@@ -195,94 +195,33 @@ helics::Time Player::extractTime(std::string_view str, int lineNumber) const
 
 void Player::loadTextFile(const std::string& filename)
 {
-    App::loadTextFile(filename);
+   
     using namespace gmlc::utilities::stringOps;  // NOLINT
-    std::ifstream infile(filename);
-    std::string str;
 
-    int mcnt = 0;
-    int pcnt = 0;
-    bool mlineComment = false;
-    // count the lines
-    while (std::getline(infile, str)) {
-        if (str.empty()) {
-            continue;
-        }
-        auto fc = str.find_first_not_of(" \t\n\r\0");
-        if (fc == std::string::npos) {
-            continue;
-        }
-        if (mlineComment) {
-            if (fc + 2 < str.size()) {
-                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']')) {
-                    mlineComment = false;
-                }
-            }
-            continue;
-        }
-        if (str[fc] == '#') {
-            if (fc + 2 < str.size()) {
-                if ((str[fc + 1] == '#') && (str[fc + 2] == '[')) {
-                    mlineComment = true;
-                }
-            }
-            continue;
-        }
-        if ((str[fc] == 'm') || (str[fc] == 'M')) {
-            ++mcnt;
-        } else {
-            ++pcnt;
-        }
-    }
+    AppTextParser aparser(filename);
+    auto cnts=aparser.preParseFile({ 'm','M' });
+
+    int mcnt = cnts[1]+cnts[2];
+    int pcnt = cnts[0]-mcnt;
     int pIndex = static_cast<int>(points.size());
     points.resize(points.size() + pcnt);
     int mIndex = static_cast<int>(messages.size());
     messages.resize(messages.size() + mcnt);
-    // now start over and actual do the loading
-    infile.close();
-    infile.open(filename);
 
-    int lcount = 0;
-    while (std::getline(infile, str)) {
-        if (str.empty()) {
-            continue;
-        }
-        auto fc = str.find_first_not_of(" \t\n\r\0");
-        if (fc == std::string::npos) {
-            continue;
-        }
-        if (mlineComment) {
-            if (fc + 2 < str.size()) {
-                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']')) {
-                    mlineComment = false;
-                }
-            }
-            continue;
-        }
-        if (str[fc] == '#') {
-            if (fc + 2 < str.size()) {
-                if ((str[fc + 1] == '#') && (str[fc + 2] == '[')) {
-                    mlineComment = true;
-                } else if (str[fc + 1] == '!') {
-                    /*  //allow configuration inside the regular text file
+    aparser.reset();
 
+    if (!aparser.configString().empty())
+    {
+        App::loadConfigOptions(aparser);
+        auto app=generateParser();
+        std::istringstream sstr(aparser.configString());
+        app->parse_from_stream(sstr);
 
-
-
-
-
-                if (playerConfig.find("time_units") != playerConfig.end())
-                {
-                    if (playerConfig["time_units"] == "ns")
-                    {
-                        timeMultiplier = 1e-9;
-                    }
-                }
-                */
-                }
-            }
-            continue;
-        }
+    }
+    std::string str;
+    int lineNumber;
+    while (aparser.loadNextLine(str,lineNumber)) {
+       
         /* time key type value units*/
         auto blk = splitlineBracket(str, ",\t ", default_bracket_chars, delimiter_compression::on);
 
@@ -291,7 +230,7 @@ void Player::loadTextFile(const std::string& filename)
             // deal with messages
             switch (blk.size()) {
                 case 5:
-                    if ((messages[mIndex].sendTime = extractTime(blk[1], lcount)) ==
+                    if ((messages[mIndex].sendTime = extractTime(blk[1], lineNumber)) ==
                         Time::minVal()) {
                         continue;
                     }
@@ -302,21 +241,21 @@ void Player::loadTextFile(const std::string& filename)
                     messages[mIndex].mess.data = decode(std::move(blk[4]));
                     break;
                 case 6:
-                    if ((messages[mIndex].sendTime = extractTime(blk[1], lcount)) ==
+                    if ((messages[mIndex].sendTime = extractTime(blk[1], lineNumber)) ==
                         Time::minVal()) {
                         continue;
                     }
 
                     messages[mIndex].mess.source = blk[3];
                     messages[mIndex].mess.dest = blk[4];
-                    if ((messages[mIndex].mess.time = extractTime(blk[2], lcount)) ==
+                    if ((messages[mIndex].mess.time = extractTime(blk[2], lineNumber)) ==
                         Time::minVal()) {
                         continue;
                     }
                     messages[mIndex].mess.data = decode(std::move(blk[5]));
                     break;
                 default:
-                    std::cerr << "unknown message format line " << lcount << '\n';
+                    std::cerr << "unknown message format line " << lineNumber << '\n';
                     break;
             }
             ++mIndex;
@@ -324,12 +263,12 @@ void Player::loadTextFile(const std::string& filename)
             if (blk.size() == 2) {
                 auto cloc = blk[0].find_last_of(':');
                 if (cloc == std::string::npos) {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) ==
+                    if ((points[pIndex].time = extractTime(trim(blk[0]), lineNumber)) ==
                         Time::minVal()) {
                         continue;
                     }
                 } else {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lcount)) ==
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lineNumber)) ==
                         Time::minVal()) {
                         continue;
                     }
@@ -340,19 +279,19 @@ void Player::loadTextFile(const std::string& filename)
                 } else {
                     std::cerr
                         << "lines without publication name but follow one with a publication line "
-                        << lcount << '\n';
+                        << lineNumber << '\n';
                 }
                 points[pIndex].value = decode(std::move(blk[1]));
                 ++pIndex;
             } else if (blk.size() == 3) {
                 auto cloc = blk[0].find_last_of(':');
                 if (cloc == std::string::npos) {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) ==
+                    if ((points[pIndex].time = extractTime(trim(blk[0]), lineNumber)) ==
                         Time::minVal()) {
                         continue;
                     }
                 } else {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lcount)) ==
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lineNumber)) ==
                         Time::minVal()) {
                         continue;
                     }
@@ -369,12 +308,12 @@ void Player::loadTextFile(const std::string& filename)
             } else if (blk.size() == 4) {
                 auto cloc = blk[0].find_last_of(':');
                 if (cloc == std::string::npos) {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]), lcount)) ==
+                    if ((points[pIndex].time = extractTime(trim(blk[0]), lineNumber)) ==
                         Time::minVal()) {
                         continue;
                     }
                 } else {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lcount)) ==
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lineNumber)) ==
                         Time::minVal()) {
                         continue;
                     }
@@ -389,7 +328,7 @@ void Player::loadTextFile(const std::string& filename)
                 points[pIndex].value = decode(std::move(blk[3]));
                 ++pIndex;
             } else {
-                std::cerr << "unknown publish format line " << lcount << '\n';
+                std::cerr << "unknown publish format line " << lineNumber << '\n';
             }
         }
     }
@@ -413,14 +352,14 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
     auto doc = fileops::loadJson(jsonString);
 
     if (doc.isMember("player")) {
-        auto playerConfig = doc["player"];
+        auto &playerConfig = doc["player"];
         if (playerConfig.isMember("time_units")) {
             if (playerConfig["time_units"].asString() == "ns") {
                 timeMultiplier = 1e-9;
             }
         }
     }
-    auto pointArray = doc["points"];
+    auto &pointArray = doc["points"];
     if (pointArray.isArray()) {
         points.reserve(points.size() + pointArray.size());
         for (const auto& pointElement : pointArray) {
@@ -460,7 +399,7 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
             }
             defV val;
             if (pointElement.isMember("value")) {
-                auto M = pointElement["value"];
+                auto &M = pointElement["value"];
                 if (M.isInt64()) {
                     val = M.asInt64();
                 } else if (M.isDouble()) {
@@ -469,7 +408,7 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
                     val = M.asString();
                 }
             } else if (pointElement.isMember("v")) {
-                auto M = pointElement["v"];
+                auto &M = pointElement["v"];
                 if (M.isInt64()) {
                     val = M.asInt64();
                 } else if (M.isDouble()) {
@@ -503,7 +442,7 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
         }
     }
 
-    auto messageArray = doc["messages"];
+    auto &messageArray = doc["messages"];
     if (messageArray.isArray()) {
         messages.reserve(messages.size() + messageArray.size());
         for (const auto& messageElement : messageArray) {
@@ -682,7 +621,8 @@ void Player::runTo(Time stopTime_input)
         fed->enterExecutingMode();
         // send the stuff at timeZero
         sendInformation(timeZero);
-    } else {
+    }
+    else {
         auto ctime = fed->getCurrentTime();
         if (isValidIndex(pointIndex, points)) {
             while (points[pointIndex].time <= ctime) {
@@ -703,9 +643,9 @@ void Player::runTo(Time stopTime_input)
     }
 
     Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal();
-    bool moreToSend{true};
-    int nextIteration{0};
-    int currentIteration{0};
+    bool moreToSend{ true };
+    int nextIteration{ 0 };
+    int currentIteration{ 0 };
     while (moreToSend) {
         auto nextSendTime = Time::maxVal();
         if (isValidIndex(pointIndex, points)) {
@@ -716,13 +656,14 @@ void Player::runTo(Time stopTime_input)
             nextSendTime = std::min(nextSendTime, messages[messageIndex].sendTime);
             nextIteration = 0;
         }
-        if (nextSendTime > stopTime_input) {
-            break;
-        }
         if (nextSendTime == Time::maxVal()) {
             moreToSend = false;
             continue;
         }
+        if (nextSendTime > stopTime_input) {
+            break;
+        }
+
         if ((nextIteration == 0) || (nextSendTime > fed->getCurrentTime())) {
             auto newTime = fed->requestTime(nextSendTime);
             currentIteration = 0;
@@ -732,11 +673,16 @@ void Player::runTo(Time stopTime_input)
                 std::cout << "processed for time " << static_cast<double>(newTime) << "\n";
                 nextPrintTime += nextPrintTimeStep;
             }
-        } else {
+        }
+        else {
             fed->requestTimeIterative(nextSendTime, IterationRequest::FORCE_ITERATION);
             ++currentIteration;
             sendInformation(nextSendTime, currentIteration);
         }
+    }
+    while (fed->getCurrentTime() < stopTime_input)
+    {
+        fed->requestTime(stopTime_input);
     }
 }
 
@@ -750,16 +696,29 @@ void Player::addPublication(std::string_view name, DataType type, std::string_vi
     if (!useLocal) {
         publications.emplace_back(
             helics::InterfaceVisibility::GLOBAL, fed.get(), name, type, pubUnits);
-    } else {
+    }
+    else {
         auto kp = name.find_first_of("./");
         if (kp == std::string::npos) {
             publications.emplace_back(fed.get(), name, type, pubUnits);
-        } else {
+        }
+        else {
             publications.emplace_back(
                 helics::InterfaceVisibility::GLOBAL, fed.get(), name, type, pubUnits);
         }
     }
-    pubids[publications.back().getName()] = static_cast<int>(publications.size()) - 1;
+    std::string_view keyname = publications.back().getName();
+    auto index = static_cast<int>(publications.size()) - 1;
+    pubids[keyname] = index;
+    if (useLocal)
+    {
+        auto& fedName = fed->getName();
+        if (keyname.compare(0, fedName.size(), fedName) == 0)
+        {
+            auto localName=keyname.substr(fedName.size()+1);
+            pubids[localName] = index;
+        }
+    }
 }
 
 void Player::addEndpoint(std::string_view endpointName, std::string_view endpointType)

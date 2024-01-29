@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsApp.hpp"
 
 #include <deque>
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <set>
 #include <string>
@@ -229,12 +229,12 @@ external protection, that will result in undefined behavior
       private:
         std::vector<ValueSetter> points;  //!< the points to generate into the federation
         std::vector<MessageHolder> messages;  //!< list of message to hold
-        std::map<std::string, std::string> tags;  //!< map of the key and type strings
+        std::unordered_map<std::string, std::string> tags;  //!< map of the key and type strings
         std::set<std::string> epts;  //!< set of the used endpoints
         std::deque<Publication> publications;  //!< the actual publication objects
         std::deque<Endpoint> endpoints;  //!< the actual endpoint objects
-        std::map<std::string_view, int> pubids;  //!< publication id map
-        std::map<std::string_view, int> eptids;  //!< endpoint id maps
+        std::unordered_map<std::string_view, int> pubids;  //!< publication id map
+        std::unordered_map<std::string_view, int> eptids;  //!< endpoint id maps
         helics::DataType defType =
             helics::DataType::HELICS_STRING;  //!< the default data type unless otherwise specified
         size_t pointIndex = 0;  //!< the current point index

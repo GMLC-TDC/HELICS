@@ -1296,7 +1296,7 @@ static void
     static constexpr std::string_view errorMessage =
         R"(interface properties require "name" and "value" fields)";
     if (json.isMember("properties")) {
-        auto props = json["properties"];
+        auto &props = json["properties"];
         if (props.isArray()) {
             for (const auto& prop : props) {
                 if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
@@ -1461,7 +1461,7 @@ static void arrayPairProcess(toml::value doc,
 {
     using fileops::isMember;
     if (isMember(doc, key)) {
-        auto info = toml::find(doc, key);
+        auto &info = toml::find(doc, key);
         if (info.is_array()) {
             for (auto& val : info.as_array()) {
                 pairOp(static_cast<std::string_view>(val.as_array()[0].as_string()),
@@ -1482,14 +1482,14 @@ static void
     static constexpr std::string_view errorMessage =
         R"(interface properties require "name" and "value" fields)";
     if (fileops::isMember(data, "properties")) {
-        auto props = toml::find(data, "properties");
+        auto &props = toml::find(data, "properties");
         if (props.is_array()) {
             auto& propArray = props.as_array();
             for (const auto& prop : propArray) {
                 std::string propname;
                 propname = toml::find_or(prop, "name", propname);
                 const toml::value uVal;
-                auto propval = toml::find_or(prop, "value", uVal);
+                auto &propval = toml::find_or(prop, "value", uVal);
 
                 if ((propname.empty()) || (propval.is_uninitialized())) {
                     if (strict) {
@@ -1547,7 +1547,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
     replaceIfMember(doc, "defaultglobal", defaultGlobal);
 
     if (isMember(doc, "filters")) {
-        auto filts = toml::find(doc, "filters");
+        auto &filts = toml::find(doc, "filters");
         if (!filts.is_array()) {
             throw(helics::InvalidParameter("filters section in toml file must be an array"));
         }
@@ -1587,7 +1587,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
         }
     }
     if (isMember(doc, "translators")) {
-        auto transs = toml::find(doc, "translators");
+        auto &transs = toml::find(doc, "translators");
         if (!transs.is_array()) {
             throw(helics::InvalidParameter("translators section in toml file must be an array"));
         }
@@ -1657,7 +1657,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
         }
     }
     if (isMember(doc, "globals")) {
-        auto globals = toml::find(doc, "globals");
+        auto &globals = toml::find(doc, "globals");
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
                 setGlobal(static_cast<std::string_view>(val.as_array()[0].as_string()),

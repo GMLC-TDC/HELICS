@@ -18,18 +18,18 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(player_tests, simple_player)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
 
-    fi.coreName = "pcore1";
-    fi.coreInitString = "-f2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    fedInfo.coreName = "pcore1";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
     play1.addPublication("pub1", helics::DataType::HELICS_DOUBLE);
     play1.addPoint(1.0, "pub1", 0.5);
     play1.addPoint(2.0, "pub1", 0.7);
     play1.addPoint(3.0, "pub1", 0.8);
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
     vfed.enterExecutingMode();
@@ -56,17 +56,17 @@ TEST(player_tests, simple_player)
 
 TEST(player_tests, simple_player_diff_inputs)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "pcore2";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcore2";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
     play1.addPublication("pub1", helics::DataType::HELICS_DOUBLE);
     play1.addPoint(1.0, "pub1", "v[3.0,4.0]");
     play1.addPoint(2.0, "pub1", "0.7");
     play1.addPoint(3.0, "pub1", std::complex<double>(0.0, 0.8));
     play1.addPoint(4.0, "pub1", "c[3.0+0j, 0.0-4.0j]");
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
     vfed.enterExecutingMode();
@@ -98,17 +98,17 @@ TEST(player_tests, simple_player_diff_inputs)
 
 TEST(player_tests, simple_player_iterative)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "pcore3";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcore3";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
     play1.addPublication("pub1", helics::DataType::HELICS_DOUBLE);
     play1.addPoint(1.0, 0, "pub1", 0.5);
     play1.addPoint(1.0, 1, "pub1", 0.7);
     play1.addPoint(1.0, 2, "pub1", 0.8);
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
     vfed.enterExecutingMode();
@@ -139,10 +139,10 @@ TEST(player_tests, simple_player_iterative)
 
 TEST(player_tests, simple_player2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "pcore4";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcore4";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
     play1.addPublication<double>("pub1");
     play1.addPoint(1.0, "pub1", 0.5);
@@ -154,7 +154,7 @@ TEST(player_tests, simple_player2)
     play1.addPoint(2.0, "pub2", 0.6);
     play1.addPoint(3.0, "pub2", 0.9);
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
@@ -199,15 +199,15 @@ class player_file_tests: public ::testing::TestWithParam<const char*> {};
 TEST_P(player_file_tests, files)
 {
     static char indx = 'a';
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = std::string("pcore5") + GetParam();
-    fi.coreName.push_back(indx++);
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = std::string("pcore5") + GetParam();
+    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
     play1.loadFile(std::string(TEST_DIR) + GetParam());
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
@@ -244,14 +244,14 @@ TEST_P(player_file_tests, files)
 
 TEST(player_tests, bigfile)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "pcorebig";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcorebig";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
     play1.loadFile(std::string(TEST_DIR) + "bigtest.txt");
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 60.0);
-    helics::ValueFederate vfed("charger", fi);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 60.0);
+    helics::ValueFederate vfed("charger", fedInfo);
     auto& sub1 = vfed.registerSubscription("Battery/EV1_current");
     auto& sub2 = vfed.registerSubscription("Battery/EV2_current");
     auto& sub3 = vfed.registerSubscription("Battery/EV3_current");
@@ -298,18 +298,67 @@ TEST(player_tests, bigfile)
     fut.get();
 }
 
+TEST(player_tests, testfile)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcoretest";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
+
+    play1.loadFile(std::string(TEST_DIR) + "oorder.txt");
+    helics::ValueFederate vfed("receiver", fedInfo);
+     vfed.registerSubscription("player1/G");
+    vfed.registerSubscription("player1/T");
+     vfed.registerSubscription("player1/Fc");
+     vfed.registerSubscription("player1/Ud");
+     vfed.registerSubscription("player1/Rg");
+     vfed.registerSubscription("player1/ctl");
+
+    std::vector<std::vector<double>> results;
+    results.resize(6);
+
+    auto fut = std::async(std::launch::async, [&play1]() {
+        play1.runTo(8.0);
+        });
+    vfed.enterExecutingMode();
+    // helics::Time maxTime = 60.0 * 60.0 * 24.0 * 7.0;
+    auto retTime = vfed.requestTime(8.0);
+
+    while (retTime <= 7.0) {
+        for (int ii = 0; ii < 6; ++ii)
+        {
+            auto &inp=vfed.getInput(ii);
+            if (inp.isUpdated())
+            {
+                results[ii].push_back(inp.getDouble());
+            }
+        }
+        retTime = vfed.requestTime(7.0);
+    }
+
+    vfed.finalize();
+    fut.get();
+    EXPECT_GE(results[0].size(),120);
+    EXPECT_EQ(results[1].size(),2);
+    EXPECT_EQ(results[2].size(),2);
+    EXPECT_EQ(results[3].size(),2);
+    EXPECT_EQ(results[4].size(),2);
+    EXPECT_EQ(results[5].size(),2);
+    EXPECT_EQ(results[2][1],63.0);
+}
+
 TEST(player_tests, simple_player_mlinecomment)
 {
     static char indx = 'a';
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "pcore6-mline";
-    fi.coreName.push_back(indx++);
-    fi.coreInitString = " -f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcore6-mline";
+    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreInitString = " -f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
     play1.loadFile(std::string(TEST_DIR) + "/example_comments.player");
 
     EXPECT_EQ(play1.pointCount(), 7U);
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
@@ -364,10 +413,10 @@ TEST_P(player_file_tests, test_files_cmd)
 
     helics::apps::Player play1(5, argv);
 
-    helics::FederateInfo fi(helics::CoreType::IPC);
-    fi.coreInitString = "--broker=ipc_broker";
+    helics::FederateInfo fedInfo(helics::CoreType::IPC);
+    fedInfo.coreInitString = "--broker=ipc_broker";
 
-    helics::ValueFederate vfed("obj", fi);
+    helics::ValueFederate vfed("obj", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
@@ -425,10 +474,10 @@ TEST_P(player_file_tests, test_files_exe)
     auto res2 =
         playerExe.runCaptureOutputAsync("--name=player --coretype=zmq --input=" + exampleFile);
 
-    helics::FederateInfo fi(helics::CoreType::ZMQ);
-    fi.coreInitString = "";
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.coreInitString = "";
 
-    helics::ValueFederate vfed("fed", fi);
+    helics::ValueFederate vfed("fed", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
     vfed.enterExecutingMode();
@@ -471,13 +520,13 @@ INSTANTIATE_TEST_SUITE_P(player_tests, player_file_tests, ::testing::ValuesIn(si
 
 TEST(player_tests, simple_player_testjson)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "pcore7";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcore7";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
     play1.loadFile(std::string(TEST_DIR) + "/example6.json");
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
@@ -512,12 +561,12 @@ TEST(player_tests, simple_player_testjson)
 
 TEST(player_tests, player_test_message)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "pcore8";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcore8";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
 
     play1.addMessage(1.0, "src", "dest", "this is a message");
@@ -540,12 +589,12 @@ TEST(player_tests, player_test_message)
 
 TEST(player_tests, player_test_message2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "pcore9";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcore9";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
 
     play1.addMessage(1.0, "src", "dest", "this is a test message");
@@ -590,12 +639,12 @@ TEST(player_tests, player_test_message2)
 
 TEST(player_tests, player_test_message3)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "pcore10";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "pcore10";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
 
     play1.addMessage(1.0, "src", "dest", "this is a test message");
@@ -648,13 +697,13 @@ class player_message_file_tests: public ::testing::TestWithParam<const char*> {}
 TEST_P(player_message_file_tests, message_test_files)
 {
     static char indx = 'a';
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = std::string("pcore11") + GetParam();
-    fi.coreName.push_back(indx++);
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Player play1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = std::string("pcore11") + GetParam();
+    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fedInfo);
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
     play1.loadFile(std::string(TEST_DIR) + GetParam());
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
