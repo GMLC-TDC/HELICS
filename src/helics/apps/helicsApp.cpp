@@ -16,10 +16,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <sstream>
 // static const std::regex creg
 // (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
@@ -141,13 +141,12 @@ void App::loadFile(const std::string& filename, bool enableFederateInterfaceRegi
     }
 }
 
+AppTextParser::AppTextParser(const std::string& filename): filePtr(filename), mFileName(filename) {}
 
-AppTextParser::AppTextParser(const std::string& filename) :filePtr(filename),mFileName(filename) {}
-
-std::vector<int> AppTextParser::preParseFile(const std::vector<char> &klines)
+std::vector<int> AppTextParser::preParseFile(const std::vector<char>& klines)
 {
     reset();
-    std::vector<int> counts(1+klines.size());
+    std::vector<int> counts(1 + klines.size());
     std::string str;
     bool inMline{false};
     // count the lines
@@ -176,26 +175,22 @@ std::vector<int> AppTextParser::preParseFile(const std::vector<char> &klines)
             continue;
         }
         if (str[fc] == '!') {
-            configStr+=str.substr(fc+1);
+            configStr += str.substr(fc + 1);
             configStr.push_back('\n');
             continue;
         }
 
         ++counts[0];
-        for (int ii = 0; ii < klines.size(); ++ii)
-        {
-            if (str[fc] == klines[ii])
-            {
-                ++counts[ii+1];
+        for (int ii = 0; ii < klines.size(); ++ii) {
+            if (str[fc] == klines[ii]) {
+                ++counts[ii + 1];
             }
         }
-
-
     }
     return counts;
 }
 
-bool AppTextParser::loadNextLine(std::string& line,int &lineNumber)
+bool AppTextParser::loadNextLine(std::string& line, int& lineNumber)
 {
     while (std::getline(filePtr, line)) {
         ++currentLineNumber;
@@ -225,28 +220,25 @@ bool AppTextParser::loadNextLine(std::string& line,int &lineNumber)
         if (line[fc] == '!') {
             continue;
         }
-        lineNumber=currentLineNumber;
+        lineNumber = currentLineNumber;
         return true;
     }
     return false;
 }
 
 void AppTextParser::reset()
-    {
+{
     filePtr.close();
     filePtr.open(mFileName);
-    mLineComment=false;
-    }
+    mLineComment = false;
+}
 
-
-void  App::loadConfigOptions(AppTextParser& aparser)
+void App::loadConfigOptions(AppTextParser& aparser)
 {
-    if (!aparser.configString().empty())
-    {
-        auto app=generateParser();
+    if (!aparser.configString().empty()) {
+        auto app = generateParser();
         std::istringstream sstr(aparser.configString());
         app->parse_from_stream(sstr);
-
     }
 }
 
@@ -255,7 +247,6 @@ void App::loadTextFile(const std::string& textFile)
     AppTextParser aparser(textFile);
     aparser.preParseFile({});
     loadConfigOptions(aparser);
-    
 }
 
 void App::loadInputFiles()

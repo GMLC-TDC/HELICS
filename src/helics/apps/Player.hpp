@@ -12,10 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsApp.hpp"
 
 #include <deque>
-#include <unordered_map>
 #include <memory>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace helics {

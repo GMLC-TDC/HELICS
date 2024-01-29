@@ -307,29 +307,25 @@ TEST(player_tests, testfile)
 
     play1.loadFile(std::string(TEST_DIR) + "oorder.txt");
     helics::ValueFederate vfed("receiver", fedInfo);
-     vfed.registerSubscription("player1/G");
+    vfed.registerSubscription("player1/G");
     vfed.registerSubscription("player1/T");
-     vfed.registerSubscription("player1/Fc");
-     vfed.registerSubscription("player1/Ud");
-     vfed.registerSubscription("player1/Rg");
-     vfed.registerSubscription("player1/ctl");
+    vfed.registerSubscription("player1/Fc");
+    vfed.registerSubscription("player1/Ud");
+    vfed.registerSubscription("player1/Rg");
+    vfed.registerSubscription("player1/ctl");
 
     std::vector<std::vector<double>> results;
     results.resize(6);
 
-    auto fut = std::async(std::launch::async, [&play1]() {
-        play1.runTo(8.0);
-        });
+    auto fut = std::async(std::launch::async, [&play1]() { play1.runTo(8.0); });
     vfed.enterExecutingMode();
     // helics::Time maxTime = 60.0 * 60.0 * 24.0 * 7.0;
     auto retTime = vfed.requestTime(8.0);
 
     while (retTime <= 7.0) {
-        for (int ii = 0; ii < 6; ++ii)
-        {
-            auto &inp=vfed.getInput(ii);
-            if (inp.isUpdated())
-            {
+        for (int ii = 0; ii < 6; ++ii) {
+            auto& inp = vfed.getInput(ii);
+            if (inp.isUpdated()) {
                 results[ii].push_back(inp.getDouble());
             }
         }
@@ -338,13 +334,13 @@ TEST(player_tests, testfile)
 
     vfed.finalize();
     fut.get();
-    EXPECT_GE(results[0].size(),120);
-    EXPECT_EQ(results[1].size(),2);
-    EXPECT_EQ(results[2].size(),2);
-    EXPECT_EQ(results[3].size(),2);
-    EXPECT_EQ(results[4].size(),2);
-    EXPECT_EQ(results[5].size(),2);
-    EXPECT_EQ(results[2][1],63.0);
+    EXPECT_GE(results[0].size(), 120);
+    EXPECT_EQ(results[1].size(), 2);
+    EXPECT_EQ(results[2].size(), 2);
+    EXPECT_EQ(results[3].size(), 2);
+    EXPECT_EQ(results[4].size(), 2);
+    EXPECT_EQ(results[5].size(), 2);
+    EXPECT_EQ(results[2][1], 63.0);
 }
 
 TEST(player_tests, simple_player_mlinecomment)

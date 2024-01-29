@@ -195,14 +195,13 @@ helics::Time Player::extractTime(std::string_view str, int lineNumber) const
 
 void Player::loadTextFile(const std::string& filename)
 {
-   
     using namespace gmlc::utilities::stringOps;  // NOLINT
 
     AppTextParser aparser(filename);
-    auto cnts=aparser.preParseFile({ 'm','M' });
+    auto cnts = aparser.preParseFile({'m', 'M'});
 
-    int mcnt = cnts[1]+cnts[2];
-    int pcnt = cnts[0]-mcnt;
+    int mcnt = cnts[1] + cnts[2];
+    int pcnt = cnts[0] - mcnt;
     int pIndex = static_cast<int>(points.size());
     points.resize(points.size() + pcnt);
     int mIndex = static_cast<int>(messages.size());
@@ -210,18 +209,15 @@ void Player::loadTextFile(const std::string& filename)
 
     aparser.reset();
 
-    if (!aparser.configString().empty())
-    {
+    if (!aparser.configString().empty()) {
         App::loadConfigOptions(aparser);
-        auto app=generateParser();
+        auto app = generateParser();
         std::istringstream sstr(aparser.configString());
         app->parse_from_stream(sstr);
-
     }
     std::string str;
     int lineNumber;
-    while (aparser.loadNextLine(str,lineNumber)) {
-       
+    while (aparser.loadNextLine(str, lineNumber)) {
         /* time key type value units*/
         auto blk = splitlineBracket(str, ",\t ", default_bracket_chars, delimiter_compression::on);
 
@@ -268,8 +264,8 @@ void Player::loadTextFile(const std::string& filename)
                         continue;
                     }
                 } else {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lineNumber)) ==
-                        Time::minVal()) {
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc),
+                                                           lineNumber)) == Time::minVal()) {
                         continue;
                     }
                     points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
@@ -291,8 +287,8 @@ void Player::loadTextFile(const std::string& filename)
                         continue;
                     }
                 } else {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lineNumber)) ==
-                        Time::minVal()) {
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc),
+                                                           lineNumber)) == Time::minVal()) {
                         continue;
                     }
                     points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
@@ -313,8 +309,8 @@ void Player::loadTextFile(const std::string& filename)
                         continue;
                     }
                 } else {
-                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc), lineNumber)) ==
-                        Time::minVal()) {
+                    if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc),
+                                                           lineNumber)) == Time::minVal()) {
                         continue;
                     }
                     points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
@@ -352,14 +348,14 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
     auto doc = fileops::loadJson(jsonString);
 
     if (doc.isMember("player")) {
-        auto &playerConfig = doc["player"];
+        auto& playerConfig = doc["player"];
         if (playerConfig.isMember("time_units")) {
             if (playerConfig["time_units"].asString() == "ns") {
                 timeMultiplier = 1e-9;
             }
         }
     }
-    auto &pointArray = doc["points"];
+    auto& pointArray = doc["points"];
     if (pointArray.isArray()) {
         points.reserve(points.size() + pointArray.size());
         for (const auto& pointElement : pointArray) {
@@ -399,7 +395,7 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
             }
             defV val;
             if (pointElement.isMember("value")) {
-                auto &M = pointElement["value"];
+                auto& M = pointElement["value"];
                 if (M.isInt64()) {
                     val = M.asInt64();
                 } else if (M.isDouble()) {
@@ -408,7 +404,7 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
                     val = M.asString();
                 }
             } else if (pointElement.isMember("v")) {
-                auto &M = pointElement["v"];
+                auto& M = pointElement["v"];
                 if (M.isInt64()) {
                     val = M.asInt64();
                 } else if (M.isDouble()) {
@@ -442,7 +438,7 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
         }
     }
 
-    auto &messageArray = doc["messages"];
+    auto& messageArray = doc["messages"];
     if (messageArray.isArray()) {
         messages.reserve(messages.size() + messageArray.size());
         for (const auto& messageElement : messageArray) {
@@ -621,8 +617,7 @@ void Player::runTo(Time stopTime_input)
         fed->enterExecutingMode();
         // send the stuff at timeZero
         sendInformation(timeZero);
-    }
-    else {
+    } else {
         auto ctime = fed->getCurrentTime();
         if (isValidIndex(pointIndex, points)) {
             while (points[pointIndex].time <= ctime) {
@@ -643,9 +638,9 @@ void Player::runTo(Time stopTime_input)
     }
 
     Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal();
-    bool moreToSend{ true };
-    int nextIteration{ 0 };
-    int currentIteration{ 0 };
+    bool moreToSend{true};
+    int nextIteration{0};
+    int currentIteration{0};
     while (moreToSend) {
         auto nextSendTime = Time::maxVal();
         if (isValidIndex(pointIndex, points)) {
@@ -673,15 +668,13 @@ void Player::runTo(Time stopTime_input)
                 std::cout << "processed for time " << static_cast<double>(newTime) << "\n";
                 nextPrintTime += nextPrintTimeStep;
             }
-        }
-        else {
+        } else {
             fed->requestTimeIterative(nextSendTime, IterationRequest::FORCE_ITERATION);
             ++currentIteration;
             sendInformation(nextSendTime, currentIteration);
         }
     }
-    while (fed->getCurrentTime() < stopTime_input)
-    {
+    while (fed->getCurrentTime() < stopTime_input) {
         fed->requestTime(stopTime_input);
     }
 }
@@ -696,13 +689,11 @@ void Player::addPublication(std::string_view name, DataType type, std::string_vi
     if (!useLocal) {
         publications.emplace_back(
             helics::InterfaceVisibility::GLOBAL, fed.get(), name, type, pubUnits);
-    }
-    else {
+    } else {
         auto kp = name.find_first_of("./");
         if (kp == std::string::npos) {
             publications.emplace_back(fed.get(), name, type, pubUnits);
-        }
-        else {
+        } else {
             publications.emplace_back(
                 helics::InterfaceVisibility::GLOBAL, fed.get(), name, type, pubUnits);
         }
@@ -710,12 +701,10 @@ void Player::addPublication(std::string_view name, DataType type, std::string_vi
     std::string_view keyname = publications.back().getName();
     auto index = static_cast<int>(publications.size()) - 1;
     pubids[keyname] = index;
-    if (useLocal)
-    {
+    if (useLocal) {
         auto& fedName = fed->getName();
-        if (keyname.compare(0, fedName.size(), fedName) == 0)
-        {
-            auto localName=keyname.substr(fedName.size()+1);
+        if (keyname.compare(0, fedName.size(), fedName) == 0) {
+            auto localName = keyname.substr(fedName.size() + 1);
             pubids[localName] = index;
         }
     }
