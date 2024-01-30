@@ -233,12 +233,14 @@ Connector::Connector(std::vector<std::string> args):
     App("connector", std::move(args)), core((fed) ? fed->getCorePointer() : nullptr)
 {
     processArgs();
+    initialSetup();
 }
 
 Connector::Connector(int argc, char* argv[]):
     App("connector", argc, argv), core((fed) ? fed->getCorePointer() : nullptr)
 {
     processArgs();
+    initialSetup();
 }
 
 void Connector::processArgs()
@@ -246,14 +248,18 @@ void Connector::processArgs()
     auto app = generateParser();
 
     if (!deactivated) {
-        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
         app->helics_parse(remArgs);
-        if (!masterFileName.empty()) {
-            loadFile(masterFileName);
-        }
     } else if (helpMode) {
         app->remove_helics_specifics();
         std::cout << app->help();
+    }
+}
+
+void Connector::initialSetup()
+{
+    if (!deactivated) {
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+        loadInputFiles();
     }
 }
 
@@ -311,7 +317,7 @@ std::unique_ptr<helicsCLI11App> Connector::generateParser()
 Connector::Connector(std::string_view appName, const FederateInfo& fedInfo):
     App(appName, fedInfo), core((fed) ? fed->getCorePointer() : nullptr)
 {
-    fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+    initialSetup();
 }
 
 Connector::Connector(std::string_view appName,
@@ -320,20 +326,19 @@ Connector::Connector(std::string_view appName,
     App(appName, core, fedInfo),
     core((fed) ? fed->getCorePointer() : nullptr)
 {
-    fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+    initialSetup();
 }
 
 Connector::Connector(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
     App(appName, core, fedInfo), core((fed) ? fed->getCorePointer() : nullptr)
 {
-    fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+    initialSetup();
 }
 
 Connector::Connector(std::string_view appName, const std::string& configString):
     App(appName, configString), core((fed) ? fed->getCorePointer() : nullptr)
 {
-    fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
-    Connector::loadJsonFile(configString);
+    initialSetup();
 }
 
 std::size_t Connector::addTag(std::string_view tagName)
@@ -458,75 +463,23 @@ class RegexMatcher {
 
 void Connector::loadTextFile(const std::string& filename)
 {
-    App::loadTextFile(filename);
     using namespace gmlc::utilities::stringOps;  // NOLINT
-    std::ifstream infile(filename);
-    std::string str;
+    AppTextParser aparser(filename);
+    auto cnts = aparser.preParseFile({});
+    
 
-    int ccnt = 0;
-    bool mlineComment = false;
-    // count the lines
-    while (std::getline(infile, str)) {
-        if (str.empty()) {
-            continue;
-        }
-        auto firstChar = str.find_first_not_of(" \t\n\r\0");
-        if (firstChar == std::string::npos) {
-            continue;
-        }
-        if (mlineComment) {
-            if (firstChar + 2 < str.size()) {
-                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') &&
-                    (str[firstChar + 2] == ']')) {
-                    mlineComment = false;
-                }
-            }
-            continue;
-        }
-        if (str[firstChar] == '#') {
-            if (firstChar + 2 < str.size()) {
-                if ((str[firstChar + 1] == '#') && (str[firstChar + 2] == '[')) {
-                    mlineComment = true;
-                }
-            }
-            continue;
-        }
-        if ((str[firstChar] == 'm') || (str[firstChar] == 'M')) {
-            ++ccnt;
-        }
+    aparser.reset();
+
+    if (!aparser.configString().empty()) {
+        App::loadConfigOptions(aparser);
+        auto app = generateParser();
+        std::istringstream sstr(aparser.configString());
+        app->parse_from_stream(sstr);
     }
-    connections.reserve(connections.size() + ccnt);
-    // now start over and actual do the loading
-    infile.close();
-    infile.open(filename);
-    while (std::getline(infile, str)) {
-        if (str.empty()) {
-            continue;
-        }
-        auto firstChar = str.find_first_not_of(" \t\n\r\0");
-        if (firstChar == std::string::npos) {
-            continue;
-        }
-        if (mlineComment) {
-            if (firstChar + 2 < str.size()) {
-                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') &&
-                    (str[firstChar + 2] == ']')) {
-                    mlineComment = false;
-                }
-            }
-            continue;
-        }
-        if (str[firstChar] == '#') {
-            if (firstChar + 2 < str.size()) {
-                if ((str[firstChar + 1] == '#') && (str[firstChar + 2] == '[')) {
-                    mlineComment = true;
-                } else if (str[firstChar + 1] == '!') {
-                    /*  //allow configuration inside the regular text file
-                     */
-                }
-            }
-            continue;
-        }
+    connections.reserve(connections.size() + cnts[0]);
+    std::string str;
+    int lineNumber;
+    while (aparser.loadNextLine(str, lineNumber)) {
         /* time key type value units*/
         auto blk = splitlineBracket(str, ",\t ", default_bracket_chars, delimiter_compression::on);
         for (auto& seq : blk) {
@@ -536,14 +489,17 @@ void Connector::loadTextFile(const std::string& filename)
     }
 }
 
-void Connector::loadJsonFile(const std::string& jsonString)
+void Connector::loadJsonFile(const std::string& jsonString, bool enableFederateInterfaceRegistration)
 {
-    loadJsonFileConfiguration("connector", jsonString);
+    loadJsonFileConfiguration("connector", jsonString, enableFederateInterfaceRegistration);
 
     auto doc = fileops::loadJson(jsonString);
 
     if (doc.isMember("connector")) {
-        auto playerConfig = doc["connector"];
+        auto connectorConfig = doc["connector"];
+            matchTargetEndpoints=fileops::getOrDefault(connectorConfig,"match_target_endpoints",matchTargetEndpoints);
+            matchMultiple=fileops::getOrDefault(connectorConfig,"match_multiple",matchMultiple);
+            alwaysCheckRegex=fileops::getOrDefault(connectorConfig,"always_check_regex",alwaysCheckRegex);
     }
     auto connectionArray = doc["connections"];
     if (connectionArray.isArray()) {
