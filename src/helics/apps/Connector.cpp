@@ -466,7 +466,6 @@ void Connector::loadTextFile(const std::string& filename)
     using namespace gmlc::utilities::stringOps;  // NOLINT
     AppTextParser aparser(filename);
     auto cnts = aparser.preParseFile({});
-    
 
     aparser.reset();
 
@@ -489,7 +488,8 @@ void Connector::loadTextFile(const std::string& filename)
     }
 }
 
-void Connector::loadJsonFile(const std::string& jsonString, bool enableFederateInterfaceRegistration)
+void Connector::loadJsonFile(const std::string& jsonString,
+                             bool enableFederateInterfaceRegistration)
 {
     loadJsonFileConfiguration("connector", jsonString, enableFederateInterfaceRegistration);
 
@@ -497,9 +497,11 @@ void Connector::loadJsonFile(const std::string& jsonString, bool enableFederateI
 
     if (doc.isMember("connector")) {
         auto connectorConfig = doc["connector"];
-            matchTargetEndpoints=fileops::getOrDefault(connectorConfig,"match_target_endpoints",matchTargetEndpoints);
-            matchMultiple=fileops::getOrDefault(connectorConfig,"match_multiple",matchMultiple);
-            alwaysCheckRegex=fileops::getOrDefault(connectorConfig,"always_check_regex",alwaysCheckRegex);
+        matchTargetEndpoints =
+            fileops::getOrDefault(connectorConfig, "match_target_endpoints", matchTargetEndpoints);
+        matchMultiple = fileops::getOrDefault(connectorConfig, "match_multiple", matchMultiple);
+        alwaysCheckRegex =
+            fileops::getOrDefault(connectorConfig, "always_check_regex", alwaysCheckRegex);
     }
     auto connectionArray = doc["connections"];
     if (connectionArray.isArray()) {
