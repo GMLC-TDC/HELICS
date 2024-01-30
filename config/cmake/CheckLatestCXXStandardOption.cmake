@@ -21,6 +21,15 @@ if(CMAKE_CXX_STANDARD LESS 17)
     message(FATAL_ERROR "{$PROJECT_NAME} requires C++17 or greater")
 endif()
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
+    if(CMAKE_CXX_STANDARD LESS 20)
+        message(
+            FATAL_ERROR
+                " using gcc>=13.0 {$PROJECT_NAME} requires setting C++ standard to C++20 or greater"
+        )
+    endif()
+endif()
+
 if(MSVC)
     if(CMAKE_CXX_STANDARD EQUAL 17)
         check_cxx_compiler_flag(/std:c++17 has_std_17_flag)

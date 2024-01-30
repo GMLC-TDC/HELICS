@@ -119,14 +119,19 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
             target_link_libraries(build_flags_target INTERFACE "stdc++fs")
 
         endif()
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
+            target_compile_options(
+                compile_flags_target INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wparentheses>
+            )
+        endif()
     endif()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(compile_flags_target INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
         target_compile_options(
             compile_flags_target INTERFACE -Wdocumentation -Wno-documentation-deprecated-sync
         )
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 13.0)
-            message(STATUS "clang>13")
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
+            message(STATUS "clang>=13")
             target_compile_options(
                 compile_flags_target INTERFACE -Wreserved-identifier -Wunused-but-set-parameter
                                                -Wunused-but-set-variable

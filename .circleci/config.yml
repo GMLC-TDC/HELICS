@@ -77,9 +77,9 @@ jobs:
 
   helicsgccTSan:
     docker:
-      - image: helics/buildenv:gcc12-builder
+      - image: helics/buildenv:gcc13-builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON -DCMAKE_CXX_STANDARD=20'
       TSAN_OPTIONS: "second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt history_size=4"
 
     steps:
@@ -89,9 +89,9 @@ jobs:
 
   helicsgccASan:
     docker:
-      - image: helics/buildenv:gcc12-builder
+      - image: helics/buildenv:gcc13-builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -static-libstdc++ -static-libasan -lrt -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -static-libstdc++ -static-libasan -lrt -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON -DCMAKE_CXX_STANDARD=20'
       ASAN_OPTIONS: "alloc_dealloc_mismatch=0"
       LSAN_OPTIONS: "suppressions=/root/project/.circleci/leak_suppression_gcc.txt"
     steps:
@@ -173,11 +173,11 @@ jobs:
       - run: *setup_helics
       - run: *run_installer_tests
 
-  gcc12:
+  gcc13:
     docker:
-      - image: helics/buildenv:gcc12-builder
+      - image: helics/buildenv:gcc13-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DCMAKE_CXX_FLAGS="-pedantic-errors" -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON'
+      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DCMAKE_CXX_FLAGS="-pedantic-errors" -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
     steps:
       - checkout
       - run: *setup_helics
@@ -241,7 +241,7 @@ workflows:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - gcc12:
+      - gcc13:
           filters:
             branches:
               ignore: /pre-commit\/.*/

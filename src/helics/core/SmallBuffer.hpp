@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <new>
 #include <stdexcept>

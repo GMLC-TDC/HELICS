@@ -20,22 +20,22 @@ SPDX-License-Identifier: BSD-3-Clause
 using logblocktype = gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>;
 TEST(logging_tests, check_log_message)
 {
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi,
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
+    helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
                                          HELICS_LOG_LEVEL_TIMING,
                                          &err);
 
-    auto fed = helicsCreateValueFederate("test1", fi, &err);
+    auto fed = helicsCreateValueFederate("test1", fedInfo, &err);
 
     logblocktype mlog;
 
     auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
-        auto* mp = reinterpret_cast<logblocktype*>(udata);
-        mp->lock()->emplace_back(level, message);
+        auto* messageLock = reinterpret_cast<logblocktype*>(udata);
+        messageLock->lock()->emplace_back(level, message);
     };
 
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
@@ -51,39 +51,39 @@ TEST(logging_tests, check_log_message)
     EXPECT_EQ(err.error_code, 0);
     auto llock = mlog.lock();
     bool found = false;
-    for (auto& m : llock) {
-        if (m.second.find("MEXAGE") != std::string::npos) {
+    for (auto& message : *llock) {
+        if (message.second.find("MEXAGE") != std::string::npos) {
             found = true;
         }
     }
     EXPECT_TRUE(found);
     if (!found) {
-        for (auto& m : llock) {
-            std::cout << "message (" << m.first << ") ::" << m.second << std::endl;
+        for (auto& message : *llock) {
+            std::cout << "message (" << message.first << ") ::" << message.second << std::endl;
         }
     }
     helicsFederateFree(fed);
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
 }
 
 TEST(logging_tests, check_log_message_levels)
 {
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi,
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
+    helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
                                          HELICS_LOG_LEVEL_TIMING,
                                          &err);
 
-    auto fed = helicsCreateValueFederate("test1", fi, &err);
+    auto fed = helicsCreateValueFederate("test1", fedInfo, &err);
 
     logblocktype mlog;
 
     auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
-        auto* mp = reinterpret_cast<logblocktype*>(udata);
-        mp->lock()->emplace_back(level, message);
+        auto* messageLock = reinterpret_cast<logblocktype*>(udata);
+        messageLock->lock()->emplace_back(level, message);
     };
     helicsFederateSetLoggingCallback(fed, nullptr, &mlog, &err);
 
@@ -101,11 +101,11 @@ TEST(logging_tests, check_log_message_levels)
     auto llock = mlog.lock();
     bool found_low = false;
     bool found_high = false;
-    for (auto& m : llock) {
-        if (m.second.find("MEXAGE1") != std::string::npos) {
+    for (auto& message : *llock) {
+        if (message.second.find("MEXAGE1") != std::string::npos) {
             found_low = true;
         }
-        if (m.second.find("MEXAGE2") != std::string::npos) {
+        if (message.second.find("MEXAGE2") != std::string::npos) {
             found_high = true;
         }
     }
@@ -113,27 +113,27 @@ TEST(logging_tests, check_log_message_levels)
     EXPECT_FALSE(found_high);
 
     helicsFederateFree(fed);
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
 }
 
 TEST(logging_tests, check_log_message_levels_high)
 {
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi,
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
+    helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
                                          HELICS_LOG_LEVEL_TRACE + 6,
                                          &err);
 
-    auto fed = helicsCreateValueFederate("test1", fi, &err);
+    auto fed = helicsCreateValueFederate("test1", fedInfo, &err);
 
     logblocktype mlog;
 
     auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
-        auto* mp = reinterpret_cast<logblocktype*>(udata);
-        mp->lock()->emplace_back(level, message);
+        auto* messageLock = reinterpret_cast<logblocktype*>(udata);
+        messageLock->lock()->emplace_back(level, message);
     };
 
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
@@ -150,17 +150,17 @@ TEST(logging_tests, check_log_message_levels_high)
     auto llock = mlog.lock();
     bool found_low = false;
     bool found_high = false;
-    for (auto& m : llock) {
-        if (m.second.find("MEXAGE1") != std::string::npos) {
+    for (auto& message : *llock) {
+        if (message.second.find("MEXAGE1") != std::string::npos) {
             found_low = true;
         }
-        if (m.second.find("MEXAGE2") != std::string::npos) {
+        if (message.second.find("MEXAGE2") != std::string::npos) {
             found_high = true;
         }
     }
     EXPECT_TRUE(found_low && found_high);
     helicsFederateFree(fed);
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
 }
 
 TEST(logging_tests, core_logging)
@@ -172,8 +172,8 @@ TEST(logging_tests, core_logging)
     logblocktype mlog;
 
     auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
-        auto* mp = reinterpret_cast<logblocktype*>(udata);
-        mp->lock()->emplace_back(level, message);
+        auto* messageLock = reinterpret_cast<logblocktype*>(udata);
+        messageLock->lock()->emplace_back(level, message);
     };
     auto err = helicsErrorInitialize();
     helicsCoreSetLoggingCallback(core, logg, &mlog, &err);
@@ -192,8 +192,8 @@ TEST(logging_tests, broker_logging)
     logblocktype mlog;
 
     auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
-        auto* mp = reinterpret_cast<logblocktype*>(udata);
-        mp->lock()->emplace_back(level, message);
+        auto* messageLock = reinterpret_cast<logblocktype*>(udata);
+        messageLock->lock()->emplace_back(level, message);
     };
     auto err = helicsErrorInitialize();
     helicsBrokerSetLoggingCallback(broker, logg, &mlog, &err);
@@ -245,9 +245,9 @@ TEST(logging_tests, fed_logging_file)
     auto core = helicsCreateCore("inproc", "clogf", "--autobroker --log_level=trace", nullptr);
 
     auto err = helicsErrorInitialize();
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreName(fi, "clogf", nullptr);
-    auto fed = helicsCreateValueFederate("f1", fi, nullptr);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreName(fedInfo, "clogf", nullptr);
+    auto fed = helicsCreateValueFederate("f1", fedInfo, nullptr);
     helicsFederateSetLogFile(fed, lfile.c_str(), nullptr);
 
     helicsCoreSetLogFile(core, lfile.c_str(), &err);
@@ -255,7 +255,7 @@ TEST(logging_tests, fed_logging_file)
     helicsFederateFinalize(fed, &err);
 
     helicsFederateSetLogFile(fed, "emptyfile.txt", nullptr);
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
     helicsCloseLibrary();
     ASSERT_TRUE(std::filesystem::exists(lfile));
     std::filesystem::remove(lfile);

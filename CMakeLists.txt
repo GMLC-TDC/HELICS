@@ -408,7 +408,12 @@ if(MSYS OR CYGWIN)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
     endif()
-    target_compile_definitions(helics_base INTERFACE -D_WIN32_WINNT=0x0601)
+    # setting to windows 10 for all compilation
+    if(WIN32_WINNT)
+        add_compile_definitions("_WIN32_WINNT=${WIN32_WINNT}")
+    else()
+        add_compile_definitions(_WIN32_WINNT=0x0A00)
+    endif()
 endif()
 
 if(MINGW AND NOT UNIX_LIKE)

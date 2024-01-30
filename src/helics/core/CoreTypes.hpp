@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../helics_enums.h"
 
+#include <cstdint>
 #include <string>
 #include <string_view>
 
