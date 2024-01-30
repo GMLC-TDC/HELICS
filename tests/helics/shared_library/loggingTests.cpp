@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.h"
 
 using logblocktype = gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>;
+
 TEST(logging_tests, check_log_message)
 {
     auto fedInfo = helicsCreateFederateInfo();
@@ -48,6 +49,7 @@ TEST(logging_tests, check_log_message)
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::cout << "finalized federate\n";
     EXPECT_EQ(err.error_code, 0);
     auto llock = mlog.lock();
     bool found = false;
@@ -62,6 +64,7 @@ TEST(logging_tests, check_log_message)
             std::cout << "message (" << message.first << ") ::" << message.second << std::endl;
         }
     }
+    llock.unlock();
     helicsFederateFree(fed);
     helicsFederateInfoFree(fedInfo);
 }
@@ -111,7 +114,7 @@ TEST(logging_tests, check_log_message_levels)
     }
     EXPECT_TRUE(found_low);
     EXPECT_FALSE(found_high);
-
+    llock.unlock();
     helicsFederateFree(fed);
     helicsFederateInfoFree(fedInfo);
 }
@@ -146,10 +149,9 @@ TEST(logging_tests, check_log_message_levels_high)
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
     EXPECT_EQ(err.error_code, 0);
-
-    auto llock = mlog.lock();
     bool found_low = false;
     bool found_high = false;
+    auto llock = mlog.lock();
     for (auto& message : *llock) {
         if (message.second.find("MEXAGE1") != std::string::npos) {
             found_low = true;
@@ -158,6 +160,7 @@ TEST(logging_tests, check_log_message_levels_high)
             found_high = true;
         }
     }
+    llock.unlock();
     EXPECT_TRUE(found_low && found_high);
     helicsFederateFree(fed);
     helicsFederateInfoFree(fedInfo);

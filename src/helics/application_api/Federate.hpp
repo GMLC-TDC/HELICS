@@ -96,6 +96,7 @@ class HELICS_CXX_EXPORT Federate {
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time mCurrentTime = Time::minVal();  //!< the current simulation time
     Time mStopTime = Time::maxVal();  //!< the stopping time for the federate
+    std::string configFile;  //!< any config file used
   private:
     /// pointer to a class defining the async call information
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>> asyncCallInfo;
@@ -730,6 +731,8 @@ received
 
     /** get the number of translators registered through this federate*/
     int getTranslatorCount() const;
+    /** get the primary config file actually used by the federate for setup*/
+    const std::string& getConfigFile() const { return configFile; }
 
   protected:
     /** function to run required operations for entering initializingMode*/

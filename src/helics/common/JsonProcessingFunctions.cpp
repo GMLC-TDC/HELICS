@@ -16,6 +16,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics::fileops {
 
+bool looksLikeCommandLine(std::string_view testString)
+{
+    if (testString.empty()) {
+        return false;
+    }
+    if (testString.front() == '-') {
+        return true;
+    }
+    return testString.find(" -") != std::string::npos;
+}
+
 bool hasJsonExtension(std::string_view jsonString)
 {
     auto ext = jsonString.substr(jsonString.length() - 4);
@@ -37,9 +48,9 @@ Json::Value loadJson(const std::string& jsonString)
 
     if (file.is_open()) {
         Json::Value doc;
-        Json::CharReaderBuilder rbuilder;
+        const Json::CharReaderBuilder rbuilder;
         std::string errs;
-        bool ok = Json::parseFromStream(rbuilder, file, &doc, &errs);
+        const bool ok = Json::parseFromStream(rbuilder, file, &doc, &errs);
         if (!ok) {
             throw(std::invalid_argument(errs.c_str()));
         }
@@ -51,10 +62,11 @@ Json::Value loadJson(const std::string& jsonString)
 Json::Value loadJsonStr(std::string_view jsonString)
 {
     Json::Value doc;
-    Json::CharReaderBuilder rbuilder;
+    const Json::CharReaderBuilder rbuilder;
     std::string errs;
     auto reader = std::unique_ptr<Json::CharReader>(rbuilder.newCharReader());
-    bool ok = reader->parse(jsonString.data(), jsonString.data() + jsonString.size(), &doc, &errs);
+    const bool ok =
+        reader->parse(jsonString.data(), jsonString.data() + jsonString.size(), &doc, &errs);
     if (!ok) {
         throw(std::invalid_argument(errs.c_str()));
     }

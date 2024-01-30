@@ -31,14 +31,16 @@ namespace apps {
     /** set a string parameter*/
     void SignalGenerator::setString(std::string_view /*parameter*/, std::string_view /*val*/) {}
 
-    Source::Source(int argc, char* argv[]): App("source", argc, argv)
+    Source::Source(int argc, char* argv[]): App("source_${#}", argc, argv)
     {
         processArgs();
+        initialSetup();
     }
 
-    Source::Source(std::vector<std::string> args): App("source", std::move(args))
+    Source::Source(std::vector<std::string> args): App("source_${#}", std::move(args))
     {
         processArgs();
+        initialSetup();
     }
 
     void Source::processArgs()
@@ -46,11 +48,7 @@ namespace apps {
         helicsCLI11App app("Options specific to the Source App");
         app.add_option("--default_period", defaultPeriod, "the default period publications");
         if (!deactivated) {
-            fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
             app.parse(remArgs);
-            if (!masterFileName.empty()) {
-                loadFile(masterFileName);
-            }
         } else if (helpMode) {
             app.remove_helics_specifics();
             std::cout << app.help();
@@ -58,7 +56,7 @@ namespace apps {
     }
     Source::Source(std::string_view appName, const FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+        initialSetup();
     }
 
     Source::Source(std::string_view appName,
@@ -66,20 +64,27 @@ namespace apps {
                    const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+        initialSetup();
     }
 
     Source::Source(std::string_view appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+        initialSetup();
     }
 
     Source::Source(std::string_view name, const std::string& configString): App(name, configString)
     {
-        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+        processArgs();
+        initialSetup();
+    }
 
-        Source::loadJsonFile(configString);
+    void Source::initialSetup()
+    {
+        if (!deactivated) {
+            fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
+            loadInputFiles();
+        }
     }
 
     static void
@@ -102,7 +107,8 @@ namespace apps {
         }
     }
 
-    void Source::loadJsonFile(const std::string& jsonString)
+    void Source::loadJsonFile(const std::string& jsonString,
+                              bool enableFederateInterfaceRegistration)
     {
         // we want to load the default period before constructing the interfaces so the default
         // period works
@@ -115,7 +121,7 @@ namespace apps {
             }
         }
 
-        loadJsonFileConfiguration("source", jsonString);
+        loadJsonFileConfiguration("source", jsonString, enableFederateInterfaceRegistration);
         auto pubCount = fed->getPublicationCount();
         for (int ii = 0; ii < pubCount; ++ii) {
             sources.emplace_back(fed->getPublication(ii), defaultPeriod);

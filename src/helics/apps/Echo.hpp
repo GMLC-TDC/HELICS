@@ -88,11 +88,14 @@ consistent answers if used from multiple threads unless protected.
 
       private:
         /** load information from a JSON file*/
-        virtual void loadJsonFile(const std::string& jsonFile) override;
+        virtual void loadJsonFile(const std::string& jsonFile,
+                                  bool enableFederateInterfaceRegistration) override;
         /** echo an actual message from an endpoint*/
         void echoMessage(const Endpoint& ept, Time currentTime);
 
       private:
+        /** run any initial setup operations including file loading*/
+        void initialSetup();
         /** process remaining command line arguments*/
         void processArgs();
         std::deque<Endpoint> endpoints;  //!< the actual endpoint objects

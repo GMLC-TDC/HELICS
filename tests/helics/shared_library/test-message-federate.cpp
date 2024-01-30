@@ -164,7 +164,7 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
-TEST_F(mfed_tests, message_object_tests)
+TEST_F(mfed_tests, message_object)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
@@ -368,6 +368,7 @@ TEST(message_object, test1_nosan)
     auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
 
     auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetBroker(fi, "brk1", nullptr);
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
 
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
@@ -454,13 +455,16 @@ TEST(message_object, test1_nosan)
 
 TEST(message_object, copy)
 {
-    auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
+    helicsCleanupLibrary();
+    auto brk = helicsCreateBroker("test", "brk_mcpy", "", nullptr);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
-    auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
+    helicsFederateInfoSetBroker(fedInfo, "brk_mcpy", nullptr);
+    helicsFederateInfoLoadFromString(fedInfo, "--force_new_core", nullptr);
+    auto fed = helicsCreateMessageFederate("fed1", fedInfo, nullptr);
 
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
     auto m1 = helicsFederateCreateMessage(fed, nullptr);
     EXPECT_NE(m1, nullptr);
 
@@ -521,13 +525,16 @@ TEST(message_object, copy)
 
 TEST(message_object, dataBuffer)
 {
-    auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
+    auto brk = helicsCreateBroker("test", "brk_db", "", nullptr);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
-    auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
 
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoSetBroker(fedInfo, "brk_db", nullptr);
+    helicsFederateInfoLoadFromString(fedInfo, "--force_new_core", nullptr);
+
+    auto fed = helicsCreateMessageFederate("fed1", fedInfo, nullptr);
+    helicsFederateInfoFree(fedInfo);
     auto m1 = helicsFederateCreateMessage(fed, nullptr);
     EXPECT_NE(m1, nullptr);
 

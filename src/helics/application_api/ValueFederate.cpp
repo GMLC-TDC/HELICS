@@ -28,46 +28,26 @@ namespace helics {
 ValueFederate::ValueFederate(std::string_view fedName, const FederateInfo& fedInfo):
     Federate(fedName, fedInfo)
 {
-    // the core object get instantiated in the Federate constructor
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
-                                                       this,
-                                                       getID(),
-                                                       singleThreadFederate);
-    vfManager->useJsonSerialization = fedInfo.useJsonSerialization;
+    loadFederateData();
 }
 ValueFederate::ValueFederate(std::string_view fedName,
                              const std::shared_ptr<Core>& core,
                              const FederateInfo& fedInfo):
     Federate(fedName, core, fedInfo)
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
-                                                       this,
-                                                       getID(),
-                                                       singleThreadFederate);
-    vfManager->useJsonSerialization = fedInfo.useJsonSerialization;
+    loadFederateData();
 }
 
 ValueFederate::ValueFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fedInfo):
     Federate(fedName, core, fedInfo)
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
-                                                       this,
-                                                       getID(),
-                                                       singleThreadFederate);
-    vfManager->useJsonSerialization = fedInfo.useJsonSerialization;
+    loadFederateData();
 }
 
 ValueFederate::ValueFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
-                                                       this,
-                                                       getID(),
-                                                       singleThreadFederate);
-    vfManager->useJsonSerialization = useJsonSerialization;
-    if (looksLikeFile(configString)) {
-        ValueFederate::registerInterfaces(configString);
-    }
+    loadFederateData();
 }
 
 ValueFederate::ValueFederate(const std::string& configString):
@@ -84,16 +64,24 @@ ValueFederate::ValueFederate() = default;
 
 ValueFederate::ValueFederate(bool /*res*/)
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
-                                                       this,
-                                                       getID(),
-                                                       singleThreadFederate);
-    vfManager->useJsonSerialization = useJsonSerialization;
+    loadFederateData();
 }
 
 ValueFederate::ValueFederate(ValueFederate&&) noexcept = default;
 
 ValueFederate::~ValueFederate() = default;
+
+void ValueFederate::loadFederateData()
+{
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
+                                                       this,
+                                                       getID(),
+                                                       singleThreadFederate);
+    vfManager->useJsonSerialization = useJsonSerialization;
+    if (!configFile.empty()) {
+        ValueFederate::registerValueInterfaces(configFile);
+    }
+}
 
 void ValueFederate::disconnect()
 {

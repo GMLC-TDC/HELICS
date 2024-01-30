@@ -42,28 +42,26 @@ static std::string encode(std::string_view str2encode)
 namespace helics::apps {
 Clone::Clone(std::string_view appName, FederateInfo& fedInfo): App(appName, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
+    initialSetup();
 }
 
 Clone::Clone(std::vector<std::string> args): App("Clone", std::move(args))
 {
     processArgs();
+    initialSetup();
 }
 
 Clone::Clone(int argc, char* argv[]): App("Clone", argc, argv)
 {
     processArgs();
+    initialSetup();
 }
 
 void Clone::processArgs()
 {
     auto app = buildArgParserApp();
     if (!deactivated) {
-        fed->setFlagOption(HELICS_FLAG_OBSERVER);
         app->parse(remArgs);
-        if (!masterFileName.empty()) {
-            loadFile(masterFileName);
-        }
     } else if (helpMode) {
         app->remove_helics_specifics();
         std::cout << app->help();
@@ -75,19 +73,19 @@ Clone::Clone(std::string_view appName,
              const FederateInfo& fedInfo):
     App(appName, core, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
+    initialSetup();
 }
 
 Clone::Clone(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
     App(appName, core, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
+    initialSetup();
 }
 
 Clone::Clone(std::string_view appName, const std::string& jsonString): App(appName, jsonString)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
-    Clone::loadJsonFile(jsonString);
+    processArgs();
+    initialSetup();
 }
 
 Clone::~Clone()
@@ -98,6 +96,14 @@ Clone::~Clone()
         }
     }
     catch (...) {
+    }
+}
+
+void Clone::initialSetup()
+{
+    if (!deactivated) {
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
+        loadInputFiles();
     }
 }
 

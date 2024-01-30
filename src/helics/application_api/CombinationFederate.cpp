@@ -17,16 +17,16 @@ CombinationFederate::CombinationFederate(std::string_view fedName, const Federat
 }
 CombinationFederate::CombinationFederate(std::string_view fedName,
                                          const std::shared_ptr<Core>& core,
-                                         const FederateInfo& fi):
-    Federate(fedName, core, fi),
+                                         const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo),
     ValueFederate(true), MessageFederate(true)
 {
 }
 
 CombinationFederate::CombinationFederate(std::string_view fedName,
                                          CoreApp& core,
-                                         const FederateInfo& fi):
-    Federate(fedName, core, fi),
+                                         const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo),
     ValueFederate(true), MessageFederate(true)
 {
 }
@@ -35,13 +35,11 @@ CombinationFederate::CombinationFederate(const std::string& configString):
     Federate(std::string_view{}, loadFederateInfo(configString)), ValueFederate(true),
     MessageFederate(true)
 {
-    CombinationFederate::registerInterfaces(configString);
 }
 
 CombinationFederate::CombinationFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString)), ValueFederate(true), MessageFederate(true)
 {
-    CombinationFederate::registerInterfaces(configString);
 }
 
 CombinationFederate::CombinationFederate(CombinationFederate&&) noexcept = default;

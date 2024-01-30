@@ -282,7 +282,7 @@ TEST_P(recorder_message_file_tests, test_message_files_cmd)
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
 
     std::vector<std::string> args{
-        "", "--name=rec", "--broker=ipc_broker", "--coretype=ipc", exampleFile};
+        "", "--name=rec", "--broker=ipc_broker", "--coretype=ipc", "--input=" + exampleFile};
     char* argv[5];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);

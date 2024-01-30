@@ -107,6 +107,9 @@ namespace apps {
         void captureForCurrentTime(Time currentTime, int iteration = 0);
         /** build the command line argument processing application*/
         std::shared_ptr<helicsCLI11App> buildArgParserApp();
+
+        /** run any initial setup operations including file loading*/
+        void initialSetup();
         /** process remaining command line arguments*/
         void processArgs();
 

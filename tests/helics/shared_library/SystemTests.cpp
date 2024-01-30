@@ -41,7 +41,7 @@ TEST(other_tests, broker_global_value)
 TEST(other_tests, broker_global_value_errors_nosan_ci_skip)
 {
     auto err = helicsErrorInitialize();
-    auto brk = helicsCreateBroker("test", "gbroker", "--root", &err);
+    auto brk = helicsCreateBroker("test", "gbroker2", "--root", &err);
     auto q = helicsCreateQuery("global_value", "testglobal");
     auto res = helicsQueryBrokerExecute(nullptr, brk, &err);
     EXPECT_NE(err.error_code, 0);
@@ -313,13 +313,13 @@ TEST(other_tests, federate_add_dependency)
 TEST(other_tests, core_creation)
 {
     auto err = helicsErrorInitialize();
-    auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
+    auto brk = helicsCreateBroker("test", "gbrokercn", "--root", &err);
 
     const char* argv[4];
     argv[0] = "";
     argv[1] = "--name=gcore";
     argv[2] = "--timeout=2000";
-    argv[3] = "--broker=gbrokerc";
+    argv[3] = "--broker=gbrokercn";
 
     auto cr = helicsCreateCoreFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_EQ(err.error_code, 0);
@@ -340,7 +340,7 @@ TEST(other_tests, core_creation_error_nosan)
     argv[0] = "";
     argv[1] = "--name=gcore2";
     argv[2] = "--log_level=what_logs?";
-    argv[3] = "--broker=gbrokerc";
+    argv[3] = "--broker=gbrokercm2";
 
     auto cr2 = helicsCreateCoreFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_NE(err.error_code, 0);
@@ -355,13 +355,13 @@ TEST(other_tests, broker_creation)
 
     const char* argv[4];
     argv[0] = "";
-    argv[1] = "--name=gbrokerc";
+    argv[1] = "--name=gbrokercm3";
     argv[2] = "--timeout=2000";
     argv[3] = "--root";
 
     auto brk = helicsCreateBrokerFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_EQ(err.error_code, 0);
-    EXPECT_STREQ(helicsBrokerGetIdentifier(brk), "gbrokerc");
+    EXPECT_STREQ(helicsBrokerGetIdentifier(brk), "gbrokercm3");
 
     helicsBrokerDisconnect(brk, &err);
 }
@@ -373,7 +373,7 @@ TEST(other_tests, broker_creation_nosan)
 
     const char* argv[4];
     argv[0] = "";
-    argv[1] = "--name=gbrokerc2";
+    argv[1] = "--name=gbrokerAC1";
     argv[2] = "--log_level=what_logs?";
     argv[3] = "--root";
 
@@ -388,7 +388,9 @@ TEST(federate_tests, federateGeneratedLocalError_nosan)
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
     helicsFederateInfoSetCoreName(fi, "core_full_le", nullptr);
-    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
+    helicsFederateInfoSetCoreInitString(fi,
+                                        "-f 1 --autobroker --broker=flebroker1 --error_timeout=0",
+                                        nullptr);
 
     auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
     helicsFederateInfoFree(fi);
@@ -412,7 +414,9 @@ TEST(federate, federateGeneratedGlobalError_nosan)
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
     helicsFederateInfoSetCoreName(fi, "core_full_ge", nullptr);
-    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
+    helicsFederateInfoSetCoreInitString(fi,
+                                        "-f 1 --autobroker --broker=fgebroker2 --error_timeout=0",
+                                        nullptr);
 
     auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
     helicsFederateInfoFree(fi);
@@ -556,7 +560,9 @@ TEST(federate, federateNoProtection)
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
     helicsFederateInfoSetCoreName(fi, "core_protect", nullptr);
-    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
+    helicsFederateInfoSetCoreInitString(fi,
+                                        "-f 1 --autobroker --broker=npbroker1 --error_timeout=0",
+                                        nullptr);
 
     auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
 
@@ -580,7 +586,9 @@ TEST(federate, federateProtection)
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
     helicsFederateInfoSetCoreName(fi, "core_protect", nullptr);
-    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
+    helicsFederateInfoSetCoreInitString(fi,
+                                        "-f 1 --autobroker --broker=npbroker2 --error_timeout=0",
+                                        nullptr);
 
     auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
     helicsFederateInfoFree(fi);
