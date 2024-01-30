@@ -151,6 +151,7 @@ TEST(logging_tests, check_log_message_levels_high)
     EXPECT_EQ(err.error_code, 0);
     bool found_low = false;
     bool found_high = false;
+    auto llock=mlog.lock();
     for (auto& message : *llock) {
         if (message.second.find("MEXAGE1") != std::string::npos) {
             found_low = true;
