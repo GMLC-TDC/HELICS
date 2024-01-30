@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -297,7 +297,7 @@ std::unique_ptr<helicsCLI11App> Connector::generateParser()
            },
            "specify connections to make in the cosimulation")
         ->expected(2, CLI::detail::expected_max_vector_size)
-        ->type_name("[INTERFACE1,INTERFACE2,DIRECTIONALITY,TXT...]");
+        ->type_name("[INTERFACE1,INTERFACE2,DIRECTIONALITY,TAGS...]");
     app->add_flag("--match_target_endpoints",
                   matchTargetEndpoints,
                   "set to true to enable connection of unconnected target endpoints")
@@ -774,7 +774,7 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
         core.dataLink(origin, target);
         if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
             fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                            fmt::format("connection publication {} to input {}", origin, target));
+                            fmt::format("connecting publication {} to input {}", origin, target));
         }
     };
     auto sourceEndpointConnector = [this, logLevel](std::string_view origin,
@@ -782,7 +782,7 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
         core.linkEndpoints(origin, target);
         if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
             fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                            fmt::format("connection source endpoint {} to target endpoint {}",
+                            fmt::format("connecting source endpoint {} to target endpoint {}",
                                         origin,
                                         target));
         }
@@ -792,7 +792,7 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
         core.linkEndpoints(source, origin);
         if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
             fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                            fmt::format("connection target endpoint {} to source endpoint {}",
+                            fmt::format("connecting target endpoint {} to source endpoint {}",
                                         origin,
                                         source));
         }
@@ -944,7 +944,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
         }
     }
 
-    /** unconnected source endpoints*/
+    /** unconnected target endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedTargetEndpoints) {
         if (makePotentialConnection(uEnd,
                                     tagList,
@@ -1084,7 +1084,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
                 ++interfacesRequested;
                 if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
                     fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                                    fmt::format("federate {} request input {}",
+                                    fmt::format("federate {} request endpoint {}",
                                                 possibleFed,
                                                 ept.first));
                 }

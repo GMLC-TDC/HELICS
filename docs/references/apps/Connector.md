@@ -1,13 +1,13 @@
 # Connector
 
-The Connector app can automatically connect interfaces together. It does this using the query mechanisms inside HELICS to detect all the unconnected interfaces in a cosimulation. Then using given database rules it will establish connections between those interfaces.
+The Connector app can automatically connect interfaces together. It does this using the query mechanisms inside HELICS to detect all the unconnected interfaces in a cosimulation. Then using given configuration rules it will establish connections between those interfaces.
 
-It can also run in a two phase mode where in the first mode if federates indicate they have potential interfaces. The connector app will go through the potential interfaces to see if there is a potential connection to be made using the same rules. If a potential interface has a connection available it will send a command to the appropriate interface to go ahead and create those interfaces.
-Then in the second phase it will go ahead an actually make any requested connections from the new and existing unconnected interfaces.
+It can also run in a two phase mode if federates indicate they have potential interfaces. In the first phase, the connector app will go through the potential interfaces to see if there is a potential connection to be made using the same rules. If a potential interface has a connection available it will send a command to the appropriate interface to go ahead and create those interfaces.
+Then in the second phase it will go ahead and actually make any requested connections from the new and existing unconnected interfaces.
 
 ## Connection configuration
 
-The main mechanism to loading connection information is through configuration files.
+The main mechanism to load connection information is through configuration files.
 
 ```text
 #comment line for simple file test
@@ -52,7 +52,7 @@ json format is also supported
 ## Notes on Tags
 
 Connections specified with no tags or "default" tag will match with everything.
-if connections have tags they will only match if the same tag is used on a federate, core, or federation.
+If connections have tags they will only match if the same tag is used on another federate, core, or federation.
 A tag can be specified by a global_value. The tag used for the connector is the name of the global or tag, the value can be anything other than "false", if the tag is specified with a value of false it is not used in the matching.
 Tags used in the connector can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.
 

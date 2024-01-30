@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -51,7 +51,7 @@ class HELICS_CXX_EXPORT Connector: public App {
     Connector(int argc, char* argv[]);
     /** construct from a federate info object
 @param name the name of the federate (can be empty to use defaults from fedInfo)
-@param fedInfo a pointer info object containing information on the desired federate configuration
+@param fedInfo a federate info object containing information on the desired federate configuration
 */
     explicit Connector(std::string_view name, const FederateInfo& fedInfo);
     /**constructor taking a federate information structure and using the given core
@@ -83,7 +83,7 @@ other configuration
     /** initialize the Player federate
 @details generate all the publications and organize the points, the final publication count will
 be available after this time and the Player will enter the initialization mode, which means it
-will not be possible to add more publications calling run will automatically do this if
+will not be possible to add more publications; calling run will automatically do this if
 necessary
 */
     virtual void initialize() override;
@@ -104,10 +104,10 @@ necessary
                        InterfaceDirection direction = InterfaceDirection::BIDIRECTIONAL,
                        const std::vector<std::string>& tags = {});
 
-    /** add a tag for later reference return a string_view reference for the tag*/
+    /** add a tag for later reference, return a string_view reference for the tag*/
     std::size_t addTag(std::string_view tagName);
 
-    /** add a interface name for later reference return a string_view reference for the interface
+    /** add an interface name for later reference, return a string_view reference for the interface
      * name*/
     std::string_view addInterface(std::string_view interfaceName);
 
@@ -134,7 +134,7 @@ necessary
     virtual void loadTextFile(const std::string& filename) override;
 
     bool addConnectionVector(const std::vector<std::string>& connection);
-    /** actually go through and make connections*/
+    /** go through and make potential connections between interfaces*/
     void establishPotentialInterfaces(ConnectionsList& possibleConnections);
     /** actually go through and make connections*/
     void makeConnections(ConnectionsList& possibleConnections);
@@ -157,7 +157,7 @@ necessary
         std::unordered_set<std::string_view>& possibleConnections,
         std::unordered_map<std::string_view, PotentialConnections>& potentials,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
-    /** get a list of the possible connections to based on the database*/
+    /** get a list of the possible connections to based on the connections map*/
     std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface,
                                                         const std::vector<std::size_t>& tags) const;
     /** load the regex matchers */
