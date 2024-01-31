@@ -300,7 +300,7 @@ CheckOptions:
   - key: readability-identifier-naming.MethodSuffix
     value: ""
   - key: readability-identifier-naming.NamespaceCase
-    value: lowercase
+    value: lower_case
   - key: readability-identifier-naming.NamespacePrefix
     value: ""
   - key: readability-identifier-naming.NamespaceSuffix
