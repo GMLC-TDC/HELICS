@@ -25,7 +25,7 @@ TEST(logging_tests, check_log_message)
     auto fedInfo = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreName(fedInfo,"clogcore",&err);
+    helicsFederateInfoSetCoreName(fedInfo, "clogcore", &err);
     helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
     helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
@@ -77,7 +77,7 @@ TEST(logging_tests, check_log_message_levels)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
-    helicsFederateInfoSetCoreName(fedInfo,"clogcorelevels",&err);
+    helicsFederateInfoSetCoreName(fedInfo, "clogcorelevels", &err);
     helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
                                          HELICS_LOG_LEVEL_TIMING,
@@ -128,7 +128,7 @@ TEST(logging_tests, check_log_message_levels_high)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
-    helicsFederateInfoSetCoreName(fedInfo,"clogcorehigh",&err);
+    helicsFederateInfoSetCoreName(fedInfo, "clogcorehigh", &err);
     helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
                                          HELICS_LOG_LEVEL_TRACE + 6,
