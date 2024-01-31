@@ -148,7 +148,7 @@ void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
 
 void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* string, int stringSize, HelicsError* err)
 {
-    static const char* invalidBuffer = "The given buffer is not valid";
+    static constexpr const char* invalidBuffer = "The given buffer is not valid";
 
     if (((err) != nullptr) && ((err)->error_code != 0)) {
         return;
@@ -166,6 +166,7 @@ void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* string, int str
     if (stringSize <= 0 || string == nullptr) {
         bufferStr->clear();
         bufferStr->push_back('>');
+        return;
     }
     bufferStr->reserve(static_cast<std::size_t>(stringSize) + 1);
     bufferStr->assign(string, string + stringSize);
