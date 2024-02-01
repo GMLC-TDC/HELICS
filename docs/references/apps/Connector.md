@@ -4,32 +4,38 @@ The Connector app can automatically connect interfaces together. It does this us
 
 It can also run in a two-phase mode to have the federates create then connect interfaces. In the first phase, the connector app will query the federates for their potential interfaces and then go through those interfaces to see if there is a potential connection to be made using the same rules. If a potential interface has a connection available, it will send a command to the appropriate federate to create the interface. Once the interfaces exist, the Connector enters the second phase and makes the requested connections from the new and existing unconnected interfaces.
 
-## Connection configuration
+## Connector configuration
 
-The main mechanism to load connection information is through configuration files.
+The main mechanism to load connection information is through configuration files called "match-files", typically a plain text file. The format is:
+
+```<origin> <target> <*direction> <*tags...>```
+
+"origin" is the interface that is currently unconnected and "target" is the interface to connect it to. "direction" is optional and is assumed to be bidirectional matching ("bi"); in this case the direction of the match does not indicate the flow of the data but rather which interface is unmatched (the "from"). For example, if the match string looked like "V_out, V_in from_to" the Connector treats "V_out" as unconnected and will match it with "V_in" even if "V_in" is already connected. Bidrectional matching allows either interface to be unconnected to create a match.
+
+"tags" are optional and allow for filtering the candidate connections; see below for further details on their use. Comments lines are supported and  begin with `#`. Currently only publications, inputs, and endpoints are supported for matching by Connector.
+
+Here's a simple example of a plain text match-file.
 
 ```text
 #comment line for simple file test
 inp1 pub1 from_to
 ```
 
-The simplest is a text file. Comment lines begin with `#`
-the format is
-`<origin> <target> <*direction> <*tags...>` The origin is the interface that is currently unconnected, and target is the interface to connect it to. Direction is optional and assumed bidirectional matching, tags are also optional. Currently only publications, inputs, and endpoints are supported. A more complicated example follows
+The following example uses a cascaded matching definition.
 
 ```text
-#comment line for cascade file test
+# comment line for cascade file test
 # second comment line
 inp1 intermediate1
 intermediate1 intermediate1 bi
 intermediate1 intermediate2 from_to
 intermediate2 intermediate3 from_to
-#comment line in the middle
+# comment line in the middle
 intermediate3 pub1 bi
 inp2 intermediate2 from_to
 ```
 
-and a short example with tags
+The following example uses tags in the matching process, see more on tags below.
 
 ```text
 #comment line for simple file test
@@ -37,7 +43,7 @@ inp1 pub1 from_to tag1
 inp2 pub1 tag2 tag3
 ```
 
-json format is also supported
+The match-file can also be JSON formatted (though you lose the ability to have comments).
 
 ```json
 {
@@ -50,10 +56,8 @@ json format is also supported
 
 ## Notes on Tags
 
-Connections specified with no tags or "default" tag will match with everything.
-If connections have tags they will only match if the same tag is used on another federate, core, or federation.
-A tag can be specified by a global_value. The tag used for the connector is the name of the global or tag, the value can be anything other than "false", if the tag is specified with a value of false it is not used in the matching.
-Tags used in the connector can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.
+ - Connections specified with no tags or "default" tag will match with everything as if the tag were not there. If a connection specified by a match in the match-file uses a tag, a connection will only be made if the specified tag is used by both federates, cores, or federations.
+ - A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than "false"; if the tag is specified with a value of "false" it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.
 
 ## Command line arguments
 
