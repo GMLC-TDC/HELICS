@@ -147,79 +147,68 @@ static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
                     const auto& potInterfaces = fed["potential_interfaces"];
                     if (potInterfaces.isMember("inputs")) {
                         for (const auto& input : potInterfaces["inputs"]) {
-                            if (input.isObject())
-                            {
+                            if (input.isObject()) {
                                 auto name = fileops::getName(input);
-                                if (name.empty())
-                                {
+                                if (name.empty()) {
                                     continue;
                                 }
                                 const std::string_view input1 =
                                     connections.interfaces.emplace_back(name);
                                 connections.potentialInputs.emplace(
-                                    input1, PotentialConnections{ federateName, input1, false });
-                            }
-                            else if (input.isString())
-                            {
+                                    input1, PotentialConnections{federateName, input1, false});
+                            } else if (input.isString()) {
                                 const std::string_view input1 =
                                     connections.interfaces.emplace_back(input.asCString());
                                 connections.potentialInputs.emplace(
-                                    input1, PotentialConnections{ federateName, input1, false });
+                                    input1, PotentialConnections{federateName, input1, false});
                             }
-
                         }
                     }
                     if (potInterfaces.isMember("publications")) {
                         for (const auto& pub : potInterfaces["publications"]) {
-                            if (pub.isObject())
-                            {
+                            if (pub.isObject()) {
                                 auto name = fileops::getName(pub);
-                                if (name.empty())
-                                {
+                                if (name.empty()) {
                                     continue;
                                 }
                                 const std::string_view pub1 =
                                     connections.interfaces.emplace_back(name);
                                 connections.potentialPubs.emplace(
-                                    pub1, PotentialConnections{ federateName, pub1, false });
-                            }
-                            else if (pub.isString())
-                            {
+                                    pub1, PotentialConnections{federateName, pub1, false});
+                            } else if (pub.isString()) {
                                 const std::string_view pub1 =
                                     connections.interfaces.emplace_back(pub.asCString());
                                 connections.potentialPubs.emplace(
-                                    pub1, PotentialConnections{ federateName, pub1, false });
+                                    pub1, PotentialConnections{federateName, pub1, false});
                             }
                         }
                     }
                     if (potInterfaces.isMember("endpoints")) {
                         for (const auto& endpoint : potInterfaces["endpoints"]) {
-                            if (endpoint.isObject())
-                            {
+                            if (endpoint.isObject()) {
                                 auto name = fileops::getName(endpoint);
-                                if (name.empty())
-                                {
+                                if (name.empty()) {
                                     continue;
                                 }
                                 const std::string_view endpoint1 =
                                     connections.interfaces.emplace_back(name);
                                 connections.potentialEndpoints.emplace(
-                                    endpoint1, PotentialConnections{ federateName, endpoint1, false });
-                            }
-                            else
-                            {
+                                    endpoint1,
+                                    PotentialConnections{federateName, endpoint1, false});
+                            } else {
                                 const std::string_view endpoint1 =
                                     connections.interfaces.emplace_back(endpoint.asCString());
                                 connections.potentialEndpoints.emplace(
-                                    endpoint1, PotentialConnections{ federateName, endpoint1, false });
+                                    endpoint1,
+                                    PotentialConnections{federateName, endpoint1, false});
                             }
                         }
                     }
                 }
             }
-            catch (const Json::Exception& /*ev*/)
-            {
-                //TODO(PT): I think this is going to be almost impossible now, but someday might want to create a response
+            catch (const Json::Exception& /*ev*/) {
+                // TODO(PT): I think this is going to be almost impossible now, but someday might
+                // want to create a response
                 continue;
             }
         }
