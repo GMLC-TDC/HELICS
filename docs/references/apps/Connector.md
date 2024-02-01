@@ -8,11 +8,11 @@ It can also run in a two-phase mode to have the federates create then connect in
 
 The main mechanism to load connection information is through configuration files called "match-files", typically a plain text file. The format is:
 
-```<origin> <target> <*direction> <*tags...>```
+`<origin> <target> <*direction> <*tags...>`
 
 "origin" is the interface that is currently unconnected and "target" is the interface to connect it to. "direction" is optional and is assumed to be bidirectional matching ("bi"); in this case the direction of the match does not indicate the flow of the data but rather which interface is unmatched (the "from"). For example, if the match string looked like "V_out, V_in from_to" the Connector treats "V_out" as unconnected and will match it with "V_in" even if "V_in" is already connected. Bidrectional matching allows either interface to be unconnected to create a match.
 
-"tags" are optional and allow for filtering the candidate connections; see below for further details on their use. Comments lines are supported and  begin with `#`. Currently only publications, inputs, and endpoints are supported for matching by Connector.
+"tags" are optional and allow for filtering the candidate connections; see below for further details on their use. Comments lines are supported and begin with `#`. Currently only publications, inputs, and endpoints are supported for matching by Connector.
 
 Here's a simple example of a plain text match-file.
 
@@ -56,8 +56,8 @@ The match-file can also be JSON formatted (though you lose the ability to have c
 
 ## Notes on Tags
 
- - Connections specified with no tags or "default" tag will match with everything as if the tag were not there. If a connection specified by a match in the match-file uses a tag, a connection will only be made if the specified tag is used by both federates, cores, or federations.
- - A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than "false"; if the tag is specified with a value of "false" it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.
+- Connections specified with no tags or "default" tag will match with everything as if the tag were not there. If a connection specified by a match in the match-file uses a tag, a connection will only be made if the specified tag is used by both federates, cores, or federations.
+- A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than "false"; if the tag is specified with a value of "false" it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.
 
 ## Command line arguments
 
