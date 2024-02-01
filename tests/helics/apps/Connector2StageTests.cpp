@@ -1259,7 +1259,6 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
 
-
 TEST(connector_2stage, multiCheckFed)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -1275,19 +1274,20 @@ TEST(connector_2stage, multiCheckFed)
     CheckFed cfed1("c1", fedInfo);
     cfed1.addPotentialInputs({"inp1", "inp2"});
     cfed1.addPotentialPubs({"pub1", "pub2"});
-    CheckFed cfed2("c2",fedInfo);
+    CheckFed cfed2("c2", fedInfo);
     cfed2.addPotentialInputs({"inpA", "inpB"});
     cfed2.addPotentialPubs({"pubA", "pubB", "pubC"});
 
     helics::CoreApp core(fedInfo.coreName);
 
-
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
 
-    auto fut2 = std::async(std::launch::async,[&cfed2](){cfed2.initialize();
-    cfed2.executing();
-    cfed2.run(5);
-    cfed2.finalize();});
+    auto fut2 = std::async(std::launch::async, [&cfed2]() {
+        cfed2.initialize();
+        cfed2.executing();
+        cfed2.run(5);
+        cfed2.finalize();
+    });
 
     cfed1.initialize();
     cfed1.executing();
