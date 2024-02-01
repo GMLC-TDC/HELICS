@@ -2,8 +2,7 @@
 
 The Connector app can automatically connect interfaces together. It does this using the query mechanisms inside HELICS to detect all the unconnected interfaces in a cosimulation. Then using given configuration rules it will establish connections between those interfaces.
 
-It can also run in a two phase mode if federates indicate they have potential interfaces. In the first phase, the connector app will go through the potential interfaces to see if there is a potential connection to be made using the same rules. If a potential interface has a connection available it will send a command to the appropriate interface to go ahead and create those interfaces.
-Then in the second phase it will go ahead and actually make any requested connections from the new and existing unconnected interfaces.
+It can also run in a two-phase mode to have the federates create then connect interfaces. In the first phase, the connector app will query the federates for their potential interfaces and then go through those interfaces to see if there is a potential connection to be made using the same rules. If a potential interface has a connection available, it will send a command to the appropriate federate to create the interface. Once the interfaces exist, the Connector enters the second phase and makes the requested connections from the new and existing unconnected interfaces.
 
 ## Connection configuration
 
