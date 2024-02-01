@@ -81,93 +81,146 @@ static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
     }
     if (core.isMember("federates")) {
         for (const auto& fed : core["federates"]) {
-            if (fed.isMember("tags")) {
-                loadTags(connections, fed["tags"]);
-            }
-            if (fed.isMember("connected_inputs")) {
-                for (const auto& input : fed["connected_inputs"]) {
-                    const std::string_view input1 =
-                        connections.interfaces.emplace_back(input.asString());
-                    connections.inputs.insert(input1);
+            try {
+                if (fed.isMember("tags")) {
+                    loadTags(connections, fed["tags"]);
                 }
-            }
-            if (fed.isMember("connected_publications")) {
-                for (const auto& pub : fed["connected_publications"]) {
-                    const std::string_view pub1 =
-                        connections.interfaces.emplace_back(pub.asString());
-                    connections.pubs.insert(pub1);
-                }
-            }
-            if (fed.isMember("unconnected_inputs")) {
-                for (const auto& input : fed["unconnected_inputs"]) {
-                    const std::string_view input1 =
-                        connections.interfaces.emplace_back(input.asString());
-                    connections.unconnectedInputs.push_back(input1);
-                    connections.inputs.insert(input1);
-                }
-            }
-            if (fed.isMember("unconnected_publications")) {
-                for (const auto& pub : fed["unconnected_publications"]) {
-                    const std::string_view pub1 =
-                        connections.interfaces.emplace_back(pub.asString());
-                    connections.unconnectedPubs.push_back(pub1);
-                    connections.pubs.insert(pub1);
-                }
-            }
-
-            if (fed.isMember("unconnected_target_endpoints")) {
-                for (const auto& endpoint : fed["unconnected_target_endpoints"]) {
-                    const std::string_view end1 =
-                        connections.interfaces.emplace_back(endpoint.asString());
-                    connections.unconnectedTargetEndpoints.push_back(end1);
-                    connections.endpoints.insert(end1);
-                }
-            }
-            if (fed.isMember("unconnected_source_endpoints")) {
-                for (const auto& endpoint : fed["unconnected_source_endpoints"]) {
-                    const std::string_view end1 =
-                        connections.interfaces.emplace_back(endpoint.asString());
-                    connections.unconnectedSourceEndpoints.push_back(end1);
-                    connections.endpoints.insert(end1);
-                }
-            }
-            if (fed.isMember("connected_endpoints")) {
-                for (const auto& endpoint : fed["connected_endpoints"]) {
-                    const std::string_view end1 =
-                        connections.interfaces.emplace_back(endpoint.asString());
-                    connections.endpoints.insert(end1);
-                }
-            }
-            if (fed.isMember("potential_interfaces")) {
-                connections.hasPotentialInterfaces = true;
-                const std::string_view federateName =
-                    connections.federatesWithPotentialInterfaces.emplace_back(
-                        fed["attributes"]["name"].asCString());
-                const auto& potInterfaces = fed["potential_interfaces"];
-                if (potInterfaces.isMember("inputs")) {
-                    for (const auto& input : potInterfaces["inputs"]) {
+                if (fed.isMember("connected_inputs")) {
+                    for (const auto& input : fed["connected_inputs"]) {
                         const std::string_view input1 =
-                            connections.interfaces.emplace_back(input.asCString());
-                        connections.potentialInputs.emplace(
-                            input1, PotentialConnections{federateName, input1, false});
+                            connections.interfaces.emplace_back(input.asString());
+                        connections.inputs.insert(input1);
                     }
                 }
-                if (potInterfaces.isMember("publications")) {
-                    for (const auto& pub : potInterfaces["publications"]) {
+                if (fed.isMember("connected_publications")) {
+                    for (const auto& pub : fed["connected_publications"]) {
                         const std::string_view pub1 =
-                            connections.interfaces.emplace_back(pub.asCString());
-                        connections.potentialPubs.emplace(
-                            pub1, PotentialConnections{federateName, pub1, false});
+                            connections.interfaces.emplace_back(pub.asString());
+                        connections.pubs.insert(pub1);
                     }
                 }
-                if (potInterfaces.isMember("endpoints")) {
-                    for (const auto& endpoint : potInterfaces["endpoints"]) {
-                        const std::string_view endpoint1 =
-                            connections.interfaces.emplace_back(endpoint.asCString());
-                        connections.potentialEndpoints.emplace(
-                            endpoint1, PotentialConnections{federateName, endpoint1, false});
+                if (fed.isMember("unconnected_inputs")) {
+                    for (const auto& input : fed["unconnected_inputs"]) {
+                        const std::string_view input1 =
+                            connections.interfaces.emplace_back(input.asString());
+                        connections.unconnectedInputs.push_back(input1);
+                        connections.inputs.insert(input1);
                     }
                 }
+                if (fed.isMember("unconnected_publications")) {
+                    for (const auto& pub : fed["unconnected_publications"]) {
+                        const std::string_view pub1 =
+                            connections.interfaces.emplace_back(pub.asString());
+                        connections.unconnectedPubs.push_back(pub1);
+                        connections.pubs.insert(pub1);
+                    }
+                }
+
+                if (fed.isMember("unconnected_target_endpoints")) {
+                    for (const auto& endpoint : fed["unconnected_target_endpoints"]) {
+                        const std::string_view end1 =
+                            connections.interfaces.emplace_back(endpoint.asString());
+                        connections.unconnectedTargetEndpoints.push_back(end1);
+                        connections.endpoints.insert(end1);
+                    }
+                }
+                if (fed.isMember("unconnected_source_endpoints")) {
+                    for (const auto& endpoint : fed["unconnected_source_endpoints"]) {
+                        const std::string_view end1 =
+                            connections.interfaces.emplace_back(endpoint.asString());
+                        connections.unconnectedSourceEndpoints.push_back(end1);
+                        connections.endpoints.insert(end1);
+                    }
+                }
+                if (fed.isMember("connected_endpoints")) {
+                    for (const auto& endpoint : fed["connected_endpoints"]) {
+                        const std::string_view end1 =
+                            connections.interfaces.emplace_back(endpoint.asString());
+                        connections.endpoints.insert(end1);
+                    }
+                }
+                if (fed.isMember("potential_interfaces")) {
+                    connections.hasPotentialInterfaces = true;
+                    const std::string_view federateName =
+                        connections.federatesWithPotentialInterfaces.emplace_back(
+                            fed["attributes"]["name"].asCString());
+                    const auto& potInterfaces = fed["potential_interfaces"];
+                    if (potInterfaces.isMember("inputs")) {
+                        for (const auto& input : potInterfaces["inputs"]) {
+                            if (input.isObject())
+                            {
+                                auto name = fileops::getName(input);
+                                if (name.empty())
+                                {
+                                    continue;
+                                }
+                                const std::string_view input1 =
+                                    connections.interfaces.emplace_back(name);
+                                connections.potentialInputs.emplace(
+                                    input1, PotentialConnections{ federateName, input1, false });
+                            }
+                            else if (input.isString())
+                            {
+                                const std::string_view input1 =
+                                    connections.interfaces.emplace_back(input.asCString());
+                                connections.potentialInputs.emplace(
+                                    input1, PotentialConnections{ federateName, input1, false });
+                            }
+
+                        }
+                    }
+                    if (potInterfaces.isMember("publications")) {
+                        for (const auto& pub : potInterfaces["publications"]) {
+                            if (pub.isObject())
+                            {
+                                auto name = fileops::getName(pub);
+                                if (name.empty())
+                                {
+                                    continue;
+                                }
+                                const std::string_view pub1 =
+                                    connections.interfaces.emplace_back(name);
+                                connections.potentialPubs.emplace(
+                                    pub1, PotentialConnections{ federateName, pub1, false });
+                            }
+                            else if (pub.isString())
+                            {
+                                const std::string_view pub1 =
+                                    connections.interfaces.emplace_back(pub.asCString());
+                                connections.potentialPubs.emplace(
+                                    pub1, PotentialConnections{ federateName, pub1, false });
+                            }
+                        }
+                    }
+                    if (potInterfaces.isMember("endpoints")) {
+                        for (const auto& endpoint : potInterfaces["endpoints"]) {
+                            if (endpoint.isObject())
+                            {
+                                auto name = fileops::getName(endpoint);
+                                if (name.empty())
+                                {
+                                    continue;
+                                }
+                                const std::string_view endpoint1 =
+                                    connections.interfaces.emplace_back(name);
+                                connections.potentialEndpoints.emplace(
+                                    endpoint1, PotentialConnections{ federateName, endpoint1, false });
+                            }
+                            else
+                            {
+                                const std::string_view endpoint1 =
+                                    connections.interfaces.emplace_back(endpoint.asCString());
+                                connections.potentialEndpoints.emplace(
+                                    endpoint1, PotentialConnections{ federateName, endpoint1, false });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Json::Exception& /*ev*/)
+            {
+                //TODO(PT): I think this is going to be almost impossible now, but someday might want to create a response
+                continue;
             }
         }
     }

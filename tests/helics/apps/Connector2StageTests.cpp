@@ -120,25 +120,78 @@ class CheckFed {
     void finalize() { vFed->finalize(); }
     std::string generateQueryResponse(std::string_view query)
     {
+        ResponseType type=responseType.load();
+
         if (query == "potential_interfaces") {
             Json::Value interfaces;
-            if (!potentialInputs.empty()) {
-                interfaces["inputs"] = Json::arrayValue;
-                for (const auto& pInput : potentialInputs) {
-                    interfaces["inputs"].append(pInput);
+            switch (type)
+            {
+            case ResponseType::EVIL: {
+                Json::Value istruct = Json::objectValue;
+                istruct["key"] = "test";
+                istruct["global"] = false;
+                istruct["target"] = "bullseye";
+
+                interfaces["inputs"].append(istruct);
+                interfaces["inputs"].append(istruct);
+                interfaces["publications"] = false;
+                interfaces["endpoints"] = "this should be fun";
+            }
+                                   break;
+            case ResponseType::LIST:
+            {
+
+                if (!potentialInputs.empty()) {
+                    interfaces["inputs"] = Json::arrayValue;
+                    for (const auto& pInput : potentialInputs) {
+                        interfaces["inputs"].append(pInput);
+                    }
+                }
+                if (!potentialPubs.empty()) {
+                    interfaces["publications"] = Json::arrayValue;
+                    for (const auto& pPub : potentialPubs) {
+                        interfaces["publications"].append(pPub);
+                    }
+                }
+                if (!potentialEndpoints.empty()) {
+                    interfaces["endpoints"] = Json::arrayValue;
+                    for (const auto& pEpt : potentialEndpoints) {
+                        interfaces["endpoints"].append(pEpt);
+                    }
                 }
             }
-            if (!potentialPubs.empty()) {
-                interfaces["publications"] = Json::arrayValue;
-                for (const auto& pPub : potentialPubs) {
-                    interfaces["publications"].append(pPub);
+            break;
+            case ResponseType::STRUCTURE:
+            {
+                if (!potentialInputs.empty()) {
+                    interfaces["inputs"] = Json::arrayValue;
+                    for (const auto& pInput : potentialInputs) {
+                        Json::Value Obj=Json::objectValue;
+                        Obj["key"]=pInput;
+                        Obj["units"]="V";
+                        interfaces["inputs"].append(Obj);
+                    }
+                }
+                if (!potentialPubs.empty()) {
+                    interfaces["publications"] = Json::arrayValue;
+                    for (const auto& pPub : potentialPubs) {
+                        Json::Value Obj=Json::objectValue;
+                        Obj["key"]=pPub;
+                        Obj["units"]="V";
+                        interfaces["publications"].append(Obj);
+                    }
+                }
+                if (!potentialEndpoints.empty()) {
+                    interfaces["endpoints"] = Json::arrayValue;
+                    for (const auto& pEpt : potentialEndpoints) {
+                        Json::Value Obj=Json::objectValue;
+                        Obj["key"]=pEpt;
+                        Obj["type"]="type1";
+                        interfaces["endpoints"].append(Obj);
+                    }
                 }
             }
-            if (!potentialEndpoints.empty()) {
-                interfaces["endpoints"] = Json::arrayValue;
-                for (const auto& pEpt : potentialEndpoints) {
-                    interfaces["endpoints"].append(pEpt);
-                }
+            break;
             }
             return helics::fileops::generateJsonString(interfaces);
         }
@@ -188,7 +241,14 @@ class CheckFed {
     const auto& getValueNames() { return valueNames; }
     const auto& getMessageNames() { return messageNames; }
     bool hasReceivedCommand() const { return receivedCommand; }
-
+public:
+    enum class ResponseType
+    {
+        LIST,
+        STRUCTURE,
+        EVIL
+    };
+    std::atomic<ResponseType> responseType{ResponseType::LIST};
   private:
     std::shared_ptr<helics::CombinationFederate> vFed;
     std::vector<std::string> potentialInputs;
@@ -199,6 +259,7 @@ class CheckFed {
     std::vector<std::vector<std::string>> messages;
     std::vector<std::string> messageNames;
     bool receivedCommand = true;
+    
 };
 
 TEST(connector_2stage, simple_connector)
@@ -216,6 +277,34 @@ TEST(connector_2stage, simple_connector)
     CheckFed cfed1("c1", fedInfo);
     cfed1.addPotentialInputs({"inp1", "inp2"});
     cfed1.addPotentialPubs({"pub1", "pub3"});
+
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    cfed1.initialize();
+    cfed1.executing();
+    cfed1.run(5);
+    cfed1.finalize();
+    fut.get();
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_FALSE(cfed1.getValues("inp1").empty());
+    EXPECT_EQ(conn1.madeConnections(), 1);
+}
+
+TEST(connector_2stage, simple_connector_struct)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = newCoreName("core2stage");
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+    conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
+    
+    fedInfo.coreInitString = "";
+    CheckFed cfed1("c1", fedInfo);
+    cfed1.addPotentialInputs({"inp1", "inp2"});
+    cfed1.addPotentialPubs({"pub1", "pub3"});
+    cfed1.responseType=CheckFed::ResponseType::STRUCTURE;
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
@@ -253,6 +342,57 @@ TEST(connector_2stage, simple_endpoint_connector)
     EXPECT_FALSE(cfed1.getMessages("ept1").empty());
     EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 2);
+}
+
+TEST(connector_2stage, simple_endpoint_connector_struct)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = newCoreName("core2stage");
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connectore1", fedInfo);
+    conn1.addConnection("ept1", "ept2", InterfaceDirection::BIDIRECTIONAL);
+
+    fedInfo.coreInitString = "";
+    CheckFed cfed1("c1", fedInfo);
+    cfed1.addPotentialEndpoints({"ept1", "ept2"});
+    cfed1.responseType=CheckFed::ResponseType::STRUCTURE;
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    cfed1.initialize();
+    cfed1.executing();
+    cfed1.run(5);
+    cfed1.finalize();
+    fut.get();
+    ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_FALSE(cfed1.getMessages("ept1").empty());
+    EXPECT_FALSE(cfed1.getMessages("ept2").empty());
+    EXPECT_EQ(conn1.madeConnections(), 2);
+}
+
+
+TEST(connector_2stage, evil_federate)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = newCoreName("core2stage");
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connectorevil1", fedInfo);
+    conn1.addConnection("ept1", "ept2", InterfaceDirection::BIDIRECTIONAL);
+
+    fedInfo.coreInitString = "";
+    CheckFed cfed1("c1", fedInfo);
+    cfed1.addPotentialEndpoints({"ept1", "ept2"});
+    cfed1.responseType=CheckFed::ResponseType::EVIL;
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    cfed1.initialize();
+    cfed1.executing();
+    cfed1.run(5);
+    cfed1.finalize();
+    EXPECT_NO_THROW(fut.get());
 }
 
 TEST(connector_2stage, simple_endpoint_connector_one_way)
