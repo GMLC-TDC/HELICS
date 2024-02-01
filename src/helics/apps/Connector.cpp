@@ -50,7 +50,7 @@ struct ConnectionsList {
     std::unordered_map<std::string_view, PotentialConnections> potentialInputs;
     std::unordered_map<std::string_view, PotentialConnections> potentialEndpoints;
     std::deque<std::string> interfaces;
-    std::vector<std::string> federatesWithPotentialInterfaces;
+    std::deque<std::string> federatesWithPotentialInterfaces;
     std::vector<std::string> unknownPubs;
     std::vector<std::string> unknownInputs;
     std::vector<std::string> unknownEndpoints;

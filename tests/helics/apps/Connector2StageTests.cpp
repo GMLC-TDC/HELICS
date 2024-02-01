@@ -1258,3 +1258,49 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
+
+
+TEST(connector_2stage, multiCheckFed)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = newCoreName("core2stage");
+    fedInfo.coreInitString = "-f3 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+    conn1.addConnection("inp1", "pubA", InterfaceDirection::FROM_TO);
+    conn1.addConnection("inpA", "pub2", InterfaceDirection::FROM_TO);
+    fedInfo.coreInitString = "";
+    CheckFed cfed1("c1", fedInfo);
+    cfed1.addPotentialInputs({"inp1", "inp2"});
+    cfed1.addPotentialPubs({"pub1", "pub2"});
+    CheckFed cfed2("c2",fedInfo);
+    cfed2.addPotentialInputs({"inpA", "inpB"});
+    cfed2.addPotentialPubs({"pubA", "pubB", "pubC"});
+
+    helics::CoreApp core(fedInfo.coreName);
+
+
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+
+    auto fut2 = std::async(std::launch::async,[&cfed2](){cfed2.initialize();
+    cfed2.executing();
+    cfed2.run(5);
+    cfed2.finalize();});
+
+    cfed1.initialize();
+    cfed1.executing();
+    cfed1.run(5);
+    cfed1.finalize();
+    fut.get();
+    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_FALSE(cfed1.getValues("inp1").empty());
+    EXPECT_TRUE(cfed1.getValues("inp2").empty());
+
+    ASSERT_EQ(cfed2.getValueNames().size(), 1);
+    EXPECT_FALSE(cfed2.getValues("inpA").empty());
+    EXPECT_TRUE(cfed2.getValues("inpB").empty());
+    // not making any connections
+    EXPECT_EQ(conn1.madeConnections(), 2);
+}
