@@ -58,8 +58,8 @@ The match-file can also be JSON formatted.
 ## Notes on Tags
 
 - Connections specified with no tags or "default" tag will match with everything as if the tag were not there. If a connection specified by a match in the match-file uses a tag, a connection will only be made if the specified tag is used by a federate, core, or broker.
-- A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than a "false" value; if the tag is specified with a "false" value it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list. The complete list of "false" valued strings is as follows:
-
+- A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than a "false" value; if the tag is specified with a "false" value it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.  The complete list of "false" valued strings is as follows:
+  
 ```txt
      "0",        "",         "false",
     "False",    "FALSE",    "off",
@@ -75,13 +75,13 @@ The match-file can also be JSON formatted.
 
 In addition to directly defining the connections to be made between interfaces, one-by-one, it is also possible to use regular expressions to define the connections. Regular expressions allow a large number of similarly-name interfaces to be matched with a single statement. The file is formatted as follows:
 
-```
+```text
 REGEX:pub_num_(?<interface_num>\d*)_(?<alpha_index>[A-Za-z]*), REGEX:input_num_(?<interface_num>\d*)_(?<alpha_index>[A-Za-z]*)
 ```
 
 In this example, "interface_num" and "alpha_index" are user-defined strings that gives a name to the portion of the regex that needs to match. The funny stuff immediately after it ("\d*", "[A-Za-z]*") is the regular expression proper that the regular expression will use to determine how to make matches. Using the above example, the following matches would be made:
 
-```
+```text
 pub_num_1_a input_num_1_a
 pub_num_204_voltage input_num_204_voltage
 ```
@@ -130,7 +130,7 @@ The federate takes the JSON command and, using its own internal knowledge of the
 
 To use the Connector to create the interface connections, simply call it as part of your federation, adding the matchfile as a command-line argument. The connector app will start up when the federation is launched and, using the match-file, create the connections between interfaces behind the scenes. Once the work it complete (by the "execution" mode of the federation), it exits the federation and allows now connected federates to proceed. A sample call looks like:
 
-```
+```sh
 helics_connector matchfile.txt
 ```
 
