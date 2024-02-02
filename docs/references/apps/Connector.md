@@ -76,6 +76,41 @@ pub_num_204_voltage input_num_204_voltage
 
 Writing regular expressions quickly and accurately is a learned skill and depending the names of the interfaces, it can be difficult to craft one that does exactly what you need. The use of tags may be helpful in preventing matches between federates when they are not needed. Additionally, it may be easier to write a regular expression that makes most of the matches you need and then use direct matches for the remainder.
 
+
+## Interface Creation and Matching
+As mentioned in the introduction, it is also possible for the Connector app to interact with federates that are created with no exposed interfaces and jointly work through a process where those interfaces are created and then connected. A [Python example](https://github.com/GMLC-TDC/HELICS-Examples/tree/53bece298f9be952002e2f9201f24922fabc73b4/user_guide_examples/advanced/advanced_connector/interface_creation) of this process in action can be found in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples) but a conceptual overivew of the process is as follows:
+
+### Federate creation
+On launch of the federation, the federates are created with no exposed interfaces BUT with an understanding of what interfaces it can create. These interfaces may, for example, be hard-coded or based on the system model it reads on start-up.
+
+### Interface Query
+The Connector queries the federates to determine which interfaces each one can create. The query is made after the federate enter initalizing mode and the federate must enter intializing mode iteratively (`helicsFederateEnterInitializingModeIterative()`) to synchronize the query responses across the federation. Every federate that is going to create interfaces neeeds to register a callback function to handle this custom query by the Connector and respond appropriately. The Connector will query the federate with "potential_interfaces" and the federate much respond with a properly formatted JSON:
+
+```json
+{
+  "publications": [<list of names of publications that can be created>]
+  "inputs": [<list of names of inputs that can be created>]
+  "endpoints": [<list of names of endpoints that can be created>]
+}
+```
+As this is a query operation which are executed asynchronously with the simulation time, it is undefined when the query will be made and thus a callback function must be used to respond to the query.
+
+### Connector Interface Creation Command
+After receiving the query responses from all the federates, the connector performs its standard matching operation using a match-file. Once the matches are made, it determines which connections need to be made and sends a command to each federate telling it which interfaces to create.  As with the query, the commands are received asynchronously but are guaranteed to be present after calling `helicsFederateEnterInitializingModeIterative()` twice. At that point, the federate can get the command and parse the returned JSON to determine which interfaces to create. The format is the same as the query response:
+
+```json
+{
+  "publications": [<list of names of publications to be created>]
+  "inputs": [<list of names of inputs to be created>]
+  "endpoints": [<list of names of endpoints to be created>]
+}
+```
+
+### Interface Creation and Co-Simulation Execution
+The federate takes the JSON command and, using its own internal knowledge of the interface (global or not, data type, units) and creates the interfaces. After that, the federate doesn't need to do anything else for the interface connections to be connected and can call `helicsFederateEnterExecutingMode()` (assuming it has nothing else to do as a part of intializing). The Connector will make the connections between the interfaces as they are created and when complete, exit the federation.
+
+
+
 ## Use of the Connector
 
 To use the Connector to create the interface connections, simply call it as part of your federation, adding the matchfile as a command-line argument. The connector app will start up when the federation is launched and, using the match-file, create the connections between interfaces behind the scenes. Once the work it complete (by the "execution" mode of the federation), it exits the federation and allows now connected federates to proceed. A sample call looks like:
