@@ -33,6 +33,7 @@ intermediate2 intermediate3 from_to
 # comment line in the middle
 intermediate3 pub1 bi
 inp2 intermediate2 from_to
+publication3 input3 to_from
 ```
 
 The following example uses tags in the matching process, see more on tags below.
@@ -43,7 +44,7 @@ inp1 pub1 from_to tag1
 inp2 pub1 tag2 tag3
 ```
 
-The match-file can also be JSON formatted (though you lose the ability to have comments).
+The match-file can also be JSON formatted.
 
 ```json
 {
@@ -56,8 +57,19 @@ The match-file can also be JSON formatted (though you lose the ability to have c
 
 ## Notes on Tags
 
-- Connections specified with no tags or "default" tag will match with everything as if the tag were not there. If a connection specified by a match in the match-file uses a tag, a connection will only be made if the specified tag is used by both federates, cores, or federations.
-- A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than "false"; if the tag is specified with a value of "false" it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.
+- Connections specified with no tags or "default" tag will match with everything as if the tag were not there. If a connection specified by a match in the match-file uses a tag, a connection will only be made if the specified tag is used by a federate, core, or broker.
+- A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than a "false" value; if the tag is specified with a "false" value it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.  The complete list of "false" valued strings is as follows:
+  
+```txt
+     "0",        "",         "false",
+    "False",    "FALSE",    "off",
+    "Off",      "OFF",      "disabled",
+    "Disabled", "DISABLED", "disable",
+    "Disable",  "DISABLE",  "f",
+    "F",        "0",        std::string_view(reinterpret_cast<const char*>(&nullstringRep), 1),
+    " ",        "no",       "NO",
+    "No",       "-"
+```
 
 ## Regular Expression (regex) Matching
 
@@ -86,7 +98,7 @@ On launch of the federation, the federates are created with no exposed interface
 
 ### Interface Query
 
-The Connector queries the federates to determine which interfaces each one can create. The query is made after the federate enter initializing mode and the federate must enter initializing mode iteratively (`helicsFederateEnterInitializingModeIterative()`) to synchronize the query responses across the federation. Every federate that is going to create interfaces needs to register a callback function to handle this custom query by the Connector and respond appropriately. The Connector will query the federate with "potential_interfaces" and the federate much respond with a properly formatted JSON:
+The Connector queries the federates to determine which interfaces each one can create. The query is made after the federate enter initializing mode and the federate must enter initializing mode iteratively (`helicsFederateEnterInitializingModeIterative()`) to synchronize the query responses across the federation. Every federate that is going to create interfaces needs to register a callback function to handle this custom query by the Connector and respond appropriately. The Connector will query the federate with "potential_interfaces" and the federate must respond with a properly formatted JSON:
 
 ```json
 {
@@ -96,7 +108,7 @@ The Connector queries the federates to determine which interfaces each one can c
 }
 ```
 
-As this is a query operation which are executed asynchronously with the simulation time, it is undefined when the query will be made and thus a callback function must be used to respond to the query.
+As this is a query operation, which are executed asynchronously with the simulation time, it is undefined when the query will be made and thus a callback function must be used to respond to the query.
 
 ### Connector Interface Creation Command
 
@@ -123,6 +135,20 @@ helics_connector matchfile.txt
 ```
 
 ## Command line arguments
+
+Options specific to the connector are as follows:
+
+```text
+Options:
+  --version                   Display program version information and exit
+  --connection [INTERFACE1,INTERFACE2,DIRECTIONALITY,TXT...] ...
+                              specify connections to make in the cosimulation
+  --match_target_endpoints    set to true to enable connection of unconnected target endpoints
+  --match_multiple            set to true to enable matching of multiple connections (default false)
+  --always_check_regex        set to true to enable regex matching even if other matches are defined
+```
+
+The full CLI list is shown below including helics connection options and general options.
 
 ```text
 Common options for all Helics Apps

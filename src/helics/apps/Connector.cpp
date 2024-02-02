@@ -522,7 +522,7 @@ void Connector::loadTextFile(const std::string& filename)
     int lineNumber;
     while (aparser.loadNextLine(str, lineNumber)) {
         /* time key type value units*/
-        auto blk = splitlineBracket(str, ",\t ", default_bracket_chars, delimiter_compression::on);
+        auto blk = splitlineQuotes(str, ",\t ", default_quote_chars, delimiter_compression::on);
         for (auto& seq : blk) {
             CLI::detail::remove_quotes(seq);
         }
