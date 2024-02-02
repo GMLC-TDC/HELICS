@@ -376,19 +376,17 @@ jobs:
       run: ./.github/actions/upload-release-asset.sh "artifacts/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
 
 #####################################
-# Send helics-version-update event(s)
+# Trigger helics-packaging workflows
 #####################################
   send-version-update-event:
-    name: Send helics-version-update event(s)
+    name: Trigger helics-packaging workflows
     needs: [generate-sha256]
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-      - name: Send event to helics-packaging
+      - name: Run helics_version_update workflow in helics-packaging
+        env:
+          GH_TOKEN: ${{ secrets.HELICS_PACKAGING_TOKEN }}
         run: |
-          HELICS_REPO="${{ github.repository }}"
           HELICS_VERSION="${{ github.event.release.tag_name }}"
-          curl -X POST --header 'authorization: Bearer ${{ secrets.HELICS_BOT_TOKEN }}' \
-               --url https://api.github.com/repos/GMLC-TDC/helics-packaging/dispatches \
-               --header 'content-type: application/json' \
-               --data "{\"event_type\":\"helics-version-update\",\"client_payload\":{\"repository\":\"${HELICS_REPO}\",\"tag_name\":\"${HELICS_VERSION}\",\"version\":\"${HELICS_VERSION#v}\"}}"
+          gh workflow run --repo GMLC-TDC/helics-packaging helics_version_update.yml -f version="${HELICS_VERSION#v}"
