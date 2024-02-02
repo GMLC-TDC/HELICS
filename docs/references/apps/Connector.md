@@ -76,6 +76,13 @@ pub_num_204_voltage input_num_204_voltage
 
 Writing regular expressions quickly and accurately is a learned skill and depending the names of the interfaces, it can be difficult to craft one that does exactly what you need. The use of tags may be helpful in preventing matches between federates when they are not needed. Additionally, it may be easier to write a regular expression that makes most of the matches you need and then use direct matches for the remainder.
 
+## Use of the Connector 
+To use the Connector to create the interface connections, simply call it as part of your federation, adding the matchfile as a command-line argument. The connector app will start up when the federation is launched and, using the match-file, create the connections between interfaces behind the scenes. Once the work it complete (by the "execution" mode of the federation), it exits the federation and allows now connected federates to proceed. A sample call looks like:
+
+```
+helics_connector matchfile.txt
+```
+
 ## Command line arguments
 
 ```text
