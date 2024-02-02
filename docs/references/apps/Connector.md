@@ -58,8 +58,8 @@ The match-file can also be JSON formatted.
 ## Notes on Tags
 
 - Connections specified with no tags or "default" tag will match with everything as if the tag were not there. If a connection specified by a match in the match-file uses a tag, a connection will only be made if the specified tag is used by a federate, core, or broker.
-- A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than a "false" value; if the tag is specified with a "false" value it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.  The complete list of "false" valued strings is as follows:
-  
+- A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than a "false" value; if the tag is specified with a "false" value it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list. The complete list of "false" valued strings is as follows:
+
 ```txt
      "0",        "",         "false",
     "False",    "FALSE",    "off",
