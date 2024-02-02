@@ -64,7 +64,7 @@ jobs:
       matrix:
         XCode-latest:
           test_config: "ci"
-          vmImage: "macOS-13"
+          vmImage: "macOS-14"
         XCode-oldest:
           test_config: "ci"
           vmImage: "macOS-12"
