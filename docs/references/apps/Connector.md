@@ -59,13 +59,14 @@ The match-file can also be JSON formatted (though you lose the ability to have c
 - Connections specified with no tags or "default" tag will match with everything as if the tag were not there. If a connection specified by a match in the match-file uses a tag, a connection will only be made if the specified tag is used by both federates, cores, or federations.
 - A tag can be specified by a "global_value". The tag used for the connector is the name of the global or tag and the value can be anything other than "false"; if the tag is specified with a value of "false" it is not used in the matching. Tags used in the match-file can also be specified in the value of the "tags" global or local tag. In this case they are specified with a comma separated list.
 
-
 ## Regular Expression (regex) Matching
+
 In addition to directly defining the connections to be made between interfaces, one-by-one, it is also possible to use regular expressions to define the connections. Regular expressions allow a large number of similarly-name interfaces to be matched with a single statement. The file is formatted as follows:
 
 ```
 REGEX:pub_num_(?<interface_num>\d*)_(?<alpha_index>[A-Za-z]*), REGEX:input_num_(?<interface_num>\d*)_(?<alpha_index>[A-Za-z]*)
 ```
+
 In this example, "interface_num" and "alpha_index" are user-defined strings that gives a name to the portion of the regex that needs to match. The funny stuff immediately after it ("\d*", "[A-Za-z]*") is the regular expression proper that the regular expression will use to determine how to make matches. Using the above example, the following matches would be made:
 
 ```
@@ -74,7 +75,6 @@ pub_num_204_voltage input_num_204_voltage
 ```
 
 Writing regular expressions quickly and accurately is a learned skill and depending the names of the interfaces, it can be difficult to craft one that does exactly what you need. The use of tags may be helpful in preventing matches between federates when they are not needed. Additionally, it may be easier to write a regular expression that makes most of the matches you need and then use direct matches for the remainder.
-
 
 ## Command line arguments
 
