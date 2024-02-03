@@ -6,12 +6,10 @@ on:
     branches:
       - develop
       - main
-      - helics2
   pull_request:
     branches:
       - develop
       - main
-      - helics2
 
 jobs:
   cpplint:

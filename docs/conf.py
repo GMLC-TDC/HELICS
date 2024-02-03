@@ -143,7 +143,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "HELICS"
-copyright = "2017-2021 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC. See the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause. Documentation source in https://github.com/GMLC-TDC/HELICS"
+copyright = "2017-2024 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC. See the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause. Documentation source in https://github.com/GMLC-TDC/HELICS"
 author = "Philip Top, Trevor Hardy, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Bryan Palmintier, Jason Fuller"
 
 # The version info for the project you're documenting, acts as replacement for

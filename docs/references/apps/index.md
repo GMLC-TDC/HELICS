@@ -16,4 +16,5 @@ Included with HELICS are a number of apps that provide useful utilities and test
   Broker
   BrokerServer
   Clone
+  Connector
 ```
