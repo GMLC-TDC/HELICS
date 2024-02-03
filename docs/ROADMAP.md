@@ -2,14 +2,21 @@
 
 This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library. All dates are approximate and subject to change, but this is a snapshot of the current planning thoughts. See the [projects](https://github.com/GMLC-TDC/HELICS/projects) for additional details
 
-## \[3.5\] ~ Summer 2023
+## \[3.6\] ~ Summer 2024
 
 - Single thread cores
+- Update IPC core
 - Some of the other features listed below
+- This release will likely update HELICS to use C++20 and update minimum Compilers, CMake, boost, and other dependencies.
+  - GCC 11
+  - clang 14
+  - Cmake 3.22
+  - MSVC 16.10
+  - XCode 14
+  
 
 ## Nearer term features
 
-- Update IPC core
 - Full xSDK compatibility
 - Separate Java Interface
 - Observer App

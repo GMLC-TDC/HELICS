@@ -9,6 +9,40 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [3.5.0][] - 2024-02-05
+
+Major release including connector app capability, a refresh of the of the dataBuffer interface, and other bug fixes
+
+### Fixed
+
+- Fixed some issues regarding config files in the apps, where the config file was not being handled consistently
+- Fixed a few more sporadically failing testing cases and a rare bug in the use of `wait_for_current_time` flag when entering executing mode
+- Fixed a memory growth issue related to find operations in the C interface
+- resolve some issues with the threadSanitizer and other sporadic failures in the test cases.
+
+### Changed
+
+- Test with Boost 1.84 and CMake 3.28
+- large refactor of the dataBufferAPI, this is now considered stable, all dataBuffer related methods now start with helicsDataBuffer for consistency with other API methods and the XXXToBytes methods are changed to FillFromXXXX to be more consistent with other API's
+- Update 3rd party libraries
+- Update copyright to 2024
+- autobuild ZMQ now set to 4.3.5
+
+### Added
+
+- Added Connector app to enable automated connections of the federates via a set of matching rules, and allow optional interface generation via a query/command
+- Added helics::systemInfo() to the C++ shared library
+- Added ability generate translators from config files
+- Added API's to get and send dataBuffers from publication/input/endpoints
+  
+### Deprecated
+
+- Nearly all methods that use `Subscription` in the name have been deprecated in favor of an equivalent version for `Input` to reduce confusion of use of subscription objects (which are just Input objects); these are all 1:1 mappings
+  - `getSubscription(string target)` -> `getInputByTarget(string target)`
+  - `getSubscription(int index)` -> `getInput(int index)`
+  - `helicsSubscriptionGetTarget(inp)` -> `helicsInputGetTarget(inp)`
+  - `helicsFederateGetSubscription(fed, string target)`->`helicsFederateGetInputByTarget(fed,string target)`
+  
 ## [3.4.0][] - 2023-01-19
 
 Major release including full dynamic federation capability and wildcard based matching for interface connections.

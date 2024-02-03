@@ -30,7 +30,7 @@ The public API includes the following
   - CoreApp.hpp
   - timeOperations.hpp
   - typeOperations.hpp
-  - Exceptions: Translators and the global time coordinator option are in Beta and subject to finalization in the 3.4 release (they are mostly final and any changes will be highlighted). Vector subscriptions, and vector inputs are subject to change. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries: the data returned via queries is subject to change, though in general queries will not be removed. As determined by the need of HELICS users and applications, the data structure may change at minor revision numbers. We hope to fully document the queries structure in HELICS v3.4 at which point they will be stable for at least minor releases and changes will be noted. The callback federate API is considered in Beta and may change.
+  - Exceptions: Translators and the global time coordinator option are in Beta and subject to finalization in a later release (they are mostly final and any changes will be highlighted). Vector subscriptions, and vector inputs are subject to change. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries: the data returned via queries is subject to change, though in general queries will not be removed. As determined by the need of HELICS users and applications, the data structure may change at minor revision numbers. We hope to fully document the queries structure at which point they will be stable for at least minor releases and changes will be noted. The callback federate API is considered in Beta and may change.
 
 - Core library headers
 
@@ -48,7 +48,6 @@ The public API includes the following
 
   - All C library operations are merged into a single header `helics.h`
   - A `helics_api.h` header is available for generating interfaces which strips out import declarations and comments. The C shared library API is the primary driver of versioning and changes to that will be considered in all versioning decisions.
-  - Translator and helicsData API's and methods are in Beta and subject to revision until the HELICS 3.3 release; comments or bugs are welcome, the 3.2.1 release includes updates to the API's and is mostly considered feature complete though still subject to revisions.
 
 - App Library
 
@@ -59,6 +58,7 @@ The public API includes the following
   - Tracer.hpp
   - Probe.hpp
   - Clone.hpp
+  - Connector.hpp  (considered in Beta and subject to change)
   - helicsApp.hpp
   - BrokerApp.hpp (aliased to application_api version)
   - CoreApp.hpp (aliased to application_api version)
