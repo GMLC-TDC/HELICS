@@ -21,17 +21,20 @@ using logblocktype = gmlc::libguarded::guarded<std::vector<std::pair<int, std::s
 
 TEST(logging_tests, check_log_message)
 {
+    helicsCleanupLibrary();
+    std::cout << "log test starting\n";
     auto fedInfo = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
+    helicsFederateInfoSetCoreName(fedInfo, "clogcore", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker --broker=clogbroker", &err);
     helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
                                          HELICS_LOG_LEVEL_TIMING,
                                          &err);
 
     auto fed = helicsCreateValueFederate("test1", fedInfo, &err);
-
+    std::cout << "log test created\n";
     logblocktype mlog;
 
     auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
@@ -74,7 +77,8 @@ TEST(logging_tests, check_log_message_levels)
     auto fedInfo = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker --broker=clogbrokerlevel", &err);
+    helicsFederateInfoSetCoreName(fedInfo, "clogcorelevels", &err);
     helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
                                          HELICS_LOG_LEVEL_TIMING,
@@ -124,7 +128,8 @@ TEST(logging_tests, check_log_message_levels_high)
     auto fedInfo = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "--autobroker --broker=clogbrokerhigh", &err);
+    helicsFederateInfoSetCoreName(fedInfo, "clogcorehigh", &err);
     helicsFederateInfoSetIntegerProperty(fedInfo,
                                          HELICS_PROPERTY_INT_LOG_LEVEL,
                                          HELICS_LOG_LEVEL_TRACE + 6,
@@ -168,7 +173,10 @@ TEST(logging_tests, check_log_message_levels_high)
 
 TEST(logging_tests, core_logging)
 {
-    auto core = helicsCreateCore("inproc", "ctype", "--autobroker --log_level=trace", nullptr);
+    auto core = helicsCreateCore("inproc",
+                                 "ctype",
+                                 "--autobroker --log_level=trace --broker=ncorelogging",
+                                 nullptr);
 
     helicsCoreSetLoggingCallback(core, nullptr, nullptr, nullptr);
 
@@ -229,7 +237,10 @@ TEST(logging_tests, core_logging_file)
     if (std::filesystem::exists(lfile)) {
         std::filesystem::remove(lfile);
     }
-    auto core = helicsCreateCore("inproc", "clog", "--autobroker --log_level=trace", nullptr);
+    auto core = helicsCreateCore("inproc",
+                                 "clog",
+                                 "--autobroker --log_level=trace --broker=clogfile",
+                                 nullptr);
 
     auto err = helicsErrorInitialize();
     helicsCoreSetLogFile(core, lfile.c_str(), &err);
@@ -245,7 +256,10 @@ TEST(logging_tests, fed_logging_file)
     if (std::filesystem::exists(lfile)) {
         std::filesystem::remove(lfile);
     }
-    auto core = helicsCreateCore("inproc", "clogf", "--autobroker --log_level=trace", nullptr);
+    auto core = helicsCreateCore("inproc",
+                                 "clogf",
+                                 "--autobroker --log_level=trace --broker=clogfbroker",
+                                 nullptr);
 
     auto err = helicsErrorInitialize();
     auto fedInfo = helicsCreateFederateInfo();
