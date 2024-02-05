@@ -1255,15 +1255,15 @@ HELICS_EXPORT void helicsBrokerFree(HelicsBroker broker);
  *
  * @details HelicsFederate objects can be used in all functions that take a HelicsFederate or HelicsFederate object as an argument.
  *
- * @param fedName The name of the federate to create, can NULL or an empty string to use the default name from fi or an assigned name.
- * @param fi The federate info object that contains details on the federate.
+ * @param fedName The name of the federate to create, can NULL or an empty string to use the default name from fedInfo or an assigned name.
+ * @param fedInfo The federate info object that contains details on the federate.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  *
  * @return An opaque value federate object.
  */
-HELICS_EXPORT HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
  * Create a value federate from a JSON file, JSON string, or TOML file.
@@ -1286,14 +1286,14 @@ HELICS_EXPORT HelicsFederate helicsCreateValueFederateFromConfig(const char* con
  * argument.
  *
  * @param fedName The name of the federate to create.
- * @param fi The federate info object that contains details on the federate.
+ * @param fedInfo The federate info object that contains details on the federate.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  *
  * @return An opaque message federate object.
  */
-HELICS_EXPORT HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
  * Create a message federate from a JSON file or JSON string or TOML file.
@@ -1316,15 +1316,15 @@ HELICS_EXPORT HelicsFederate helicsCreateMessageFederateFromConfig(const char* c
  * @details Combination federates are both value federates and message federates, objects can be used in all functions
  *                      that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument
  *
- * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
- * @param fi The federate info object that contains details on the federate.
+ * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fedInfo.
+ * @param fedInfo The federate info object that contains details on the federate.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  *
  * @return An opaque value federate object nullptr if the object creation failed.
  */
-HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
  * Create a combination federate from a JSON file or JSON string or TOML file.
@@ -1346,15 +1346,15 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const cha
 *
 * @details Callback federates are combination federates that run a series of callback for execution in a completely automated fashion.
 *
-* @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
-* @param fi The federate info object that contains details on the federate.
+* @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fedInfo.
+* @param fedInfo The federate info object that contains details on the federate.
 *
 * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
 *
 * @return An opaque value federate object; nullptr if the object creation failed.
 */
-HELICS_EXPORT HelicsFederate helicsCreateCallbackFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateCallbackFederate(const char* fedName, HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
 * Create a callback federate from a JSON file or JSON string or TOML file.
@@ -1431,42 +1431,42 @@ HELICS_EXPORT HelicsFederateInfo helicsCreateFederateInfo(void);
 /**
  * Create a federate info object from an existing one and clone the information.
  *
- * @param fi A federateInfo object to duplicate.
+ * @param fedInfo A federateInfo object to duplicate.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  *
  *  @return A HelicsFederateInfo object which is a reference to the created object.
  */
-HELICS_EXPORT HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
  * Load federate info from command line arguments.
  *
- * @param fi A federateInfo object.
+ * @param fedInfo A federateInfo object.
  * @param argc The number of command line arguments.
  * @param argv An array of strings from the command line.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char* const* argv, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fedInfo, int argc, const char* const* argv, HelicsError* err);
 
 /**
  * Load federate info from command line arguments contained in a string.
  *
- * @param fi A federateInfo object.
+ * @param fedInfo A federateInfo object.
  * @param args Command line arguments specified in a string.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char* args, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoLoadFromString(HelicsFederateInfo fedInfo, const char* args, HelicsError* err);
 
 /**
  * Delete the memory associated with a federate info object.
  */
-HELICS_EXPORT void helicsFederateInfoFree(HelicsFederateInfo fi);
+HELICS_EXPORT void helicsFederateInfoFree(HelicsFederateInfo fedInfo);
 
 /**
  * Check if a federate_object is valid.
@@ -1478,107 +1478,107 @@ HELICS_EXPORT HelicsBool helicsFederateIsValid(HelicsFederate fed);
 /**
  * Set the name of the core to link to for a federate.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param corename The identifier for a core to link to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreName(HelicsFederateInfo fi, const char* corename, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreName(HelicsFederateInfo fedInfo, const char* corename, HelicsError* err);
 
 /**
  * Set the initialization string for the core usually in the form of command line arguments.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param coreInit A string containing command line arguments to be passed to the core.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreInitString(HelicsFederateInfo fi, const char* coreInit, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreInitString(HelicsFederateInfo fedInfo, const char* coreInit, HelicsError* err);
 
 /**
  * Set the initialization string that a core will pass to a generated broker usually in the form of command line arguments.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param brokerInit A string with command line arguments for a generated broker.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(HelicsFederateInfo fi, const char* brokerInit, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(HelicsFederateInfo fedInfo, const char* brokerInit, HelicsError* err);
 
 /**
  * Set the core type by integer code.
  *
  * @details Valid values available by definitions in api-data.h.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param coretype An numerical code for a core type see /ref helics_CoreType.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreType(HelicsFederateInfo fi, int coretype, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreType(HelicsFederateInfo fedInfo, int coretype, HelicsError* err);
 
 /**
  * Set the core type from a string.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param coretype A string naming a core type.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fi, const char* coretype, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fedInfo, const char* coretype, HelicsError* err);
 
 /**
  * Set the name or connection information for a broker.
  *
  * @details This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param broker A string which defines the connection information for a broker either a name or an address.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetBroker(HelicsFederateInfo fi, const char* broker, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBroker(HelicsFederateInfo fedInfo, const char* broker, HelicsError* err);
 
 /**
  * Set the key for a broker connection.
  *
  * @details This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param brokerkey A string containing a key for the broker to connect.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerKey(HelicsFederateInfo fi, const char* brokerkey, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerKey(HelicsFederateInfo fedInfo, const char* brokerkey, HelicsError* err);
 
 /**
  * Set the port to use for the broker.
  *
  * @details This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
  * This will only be useful for network broker connections.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param brokerPort The integer port number to use for connection with a broker.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerPort(HelicsFederateInfo fi, int brokerPort, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerPort(HelicsFederateInfo fedInfo, int brokerPort, HelicsError* err);
 
 /**
  * Set the local port to use.
  *
  * @details This is only used if the core is automatically created, the port information will be transferred to the core for connection.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param localPort A string with the port information to use as the local server port can be a number or "auto" or "os_local".
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetLocalPort(HelicsFederateInfo fi, const char* localPort, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetLocalPort(HelicsFederateInfo fedInfo, const char* localPort, HelicsError* err);
 
 /**
  * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty,
@@ -1629,36 +1629,37 @@ HELICS_EXPORT int helicsGetDataType(const char* val);
  * Set a flag in the info structure.
  *
  * @details Valid flags are available /ref helics_federate_flags.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param flag A numerical index for a flag.
  * @param value The desired value of the flag HELICS_TRUE or HELICS_FALSE.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool value, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetFlagOption(HelicsFederateInfo fedInfo, int flag, HelicsBool value, HelicsError* err);
 
 /**
  * Set the separator character in the info structure.
  *
  * @details The separator character is the separation character for local publications/endpoints in creating their global name.
  * For example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param separator The character to use as a separator.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char separator, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fedInfo, char separator, HelicsError* err);
 
 /**
  * Set the output delay for a federate.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param timeProperty An integer representation of the time based property to set see /ref helics_properties.
  * @param propertyValue The value of the property to set the timeProperty to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
+HELICS_EXPORT void
+    helicsFederateInfoSetTimeProperty(HelicsFederateInfo fedInfo, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 
 // TODO(Dheepak): what are known properties. The docstring should reference all properties that can be passed here.
 /**
@@ -1666,13 +1667,13 @@ HELICS_EXPORT void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int 
  *
  * @details Set known properties.
  *
- * @param fi The federateInfo object to alter.
+ * @param fedInfo The federateInfo object to alter.
  * @param intProperty An int identifying the property.
  * @param propertyValue The value to set the property to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fi, int intProperty, int propertyValue, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fedInfo, int intProperty, int propertyValue, HelicsError* err);
 
 /**
  * Load interfaces from a file.
