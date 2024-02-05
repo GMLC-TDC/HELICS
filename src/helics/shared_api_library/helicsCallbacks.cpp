@@ -32,9 +32,9 @@ void helicsBrokerSetLoggingCallback(HelicsBroker broker,
             brk->setLoggingCallback({});
         } else {
             brk->setLoggingCallback([logger, userdata](int loglevel, std::string_view ident, std::string_view message) {
-                const std::string id(ident);
+                const std::string identifier(ident);
                 const std::string mess(message);
-                logger(loglevel, id.c_str(), mess.c_str(), userdata);
+                logger(loglevel, identifier.c_str(), mess.c_str(), userdata);
             });
         }
     }
@@ -48,20 +48,20 @@ void helicsCoreSetLoggingCallback(HelicsCore core,
                                   void* userdata,
                                   HelicsError* err)
 {
-    auto* cr = getCore(core, err);
-    if (cr == nullptr) {
+    auto* coreObj = getCore(core, err);
+    if (coreObj == nullptr) {
         return;
     }
     try {
         if (logger == nullptr) {
-            cr->setLoggingCallback(helics::gLocalCoreId, {});
+            coreObj->setLoggingCallback(helics::gLocalCoreId, {});
         } else {
-            cr->setLoggingCallback(helics::gLocalCoreId,
-                                   [logger, userdata](int loglevel, std::string_view ident, std::string_view message) {
-                                       const std::string ID(ident);
-                                       const std::string mess(message);
-                                       logger(loglevel, ID.c_str(), mess.c_str(), userdata);
-                                   });
+            coreObj->setLoggingCallback(helics::gLocalCoreId,
+                                        [logger, userdata](int loglevel, std::string_view ident, std::string_view message) {
+                                            const std::string identifier(ident);
+                                            const std::string mess(message);
+                                            logger(loglevel, identifier.c_str(), mess.c_str(), userdata);
+                                        });
         }
     }
     catch (...) {  // LCOV_EXCL_LINE
@@ -84,9 +84,9 @@ void helicsFederateSetLoggingCallback(HelicsFederate fed,
             fedptr->setLoggingCallback({});
         } else {
             fedptr->setLoggingCallback([logger, userdata](int loglevel, std::string_view ident, std::string_view message) {
-                const std::string id(ident);
+                const std::string identifier(ident);
                 const std::string mess(message);
-                logger(loglevel, id.c_str(), mess.c_str(), userdata);
+                logger(loglevel, identifier.c_str(), mess.c_str(), userdata);
             });
         }
     }
@@ -148,7 +148,7 @@ void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
 
 void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* string, int stringSize, HelicsError* err)
 {
-    static const char* invalidBuffer = "The given buffer is not valid";
+    static constexpr const char* invalidBuffer = "The given buffer is not valid";
 
     if (((err) != nullptr) && ((err)->error_code != 0)) {
         return;
@@ -166,6 +166,7 @@ void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* string, int str
     if (stringSize <= 0 || string == nullptr) {
         bufferStr->clear();
         bufferStr->push_back('>');
+        return;
     }
     bufferStr->reserve(static_cast<std::size_t>(stringSize) + 1);
     bufferStr->assign(string, string + stringSize);
