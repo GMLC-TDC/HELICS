@@ -729,12 +729,16 @@ void FederateInfo::config_additional(helicsCLI11App* app)
     auto* opt = app->get_option("--config");
     if (opt->count() > 0) {
         auto configString = opt->as<std::string>();
-        if (fileops::hasTomlExtension(configString)) {
-            loadInfoFromToml(configString, false);
-            fileInUse = configString;
-        } else if (fileops::hasJsonExtension(configString)) {
-            loadInfoFromJson(configString, false);
-            fileInUse = configString;
+        if (CLI::ExistingFile(configString).empty())
+        {
+            if (fileops::hasTomlExtension(configString)) {
+                loadInfoFromToml(configString, false);
+                fileInUse = configString;
+            }
+            else if (fileops::hasJsonExtension(configString)) {
+                loadInfoFromJson(configString, false);
+                fileInUse = configString;
+            }
         }
     }
 }
