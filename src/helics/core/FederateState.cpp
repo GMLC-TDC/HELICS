@@ -1802,6 +1802,8 @@ void FederateState::processDataMessage(ActionMessage& cmd)
                                              prettyPrintString(cmd),
                                              subI->getSourceName(src)));
                     }
+                    // this can only match once
+                    break;
                 }
             }
             if (state <= FederateStates::EXECUTING) {
