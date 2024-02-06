@@ -29,24 +29,26 @@ bool changeDetected(const defV& prevValue, std::string_view val, double /*deltaV
     return true;
 }
 
-static const std::set<std::string> falseString{"0",        "",         "false",
-                                               "False",    "FALSE",    "off",
-                                               "Off",      "OFF",      "disabled",
-                                               "Disabled", "DISABLED", "disable",
-                                               "Disable",  "DISABLE",  "f",
-                                               "F",        "0",        std::string(1, '\0'),
-                                               " ",        "no",       "NO",
-                                               "No",       "-"};
+static constexpr int nullstringRep{0};
+static const std::set<std::string_view> falseString{
+    "0",        "",         "false",
+    "False",    "FALSE",    "off",
+    "Off",      "OFF",      "disabled",
+    "Disabled", "DISABLED", "disable",
+    "Disable",  "DISABLE",  "f",
+    "F",        "0",        std::string_view(reinterpret_cast<const char*>(&nullstringRep), 1),
+    " ",        "no",       "NO",
+    "No",       "-"};
 
-static bool isTrueString(const std::string& str)
+bool isTrueString(const std::string_view str)
 {
-    if (str == "1") {
+    if (str.size() == 1 && str[0] == '1') {
         return true;
     }
-    if (str == "0") {
+    if (str.size() == 1 && str[0] == '0') {
         return false;
     }
-    return (falseString.find(str) != falseString.end());
+    return (falseString.find(str) == falseString.end());
 }
 
 bool changeDetected(const defV& prevValue, bool val, double /*deltaV*/)

@@ -1954,7 +1954,7 @@ bool CoreBroker::checkInterfaceCreation(ActionMessage& message, InterfaceType ty
                 propagateError(std::move(eret));
                 return false;
             }
-            if (!(fed->observer || (fed->dynamic && fed->state == ConnectionState::CONNECTED))) {
+            if (!(fed->observer && (!fed->dynamic || fed->state != ConnectionState::CONNECTED))) {
                 ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, message.source_id);
                 eret.dest_handle = message.source_handle;
                 eret.messageID = defs::Errors::REGISTRATION_FAILURE;
@@ -2205,9 +2205,18 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
             }
         } break;
         case CMD_ADD_ALIAS:
-            handles.addAlias(command.payload.to_string(), command.getString(targetStringLoc));
-            if (!isRootc) {
-                routeMessage(std::move(command), parent_broker_id);
+            try {
+                handles.addAlias(command.payload.to_string(), command.getString(targetStringLoc));
+                if (!isRootc) {
+                    routeMessage(std::move(command), parent_broker_id);
+                }
+            }
+            catch (const std::runtime_error& rtError) {
+                ActionMessage error(CMD_ERROR);
+                error.setDestination(command.getSource());
+                error.source_id = global_broker_id_local;
+                error.payload = rtError.what();
+                routeMessage(std::move(error));
             }
             break;
         default:
@@ -2684,6 +2693,30 @@ void CoreBroker::executeInitializationOperations(bool iterating)
         loadTimeMonitor(true, std::string_view{});
     }
     if (unknownHandles.hasUnknowns()) {
+        unknownHandles.processUnknownLinks([this](const std::string& origin,
+                                                  InterfaceType originType,
+                                                  const std::string& target,
+                                                  InterfaceType targetType) {
+            const auto* originHandle = handles.getInterfaceHandle(origin, originType);
+            if (originHandle != nullptr) {
+                const auto* targetHandle = handles.getInterfaceHandle(target, targetType);
+                if (targetHandle != nullptr) {
+                    if (originType == InterfaceType::PUBLICATION) {
+                        ActionMessage datalink(CMD_DATA_LINK);
+                        datalink.name(originHandle->key);
+                        datalink.setString(targetStringLoc, targetHandle->key);
+                        linkInterfaces(datalink);
+                    } else if (originType == InterfaceType::ENDPOINT &&
+                               targetType == InterfaceType::ENDPOINT) {
+                        ActionMessage eptlink(CMD_ENDPOINT_LINK);
+                        eptlink.name(originHandle->key);
+                        eptlink.setString(targetStringLoc, targetHandle->key);
+                        linkInterfaces(eptlink);
+                    }
+                    // TODO(PT):: make this work for filters
+                }
+            }
+        });
         std::vector<std::vector<std::string>> foundAliasHandles;
         foundAliasHandles.resize(4);
         bool useRegex{false};
@@ -2755,6 +2788,8 @@ void CoreBroker::executeInitializationOperations(bool iterating)
                 return (target.compare(0, 6, regexKey) == 0);
             });
         }
+        /** now do a check on the unknownLinks*/
+
         if (unknownHandles.hasNonOptionalUnknowns()) {
             if (unknownHandles.hasRequiredUnknowns()) {
                 ActionMessage eMiss(CMD_ERROR);
@@ -2864,8 +2899,8 @@ void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
 
 void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key)
 {
-    auto Handles = unknownHandles.checkForEndpoints(key);
-    for (const auto& target : Handles) {
+    auto uHandles = unknownHandles.checkForEndpoints(key);
+    for (const auto& target : uHandles) {
         const auto* iface = handles.findHandle(target.first);
         auto destFlags = target.second;
         if (iface->handleType != InterfaceType::FILTER) {
@@ -2882,8 +2917,9 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
                                              CMD_ADD_ENDPOINT :
                                              CMD_ADD_FILTER));
     }
-    auto EptTargets = unknownHandles.checkForEndpointLinks(key);
-    for (const auto& ept : EptTargets) {
+
+    auto eptTargets = unknownHandles.checkForEndpointLinks(key);
+    for (const auto& ept : eptTargets) {
         ActionMessage link(CMD_ADD_NAMED_ENDPOINT);
         link.name(ept);
         link.setSource(handleInfo.handle);
@@ -2892,7 +2928,7 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
         checkForNamedInterface(link);
     }
 
-    if (!Handles.empty()) {
+    if (!(uHandles.empty() && eptTargets.empty())) {
         unknownHandles.clearEndpoint(key);
     }
 }
@@ -3389,6 +3425,7 @@ static const std::set<std::string> querySet{"isinit",
                                             "global_state",
                                             "global_flush",
                                             "current_state",
+                                            "unconnected_interfaces",
                                             "logs"};
 
 static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> mapIndex{
@@ -3401,6 +3438,7 @@ static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> ma
     {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
     {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
     {"barriers", {BARRIERS, QueryReuse::DISABLED}},
+    {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
     {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
 
 std::string CoreBroker::quickBrokerQueries(std::string_view request) const
@@ -3645,7 +3683,7 @@ std::string CoreBroker::generateGlobalStatus(fileops::JsonMapBuilder& builder)
             }
         }
     }
-    std::string tste =
+    const std::string tste =
         (minTime >= timeZero) ? std::string("operating") : std::string("init_requested");
 
     Json::Value json;
@@ -3797,6 +3835,72 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
             if (timeCoord && !timeCoord->empty()) {
                 base["time"] = Json::Value();
                 timeCoord->generateDebuggingTimeInfo(base["time"]);
+            }
+            break;
+        case UNCONNECTED_INTERFACES:
+            if (!global_values.empty()) {
+                Json::Value tagBlock = Json::objectValue;
+                for (const auto& global : global_values) {
+                    tagBlock[global.first] = global.second;
+                }
+                base["tags"] = tagBlock;
+            }
+            const auto& aliases = handles.getAliases();
+            if (!aliases.empty()) {
+                base["aliases"] = Json::arrayValue;
+                for (const auto& alias : aliases) {
+                    const std::string_view interfaceName = alias.first;
+                    const auto& aliasNames = alias.second;
+                    for (const auto& aliasName : aliasNames) {
+                        Json::Value aliasSet = Json::arrayValue;
+                        aliasSet.append(std::string(interfaceName));
+                        aliasSet.append(std::string(aliasName));
+                        base["aliases"].append(std::move(aliasSet));
+                    }
+                }
+            }
+            if (unknownHandles.hasUnknowns()) {
+                base["unknown_publications"] = Json::arrayValue;
+                base["unknown_inputs"] = Json::arrayValue;
+                base["unknown_endpoints"] = Json::arrayValue;
+                auto unknownProcessor = [&base](const std::string& name,
+                                                InterfaceType type,
+                                                UnknownHandleManager::TargetInfo /*target*/) {
+                    switch (type) {
+                        case InterfaceType::INPUT:
+                            base["unknown_inputs"].append(name);
+                            break;
+                        case InterfaceType::PUBLICATION:
+                            base["unknown_publications"].append(name);
+                            break;
+                        case InterfaceType::ENDPOINT:
+                            base["unknown_endpoints"].append(name);
+                            break;
+                        default:
+                            break;
+                    }
+                };
+                unknownHandles.processUnknowns(unknownProcessor);
+                auto unknownLinkProcessor = [&base](const std::string& origin,
+                                                    InterfaceType type1,
+                                                    const std::string& target,
+                                                    InterfaceType type2) {
+                    switch (type2) {
+                        case InterfaceType::INPUT:
+                            base["unknown_inputs"].append(target);
+                            base["unknown_publications"].append(origin);
+                            break;
+                        case InterfaceType::ENDPOINT:
+                            base["unknown_endpoints"].append(target);
+                            if (type1 == InterfaceType::ENDPOINT) {
+                                base["unknown_endpoints"].append(origin);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                };
+                unknownHandles.processUnknownLinks(unknownLinkProcessor);
             }
             break;
     }

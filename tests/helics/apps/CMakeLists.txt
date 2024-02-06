@@ -24,6 +24,11 @@ set(helics_apps_test_sources
     BrokerAppTests.cpp
     MultiBrokerTests.cpp
     ProbeTests.cpp
+    ConnectorTests.cpp
+    ConnectorTests2.cpp
+    ConnectorFileTests.cpp
+    Connector2StageTests.cpp
+    ConnectorTagTests.cpp
     exeTestHelper.h
 )
 

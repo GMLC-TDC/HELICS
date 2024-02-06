@@ -1598,7 +1598,7 @@ void FederateState::timeoutCheck(ActionMessage& cmd)
         LOG_WARNING(qres);
         auto parentID = timeCoord->getParent();
         if (parentID.isValid()) {
-            auto brokerTimeoutCheck = cmd;
+            ActionMessage brokerTimeoutCheck{cmd};
             brokerTimeoutCheck.source_id = global_id.load();
             brokerTimeoutCheck.dest_id = parentID;
             routeMessage(brokerTimeoutCheck);
@@ -2543,6 +2543,9 @@ std::string FederateState::processQueryActual(std::string_view query) const
     };
 
     auto qres = generateInterfaceQueryResults(query, interfaceInformation, addHeader);
+    if (!qres.empty()) {
+        return qres;
+    }
     if (query == "global_flush") {
         return "{\"status\":true}";
     }
@@ -2624,6 +2627,35 @@ std::string FederateState::processQueryActual(std::string_view query) const
         addFederateTags(base, this);
         return fileops::generateJsonString(base);
     }
+    if (query == "unconnected_interfaces") {
+        Json::Value base;
+        addHeader(base);
+        interfaceInformation.getUnconnectedInterfaces(base);
+
+        if (!tags.empty()) {
+            Json::Value tagBlock = Json::objectValue;
+            for (const auto& tag : tags) {
+                tagBlock[tag.first] = tag.second;
+            }
+            base["tags"] = tagBlock;
+        }
+        if (queryCallback) {
+            auto potential = queryCallback("potential_interfaces");
+            if (!potential.empty()) {
+                try {
+                    auto json = fileops::loadJsonStr(potential);
+
+                    if (!json.isMember("error")) {
+                        base["potential_interfaces"] = json;
+                    }
+                }
+                catch (const std::invalid_argument&) {
+                    ;
+                }
+            }
+        }
+        return fileops::generateJsonString(base);
+    }
     if (query == "tags") {
         Json::Value tagBlock = Json::objectValue;
         for (const auto& tag : tags) {
@@ -2654,7 +2686,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
     if (query == "data_flow_graph") {
         Json::Value base;
         addHeader(base);
-        interfaceInformation.GenerateDataFlowGraph(base);
+        interfaceInformation.generateDataFlowGraph(base);
         return fileops::generateJsonString(base);
     }
     if (query == "global_time" || query == "global_status") {
@@ -2702,7 +2734,7 @@ std::string FederateState::processQuery(std::string_view query, bool force_order
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
-            R"("publications","inputs","logs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time","global_time","global_status")";
+            R"("publications","inputs","logs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time","global_time","global_status","unconnected_interfaces")";
     } else if (query == "state") {
         qstring = fmt::format("\"{}\"", fedStateString(getState()));
     } else {  // the rest might need be locked to prevent a race condition
@@ -2724,10 +2756,10 @@ int FederateState::loggingLevel() const
 void FederateState::setTag(std::string_view tag, std::string_view value)
 {
     spinlock();
-    for (auto& existingTag : tags) {
-        if (existingTag.first == tag) {
+    for (auto& testTag : tags) {
+        if (testTag.first == tag) {
             unlock();
-            existingTag.second = value;
+            testTag.second = value;
             return;
         }
     }

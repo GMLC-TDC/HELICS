@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 #include <iostream>
+#include <numeric>
 #include <thread>
 
 /** these test cases test out the message federates
@@ -487,3 +488,156 @@ TEST_F(mfed_tests, regex_combo_data_sink)
     mFed2->finalizeComplete();
     mFed1->finalizeComplete();
 }
+
+TEST_F(mfed_tests, endpoint_linking)
+{
+    SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+
+    auto& ept1 = mFed1->registerGlobalTargetedEndpoint("source_endpoint");
+    auto& ept2 = mFed1->registerGlobalTargetedEndpoint("dest_endpoint");
+    helics::CoreApp core(mFed1->getCorePointer());
+    core->linkEndpoints("source_endpoint", "dest_endpoint");
+    mFed1->enterExecutingMode();
+    ept1.send("test message");
+    mFed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    auto m = ept2.getMessage();
+    EXPECT_EQ(m->to_string(), "test message");
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, endpoint_linking_dest_unknown)
+{
+    SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    helics::CoreApp core(mFed1->getCorePointer());
+    auto& ept1 = mFed1->registerGlobalTargetedEndpoint("source_endpoint");
+    core->linkEndpoints("source_endpoint", "dest_endpoint");
+    auto& ept2 = mFed1->registerGlobalTargetedEndpoint("dest_endpoint");
+
+    mFed1->enterExecutingMode();
+    ept1.send("test message");
+    mFed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    auto m = ept2.getMessage();
+    EXPECT_EQ(m->to_string(), "test message");
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, endpoint_linking_source_unknown)
+{
+    SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    helics::CoreApp core(mFed1->getCorePointer());
+    auto& ept2 = mFed1->registerGlobalTargetedEndpoint("dest_endpoint");
+    core->linkEndpoints("source_endpoint", "dest_endpoint");
+
+    auto& ept1 = mFed1->registerGlobalTargetedEndpoint("source_endpoint");
+    mFed1->enterExecutingMode();
+    ept1.send("test message");
+    mFed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    auto m = ept2.getMessage();
+    EXPECT_EQ(m->to_string(), "test message");
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, endpoint_linking_both_unknown)
+{
+    SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    helics::CoreApp core(mFed1->getCorePointer());
+
+    core->linkEndpoints("source_endpoint", "dest_endpoint");
+    auto& ept2 = mFed1->registerGlobalTargetedEndpoint("dest_endpoint");
+
+    auto& ept1 = mFed1->registerGlobalTargetedEndpoint("source_endpoint");
+    mFed1->enterExecutingMode();
+    ept1.send("test message");
+    mFed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    auto m = ept2.getMessage();
+    EXPECT_EQ(m->to_string(), "test message");
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, endpoint_linking_source_alias)
+{
+    SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    helics::CoreApp core(mFed1->getCorePointer());
+
+    core->linkEndpoints("source", "dest_endpoint");
+    auto& ept2 = mFed1->registerGlobalTargetedEndpoint("dest_endpoint");
+
+    auto& ept1 = mFed1->registerGlobalTargetedEndpoint("source_endpoint");
+    core->addAlias("source_endpoint", "source");
+    mFed1->enterExecutingMode();
+    ept1.send("test message");
+    mFed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    auto m = ept2.getMessage();
+    EXPECT_EQ(m->to_string(), "test message");
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, endpoint_linking_dest_alias)
+{
+    SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    helics::CoreApp core(mFed1->getCorePointer());
+
+    core->linkEndpoints("source_endpoint", "dest");
+    auto& ept2 = mFed1->registerGlobalTargetedEndpoint("dest_endpoint");
+
+    auto& ept1 = mFed1->registerGlobalTargetedEndpoint("source_endpoint");
+    core->addAlias("dest_endpoint", "dest");
+    mFed1->enterExecutingMode();
+    ept1.send("test message");
+    mFed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    auto m = ept2.getMessage();
+    EXPECT_EQ(m->to_string(), "test message");
+    mFed1->finalize();
+}
+
+class mfed_permutation_tests: public ::testing::TestWithParam<int>, public FederateTestFixture {};
+
+TEST_P(mfed_permutation_tests, endpoint_linking_order_permutations)
+{
+    SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    helics::CoreApp core(mFed1->getCorePointer());
+
+    std::vector<std::function<void()>> exList(5);
+    std::vector<int> exOrder(5);
+    std::iota(exOrder.begin(), exOrder.end(), 0);
+
+    int permutations = GetParam();
+    for (int kk = 0; kk < permutations; ++kk) {
+        std::next_permutation(exOrder.begin(), exOrder.end());
+    }
+    exList[0] = [&mFed1]() { mFed1->registerGlobalTargetedEndpoint("dest_endpoint"); };
+    exList[1] = [&mFed1]() { mFed1->registerGlobalTargetedEndpoint("source_endpoint"); };
+    exList[2] = [&core]() { core->addAlias("dest_endpoint", "dest"); };
+    exList[3] = [&core]() { core->addAlias("source_endpoint", "source"); };
+    exList[4] = [&core]() { core->linkEndpoints("source", "dest"); };
+
+    for (int ii = 0; ii < 5; ++ii) {
+        exList[exOrder[ii]]();
+    }
+    auto& ept2 = mFed1->getEndpoint("dest_endpoint");
+    auto& ept1 = mFed1->getEndpoint("source_endpoint");
+    mFed1->enterExecutingMode();
+    ept1.send("test message");
+    mFed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    auto m = ept2.getMessage();
+    EXPECT_EQ(m->to_string(), "test message");
+    mFed1->finalize();
+}
+
+INSTANTIATE_TEST_SUITE_P(OrderPermutations,
+                         mfed_permutation_tests,
+                         testing::Range(0, 5 * 4 * 3 * 2 * 1));

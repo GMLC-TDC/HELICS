@@ -23,8 +23,11 @@ SPDX-License-Identifier: BSD-3-Clause
 API and core
 */
 namespace helics {
-/** define a variant with the different types*/
 
+/** detect if a string is not a string that represents false*/
+HELICS_CXX_EXPORT bool isTrueString(std::string_view str);
+
+/** define a variant with the different types*/
 using defV = std::variant<double,
                           int64_t,
                           std::string,

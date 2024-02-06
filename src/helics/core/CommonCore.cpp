@@ -2584,6 +2584,7 @@ static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> ma
     {"barriers", {BARRIERS, QueryReuse::DISABLED}},
     {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
     {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
+    {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
     {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
 
 void CommonCore::setQueryCallback(LocalFederateId federateID,
@@ -2820,6 +2821,15 @@ void CommonCore::initializeMapBuilder(std::string_view request,
             if (timeCoord && !timeCoord->empty()) {
                 base["time"] = Json::Value();
                 timeCoord->generateDebuggingTimeInfo(base["time"]);
+            }
+            break;
+        case UNCONNECTED_INTERFACES:
+            if (!tags.empty()) {
+                Json::Value tagBlock = Json::objectValue;
+                for (const auto& tag : tags) {
+                    tagBlock[tag.first] = tag.second;
+                }
+                base["tags"] = tagBlock;
             }
             break;
         default:
@@ -3622,7 +3632,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_CORE_TAG:
             if (command.source_id == global_broker_id_local &&
                 command.dest_id == global_broker_id_local) {
-                auto keyTag = command.getString(0);
+                const auto& keyTag = command.getString(0);
                 for (auto& tag : tags) {
                     if (tag.first == keyTag) {
                         tag.second = command.getString(1);
@@ -4613,6 +4623,8 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                     if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
                         loopFederates.apply([&cmd](auto& fed) {
                             if (fed->initIterating.load()) {
+                                fed->initIterating.store(false);
+                                fed->init_transmitted = false;
                                 fed->addAction(cmd);
                             }
                         });
