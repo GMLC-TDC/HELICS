@@ -58,7 +58,7 @@ The public API includes the following
   - Tracer.hpp
   - Probe.hpp
   - Clone.hpp
-  - Connector.hpp  (considered in Beta and subject to change)
+  - Connector.hpp (considered in Beta and subject to change)
   - helicsApp.hpp
   - BrokerApp.hpp (aliased to application_api version)
   - CoreApp.hpp (aliased to application_api version)

@@ -34,7 +34,7 @@ Major release including connector app capability, a refresh of the of the dataBu
 - Added helics::systemInfo() to the C++ shared library
 - Added ability generate translators from config files
 - Added API's to get and send dataBuffers from publication/input/endpoints
-  
+
 ### Deprecated
 
 - Nearly all methods that use `Subscription` in the name have been deprecated in favor of an equivalent version for `Input` to reduce confusion of use of subscription objects (which are just Input objects); these are all 1:1 mappings
@@ -42,7 +42,7 @@ Major release including connector app capability, a refresh of the of the dataBu
   - `getSubscription(int index)` -> `getInput(int index)`
   - `helicsSubscriptionGetTarget(inp)` -> `helicsInputGetTarget(inp)`
   - `helicsFederateGetSubscription(fed, string target)`->`helicsFederateGetInputByTarget(fed,string target)`
-  
+
 ## [3.4.0][] - 2023-01-19
 
 Major release including full dynamic federation capability and wildcard based matching for interface connections.

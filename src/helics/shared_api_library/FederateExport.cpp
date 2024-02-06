@@ -1463,7 +1463,7 @@ void helicsCallbackFederateNextTimeIterativeCallback(
             fedptr->clearNextTimeCallback();
         } else {
             fedptr->setNextTimeIterativeCallback([timeUpdate, userdata](helics::iteration_time time) {
-                HelicsIterationRequest request{ HELICS_ITERATION_REQUEST_ERROR };
+                HelicsIterationRequest request{HELICS_ITERATION_REQUEST_ERROR};
                 const helics::Time newTime = timeUpdate(time.grantedTime, getIterationStatus(time.state), &request, userdata);
                 return std::make_pair(newTime, getIterationRequest(request));
             });

@@ -13,7 +13,6 @@ This document contains tentative plans for changes and improvements of note in u
   - Cmake 3.22
   - MSVC 16.10
   - XCode 14
-  
 
 ## Nearer term features
 
