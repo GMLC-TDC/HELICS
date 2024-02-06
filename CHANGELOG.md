@@ -18,22 +18,22 @@ Major release including connector app capability, a refresh of the of the dataBu
 - Fixed some issues regarding config files in the apps, where the config file was not being handled consistently
 - Fixed a few more sporadically failing testing cases and a rare bug in the use of `wait_for_current_time` flag when entering executing mode
 - Fixed a memory growth issue related to find operations in the C interface
-- resolve some issues with the threadSanitizer and other sporadic failures in the test cases.
+- Resolved some issues with the threadSanitizer and other sporadic failures in the test cases
 
 ### Changed
 
 - Test with Boost 1.84 and CMake 3.28
-- large refactor of the dataBufferAPI, this is now considered stable, all dataBuffer related methods now start with helicsDataBuffer for consistency with other API methods and the XXXToBytes methods are changed to FillFromXXXX to be more consistent with other API's
+- Large refactor of the dataBufferAPI, this is now considered stable, all dataBuffer related methods now start with helicsDataBuffer for consistency with other API methods and the XXXToBytes methods are changed to FillFromXXXX to be more consistent with other API's
 - Update 3rd party libraries
 - Update copyright to 2024
-- autobuild ZMQ now set to 4.3.5
+- Autobuild ZMQ now set to 4.3.5
 
 ### Added
 
 - Added Connector app to enable automated connections of the federates via a set of matching rules, and allow optional interface generation via a query/command
 - Added helics::systemInfo() to the C++ shared library
-- Added ability generate translators from config files
-- Added API's to get and send dataBuffers from publication/input/endpoints
+- Added ability to generate translators from config files
+- Added API's to get and send dataBuffers from publications/inputs/endpoints
 
 ### Deprecated
 

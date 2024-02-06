@@ -10,7 +10,7 @@ This document contains tentative plans for changes and improvements of note in u
 - This release will likely update HELICS to use C++20 and update minimum Compilers, CMake, boost, and other dependencies.
   - GCC 11
   - clang 14
-  - Cmake 3.22
+  - CMake 3.22
   - MSVC 16.10
   - XCode 14
 
