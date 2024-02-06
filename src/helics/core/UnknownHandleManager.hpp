@@ -120,7 +120,7 @@ class UnknownHandleManager {
 
     /** run a callback for each Unknown Link
     @param cfunc a callback function with the signature of the name of the interface,
-    the interface type , the name of the target, and type of the target.
+    the interface type, the name of the target, and type of the target.
     */
     void processUnknownLinks(const std::function<void(const std::string& origin,
                                                       InterfaceType,
