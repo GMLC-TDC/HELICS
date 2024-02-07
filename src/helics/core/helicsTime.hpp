@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -38,12 +38,6 @@ constexpr Time cBigTime = Time{static_cast<int64_t>(HELICS_BIG_NUMBER * 1000000)
 
 /** common definition of currentTime in initialization mode*/
 constexpr Time initializationTime = negEpsilon;
-
-/** user defined literal for a time variable*/
-constexpr Time operator"" _t(long double val)
-{
-    return {static_cast<double>(val)};
-}  // NOLINT
 
 /** simple structure with the time and completion marker for iterations or dense time steps*/
 struct iteration_time {

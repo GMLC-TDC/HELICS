@@ -185,7 +185,7 @@ The following queries will be answered by a core:
 | ``data_flow_graph``      | a representation of the data connections from all interfaces in a core [structure]  |
 +--------------------------+-------------------------------------------------------------------------------------+
 |``filtered_endpoints``    | data structure containing the filters on endpoints for the core[structure]          |
-+-------------------------+--------------------------------------------------------------------------------------+
++--------------------------+-------------------------------------------------------------------------------------+
 | ``barriers``             | a data structure with current time barriers [structure]                             |
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``queries``              | list of dependent objects [sv]                                                      |
@@ -253,10 +253,10 @@ The following queries will be answered by a broker:
 | ``dependencies``         | structure containing dependency information for the broker [structure]                            |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``dependents``           | list of dependent objects [sv]                                                                    |
-+-------------------------+----------------------------------------------------------------------------------------------------+
++--------------------------+---------------------------------------------------------------------------------------------------+
 | ``barriers``             | a data structure with current time barriers [structure]                                           |
 +--------------------------+---------------------------------------------------------------------------------------------------+
-| ``counts``               | a simple count of the number of brokers, federates, and handles [structure]                       |
+| ``counts``               | a simple count of the number of brokers, federates, and interfaces [structure]                    |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``current_state``        | a structure with the current known status of the brokers and federates [structure]                |
 +--------------------------+---------------------------------------------------------------------------------------------------+
@@ -338,7 +338,7 @@ In the header [`<helics\queryFunctions.hpp>`](https://docs.helics.org/en/latest/
 
 ### C API and interface API's
 
-Queries in the [C API](../../api-reference/C_API.md#query) have the same valid targets and properties that can be queried but the construction of the query is slightly different. The basic operation is to create a query using `helicsQueryCreate(target,query)`. Once created, the target or query string can be changed with `helicsQuerySetTarget()` and `helicsQuerySetQueryString()`, respectively.
+Queries in the [C API](../../references/api-reference/C_API.md#query) have the same valid targets and properties that can be queried but the construction of the query is slightly different. The basic operation is to create a query using `helicsQueryCreate(target,query)`. Once created, the target or query string can be changed with `helicsQuerySetTarget()` and `helicsQuerySetQueryString()`, respectively.
 
 This function returns a query object that can be used in one of the execute functions (`helicsQueryExecute()`, `helicsQueryExecuteAsync()`, `helicsQueryBrokerExecute()`, `helicsQueryCoreExecute()`, to perform the query and receive back results. The query can be called asynchronously on a federate. The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.
 A query must be freed after use `helicsQueryFree()`.

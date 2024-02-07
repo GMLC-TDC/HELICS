@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -26,19 +26,19 @@ constexpr int typeOutStringLoc{1};
 
 constexpr int32_t cmd_info_basis{65536};
 
-/** class defining the primary message object used in HELICS */
+/** class defining the primary multiMessage object used in HELICS */
 class ActionMessage {
     // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT
     // there yet
   private:
     action_message_def::action_t messageAction{CMD_IGNORE};  // 4 -- command
   public:
-    int32_t messageID{0};  //!< 8 -- message ID for a variety of purposes
+    int32_t messageID{0};  //!< 8 -- multiMessage ID for a variety of purposes
     GlobalFederateId source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
     InterfaceHandle source_handle{};  //!< 16 -- for local handle or local code
-    GlobalFederateId dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
-    InterfaceHandle dest_handle{};  //!< 24 local handle for a targeted message
-    uint16_t counter{0};  //!< 26 counter for filter tracking or message counter
+    GlobalFederateId dest_id{parent_broker_id};  //!< 20 fed_id for a targeted multiMessage
+    InterfaceHandle dest_handle{};  //!< 24 local handle for a targeted multiMessage
+    uint16_t counter{0};  //!< 26 counter for filter tracking or multiMessage counter
     uint16_t flags{0};  //!<  28 set of messageFlags
     uint32_t sequenceID{0};  //!< 32 a sequence number for ordering
     Time actionTime{timeZero};  //!< 40 the time an action took place or will take place    //32
@@ -80,11 +80,12 @@ class ActionMessage {
     /** move assignment*/
     ActionMessage& operator=(ActionMessage&& act) noexcept;
     /** move assignment from message data into the actionMessage
-    @details take ownership of the message and move the contents out then destroy the message shell
+    @details take ownership of the message and move the contents out then destroy the
+    message shell
     @param message the message to move.
     */
     ActionMessage& operator=(std::unique_ptr<Message> message) noexcept;
-    /** get the action of the message*/
+    /** get the action of the multiMessage*/
     action_message_def::action_t action() const noexcept { return messageAction; }
     /** set the action*/
     void setAction(action_message_def::action_t newAction);
@@ -163,7 +164,7 @@ class ActionMessage {
     int32_t getExtraDestData() const { return source_handle.baseValue(); }
     // functions that convert to and from a byte stream
 
-    /** generate a size of the message in bytes if it were to be serialized*/
+    /** generate a size of the multiMessage in bytes if it were to be serialized*/
     int serializedByteCount() const;
     /** convert a command to a raw data bytes
     @param[out] data pointer to memory to store the command
@@ -177,11 +178,11 @@ class ActionMessage {
     std::string to_string() const;
     /** convert to a json string*/
     std::string to_json_string() const;
-    /** packetize the message with a simple header and tail sequence
+    /** packetize the multiMessage with a simple header and tail sequence
      */
     std::string packetize() const;
     void packetize(std::string& data) const;
-    /** packetize the message with a simple header and tail sequence using json serialization
+    /** packetize the multiMessage with a simple header and tail sequence using json serialization
      */
     std::string packetize_json() const;
     /** convert to a byte vector using a reference*/
@@ -212,13 +213,13 @@ inline bool operator<(const ActionMessage& cmd, const ActionMessage& cmd2)
     return (cmd.actionTime < cmd2.actionTime);
 }
 
-/** create a new message object that copies all the information from the ActionMessage into newly
- * allocated memory for the message
+/** create a new multiMessage object that copies all the information from the ActionMessage into
+ * newly allocated memory for the multiMessage
  */
 std::unique_ptr<Message> createMessageFromCommand(const ActionMessage& cmd);
 
-/** create a new message object that moves all the information from the ActionMessage into newly
- * allocated memory for the message
+/** create a new multiMessage object that moves all the information from the ActionMessage into
+ * newly allocated memory for the multiMessage
  */
 std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd);
 
@@ -347,13 +348,13 @@ std::string prettyPrintString(const ActionMessage& command);
 
 /** stream operator for a command
  */
-std::ostream& operator<<(std::ostream& os, const ActionMessage& command);
+std::ostream& operator<<(std::ostream& out, const ActionMessage& command);
 
-/** append a message to multi message container
-@param m the message to add the extra message to
-@param newMessage the message to append
-@return the integer location of the message in the stringData section*/
-int appendMessage(ActionMessage& m, const ActionMessage& newMessage);
+/** append a multiMessage to multi multiMessage container
+@param multiMessage the multiMessage to add the extra multiMessage to
+@param newMessage the multiMessage to append
+@return the integer location of the multiMessage in the stringData section*/
+int appendMessage(ActionMessage& multiMessage, const ActionMessage& newMessage);
 
 /** generate a string representing an error from an ActionMessage
 @param command the command to generate the error string for

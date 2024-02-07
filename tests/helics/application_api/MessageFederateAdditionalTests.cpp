@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -649,6 +649,20 @@ TEST(messageFederate, constructor4)
 
     EXPECT_THROW(mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_bad.toml"),
                  helics::HelicsException);
+    EXPECT_NO_THROW(mf1.enterExecutingMode());
+    mf1.finalize();
+}
+
+TEST(messageFederate, constructorWithSpaceInFilename)
+{
+    helics::MessageFederate mf1("fed1",
+                                std::string(TEST_DIR) + "example message fed with space.json");
+
+    mf1.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
+
+    mf1.registerGlobalFilter("filt1");
+    mf1.registerGlobalFilter("filt2");
+
     EXPECT_NO_THROW(mf1.enterExecutingMode());
     mf1.finalize();
 }

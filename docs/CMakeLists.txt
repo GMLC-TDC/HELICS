@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2024, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -37,7 +37,6 @@ if(MSVC)
         ${PROJECT_SOURCE_DIR}/CONTRIBUTORS.md
         ${PROJECT_SOURCE_DIR}/CONTRIBUTING.md
         ${PROJECT_SOURCE_DIR}/docs/Public_API.md
-        ${PROJECT_SOURCE_DIR}/docs/docker.md
         ${PROJECT_SOURCE_DIR}/docs/ROADMAP.md
     )
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -133,8 +133,8 @@ std::string os_info()
 
 std::uint64_t getTotalSystemMemory()
 {
-    std::uint64_t pages = sysconf(_SC_PHYS_PAGES);
-    std::uint64_t page_size = sysconf(_SC_PAGE_SIZE);
+    const std::uint64_t pages = sysconf(_SC_PHYS_PAGES);
+    const std::uint64_t page_size = sysconf(_SC_PAGE_SIZE);
     return pages * page_size;
 }
 
@@ -143,7 +143,7 @@ std::string os_info()
     std::string osInfo;
     utsname details = {};
 
-    int ret = uname(&details);
+    const int ret = uname(&details);
 
     if (ret == 0) {
         osInfo.append(details.sysname);
@@ -190,7 +190,7 @@ std::string getHostName()
     return computerName;
 }
 
-namespace helics {
+namespace helics::core {
 
 std::string systemInfo()
 {
@@ -229,4 +229,4 @@ std::string systemInfo()
     return fileops::generateJsonString(base);
 }
 
-}  // namespace helics
+}  // namespace helics::core

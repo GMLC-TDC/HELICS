@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2024, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -72,6 +72,9 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(cpp98)
 
     if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-        set_target_properties(helics helicsCpp98_ide PROPERTIES FOLDER helics)
+        set_target_properties(helics PROPERTIES FOLDER helics)
+        if(TARGET helicsCpp98_ide)
+            set_target_properties(helicsCpp98_ide PROPERTIES FOLDER helics)
+        endif()
     endif()
 endif()

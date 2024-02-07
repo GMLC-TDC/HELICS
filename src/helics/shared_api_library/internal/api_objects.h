@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -212,7 +212,10 @@ std::unique_ptr<helics::Message> getMessageUniquePtr(HelicsMessage message, Heli
 /** create a message object from a message pointer*/
 HelicsMessage createAPIMessage(std::unique_ptr<helics::Message>& mess);
 
+/** add required information to SmallBuffer and return a HelicsDataBuffer object*/
 HelicsDataBuffer createAPIDataBuffer(helics::SmallBuffer& buff);
+/** get the small buffer point from a HelicsDataBuffer*/
+helics::SmallBuffer* getBuffer(HelicsDataBuffer data);
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, HelicsError* err);

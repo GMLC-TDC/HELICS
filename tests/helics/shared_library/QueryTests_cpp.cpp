@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -12,9 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
-struct query_tests: public FederateTestFixture_cpp, public ::testing::Test {};
+struct QueryTests: public FederateTestFixture_cpp, public ::testing::Test {};
 
-TEST_F(query_tests, exists)
+TEST_F(QueryTests, exists)
 {
     SetupTest<helicscpp::MessageFederate>("test_2", 2, 1.0);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate>(0);
@@ -87,7 +87,7 @@ TEST_F(query_tests, exists)
     core1.waitForDisconnect();
 }
 
-TEST_F(query_tests, callback)
+TEST_F(QueryTests, callback)
 {
     SetupTest<helicscpp::MessageFederate>("test_2", 2, 1.0);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate>(0);

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -70,20 +70,22 @@ class InterfaceInfo {
     /** get the current value of the change update flag*/
     bool getChangeUpdateFlag() const { return only_update_on_change; }
     /** set a property on a specific interface*/
-    bool setInputProperty(InterfaceHandle id, int32_t option, int32_t value);
-    bool setPublicationProperty(InterfaceHandle id, int32_t option, int32_t value);
-    bool setEndpointProperty(InterfaceHandle id, int32_t option, int32_t value);
+    bool setInputProperty(InterfaceHandle hid, int32_t option, int32_t value);
+    bool setPublicationProperty(InterfaceHandle hid, int32_t option, int32_t value);
+    bool setEndpointProperty(InterfaceHandle hid, int32_t option, int32_t value);
     /** get properties for an interface*/
-    int32_t getInputProperty(InterfaceHandle id, int32_t option) const;
-    int32_t getPublicationProperty(InterfaceHandle id, int32_t option) const;
-    int32_t getEndpointProperty(InterfaceHandle id, int32_t option) const;
+    int32_t getInputProperty(InterfaceHandle hid, int32_t option) const;
+    int32_t getPublicationProperty(InterfaceHandle hid, int32_t option) const;
+    int32_t getEndpointProperty(InterfaceHandle hid, int32_t option) const;
 
     /** check the interfaces for specific issues*/
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues();
     /** generate a configuration script for the interfaces*/
     void generateInferfaceConfig(Json::Value& base) const;
     /** load a dependency graph for the interfaces*/
-    void GenerateDataFlowGraph(Json::Value& base) const;
+    void generateDataFlowGraph(Json::Value& base) const;
+    /** generate a list of unconnected interfaces*/
+    void getUnconnectedInterfaces(Json::Value& base) const;
 
   private:
     std::atomic<GlobalFederateId> global_id;

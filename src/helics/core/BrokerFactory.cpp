@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
-#include "helics/common/fmt_format.h"
 #include "helics/helics-config.h"
 
 #include <cassert>
+#include <fmt/format.h>
 #include <tuple>
 #include <utility>
 
@@ -29,17 +29,17 @@ namespace helics::BrokerFactory {
 things that call it so it needs to be a static member of function call*/
 class MasterBrokerBuilder {
   public:
-    using BuildT = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
+    using BuilderData = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
 
-    static void addBuilder(std::shared_ptr<BrokerBuilder> cb, std::string_view name, int code)
+    static void addBuilder(std::shared_ptr<BrokerBuilder> builder, std::string_view name, int code)
     {
-        instance()->builders.emplace_back(code, name, std::move(cb));
+        instance()->builders.emplace_back(code, name, std::move(builder));
     }
     static const std::shared_ptr<BrokerBuilder>& getBuilder(int code)
     {
-        for (auto& bb : instance()->builders) {
-            if (std::get<0>(bb) == code) {
-                return std::get<2>(bb);
+        for (auto& builder : instance()->builders) {
+            if (std::get<0>(builder) == code) {
+                return std::get<2>(builder);
             }
         }
         throw(HelicsException("core type is not available"));
@@ -56,9 +56,9 @@ class MasterBrokerBuilder {
     static const std::shared_ptr<BrokerBuilder>& getDefaultBuilder()
     {
         const auto& blder = instance();
-        for (auto& bb : instance()->builders) {
-            if (std::get<0>(bb) <= 10) {
-                return std::get<2>(bb);
+        for (auto& builder : instance()->builders) {
+            if (std::get<0>(builder) <= 10) {
+                return std::get<2>(builder);
             }
         }
         if (blder->builders.empty()) {
@@ -69,7 +69,7 @@ class MasterBrokerBuilder {
 
     static const std::shared_ptr<MasterBrokerBuilder>& instance()
     {
-        static std::shared_ptr<MasterBrokerBuilder> iptr(new MasterBrokerBuilder());
+        static const std::shared_ptr<MasterBrokerBuilder> iptr(new MasterBrokerBuilder());
         return iptr;
     }
 
@@ -77,12 +77,12 @@ class MasterBrokerBuilder {
     /** private constructor since we only really want one of them
     accessed through the instance static member*/
     MasterBrokerBuilder() = default;
-    std::vector<BuildT> builders;  //!< container for the builders
+    std::vector<BuilderData> builders;  //!< container for the builders
 };
 
-void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, std::string_view name, int code)
+void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> builder, std::string_view name, int code)
 {
-    MasterBrokerBuilder::addBuilder(std::move(cb), name, code);
+    MasterBrokerBuilder::addBuilder(std::move(builder), name, code);
 }
 
 std::shared_ptr<Broker> makeBroker(CoreType type, std::string_view name)
@@ -110,8 +110,7 @@ std::shared_ptr<Broker>
         throw(helics::RegistrationFailure("unable to create broker"));
     }
     broker->configure(configureString);
-    bool reg = registerBroker(broker, type);
-    if (!reg) {
+    if (!registerBroker(broker, type)) {
         throw(helics::RegistrationFailure("unable to register broker"));
     }
     broker->connect();
@@ -128,8 +127,7 @@ std::shared_ptr<Broker> create(CoreType type, std::string_view brokerName, int a
 {
     auto broker = makeBroker(type, brokerName);
     broker->configureFromArgs(argc, argv);
-    bool reg = registerBroker(broker, type);
-    if (!reg) {
+    if (!registerBroker(broker, type)) {
         throw(helics::RegistrationFailure("unable to register broker"));
     }
     broker->connect();
@@ -147,8 +145,7 @@ std::shared_ptr<Broker>
 {
     auto broker = makeBroker(type, brokerName);
     broker->configureFromVector(std::move(args));
-    bool reg = registerBroker(broker, type);
-    if (!reg) {
+    if (!registerBroker(broker, type)) {
         throw(helics::RegistrationFailure("unable to register broker"));
     }
     broker->connect();
@@ -309,7 +306,7 @@ void unregisterBroker(std::string_view name)
 
 void addAssociatedBrokerType(std::string_view name, CoreType type)
 {
-    std::string sname{name};
+    const std::string sname{name};
     searchableBrokers.addType(sname, type);
     addExtraTypes(sname, type);
 }

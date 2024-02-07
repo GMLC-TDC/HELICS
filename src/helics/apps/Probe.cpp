@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -22,15 +22,17 @@ Probe::Probe(int argc, char* argv[]): App("probe_${#}", argc, argv) {}
 
 Probe::Probe(std::vector<std::string> args): App("probe_${#}", std::move(args)) {}
 
-Probe::Probe(std::string_view appName, const FederateInfo& fi): App(appName, fi) {}
+Probe::Probe(std::string_view appName, const FederateInfo& fedInfo): App(appName, fedInfo) {}
 
-Probe::Probe(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Probe::Probe(std::string_view appName,
+             const std::shared_ptr<Core>& core,
+             const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
 }
 
-Probe::Probe(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Probe::Probe(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
 }
 
@@ -38,14 +40,14 @@ Probe::Probe(std::string_view name, const std::string& configString): App(name, 
 
 void Probe::initialize()
 {
-    auto md = fed->getCurrentMode();
-    if (md != Federate::Modes::STARTUP) {
+    auto currentMode = fed->getCurrentMode();
+    if (currentMode != Federate::Modes::STARTUP) {
         return;
     }
     auto period = fed->getTimeProperty(HELICS_PROPERTY_TIME_PERIOD);
     if (period <= Time::epsilon()) {
-        auto td = fed->getTimeProperty(HELICS_PROPERTY_TIME_DELTA);
-        if (td <= Time::epsilon()) {
+        auto delta = fed->getTimeProperty(HELICS_PROPERTY_TIME_DELTA);
+        if (delta <= Time::epsilon()) {
             fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         }
     }
@@ -77,12 +79,12 @@ void Probe::initialize()
 
 void Probe::runTo(Time stopTime_input)
 {
-    auto md = fed->getCurrentMode();
-    if (md == Federate::Modes::STARTUP) {
+    auto currentMode = fed->getCurrentMode();
+    if (currentMode == Federate::Modes::STARTUP) {
         initialize();
     }
 
-    if (md < Federate::Modes::EXECUTING) {
+    if (currentMode < Federate::Modes::EXECUTING) {
         fed->enterExecutingMode();
     }
 
@@ -98,12 +100,15 @@ void Probe::runProbe()
 {
     auto ctime = fed->getCurrentTime();
     while (endpoint.hasMessage()) {
-        auto m = endpoint.getMessage();
-        fed->logInfoMessage(
-            fmt::format("Message from {} at Time {}: [{}]", m->source, ctime, m->to_string()));
+        auto message = endpoint.getMessage();
+        fed->logInfoMessage(fmt::format("Message from {} at Time {}: [{}]",
+                                        message->source,
+                                        static_cast<double>(ctime),
+                                        message->to_string()));
         ++messagesReceived;
     }
-    endpoint.send(fmt::format("message from {},time {}", fed->getName(), ctime));
+    endpoint.send(
+        fmt::format("message from {},time {}", fed->getName(), static_cast<double>(ctime)));
 }
 
 }  // namespace helics::apps

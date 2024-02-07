@@ -1,0 +1,9 @@
+#comment line for cascade file test
+# second comment line
+inp1 intermediate1
+intermediate1 intermediate1 bi
+intermediate1 intermediate2 from_to
+intermediate2 intermediate3 from_to
+#comment line in the middle
+intermediate3 pub1 bi
+inp2 intermediate2 from_to

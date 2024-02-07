@@ -16,15 +16,15 @@ The Fundamental examples are meant to build in complexity -- if you are new to H
 
 This page describes the model -- what is the research question addressed, and what are the components to a simple HELICS co-simulation:
 
-- [Where is the code?](#where-is-the-code)
-- [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
-- [HELICS Components](#helics-components)
-  - [Register and Configure Federates](#register-and-configure-federates)
-  - [Enter Execution Mode](#enter-execution-mode)
-  - [Define Time Variables](#define-time-variables)
-  - [Initiate Time Steps for the Time Loop](#initiate-time-steps-for-the-time-loop)
-  - [Send/Receive Communication between Federates](#send-receive-communication-between-federates)
-  - [Finalize Co-simulation](#finalize-co-simulation)
+- <a href="#where-is-the-code">Where is the Code?</a>
+- <a href="#what-is-this-co-simulation-doing">What is this Co-simulation Doing?</a>
+- <a href="#helics-components">HELICS Components</a>
+  - <a href="#register-and-configure-federates">Register and Configure Federates</a>
+  - <a href="#enter-execution-mode">Enter Execution Mode</a>
+  - <a href="#define-time-variables">Define Time Variables</a>
+  - <a href="#initiate-time-steps-for-the-time-loop">Initiate Time Steps for the Time Loop</a>
+  - <a href="#send-receive-communication-between-federates">Send/Receive Communication between Federates</a>
+  - <a href="#finalize-co-simulation">Finalize Co-simulation</a>
 
 <a name="where-is-the-code">
 <strong>
@@ -224,9 +224,9 @@ Send/Receive Communication between Federates
 </strong>
 </a>
 
-Once inside the time loop, information is requested and sent between federates at each time step. In the Base Example, the federates first request information from the handles to which they have subscribed, and then send information from the handles from which they publish.
+Once inside the time loop, information is requested and sent between federates at each time step. In the Base Example, the federates first request information from the interfaces to which they have subscribed, and then send information from the interfaces from which they publish.
 
-The `Battery.py` federate first asks for voltage information from the handles to which it subscribes:
+The `Battery.py` federate first asks for voltage information from the interfaces to which it subscribes:
 
 ```python
 # Get the applied charging voltage from the EV
@@ -237,7 +237,7 @@ logger.debug(
 )
 ```
 
-And then (after doing some internal calculations) publishes the charging current of the battery at its publication handle:
+And then (after doing some internal calculations) publishes the charging current of the battery at its publication interface:
 
 ```python
 # Publish out charging current
@@ -245,7 +245,7 @@ h.helicsPublicationPublishDouble(pubid[j], charging_current)
 logger.debug(f"\tPublished {pub_name[j]} with value " f"{charging_current:.2f}")
 ```
 
-Meanwhile, the `Charger.py` federate asks for charging current from the handles to which it subscribes:
+Meanwhile, the `Charger.py` federate asks for charging current from the interfaces to which it subscribes:
 
 ```python
 charging_current[j] = h.helicsInputGetDouble((subid[j]))
@@ -255,7 +255,7 @@ logger.debug(
 )
 ```
 
-And publishes the charging voltage at its publication handle:
+And publishes the charging voltage at its publication interface:
 
 ```python
 # Publish updated charging voltage

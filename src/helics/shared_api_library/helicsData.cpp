@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -41,16 +41,25 @@ HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapaci
     return static_cast<HelicsDataBuffer>(ptr);
 }
 
-static helics::SmallBuffer* getBuffer(HelicsDataBuffer data)
+helics::SmallBuffer* getBuffer(HelicsDataBuffer data)
 {
     auto* ptr = reinterpret_cast<helics::SmallBuffer*>(data);
-    return (ptr != nullptr && ptr->userKey == gBufferValidationIdentifier) ? ptr : nullptr;
+    if (ptr != nullptr && ptr->userKey == gBufferValidationIdentifier) {
+        return ptr;
+    }
+    auto* message = getMessageObj(data, nullptr);
+    if (message != nullptr) {
+        return &message->data;
+    }
+    return nullptr;
 }
 
 void helicsDataBufferFree(HelicsDataBuffer data)
 {
-    auto* ptr = getBuffer(data);
-    delete ptr;
+    auto* ptr = reinterpret_cast<helics::SmallBuffer*>(data);
+    if (ptr != nullptr && ptr->userKey == gBufferValidationIdentifier) {
+        delete ptr;
+    }
 }
 
 HelicsBool helicsDataBufferIsValid(HelicsDataBuffer data)
@@ -103,7 +112,7 @@ HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data)
     return static_cast<HelicsDataBuffer>(newptr);
 }
 
-HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data)
+HELICS_EXPORT int32_t helicsDataBufferFillFromInteger(HelicsDataBuffer data, int64_t value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -119,7 +128,7 @@ HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data)
 }
 
 /** convert a double to serialized bytes*/
-HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data)
+HELICS_EXPORT int32_t helicsDataBufferFillFromDouble(HelicsDataBuffer data, double value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -135,7 +144,7 @@ HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data)
 }
 
 /** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data)
+HELICS_EXPORT int32_t helicsDataBufferFillFromString(HelicsDataBuffer data, const char* str)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -151,7 +160,7 @@ HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data
 }
 
 /** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data)
+HELICS_EXPORT int32_t helicsDataBufferFillFromRawString(HelicsDataBuffer data, const char* str, int stringSize)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -166,7 +175,7 @@ HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, He
     }
 }
 
-int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data)
+int32_t helicsDataBufferFillFromBoolean(HelicsDataBuffer data, HelicsBool value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -183,7 +192,7 @@ int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data)
 }
 
 /** convert a char to serialized bytes*/
-int32_t helicsCharToBytes(char value, HelicsDataBuffer data)
+int32_t helicsDataBufferFillFromChar(HelicsDataBuffer data, char value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -199,7 +208,7 @@ int32_t helicsCharToBytes(char value, HelicsDataBuffer data)
 }
 
 /** convert a HelicsTime to serialized bytes*/
-int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data)
+int32_t helicsDataBufferFillFromTime(HelicsDataBuffer data, HelicsTime value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -214,7 +223,7 @@ int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data)
     }
 }
 
-int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data)
+int32_t helicsDataBufferFillFromComplex(HelicsDataBuffer data, double real, double imag)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -229,7 +238,7 @@ int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data)
     }
 }
 
-int32_t helicsNamedPointToBytes(const char* name, double val, HelicsDataBuffer data)
+int32_t helicsDataBufferFillFromNamedPoint(HelicsDataBuffer data, const char* name, double val)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -244,12 +253,12 @@ int32_t helicsNamedPointToBytes(const char* name, double val, HelicsDataBuffer d
     }
 }
 
-int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsDataBuffer data)
+int32_t helicsDataBufferFillFromComplexObject(HelicsDataBuffer data, HelicsComplex value)
 {
-    return helicsComplexToBytes(value.real, value.imag, data);
+    return helicsDataBufferFillFromComplex(data, value.real, value.imag);
 }
 
-int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data)
+int32_t helicsDataBufferFillFromVector(HelicsDataBuffer data, const double* value, int dataSize)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -270,7 +279,7 @@ int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer 
 // std::complex is explicitly allowed to alias like this in the standard
 #endif
 
-int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data)
+int32_t helicsDataBufferFillFromComplexVector(HelicsDataBuffer data, const double* value, int dataSize)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -399,6 +408,8 @@ int helicsDataBufferStringSize(HelicsDataBuffer data)
             return static_cast<int>(helics::detail::getDataSize(ptr->data())) + 1;
         case helics::DataType::HELICS_CHAR:
             return 1;
+        case helics::DataType::HELICS_UNKNOWN:
+            return static_cast<int>(ptr->size());
         default: {
             std::string v;
             helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);

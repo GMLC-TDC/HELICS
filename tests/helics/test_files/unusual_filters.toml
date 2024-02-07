@@ -20,7 +20,7 @@ input_delay=0 #the input delay for external data to propagate to federates
 strict_config_checking=false  # this file is odd so let it be flexible and only produce warnings
 separator=":" # set the character separator for local interfaces
 
-#endpoints used in the federate not really necessary to define endpoints for a filer
+#endpoints used in the federate not really necessary to define endpoints for a filter
 [[endpoints]]
 name="ept1" # the name of the endpoint
  type="genmessage"  # the type associated with a endpoint endpoint types have limited usefulness at present (optional)

@@ -1,14 +1,14 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#include "fmt_format.h"
 
 #include "json/json.h"
 #include "json/writer.h"
+#include <fmt/format.h>
 #include <string>
 
 namespace helics {

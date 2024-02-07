@@ -11,7 +11,7 @@ This example shows how to configure a HELICS co-simulation to allow the use of m
 
 - [Where is the code?](#where-is-the-code)
 - [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
-  - [Differences Compared to the Advanced Default Example](#differences-compared-to-the-advanced-default-example)
+  - [Differences Compared to the Advanced Default Example](#differences-compared-to-advanced-default-example)
     - [HELICS Differences](#helics-differences)
   - [HELICS Components](#helics-components)
 - [Execution and Results](#execution-and-results)
@@ -88,6 +88,6 @@ These results are identical to those in the base [Advanced Default example](./ad
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

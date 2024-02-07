@@ -1,6 +1,10 @@
 # This is a known purposeful leak and possible resulting race condition detection on closing of shared libraries
-
 # potential race condition from
 race:cxa_at_exit_wrapper
 race:zmq::session_base_t
 race:zmq::pipe_t
+
+mutex:DelayedDestructor::destroyObjects
+
+# false positive https://github.com/google/sanitizers/issues/1620
+mutex:timed_mutex::unlock

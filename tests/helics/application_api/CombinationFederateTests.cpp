@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -294,7 +294,8 @@ INSTANTIATE_TEST_SUITE_P(combofed_tests,
                          testNamer);
 
 static constexpr const char* combo_config_files[] = {"example_combo_fed.json",
-                                                     "example_combo_fed.toml"};
+                                                     "example_combo_fed.toml",
+                                                     "folder with space/example_combo_fed.toml"};
 
 class combofed_file_load_tests:
     public ::testing::TestWithParam<const char*>,

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -87,7 +87,7 @@ class HELICS_CXX_EXPORT BrokerApp {
      */
     bool isOpenToNewFederates() const;
 
-    /** forceably disconnect the broker*/
+    /** forcibly disconnect the broker*/
     void forceTerminate();
     /** wait for the broker to normally disconnect for a certain amount of time*/
     bool waitForDisconnect(std::chrono::milliseconds waitTime = std::chrono::milliseconds(0));

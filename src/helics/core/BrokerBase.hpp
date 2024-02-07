@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -188,9 +188,9 @@ class BrokerBase {
     virtual void configureBase();
 
     /** add an action Message to the process queue*/
-    void addActionMessage(const ActionMessage& m);
+    void addActionMessage(const ActionMessage& message);
     /** move a action Message into the commandQueue*/
-    void addActionMessage(ActionMessage&& m);
+    void addActionMessage(ActionMessage&& message);
 
     /** set the logging callback function
     @param logFunction a function with a signature of void(int level, std::string_view identifier,
@@ -228,7 +228,7 @@ class BrokerBase {
 
     /** move a action Message into the commandQueue allow const in this case to allow messages
     to be sent internally in a few specific instances*/
-    void addActionMessage(ActionMessage&& m) const;
+    void addActionMessage(ActionMessage&& message) const;
 
   protected:
     /** check whether a code contains a specific reason*/

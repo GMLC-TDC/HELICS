@@ -41,7 +41,7 @@ graph LR
     end
     subgraph Package Manager/Precompiled
         languageChoice(What language are <br/> you using?)
-        languageChoice -->|Python| python[Use pip: <br><br> pip install helics]
+        languageChoice -->|Python| python["Use pip: <br><br> pip install 'helics[cli]'"]
         languageChoice -->|MATLAB| matlab[Follow instructions in <br> the matHELICS repository]
         languageChoice -->|julia| julia[Use pkg: <br><br> pck> add helics]
         languageChoice -->|Java| java[Build from source with the <br> Java CMAKE option set <br><br>HELICS_BUILD_JAVA_INTERFACE=ON]
@@ -81,6 +81,10 @@ Installation instructions are available in the [matHELICS repository README](htt
 
 [`pkg> add HELICS`](https://github.com/GMLC-TDC/HELICS.jl/blob/master/README.md)
 
+### pip install
+
+[`pip install 'helics[cli]'`](https://python.helics.org/) (Includes the optional but recommended helics_cli tool.)
+
 ### jHELICS
 
 [Build from source](./build_from_source.md) with the [CMAKE option](./helics_cmake_options.md) `HELICS_BUILD_JAVA_INTERFACE=ON`
@@ -101,6 +105,10 @@ Installation instructions are available in the [matHELICS repository README](htt
 
 [`spack install helics`](./spack.md)
 
+## Running an Example
+
+The [Quick Start guide](../../quick_start/quick_start_index.md) walks through the steps of running the first Python-based User Guide example and serves as a good way to test your (Python) installation.
+
 ## HELICS runner
 
 Previously a separate executable, `helics_cli` was used to provide functionality to launch a HELICS-based co-simulation by calling a JSON configuration such as
@@ -109,4 +117,4 @@ Previously a separate executable, `helics_cli` was used to provide functionality
 helics run --path=<path to HELICS runner JSON>
 ```
 
-This functionality still exists but has been moved to the [PyHELICS code base](https://python.helics.org/) and the `helics_cli` repository has been deprecated. Thus, it is recommended that all users install PyHELICS (via `pip install helics` as described above) to gain the runner and web interface functionality.
+This functionality still exists but has been moved to the [PyHELICS code base](https://python.helics.org/) and the `helics_cli` repository has been deprecated. Thus, it is recommended that all users install PyHELICS (via `pip install 'helics[cli]'` as described above) to gain the runner and web interface functionality.

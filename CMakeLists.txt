@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2024, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.11...3.25)
+cmake_minimum_required(VERSION 3.11...3.28)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -17,14 +17,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.4.0)
+project(HELICS VERSION 3.5.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2023-01-19")
+set(HELICS_DATE "2024-02-06")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -309,7 +309,7 @@ if(NOT TARGET toml11::toml11)
     set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
     set(toml11_INSTALL OFF CACHE INTERNAL "")
     add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
-
+    hide_variable(TOML11_USE_UNRELEASED_TOML_FEATURES)
 endif()
 
 # -------------------------------------------------------------
@@ -408,7 +408,12 @@ if(MSYS OR CYGWIN)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
     endif()
-    target_compile_definitions(helics_base INTERFACE -D_WIN32_WINNT=0x0601)
+    # setting to windows 10 for all compilation
+    if(WIN32_WINNT)
+        add_compile_definitions("_WIN32_WINNT=${WIN32_WINNT}")
+    else()
+        add_compile_definitions(_WIN32_WINNT=0x0A00)
+    endif()
 endif()
 
 if(MINGW AND NOT UNIX_LIKE)
@@ -706,7 +711,7 @@ if(HELICS_BUILD_BENCHMARKS)
 endif()
 
 if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
-    list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
+    list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/LICENSE")
 endif()
 
 if(NOT HELICS_DISABLE_ASIO)

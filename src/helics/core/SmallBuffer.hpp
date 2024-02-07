@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <new>
 #include <stdexcept>
@@ -91,6 +92,17 @@ class SmallBuffer {
     }
     SmallBuffer& operator=(SmallBuffer&& sb) noexcept
     {
+        if (locked) {
+            // if locked then use the copy operation not move
+            const SmallBuffer& buf = sb;
+            try {
+                return operator=(buf);
+            }
+            catch (std::bad_alloc&) {
+                errorCondition = 2;
+                return *this;
+            }
+        }
         if (usingAllocatedBuffer) {
             if (nonOwning) {
                 if (sb.heap == heap) {
@@ -106,6 +118,7 @@ class SmallBuffer {
                 delete[] heap;
             }
         }
+
         if (sb.usingAllocatedBuffer) {
             heap = sb.heap;
             bufferCapacity = sb.bufferCapacity;
@@ -310,6 +323,8 @@ class SmallBuffer {
     void lock(bool lockStatus = true) { locked = lockStatus; }
 
     bool isLocked() const { return locked; }
+    /** get the error condition*/
+    std::int8_t errorState() const { return errorCondition; }
     /** check if the buffer is empty*/
     bool empty() const { return (bufferSize == 0); }
     /** get the current size of the buffer*/
@@ -380,6 +395,7 @@ class SmallBuffer {
     bool nonOwning{false};
     bool locked{false};
     bool usingAllocatedBuffer{false};
+    std::int8_t errorCondition{0};
 
   public:
     std::uint32_t userKey{0};  // 32 bits of user data for whatever purpose is desired has no impact

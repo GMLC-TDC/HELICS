@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -44,8 +44,9 @@ namespace CoreFactory {
     };
 
     //** define a new Core Builder from the builder give a name and build code*/
-    void
-        defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, std::string_view coreTypeName, int code);
+    void defineCoreBuilder(std::shared_ptr<CoreBuilder> builder,
+                           std::string_view coreTypeName,
+                           int code);
 
     /** template function to create a builder and link it into the library*/
     template<class CoreTYPE>

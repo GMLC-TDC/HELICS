@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -28,29 +28,31 @@ class HELICS_CXX_EXPORT ValueFederate:
 {
   public:
     /**constructor taking a federate information structure and using the default core
-    @param fedName the name of the federate, can be empty to use the name from fi or an auto
+    @param fedName the name of the federate, can be empty to use the name from fedInfo or an auto
     generated one
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-    ValueFederate(std::string_view fedName, const FederateInfo& fi);
+    ValueFederate(std::string_view fedName, const FederateInfo& fedInfo);
 
-    /**constructor taking a core and a federate information structure, core information in fi is
-    ignored
-    @param fedName the name of the federate, can be empty to use the name from fi or an auto
+    /**constructor taking a core and a federate information structure, core information in fedInfo
+    is ignored
+    @param fedName the name of the federate, can be empty to use the name from fedInfo or an auto
     generated one
     @param core a shared ptr to a core to join
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
     ValueFederate(std::string_view fedName,
                   const std::shared_ptr<Core>& core,
-                  const FederateInfo& fi = FederateInfo{});
+                  const FederateInfo& fedInfo = FederateInfo{});
 
     /**constructor taking a CoreApp and a federate information structure
     @param fedName the name of the federate can be empty to use a name from the federateInfo
     @param core a CoreApp with the core to connect to.
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-    ValueFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi = FederateInfo{});
+    ValueFederate(std::string_view fedName,
+                  CoreApp& core,
+                  const FederateInfo& fedInfo = FederateInfo{});
 
     /**constructor taking a string with the required information
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string
@@ -320,6 +322,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     void registerValueInterfaces(const std::string& configString);
 
   private:
+    void loadFederateData();
+
     /** register interfaces through a json file or string*/
     void registerValueInterfacesJson(const std::string& jsonString);
     /** register interface through a toml value or string*/

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -26,7 +26,7 @@ namespace apps {
     class HELICS_CXX_EXPORT Tracer: public App {
       public:
         /** construct from a FederateInfo structure*/
-        explicit Tracer(std::string_view name, FederateInfo& fi);
+        explicit Tracer(std::string_view name, FederateInfo& fedInfo);
         /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
@@ -36,24 +36,26 @@ namespace apps {
         Tracer(int argc, char* argv[]);
 
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the tracer object, if empty it tries to figure it out from fi
+    @param name the name of the tracer object, if empty it tries to figure it out from fedInfo
     @param core a pointer to core object which the federate can join
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Tracer(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Tracer(std::string_view name,
+               const std::shared_ptr<Core>& core,
+               const FederateInfo& fedInfo);
 
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate (can be empty to use defaults from fi)
+    @param name the name of the federate (can be empty to use defaults from fedInfo)
     @param core a coreApp object that can be joined
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Tracer(std::string_view name, CoreApp& core, const FederateInfo& fi);
+        Tracer(std::string_view name, CoreApp& core, const FederateInfo& fedInfo);
 
         /**constructor taking a file with the required information
     @param name the name of the app may be empty to pull name from the file
     @param file a file defining the federate information
     */
-        Tracer(std::string_view name, const std::string& file);
+        Tracer(std::string_view name, const std::string& configString);
         /** move construction*/
         Tracer(Tracer&& other_tracer) = default;
         /** move assignment*/
@@ -105,10 +107,13 @@ namespace apps {
         void disableTextOutput() { printMessage = false; }
 
       private:
+        /** run any initial setup operations including file loading*/
+        void initialSetup();
         /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
-        virtual void loadJsonFile(const std::string& jsonString) override;
+        virtual void loadJsonFile(const std::string& jsonString,
+                                  bool enableFederateInterfaceRegistration) override;
         /** load a text file*/
         virtual void loadTextFile(const std::string& textFile) override;
 

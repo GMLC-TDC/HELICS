@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -43,12 +43,12 @@ void addOperations(Translator* trans, TranslatorTypes type)
         default:
             break;
         case TranslatorTypes::JSON: {
-            auto op = std::make_shared<JsonTranslatorOperation>();
-            trans->setTranslatorOperations(std::move(op));
+            auto operation = std::make_shared<JsonTranslatorOperation>();
+            trans->setTranslatorOperations(std::move(operation));
         } break;
         case TranslatorTypes::BINARY: {
-            auto op = std::make_shared<BinaryTranslatorOperation>();
-            trans->setTranslatorOperations(std::move(op));
+            auto operation = std::make_shared<BinaryTranslatorOperation>();
+            trans->setTranslatorOperations(std::move(operation));
         } break;
     }
 }
@@ -66,15 +66,15 @@ Translator::Translator(Core* core, std::string_view translatorName, InterfaceHan
 Translator::Translator(Core* core, const std::string_view translatorName):
     Interface(core, InterfaceHandle(), translatorName)
 {
-    if (cr != nullptr) {
-        handle = cr->registerTranslator(translatorName, std::string_view{}, std::string_view{});
+    if (mCore != nullptr) {
+        handle = mCore->registerTranslator(translatorName, std::string_view{}, std::string_view{});
     }
 }
 
-void Translator::setOperator(std::shared_ptr<TranslatorOperator> mo)
+void Translator::setOperator(std::shared_ptr<TranslatorOperator> operation)
 {
-    if (mo) {
-        setTranslatorOperations(std::make_shared<CustomTranslatorOperation>(std::move(mo)));
+    if (operation) {
+        setTranslatorOperations(std::make_shared<CustomTranslatorOperation>(std::move(operation)));
     } else {
         setTranslatorOperations(nullptr);
     }
@@ -83,8 +83,8 @@ void Translator::setOperator(std::shared_ptr<TranslatorOperator> mo)
 void Translator::setTranslatorOperations(std::shared_ptr<TranslatorOperations> translatorOps)
 {
     transOp = std::move(translatorOps);
-    if (cr != nullptr) {
-        cr->setTranslatorOperator(handle, (transOp) ? transOp->getOperator() : nullptr);
+    if (mCore != nullptr) {
+        mCore->setTranslatorOperator(handle, (transOp) ? transOp->getOperator() : nullptr);
     }
 }
 

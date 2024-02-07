@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -87,7 +87,7 @@ class HELICS_CXX_EXPORT CoreApp {
     /** check if the broker is ready to accept new federates or cores
      */
     bool isOpenToNewFederates() const;
-    /** forceably disconnect the core*/
+    /** forcibly disconnect the core*/
     void forceTerminate();
     /** wait for the core to normally disconnect for a certain amount of time*/
     bool waitForDisconnect(std::chrono::milliseconds waitTime = std::chrono::milliseconds(0));
@@ -125,7 +125,7 @@ class HELICS_CXX_EXPORT CoreApp {
   queryable through a "tags" query or "tag/<tagname>"
   @param tag the name of the tag to set the value for
   @param value the value for the given tag*/
-    void setTag(std::string_view tag, std::string_view value);
+    void setTag(std::string_view tag, std::string_view value = "true");
     /** get the value of a specific tag (key-value pair) for a core
     @details the tag is an arbitrary user defined string and value; the tags for a core are
     queryable
@@ -141,7 +141,7 @@ class HELICS_CXX_EXPORT CoreApp {
     @param valueName the name of the global to set
     @param value the value of the global
     */
-    void setGlobal(std::string_view valueName, std::string_view value);
+    void setGlobal(std::string_view valueName, std::string_view value = "true");
 
     /** send a command to a specific target
    @details the format is somewhat unspecified; target is the name of an object, typically one of

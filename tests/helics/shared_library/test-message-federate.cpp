@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -164,7 +164,7 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
-TEST_F(mfed_tests, message_object_tests)
+TEST_F(mfed_tests, message_object)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
@@ -368,6 +368,7 @@ TEST(message_object, test1_nosan)
     auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
 
     auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetBroker(fi, "brk1", nullptr);
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
 
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
@@ -454,13 +455,16 @@ TEST(message_object, test1_nosan)
 
 TEST(message_object, copy)
 {
-    auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
+    helicsCleanupLibrary();
+    auto brk = helicsCreateBroker("test", "brk_mcpy", "", nullptr);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
-    auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
+    helicsFederateInfoSetBroker(fedInfo, "brk_mcpy", nullptr);
+    helicsFederateInfoLoadFromString(fedInfo, "--force_new_core", nullptr);
+    auto fed = helicsCreateMessageFederate("fed1", fedInfo, nullptr);
 
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
     auto m1 = helicsFederateCreateMessage(fed, nullptr);
     EXPECT_NE(m1, nullptr);
 
@@ -513,6 +517,49 @@ TEST(message_object, copy)
     EXPECT_EQ(helicsMessageGetFlagOption(m2, 4), HELICS_FALSE);
 
     EXPECT_EQ(helicsMessageGetByteCount(m2), 0);
+
+    helicsFederateEnterExecutingMode(fed, nullptr);
+    helicsFederateFinalize(fed, nullptr);
+    helicsBrokerDisconnect(brk, nullptr);
+}
+
+TEST(message_object, dataBuffer)
+{
+    auto brk = helicsCreateBroker("test", "brk_db", "", nullptr);
+
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
+
+    helicsFederateInfoSetBroker(fedInfo, "brk_db", nullptr);
+    helicsFederateInfoLoadFromString(fedInfo, "--force_new_core", nullptr);
+
+    auto fed = helicsCreateMessageFederate("fed1", fedInfo, nullptr);
+    helicsFederateInfoFree(fedInfo);
+    auto m1 = helicsFederateCreateMessage(fed, nullptr);
+    EXPECT_NE(m1, nullptr);
+
+    auto m2 = helicsFederateCreateMessage(fed, nullptr);
+    EXPECT_NE(m2, nullptr);
+
+    helicsMessageSetString(m1, "raw data", nullptr);
+
+    auto err = helicsErrorInitialize();
+
+    EXPECT_EQ(helicsDataBufferIsValid(m1), HELICS_TRUE);
+
+    char data[20];
+    int actSize{10};
+
+    EXPECT_EQ(helicsDataBufferSize(m1), 8);
+    helicsDataBufferToRawString(m1, data, 20, &actSize);
+    EXPECT_EQ(actSize, 8);
+    EXPECT_EQ(std::string(data, data + actSize), "raw data");
+
+    helicsMessageClear(m2, &err);
+    // test the connection between the buffer and message
+    EXPECT_EQ(helicsDataBufferSize(m2), 0);
+    EXPECT_EQ(helicsMessageIsValid(m2), HELICS_FALSE);
+    EXPECT_EQ(helicsDataBufferIsValid(m2), HELICS_TRUE);
 
     helicsFederateEnterExecutingMode(fed, nullptr);
     helicsFederateFinalize(fed, nullptr);

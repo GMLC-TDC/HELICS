@@ -6,8 +6,8 @@ This tutorial is organized as follows:
 
 - [Example files](#example-files)
 - [Federate Communication with Endpoints](#federate-communication-with-endpoints)
-  - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
-  - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
+  - [When to use pub/subs vs endpoints](#when-to-use-pubsubs-vs-endpoints)
+  - [Translation from pub/sub to endpoints](#translation-from-pubsub-to-endpoints)
     - [Config Files](#config-files)
     - [Simulators](#simulators)
   - [Co-simulation Execution](#co-simulation-execution)
@@ -143,7 +143,7 @@ As with the Base Example, configuration can be done with JSON files. The first c
 ]
 ```
 
-If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../../references/configuration_options_reference.md#period-0) that the `period` controls the minimum time resolution for a federate.
+If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../../references/configuration_options_reference.md#period-1ns) that the `period` controls the minimum time resolution for a federate.
 
 We have a federation sending messages at the same time (`"period": 60`), and HELICS doesn't know which message arrives first. We need to introduce an `offset` to the config file of one of the federates to force it to wait until the message has been received. We also need to keep `"uninterruptible": false`, so that the federate will be granted the time at which it has received a message (which will be `"period": 60`).
 
@@ -323,6 +323,6 @@ Armed now with the knowledge of endpoints and messages, how could you change the
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

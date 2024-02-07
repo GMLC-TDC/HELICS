@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCore.h"
 #include "internal/api_objects.h"
 
+#include <algorithm>
 #include <cstring>
 #include <memory>
 #include <mutex>
@@ -20,13 +21,39 @@ SPDX-License-Identifier: BSD-3-Clause
 // random integer for validation purposes of endpoints
 static constexpr int EndpointValidationIdentifier = 0xB453'94C2;
 
+static auto endpointSearch = [](const helics::InterfaceHandle& hnd, const auto& testEndpoint) {
+    return hnd < testEndpoint->endPtr->getHandle();
+};
+
 static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<helics::EndpointObject> ept)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     ept->valid = EndpointValidationIdentifier;
+    ept->fed = fedObj;
     HelicsEndpoint hept = ept.get();
-    fedObj->epts.push_back(std::move(ept));
+
+    if (fedObj->epts.empty() || ept->endPtr->getHandle() > fedObj->epts.back()->endPtr->getHandle()) {
+        fedObj->epts.push_back(std::move(ept));
+    } else {
+        auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), ept->endPtr->getHandle(), endpointSearch);
+        fedObj->epts.insert(ind, std::move(ept));
+    }
     return hept;
+}
+
+static HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint& endp)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    const auto handle = endp.getHandle();
+    auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), handle, endpointSearch);
+    if (ind != fedObj->epts.end() && (*ind)->endPtr->getHandle() == handle) {
+        HelicsEndpoint hend = ind->get();
+        return hend;
+    }
+    auto end = std::make_unique<helics::EndpointObject>();
+    end->endPtr = &endp;
+    end->fedptr = getMessageFedSharedPtr(fed, nullptr);
+    return addEndpoint(fed, std::move(end));
 }
 
 static constexpr char nullcstr[] = "";
@@ -142,11 +169,7 @@ HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, H
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidEndName);
             return nullptr;
         }
-        auto end = std::make_unique<helics::EndpointObject>();
-        end->endPtr = &id;
-        end->fedptr = std::move(fedObj);
-        end->fed = helics::getFedObject(fed, err);
-        return addEndpoint(fed, std::move(end));
+        return findOrCreateEndpoint(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -168,11 +191,7 @@ HelicsEndpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, H
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidEndIndex);
             return nullptr;
         }
-        auto end = std::make_unique<helics::EndpointObject>();
-        end->endPtr = &id;
-        end->fedptr = std::move(fedObj);
-        end->fed = helics::getFedObject(fed, err);
-        return addEndpoint(fed, std::move(end));
+        return findOrCreateEndpoint(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -949,6 +968,15 @@ void* helicsMessageGetBytesPointer(HelicsMessage message)
     return mess->data.data();
 }
 
+HelicsDataBuffer helicsMessageDataBuffer(HelicsMessage message, HelicsError* err)
+{
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return nullptr;
+    }
+    return message;
+}
+
 HelicsBool helicsMessageIsValid(HelicsMessage message)
 {
     auto* mess = getMessageObj(message, nullptr);
@@ -1081,6 +1109,20 @@ void helicsMessageSetData(HelicsMessage message, const void* data, int inputData
         return;
     }
     mess->data = std::string_view(static_cast<const char*>(data), inputDataLength);
+}
+
+void helicsMessageSetDataBuffer(HelicsMessage message, HelicsDataBuffer data, HelicsError* err)
+{
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return;
+    }
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        mess->data.clear();
+        return;
+    }
+    mess->data = *ptr;
 }
 
 void helicsMessageAppendData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err)

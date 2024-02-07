@@ -38,11 +38,11 @@ jobs:
 
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       if: github.event_name != 'schedule'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -75,9 +75,9 @@ jobs:
        
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-benchmarks
+        name: ${{ matrix.id }}-benchmarks
         path: artifact
       
 

@@ -128,7 +128,8 @@ public class helics implements helicsConstants {
   }
 
   /**
-   *  create a new data buffer and copy an existing buffer
+   *  create a new data buffer and copy an existing buffer<br>
+   * @return a data buffer object with a copy of the data
    */
   public static SWIGTYPE_p_void helicsDataBufferClone(SWIGTYPE_p_void data) {
     long cPtr = helicsJNI.helicsDataBufferClone(SWIGTYPE_p_void.getCPtr(data));
@@ -136,87 +137,121 @@ public class helics implements helicsConstants {
   }
 
   /**
-   *  convert an integer to serialized bytes
+   *  convert an integer to serialized bytes in a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsIntegerToBytes(long value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsIntegerToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromInteger(SWIGTYPE_p_void data, long value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromInteger(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a double to serialized bytes
+   *  convert a double to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsDoubleToBytes(double value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDoubleToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromDouble(SWIGTYPE_p_void data, double value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromDouble(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a string to serialized bytes
+   *  convert a string to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsStringToBytes(String value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsStringToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromString(SWIGTYPE_p_void data, String value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromString(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a raw string (may contain nulls) to serialized bytes
+   *  convert a raw string (may contain nulls) to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsRawStringToBytes(String str, int stringSize, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsRawStringToBytes(str, stringSize, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromRawString(SWIGTYPE_p_void data, String str, int stringSize) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromRawString(SWIGTYPE_p_void.getCPtr(data), str, stringSize), true);
   }
 
   /**
-   *  convert a bool to serialized bytes
+   *  convert a bool to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsBooleanToBytes(int value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsBooleanToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromBoolean(SWIGTYPE_p_void data, int value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromBoolean(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a char to serialized bytes
+   *  convert a char to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsCharToBytes(char value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsCharToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromChar(SWIGTYPE_p_void data, char value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromChar(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a time to serialized bytes
+   *  convert a time to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsTimeToBytes(double value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsTimeToBytes(value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromTime(SWIGTYPE_p_void data, double value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromTime(SWIGTYPE_p_void.getCPtr(data), value), true);
   }
 
   /**
-   *  convert a complex pair to serialized bytes
+   *  convert a complex pair to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsComplexToBytes(double real, double imag, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsComplexToBytes(real, imag, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromComplex(SWIGTYPE_p_void data, double real, double imag) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromComplex(SWIGTYPE_p_void.getCPtr(data), real, imag), true);
   }
 
   /**
-   *  convert a complex object to serialized bytes
+   *  convert a complex object to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsComplexObjectToBytes(HelicsComplex value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsComplexObjectToBytes(HelicsComplex.getCPtr(value), value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromComplexObject(SWIGTYPE_p_void data, HelicsComplex value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromComplexObject(SWIGTYPE_p_void.getCPtr(data), HelicsComplex.getCPtr(value), value), true);
   }
 
   /**
-   *  convert a real vector to serialized bytes
+   *  convert a real vector to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsVectorToBytes(double[] value, int dataSize, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsVectorToBytes(value, dataSize, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromVector(SWIGTYPE_p_void data, double[] value, int dataSize) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromVector(SWIGTYPE_p_void.getCPtr(data), value, dataSize), true);
   }
 
   /**
-   *  convert a named point to serialized bytes
+   *  convert a named point to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsNamedPointToBytes(String name, double value, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsNamedPointToBytes(name, value, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromNamedPoint(SWIGTYPE_p_void data, String name, double value) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromNamedPoint(SWIGTYPE_p_void.getCPtr(data), name, value), true);
   }
 
   /**
-   *  convert a complex vector to serialized bytes
+   *  convert a complex vector to serialized bytesin a buffer<br>
+   * @param data the HelicsDataBuffer to fill<br>
+   * @param value the value to serialize into the dataBuffer<br>
+   * @return the buffer size after filling
    */
-  public static SWIGTYPE_p_int32_t helicsComplexVectorToBytes(double[] value, int dataSize, SWIGTYPE_p_void data) {
-    return new SWIGTYPE_p_int32_t(helicsJNI.helicsComplexVectorToBytes(value, dataSize, SWIGTYPE_p_void.getCPtr(data)), true);
+  public static SWIGTYPE_p_int32_t helicsDataBufferFillFromComplexVector(SWIGTYPE_p_void data, double[] value, int dataSize) {
+    return new SWIGTYPE_p_int32_t(helicsJNI.helicsDataBufferFillFromComplexVector(SWIGTYPE_p_void.getCPtr(data), value, dataSize), true);
   }
 
   /**
@@ -852,16 +887,16 @@ public class helics implements helicsConstants {
    * <br>
    * HelicsFederate objects can be used in all functions that take a HelicsFederate or HelicsFederate object as an argument.<br>
    * <br>
-   * @param fedName The name of the federate to create, can NULL or an empty string to use the default name from fi or an assigned name.<br>
-   * @param fi The federate info object that contains details on the federate.<br>
+   * @param fedName The name of the federate to create, can NULL or an empty string to use the default name from fedInfo or an assigned name.<br>
+   * @param fedInfo The federate info object that contains details on the federate.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
    * <br>
    * <br>
    * @return An opaque value federate object.
    */
-  public static SWIGTYPE_p_void helicsCreateValueFederate(String fedName, SWIGTYPE_p_void fi) {
-    long cPtr = helicsJNI.helicsCreateValueFederate(fedName, SWIGTYPE_p_void.getCPtr(fi));
+  public static SWIGTYPE_p_void helicsCreateValueFederate(String fedName, SWIGTYPE_p_void fedInfo) {
+    long cPtr = helicsJNI.helicsCreateValueFederate(fedName, SWIGTYPE_p_void.getCPtr(fedInfo));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -889,15 +924,15 @@ public class helics implements helicsConstants {
    * argument.<br>
    * <br>
    * @param fedName The name of the federate to create.<br>
-   * @param fi The federate info object that contains details on the federate.<br>
+   * @param fedInfo The federate info object that contains details on the federate.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
    * <br>
    * <br>
    * @return An opaque message federate object.
    */
-  public static SWIGTYPE_p_void helicsCreateMessageFederate(String fedName, SWIGTYPE_p_void fi) {
-    long cPtr = helicsJNI.helicsCreateMessageFederate(fedName, SWIGTYPE_p_void.getCPtr(fi));
+  public static SWIGTYPE_p_void helicsCreateMessageFederate(String fedName, SWIGTYPE_p_void fedInfo) {
+    long cPtr = helicsJNI.helicsCreateMessageFederate(fedName, SWIGTYPE_p_void.getCPtr(fedInfo));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -925,16 +960,16 @@ public class helics implements helicsConstants {
    * Combination federates are both value federates and message federates, objects can be used in all functions<br>
    *                      that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument<br>
    * <br>
-   * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.<br>
-   * @param fi The federate info object that contains details on the federate.<br>
+   * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fedInfo.<br>
+   * @param fedInfo The federate info object that contains details on the federate.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
    * <br>
    * <br>
    * @return An opaque value federate object nullptr if the object creation failed.
    */
-  public static SWIGTYPE_p_void helicsCreateCombinationFederate(String fedName, SWIGTYPE_p_void fi) {
-    long cPtr = helicsJNI.helicsCreateCombinationFederate(fedName, SWIGTYPE_p_void.getCPtr(fi));
+  public static SWIGTYPE_p_void helicsCreateCombinationFederate(String fedName, SWIGTYPE_p_void fedInfo) {
+    long cPtr = helicsJNI.helicsCreateCombinationFederate(fedName, SWIGTYPE_p_void.getCPtr(fedInfo));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -961,16 +996,16 @@ public class helics implements helicsConstants {
    * <br>
    * Callback federates are combination federates that run a series of callback for execution in a completely automated fashion.<br>
    * <br>
-   * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.<br>
-   * @param fi The federate info object that contains details on the federate.<br>
+   * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fedInfo.<br>
+   * @param fedInfo The federate info object that contains details on the federate.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
    * <br>
    * <br>
    * @return An opaque value federate object; nullptr if the object creation failed.
    */
-  public static SWIGTYPE_p_void helicsCreateCallbackFederate(String fedName, SWIGTYPE_p_void fi) {
-    long cPtr = helicsJNI.helicsCreateCallbackFederate(fedName, SWIGTYPE_p_void.getCPtr(fi));
+  public static SWIGTYPE_p_void helicsCreateCallbackFederate(String fedName, SWIGTYPE_p_void fedInfo) {
+    long cPtr = helicsJNI.helicsCreateCallbackFederate(fedName, SWIGTYPE_p_void.getCPtr(fedInfo));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -1064,48 +1099,48 @@ public class helics implements helicsConstants {
   /**
    * Create a federate info object from an existing one and clone the information.<br>
    * <br>
-   * @param fi A federateInfo object to duplicate.<br>
+   * @param fedInfo A federateInfo object to duplicate.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
    * <br>
    * <br>
    *  @return A HelicsFederateInfo object which is a reference to the created object.
    */
-  public static SWIGTYPE_p_void helicsFederateInfoClone(SWIGTYPE_p_void fi) {
-    long cPtr = helicsJNI.helicsFederateInfoClone(SWIGTYPE_p_void.getCPtr(fi));
+  public static SWIGTYPE_p_void helicsFederateInfoClone(SWIGTYPE_p_void fedInfo) {
+    long cPtr = helicsJNI.helicsFederateInfoClone(SWIGTYPE_p_void.getCPtr(fedInfo));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
   /**
    * Load federate info from command line arguments.<br>
    * <br>
-   * @param fi A federateInfo object.<br>
+   * @param fedInfo A federateInfo object.<br>
    * @param argc The number of command line arguments.<br>
    * @param argv An array of strings from the command line.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void fi, String[] argc) {
-    helicsJNI.helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void.getCPtr(fi), argc);
+  public static void helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void fedInfo, String[] argc) {
+    helicsJNI.helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void.getCPtr(fedInfo), argc);
   }
 
   /**
    * Load federate info from command line arguments contained in a string.<br>
    * <br>
-   * @param fi A federateInfo object.<br>
+   * @param fedInfo A federateInfo object.<br>
    * @param args Command line arguments specified in a string.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoLoadFromString(SWIGTYPE_p_void fi, String args) {
-    helicsJNI.helicsFederateInfoLoadFromString(SWIGTYPE_p_void.getCPtr(fi), args);
+  public static void helicsFederateInfoLoadFromString(SWIGTYPE_p_void fedInfo, String args) {
+    helicsJNI.helicsFederateInfoLoadFromString(SWIGTYPE_p_void.getCPtr(fedInfo), args);
   }
 
   /**
    * Delete the memory associated with a federate info object.
    */
-  public static void helicsFederateInfoFree(SWIGTYPE_p_void fi) {
-    helicsJNI.helicsFederateInfoFree(SWIGTYPE_p_void.getCPtr(fi));
+  public static void helicsFederateInfoFree(SWIGTYPE_p_void fedInfo) {
+    helicsJNI.helicsFederateInfoFree(SWIGTYPE_p_void.getCPtr(fedInfo));
   }
 
   /**
@@ -1120,88 +1155,88 @@ public class helics implements helicsConstants {
   /**
    * Set the name of the core to link to for a federate.<br>
    * <br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param corename The identifier for a core to link to.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetCoreName(SWIGTYPE_p_void fi, String corename) {
-    helicsJNI.helicsFederateInfoSetCoreName(SWIGTYPE_p_void.getCPtr(fi), corename);
+  public static void helicsFederateInfoSetCoreName(SWIGTYPE_p_void fedInfo, String corename) {
+    helicsJNI.helicsFederateInfoSetCoreName(SWIGTYPE_p_void.getCPtr(fedInfo), corename);
   }
 
   /**
    * Set the initialization string for the core usually in the form of command line arguments.<br>
    * <br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param coreInit A string containing command line arguments to be passed to the core.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void fi, String coreInit) {
-    helicsJNI.helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void.getCPtr(fi), coreInit);
+  public static void helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void fedInfo, String coreInit) {
+    helicsJNI.helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void.getCPtr(fedInfo), coreInit);
   }
 
   /**
    * Set the initialization string that a core will pass to a generated broker usually in the form of command line arguments.<br>
    * <br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param brokerInit A string with command line arguments for a generated broker.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetBrokerInitString(SWIGTYPE_p_void fi, String brokerInit) {
-    helicsJNI.helicsFederateInfoSetBrokerInitString(SWIGTYPE_p_void.getCPtr(fi), brokerInit);
+  public static void helicsFederateInfoSetBrokerInitString(SWIGTYPE_p_void fedInfo, String brokerInit) {
+    helicsJNI.helicsFederateInfoSetBrokerInitString(SWIGTYPE_p_void.getCPtr(fedInfo), brokerInit);
   }
 
   /**
    * Set the core type by integer code.<br>
    * <br>
    * Valid values available by definitions in api-data.h.<br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param coretype An numerical code for a core type see /ref helics_CoreType.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetCoreType(SWIGTYPE_p_void fi, int coretype) {
-    helicsJNI.helicsFederateInfoSetCoreType(SWIGTYPE_p_void.getCPtr(fi), coretype);
+  public static void helicsFederateInfoSetCoreType(SWIGTYPE_p_void fedInfo, int coretype) {
+    helicsJNI.helicsFederateInfoSetCoreType(SWIGTYPE_p_void.getCPtr(fedInfo), coretype);
   }
 
   /**
    * Set the core type from a string.<br>
    * <br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param coretype A string naming a core type.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetCoreTypeFromString(SWIGTYPE_p_void fi, String coretype) {
-    helicsJNI.helicsFederateInfoSetCoreTypeFromString(SWIGTYPE_p_void.getCPtr(fi), coretype);
+  public static void helicsFederateInfoSetCoreTypeFromString(SWIGTYPE_p_void fedInfo, String coretype) {
+    helicsJNI.helicsFederateInfoSetCoreTypeFromString(SWIGTYPE_p_void.getCPtr(fedInfo), coretype);
   }
 
   /**
    * Set the name or connection information for a broker.<br>
    * <br>
    * This is only used if the core is automatically created, the broker information will be transferred to the core for connection.<br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param broker A string which defines the connection information for a broker either a name or an address.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetBroker(SWIGTYPE_p_void fi, String broker) {
-    helicsJNI.helicsFederateInfoSetBroker(SWIGTYPE_p_void.getCPtr(fi), broker);
+  public static void helicsFederateInfoSetBroker(SWIGTYPE_p_void fedInfo, String broker) {
+    helicsJNI.helicsFederateInfoSetBroker(SWIGTYPE_p_void.getCPtr(fedInfo), broker);
   }
 
   /**
    * Set the key for a broker connection.<br>
    * <br>
    * This is only used if the core is automatically created, the broker information will be transferred to the core for connection.<br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param brokerkey A string containing a key for the broker to connect.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetBrokerKey(SWIGTYPE_p_void fi, String brokerkey) {
-    helicsJNI.helicsFederateInfoSetBrokerKey(SWIGTYPE_p_void.getCPtr(fi), brokerkey);
+  public static void helicsFederateInfoSetBrokerKey(SWIGTYPE_p_void fedInfo, String brokerkey) {
+    helicsJNI.helicsFederateInfoSetBrokerKey(SWIGTYPE_p_void.getCPtr(fedInfo), brokerkey);
   }
 
   /**
@@ -1209,26 +1244,26 @@ public class helics implements helicsConstants {
    * <br>
    * This is only used if the core is automatically created, the broker information will be transferred to the core for connection.<br>
    * This will only be useful for network broker connections.<br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param brokerPort The integer port number to use for connection with a broker.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetBrokerPort(SWIGTYPE_p_void fi, int brokerPort) {
-    helicsJNI.helicsFederateInfoSetBrokerPort(SWIGTYPE_p_void.getCPtr(fi), brokerPort);
+  public static void helicsFederateInfoSetBrokerPort(SWIGTYPE_p_void fedInfo, int brokerPort) {
+    helicsJNI.helicsFederateInfoSetBrokerPort(SWIGTYPE_p_void.getCPtr(fedInfo), brokerPort);
   }
 
   /**
    * Set the local port to use.<br>
    * <br>
    * This is only used if the core is automatically created, the port information will be transferred to the core for connection.<br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param localPort A string with the port information to use as the local server port can be a number or "auto" or "os_local".<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetLocalPort(SWIGTYPE_p_void fi, String localPort) {
-    helicsJNI.helicsFederateInfoSetLocalPort(SWIGTYPE_p_void.getCPtr(fi), localPort);
+  public static void helicsFederateInfoSetLocalPort(SWIGTYPE_p_void fedInfo, String localPort) {
+    helicsJNI.helicsFederateInfoSetLocalPort(SWIGTYPE_p_void.getCPtr(fedInfo), localPort);
   }
 
   /**
@@ -1290,14 +1325,14 @@ public class helics implements helicsConstants {
    * Set a flag in the info structure.<br>
    * <br>
    * Valid flags are available /ref helics_federate_flags.<br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param flag A numerical index for a flag.<br>
    * @param value The desired value of the flag HELICS_TRUE or HELICS_FALSE.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetFlagOption(SWIGTYPE_p_void fi, int flag, int value) {
-    helicsJNI.helicsFederateInfoSetFlagOption(SWIGTYPE_p_void.getCPtr(fi), flag, value);
+  public static void helicsFederateInfoSetFlagOption(SWIGTYPE_p_void fedInfo, int flag, int value) {
+    helicsJNI.helicsFederateInfoSetFlagOption(SWIGTYPE_p_void.getCPtr(fedInfo), flag, value);
   }
 
   /**
@@ -1305,26 +1340,26 @@ public class helics implements helicsConstants {
    * <br>
    * The separator character is the separation character for local publications/endpoints in creating their global name.<br>
    * For example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName.<br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param separator The character to use as a separator.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetSeparator(SWIGTYPE_p_void fi, char separator) {
-    helicsJNI.helicsFederateInfoSetSeparator(SWIGTYPE_p_void.getCPtr(fi), separator);
+  public static void helicsFederateInfoSetSeparator(SWIGTYPE_p_void fedInfo, char separator) {
+    helicsJNI.helicsFederateInfoSetSeparator(SWIGTYPE_p_void.getCPtr(fedInfo), separator);
   }
 
   /**
    * Set the output delay for a federate.<br>
    * <br>
-   * @param fi The federate info object to alter.<br>
+   * @param fedInfo The federate info object to alter.<br>
    * @param timeProperty An integer representation of the time based property to set see /ref helics_properties.<br>
    * @param propertyValue The value of the property to set the timeProperty to.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetTimeProperty(SWIGTYPE_p_void fi, int timeProperty, double propertyValue) {
-    helicsJNI.helicsFederateInfoSetTimeProperty(SWIGTYPE_p_void.getCPtr(fi), timeProperty, propertyValue);
+  public static void helicsFederateInfoSetTimeProperty(SWIGTYPE_p_void fedInfo, int timeProperty, double propertyValue) {
+    helicsJNI.helicsFederateInfoSetTimeProperty(SWIGTYPE_p_void.getCPtr(fedInfo), timeProperty, propertyValue);
   }
 
   /**
@@ -1332,14 +1367,14 @@ public class helics implements helicsConstants {
    * <br>
    * Set known properties.<br>
    * <br>
-   * @param fi The federateInfo object to alter.<br>
+   * @param fedInfo The federateInfo object to alter.<br>
    * @param intProperty An int identifying the property.<br>
    * @param propertyValue The value to set the property to.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
-  public static void helicsFederateInfoSetIntegerProperty(SWIGTYPE_p_void fi, int intProperty, int propertyValue) {
-    helicsJNI.helicsFederateInfoSetIntegerProperty(SWIGTYPE_p_void.getCPtr(fi), intProperty, propertyValue);
+  public static void helicsFederateInfoSetIntegerProperty(SWIGTYPE_p_void fedInfo, int intProperty, int propertyValue) {
+    helicsJNI.helicsFederateInfoSetIntegerProperty(SWIGTYPE_p_void.getCPtr(fedInfo), intProperty, propertyValue);
   }
 
   /**
@@ -2903,6 +2938,18 @@ public class helics implements helicsConstants {
   }
 
   /**
+   * Publish the contents of a helicsDataBuffer.<br>
+   * <br>
+   * @param pub The publication to publish for.<br>
+   * @param buffer a HelicsDataBuffer object containing the data to publish<br>
+   * <br>
+   * ,out] err A pointer to an error object for catching errors.
+   */
+  public static void helicsPublicationPublishDataBuffer(SWIGTYPE_p_void pub, SWIGTYPE_p_void buffer) {
+    helicsJNI.helicsPublicationPublishDataBuffer(SWIGTYPE_p_void.getCPtr(pub), SWIGTYPE_p_void.getCPtr(buffer));
+  }
+
+  /**
    * Add a named input to the list of targets a publication publishes to.<br>
    * <br>
    * @param pub The publication to add the target for.<br>
@@ -2959,6 +3006,19 @@ public class helics implements helicsConstants {
    */
   public static void helicsInputGetBytes(SWIGTYPE_p_void ipt, SWIGTYPE_p_void data, int maxDataLength, int[] actualSize) {
     helicsJNI.helicsInputGetBytes(SWIGTYPE_p_void.getCPtr(ipt), SWIGTYPE_p_void.getCPtr(data), maxDataLength, actualSize);
+  }
+
+  /**
+   * Get a copy of the raw data in a HelicsDataBuffer<br>
+   * <br>
+   * @param inp The input to get the data for.<br>
+   * <br>
+   * ,out] err A pointer to an error object for catching errors.<br>
+   * @return A HelicsDataBuffer object containing the data
+   */
+  public static SWIGTYPE_p_void helicsInputGetDataBuffer(SWIGTYPE_p_void inp) {
+    long cPtr = helicsJNI.helicsInputGetDataBuffer(SWIGTYPE_p_void.getCPtr(inp));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
   /**
@@ -4278,6 +4338,18 @@ public class helics implements helicsConstants {
   }
 
   /**
+   * Get a data buffer to the message object<br>
+   * <br>
+   * @param message A message object to get the dataBuffer for<br>
+   * <br>
+   * @return A HelicsDataBuffer object to the data in a message.  Modifying the buffer will directly modify the message contents.
+   */
+  public static SWIGTYPE_p_void helicsMessageDataBuffer(SWIGTYPE_p_void message) {
+    long cPtr = helicsJNI.helicsMessageDataBuffer(SWIGTYPE_p_void.getCPtr(message));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
    * A check if the message contains a valid payload.<br>
    * <br>
    * @param message The message object in question.<br>
@@ -4421,6 +4493,18 @@ public class helics implements helicsConstants {
    */
   public static void helicsMessageSetData(SWIGTYPE_p_void message, SWIGTYPE_p_void data, int inputDataLength) {
     helicsJNI.helicsMessageSetData(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  }
+
+  /**
+   * Set the data payload of a message from a HelicsDataBuffer Object<br>
+   * <br>
+   * @param message The message object in question.<br>
+   * @param data the dataBuffer containing the appropriate data, if null will clear the message payload<br>
+   * <br>
+   * ,out] err An error object to fill out in case of an error.
+   */
+  public static void helicsMessageSetDataBuffer(SWIGTYPE_p_void message, SWIGTYPE_p_void data) {
+    helicsJNI.helicsMessageSetDataBuffer(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_void.getCPtr(data));
   }
 
   /**

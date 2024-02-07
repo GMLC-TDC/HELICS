@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -31,7 +31,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     Endpoint() = default;
     /**/
     // constructor used by messageFederateManager
-    Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle id);
+    Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle hid);
 
     Endpoint(MessageFederate* mFed,
              std::string_view name,

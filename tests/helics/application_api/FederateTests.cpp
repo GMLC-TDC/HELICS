@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -28,10 +28,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(federate, federate_initialize_tests)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     auto core = Fed->getCorePointer();
     ASSERT_TRUE((core));
@@ -57,10 +57,10 @@ TEST(federate, federate_initialize_tests)
 
 TEST(federate, single_core_federate)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setFlagOption(helics::defs::SINGLE_THREAD_FEDERATE);
-    auto fed = std::make_shared<helics::Federate>("test1", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setFlagOption(helics::defs::SINGLE_THREAD_FEDERATE);
+    auto fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     auto core = fed->getCorePointer();
     ASSERT_TRUE((core));
@@ -80,9 +80,9 @@ TEST(federate, single_core_federate)
 
 TEST(federate, renamer)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    auto fed = std::make_shared<helics::Federate>("test_${#}", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    auto fed = std::make_shared<helics::Federate>("test_${#}", fedInfo);
 
     auto core = fed->getCorePointer();
     ASSERT_TRUE((core));
@@ -92,24 +92,30 @@ TEST(federate, renamer)
     EXPECT_EQ(name, fed->getName());
     EXPECT_EQ(name, "test_1");
 
-    fi.coreInitString.clear();
-    auto fed2 = std::make_shared<helics::Federate>("test_${#}", fi);
+    fedInfo.coreInitString.clear();
+    auto fed2 = std::make_shared<helics::Federate>("test_${#}", fedInfo);
     EXPECT_EQ("test_2", fed2->getName());
 
+    auto fed3 = std::make_shared<helics::Federate>("test_${#}", fed->getCorePointer(), fedInfo);
+    EXPECT_EQ("test_3", fed3->getName());
+
     fed->enterInitializingModeAsync();
+    fed3->enterInitializingModeAsync();
     fed2->enterInitializingMode();
     fed->enterInitializingModeComplete();
+    fed3->enterInitializingModeComplete();
 
     fed = nullptr;  // force the destructor
     fed2 = nullptr;
+    fed3 = nullptr;
 }
 
 TEST(federate_tests, federate_initialize_iterate)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     auto core = Fed->getCorePointer();
     ASSERT_TRUE((core));
@@ -142,10 +148,10 @@ TEST(federate_tests, federate_initialize_json)
 {
     helics::BrokerApp brk(helics::CoreType::ZMQ);
 
-    helics::FederateInfo fi(helics::CoreType::ZMQ);
-    fi.coreInitString = "--json";
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.coreInitString = "--json";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     auto core = Fed->getCorePointer();
     ASSERT_TRUE((core));
@@ -167,10 +173,10 @@ TEST(federate_tests, federate_initialize_iteration_multiple)
 {
     helics::BrokerApp brk(helics::CoreType::ZMQ);
 
-    helics::FederateInfo fi(helics::CoreType::ZMQ);
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
 
-    auto Fed1 = std::make_shared<helics::Federate>("test1", fi);
-    auto Fed2 = std::make_shared<helics::Federate>("test2", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("test1", fedInfo);
+    auto Fed2 = std::make_shared<helics::Federate>("test2", fedInfo);
 
     Fed1->enterInitializingModeAsync();
     Fed2->enterInitializingModeIterative();
@@ -182,10 +188,10 @@ TEST(federate_tests, federate_initialize_iteration_multiple)
     EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::PENDING_ITERATIVE_INIT ||
                 Fed2->getCurrentMode() == helics::Federate::Modes::STARTUP);
     std::this_thread::yield();
-    int ii{0};
+    int count{0};
     while (!Fed2->isAsyncOperationCompleted()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        if (++ii > 20) {
+        if (++count > 20) {
             break;
         }
     }
@@ -206,10 +212,10 @@ TEST(federate_tests, federate_initialize_iteration_multiple)
 TEST(federate, federate_initialize_tests_env)
 {
     setEnvironmentVariable("HELICS_LOG_LEVEL", "connections");
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     auto core = Fed->getCorePointer();
     ASSERT_TRUE((core));
@@ -232,10 +238,10 @@ TEST(federate, federate_initialize_tests_env)
 TEST(federate, federate_initialize_tests_env2)
 {
     setEnvironmentVariable("HELICS_BROKER_LOG_LEVEL", std::to_string(HELICS_LOG_LEVEL_CONNECTIONS));
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     auto core = Fed->getCorePointer();
     ASSERT_TRUE((core));
@@ -256,10 +262,10 @@ TEST(federate, federate_initialize_tests_env2)
 */
 TEST(federate, time_step_tests)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
     Fed->enterInitializingMode();
@@ -278,10 +284,10 @@ TEST(federate, time_step_tests)
 
 TEST(federate, dynamic_join)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --broker_init_string='--dynamic --name=dyn_broker'";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --broker_init_string='--dynamic --name=dyn_broker'";
 
-    auto fed = std::make_shared<helics::Federate>("test1", fi);
+    auto fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     EXPECT_TRUE(fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
     fed->enterInitializingMode();
@@ -293,10 +299,10 @@ TEST(federate, dynamic_join)
     res = fed->requestTime(2.0);
     EXPECT_EQ(res, 2.0);
     // now join a dynamic broker
-    fi.coreInitString.clear();
-    fi.broker = "dyn_broker";
+    fedInfo.coreInitString.clear();
+    fedInfo.broker = "dyn_broker";
     decltype(fed) fedDyn;
-    EXPECT_NO_THROW(fedDyn = std::make_shared<helics::Federate>("test_dyn", fi));
+    EXPECT_NO_THROW(fedDyn = std::make_shared<helics::Federate>("test_dyn", fedInfo));
 
     fedDyn->enterInitializingMode();
     EXPECT_TRUE(fedDyn->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
@@ -317,11 +323,11 @@ TEST(federate, broker_disconnect_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "b1", "-f 1");
     brk->connect();
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
 
-    fi.coreInitString = "--broker=b1 --tick=200 --timeout=1000";
+    fedInfo.coreInitString = "--broker=b1 --tick=200 --timeout=1000";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
     Fed->enterInitializingMode();
@@ -347,10 +353,10 @@ TEST(federate, broker_disconnect_ci_skip)
 
 TEST(federate, index_groups)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setProperty(HELICS_PROPERTY_INT_INDEX_GROUP, 3);
-    auto fed1 = std::make_shared<helics::Federate>("test1", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_INT_INDEX_GROUP, 3);
+    auto fed1 = std::make_shared<helics::Federate>("test1", fedInfo);
 
     helics::FederateInfo fi2(CORE_TYPE_TO_TEST);
     auto fed2 = std::make_shared<helics::Federate>("test2", fi2);
@@ -371,19 +377,19 @@ TEST(federate, index_groups)
 // TODO(PT): make this work for all test types
 TEST(federate, bad_broker_error_zmq_ci_skip)
 {
-    helics::FederateInfo fi(helics::CoreType::ZMQ);
-    fi.coreInitString = "--broker=b1 --tick=200 --timeout=800 --networktimeout=400";
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.coreInitString = "--broker=b1 --tick=200 --timeout=800 --networktimeout=400";
 
-    EXPECT_THROW(auto fed = std::make_shared<helics::Federate>("test1", fi),
+    EXPECT_THROW(auto fed = std::make_shared<helics::Federate>("test1", fedInfo),
                  helics::RegistrationFailure);
 }
 
 TEST(federate, timeout_error_zmq_ci_skip_nosan)
 {
-    helics::FederateInfo fi(helics::CoreType::ZMQ);
-    fi.coreInitString = "--tick=200 --timeout=800 --networktimeout=400";
+    helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+    fedInfo.coreInitString = "--tick=200 --timeout=800 --networktimeout=400";
 
-    EXPECT_THROW(auto fed = std::make_shared<helics::Federate>("test1", fi),
+    EXPECT_THROW(auto fed = std::make_shared<helics::Federate>("test1", fedInfo),
                  helics::RegistrationFailure);
 }
 
@@ -391,9 +397,9 @@ TEST(federate, timeout_abort_zmq_ci_skip_nosan_nocov)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
-        helics::FederateInfo fi(helics::CoreType::ZMQ);
-        fi.coreInitString = "";
-        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
+        fedInfo.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fedInfo);
         return fed;
     };
 
@@ -420,9 +426,9 @@ TEST(federate, timeout_abort_tcp_ci_skip_nosan_nocov)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
-        helics::FederateInfo fi(helics::CoreType::TCP);
-        fi.coreInitString = "";
-        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        helics::FederateInfo fedInfo(helics::CoreType::TCP);
+        fedInfo.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fedInfo);
         return fed;
     };
 
@@ -446,9 +452,9 @@ TEST(federate, timeout_abort_tcpss_ci_skip_nosan_nocov)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
-        helics::FederateInfo fi(helics::CoreType::TCP_SS);
-        fi.coreInitString = "";
-        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        helics::FederateInfo fedInfo(helics::CoreType::TCP_SS);
+        fedInfo.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fedInfo);
         return fed;
     };
 
@@ -474,9 +480,9 @@ TEST(federate, timeout_abort_udp_ci_skip_nosan_nocov)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
-        helics::FederateInfo fi(helics::CoreType::UDP);
-        fi.coreInitString = "";
-        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        helics::FederateInfo fedInfo(helics::CoreType::UDP);
+        fedInfo.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fedInfo);
         return fed;
     };
 
@@ -499,13 +505,13 @@ TEST(federate, timeout_abort_udp_ci_skip_nosan_nocov)
 
 TEST(federate, federate_multiple_federates)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreName = "core1-mult";
-    fi.coreInitString = "-f 2 --autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "core1-mult";
+    fedInfo.coreInitString = "-f 2 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
-    auto Fed2 = std::make_shared<helics::Federate>("fed2", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("fed2", fedInfo);
 
     EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::STARTUP);
     EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::STARTUP);
@@ -549,14 +555,14 @@ TEST(federate, federate_multiple_federates)
 /** the same as the previous test except with multiple cores and a single broker*/
 TEST(federate, multiple_federates_multi_cores)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreName = "core_mc1";
-    fi.coreInitString = "--autobroker --broker=brk1";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "core_mc1";
+    fedInfo.coreInitString = "--autobroker --broker=brk1";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
-    fi.coreName = "core_mc2";
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
+    fedInfo.coreName = "core_mc2";
 
-    auto Fed2 = std::make_shared<helics::Federate>("fed2", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("fed2", fedInfo);
 
     EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::STARTUP);
     EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::STARTUP);
@@ -597,13 +603,13 @@ TEST(federate, multiple_federates_multi_cores)
 
 TEST(federate, multiple_federates_async_calls)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreName = "core_async";
-    fi.coreInitString = "-f 2 --autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "core_async";
+    fedInfo.coreInitString = "-f 2 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
-    auto Fed2 = std::make_shared<helics::Federate>("fed2", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("fed2", fedInfo);
 
     EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::STARTUP);
     EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::STARTUP);
@@ -614,11 +620,11 @@ TEST(federate, multiple_federates_async_calls)
     Fed2->enterInitializingMode();
     EXPECT_NO_THROW(Fed2->enterInitializingMode());
 
-    auto c1 = Fed1->getCorePointer();
-    auto c2 = Fed2->getCorePointer();
-    EXPECT_EQ(c1->getIdentifier(), c2->getIdentifier());
-    c1.reset();
-    c2.reset();
+    auto core1 = Fed1->getCorePointer();
+    auto core2 = Fed2->getCorePointer();
+    EXPECT_EQ(core1->getIdentifier(), core2->getIdentifier());
+    core1.reset();
+    core2.reset();
 
     Fed1->enterInitializingModeComplete();
 
@@ -655,24 +661,24 @@ TEST(federate, multiple_federates_async_calls)
 
 TEST(federate, missing_core)
 {
-    helics::FederateInfo fi(helics::CoreType::NULLCORE);
-    fi.coreName = "core_missing";
-    fi.coreInitString = "-f 1";
+    helics::FederateInfo fedInfo(helics::CoreType::NULLCORE);
+    fedInfo.coreName = "core_missing";
+    fedInfo.coreInitString = "-f 1";
 
-    EXPECT_THROW(auto Fed1 = std::make_shared<helics::Federate>("fed1", fi),
+    EXPECT_THROW(auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo),
                  helics::HelicsException);
 }
 
 TEST(federate, not_open)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterExecutingMode();
 
-    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("fed2", fi),
+    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("fed2", fedInfo),
                  helics::RegistrationFailure);
     Fed1->finalize();
 }
@@ -680,8 +686,8 @@ TEST(federate, not_open)
 TEST(federate, coreApp)
 {
     helics::CoreApp capp(helics::CoreType::TEST, "corename", "-f 1 --autobroker");
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", capp, fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", capp, fedInfo);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
 
     Fed1->finalize();
@@ -689,24 +695,24 @@ TEST(federate, coreApp)
 
 TEST(federate, core_ptr)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_ptr";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_ptr";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", nullptr, fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", nullptr, fedInfo);
     Fed1->enterExecutingMode();
 
-    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("fed2", nullptr, fi),
+    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("fed2", nullptr, fedInfo),
                  helics::RegistrationFailure);
     Fed1->finalize();
 }
 
 TEST(federate, core_ptr_no_name)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>(std::string{}, nullptr, fi);
+    auto Fed1 = std::make_shared<helics::Federate>(std::string{}, nullptr, fedInfo);
     Fed1->enterExecutingMode();
     Fed1->finalize();
 }
@@ -717,10 +723,10 @@ TEST(federate, from_string)
         "fed1", "--coretype=TEST --corename core_init --coreinitstring='-f 1 --autobroker'");
     Fed1->enterExecutingMode();
 
-    auto c1 = Fed1->getCorePointer();
-    EXPECT_EQ(c1->getIdentifier(), "core_init");
+    auto core = Fed1->getCorePointer();
+    EXPECT_EQ(core->getIdentifier(), "core_init");
     Fed1->finalize();
-    c1.reset();
+    core.reset();
 }
 
 TEST(federate, from_file1)
@@ -767,6 +773,15 @@ TEST(federate, from_file_invalid)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
     auto fstr2 = std::string(TEST_DIR) + "invalid_filter_operation.json";
+    std::shared_ptr<helics::Federate> Fed1;
+    EXPECT_THROW(Fed1 = std::make_shared<helics::Federate>(fstr2), std::exception);
+}
+
+TEST(federate, from_file_invalid_translator)
+{
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+    auto fstr2 = std::string(TEST_DIR) + "invalid_translator_operation.json";
     std::shared_ptr<helics::Federate> Fed1;
     EXPECT_THROW(Fed1 = std::make_shared<helics::Federate>(fstr2), std::exception);
 }
@@ -831,7 +846,7 @@ TEST(federate, from_file10)
 
     auto fstr2 = std::string(LONG_TEST_NAME);
     if (fstr2.size() < FILENAME_MAX) {
-        // this test would fail if the file name exceeeds the max filename length
+        // this test would fail if the file name exceeds the max filename length
         std::shared_ptr<helics::Federate> Fed1;
         EXPECT_NO_THROW(Fed1 = std::make_shared<helics::Federate>(fstr2));
         if (Fed1) {
@@ -854,11 +869,11 @@ TEST(federate, from_string2)
 
 TEST(federate, enterInit)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_a";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_a";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingModeAsync();
     // make sure it doesn't error if called twice
     EXPECT_NO_THROW(Fed1->enterInitializingModeAsync());
@@ -872,11 +887,11 @@ TEST(federate, enterInit)
 
 TEST(federate, enterInitComplete)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_b";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_b";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     // this should be the same as just calling enterInitializingMode
     EXPECT_NO_THROW(Fed1->enterInitializingModeComplete());
 
@@ -886,11 +901,11 @@ TEST(federate, enterInitComplete)
 
 TEST(federate, enterExec)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_c";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_c";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingModeAsync();
     Fed1->setProperty(helics::defs::Properties::TIME_DELTA, helics::Time(1.0));
     // make sure it doesn't error if called twice
@@ -906,14 +921,14 @@ TEST(federate, enterExec)
 
 TEST(federate, enterExecAfterFinal)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_ec";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_ec";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingMode();
-    auto cr = Fed1->getCorePointer();
-    cr->disconnect();
+    auto core = Fed1->getCorePointer();
+    core->disconnect();
 
     auto iterating = Fed1->enterExecutingMode();
     EXPECT_EQ(iterating, helics::IterationResult::HALTED);
@@ -923,14 +938,14 @@ TEST(federate, enterExecAfterFinal)
 
 TEST(federate, enterExecAfterFinalAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_eca";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_eca";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingMode();
-    auto cr = Fed1->getCorePointer();
-    cr->disconnect();
+    auto core = Fed1->getCorePointer();
+    core->disconnect();
 
     Fed1->enterExecutingModeAsync();
     auto iterating = Fed1->enterExecutingModeComplete();
@@ -941,15 +956,15 @@ TEST(federate, enterExecAfterFinalAsync)
 
 TEST(federate, iterativeTimeRequestHalt)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_eca1";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_eca1";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterExecutingMode();
 
-    auto cr = Fed1->getCorePointer();
-    cr->disconnect();
+    auto core = Fed1->getCorePointer();
+    core->disconnect();
 
     auto itTime = Fed1->requestTimeIterative(2.0, helics::IterationRequest::FORCE_ITERATION);
     EXPECT_EQ(itTime.state, helics::IterationResult::HALTED);
@@ -960,15 +975,15 @@ TEST(federate, iterativeTimeRequestHalt)
 
 TEST(federate, iterativeTimeRequestAsyncHalt)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_eca2";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_eca2";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterExecutingMode();
 
-    auto cr = Fed1->getCorePointer();
-    cr->disconnect();
+    auto core = Fed1->getCorePointer();
+    core->disconnect();
 
     Fed1->requestTimeIterativeAsync(2.0, helics::IterationRequest::FORCE_ITERATION);
     auto itTime = Fed1->requestTimeIterativeComplete();
@@ -980,11 +995,11 @@ TEST(federate, iterativeTimeRequestAsyncHalt)
 
 TEST(federate, enterExecAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_d";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_d";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingModeAsync();
     EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());
@@ -993,11 +1008,11 @@ TEST(federate, enterExecAsync)
 
 TEST(federate, enterExecAsyncIterative)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_e";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_e";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingModeAsync(helics::IterationRequest::FORCE_ITERATION);
     EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());
@@ -1011,11 +1026,11 @@ TEST(federate, enterExecAsyncIterative)
 
 TEST(federate, enterRequestTimeAsyncIterative)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_e";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_e";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(1.0);
@@ -1045,27 +1060,27 @@ TEST(federate, enterRequestTimeAsyncIterative)
 
 TEST(federate, enterRequestTimeAsyncIterativeFinalize)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_e2";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_e2";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeIterativeAsync(1.0, helics::IterationRequest::FORCE_ITERATION);
     EXPECT_NO_THROW(Fed1->finalize());
     // check time results after finalize
-    auto tm = Fed1->requestTime(3.0);
-    EXPECT_EQ(tm, helics::Time::maxVal());
+    auto time = Fed1->requestTime(3.0);
+    EXPECT_EQ(time, helics::Time::maxVal());
 }
 
 TEST(federate, enterRequestTimeAsyncFinalize)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_e3";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_e3";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(1.0);
@@ -1075,11 +1090,11 @@ TEST(federate, enterRequestTimeAsyncFinalize)
 
 TEST(federate, enterRequestTimeAsyncFinalizeAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_e3a";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_e3a";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(1.0);
@@ -1090,11 +1105,11 @@ TEST(federate, enterRequestTimeAsyncFinalizeAsync)
 
 TEST(federate, enterEnterExecAsyncFinalize)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_e4";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_e4";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingMode();
     Fed1->enterExecutingModeAsync();
     EXPECT_NO_THROW(Fed1->finalize());
@@ -1103,11 +1118,11 @@ TEST(federate, enterEnterExecAsyncFinalize)
 
 TEST(federate, enterEnterInitAsyncFinalize)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_e5";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_e5";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingModeAsync();
     EXPECT_NO_THROW(Fed1->finalize());
     EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
@@ -1115,11 +1130,11 @@ TEST(federate, enterEnterInitAsyncFinalize)
 
 TEST(federate, enterEnterExecAsyncFinalizeAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_e4a";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_e4a";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingMode();
     Fed1->enterExecutingModeAsync();
     EXPECT_NO_THROW(Fed1->finalizeAsync());
@@ -1129,11 +1144,11 @@ TEST(federate, enterEnterExecAsyncFinalizeAsync)
 
 TEST(federate, enterEnterInitAsyncFinalizeAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_e5a";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_e5a";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingModeAsync();
     EXPECT_NO_THROW(Fed1->finalizeAsync());
     Fed1->finalizeComplete();
@@ -1142,26 +1157,26 @@ TEST(federate, enterEnterInitAsyncFinalizeAsync)
 
 TEST(federate, enterExecPendingTimeIterative)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_epa";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_epa";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterExecutingMode();
     Fed1->requestTimeIterativeAsync(2.0, helics::IterationRequest::FORCE_ITERATION);
-    auto it = Fed1->enterExecutingMode();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    auto result = Fed1->enterExecutingMode();
+    EXPECT_EQ(result, helics::IterationResult::NEXT_STEP);
     Fed1->finalizeComplete();
     EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
 }
 
 TEST(federate, forceErrorExec)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_fe";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_fe";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->localError(9827);
@@ -1174,11 +1189,11 @@ TEST(federate, forceErrorExec)
 
 TEST(federate, forceErrorExecAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_fe1";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_fe1";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingModeAsync(helics::IterationRequest::FORCE_ITERATION);
     Fed1->localError(9827);
@@ -1191,11 +1206,11 @@ TEST(federate, forceErrorExecAsync)
 
 TEST(federate, forceErrorInitAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_fe2";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_fe2";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterInitializingModeAsync();
     Fed1->localError(9827);
@@ -1208,11 +1223,11 @@ TEST(federate, forceErrorInitAsync)
 
 TEST(federate, forceErrorPendingTimeAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_fe3";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_fe3";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(2.0);
@@ -1225,11 +1240,11 @@ TEST(federate, forceErrorPendingTimeAsync)
 
 TEST(federate, federateGeneratedLocalError)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_le";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_le";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->localError(9827, "user generated error");
@@ -1243,11 +1258,11 @@ TEST(federate, federateGeneratedLocalError)
 
 TEST(federate, federateGeneratedGlobalError)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_ge";
-    fi.coreInitString = "-f 1 --autobroker --error_timeout=0";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_ge";
+    fedInfo.coreInitString = "-f 1 --autobroker --error_timeout=0";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(2.0);
@@ -1263,11 +1278,11 @@ TEST(federate, federateGeneratedGlobalError)
 
 TEST(federate, federateGeneratedlocalErrorEscalation)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_ge";
-    fi.coreInitString = "-f 1 --autobroker --error_timeout=0";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_ge";
+    fedInfo.coreInitString = "-f 1 --autobroker --error_timeout=0";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->setFlagOption(helics::defs::Flags::TERMINATE_ON_ERROR);
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(2.0);
@@ -1283,23 +1298,23 @@ TEST(federate, federateGeneratedlocalErrorEscalation)
 
 TEST(federate, queryTest1)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_q";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_q";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed_q", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed_q", fedInfo);
 
     Fed1->enterExecutingMode();
 
     auto qres = Fed1->query("name");
     EXPECT_EQ(qres, "\"fed_q\"");
     qres = Fed1->query("corename");
-    auto cr = Fed1->getCorePointer();
-    EXPECT_EQ(qres, std::string("\"") + cr->getIdentifier() + '"');
+    auto core = Fed1->getCorePointer();
+    EXPECT_EQ(qres, std::string("\"") + core->getIdentifier() + '"');
     qres = Fed1->query("federate", "name");
     EXPECT_EQ(qres, "\"fed_q\"");
 
-    cr.reset();
+    core.reset();
     Fed1->disconnect();
     qres = Fed1->query("corename");
     // core name should be empty after disconnect
@@ -1318,11 +1333,11 @@ TEST(federate, queryTest1)
 
 TEST(federate, forceErrorPendingTimeIterativeAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_fe4";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_fe4";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeIterativeAsync(2.0, helics::IterationRequest::NO_ITERATIONS);
@@ -1335,11 +1350,11 @@ TEST(federate, forceErrorPendingTimeIterativeAsync)
 
 TEST(federate, forceErrorFinalizeAsync)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_fe5";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_fe5";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
     Fed1->enterExecutingMode();
     Fed1->finalizeAsync();
@@ -1352,31 +1367,31 @@ TEST(federate, forceErrorFinalizeAsync)
 
 TEST(federate, error_after_disconnect)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_full_g";
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_full_g";
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
-    auto& f1 = Fed1->registerGlobalFilter("filt1", "type1", "type2");
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
+    auto& filt1 = Fed1->registerGlobalFilter("filt1", "type1", "type2");
     Fed1->enterExecutingMode();
     Fed1->disconnect();
 
     const auto& Fedref = *Fed1;
-    auto& fb = Fedref.getFilter(0);
-    auto& fb2 = Fedref.getFilter("filt1");
-    auto& fb3 = Fedref.getFilter("notafilter");
-    auto& fb4 = Fed1->getFilter("filt1");
-    EXPECT_EQ(fb.getName(), f1.getName());
-    EXPECT_EQ(fb2.getName(), f1.getName());
-    EXPECT_EQ(fb4.getName(), f1.getName());
-    EXPECT_FALSE(fb3.isValid());
+    auto& filt1ref1 = Fedref.getFilter(0);
+    auto& filt1ref2 = Fedref.getFilter("filt1");
+    auto& filt1ref3 = Fedref.getFilter("notafilter");
+    auto& filt1ref4 = Fed1->getFilter("filt1");
+    EXPECT_EQ(filt1ref1.getName(), filt1.getName());
+    EXPECT_EQ(filt1ref2.getName(), filt1.getName());
+    EXPECT_EQ(filt1ref4.getName(), filt1.getName());
+    EXPECT_FALSE(filt1ref3.isValid());
 
     EXPECT_NO_THROW(Fed1->setGlobal("global1", "global1"));
-    EXPECT_THROW(f1.addSourceTarget("ept"), helics::InvalidFunctionCall);
+    EXPECT_THROW(filt1.addSourceTarget("ept"), helics::InvalidFunctionCall);
     EXPECT_NO_THROW(Fed1->addDependency("otherFed"));
 
-    EXPECT_THROW(f1.addDestinationTarget("ept"), helics::InvalidFunctionCall);
-    EXPECT_NO_THROW(Fed1->setFilterOperator(f1, {}));
+    EXPECT_THROW(filt1.addDestinationTarget("ept"), helics::InvalidFunctionCall);
+    EXPECT_NO_THROW(Fed1->setFilterOperator(filt1, {}));
 
     EXPECT_THROW(Fed1->localError(99), helics::FederateError);
     EXPECT_THROW(Fed1->globalError(99), helics::FederateError);
@@ -1386,22 +1401,22 @@ static constexpr const char* simple_global_files[] = {"example_globals1.json",
                                                       "example_globals1.toml",
                                                       "example_globals2.json"};
 
-class federate_global_files: public ::testing::TestWithParam<const char*> {};
+class FederateGlobalFiles: public ::testing::TestWithParam<const char*> {};
 
-TEST_P(federate_global_files, global_file_ci_skip)
+TEST_P(FederateGlobalFiles, global_file_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST, "b1", "-f 2");
     brk->connect();
     auto testFile = std::string(TEST_DIR) + GetParam();
     brk->makeConnections(testFile);
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreName = "core_global1";
-    fi.coreInitString = "-f 2";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "core_global1";
+    fedInfo.coreInitString = "-f 2";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 
-    auto Fed2 = std::make_shared<helics::Federate>("fed2", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("fed2", fedInfo);
 
     Fed1->enterInitializingModeAsync();
     Fed2->enterInitializingMode();
@@ -1422,22 +1437,22 @@ TEST_P(federate_global_files, global_file_ci_skip)
     brk->waitForDisconnect();
 }
 
-TEST_P(federate_global_files, core_global_file_ci_skip)
+TEST_P(FederateGlobalFiles, core_global_file_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST, "b1", "-f2");
     brk->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreName = "core_global3";
-    fi.coreInitString = "-f 1";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "core_global3";
+    fedInfo.coreInitString = "-f 1";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
-    fi.coreName = "core_global4";
-    auto Fed2 = std::make_shared<helics::Federate>("fed2", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
+    fedInfo.coreName = "core_global4";
+    auto Fed2 = std::make_shared<helics::Federate>("fed2", fedInfo);
 
-    auto cr = Fed1->getCorePointer();
+    auto core = Fed1->getCorePointer();
     auto testFile = std::string(TEST_DIR) + GetParam();
-    cr->makeConnections(testFile);
+    core->makeConnections(testFile);
     Fed1->enterInitializingModeAsync();
     Fed2->enterInitializingMode();
 
@@ -1447,7 +1462,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is a global1 value");
     str1 = Fed2->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = cr->query("global_value", "global1", HELICS_SEQUENCING_MODE_FAST);
+    str1 = core->query("global_value", "global1", HELICS_SEQUENCING_MODE_FAST);
     EXPECT_EQ(str1, "this is a global1 value");
     str1 = brk->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
@@ -1456,7 +1471,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is another global value");
     str1 = Fed2->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = cr->query("global_value", "global2", HELICS_SEQUENCING_MODE_FAST);
+    str1 = core->query("global_value", "global2", HELICS_SEQUENCING_MODE_FAST);
     EXPECT_EQ(str1, "this is another global value");
     str1 = brk->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
@@ -1468,8 +1483,8 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_NE(str3, "#invalid");
     Fed1->finalize();
     Fed2->finalize();
-    cr = nullptr;
+    core = nullptr;
     brk->waitForDisconnect();
 }
 
-INSTANTIATE_TEST_SUITE_P(federate, federate_global_files, ::testing::ValuesIn(simple_global_files));
+INSTANTIATE_TEST_SUITE_P(federate, FederateGlobalFiles, ::testing::ValuesIn(simple_global_files));

@@ -126,6 +126,8 @@ myst_enable_extensions = [
 ]
 myst_dmath_double_inline = True
 
+myst_heading_anchors = 5
+
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
 }
@@ -141,7 +143,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "HELICS"
-copyright = "2017-2021 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC. See the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause. Documentation source in https://github.com/GMLC-TDC/HELICS"
+copyright = "2017-2024 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC. See the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause. Documentation source in https://github.com/GMLC-TDC/HELICS"
 author = "Philip Top, Trevor Hardy, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Bryan Palmintier, Jason Fuller"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -158,12 +160,20 @@ release = ""
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "deprecated",
+    "404.md",
+    "swagger/docs/HELICS-api.md",
+    "user-guide/deprecated",
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"

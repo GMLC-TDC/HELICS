@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerBase.hpp"
 
-#include "../common/fmt_format.h"
 #include "../common/logging.hpp"
 #include "AsyncTimeCoordinator.hpp"
 #include "ForwardingTimeCoordinator.hpp"
@@ -23,6 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
+
+#include <fmt/format.h>
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "gmlc/networking/AsioContextManager.h"
@@ -43,22 +44,23 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static inline std::string genId()
 {
-    std::string nm = gmlc::utilities::randomString(24);
+    std::string newid = gmlc::utilities::randomString(24);
 
-    nm[0] = '-';
-    nm[6] = '-';
-    nm[12] = '-';
-    nm[18] = '-';
+    newid[0] = '-';
+    newid[6] = '-';
+    newid[12] = '-';
+    newid[18] = '-';
 
 #ifdef _WIN32
-    std::string pid_str = std::to_string(GetCurrentProcessId()) + nm;
+    std::string pid_str = std::to_string(GetCurrentProcessId()) + newid;
 #else
-    std::string pid_str = std::to_string(getpid()) + nm;
+    std::string pid_str = std::to_string(getpid()) + newid;
 #endif
     return pid_str;
 }
 
 namespace helics {
+
 BrokerBase::BrokerBase(bool DisableQueue) noexcept:
     queueDisabled(DisableQueue), mLogManager(std::make_shared<LogManager>())
 {
@@ -357,10 +359,10 @@ void BrokerBase::configureBase()
     timeCoord->setMessageSender([this](const ActionMessage& msg) { addActionMessage(msg); });
     timeCoord->setRestrictivePolicy(restrictive_time_policy);
 
-    mLogManager->setTransmitCallback([this](ActionMessage&& m) {
+    mLogManager->setTransmitCallback([this](ActionMessage&& message) {
         if (getBrokerState() < BrokerState::TERMINATING) {
-            m.source_id = global_id.load();
-            addActionMessage(std::move(m));
+            message.source_id = global_id.load();
+            addActionMessage(std::move(message));
         }
     });
     mLogManager->initializeLogging(identifier);
@@ -376,7 +378,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               std::string_view message,
                               bool fromRemote) const
 {
-    bool noID = (federateID != global_id.load()) || (!name.empty() && name.back() == ']');
+    const bool noID = (federateID != global_id.load()) || (!name.empty() && name.back() == ']');
 
     std::string header;
     if (noID) {
@@ -384,13 +386,13 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
     } else {
         std::string timeString;
 
-        Time currentTime = getSimulationTime();
+        const Time currentTime = getSimulationTime();
         if (currentTime <= mInvalidSimulationTime || currentTime >= cHelicsBigNumber) {
             timeString.push_back('[');
             timeString.append(brokerStateName(getBrokerState()));
             timeString.push_back(']');
         } else {
-            timeString = fmt::format("[t={}]", currentTime);
+            timeString = fmt::format("[t={}]", static_cast<double>(currentTime));
         }
         header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
     }
@@ -436,11 +438,11 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
         }
         if (errorDelay <= timeZero || eCode == HELICS_ERROR_TERMINATED ||
             eCode == HELICS_ERROR_USER_ABORT) {
-            ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
+            const ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
             addActionMessage(halt);
         } else {
             errorTimeStart = std::chrono::steady_clock::now();
-            ActionMessage echeck(CMD_ERROR_CHECK, global_id.load(), global_id.load());
+            const ActionMessage echeck(CMD_ERROR_CHECK, global_id.load(), global_id.load());
             addActionMessage(echeck);
         }
     }
@@ -488,7 +490,7 @@ std::pair<bool, std::vector<std::string_view>>
             LOG_SUMMARY(global_broker_id_local,
                         identifier,
                         " received terminate instruction via command instruction")
-            ActionMessage udisconnect(CMD_USER_DISCONNECT);
+            const ActionMessage udisconnect(CMD_USER_DISCONNECT);
             addActionMessage(udisconnect);
         }
     } else if (res[0] == "echo") {
@@ -580,35 +582,35 @@ void BrokerBase::setLogLevels(int32_t consoleLevel, int32_t fileLevel)
     maxLogLevel.store(mLogManager->getMaxLevel());
 }
 
-void BrokerBase::addActionMessage(const ActionMessage& m)
+void BrokerBase::addActionMessage(const ActionMessage& message)
 {
-    if (isPriorityCommand(m)) {
-        actionQueue.pushPriority(m);
+    if (isPriorityCommand(message)) {
+        actionQueue.pushPriority(message);
     } else {
         // just route to the general queue;
-        actionQueue.push(m);
+        actionQueue.push(message);
     }
 }
 
-void BrokerBase::addActionMessage(ActionMessage&& m)
+void BrokerBase::addActionMessage(ActionMessage&& message)
 {
-    if (isPriorityCommand(m)) {
-        actionQueue.emplacePriority(std::move(m));
+    if (isPriorityCommand(message)) {
+        actionQueue.emplacePriority(std::move(message));
     } else {
         // just route to the general queue;
-        actionQueue.emplace(std::move(m));
+        actionQueue.emplace(std::move(message));
     }
 }
 
-void BrokerBase::addActionMessage(ActionMessage&& m) const
+void BrokerBase::addActionMessage(ActionMessage&& message) const
 {
     // the queue is thread safe so can be run in a const situation without possibility of issues
     auto& lQueue = const_cast<decltype(actionQueue)&>(actionQueue);
-    if (isPriorityCommand(m)) {
-        lQueue.emplacePriority(std::move(m));
+    if (isPriorityCommand(message)) {
+        lQueue.emplacePriority(std::move(message));
     } else {
         // just route to the general queue;
-        lQueue.emplace(std::move(m));
+        lQueue.emplace(std::move(message));
     }
 }
 
@@ -619,10 +621,10 @@ static bool haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
 {
     bool TimerRunning = true;
     {
-        auto p = active.lock();
-        if (p->second) {
-            p->first = false;
-            p.unlock();
+        auto protector = active.lock();
+        if (protector->second) {
+            protector->first = false;
+            protector.unlock();
             auto cancelled = tickTimer.cancel();
             if (cancelled == 0) {
                 TimerRunning = false;
@@ -631,17 +633,17 @@ static bool haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
             TimerRunning = false;
         }
     }
-    int ii = 0;
+    int timerLoopCount = 0;
     while (TimerRunning) {
-        if (ii % 4 != 3) {
+        if (timerLoopCount % 4 != 3) {
             std::this_thread::yield();
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(40));
         }
         auto res = active.load();
         TimerRunning = res.second;
-        ++ii;
-        if (ii == 100) {
+        ++timerLoopCount;
+        if (timerLoopCount == 100) {
             // assume the timer was never started so just exit and hope it doesn't somehow get
             // called later and generate a seg fault.
             return false;
@@ -653,8 +655,8 @@ static bool haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
 static void
     timerTickHandler(BrokerBase* bbase, activeProtector& active, const std::error_code& error)
 {
-    auto p = active.lock();
-    if (p->first) {
+    auto timeProtector = active.lock();
+    if (timeProtector->first) {
         if (error != asio::error::operation_aborted) {
             try {
                 bbase->addActionMessage(CMD_TICK);
@@ -663,12 +665,12 @@ static void
                 std::cerr << "exception caught from addActionMessage" << e.what() << std::endl;
             }
         } else {
-            ActionMessage M(CMD_TICK);
-            setActionFlag(M, error_flag);
-            bbase->addActionMessage(M);
+            ActionMessage tick(CMD_TICK);
+            setActionFlag(tick, error_flag);
+            bbase->addActionMessage(tick);
         }
     }
-    p->second = false;
+    timeProtector->second = false;
 }
 
 #endif
@@ -692,8 +694,8 @@ void BrokerBase::queueProcessingLoop()
     asio::steady_timer ticktimer(serv->getBaseContext());
     activeProtector active(true, false);
 
-    auto timerCallback = [this, &active](const std::error_code& ec) {
-        timerTickHandler(this, active, ec);
+    auto timerCallback = [this, &active](const std::error_code& errorCode) {
+        timerTickHandler(this, active, errorCode);
     };
     if (tickTimer > timeZero && !disable_timer) {
         if (tickTimer < Time(0.5)) {
@@ -761,8 +763,8 @@ void BrokerBase::queueProcessingLoop()
                 // deal with error state timeout
                 if (brokerState.load() == BrokerState::CONNECTED_ERROR) {
                     auto ctime = std::chrono::steady_clock::now();
-                    auto td = ctime - errorTimeStart;
-                    if (td >= errorDelay.to_ms()) {
+                    auto timeDiff = ctime - errorTimeStart;
+                    if (timeDiff >= errorDelay.to_ms()) {
                         command.setAction(CMD_USER_DISCONNECT);
                         addActionMessage(command);
                     } else {
@@ -816,13 +818,13 @@ void BrokerBase::queueProcessingLoop()
             case CMD_ERROR_CHECK:
                 if (brokerState.load() == BrokerState::CONNECTED_ERROR) {
                     auto ctime = std::chrono::steady_clock::now();
-                    auto td = ctime - errorTimeStart;
-                    if (td > errorDelay.to_ms()) {
+                    auto timeDiff = ctime - errorTimeStart;
+                    if (timeDiff > errorDelay.to_ms()) {
                         command.setAction(CMD_USER_DISCONNECT);
                         addActionMessage(command);
                     } else {
 #ifndef HELICS_DISABLE_ASIO
-                        if (tickTimer > td * 2 || disable_timer) {
+                        if (tickTimer > timeDiff * 2 || disable_timer) {
                             std::this_thread::sleep_for(std::chrono::milliseconds(200));
                             addActionMessage(command);
                         }
@@ -970,13 +972,13 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
             for (int ii = 0; ii < command.counter; ++ii) {
                 ActionMessage NMess;
                 NMess.from_string(command.getString(ii));
-                auto V = commandProcessor(NMess);
-                if (V != CMD_IGNORE) {
+                auto commandAction = commandProcessor(NMess);
+                if (commandAction != CMD_IGNORE) {
                     // overwrite the abort command but ignore ticks in a multi-message context
                     // they shouldn't be there
-                    if (V != CMD_TICK) {
+                    if (commandAction != CMD_TICK) {
                         command = NMess;
-                        return V;
+                        return commandAction;
                     }
                 }
             }

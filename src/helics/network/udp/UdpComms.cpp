@@ -1,18 +1,18 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "UdpComms.h"
 
-#include "../../common/fmt_format.h"
 #include "../../core/ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "../networkDefaults.hpp"
 #include "gmlc/networking/AsioContextManager.h"
 
 #include <asio/ip/udp.hpp>
+#include <fmt/format.h>
 #include <map>
 #include <memory>
 #include <string>

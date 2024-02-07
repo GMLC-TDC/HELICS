@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -611,6 +611,44 @@ TEST_P(valuefed_add_configfile_tests, file_load)
 TEST(valuefed_json_tests, file_loadb)
 {
     helics::ValueFederate vFed(std::string(TEST_DIR) + "example_value_fed_testb.json");
+
+    EXPECT_EQ(vFed.getName(), "valueFed2");
+
+    EXPECT_EQ(vFed.getInputCount(), 3);
+    EXPECT_EQ(vFed.getPublicationCount(), 2);
+    auto& id = vFed.getPublication("primary");
+
+    EXPECT_EQ(id.getName(), "valueFed2/pub2");
+
+    auto& id2 = vFed.getPublication("pub1");
+    EXPECT_EQ(id2.getUnits(), "m");
+
+    EXPECT_EQ(id2.getTag("description"), "a test publication");
+    EXPECT_EQ(std::stod(id2.getTag("period")), 0.5);
+
+    auto& inp2 = vFed.getInput("ipt2");
+    EXPECT_EQ(inp2.getTag("description"), "a test input");
+    EXPECT_EQ(std::stod(inp2.getTag("period")), 0.7);
+
+    EXPECT_EQ(vFed.getTag("description"), "fedb description");
+    EXPECT_EQ(vFed.getTag("version"), "27");
+
+    auto& sub1 = vFed.getInput(0);
+    vFed.enterInitializingMode();
+
+    auto dv = sub1.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 9.33);
+    dv = inp2.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 3.67);
+    vFed.disconnect();
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+}
+
+TEST(valuefed_json_tests, file_loadb_with_space)
+{
+    helics::ValueFederate vFed(std::string(TEST_DIR) +
+                               "folder with space/example_value_fed_testb.json");
 
     EXPECT_EQ(vFed.getName(), "valueFed2");
 

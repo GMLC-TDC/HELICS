@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -20,8 +20,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <deque>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -159,9 +161,9 @@ class FederateState {
     void setState(FederateStates newState);
 
     /** check if a message should be delayed*/
-    bool messageShouldBeDelayed(const ActionMessage& cmd) const;
+    bool messageShouldBeDelayed(const ActionMessage& cmd) const noexcept;
     /** add a federate to the delayed list*/
-    void addFederateToDelay(GlobalFederateId id);
+    void addFederateToDelay(GlobalFederateId gid);
     /** generate a component of json config string*/
     void generateConfig(Json::Value& base) const;
 
@@ -180,7 +182,7 @@ class FederateState {
     const InterfaceInfo& interfaces() const { return interfaceInformation; }
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
-    uint64_t getQueueSize(InterfaceHandle id) const;
+    uint64_t getQueueSize(InterfaceHandle hid) const;
     /** get the sum of all message queue sizes i.e. the total number of messages available in all
      * endpoints*/
     uint64_t getQueueSize() const;
@@ -189,12 +191,12 @@ class FederateState {
     */
     int32_t getCurrentIteration() const;
     /** get the next available message for an endpoint
-    @param id the handle of an endpoint or filter
+    @param hid the handle of an endpoint or filter
     @return a pointer to a message -the ownership of the message is transferred to the caller*/
-    std::unique_ptr<Message> receive(InterfaceHandle id);
+    std::unique_ptr<Message> receive(InterfaceHandle hid);
     /** get any message ready for reception
-    @param[out] id the endpoint related to the message*/
-    std::unique_ptr<Message> receiveAny(InterfaceHandle& id);
+    @param[out] hid the endpoint related to the message*/
+    std::unique_ptr<Message> receiveAny(InterfaceHandle& hid);
     /**
      * Return the data for the specified handle or the latest input
      */
@@ -309,10 +311,26 @@ class FederateState {
     @return a convergence state value with an indicator of return reason and state of convergence
     */
     MessageProcessingResult processDelayQueue() noexcept;
+
+    std::optional<MessageProcessingResult>
+        checkProcResult(std::tuple<FederateStates, MessageProcessingResult, bool>& proc_result,
+                        ActionMessage& cmd);
     /** process a single message
     @return a convergence state value with an indicator of return reason and state of convergence
     */
     MessageProcessingResult processActionMessage(ActionMessage& cmd);
+
+    /** process a data connection management message
+     */
+    void processDataConnectionMessage(ActionMessage& cmd);
+
+    /** process a message containing data
+     */
+    void processDataMessage(ActionMessage& cmd);
+    /** run a timeout check*/
+    void timeoutCheck(ActionMessage& cmd);
+    /** process a logging message*/
+    void processLoggingMessage(ActionMessage& cmd);
     /** fill event list
     @param currentTime the time of the update
     */

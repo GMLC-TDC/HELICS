@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -406,15 +406,22 @@ class CommonCore: public Core, public BrokerBase {
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** deal with a query response addressed to this core*/
-    void processQueryResponse(const ActionMessage& m);
+    void processQueryResponse(const ActionMessage& message);
     /** manage query timeouts*/
     void checkQueryTimeouts();
     /** handle command with the core itself as a destination at the core*/
     void processCommandsForCore(const ActionMessage& cmd);
     /** process configure commands for the core*/
     void processCoreConfigureCommands(ActionMessage& cmd);
+    /** handle init messages*/
+    void processInitRequest(ActionMessage& cmd);
+    /** process and exec request command*/
+    void processExecRequest(ActionMessage& cmd);
     /** process commands related to disconnect messages*/
     void processDisconnectCommand(ActionMessage& cmd);
+
+    /** process a timing tick message */
+    void processTimingTick(ActionMessage& cmd);
     /** handle the processing for a query command*/
     void processQueryCommand(ActionMessage& cmd);
     /** handle logging and error related commands*/

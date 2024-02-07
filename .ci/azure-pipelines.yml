@@ -12,28 +12,28 @@ jobs:
     strategy:
       matrix:
         ubuntuDefault:
-          containerImage: 'helics/buildenv:ubuntu20.04-default-builder'
-          test_config: 'ci'
-          use_mpi: 'true'
-          encrypted: 'true'
+          containerImage: "helics/buildenv:ubuntu20.04-default-builder"
+          test_config: "ci"
+          use_mpi: "true"
+          encrypted: "true"
         gcc8:
-          containerImage: 'helics/buildenv:gcc8-builder'
-          test_config: 'ci'
-          use_mpi: 'true'
-          encrypted: 'true'
+          containerImage: "helics/buildenv:gcc8-builder"
+          test_config: "ci"
+          use_mpi: "true"
+          encrypted: "true"
         clang13:
-          containerImage: 'helics/buildenv:clang13-builder'
-          test_config: 'ci'
-          use_mpi: ''
-          encrypted: ''
+          containerImage: "helics/buildenv:clang13-builder"
+          test_config: "ci"
+          use_mpi: ""
+          encrypted: ""
         clang7:
-          containerImage: 'helics/buildenv:clang7-builder'
-          test_config: 'ci'
-          use_mpi: ''
-          encrypted: ''
+          containerImage: "helics/buildenv:clang7-builder"
+          test_config: "ci"
+          use_mpi: ""
+          encrypted: ""
 
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: "ubuntu-latest"
     container: $[ variables['containerImage'] ]
     timeoutInMinutes: 60
 
@@ -44,31 +44,31 @@ jobs:
           mkdir -p build && cd build
           ../scripts/ci-build.sh
         env:
-          MAKEFLAGS: '-j 4'
-          CMAKE_GENERATOR: 'Unix Makefiles'
-          USE_SWIG: 'true'
+          MAKEFLAGS: "-j 4"
+          CMAKE_GENERATOR: "Unix Makefiles"
+          USE_SWIG: "true"
           USE_MPI: $[variables['use_mpi']]
           ENCRYPTED: $[variables['encrypted']]
           ZMQ_SUBPROJECT: $[variables['zmq_subproject']]
           ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]
-        displayName: 'Build HELICS'
+        displayName: "Build HELICS"
 
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
         env:
           TEST_CONFIG: $[variables['test_config']]
-        workingDirectory: 'build'
-        displayName: 'Test HELICS'
+        workingDirectory: "build"
+        displayName: "Test HELICS"
 
   - job: macOS
     strategy:
       matrix:
         XCode-latest:
-          test_config: 'ci'
-          vmImage: 'macOS-12'
+          test_config: "ci"
+          vmImage: "macOS-13"
         XCode-oldest:
-          test_config: 'ci'
-          vmImage: 'macOS-11'
-          xcode_path: '/Applications/Xcode_11.7.app'
+          test_config: "ci"
+          vmImage: "macOS-12"
+          xcode_path: "/Applications/Xcode_13.2.1.app"
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 60
@@ -77,46 +77,46 @@ jobs:
       - bash: sudo xcode-select --switch "${XCODE_PATH}/Contents/Developer"
         env:
           XCODE_PATH: $[variables['xcode_path']]
-        displayName: 'Set XCode Path'
+        displayName: "Set XCode Path"
         condition: ne(variables['xcode_path'],'')
       - bash: |
           brew install swig zeromq boost
-        displayName: 'Install dependencies'
+        displayName: "Install dependencies"
       - bash: |
           unset VCPKG_ROOT
           source scripts/setup-helics-ci-options.sh
           mkdir -p build && cd build
           ../scripts/ci-build.sh
         env:
-          MAKEFLAGS: '-j 4'
-          CMAKE_GENERATOR: 'Unix Makefiles'
-          USE_SWIG: 'true'
-        displayName: 'Build HELICS'
+          MAKEFLAGS: "-j 4"
+          CMAKE_GENERATOR: "Unix Makefiles"
+          USE_SWIG: "true"
+        displayName: "Build HELICS"
 
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
         env:
           TEST_CONFIG: $[variables['test_config']]
-        workingDirectory: 'build'
-        displayName: 'Test HELICS'
+        workingDirectory: "build"
+        displayName: "Test HELICS"
 
   - job: Windows
     strategy:
       matrix:
         VS2019-32bit:
-          imageName: 'windows-2019'
-          langArch: 'x86'
-          vsArch: 'Win32'
-          extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON'
+          imageName: "windows-2019"
+          langArch: "x86"
+          vsArch: "Win32"
+          extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
         VS2019-64bit:
-          imageName: 'windows-2019'
-          langArch: 'x64'
-          vsArch: 'x64'
-          extraFlags: ''
+          imageName: "windows-2019"
+          langArch: "x64"
+          vsArch: "x64"
+          extraFlags: ""
         VS2022-64bit:
-          imageName: 'windows-2022'
-          langArch: 'x64'
-          vsArch: 'x64'
-          extraFlags: '-DCMAKE_CXX_STANDARD=20'
+          imageName: "windows-2022"
+          langArch: "x64"
+          vsArch: "x64"
+          extraFlags: "-DCMAKE_CXX_STANDARD=20"
 
     pool:
       vmImage: $(imageName)
@@ -157,7 +157,7 @@ jobs:
       - task: CMake@1
         inputs:
           cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
-        displayName: 'Configure HELICS'
+        displayName: "Configure HELICS"
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
       #  - task: CMake@1
@@ -170,7 +170,7 @@ jobs:
       # Build HELICS
       # -----------------------
       - bash: cmake --build . --config Release
-        displayName: 'Build HELICS'
+        displayName: "Build HELICS"
         workingDirectory: build
 
       # -----------------------
@@ -180,30 +180,30 @@ jobs:
           cpack_dir="$(which cmake)"
           cpack_dir="${cpack_dir%/cmake}"
           "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
-        displayName: 'Package HELICS'
+        displayName: "Package HELICS"
         workingDirectory: build
 
       - task: CopyFiles@2
         inputs:
-          sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
-          contents: '*.exe'
-          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          sourceFolder: "$(Build.SourcesDirectory)/build/installer-output"
+          contents: "*.exe"
+          TargetFolder: "$(Build.ArtifactStagingDirectory)"
 
       - task: PublishBuildArtifacts@1
         inputs:
-          pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          pathtoPublish: "$(Build.ArtifactStagingDirectory)"
           artifactName: installer
 
       # -----------------------
       # Test HELICS
       # -----------------------
       - bash: ctest --output-on-failure --timeout 440 -C Release -L "Continuous"
-        displayName: 'Test HELICS'
+        displayName: "Test HELICS"
         workingDirectory: build
 
       # Packaging tests
       - bash: ctest --output-on-failure --timeout 200 -C Release -L "PackagingFast"
-        displayName: 'Test HELICS packaging'
+        displayName: "Test HELICS packaging"
         workingDirectory: build
 
       # For debugging, can get build folder contents by adding PublishBuildArtifacts task and set pathtoPublish: '$(Build.SourcesDirectory)/build'

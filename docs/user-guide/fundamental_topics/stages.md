@@ -112,7 +112,7 @@ pub = h.helicsFederateGetPublicationByIndex(fed, index)
 pub_key = h.helicsPublicationGetKey(pub)
 ```
 
-The object returned when the helicsFederateGetPublicationByIndex() method is invoked is the handle used for retrieving other publication metadata (as in the helicsPublicationGetKey() method) and when publishing data to HELICS (as described in the execution section below).
+The object returned when the helicsFederateGetPublicationByIndex() method is invoked is the interface object used for retrieving other publication metadata (as in the helicsPublicationGetKey() method) and when publishing data to HELICS (as described in the execution section below).
 
 ## Initialization
 

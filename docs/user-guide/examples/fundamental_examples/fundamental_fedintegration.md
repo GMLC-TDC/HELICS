@@ -5,9 +5,9 @@ The Federate Integration Example extends the Base Example to demonstrate how to 
 - [Computing Environment](#computing-environment)
 - [Example files](#example-files)
 - [Federate Integration using the PyHELICS API](#federate-integration-using-the-pyhelics-api)
-  - [Translation from JSON to PyHELICS API methods](#translation-from-json-to-pyhelics-api)
+  - [Translation from JSON to PyHELICS API methods](#translation-from-json-to-pyhelics-api-methods)
   - [Federate Integration with API calls](#federate-integration-with-api-calls)
-  - [Dynamic Pub/Subs with API calls](#dynamic-pub-subs-with-api-calls)
+  - [Dynamic Pub/Subs with API calls](#dynamic-pubsubs-with-api-calls)
   - [Co-simulation Execution](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
@@ -187,7 +187,7 @@ Notice that we pass to this API the `fedinfo` set by all preceding API calls.
 
 ### Dynamic Pub/Subs with API calls
 
-In the Base Example, we configured the pubs and subs with an external JSON file, where _each_ publication and subscription between federate handles needed to be explicitly defined for a predetermined number of connections:
+In the Base Example, we configured the pubs and subs with an external JSON file, where _each_ publication and subscription between federate interfaces needed to be explicitly defined for a predetermined number of connections:
 
 ```json
 "publications":[
@@ -286,6 +286,6 @@ If your output is not the same as with the Base Example, it can be helpful to pi
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

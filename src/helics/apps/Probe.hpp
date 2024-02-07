@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -37,25 +37,25 @@ class HELICS_CXX_EXPORT Probe: public App {
 */
     Probe(int argc, char* argv[]);
     /** construct from a federate info object
-@param name the name of the source object (can be empty to use defaults from fi)
-@param fi a pointer info object containing information on the desired federate configuration
+@param name the name of the source object (can be empty to use defaults from fedInfo)
+@param fedInfo a pointer info object containing information on the desired federate configuration
 */
-    Probe(std::string_view name, const FederateInfo& fi);
+    Probe(std::string_view name, const FederateInfo& fedInfo);
     /**constructor taking a federate information structure and using the given core
-@param name the name of the source object (can be empty to use defaults from fi)
+@param name the name of the source object (can be empty to use defaults from fedInfo)
 @param core a pointer to core object which the federate can join
-@param fi  a federate information structure
+@param fedInfo  a federate information structure
 */
-    Probe(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+    Probe(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo);
 
     /**constructor taking a federate information structure and using the given core
-@param name the name of the federate (can be empty to use defaults from fi)
+@param name the name of the federate (can be empty to use defaults from fedInfo)
 @param core a coreApp object that can be joined
-@param fi  a federate information structure
+@param fedInfo  a federate information structure
 */
-    Probe(std::string_view name, CoreApp& core, const FederateInfo& fi);
+    Probe(std::string_view name, CoreApp& core, const FederateInfo& fedInfo);
     /**constructor taking a file with the required information
-@param name the name of the source object (can be empty to use defaults from fi)
+@param name the name of the source object (can be empty to use defaults from fedInfo)
 @param configString file a JSON or TOML file or string containing configuration informatino
 */
     Probe(std::string_view name, const std::string& configString);

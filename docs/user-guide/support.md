@@ -23,4 +23,4 @@ If you're having trouble with understanding what HELICS does, how to use HELICS,
 
 - **[Gitter](https://gitter.im/GMLC-TDC/HELICS)** - Live chat with developers (when they're logged in) for quick fix support.
 
-- **Virtual Office Hours** - HELICS developers have periodic open office hours where anybody can come and get hands-on help with understanding HELICS better or getting a particular feature to work. Contact helicsteam@helics.org for an invitation.
+- **Virtual Office Hours** - HELICS developers have periodic [open office hours](https://helics.org/HELICSOfficeHours.ics) where anybody can come and get hands-on help with understanding HELICS better or getting a particular feature to work.

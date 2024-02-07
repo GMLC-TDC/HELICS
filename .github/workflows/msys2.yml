@@ -42,13 +42,13 @@ jobs:
           mingw-w64-${{matrix.env}}-zeromq
           mingw-w64-${{matrix.env}}-boost
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: true
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: true
         ref: develop
@@ -59,6 +59,7 @@ jobs:
         CMAKE_GENERATOR: ${{matrix.gen}}
         DISABLE_INTERFACES: "Java"
         DISABLE_EXAMPLES: "true"
+        CXX_STANDARD: 20
         #ZMQ_SUBPROJECT: "true"
         #ZMQ_FORCE_SUBPROJECT: "true"
       run: |

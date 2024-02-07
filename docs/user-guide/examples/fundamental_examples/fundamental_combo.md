@@ -6,8 +6,6 @@ This tutorial is organized as follows:
 
 - [Example files](#example-files)
 - [Combination Federates](#combination-federates)
-  - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
-  - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
   - [Co-simulation Execution](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
@@ -228,6 +226,6 @@ How would you model an unknown demand for vehicle charging? How would you model 
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

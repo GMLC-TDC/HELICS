@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -1184,3 +1184,58 @@ TEST_P(vfed_simple_type_tests, test_info_field)
 
 INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
 INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes));
+
+TEST_F(vfed_single_tests, buffer_tests)
+{
+    HelicsTime gtime;
+    double val1 = 0;
+    double* val = &val1;
+    const double testValue1{4.565};
+    const double testValue2{-2624.262};
+    SetupTest(helicsCreateValueFederate, "test", 1, 1.0);
+    auto vFed = GetFederateAt(0);
+    // register the publications
+    auto pubid =
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
+    auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "", nullptr);
+
+    CE(helicsFederateEnterExecutingMode(vFed, &err));
+
+    // publish string1 at time=0.0;
+    CE(helicsPublicationPublishDouble(pubid, testValue1, &err));
+
+    CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
+    EXPECT_EQ(gtime, 1.0);
+
+    // get the value
+    CE(*val = helicsInputGetDouble(subid, &err));
+    // make sure the string is what we expect
+    EXPECT_EQ(*val, testValue1);
+
+    // publish a second value
+    auto buf1 = helicsCreateDataBuffer(20);
+    helicsDataBufferFillFromDouble(buf1, testValue2);
+
+    CE(helicsPublicationPublishDataBuffer(pubid, buf1, &err));
+
+    helicsDataBufferFree(buf1);
+    // make sure the value is still what we expect
+    CE(*val = helicsInputGetDouble(subid, &err));
+    EXPECT_EQ(*val, testValue1);
+
+    auto buffer = helicsInputGetDataBuffer(subid, nullptr);
+    EXPECT_EQ(helicsDataBufferIsValid(buffer), HELICS_TRUE);
+    EXPECT_EQ(helicsDataBufferType(buffer), HELICS_DATA_TYPE_DOUBLE);
+    EXPECT_EQ(helicsDataBufferToDouble(buffer), testValue1);
+
+    helicsDataBufferFree(buffer);
+    // advance time
+    CE(gtime = helicsFederateRequestTime(vFed, 2.0, &err));
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 2.0);
+
+    CE(*val = helicsInputGetDouble(subid, &err));
+    EXPECT_EQ(*val, testValue2);
+
+    CE(helicsFederateFinalize(vFed, &err));
+}

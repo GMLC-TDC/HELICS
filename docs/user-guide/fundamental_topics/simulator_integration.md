@@ -1,16 +1,18 @@
+# Simulator Integration
+
 A "simulator" is the executable program. As soon as one particular instance of that simulator begins running in a co-simulation it is considered a "federate". Every federate (instance of a simulator) will require configuration of the way it will communicate (send signals) to other federates in the federation. For simulators that already have HELICS support, the configuration takes the form of a JSON (or TOML) file; bespoke simulators can be configured with the HELICS APIs in the code or via a JSON file. The essential information that HELICS configuration defines is:
 
 **Federate name** - The unique name this federate will be known as throughout the federation. It is essential this name is unique so that HELICS messages can route properly.
 
 **Core type** - The core manages interfaces between the federation and the federate; there are several messaging technologies supported by HELICS.
 
-**Publications and Inputs** - Publication configuration contains a listing of source handle, data types, and units being sent by the federate; input configuration does the same for values being received by the federate. If supported by the simulator (e.g., [a Python simulator](../examples/fundamental_examples/fundamental_default.md)), these values can be mapped to internal variables of the simulator from the configuration file.
+**Publications and Inputs** - Publication configuration contains a listing of source interface name, data types, and units being sent by the federate; input configuration does the same for values being received by the federate. If supported by the simulator (e.g., [a Python simulator](../examples/fundamental_examples/fundamental_default.md)), these values can be mapped to internal variables of the simulator from the configuration file.
 
 **Endpoints** - Endpoints are sending and receiving points for HELICS messages to and from message federates. They are declared and defined for each federate.
 
 **Time step size** - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to step to a time of which it has no concept (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second).
 
-# Integration of Federates
+## Integration of Federates
 
 A co-simulation is, in some sense, a simulation of simulations. There will be two types of configuration required:
 
@@ -39,7 +41,7 @@ The figure below shows the most common architecture for HELICS co-simulation. Ea
 
 ## Configuring the federate
 
-Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#Using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
+Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
 
 ### Sample federate JSON configuration file
 
@@ -207,7 +209,7 @@ pub = h.helicsFederateGetPublicationByIndex(fed, index)
 pub_key = h.helicsPublicationGetKey(pub)
 ```
 
-The object returned when the helicsFederateGetPublicationByIndex() method is invoked is the handle used for retrieving other publication metadata (as in the helicsPublicationGetKey() method) and when publishing data to HELICS (as described in the execution section below).
+The object returned when the helicsFederateGetPublicationByIndex() method is invoked is the interface object used for retrieving other publication metadata (as in the helicsPublicationGetKey() method) and when publishing data to HELICS (as described in the execution section below).
 
 ### Federate Execution
 

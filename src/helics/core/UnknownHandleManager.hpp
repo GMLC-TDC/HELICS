@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -117,6 +117,15 @@ class UnknownHandleManager {
     */
     void processUnknowns(
         const std::function<void(const std::string& name, InterfaceType, TargetInfo)>& cfunc) const;
+
+    /** run a callback for each Unknown Link
+    @param cfunc a callback function with the signature of the name of the interface,
+    the interface type, the name of the target, and type of the target.
+    */
+    void processUnknownLinks(const std::function<void(const std::string& origin,
+                                                      InterfaceType,
+                                                      const std::string& target,
+                                                      InterfaceType)>& cfunc) const;
 };
 
 }  // namespace helics

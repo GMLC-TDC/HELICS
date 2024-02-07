@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -31,7 +31,8 @@ enum Subqueries : std::uint16_t {
     GLOBAL_TIME_DEBUGGING = 7,
     GLOBAL_FLUSH = 8,
     GLOBAL_STATUS = 9,
-    BARRIERS = 11
+    BARRIERS = 11,
+    UNCONNECTED_INTERFACES = 14
 };
 
 /// Enumeration of if query result is reusable

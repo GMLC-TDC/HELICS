@@ -1,12 +1,11 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InprocComms.h"
 
-#include "../../common/fmt_format.h"
 #include "../../core/ActionMessage.hpp"
 #include "../../core/BrokerFactory.hpp"
 #include "../../core/CommonCore.hpp"
@@ -14,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/CoreFactory.hpp"
 #include "../NetworkBrokerData.hpp"
 
+#include <fmt/format.h>
 #include <map>
 #include <memory>
 #include <string>

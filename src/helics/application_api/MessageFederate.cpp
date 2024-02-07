@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -18,44 +18,31 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& fi):
-    Federate(fedName, fi)
+MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& fedInfo):
+    Federate(fedName, fedInfo)
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
+    loadFederateData();
 }
 MessageFederate::MessageFederate(std::string_view fedName,
                                  const std::shared_ptr<Core>& core,
-                                 const FederateInfo& fi):
-    Federate(fedName, core, fi)
+                                 const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo)
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
+    loadFederateData();
 }
 
-MessageFederate::MessageFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi):
-    Federate(fedName, core, fi)
+MessageFederate::MessageFederate(std::string_view fedName,
+                                 CoreApp& core,
+                                 const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo)
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
+    loadFederateData();
 }
 
 MessageFederate::MessageFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
-    if (looksLikeFile(configString)) {
-        MessageFederate::registerInterfaces(configString);
-    }
+    loadFederateData();
 }
 
 MessageFederate::MessageFederate(const std::string& configString):
@@ -77,10 +64,7 @@ MessageFederate::MessageFederate(bool /*unused*/)
 {  // this constructor should only be called by child class that has already constructed the
    // underlying federate in
     // a virtual inheritance
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
-                                                         this,
-                                                         getID(),
-                                                         singleThreadFederate);
+    loadFederateData();
 }
 MessageFederate::MessageFederate(MessageFederate&&) noexcept = default;
 
@@ -96,6 +80,16 @@ MessageFederate& MessageFederate::operator=(MessageFederate&& mFed) noexcept
 
 MessageFederate::~MessageFederate() = default;
 
+void MessageFederate::loadFederateData()
+{
+    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
+                                                         this,
+                                                         getID(),
+                                                         singleThreadFederate);
+    if (!configFile.empty()) {
+        MessageFederate::registerMessageInterfaces(configFile);
+    }
+}
 void MessageFederate::disconnect()
 {
     Federate::disconnect();
@@ -171,7 +165,7 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
     using fileops::getOrDefault;
     addTargets(data, "flags", [&ept, fed](const std::string& target) {
         auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
-        int val = (target.front() != '-') ? 1 : 0;
+        const int val = (target.front() != '-') ? 1 : 0;
         if (oindex == HELICS_INVALID_OPTION_INDEX) {
             fed->logWarningMessage(target + " is not a recognized flag");
             return;
@@ -193,12 +187,26 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
     });
     addTargets(data, "subscriptions", [&ept](std::string_view sub) { ept.subscribe(sub); });
     addTargets(data, "filters", [&ept](std::string_view filt) { ept.addSourceFilter(filt); });
-    addTargets(data, "sourceFilters", [&ept](std::string_view filt) { ept.addSourceFilter(filt); });
+    addTargetVariations(data, "source", "inputs", [&ept](std::string_view ipt) {
+        ept.subscribe(ipt);
+    });
+    addTargetVariations(data, "source", "filters", [&ept](std::string_view filt) {
+        ept.addSourceFilter(filt);
+    });
+    addTargetVariations(data, "destination", "filters", [&ept](std::string_view filt) {
+        ept.addDestinationFilter(filt);
+    });
+    addTargetVariations(data, "source", "endpoints", [&ept](std::string_view endpoint) {
+        ept.addSourceEndpoint(endpoint);
+    });
+    addTargetVariations(data, "destination", "endpoints", [&ept](std::string_view endpoint) {
+        ept.addDestinationEndpoint(endpoint);
+    });
     addTargets(data, "destFilters", [&ept](std::string_view filt) {
         ept.addDestinationFilter(filt);
     });
 
-    auto defTarget = getOrDefault(data, "target", emptyStr);
+    auto defTarget = fileops::getOrDefault(data, "target", emptyStr);
     fileops::replaceIfMember(data, "destination", defTarget);
     if (!defTarget.empty()) {
         ept.setDefaultDestination(defTarget);
@@ -214,7 +222,7 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
         for (const auto& ept : doc["endpoints"]) {
             auto eptName = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
-            bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
+            const bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(eptName, type) : registerEndpoint(eptName, type);
 
@@ -252,7 +260,7 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
         for (auto& ept : eptArray) {
             auto key = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
-            bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
+            const bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(key, type) : registerEndpoint(key, type);
 
@@ -329,11 +337,11 @@ std::unique_ptr<Message> MessageFederate::getMessage(const Endpoint& ept)
 
 Endpoint& MessageFederate::getEndpoint(std::string_view eptName) const
 {
-    auto& id = mfManager->getEndpoint(eptName);
-    if (!id.isValid()) {
+    auto& ept = mfManager->getEndpoint(eptName);
+    if (!ept.isValid()) {
         return mfManager->getEndpoint(localNameGenerator(eptName));
     }
-    return id;
+    return ept;
 }
 
 Endpoint& MessageFederate::getDataSink(std::string_view sinkName) const

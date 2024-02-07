@@ -19,7 +19,7 @@ This example on [queries can be found here](https://github.com/GMLC-TDC/HELICS-E
 
 This example shows how to run queries on a federation and to use the output of the queries to configure a federate. Rather than a static configuration that is defined prior to runtime, this dynamic configuration can be useful for federations that change composition frequently.
 
-### Difference compared to the Advanced Default example
+### Differences compared to the Advanced Default example
 
 This example has the same federates interacting in the same ways as in the [Advanced Default example](./advanced_default.md). The only difference is the use of queries for dynamic configuration rather than static configuration.
 
@@ -125,6 +125,6 @@ Federate Charger (with id 131072) has the following subscriptions:
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

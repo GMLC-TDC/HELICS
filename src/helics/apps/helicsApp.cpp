@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsApp.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/TomlProcessingFunctions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
 #include "PrecHelper.hpp"
@@ -15,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,23 +37,23 @@ namespace helics::apps {
 App::App(std::string_view defaultAppName, std::vector<std::string> args)
 {
     auto app = generateParser();
-    FederateInfo fi;
-    fi.injectParser(app.get());
+    FederateInfo fedInfo;
+    fedInfo.injectParser(app.get());
     app->helics_parse(std::move(args));
-    processArgs(app, fi, defaultAppName);
+    processArgs(app, fedInfo, defaultAppName);
 }
 
 App::App(std::string_view defaultAppName, int argc, char* argv[])
 {
     auto app = generateParser();
-    FederateInfo fi;
-    fi.injectParser(app.get());
+    FederateInfo fedInfo;
+    fedInfo.injectParser(app.get());
     app->helics_parse(argc, argv);
-    processArgs(app, fi, defaultAppName);
+    processArgs(app, fedInfo, defaultAppName);
 }
 
 void App::processArgs(std::unique_ptr<helicsCLI11App>& app,
-                      FederateInfo& fi,
+                      FederateInfo& fedInfo,
                       std::string_view defaultAppName)
 {
     remArgs = app->remaining_for_passthrough();
@@ -64,42 +66,44 @@ void App::processArgs(std::unique_ptr<helicsCLI11App>& app,
         return;
     }
 
-    if (masterFileName.empty()) {
+    if (inputFileName.empty()) {
         if (!fileLoaded) {
             if (CLI::ExistingFile("helics.json").empty()) {
-                masterFileName = "helics.json";
+                inputFileName = "helics.json";
             }
         }
     }
 
-    if (fi.defName.empty()) {
-        fi.defName = defaultAppName;
+    if (fedInfo.defName.empty()) {
+        fedInfo.defName = defaultAppName;
     }
 
-    fed = std::make_shared<CombinationFederate>("", fi);
+    fed = std::make_shared<CombinationFederate>("", fedInfo);
+    configFileName = fed->getConfigFile();
 }
 
-App::App(std::string_view appName, const FederateInfo& fi):
-    fed(std::make_shared<CombinationFederate>(appName, fi))
+App::App(std::string_view appName, const FederateInfo& fedInfo):
+    fed(std::make_shared<CombinationFederate>(appName, fedInfo))
 {
+    configFileName = fed->getConfigFile();
 }
 
-App::App(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi):
-    fed(std::make_shared<CombinationFederate>(appName, core, fi))
+App::App(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo):
+    fed(std::make_shared<CombinationFederate>(appName, core, fedInfo))
 {
+    configFileName = fed->getConfigFile();
 }
 
-App::App(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-    fed(std::make_shared<CombinationFederate>(appName, core, fi))
+App::App(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+    fed(std::make_shared<CombinationFederate>(appName, core, fedInfo))
 {
+    configFileName = fed->getConfigFile();
 }
 
 App::App(std::string_view appName, const std::string& jsonString):
     fed(std::make_shared<CombinationFederate>(appName, jsonString))
 {
-    if (jsonString.size() < 200) {
-        masterFileName = jsonString;
-    }
+    configFileName = fed->getConfigFile();
 }
 
 App::~App() = default;
@@ -112,52 +116,162 @@ std::unique_ptr<helicsCLI11App> App::generateParser()
     app->add_flag("--local",
                   useLocal,
                   "Specify otherwise unspecified endpoints and publications as local "
-                  "(i.e. the names will be prepended with the player name)");
+                  "(i.e. the names will be prepended with the app name)");
     app->add_option("--stop", stopTime, "The time to stop the app");
-    app->add_option("--input,input", masterFileName, "The primary input file")
+    app->add_option("--input,input",
+                    inputFileName,
+                    "The primary input file containing app configuration")
         ->check(CLI::ExistingFile);
     app->allow_extras()->validate_positionals();
     return app;
 }
 
-void App::loadFile(const std::string& filename)
+void App::loadFile(const std::string& filename, bool enableFederateInterfaceRegistration)
 {
     if (fileops::hasJsonExtension(filename)) {
-        loadJsonFile(filename);
+        loadJsonFile(filename, enableFederateInterfaceRegistration);
+    } else if (fileops::hasTomlExtension(filename)) {
+        if (enableFederateInterfaceRegistration) {
+            fed->registerInterfaces(filename);
+        } else {
+            fed->logWarningMessage("Toml files are not support for app configuration");
+        }
     } else {
         loadTextFile(filename);
     }
 }
 
-void App::loadTextFile(const std::string& textFile)
-{
-    // using namespace gmlc::utilities::stringOps;
-    std::ifstream infile(textFile);
-    std::string str;
+AppTextParser::AppTextParser(const std::string& filename): filePtr(filename), mFileName(filename) {}
 
+std::vector<int> AppTextParser::preParseFile(const std::vector<char>& klines)
+{
+    reset();
+    std::vector<int> counts(1 + klines.size());
+    std::string str;
+    bool inMline{false};
     // count the lines
-    while (std::getline(infile, str)) {
+    while (std::getline(filePtr, str)) {
         if (str.empty()) {
             continue;
         }
         auto fc = str.find_first_not_of(" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#')) {
+        if (fc == std::string::npos) {
+            continue;
+        }
+        if (inMline) {
+            if (fc + 2 < str.size()) {
+                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']')) {
+                    inMline = false;
+                }
+            }
+            continue;
+        }
+        if (str[fc] == '#') {
+            if (fc + 2 < str.size()) {
+                if ((str[fc + 1] == '#') && (str[fc + 2] == '[')) {
+                    inMline = true;
+                }
+            }
             continue;
         }
         if (str[fc] == '!') {
+            configStr += str.substr(fc + 1);
+            configStr.push_back('\n');
+            continue;
         }
+
+        ++counts[0];
+        for (int ii = 0; ii < klines.size(); ++ii) {
+            if (str[fc] == klines[ii]) {
+                ++counts[ii + 1];
+            }
+        }
+    }
+    return counts;
+}
+
+bool AppTextParser::loadNextLine(std::string& line, int& lineNumber)
+{
+    while (std::getline(filePtr, line)) {
+        ++currentLineNumber;
+        if (line.empty()) {
+            continue;
+        }
+        auto fc = line.find_first_not_of(" \t\n\r\0");
+        if (fc == std::string::npos) {
+            continue;
+        }
+        if (mLineComment) {
+            if (fc + 2 < line.size()) {
+                if ((line[fc] == '#') && (line[fc + 1] == '#') && (line[fc + 2] == ']')) {
+                    mLineComment = false;
+                }
+            }
+            continue;
+        }
+        if (line[fc] == '#') {
+            if (fc + 2 < line.size()) {
+                if ((line[fc + 1] == '#') && (line[fc + 2] == '[')) {
+                    mLineComment = true;
+                }
+            }
+            continue;
+        }
+        if (line[fc] == '!') {
+            continue;
+        }
+        lineNumber = currentLineNumber;
+        return true;
+    }
+    return false;
+}
+
+void AppTextParser::reset()
+{
+    filePtr.close();
+    filePtr.open(mFileName);
+    mLineComment = false;
+}
+
+void App::loadConfigOptions(AppTextParser& aparser)
+{
+    if (!aparser.configString().empty()) {
+        auto app = generateParser();
+        std::istringstream sstr(aparser.configString());
+        app->parse_from_stream(sstr);
     }
 }
 
-void App::loadJsonFile(const std::string& jsonString)
+void App::loadTextFile(const std::string& textFile)
 {
-    loadJsonFileConfiguration("application", jsonString);
+    AppTextParser aparser(textFile);
+    aparser.preParseFile({});
+    loadConfigOptions(aparser);
 }
 
-void App::loadJsonFileConfiguration(const std::string& appName, const std::string& jsonString)
+void App::loadInputFiles()
 {
-    fed->registerInterfaces(jsonString);
+    if (!configFileName.empty()) {
+        /** this one would have been loaded through the federate already*/
+        loadFile(configFileName, false);
+    }
+    if (!inputFileName.empty()) {
+        loadFile(inputFileName, true);
+    }
+}
 
+void App::loadJsonFile(const std::string& jsonString, bool enableFederateInterfaceRegistration)
+{
+    loadJsonFileConfiguration("application", jsonString, enableFederateInterfaceRegistration);
+}
+
+void App::loadJsonFileConfiguration(const std::string& appName,
+                                    const std::string& jsonString,
+                                    bool enableFederateInterfaceRegistration)
+{
+    if (enableFederateInterfaceRegistration) {
+        fed->registerInterfaces(jsonString);
+    }
     auto doc = fileops::loadJson(jsonString);
 
     if (doc.isMember("app")) {

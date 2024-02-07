@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -109,6 +109,11 @@ class HandleManager {
     /* search for handles based on a regex string and type*/
     std::vector<GlobalHandle> regexSearch(const std::string& regexExpression,
                                           InterfaceType type) const;
+    /** get all the aliases*/
+    const std::unordered_map<std::string_view, std::vector<std::string_view>>& getAliases() const
+    {
+        return aliases;
+    }
 
   private:
     void addSearchFields(const BasicHandleInfo& handle, int32_t index);

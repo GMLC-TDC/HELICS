@@ -6,12 +6,10 @@ on:
     branches:
       - develop
       - main
-      - helics2
   pull_request:
     branches:
       - develop
       - main
-      - helics2
 
 jobs:
   cpplint:
@@ -19,7 +17,7 @@ jobs:
     container: helics/buildenv:cpplint
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run cpplint
       run: cpplint --counting=detailed --recursive examples benchmarks src tests
 
@@ -29,7 +27,9 @@ jobs:
     container: helics/buildenv:clang-extra-tools
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run clang-tidy on changed files
       shell: bash
-      run: ./.github/actions/run-clang-tidy-pr.sh
+      run: |
+        git config --global --add safe.directory ${GITHUB_WORKSPACE}
+        ./.github/actions/run-clang-tidy-pr.sh

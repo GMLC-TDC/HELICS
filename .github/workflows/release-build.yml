@@ -5,9 +5,16 @@ on:
   workflow_dispatch:
     inputs:
       packages:
-        description: 'List of packages to build (everything, archive, msvc, installer, sharedlib)'
+        description: 'List of packages to build'
         required: true
         default: 'everything'
+        type: choice
+        options:
+          - everything
+          - archive
+          - msvc
+          - installer
+          - sharedlib
       commit:
         description: 'Commit-ish (tag, branchname, sha) for code to build (uses scripts from the same branch as the workflow)'
         default: ''
@@ -31,10 +38,10 @@ jobs:
       run: |
         unset DEPTH
         if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
-        echo "::set-output name=DEPTH::${DEPTH}"
+        echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event.action == 'published' || github.event_name == 'workflow_dispatch'
@@ -65,7 +72,7 @@ jobs:
       run: ./.github/actions/upload-release-asset.sh "artifact/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-source.tar.gz"
       
     - name: Upload artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: all-submodules-archive
         path: artifact
@@ -94,16 +101,16 @@ jobs:
       run: |
         unset DEPTH
         if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
-        echo "::set-output name=DEPTH::${DEPTH}"
+        echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -136,9 +143,9 @@ jobs:
       
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-installers
+        name: ${{ matrix.os }}-msvc-installers
         path: artifact
         
 #####################################
@@ -181,16 +188,16 @@ jobs:
       run: |
         unset DEPTH
         if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
-        echo "::set-output name=DEPTH::${DEPTH}"
+        echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -239,9 +246,9 @@ jobs:
 
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-installers
+        name: ${{ matrix.id }}-installers
         path: artifact
       
 #####################################
@@ -280,16 +287,16 @@ jobs:
       run: |
         unset DEPTH
         if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
-        echo "::set-output name=DEPTH::${DEPTH}"
+        echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -337,9 +344,9 @@ jobs:
       
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ runner.os }}-installers
+        name: ${{ matrix.id }}-sharedlib-installers
         path: artifact
         
 #####################################
@@ -351,31 +358,13 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       
-    - name: Get all submodules archive
-      uses: actions/download-artifact@v1
+    - name: Get all artifacts
+      uses: actions/download-artifact@v4
       with:
-        name: all-submodules-archive
         path: artifacts
-        
-    - name: Get Windows installers
-      uses: actions/download-artifact@v1
-      with:
-        name: Windows-installers
-        path: artifacts
-        
-    - name: Get macOS installers
-      uses: actions/download-artifact@v1
-      with:
-        name: macOS-installers
-        path: artifacts
-        
-    - name: Get Linux installers
-      uses: actions/download-artifact@v1
-      with:
-        name: Linux-installers
-        path: artifacts
+        merge-multiple: true
         
     - name: Create SHA-256 file
       run: cd artifacts && sha256sum * > "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
@@ -387,19 +376,17 @@ jobs:
       run: ./.github/actions/upload-release-asset.sh "artifacts/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
 
 #####################################
-# Send helics-version-update event(s)
+# Trigger helics-packaging workflows
 #####################################
   send-version-update-event:
-    name: Send helics-version-update event(s)
+    name: Trigger helics-packaging workflows
     needs: [generate-sha256]
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-      - name: Send event to helics-packaging
+      - name: Run helics_version_update workflow in helics-packaging
+        env:
+          GH_TOKEN: ${{ secrets.HELICS_PACKAGING_TOKEN }}
         run: |
-          HELICS_REPO="${{ github.repository }}"
           HELICS_VERSION="${{ github.event.release.tag_name }}"
-          curl -X POST --header 'authorization: Bearer ${{ secrets.HELICS_BOT_TOKEN }}' \
-               --url https://api.github.com/repos/GMLC-TDC/helics-packaging/dispatches \
-               --header 'content-type: application/json' \
-               --data "{\"event_type\":\"helics-version-update\",\"client_payload\":{\"repository\":\"${HELICS_REPO}\",\"tag_name\":\"${HELICS_VERSION}\",\"version\":\"${HELICS_VERSION#v}\"}}"
+          gh workflow run --repo GMLC-TDC/helics-packaging helics_version_update.yml -f version="${HELICS_VERSION#v}"

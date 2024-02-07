@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -16,15 +16,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/libguarded/shared_guarded.hpp"
-#include "helics/common/fmt_format.h"
 #include "helics/helics-config.h"
 #include "helicsCLI11.hpp"
 
 #include <cassert>
 #include <cstring>
+#include <fmt/format.h>
 #include <tuple>
 #include <utility>
 
+// NOLINTNEXTLINE
 DECLARE_TRIPLINE()
 
 namespace helics::CoreFactory {
@@ -36,17 +37,17 @@ static constexpr std::string_view gHelicsEmptyString;
 that call it so it needs to be a static member of function call*/
 class MasterCoreBuilder {
   public:
-    using BuildT = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
+    using BuilderData = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
 
-    static void addBuilder(std::shared_ptr<CoreBuilder> cb, std::string_view name, int code)
+    static void addBuilder(std::shared_ptr<CoreBuilder> builder, std::string_view name, int code)
     {
-        instance()->builders.emplace_back(code, name, std::move(cb));
+        instance()->builders.emplace_back(code, name, std::move(builder));
     }
     static const std::shared_ptr<CoreBuilder>& getBuilder(int code)
     {
-        for (auto& bb : instance()->builders) {
-            if (std::get<0>(bb) == code) {
-                return std::get<2>(bb);
+        for (auto& builder : instance()->builders) {
+            if (std::get<0>(builder) == code) {
+                return std::get<2>(builder);
             }
         }
         throw(HelicsException("core type is not available"));
@@ -61,7 +62,7 @@ class MasterCoreBuilder {
     }
     static const std::shared_ptr<MasterCoreBuilder>& instance()
     {
-        static std::shared_ptr<MasterCoreBuilder> iptr(new MasterCoreBuilder());
+        static const std::shared_ptr<MasterCoreBuilder> iptr(new MasterCoreBuilder());
         return iptr;
     }
     static size_t size()
@@ -82,12 +83,12 @@ class MasterCoreBuilder {
     /** private constructor since we only really want one of them
     accessed through the instance static member*/
     MasterCoreBuilder() = default;
-    std::vector<BuildT> builders;  //!< container for the different builders
+    std::vector<BuilderData> builders;  //!< container for the different builders
 };
 
-void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, std::string_view name, int code)
+void defineCoreBuilder(std::shared_ptr<CoreBuilder> builder, std::string_view name, int code)
 {
-    MasterCoreBuilder::addBuilder(std::move(cb), name, code);
+    MasterCoreBuilder::addBuilder(std::move(builder), name, code);
 }
 
 std::vector<std::string> getAvailableCoreTypes()
@@ -123,8 +124,8 @@ std::shared_ptr<Core> getEmptyCore()
 
 Core* getEmptyCorePtr()
 {
-    static EmptyCore c1;
-    return &c1;
+    static EmptyCore eCore;
+    return &eCore;
 }
 
 std::shared_ptr<Core> create(std::string_view initializationString)
@@ -225,8 +226,7 @@ std::shared_ptr<Core>
     core = makeCore(type, coreName);
     core->configureFromVector(std::move(args));
 
-    bool success = registerCore(core, type);
-    if (!success) {
+    if (!registerCore(core, type)) {
         core = findCore(coreName);
         if (core) {
             return core;
@@ -246,8 +246,7 @@ std::shared_ptr<Core>
     core = makeCore(type, coreName);
     core->configure(configureString);
 
-    bool success = registerCore(core, type);
-    if (!success) {
+    if (!registerCore(core, type)) {
         core = findCore(coreName);
         if (core) {
             return core;
@@ -266,8 +265,7 @@ std::shared_ptr<Core> FindOrCreate(CoreType type, std::string_view coreName, int
     core = makeCore(type, coreName);
 
     core->configureFromArgs(argc, argv);
-    bool success = registerCore(core, type);
-    if (!success) {
+    if (!registerCore(core, type)) {
         core = findCore(coreName);
         if (core) {
             return core;
@@ -358,8 +356,8 @@ size_t cleanUpCores(std::chrono::milliseconds delay)
 void terminateAllCores()
 {
     auto cores = searchableCores.getObjects();
-    for (auto& cr : cores) {
-        cr->disconnect();
+    for (auto& core : cores) {
+        core->disconnect();
     }
     cleanUpCores(std::chrono::milliseconds(250));
 }
@@ -367,14 +365,14 @@ void terminateAllCores()
 void abortAllCores(int errorCode, std::string_view errorString)
 {
     auto cores = searchableCores.getObjects();
-    for (auto& cr : cores) {
-        cr->globalError(gLocalCoreId,
-                        errorCode,
-                        fmt::format("{} sent abort message: '{}'",
-                                    cr->getIdentifier(),
-                                    errorString));
+    for (auto& core : cores) {
+        core->globalError(gLocalCoreId,
+                          errorCode,
+                          fmt::format("{} sent abort message: '{}'",
+                                      core->getIdentifier(),
+                                      errorString));
 
-        cr->disconnect();
+        core->disconnect();
     }
     cleanUpCores(std::chrono::milliseconds(250));
 }
@@ -407,15 +405,15 @@ void displayHelp(CoreType type)
 {
     if (type == CoreType::DEFAULT || type == CoreType::UNRECOGNIZED) {
         std::cout << "All core types have similar options\n";
-        auto cr = makeCore(CoreType::DEFAULT, gHelicsEmptyString);
-        cr->configure(helpStr);
+        auto core = makeCore(CoreType::DEFAULT, gHelicsEmptyString);
+        core->configure(helpStr);
 #ifdef HELICS_ENABLE_TCP_CORE
-        cr = makeCore(CoreType::TCP_SS, gHelicsEmptyString);
-        cr->configure(helpStr);
+        core = makeCore(CoreType::TCP_SS, gHelicsEmptyString);
+        core->configure(helpStr);
 #endif
     } else {
-        auto cr = makeCore(type, gHelicsEmptyString);
-        cr->configure(helpStr);
+        auto core = makeCore(type, gHelicsEmptyString);
+        core->configure(helpStr);
     }
 }
 }  // namespace helics::CoreFactory

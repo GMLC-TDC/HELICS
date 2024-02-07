@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -52,8 +52,8 @@ void LogBuffer::process(
         return;
     }
     auto block = mBuffer.lock_shared();
-    for (const auto& lm : block) {
-        procFunc(std::get<0>(lm), std::get<1>(lm), std::get<2>(lm));
+    for (const auto& logMessage : *block) {
+        procFunc(std::get<0>(logMessage), std::get<1>(logMessage), std::get<2>(logMessage));
     }
 }
 

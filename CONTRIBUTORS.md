@@ -32,7 +32,6 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Ai Enkoji](https://github.com/aenkoji1)
 - [Nan Duan](https://github.com/nan-duan)
 - [Nathan Yee](https://github.com/yee29) (Now Accenture)
-- [Ai Enkoji](https://github.com/aenkoji1)
 
 ### National Renewable Energy Lab
 
@@ -76,7 +75,7 @@ CLI11 is a command line parser used throughout HELICS. Several modification used
 
 ### [toml11](https://github.com/ToruNiina/toml11)
 
-toml11 is a C\++11 header-only TOML parser/encoder depending only on the C++ standard library. Compatible with the latest version of TOML v0.5.0. toml11 is licensed under the [MIT](https://github.com/ToruNiina/toml11/blob/master/LICENSE) license. HELICS includes it through a submodule of a library [fork](https://github.com/GMLC-TDC/toml11) until the changes can be merged upstream.
+toml11 is a C\++11 header-only TOML parser/encoder depending only on the C++ standard library. Compatible with the latest version of TOML v1.0.0. toml11 is licensed under the [MIT](https://github.com/ToruNiina/toml11/blob/master/LICENSE) license. HELICS includes it through a submodule of a library [fork](https://github.com/GMLC-TDC/toml11) until the changes can be merged upstream.
 
 ### [GridDyn](https://github.com/LLNL/GridDyn)
 
@@ -139,7 +138,8 @@ Boost is used in a few places in the code. The IPC core uses the Boost.Interproc
 
 #### [zmq](http://www.zeromq.org)
 
-ZeroMQ is one of many backends that can be used by HELICS for message passing (ZMQ core networking). The automatic download currently uses version 4.3.1. No ZMQ library code is included in the HELICS source. HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified. Clarification on static linking being okay can be found in [this github issue](https://github.com/zeromq/libzmq/issues/3787). No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code. Currently the Windows installers and shared library builds static link ZeroMQ. When building from source it is an optional component and can be excluded by setting `HELICS_ENABLE_ZMQ_CORE` to `OFF`
+ZeroMQ is one of many backends that can be used by HELICS for message passing (ZMQ core networking). The automatic download currently uses version 4.3.5. No ZMQ library code is included in the HELICS source. HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [MPL](https://github.com/zeromq/libzmq/blob/master/LICENSE)
+Previous versions(prior to 4.3.5) were under LGPL with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified. Clarification on static linking being okay can be found in [this github issue](https://github.com/zeromq/libzmq/issues/3787). No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code. Currently the Windows installers and shared library builds static link ZeroMQ. When building from source it is an optional component and can be excluded by setting `HELICS_ENABLE_ZMQ_CORE` to `OFF`
 
 ### [Google Test](https://github.com/google/googletest)
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -7,12 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BaseTimeCoordinator.hpp"
 
-#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
 #include "json/json.h"
 #include <algorithm>
+#include <fmt/format.h>
 #include <iostream>
 #include <set>
 #include <string>
@@ -51,12 +51,12 @@ void BaseTimeCoordinator::enteringExecMode(IterationRequest /*mode*/)
         updateTimeFactors();
         auto res = dependencies.checkForIssues(false);
         if (res.first != 0) {
-            ActionMessage ge(CMD_GLOBAL_ERROR);
-            ge.dest_id = parent_broker_id;
-            ge.source_id = mSourceId;
-            ge.messageID = res.first;
-            ge.payload = res.second;
-            sendMessageFunction(ge);
+            ActionMessage error(CMD_GLOBAL_ERROR);
+            error.dest_id = parent_broker_id;
+            error.source_id = mSourceId;
+            error.messageID = res.first;
+            error.payload = res.second;
+            sendMessageFunction(error);
             return;
         }
     }
@@ -387,12 +387,12 @@ TimeProcessingResult BaseTimeCoordinator::processTimeMessage(const ActionMessage
     if (procRes == TimeProcessingResult::PROCESSED_AND_CHECK) {
         auto checkRes = dependencies.checkForIssues(false);
         if (checkRes.first != 0) {
-            ActionMessage ge(CMD_GLOBAL_ERROR);
-            ge.dest_id = parent_broker_id;
-            ge.source_id = mSourceId;
-            ge.messageID = checkRes.first;
-            ge.payload = checkRes.second;
-            sendMessageFunction(ge);
+            ActionMessage error(CMD_GLOBAL_ERROR);
+            error.dest_id = parent_broker_id;
+            error.source_id = mSourceId;
+            error.messageID = checkRes.first;
+            error.payload = checkRes.second;
+            sendMessageFunction(error);
         }
     }
     return procRes;

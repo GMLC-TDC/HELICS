@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -331,4 +331,85 @@ TEST_F(mfed_tests, message_create_from_ept_after)
 
     auto mFed1State = mFed1->getCurrentMode();
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
+}
+
+TEST_F(mfed_tests, dataBuffer)
+{
+    SetupTest<helicscpp::MessageFederate>("test", 1, 1.0);
+    auto mFed1 = GetFederateAs<helicscpp::MessageFederate>(0);
+
+    auto m1 = helicscpp::Message(*mFed1);
+
+    auto m2 = helicscpp::Message(*mFed1);
+    m1.data("raw data");
+
+    EXPECT_EQ(m1.size(), 8);
+    EXPECT_TRUE(m1.isValid());
+    EXPECT_STREQ(m1.c_str(), "raw data");
+
+    // test the connection between the buffer and message
+    EXPECT_EQ(m2.size(), 0);
+    EXPECT_FALSE(m2.isValid());
+    auto buffer = m2.dataBuffer();
+
+    EXPECT_TRUE(buffer.isValid());
+
+    mFed1->enterExecutingMode();
+    mFed1->finalize();
+}
+
+TEST(dataBuffer, buffer)
+{
+    helicscpp::DataBuffer buf1(345);
+    EXPECT_GE(buf1.capacity(), 345);
+    EXPECT_TRUE(buf1.reserve(1024));
+    EXPECT_GE(buf1.capacity(), 1024);
+    EXPECT_FALSE(buf1.reserve(-456));
+    std::string str1("this is a long string that I want to put in a buffer");
+    const char* str2 = "this is another string, that is fairly long that I want to put in a buffer";
+    buf1.fill(str1);
+    // +1 is to account for newline stringSize is the size required to hold the string
+    EXPECT_EQ(buf1.stringSize(), str1.size() + 1);
+    EXPECT_EQ(buf1.toString(), str1);
+    buf1.fill(str2);
+    EXPECT_EQ(buf1.toString(), str2);
+
+    EXPECT_EQ(buf1.type(), HELICS_DATA_TYPE_STRING);
+
+    auto buf2 = buf1.clone();
+    EXPECT_EQ(buf1.toString(), buf2.toString());
+
+    double tValue = 45.626525;
+    buf2.fill(tValue);
+    EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_DOUBLE);
+
+    buf2.convertToType(HELICS_DATA_TYPE_NAMED_POINT);
+
+    EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_NAMED_POINT);
+
+    buf2.convertToType(HELICS_DATA_TYPE_VECTOR);
+    EXPECT_EQ(buf2.vectorSize(), 1);
+
+    EXPECT_EQ(buf2.toDouble(), tValue);
+}
+
+TEST(dataBuffer, bufferMemory)
+{
+    std::string v1;
+    v1.resize(1024, '\0');
+    helicscpp::DataBuffer buf1(v1.data(), 0, static_cast<int>(v1.size()));
+    EXPECT_EQ(buf1.capacity(), v1.size());
+    EXPECT_EQ(buf1.size(), 0);
+    buf1.fill(std::vector<double>{34.673, 19.1514, 1e-45});
+    helicscpp::DataBuffer buf2(v1.data(),
+                               static_cast<int>(buf1.size()),
+                               static_cast<int>(v1.capacity()));
+
+    EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_VECTOR);
+
+    EXPECT_FALSE(buf1.reserve(2048));
+    buf2.convertToType(HELICS_DATA_TYPE_STRING);
+    // checking linkage here
+    EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_STRING);
+    EXPECT_EQ(buf1.type(), HELICS_DATA_TYPE_STRING);
 }
