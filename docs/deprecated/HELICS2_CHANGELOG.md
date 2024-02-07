@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 A note on future revisions.
-Everything within a major version number should be code compatible (with the exception of experimental interfaces). Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
+Everything within a major version number should be code compatible (with the exception of experimental interfaces). Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./Public_API.md) for details on what is included and excluded from the public API and version stability.
 
 ## [2.8.1][] - 2022-06-09
 
@@ -541,7 +541,7 @@ Minor release with bug fixes and a few additional features
 - helics apps tests is converted to use Google test and is now being run through the sanitizers
 - **BREAKING CHANGE** The C interface helics logging callback specifications now include a user data object. This is technically a breaking change, but there were a few issues with the current implementation so it is not entirely clear it was usable as it was. There are now some tests for the functionality. This log callback specification was not available in the language API's and the C++ API has not changed, only the C interface to specifying direct logging callbacks. This is considered a minor change due to no known users of this interface at present and as it was it wasn't entirely operational. No further changes are expected.
 - The use of Boost C++ in the helics core and application api are now limited to the IPC core(there are no plans to remove this usage) and an option to `DISABLE_BOOST` is available in the CMAKE files. This will turn off the IPC_CORE and any optional uses of boost in some of the libraries. Future features may use Boost but should retain the ability to disable its use.
-- **BREAKING CHANGE** Some function names in the C\+\+98 API were changed to better match the C\+\+ API and were documented more completely through doxygen, these were listed as potentially changing in the [Public API](/docs/Public_API.md) so this is not a consideration for semantic versioning. The C++98 API also has limited numbers of users at this point yet and may not be fully stable until HELICS 3.0 release
+- **BREAKING CHANGE** Some function names in the C\+\+98 API were changed to better match the C\+\+ API and were documented more completely through doxygen, these were listed as potentially changing in the [Public API](./Public_API.md) so this is not a consideration for semantic versioning. The C++98 API also has limited numbers of users at this point yet and may not be fully stable until HELICS 3.0 release
 - The doxygen CMake project was renamed from `doc` to `helics_doxygen`
 - several variables used by submodules in CMake were hidden
 - updated zmq subproject version to 4.3.2
@@ -739,7 +739,7 @@ This is a major revision so this changelog will not capture all the changes that
 - some additional tests for the shared library
 - TOML readers for interface description in Federates
 - interactive command line for helics_broker
-- a few new queries on brokers see [Queries](docs/user_guide/Queries.md)
+- a few new queries on brokers see [Queries](./user-guide/advanced_topics/queries.md)
 - CPACK can now build a dmg files
 - Players can have multiline comments in input file and omit the tag for repeated messages
 - marker option on player, recorder, tracer to print time advancement message
