@@ -28,6 +28,6 @@ This utilizes a tool we call `helics_cli` that is (optionally) [installed with t
 
     fundamental_examples/fundamental_examples_index
     advanced_examples/advanced_examples_index
-    supported_language_examples_index
+    supported_languages_examples/supported_languages_examples_index
     misc_examples/misc_examples_index
 ```
