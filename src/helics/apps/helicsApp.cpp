@@ -235,7 +235,7 @@ void AppTextParser::reset()
 
 void App::loadConfigOptions(AppTextParser& aparser)
 {
-    const auto &configStr=aparser.configString();
+    const auto& configStr = aparser.configString();
     if (!configStr.empty()) {
         auto app = generateParser();
         std::istringstream sstr(configStr);
