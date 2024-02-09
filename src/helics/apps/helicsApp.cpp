@@ -203,7 +203,8 @@ bool AppTextParser::loadNextLine(std::string& line, int& lineNumber)
         }
         if (mLineComment) {
             if (firstChar + 2 < line.size()) {
-                if ((line[firstChar] == '#') && (line[firstChar + 1] == '#') && (line[firstChar + 2] == ']')) {
+                if ((line[firstChar] == '#') && (line[firstChar + 1] == '#') &&
+                    (line[firstChar + 2] == ']')) {
                     mLineComment = false;
                 }
             }
