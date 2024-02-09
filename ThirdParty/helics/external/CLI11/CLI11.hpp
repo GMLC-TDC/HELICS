@@ -8914,7 +8914,7 @@ CLI11_INLINE void App::_process_env() {
 
     for(App_p &sub : subcommands_) {
         if(sub->get_name().empty() || !sub->parse_complete_callback_) {
-            if(sub->count_all() > 0) {
+            if(sub->count_all() > 0 || sub->get_name().empty()) {
                 // only process environment variables if the callback has actually been triggered already
                 sub->_process_env();
             }
