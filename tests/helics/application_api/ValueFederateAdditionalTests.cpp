@@ -1321,6 +1321,4 @@ TEST_P(vfedPermutation, value_linking_order_permutations)
     vFed2->finalize();
 }
 
-INSTANTIATE_TEST_SUITE_P(OrderPermutations,
-                         vfedPermutation,
-                         testing::Range(0, 5 * 4 * 3 * 2 * 1));
+INSTANTIATE_TEST_SUITE_P(OrderPermutations, vfedPermutation, testing::Range(0, 5 * 4 * 3 * 2 * 1));

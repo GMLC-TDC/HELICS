@@ -14,9 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value federates
  */
 
-class vfedSimpleType:
-    public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {};
+class vfedSimpleType: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 class cfedType: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
@@ -368,7 +366,7 @@ TEST_P(cfedType, single_transfer)
 {
     // HelicsTime stime = 1.0;
     HelicsTime gtime;
-    static constexpr int STRINGLEN{ 100 };
+    static constexpr int STRINGLEN{100};
     char string1[STRINGLEN] = "n2";
 
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
@@ -1114,7 +1112,7 @@ TEST_P(cfedType, subscriber_and_publisher_registration)
 
 TEST_P(cfedType, single_transfer_publisher)
 {
-    static constexpr int STRINGLEN{ 100 };
+    static constexpr int STRINGLEN{100};
 
     //    HelicsTime stime = 1.0;
     HelicsTime gtime;

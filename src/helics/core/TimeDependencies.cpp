@@ -25,7 +25,7 @@ static TimeProcessingResult processMessage(const ActionMessage& cmd, DependencyI
         case CMD_EXEC_REQUEST:
             dep.mTimeState = checkActionFlag(cmd, iteration_requested_flag) ?
                 (checkActionFlag(cmd, required_flag) ? TimeState::exec_requested_require_iteration :
-                                                     TimeState::exec_requested_iterative) :
+                                                       TimeState::exec_requested_iterative) :
                 TimeState::exec_requested;
             delayed = checkActionFlag(cmd, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
@@ -70,7 +70,7 @@ static TimeProcessingResult processMessage(const ActionMessage& cmd, DependencyI
             }
             dep.mTimeState = checkActionFlag(cmd, iteration_requested_flag) ?
                 (checkActionFlag(cmd, required_flag) ? TimeState::time_requested_require_iteration :
-                                                     TimeState::time_requested_iterative) :
+                                                       TimeState::time_requested_iterative) :
                 TimeState::time_requested;
             //   printf("%d Request from %d time %f, te=%f, Tdemin=%f\n", fedID, m.source_id,
             //   static_cast<double>(m.actionTime), static_cast<double>(m.Te),
@@ -603,9 +603,11 @@ bool TimeDependencies::hasActiveTimeDependencies() const
 
 bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sequenceCount)
 {
-    return std::all_of(dependencies.begin(), dependencies.end(), [tmin, sequenceCount](const auto& dep) {
-        return checkSequenceCounter(dep, tmin, sequenceCount);
-    });
+    return std::all_of(dependencies.begin(),
+                       dependencies.end(),
+                       [tmin, sequenceCount](const auto& dep) {
+                           return checkSequenceCounter(dep, tmin, sequenceCount);
+                       });
 }
 int TimeDependencies::activeDependencyCount() const
 {
@@ -711,16 +713,16 @@ static void generateMinTimeImplementation(TimeData& mTime,
                 mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.responseSequenceCounter = dep.sequenceCounter;
                 mTime.interrupted = dep.interrupted;
-            } else if (dep.restrictionLevel == mTime.restrictionLevel && dep.interrupted != mTime.interrupted) {
-                if (!dep.interrupted)
-                {
+            } else if (dep.restrictionLevel == mTime.restrictionLevel &&
+                       dep.interrupted != mTime.interrupted) {
+                if (!dep.interrupted) {
                     mTime.minFed = dep.fedID;
                     mTime.delayedTiming = dep.delayedTiming;
                     mTime.restrictionLevel = dep.restrictionLevel;
                     mTime.sequenceCounter = dep.sequenceCounter;
                     mTime.responseSequenceCounter = dep.sequenceCounter;
                     mTime.interrupted = false;
-                }   
+                }
             } else if (dep.restrictionLevel == mTime.restrictionLevel && dep.fedID < mTime.minFed) {
                 mTime.minFed = dep.fedID;
                 mTime.delayedTiming = dep.delayedTiming;
