@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 #include <gtest/gtest.h>
+#include <algorithm>
+#include <numeric>
 
 /** these test cases test out the value federates with some additional tests
  */
@@ -1276,3 +1278,50 @@ TEST(valuefederate, duplicate_targets)
 
     Fed1->finalize();
 }
+
+
+class vfed_permutation_tests: public ::testing::TestWithParam<int>, public FederateTestFixture {};
+
+TEST_P(vfed_permutation_tests, value_linking_order_permutations)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    helics::CoreApp core(vFed1->getCorePointer());
+
+    std::vector<std::function<void()>> exList(5);
+    std::vector<int> exOrder(5);
+    std::iota(exOrder.begin(), exOrder.end(), 0);
+
+    int permutations = GetParam();
+    for (int kk = 0; kk < permutations; ++kk) {
+        std::next_permutation(exOrder.begin(), exOrder.end());
+    }
+    exList[0] = [&vFed1]() { vFed1->registerGlobalInput("dest_input","double"); };
+    exList[1] = [&vFed2]() { vFed2->registerGlobalPublication("source_pub","double"); };
+    exList[2] = [&core]() { core->addAlias("dest_input", "dest"); };
+    exList[3] = [&core]() { core->addAlias("source_pub", "source"); };
+    exList[4] = [&core]() { core->dataLink("source", "dest"); };
+
+    for (int ii = 0; ii < 5; ++ii) {
+        exList[exOrder[ii]]();
+    }
+    auto& inp1 = vFed1->getInput("dest_input");
+    auto& pub1 = vFed2->getPublication("source_pub");
+    vFed2->enterExecutingModeAsync();
+    vFed1->enterExecutingMode();
+    vFed2->enterExecutingModeComplete();
+    pub1.publish(37.6);
+    vFed2->requestTimeAsync(0);
+    vFed1->requestNextStep();
+    vFed2->requestTimeComplete();
+    EXPECT_TRUE(inp1.isUpdated());
+    auto m = inp1.getDouble();
+    EXPECT_EQ(m, 37.6);
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+INSTANTIATE_TEST_SUITE_P(OrderPermutations,
+    vfed_permutation_tests,
+    testing::Range(0, 5 * 4 * 3 * 2 * 1));

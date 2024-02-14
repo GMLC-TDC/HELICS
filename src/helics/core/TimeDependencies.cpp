@@ -702,6 +702,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.restrictionLevel = dep.restrictionLevel;
             mTime.sequenceCounter = dep.sequenceCounter;
             mTime.responseSequenceCounter = dep.responseSequenceCounter;
+            mTime.interrupted = dep.interrupted;
         } else if (dep.mTimeState == mTime.mTimeState) {
             if (dep.restrictionLevel < mTime.restrictionLevel) {
                 mTime.minFed = dep.fedID;
@@ -709,11 +710,22 @@ static void generateMinTimeImplementation(TimeData& mTime,
                 mTime.restrictionLevel = dep.restrictionLevel;
                 mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.responseSequenceCounter = dep.sequenceCounter;
+                mTime.interrupted = dep.interrupted;
+            }
+            else if (!dep.interrupted && mTime.interrupted)
+            {
+                mTime.minFed = dep.fedID;
+                mTime.delayedTiming = dep.delayedTiming;
+                mTime.restrictionLevel = dep.restrictionLevel;
+                mTime.sequenceCounter = dep.sequenceCounter;
+                mTime.responseSequenceCounter = dep.sequenceCounter;
+                mTime.interrupted = dep.interrupted;
             } else if (dep.restrictionLevel == mTime.restrictionLevel && dep.fedID < mTime.minFed) {
                 mTime.minFed = dep.fedID;
                 mTime.delayedTiming = dep.delayedTiming;
                 mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.responseSequenceCounter = dep.sequenceCounter;
+                mTime.interrupted = dep.interrupted;
             }
         }
         mTime.next = initializationTime;

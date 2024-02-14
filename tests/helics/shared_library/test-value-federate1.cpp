@@ -22,6 +22,10 @@ class vfed_type_tests: public ::testing::TestWithParam<const char*>, public Fede
 
 class vfed_single_tests: public ::testing::Test, public FederateTestFixture {};
 
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
+
 /** test simple creation and destruction*/
 TEST_P(vfed_simple_type_tests, initialize_tests)
 {
@@ -1052,6 +1056,7 @@ TEST_P(vfed_type_tests, single_transfer_complex_vector)
 
 TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
 {
+    helicsCleanupLibrary();
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
     auto vFed = GetFederateAt(0);
 
@@ -1104,6 +1109,7 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
     EXPECT_STREQ(pubunit3, "V");
 
     CE(helicsFederateFinalize(vFed, &err));
+    helicsCleanupLibrary();
 }
 
 TEST_P(vfed_type_tests, single_transfer_publisher)
@@ -1182,8 +1188,8 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     EXPECT_EQ(wait, HELICS_TRUE);
 }
 
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple),testNamer);
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes),testNamer);
 
 TEST_F(vfed_single_tests, buffer_tests)
 {
