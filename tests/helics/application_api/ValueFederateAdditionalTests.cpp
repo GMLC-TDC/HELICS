@@ -14,9 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "testFixtures.hpp"
 
+#include <algorithm>
 #include <future>
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <numeric>
 
 /** these test cases test out the value federates with some additional tests
@@ -1279,7 +1279,6 @@ TEST(valuefederate, duplicate_targets)
     Fed1->finalize();
 }
 
-
 class vfed_permutation_tests: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
 TEST_P(vfed_permutation_tests, value_linking_order_permutations)
@@ -1297,8 +1296,8 @@ TEST_P(vfed_permutation_tests, value_linking_order_permutations)
     for (int kk = 0; kk < permutations; ++kk) {
         std::next_permutation(exOrder.begin(), exOrder.end());
     }
-    exList[0] = [&vFed1]() { vFed1->registerGlobalInput("dest_input","double"); };
-    exList[1] = [&vFed2]() { vFed2->registerGlobalPublication("source_pub","double"); };
+    exList[0] = [&vFed1]() { vFed1->registerGlobalInput("dest_input", "double"); };
+    exList[1] = [&vFed2]() { vFed2->registerGlobalPublication("source_pub", "double"); };
     exList[2] = [&core]() { core->addAlias("dest_input", "dest"); };
     exList[3] = [&core]() { core->addAlias("source_pub", "source"); };
     exList[4] = [&core]() { core->dataLink("source", "dest"); };
@@ -1323,5 +1322,5 @@ TEST_P(vfed_permutation_tests, value_linking_order_permutations)
 }
 
 INSTANTIATE_TEST_SUITE_P(OrderPermutations,
-    vfed_permutation_tests,
-    testing::Range(0, 5 * 4 * 3 * 2 * 1));
+                         vfed_permutation_tests,
+                         testing::Range(0, 5 * 4 * 3 * 2 * 1));

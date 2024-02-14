@@ -1188,8 +1188,11 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     EXPECT_EQ(wait, HELICS_TRUE);
 }
 
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple),testNamer);
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes),testNamer);
+INSTANTIATE_TEST_SUITE_P(vfed_tests,
+                         vfed_simple_type_tests,
+                         ::testing::ValuesIn(CoreTypes_simple),
+                         testNamer);
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes), testNamer);
 
 TEST_F(vfed_single_tests, buffer_tests)
 {

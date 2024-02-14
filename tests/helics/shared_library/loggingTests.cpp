@@ -58,7 +58,7 @@ TEST(logging_tests, check_log_message)
             found = true;
         }
     }
-    
+
     /*if (!found) {
         for (auto& message : *llock) {
             std::cout << "message (" << message.first << ") ::" << message.second << std::endl;

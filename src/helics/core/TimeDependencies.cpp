@@ -711,9 +711,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
                 mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.responseSequenceCounter = dep.sequenceCounter;
                 mTime.interrupted = dep.interrupted;
-            }
-            else if (!dep.interrupted && mTime.interrupted)
-            {
+            } else if (!dep.interrupted && mTime.interrupted) {
                 mTime.minFed = dep.fedID;
                 mTime.delayedTiming = dep.delayedTiming;
                 mTime.restrictionLevel = dep.restrictionLevel;
