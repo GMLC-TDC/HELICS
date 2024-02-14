@@ -142,17 +142,17 @@ class TimeDependencies {
     /** insert a dependency into the structure
     @return true if the dependency was added, false if it existed already
     */
-    bool addDependency(GlobalFederateId id);
+    bool addDependency(GlobalFederateId gid);
     /** remove  dependency from consideration*/
-    void removeDependency(GlobalFederateId id);
+    void removeDependency(GlobalFederateId gid);
     /** update the info about a dependency based on a message*/
-    bool addDependent(GlobalFederateId id);
+    bool addDependent(GlobalFederateId gid);
     /** remove  dependent from consideration*/
-    void removeDependent(GlobalFederateId id);
+    void removeDependent(GlobalFederateId gid);
     /** remove an interdependency from consideration*/
-    void removeInterdependence(GlobalFederateId id);
+    void removeInterdependence(GlobalFederateId gid);
     /** update the info about a dependency based on a message*/
-    TimeProcessingResult updateTime(const ActionMessage& m);
+    TimeProcessingResult updateTime(const ActionMessage& cmd);
     /** get the number of dependencies*/
     auto size() const { return dependencies.size(); }
     /** iterator to first dependency*/
@@ -171,10 +171,10 @@ class TimeDependencies {
     /**  check if there are no dependencies*/
     bool empty() const { return dependencies.empty(); }
     /** get a pointer to the dependency information for a particular object*/
-    const DependencyInfo* getDependencyInfo(GlobalFederateId id) const;
+    const DependencyInfo* getDependencyInfo(GlobalFederateId gid) const;
 
     /** get a pointer to the dependency information for a particular object*/
-    DependencyInfo* getDependencyInfo(GlobalFederateId id);
+    DependencyInfo* getDependencyInfo(GlobalFederateId gid);
 
     /** check if the dependencies would allow entry to exec mode*/
     bool checkIfReadyForExecEntry(bool iterating, bool waiting) const;
@@ -199,7 +199,7 @@ class TimeDependencies {
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies() const;
     /** verify that all the sequence Counters match*/
-    bool verifySequenceCounter(Time tmin, std::int32_t sq);
+    bool verifySequenceCounter(Time tmin, std::int32_t sequenceCount);
     /** get a count of the active dependencies*/
     int activeDependencyCount() const;
     /** get a count of the active dependencies*/

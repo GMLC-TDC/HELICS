@@ -17,25 +17,25 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInfo& dep)
+static TimeProcessingResult processMessage(const ActionMessage& cmd, DependencyInfo& dep)
 {
     TimeProcessingResult res{TimeProcessingResult::PROCESSED};
     bool delayed{false};
-    switch (m.action()) {
+    switch (cmd.action()) {
         case CMD_EXEC_REQUEST:
-            dep.mTimeState = checkActionFlag(m, iteration_requested_flag) ?
-                (checkActionFlag(m, required_flag) ? TimeState::exec_requested_require_iteration :
+            dep.mTimeState = checkActionFlag(cmd, iteration_requested_flag) ?
+                (checkActionFlag(cmd, required_flag) ? TimeState::exec_requested_require_iteration :
                                                      TimeState::exec_requested_iterative) :
                 TimeState::exec_requested;
-            delayed = checkActionFlag(m, delayed_timing_flag);
+            delayed = checkActionFlag(cmd, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
                 res = TimeProcessingResult::PROCESSED_AND_CHECK;
             }
             dep.delayedTiming = delayed;
-            dep.restrictionLevel = m.messageID;
-            dep.sequenceCounter = m.counter;
-            dep.minFed = GlobalFederateId(m.getExtraData());
-            dep.responseSequenceCounter = m.getExtraDestData();
+            dep.restrictionLevel = cmd.messageID;
+            dep.sequenceCounter = cmd.counter;
+            dep.minFed = GlobalFederateId(cmd.getExtraData());
+            dep.responseSequenceCounter = cmd.getExtraDestData();
             if (dep.connection == ConnectionType::SELF) {
                 dep.responseSequenceCounter = dep.sequenceCounter;
             }
@@ -44,7 +44,7 @@ static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInf
             }
             break;
         case CMD_EXEC_GRANT:
-            if (!checkActionFlag(m, iteration_requested_flag)) {
+            if (!checkActionFlag(cmd, iteration_requested_flag)) {
                 dep.mTimeState = TimeState::time_granted;
                 dep.next = timeZero;
                 dep.minDe = timeZero;
@@ -57,7 +57,7 @@ static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInf
                 dep.minFed = GlobalFederateId{};
             } else {
                 dep.mTimeState = TimeState::initialized;
-                dep.sequenceCounter = m.counter;
+                dep.sequenceCounter = cmd.counter;
                 dep.responseSequenceCounter = 0;
                 dep.restrictionLevel = 0;
             }
@@ -68,30 +68,30 @@ static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInf
                 dep.lastGrant = dep.next;
                 res = TimeProcessingResult::PROCESSED_NEW_REQUEST;
             }
-            dep.mTimeState = checkActionFlag(m, iteration_requested_flag) ?
-                (checkActionFlag(m, required_flag) ? TimeState::time_requested_require_iteration :
+            dep.mTimeState = checkActionFlag(cmd, iteration_requested_flag) ?
+                (checkActionFlag(cmd, required_flag) ? TimeState::time_requested_require_iteration :
                                                      TimeState::time_requested_iterative) :
                 TimeState::time_requested;
             //   printf("%d Request from %d time %f, te=%f, Tdemin=%f\n", fedID, m.source_id,
             //   static_cast<double>(m.actionTime), static_cast<double>(m.Te),
             //   static_cast<double>(m.Tdemin)); assert(m.actionTime >= Tnext);
-            dep.next = m.actionTime;
-            dep.Te = m.Te;
-            dep.minDe = m.Tdemin;
+            dep.next = cmd.actionTime;
+            dep.Te = cmd.Te;
+            dep.minDe = cmd.Tdemin;
 
             if (dep.Te < dep.minDe) {
                 dep.minDe = dep.Te;
             }
 
-            dep.minFed = GlobalFederateId(m.getExtraData());
-            dep.interrupted = checkActionFlag(m, interrupted_flag);
+            dep.minFed = GlobalFederateId(cmd.getExtraData());
+            dep.interrupted = checkActionFlag(cmd, interrupted_flag);
 
             // NEXT version this gets moved out of here
-            if (checkActionFlag(m, non_granting_flag)) {
+            if (checkActionFlag(cmd, non_granting_flag)) {
                 dep.nonGranting = true;
             }
 
-            delayed = checkActionFlag(m, delayed_timing_flag);
+            delayed = checkActionFlag(cmd, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
                 res = TimeProcessingResult::PROCESSED_AND_CHECK;
             }
@@ -100,10 +100,10 @@ static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInf
             }
             // END remove block
 
-            dep.triggered = checkActionFlag(m, destination_target);
-            dep.sequenceCounter = m.counter;
+            dep.triggered = checkActionFlag(cmd, destination_target);
+            dep.sequenceCounter = cmd.counter;
             dep.responseSequenceCounter = (dep.connection != ConnectionType::SELF) ?
-                m.getExtraDestData() :
+                cmd.getExtraDestData() :
                 dep.sequenceCounter;
             if (dep.responseSequenceCounter == dep.grantedIteration) {
                 dep.updateRequested = false;
@@ -114,13 +114,13 @@ static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInf
             //    printf("%d Grant from %d time %f\n", fedID, m.source_id,
             //    static_cast<double>(m.actionTime));
             //   assert(m.actionTime >= Tnext);
-            dep.next = m.actionTime;
+            dep.next = cmd.actionTime;
             dep.Te = dep.next;
             dep.minDe = dep.next;
             dep.minFed = GlobalFederateId{};
             dep.timeoutCount = 0;
             dep.interrupted = false;
-            dep.sequenceCounter = m.counter;
+            dep.sequenceCounter = cmd.counter;
             dep.hasData = false;
             break;
         case CMD_DISCONNECT:
@@ -140,9 +140,9 @@ static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInf
             dep.updateRequested = false;
             break;
         case CMD_TIMING_INFO:
-            dep.nonGranting = checkActionFlag(m, non_granting_flag);
-            dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
-            dep.timingVersion = static_cast<std::uint8_t>(m.getExtraData());
+            dep.nonGranting = checkActionFlag(cmd, non_granting_flag);
+            dep.delayedTiming = checkActionFlag(cmd, delayed_timing_flag);
+            dep.timingVersion = static_cast<std::uint8_t>(cmd.getExtraData());
             res = TimeProcessingResult::PROCESSED_AND_CHECK;
             break;
         case CMD_LOCAL_ERROR:
@@ -160,7 +160,7 @@ static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInf
             dep.hasData = true;
             break;
         case CMD_REQUEST_CURRENT_TIME:
-            dep.sequenceCounter = m.counter;
+            dep.sequenceCounter = cmd.counter;
             break;
         default:
             res = TimeProcessingResult::NOT_PROCESSED;
@@ -174,7 +174,7 @@ bool TimeData::update(const TimeData& update)
     bool updated = (mTimeState != update.mTimeState);
     mTimeState = update.mTimeState;
 
-    Time prev_next = next;
+    const Time prev_next = next;
     next = update.next;
 
     if (update.Te != Te) {
@@ -327,56 +327,56 @@ bool TimeDependencies::isDependent(GlobalFederateId ofed) const
     return (res->fedID == ofed) ? res->dependent : false;
 }
 
-const DependencyInfo* TimeDependencies::getDependencyInfo(GlobalFederateId id) const
+const DependencyInfo* TimeDependencies::getDependencyInfo(GlobalFederateId gid) const
 {
-    auto res = std::lower_bound(dependencies.cbegin(), dependencies.cend(), id, dependencyCompare);
-    if ((res == dependencies.cend()) || (res->fedID != id)) {
+    auto res = std::lower_bound(dependencies.cbegin(), dependencies.cend(), gid, dependencyCompare);
+    if ((res == dependencies.cend()) || (res->fedID != gid)) {
         return nullptr;
     }
 
     return &(*res);
 }
 
-DependencyInfo* TimeDependencies::getDependencyInfo(GlobalFederateId id)
+DependencyInfo* TimeDependencies::getDependencyInfo(GlobalFederateId gid)
 {
-    auto res = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
-    if ((res == dependencies.end()) || (res->fedID != id)) {
+    auto res = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
+    if ((res == dependencies.end()) || (res->fedID != gid)) {
         return nullptr;
     }
 
     return &(*res);
 }
 
-bool TimeDependencies::addDependency(GlobalFederateId id)
+bool TimeDependencies::addDependency(GlobalFederateId gid)
 
 {
     if (dependencies.empty()) {
-        dependencies.emplace_back(id);
+        dependencies.emplace_back(gid);
         dependencies.back().dependency = true;
         return true;
     }
-    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
+    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
     if (dep == dependencies.end()) {
-        dependencies.emplace_back(id);
+        dependencies.emplace_back(gid);
         dependencies.back().dependency = true;
     } else {
-        if (dep->fedID == id) {
+        if (dep->fedID == gid) {
             auto rval = dep->dependency;
             dep->dependency = true;
             // the dependency is already present
             return !rval;
         }
-        auto it = dependencies.emplace(dep, id);
+        auto it = dependencies.emplace(dep, gid);
         it->dependency = true;
     }
     return true;
 }
 
-void TimeDependencies::removeDependency(GlobalFederateId id)
+void TimeDependencies::removeDependency(GlobalFederateId gid)
 {
-    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
+    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
     if (dep != dependencies.end()) {
-        if (dep->fedID == id) {
+        if (dep->fedID == gid) {
             dep->dependency = false;
             if (!dep->dependent) {
                 dependencies.erase(dep);
@@ -385,36 +385,36 @@ void TimeDependencies::removeDependency(GlobalFederateId id)
     }
 }
 
-bool TimeDependencies::addDependent(GlobalFederateId id)
+bool TimeDependencies::addDependent(GlobalFederateId gid)
 
 {
     if (dependencies.empty()) {
-        dependencies.emplace_back(id);
+        dependencies.emplace_back(gid);
         dependencies.back().dependent = true;
         return true;
     }
-    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
+    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
     if (dep == dependencies.end()) {
-        dependencies.emplace_back(id);
+        dependencies.emplace_back(gid);
         dependencies.back().dependent = true;
     } else {
-        if (dep->fedID == id) {
+        if (dep->fedID == gid) {
             auto rval = dep->dependent;
             dep->dependent = true;
             // the dependency is already present
             return !rval;
         }
-        auto it = dependencies.emplace(dep, id);
+        auto it = dependencies.emplace(dep, gid);
         it->dependent = true;
     }
     return true;
 }
 
-void TimeDependencies::removeDependent(GlobalFederateId id)
+void TimeDependencies::removeDependent(GlobalFederateId gid)
 {
-    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
+    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
     if (dep != dependencies.end()) {
-        if (dep->fedID == id) {
+        if (dep->fedID == gid) {
             dep->dependent = false;
             if (!dep->dependency) {
                 dependencies.erase(dep);
@@ -423,23 +423,23 @@ void TimeDependencies::removeDependent(GlobalFederateId id)
     }
 }
 
-void TimeDependencies::removeInterdependence(GlobalFederateId id)
+void TimeDependencies::removeInterdependence(GlobalFederateId gid)
 {
-    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
+    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
     if (dep != dependencies.end()) {
-        if (dep->fedID == id) {
+        if (dep->fedID == gid) {
             dependencies.erase(dep);
         }
     }
 }
 
-TimeProcessingResult TimeDependencies::updateTime(const ActionMessage& m)
+TimeProcessingResult TimeDependencies::updateTime(const ActionMessage& cmd)
 {
-    auto* depInfo = getDependencyInfo(m.source_id);
+    auto* depInfo = getDependencyInfo(cmd.source_id);
     if (depInfo == nullptr || !depInfo->dependency) {
         return TimeProcessingResult::NOT_PROCESSED;
     }
-    return processMessage(m, *depInfo);
+    return processMessage(cmd, *depInfo);
 }
 
 bool TimeDependencies::checkIfAllDependenciesArePastExec(bool iterating) const
@@ -601,10 +601,10 @@ bool TimeDependencies::hasActiveTimeDependencies() const
     });
 }
 
-bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sq)
+bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sequenceCount)
 {
-    return std::all_of(dependencies.begin(), dependencies.end(), [tmin, sq](const auto& dep) {
-        return checkSequenceCounter(dep, tmin, sq);
+    return std::all_of(dependencies.begin(), dependencies.end(), [tmin, sequenceCount](const auto& dep) {
+        return checkSequenceCounter(dep, tmin, sequenceCount);
     });
 }
 int TimeDependencies::activeDependencyCount() const
@@ -711,19 +711,21 @@ static void generateMinTimeImplementation(TimeData& mTime,
                 mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.responseSequenceCounter = dep.sequenceCounter;
                 mTime.interrupted = dep.interrupted;
-            } else if (!dep.interrupted && mTime.interrupted) {
-                mTime.minFed = dep.fedID;
-                mTime.delayedTiming = dep.delayedTiming;
-                mTime.restrictionLevel = dep.restrictionLevel;
-                mTime.sequenceCounter = dep.sequenceCounter;
-                mTime.responseSequenceCounter = dep.sequenceCounter;
-                mTime.interrupted = dep.interrupted;
+            } else if (dep.restrictionLevel == mTime.restrictionLevel && dep.interrupted != mTime.interrupted) {
+                if (!dep.interrupted)
+                {
+                    mTime.minFed = dep.fedID;
+                    mTime.delayedTiming = dep.delayedTiming;
+                    mTime.restrictionLevel = dep.restrictionLevel;
+                    mTime.sequenceCounter = dep.sequenceCounter;
+                    mTime.responseSequenceCounter = dep.sequenceCounter;
+                    mTime.interrupted = false;
+                }   
             } else if (dep.restrictionLevel == mTime.restrictionLevel && dep.fedID < mTime.minFed) {
                 mTime.minFed = dep.fedID;
                 mTime.delayedTiming = dep.delayedTiming;
                 mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.responseSequenceCounter = dep.sequenceCounter;
-                mTime.interrupted = dep.interrupted;
             }
         }
         mTime.next = initializationTime;
@@ -804,7 +806,7 @@ const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependenci
                                               ConnectionType ignoreType,
                                               GlobalFederateId ignore)
 {
-    static DependencyInfo maxDep{Time::maxVal(), TimeState::initialized, 50U};
+    static const DependencyInfo maxDep{Time::maxVal(), TimeState::initialized, 50U};
 
     const DependencyInfo* minDep = &maxDep;
 
