@@ -17,6 +17,9 @@ Brief History: HELICS began as the core software development of the Grid Moderni
 
 Motivation: Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations. It is designed to increase scalability and portability in modeling advanced features of highly integrated power system and cyber-physical energy systems.
 
+General citation for HELICS:
+T. Hardy, B. Palmintier, P. Top, D. Krishnamurthy and J. Fuller, "HELICS: A Co-Simulation Framework for Scalable Multi-Domain Modeling and Analysis," in IEEE Access, doi: 10.1109/ACCESS.2024.3363615, available at [https://ieeexplore.ieee.org/document/10424422](https://ieeexplore.ieee.org/document/10424422)
+
 ```{eval-rst}
 .. toctree::
    :maxdepth: 2
@@ -28,3 +31,5 @@ Motivation: Energy systems and their associated information and communication te
    quick-links
 
 ```
+
+
