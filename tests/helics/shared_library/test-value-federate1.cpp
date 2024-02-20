@@ -64,10 +64,10 @@ TEST_F(vfedSingle, publisher_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsPublicationGetName(pubid);
-    auto sv2 = helicsPublicationGetName(pubid2);
-    EXPECT_STREQ(sv, "fed0/pub1");
-    EXPECT_STREQ(sv2, "pub2");
+    auto pubname = helicsPublicationGetName(pubid);
+    auto pubname2 = helicsPublicationGetName(pubid2);
+    EXPECT_STREQ(pubname, "fed0/pub1");
+    EXPECT_STREQ(pubname2, "pub2");
     auto pub3name = helicsPublicationGetName(pubid3);
     EXPECT_STREQ(pub3name, "fed0/pub3");
 
@@ -103,10 +103,10 @@ TEST_F(vfedSingle, subscription_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsInputGetTarget(subid);
-    auto sv2 = helicsInputGetTarget(subid2);
-    EXPECT_STREQ(sv, "sub1");
-    EXPECT_STREQ(sv2, "sub2");
+    auto target1 = helicsInputGetTarget(subid);
+    auto target2 = helicsInputGetTarget(subid2);
+    EXPECT_STREQ(target1, "sub1");
+    EXPECT_STREQ(target2, "sub2");
 
     auto sub3name = helicsInputGetTarget(subid3);
 
@@ -148,11 +148,11 @@ TEST_F(vfedSingle, subscription_and_publication_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsInputGetTarget(subid);
-    auto sv2 = helicsInputGetTarget(subid2);
+    auto target1 = helicsInputGetTarget(subid);
+    auto target2 = helicsInputGetTarget(subid2);
 
-    EXPECT_STREQ(sv, "sub1");
-    EXPECT_STREQ(sv2, "sub2");
+    EXPECT_STREQ(target1, "sub1");
+    EXPECT_STREQ(target2, "sub2");
     auto sub3name = helicsInputGetTarget(subid3);
     EXPECT_STREQ(sub3name, "sub3");
 
@@ -169,10 +169,10 @@ TEST_F(vfedSingle, subscription_and_publication_registration)
     EXPECT_STREQ(tmp, "V");
     // check publications
 
-    sv = helicsPublicationGetName(pubid);
-    sv2 = helicsPublicationGetName(pubid2);
-    EXPECT_STREQ(sv, "fed0/pub1");
-    EXPECT_STREQ(sv2, "pub2");
+    target1 = helicsPublicationGetName(pubid);
+    target2 = helicsPublicationGetName(pubid2);
+    EXPECT_STREQ(target1, "fed0/pub1");
+    EXPECT_STREQ(target2, "pub2");
     auto pub3name = helicsPublicationGetName(pubid3);
     EXPECT_STREQ(pub3name, "fed0/pub3");
 
@@ -266,8 +266,8 @@ TEST_F(vfedSingle, default_value_tests)
 
     EXPECT_EQ(helicsInputGetPublicationDataType(inp_double), HELICS_DATA_TYPE_INT);
 
-    auto c2 = helicsInputGetChar(inp_char, &err);
-    EXPECT_EQ(c2, 'q');
+    auto char2 = helicsInputGetChar(inp_char, &err);
+    EXPECT_EQ(char2, 'q');
     int actSize = 56;
     // this should not be an error
     helicsInputGetVector(inp_vect, nullptr, 5, &actSize, &err);
@@ -502,10 +502,10 @@ void runFederateTestComplex(const char* core,
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
-    CE(HelicsComplex hc = helicsInputGetComplexObject(subid, &err));
+    CE(HelicsComplex valComplex = helicsInputGetComplexObject(subid, &err));
     // make sure the string is what we expect
-    EXPECT_EQ(hc.real, testValue1_r);
-    EXPECT_EQ(hc.imag, testValue1_i);
+    EXPECT_EQ(valComplex.real, testValue1_r);
+    EXPECT_EQ(valComplex.imag, testValue1_i);
 
     // publish a second value
     CE(helicsPublicationPublishComplex(pubid, testValue2_r, testValue2_i, &err));
@@ -519,9 +519,9 @@ void runFederateTestComplex(const char* core,
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
 
-    CE(hc = helicsInputGetComplexObject(subid, &err));
-    EXPECT_EQ(hc.real, testValue2_r);
-    EXPECT_EQ(hc.imag, testValue2_i);
+    CE(valComplex = helicsInputGetComplexObject(subid, &err));
+    EXPECT_EQ(valComplex.real, testValue2_r);
+    EXPECT_EQ(valComplex.imag, testValue2_i);
 
     CE(helicsFederateFinalize(vFed, &err));
 }

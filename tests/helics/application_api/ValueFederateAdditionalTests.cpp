@@ -62,27 +62,27 @@ TEST_P(valuefed_add_ztype_tests, publication_registration)
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
-    auto& pubid = vFed1->registerPublication<std::string>("pub1");
-    auto& pubid2 = vFed1->registerGlobalPublication<int>("pub2");
+    auto& pub1 = vFed1->registerPublication<std::string>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<int>("pub2");
 
-    auto& pubid3 = vFed1->registerPublication("pub3", "double", "V");
+    auto& pub3 = vFed1->registerPublication("pub3", "double", "V");
     vFed1->enterExecutingMode();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
-    const auto& stringval1 = pubid.getName();
-    const auto& stringval2 = pubid2.getName();
-    EXPECT_EQ(stringval1, "fed0/pub1");
-    EXPECT_EQ(stringval2, "pub2");
-    const auto& pub3name = pubid3.getName();
-    EXPECT_EQ(pub3name, "fed0/pub3");
+    const auto& pubname1 = pub1.getName();
+    const auto& pubname2 = pub2.getName();
+    EXPECT_EQ(pubname1, "fed0/pub1");
+    EXPECT_EQ(pubname2, "pub2");
+    const auto& pubname3 = pub3.getName();
+    EXPECT_EQ(pubname3, "fed0/pub3");
 
-    EXPECT_EQ(pubid3.getExtractionType(), "double");
-    EXPECT_EQ(pubid3.getExtractionUnits(), "V");
+    EXPECT_EQ(pub3.getExtractionType(), "double");
+    EXPECT_EQ(pub3.getExtractionUnits(), "V");
 
-    EXPECT_TRUE(vFed1->getPublication("pub1").getHandle() == pubid.getHandle());
-    EXPECT_TRUE(vFed1->getPublication("pub2").getHandle() == pubid2.getHandle());
-    EXPECT_TRUE(vFed1->getPublication("fed0/pub1").getHandle() == pubid.getHandle());
+    EXPECT_TRUE(vFed1->getPublication("pub1").getHandle() == pub1.getHandle());
+    EXPECT_TRUE(vFed1->getPublication("pub2").getHandle() == pub2.getHandle());
+    EXPECT_TRUE(vFed1->getPublication("fed0/pub1").getHandle() == pub1.getHandle());
     vFed1->disconnect();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -109,10 +109,10 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
-    const auto& sv = pubid.getName();
-    const auto& sv2 = pubid2.getName();
-    EXPECT_EQ(sv, "fed0/pub1");
-    EXPECT_EQ(sv2, "pub2");
+    const auto& pubname1 = pubid.getName();
+    const auto& pubname2 = pubid2.getName();
+    EXPECT_EQ(pubname1, "fed0/pub1");
+    EXPECT_EQ(pubname2, "pub2");
     const auto& pub3name = pubid3.getName();
     EXPECT_EQ(pub3name, "fed0-pub3");
 
@@ -141,10 +141,10 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_registration)
 
     // EXPECT_TRUE (vFed->getCurrentMode () == helics::Federate::Modes::EXECUTING);
 
-    auto& sv = vFed1->getTarget(subid);
-    auto& sv2 = vFed1->getTarget(subid2);
-    EXPECT_EQ(sv, "sub1");
-    EXPECT_EQ(sv2, "sub2");
+    auto& target1 = vFed1->getTarget(subid);
+    auto& target2 = vFed1->getTarget(subid2);
+    EXPECT_EQ(target1, "sub1");
+    EXPECT_EQ(target2, "sub2");
     auto& sub3name = vFed1->getTarget(subid3);
 
     vFed1->addAlias(subid, "Shortcut");
@@ -184,10 +184,10 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     // check subscriptions
-    auto sv = vFed1->getTarget(subid);
-    auto sv2 = vFed1->getTarget(subid2);
-    EXPECT_EQ(sv, "sub1");
-    EXPECT_EQ(sv2, "sub2");
+    auto target1 = vFed1->getTarget(subid);
+    auto target2 = vFed1->getTarget(subid2);
+    EXPECT_EQ(target1, "sub1");
+    EXPECT_EQ(target2, "sub2");
     auto sub3name = vFed1->getTarget(subid3);
     EXPECT_EQ(sub3name, "sub3");
 
@@ -195,10 +195,10 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
 
     // check publications
 
-    sv = pubid.getName();
-    sv2 = pubid2.getName();
-    EXPECT_EQ(sv, "fed0/pub1");
-    EXPECT_EQ(sv2, "pub2");
+    target1 = pubid.getName();
+    target2 = pubid2.getName();
+    EXPECT_EQ(target1, "fed0/pub1");
+    EXPECT_EQ(target2, "pub2");
     const auto& pub3name = pubid3.getName();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
@@ -245,10 +245,10 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, input_and_publication_registratio
 
     // check publications
 
-    auto& sv = pubid.getName();
-    auto& sv2 = pubid2.getName();
-    EXPECT_EQ(sv, "fed0/pub1");
-    EXPECT_EQ(sv2, "pub2");
+    auto& pubname1 = pubid.getName();
+    auto& pubname2 = pubid2.getName();
+    EXPECT_EQ(pubname1, "fed0/pub1");
+    EXPECT_EQ(pubname2, "pub2");
     auto& pub3name = pubid3.getName();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
@@ -276,23 +276,23 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, single_transfer)
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    std::string_view s = subid.getString();
+    std::string_view string1 = subid.getString();
     // get the value
     // make sure the string is what we expect
-    EXPECT_EQ(s, "string1");
+    EXPECT_EQ(string1, "string1");
     // publish a second string
     pubid.publish("string2");
     // make sure the value is still what we expect
-    s = subid.getString();
+    string1 = subid.getString();
 
-    EXPECT_EQ(s, "string1");
+    EXPECT_EQ(string1, "string1");
     // advance time
     gtime = vFed1->requestTimeAdvance(1.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    s = subid.getString();
+    string1 = subid.getString();
 
-    EXPECT_EQ(s, "string2");
+    EXPECT_EQ(string1, "string2");
 }
 
 TEST_P(valuefed_add_all_type_tests_ci_skip, dual_transfer_string)
@@ -319,17 +319,17 @@ TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_vector)
 TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_complex)
 {
     std::complex<double> def = {54.23233, 0.7};
-    std::complex<double> v1 = std::polar(10.0, 0.43);
-    std::complex<double> v2 = {-3e45, 1e-23};
-    runDualFederateTest<std::complex<double>>(GetParam(), def, v1, v2);
+    std::complex<double> val1 = std::polar(10.0, 0.43);
+    std::complex<double> val2 = {-3e45, 1e-23};
+    runDualFederateTest<std::complex<double>>(GetParam(), def, val1, val2);
 }
 
 TEST_F(valuefed_add_tests_ci_skip, dual_transfer_complex_long)
 {
     std::complex<double> def = {54.23233, 0.7};
-    std::complex<double> v1 = std::polar(10.0, 0.43);
-    std::complex<double> v2 = {-3e45, 1e-23};
-    runDualFederateTest<std::complex<double>>("test_7", def, v1, v2);
+    std::complex<double> val1 = std::polar(10.0, 0.43);
+    std::complex<double> val2 = {-3e45, 1e-23};
+    runDualFederateTest<std::complex<double>>("test_7", def, val1, val2);
 }
 
 TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_types_obj8)
@@ -348,17 +348,17 @@ TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_types_obj8)
 TEST_P(valuefed_add_all_type_tests_ci_skip, dual_transfer_types_obj9)
 {
     std::complex<double> def = {54.23233, 0.7};
-    std::complex<double> v1 = std::polar(10.0, 0.43);
-    std::complex<double> v2 = {-3e45, 1e-23};
-    runDualFederateTestObj<std::complex<double>>(GetParam(), def, v1, v2);
+    std::complex<double> val1 = std::polar(10.0, 0.43);
+    std::complex<double> val2 = {-3e45, 1e-23};
+    runDualFederateTestObj<std::complex<double>>(GetParam(), def, val1, val2);
 }
 
 TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_types_obj10)
 {
     helics::NamedPoint def{"trigger", 0.7};
-    helics::NamedPoint v1{"response", -1e-12};
-    helics::NamedPoint v2{"variance", 45.23};
-    runDualFederateTestObj<helics::NamedPoint>(GetParam(), def, v1, v2);
+    helics::NamedPoint val1{"response", -1e-12};
+    helics::NamedPoint val2{"variance", 45.23};
+    runDualFederateTestObj<helics::NamedPoint>(GetParam(), def, val1, val2);
 }
 
 TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_types_obj11)
@@ -475,15 +475,15 @@ TEST_P(valuefed_add_type_tests_ci_skip, async_calls)
     EXPECT_EQ(gtime, 1.0);
     EXPECT_EQ(f1time, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string string1 = subid.getString();
 
     // make sure the string is what we expect
-    EXPECT_EQ(s, "string1");
+    EXPECT_EQ(string1, "string1");
     // publish a second string
     pubid.publish("string2");
     // make sure the value is still what we expect
-    subid.getValue(s);
-    EXPECT_EQ(s, "string1");
+    subid.getValue(string1);
+    EXPECT_EQ(string1, "string1");
     // advance time
     vFed1->requestTimeAsync(2.0);
     vFed2->requestTimeAsync(2.0);
@@ -495,8 +495,8 @@ TEST_P(valuefed_add_type_tests_ci_skip, async_calls)
 
     // make sure the value was updated
 
-    s = subid.getValue<std::string>();
-    EXPECT_EQ(s, "string2");
+    string1 = subid.getValue<std::string>();
+    EXPECT_EQ(string1, "string2");
     vFed1->finalizeAsync();
     vFed2->finalize();
     vFed1->finalizeComplete();
@@ -789,24 +789,24 @@ TEST(valuefed_json_tests, test_json_register_publish)
 
     vFed.registerFromPublicationJSON(std::string(TEST_DIR) + "example_pub_input1.json");
     auto& sub1 = vFed.registerSubscription("test2/pub1");
-    auto& s2 = vFed.registerSubscription("test2/pub2");
-    auto& s3 = vFed.registerSubscription("test2/group1/pubA");
-    auto& s4 = vFed.registerSubscription("test2/group1/pubB");
+    auto& sub2 = vFed.registerSubscription("test2/pub2");
+    auto& sub3 = vFed.registerSubscription("test2/group1/pubA");
+    auto& sub4 = vFed.registerSubscription("test2/group1/pubB");
     vFed.enterExecutingMode();
 
     vFed.publishJSON(std::string(TEST_DIR) + "example_pub_input1.json");
     vFed.requestTime(1.0);
     EXPECT_EQ(sub1.getValue<double>(), 99.9);
-    EXPECT_EQ(s2.getValue<std::string>(), "things");
-    EXPECT_EQ(s3.getValue<double>(), 45.7);
-    EXPECT_EQ(s4.getValue<std::string>(), "count");
+    EXPECT_EQ(sub2.getValue<std::string>(), "things");
+    EXPECT_EQ(sub3.getValue<double>(), 45.7);
+    EXPECT_EQ(sub4.getValue<std::string>(), "count");
 
     vFed.publishJSON(std::string(TEST_DIR) + "example_pub_input2.json");
     vFed.requestTime(2.0);
     EXPECT_EQ(sub1.getValue<double>(), 88.2);
-    EXPECT_EQ(s2.getValue<std::string>(), "items");
-    EXPECT_EQ(s3.getValue<double>(), 15.0);
-    EXPECT_EQ(s4.getValue<std::string>(), "count2");
+    EXPECT_EQ(sub2.getValue<std::string>(), "items");
+    EXPECT_EQ(sub3.getValue<double>(), 15.0);
+    EXPECT_EQ(sub4.getValue<std::string>(), "count2");
 
     vFed.disconnect();
 }
@@ -822,22 +822,22 @@ TEST(valuefed_json_tests, test_json_register_publish_error)
     // this tests an already registered publication
     vFed.registerFromPublicationJSON(std::string(TEST_DIR) + "example_pub_input1.json");
     auto& sub1 = vFed.registerSubscription("test2/pub1");
-    auto& s2 = vFed.registerSubscription("test2/pub2");
-    auto& s3 = vFed.registerSubscription("test2/group1/pubA");
-    auto& s4 = vFed.registerSubscription("test2/group1/pubB");
+    auto& sub2 = vFed.registerSubscription("test2/pub2");
+    auto& sub3 = vFed.registerSubscription("test2/group1/pubA");
+    auto& sub4 = vFed.registerSubscription("test2/group1/pubB");
 
     EXPECT_NO_THROW(vFed.registerFromPublicationJSON("{\"pub3\":45}"));
-    auto& s5 = vFed.registerSubscription("test2/pub3");
+    auto& sub5 = vFed.registerSubscription("test2/pub3");
     vFed.enterExecutingMode();
 
     vFed.publishJSON(std::string(TEST_DIR) + "example_pub_input1.json");
     EXPECT_NO_THROW(vFed.publishJSON("{\"pub3\":45}"));
     vFed.requestTime(1.0);
     EXPECT_EQ(sub1.getValue<double>(), 99.9);
-    EXPECT_EQ(s2.getValue<std::string>(), "things");
-    EXPECT_EQ(s3.getValue<double>(), 45.7);
-    EXPECT_EQ(s4.getValue<std::string>(), "count");
-    EXPECT_EQ(s5.getValue<double>(), 45.0);
+    EXPECT_EQ(sub2.getValue<std::string>(), "things");
+    EXPECT_EQ(sub3.getValue<double>(), 45.7);
+    EXPECT_EQ(sub4.getValue<std::string>(), "count");
+    EXPECT_EQ(sub5.getValue<double>(), 45.0);
     vFed.disconnect();
 }
 
@@ -1085,9 +1085,9 @@ TEST(valuefederate, indexed_pubs)
     EXPECT_TRUE(pg4.isValid());
     EXPECT_EQ(pg4.getName(), pubz.getName());
 
-    auto& gs = cFed.getInputByTarget("pubg");
-    EXPECT_TRUE(gs.isValid());
-    EXPECT_EQ(gs.getTarget(), "pubg");
+    auto& inp1 = cFed.getInputByTarget("pubg");
+    EXPECT_TRUE(inp1.isValid());
+    EXPECT_EQ(inp1.getTarget(), "pubg");
 
     auto& pg5 = cFed.getPublication("publocal");
     EXPECT_TRUE(pg5.isValid());
@@ -1230,8 +1230,8 @@ TEST(valuefederate, file_and_config)
     Fed1->requestTimeComplete();
 
     Fed1->finalize();
-    auto t2 = Fed2->requestTimeComplete();
-    EXPECT_EQ(t2, 1.0);
+    auto time2 = Fed2->requestTimeComplete();
+    EXPECT_EQ(time2, 1.0);
     Fed2->finalize();
     broker->disconnect();
 }
