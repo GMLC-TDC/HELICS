@@ -687,7 +687,7 @@ set(LICENSE_LIST
     "cppzmq"
     "${PROJECT_SOURCE_DIR}/ThirdParty/cppzmq/LICENSE"
     "fmt"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE.rst"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE"
     "units"
     "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
     "JsonCpp"
