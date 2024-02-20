@@ -459,7 +459,7 @@ bool TimeDependencies::checkIfAllDependenciesArePastExec(bool iterating) const
      });*/
 }
 
-static bool iteratingWaitingDependencyCheck(const DependencyInfo &dep)
+static bool iteratingWaitingDependencyCheck(const DependencyInfo& dep)
 {
     if (!dep.dependency) {
         return true;
@@ -485,7 +485,9 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
 {
     if (iterating) {
         if (waiting) {
-            return std::all_of(dependencies.begin(), dependencies.end(), iteratingWaitingDependencyCheck);
+            return std::all_of(dependencies.begin(),
+                               dependencies.end(),
+                               iteratingWaitingDependencyCheck);
         }
         return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
             return (dep.dependency && dep.mTimeState == TimeState::initialized);
@@ -502,8 +504,9 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
     });
 }
 
-static bool iteratingTimeGrantCheck(const DependencyInfo& dep,Time desiredGrantTime,
-    GrantDelayMode delayMode)
+static bool iteratingTimeGrantCheck(const DependencyInfo& dep,
+                                    Time desiredGrantTime,
+                                    GrantDelayMode delayMode)
 {
     if (!dep.dependency || dep.next >= cBigTime) {
         return true;
@@ -533,8 +536,11 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                                                 GrantDelayMode delayMode) const
 {
     if (iterating) {
-        return std::all_of(dependencies.begin(), dependencies.end(), [desiredGrantTime, delayMode](const auto& dep) {return iteratingTimeGrantCheck(dep, desiredGrantTime, delayMode); });
-
+        return std::all_of(dependencies.begin(),
+                           dependencies.end(),
+                           [desiredGrantTime, delayMode](const auto& dep) {
+                               return iteratingTimeGrantCheck(dep, desiredGrantTime, delayMode);
+                           });
     }
     switch (delayMode) {
         case GrantDelayMode::NONE:
