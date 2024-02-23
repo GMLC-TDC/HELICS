@@ -99,9 +99,9 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
 
     helics::Publication pub1(vFed1.get(), "pub1", helics::helicsType<std::string>());
     helics::Publication pub2(helics::InterfaceVisibility::GLOBAL,
-                               vFed1.get(),
-                               "pub2",
-                               helics::DataType::HELICS_INT);
+                             vFed1.get(),
+                             "pub2",
+                             helics::DataType::HELICS_INT);
 
     vFed1->setSeparator('-');
     helics::Publication pubid3(vFed1.get(), "pub3", helics::helicsType<double>(), "V");
@@ -165,7 +165,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_registration)
 
 TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_registration)
 {
-    //testing copy constructor as well in this test
+    // testing copy constructor as well in this test
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     vFed1->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
@@ -176,7 +176,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
     auto pub3 = vFed1->registerPublication("pub3", "double", "V");
 
     // optional
-    
+
     auto sub1 = vFed1->registerSubscription("sub1", "V");
     auto sub2 = vFed1->registerSubscription("sub2");
 
