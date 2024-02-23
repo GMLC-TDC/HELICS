@@ -51,10 +51,10 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
     vFed1->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
 
     // register the publications
-    Publication pubid(vFed1.get(), "pub1", helicsType<std::string>());
-    Publication pubid2(helics::InterfaceVisibility::GLOBAL, vFed1, "pub2", helicsType<double>());
+    Publication pub1(vFed1.get(), "pub1", helicsType<std::string>());
+    Publication pub2(helics::InterfaceVisibility::GLOBAL, vFed1, "pub2", helicsType<double>());
 
-    Publication pubid3(vFed1, "pub3", helicsType<double>(), "V");
+    Publication pub3(vFed1, "pub3", helicsType<double>(), "V");
 
     // these aren't meant to match the publications
     auto& subid1 = vFed1->registerSubscription("sub1");
@@ -86,15 +86,15 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 
     // check publications
 
-    const auto& pk = pubid.getName();
-    const auto& pk2 = pubid2.getName();
+    const auto& pk = pub1.getName();
+    const auto& pk2 = pub2.getName();
     EXPECT_EQ(pk, "fed0/pub1");
     EXPECT_EQ(pk2, "pub2");
-    const auto& pub3name = pubid3.getName();
+    const auto& pub3name = pub3.getName();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
-    EXPECT_EQ(pubid3.getType(), "double");
-    EXPECT_EQ(pubid3.getUnits(), "V");
+    EXPECT_EQ(pub3.getType(), "double");
+    EXPECT_EQ(pub3.getUnits(), "V");
     vFed1->finalize();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == Federate::Modes::FINALIZE);
@@ -106,36 +106,36 @@ TEST_F(valuefed, single_transfer_publisher_alias)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     ASSERT_TRUE(vFed1);
     // register the publications
-    helics::Publication pubid(helics::InterfaceVisibility::LOCAL,
+    helics::Publication pub1(helics::InterfaceVisibility::LOCAL,
                               vFed1.get(),
                               "pub1",
                               helics::DataType::HELICS_STRING);
 
-    auto& subid = vFed1->registerSubscription("publisher");
+    auto& sub1 = vFed1->registerSubscription("publisher");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    vFed1->addAlias(pubid.getName(), "publisher");
+    vFed1->addAlias(pub1.getName(), "publisher");
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
     std::string s;
     // get the value
-    subid.getValue(s);
+    sub1.getValue(s);
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string1");
     // advance time
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -149,36 +149,36 @@ TEST_F(valuefed, single_transfer_publisher_alias2)
     // register the publications
     vFed1->addAlias("pub1", "publisher");
 
-    helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                               vFed1.get(),
                               "pub1",
                               helics::DataType::HELICS_STRING);
 
-    auto& subid = vFed1->registerSubscription("publisher");
+    auto& sub1 = vFed1->registerSubscription("publisher");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
     std::string s;
     // get the value
-    subid.getValue(s);
+    sub1.getValue(s);
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string1");
     // advance time
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -278,35 +278,35 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     ASSERT_TRUE(vFed1);
     // register the publications
-    helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                               vFed1.get(),
                               "pub1",
                               helics::DataType::HELICS_STRING);
 
-    auto& subid = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
     std::string s;
     // get the value
-    subid.getValue(s);
+    sub1.getValue(s);
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string1");
     // advance time
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -314,8 +314,8 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
 
 static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
                                std::shared_ptr<helics::ValueFederate>& vFed2,
-                               helics::Publication& pubid,
-                               helics::Input& subid)
+                               helics::Publication& pub1,
+                               helics::Input& sub1)
 {
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
@@ -326,7 +326,7 @@ static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
     vFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
     auto gtime = vFed2->requestTime(1.0);
 
@@ -340,7 +340,7 @@ static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
         correct = false;
     }
     // get the value
-    std::string s = subid.getValue<std::string>();
+    std::string s = sub1.getValue<std::string>();
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
@@ -348,9 +348,9 @@ static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
         correct = false;
     }
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    subid.getValue(s);
+    sub1.getValue(s);
     EXPECT_EQ(s, "string1");
     if (s != "string1") {
         correct = false;
@@ -370,7 +370,7 @@ static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
     }
     // make sure the value was updated
 
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string2");
     if (s != "string2") {
@@ -389,10 +389,10 @@ TEST_P(valuefed_all_type_tests, dual_transfer)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto& subid = vFed2->registerSubscription("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, subid);
+    auto& sub1 = vFed2->registerSubscription("pub1");
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, sub1);
     EXPECT_TRUE(res);
 }
 
@@ -403,10 +403,10 @@ TEST_P(valuefed_all_type_tests, dual_transfer_json)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication("pub1", "json");
+    auto& pub1 = vFed1->registerGlobalPublication("pub1", "json");
 
-    auto& subid = vFed2->registerSubscription("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, subid);
+    auto& sub1 = vFed2->registerSubscription("pub1");
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, sub1);
     EXPECT_TRUE(res);
 }
 
@@ -417,12 +417,12 @@ TEST_P(valuefed_all_type_tests, dual_transfer_inputs)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& inpid = vFed2->registerInput<std::string>("inp1");
 
     vFed2->addTarget(inpid, "pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -433,11 +433,11 @@ TEST_P(valuefed_all_type_tests, dual_transfer_pubtarget)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    vFed1->addTarget(pubid, "inp1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    vFed1->addTarget(pub1, "inp1");
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -448,11 +448,11 @@ TEST_P(valuefed_all_type_tests, dual_transfer_nameless_pub)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    auto& pubid = vFed1->registerPublication<std::string>("");
-    vFed1->addTarget(pubid, "inp1");
+    auto& pub1 = vFed1->registerPublication<std::string>("");
+    vFed1->addTarget(pub1, "inp1");
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -465,10 +465,10 @@ TEST_P(valuefed_all_type_tests, dual_transfer_broker_link)
     auto& broker = brokers[0];
     broker->dataLink("pub1", "inp1");
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -481,10 +481,10 @@ TEST_F(valuefed, dual_transfer_brokerApp_link)
     helics::BrokerApp brk(brokers[0]);
     brk.dataLink("pub1", "inp1");
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -530,10 +530,10 @@ TEST_F(valuefed, dual_transfer_coreApp_link)
     helics::CoreApp cr(vFed1->getCorePointer());
     cr.dataLink("pub1", "inp1");
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -546,11 +546,11 @@ TEST_P(valuefed_all_type_tests, dual_transfer_broker_link_late)
     auto& broker = brokers[0];
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     broker->dataLink("pub1", "inp1");
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -563,12 +563,12 @@ TEST_P(valuefed_all_type_tests, dual_transfer_broker_link_direct)
     auto& broker = brokers[0];
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     broker->dataLink("pub1", "inp1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -596,8 +596,8 @@ TEST_P(valuefed_link_file, dual_transfer_broker_link_file)
     auto testFile = std::string(TEST_DIR) + GetParam();
     broker->makeConnections(testFile);
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -614,8 +614,8 @@ TEST_F(valuefed, dual_transfer_broker_link_json_string)
     broker->makeConnections(R"({"connections":[["pub1", "inp1"]]})");
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -629,10 +629,10 @@ TEST_P(valuefed_all_type_tests, dual_transfer_core_link)
     core->dataLink("pub1", "inp1");
     core = nullptr;
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -645,12 +645,12 @@ TEST_P(valuefed_all_type_tests, dual_transfer_core_link_late)
     auto core = vFed1->getCorePointer();
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     core->dataLink("pub1", "inp1");
     core = nullptr;
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -667,8 +667,8 @@ TEST_P(valuefed_all_type_tests, dual_transfer_core_link_late_switch)
     core->dataLink("pub1", "inp1");
     core = nullptr;
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -681,13 +681,13 @@ TEST_P(valuefed_all_type_tests, dual_transfer_core_link_direct1)
     auto core = vFed1->getCorePointer();
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     core->dataLink("pub1", "inp1");
     core = nullptr;
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -700,13 +700,13 @@ TEST_P(valuefed_all_type_tests, dual_transfer_core_link_direct2)
     auto core = vFed2->getCorePointer();
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     core->dataLink("pub1", "inp1");
     core = nullptr;
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -724,8 +724,8 @@ TEST_P(valuefed_link_file, dual_transfer_core_link_file)
     core->makeConnections(testFile);
     core = nullptr;
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -746,8 +746,8 @@ TEST_F(valuefed, dual_transfer_core_link_json_string)
     core->makeConnections(R"({"connections":[["pub1", "inp1"]]})");
     core = nullptr;
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    bool res = dual_transfer_test(vFed1, vFed2, pub1, inpid);
     EXPECT_TRUE(res);
 }
 
@@ -757,20 +757,20 @@ TEST_P(valuefed_single_type, init_publish)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
 
-    auto& subid = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterInitializingMode();
-    pubid.publish(1.0);
+    pub1.publish(1.0);
 
     vFed1->enterExecutingMode();
     // get the value set at initialization
-    double val = subid.getDouble();
+    double val = sub1.getDouble();
 
     EXPECT_EQ(val, 1.0);
     // publish string1 at time=0.0;
-    pubid.publish(2.0);
+    pub1.publish(2.0);
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
@@ -778,20 +778,20 @@ TEST_P(valuefed_single_type, init_publish)
     gtime = vFed1->getCurrentTime();
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    subid.getValue(val);
+    sub1.getValue(val);
     // make sure the string is what we expect
     EXPECT_EQ(val, 2.0);
     // publish a second string
-    pubid.publish(3.0);
+    pub1.publish(3.0);
     // make sure the value is still what we expect
-    val = subid.getDouble();
+    val = sub1.getDouble();
 
     EXPECT_EQ(val, 2.0);
     // advance time
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    subid.getValue(val);
+    sub1.getValue(val);
     EXPECT_EQ(val, 3.0);
     vFed1->finalize();
 }
@@ -804,19 +804,20 @@ TEST_P(valuefed_single_type, block_send_receive)
     vFed1->registerPublication<std::string>("pub1");
     vFed1->registerGlobalPublication<int>("pub2");
 
-    auto& pubid3 = vFed1->registerPublication("pub3", "");
+    auto& pub3 = vFed1->registerPublication("pub3", "");
 
     auto& sub1 = vFed1->registerSubscription("fed0/pub3", "");
 
     helics::SmallBuffer db(547, ';');
 
     vFed1->enterExecutingMode();
-    vFed1->publishBytes(pubid3, db);
+    vFed1->publishBytes(pub3, db);
     vFed1->requestTime(1.0);
     EXPECT_TRUE(vFed1->isUpdated(sub1));
     auto res = vFed1->getBytes(sub1);
     EXPECT_EQ(res.size(), db.size());
     EXPECT_TRUE(vFed1->isUpdated(sub1) == false);
+    vFed1->disconnect();
 }
 
 /** test the all callback*/
@@ -826,10 +827,10 @@ TEST_F(valuefed, all_callback)
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
-    auto& pubid1 = vFed1->registerPublication<std::string>("pub1");
-    auto& pubid2 = vFed1->registerGlobalPublication<int>("pub2");
+    auto& pub1 = vFed1->registerPublication<std::string>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<int>("pub2");
 
-    auto& pubid3 = vFed1->registerPublication("pub3", "");
+    auto& pub3 = vFed1->registerPublication("pub3", "");
 
     auto& sub1 = vFed1->registerSubscription("fed0/pub1", "");
     auto& sub2 = vFed1->registerSubscription("pub2", "");
@@ -838,12 +839,12 @@ TEST_F(valuefed, all_callback)
     helics::SmallBuffer db(547, ';');
     helics::InterfaceHandle lastId;
     helics::Time lastTime;
-    vFed1->setInputNotificationCallback([&](const helics::Input& subid, helics::Time callTime) {
+    vFed1->setInputNotificationCallback([&](const helics::Input& sub1, helics::Time callTime) {
         lastTime = callTime;
-        lastId = subid.getHandle();
+        lastId = sub1.getHandle();
     });
     vFed1->enterExecutingMode();
-    vFed1->publishBytes(pubid3, db);
+    vFed1->publishBytes(pub3, db);
     vFed1->requestTime(1.0);
     // the callback should have occurred here
     EXPECT_TRUE(lastId == sub3.getHandle());
@@ -854,12 +855,12 @@ TEST_F(valuefed, all_callback)
         EXPECT_TRUE(false) << " missed callback\n";
     }
 
-    pubid2.publish(4);
+    pub2.publish(4);
     vFed1->requestTime(2.0);
     // the callback should have occurred here
     EXPECT_TRUE(lastId == sub2.getHandle());
     EXPECT_EQ(lastTime, 2.0);
-    pubid1.publish("this is a test");
+    pub1.publish("this is a test");
     vFed1->requestTime(3.0);
     // the callback should have occurred here
     EXPECT_TRUE(lastId == sub1.getHandle());
@@ -869,15 +870,15 @@ TEST_F(valuefed, all_callback)
     vFed1->setInputNotificationCallback(
         [&](const helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
 
-    vFed1->publishBytes(pubid3, db);
-    pubid2.publish(4);
+    vFed1->publishBytes(pub3, db);
+    pub2.publish(4);
     vFed1->requestTime(4.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 2);
     ccnt = 0;  // reset the counter
-    vFed1->publishBytes(pubid3, db);
-    pubid2.publish(4);
-    pubid1.publish("test string2");
+    vFed1->publishBytes(pub3, db);
+    pub2.publish(4);
+    pub1.publish("test string2");
     vFed1->requestTime(5.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 3);
@@ -889,10 +890,10 @@ TEST_F(valuefed, time_update_callback)
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
-    auto& pubid1 = vFed1->registerPublication<std::string>("pub1");
-    auto& pubid2 = vFed1->registerGlobalPublication<int>("pub2");
+    auto& pub1 = vFed1->registerPublication<std::string>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<int>("pub2");
 
-    auto& pubid3 = vFed1->registerPublication("pub3", "");
+    auto& pub3 = vFed1->registerPublication("pub3", "");
 
     auto& sub1 = vFed1->registerSubscription("fed0/pub1", "");
     auto& sub2 = vFed1->registerSubscription("pub2", "");
@@ -902,9 +903,9 @@ TEST_F(valuefed, time_update_callback)
     helics::InterfaceHandle lastId;
     helics::Time lastTime{helics::Time::minVal()};
     int validCount{0};
-    vFed1->setInputNotificationCallback([&](const helics::Input& subid, helics::Time callTime) {
+    vFed1->setInputNotificationCallback([&](const helics::Input& sub1, helics::Time callTime) {
         lastTime = callTime;
-        lastId = subid.getHandle();
+        lastId = sub1.getHandle();
     });
     vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
         if (newTime > lastTime && !iterating) {
@@ -913,7 +914,7 @@ TEST_F(valuefed, time_update_callback)
     });
     vFed1->enterExecutingMode();
     EXPECT_EQ(validCount, 1);
-    vFed1->publishBytes(pubid3, db);
+    vFed1->publishBytes(pub3, db);
     vFed1->requestTime(1.0);
     // the callbacks should have occurred here
     EXPECT_EQ(validCount, 2);
@@ -925,13 +926,13 @@ TEST_F(valuefed, time_update_callback)
         EXPECT_TRUE(false) << " missed callback\n";
     }
 
-    pubid2.publish(4);
+    pub2.publish(4);
     vFed1->requestTime(2.0);
     // the callback should have occurred here
     EXPECT_EQ(validCount, 3);
     EXPECT_TRUE(lastId == sub2.getHandle());
     EXPECT_EQ(lastTime, 2.0);
-    pubid1.publish("this is a test");
+    pub1.publish("this is a test");
     vFed1->requestTime(3.0);
     // the callback should have occurred here
     EXPECT_EQ(validCount, 4);
@@ -948,10 +949,10 @@ TEST_F(valuefed, time_update_callback_single_thread)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     EXPECT_TRUE(vFed1->getFlagOption(HELICS_FLAG_SINGLE_THREAD_FEDERATE));
-    auto& pubid1 = vFed1->registerPublication<std::string>("pub1");
-    auto& pubid2 = vFed1->registerGlobalPublication<int>("pub2");
+    auto& pub1 = vFed1->registerPublication<std::string>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<int>("pub2");
 
-    auto& pubid3 = vFed1->registerPublication("pub3", "");
+    auto& pub3 = vFed1->registerPublication("pub3", "");
 
     auto& sub1 = vFed1->registerSubscription("fed0/pub1", "");
     auto& sub2 = vFed1->registerSubscription("pub2", "");
@@ -961,9 +962,9 @@ TEST_F(valuefed, time_update_callback_single_thread)
     helics::InterfaceHandle lastId;
     helics::Time lastTime{helics::Time::minVal()};
     int validCount{0};
-    vFed1->setInputNotificationCallback([&](const helics::Input& subid, helics::Time callTime) {
+    vFed1->setInputNotificationCallback([&](const helics::Input& sub1, helics::Time callTime) {
         lastTime = callTime;
-        lastId = subid.getHandle();
+        lastId = sub1.getHandle();
     });
     vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
         if (newTime > lastTime && !iterating) {
@@ -972,7 +973,7 @@ TEST_F(valuefed, time_update_callback_single_thread)
     });
     vFed1->enterExecutingMode();
     EXPECT_EQ(validCount, 1);
-    vFed1->publishBytes(pubid3, db);
+    vFed1->publishBytes(pub3, db);
     vFed1->requestTime(1.0);
     // the callbacks should have occurred here
     EXPECT_EQ(validCount, 2);
@@ -984,13 +985,13 @@ TEST_F(valuefed, time_update_callback_single_thread)
         EXPECT_TRUE(false) << " missed callback\n";
     }
 
-    pubid2.publish(4);
+    pub2.publish(4);
     vFed1->requestTime(2.0);
     // the callback should have occurred here
     EXPECT_EQ(validCount, 3);
     EXPECT_TRUE(lastId == sub2.getHandle());
     EXPECT_EQ(lastTime, 2.0);
-    pubid1.publish("this is a test");
+    pub1.publish("this is a test");
     vFed1->requestTime(3.0);
     // the callback should have occurred here
     EXPECT_EQ(validCount, 4);
@@ -1028,39 +1029,39 @@ TEST_P(valuefed_single_type, transfer_close)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto subid = vFed1->registerSubscription("pub1");
+    auto sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    std::string s = subid.getString();
+    std::string s = sub1.getString();
     // get the value
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    s = subid.getString();
+    s = sub1.getString();
     EXPECT_EQ(s, "string1");
-    pubid.close();
+    pub1.close();
     // advance time
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    s = subid.getString();
+    s = sub1.getString();
 
     EXPECT_EQ(s, "string2");
-    pubid.publish("string3");
+    pub1.publish("string3");
     // make sure the value is still what we expect
 
     // advance time
     gtime = vFed1->requestTime(3.0);
-    s = subid.getString();
+    s = sub1.getString();
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -1072,41 +1073,41 @@ TEST_P(valuefed_single_type, transfer_remove_target)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto subid = vFed1->registerSubscription("pub1");
+    auto sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    std::string s = subid.getString();
+    std::string s = sub1.getString();
     // get the value
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    s = subid.getString();
-    subid.getString();
+    s = sub1.getString();
+    sub1.getString();
     EXPECT_EQ(s, "string1");
 
-    subid.removeTarget("pub1");
+    sub1.removeTarget("pub1");
     // advance time
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    s = subid.getString();
+    s = sub1.getString();
 
     EXPECT_EQ(s, "string2");
-    pubid.publish("string3");
+    pub1.publish("string3");
     // make sure the value is still what we expect
 
     // advance time
     gtime = vFed1->requestTime(3.0);
-    s = subid.getString();
+    s = sub1.getString();
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -1119,9 +1120,9 @@ TEST_P(valuefed_all_type_tests, dual_transfer_close)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto& subid = vFed2->registerSubscription("pub1");
+    auto& sub1 = vFed2->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
@@ -1129,7 +1130,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_close)
     vFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
     auto gtime = vFed2->requestTime(1.0);
 
@@ -1137,17 +1138,17 @@ TEST_P(valuefed_all_type_tests, dual_transfer_close)
     gtime = f1time.get();
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string s = sub1.getString();
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    subid.getValue(s);
+    sub1.getValue(s);
     EXPECT_EQ(s, "string1");
     // advance time
-    pubid.close();
+    pub1.close();
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(2.0); });
     gtime = vFed2->requestTime(2.0);
 
@@ -1156,17 +1157,17 @@ TEST_P(valuefed_all_type_tests, dual_transfer_close)
     EXPECT_EQ(gtime, 2.0);
     // make sure the value was updated
 
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string2");
 
-    pubid.publish("string3");
+    pub1.publish("string3");
     // make sure the value is still what we expect
 
     // advance time
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(3.0); });
     gtime = vFed2->requestTime(3.0);
-    s = subid.getString();
+    s = sub1.getString();
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -1180,9 +1181,9 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto& subid = vFed2->registerSubscription("pub1");
+    auto& sub1 = vFed2->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
@@ -1190,7 +1191,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     vFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
     auto gtime = vFed2->requestTime(1.0);
 
@@ -1198,17 +1199,17 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     gtime = f1time.get();
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string s = sub1.getString();
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    subid.getValue(s);
+    sub1.getValue(s);
     EXPECT_EQ(s, "string1");
     // the target removal occurs at time 1, thus any message sent after 1.0 should be ignored
-    subid.removeTarget("pub1");
+    sub1.removeTarget("pub1");
     // advance time
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(2.0); });
     gtime = vFed2->requestTime(2.0);
@@ -1218,10 +1219,10 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     EXPECT_EQ(gtime, 2.0);
     // make sure the value was updated
 
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string2");
-    pubid.publish("string3");
+    pub1.publish("string3");
     // so in theory the remove target could take a little while since it needs to route through the
     // core on occasion
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(3.0); });
@@ -1231,7 +1232,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     EXPECT_EQ(gtime, 3.0);
 
     // make sure the value is still what we expect
-    s = subid.getString();
+    s = sub1.getString();
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -1245,9 +1246,9 @@ TEST_F(valuefed, rem_target_single_test)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto& subid = vFed2->registerSubscription("pub1");
+    auto& sub1 = vFed2->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
@@ -1256,13 +1257,13 @@ TEST_F(valuefed, rem_target_single_test)
     f1finish.wait();
     // both at executionMode
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto gtime = vFed1->requestTime(1.0);
     EXPECT_EQ(gtime, 1.0);
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     gtime = vFed1->requestTime(2.0);
-    pubid.publish("string3");
+    pub1.publish("string3");
     gtime = vFed1->requestTime(3.0);
     EXPECT_EQ(gtime, 3.0);
     vFed1->finalize();
@@ -1271,16 +1272,16 @@ TEST_F(valuefed, rem_target_single_test)
     gtime = vFed2->requestTime(1.0);
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string s = sub1.getString();
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
 
     // make sure the value is still what we expect
-    subid.getValue(s);
+    sub1.getValue(s);
     EXPECT_EQ(s, "string1");
     // the target removal occurs at time 1, thus any message sent after 1.0 should be ignored
-    subid.removeTarget("pub1");
+    sub1.removeTarget("pub1");
     // advance time
 
     gtime = vFed2->requestTime(2.0);
@@ -1288,7 +1289,7 @@ TEST_F(valuefed, rem_target_single_test)
     EXPECT_EQ(gtime, 2.0);
     // make sure the value was updated
 
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string2");
 
@@ -1298,7 +1299,7 @@ TEST_F(valuefed, rem_target_single_test)
     EXPECT_EQ(gtime, 3.0);
 
     // make sure the value is still what we expect
-    s = subid.getString();
+    s = sub1.getString();
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
 
@@ -1312,10 +1313,10 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto& subid = vFed2->registerGlobalInput<std::string>("sub1");
-    pubid.addTarget("sub1");
+    auto& sub1 = vFed2->registerGlobalInput<std::string>("sub1");
+    pub1.addTarget("sub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
@@ -1323,7 +1324,7 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
     vFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
     auto gtime = vFed2->requestTime(1.0);
 
@@ -1331,17 +1332,17 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
     gtime = f1time.get();
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string s = sub1.getString();
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    subid.getValue(s);
+    sub1.getValue(s);
     EXPECT_EQ(s, "string1");
     // advance time
-    pubid.removeTarget("sub1");
+    pub1.removeTarget("sub1");
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(2.0); });
     gtime = vFed2->requestTime(2.0);
 
@@ -1350,17 +1351,17 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
     EXPECT_EQ(gtime, 2.0);
     // make sure the value was updated
 
-    subid.getValue(s);
+    sub1.getValue(s);
 
     EXPECT_EQ(s, "string2");
 
-    pubid.publish("string3");
+    pub1.publish("string3");
     // make sure the value is still what we expect
 
     // advance time
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(3.0); });
     gtime = vFed2->requestTime(3.0);
-    s = subid.getString();
+    s = sub1.getString();
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -1424,19 +1425,19 @@ TEST_F(valuefed, publish_time_restrict)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<int>("pub1");
 
-    auto& subid = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    pubid.setOption(HELICS_HANDLE_OPTION_TIME_RESTRICTED, 10000);
+    pub1.setOption(HELICS_HANDLE_OPTION_TIME_RESTRICTED, 10000);
 
     vFed1->enterExecutingMode();
     std::vector<int> returned;
     for (auto ii = 0; ii < 200; ++ii) {
-        if (subid.isUpdated()) {
-            returned.push_back(subid.getValue<int>());
+        if (sub1.isUpdated()) {
+            returned.push_back(sub1.getValue<int>());
         }
-        pubid.publish(ii);
+        pub1.publish(ii);
         vFed1->requestNextStep();
     }
 
@@ -1451,19 +1452,19 @@ TEST_F(valuefed, input_time_restrict)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<int>("pub1");
 
-    auto& subid = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    subid.setOption(HELICS_HANDLE_OPTION_TIME_RESTRICTED, 10000);
+    sub1.setOption(HELICS_HANDLE_OPTION_TIME_RESTRICTED, 10000);
 
     vFed1->enterExecutingMode();
     std::vector<int> returned;
     for (auto ii = 0; ii < 200; ++ii) {
-        if (subid.isUpdated()) {
-            returned.push_back(subid.getValue<int>());
+        if (sub1.isUpdated()) {
+            returned.push_back(sub1.getValue<int>());
         }
-        pubid.publish(ii);
+        pub1.publish(ii);
         vFed1->requestNextStep();
     }
 
@@ -1478,19 +1479,19 @@ TEST_F(valuefed, publish_change_restrict)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<int>("pub1");
 
-    auto& subid = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    pubid.setOption(HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE);
+    pub1.setOption(HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE);
 
     vFed1->enterExecutingMode();
     std::vector<int> returned;
     for (auto ii = 0; ii < 200; ++ii) {
-        if (subid.isUpdated()) {
-            returned.push_back(subid.getValue<int>());
+        if (sub1.isUpdated()) {
+            returned.push_back(sub1.getValue<int>());
         }
-        pubid.publish(static_cast<int>(ii / 10));
+        pub1.publish(static_cast<int>(ii / 10));
         vFed1->requestNextStep();
     }
 
@@ -1505,19 +1506,19 @@ TEST_F(valuefed, input_change_restrict)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<int>("pub1");
 
-    auto& subid = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    subid.setOption(HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE, true);
+    sub1.setOption(HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE, true);
 
     vFed1->enterExecutingMode();
     std::vector<int> returned;
     for (auto ii = 0; ii < 200; ++ii) {
-        if (subid.isUpdated()) {
-            returned.push_back(subid.getValue<int>());
+        if (sub1.isUpdated()) {
+            returned.push_back(sub1.getValue<int>());
         }
-        pubid.publish(static_cast<int>(ii / 10));
+        pub1.publish(static_cast<int>(ii / 10));
         vFed1->requestNextStep();
     }
 
