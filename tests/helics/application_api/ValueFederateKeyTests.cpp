@@ -313,9 +313,9 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
 }
 
 static bool dualTransfer(std::shared_ptr<helics::ValueFederate>& vFed1,
-                               std::shared_ptr<helics::ValueFederate>& vFed2,
-                               helics::Publication& pub1,
-                               helics::Input& sub1)
+                         std::shared_ptr<helics::ValueFederate>& vFed2,
+                         helics::Publication& pub1,
+                         helics::Input& sub1)
 {
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
@@ -503,7 +503,8 @@ TEST_P(valuefed_flagfile_tests, configure_test)
     std::string file = std::string(TEST_DIR) + GetParam();
     std::ifstream teststream(file);
 
-    std::string config((std::istreambuf_iterator<char>(teststream)), std::istreambuf_iterator<char>());
+    std::string config((std::istreambuf_iterator<char>(teststream)),
+                       std::istreambuf_iterator<char>());
 
     AddBroker("zmq", 1);
     helics::ValueFederate vFed2("", config);

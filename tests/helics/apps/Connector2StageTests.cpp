@@ -275,7 +275,7 @@ TEST(connector_2stage, simple_connector)
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
-    EXPECT_EQ(cfed1.getValueNames(),std::vector<std::string>{"inp1"});
+    EXPECT_EQ(cfed1.getValueNames(), std::vector<std::string>{"inp1"});
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
