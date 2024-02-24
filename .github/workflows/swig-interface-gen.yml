@@ -36,7 +36,7 @@ jobs:
 
     # Run clang-format on helics.h and helics_api.h
     - name: clang-format
-      uses: pre-commit/action@v3.0.0
+      uses: pre-commit/action@v3.0.1
       # Failure is expected, since we know it will be fixing up the generated helics header files
       continue-on-error: true
       with:

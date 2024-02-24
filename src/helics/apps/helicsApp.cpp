@@ -100,8 +100,8 @@ App::App(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
     configFileName = fed->getConfigFile();
 }
 
-App::App(std::string_view appName, const std::string& jsonString):
-    fed(std::make_shared<CombinationFederate>(appName, jsonString))
+App::App(std::string_view appName, const std::string& configString):
+    fed(std::make_shared<CombinationFederate>(appName, configString))
 {
     configFileName = fed->getConfigFile();
 }
@@ -197,27 +197,28 @@ bool AppTextParser::loadNextLine(std::string& line, int& lineNumber)
         if (line.empty()) {
             continue;
         }
-        auto fc = line.find_first_not_of(" \t\n\r\0");
-        if (fc == std::string::npos) {
+        auto firstChar = line.find_first_not_of(" \t\n\r\0");
+        if (firstChar == std::string::npos) {
             continue;
         }
         if (mLineComment) {
-            if (fc + 2 < line.size()) {
-                if ((line[fc] == '#') && (line[fc + 1] == '#') && (line[fc + 2] == ']')) {
+            if (firstChar + 2 < line.size()) {
+                if ((line[firstChar] == '#') && (line[firstChar + 1] == '#') &&
+                    (line[firstChar + 2] == ']')) {
                     mLineComment = false;
                 }
             }
             continue;
         }
-        if (line[fc] == '#') {
-            if (fc + 2 < line.size()) {
-                if ((line[fc + 1] == '#') && (line[fc + 2] == '[')) {
+        if (line[firstChar] == '#') {
+            if (firstChar + 2 < line.size()) {
+                if ((line[firstChar + 1] == '#') && (line[firstChar + 2] == '[')) {
                     mLineComment = true;
                 }
             }
             continue;
         }
-        if (line[fc] == '!') {
+        if (line[firstChar] == '!') {
             continue;
         }
         lineNumber = currentLineNumber;
@@ -235,9 +236,10 @@ void AppTextParser::reset()
 
 void App::loadConfigOptions(AppTextParser& aparser)
 {
-    if (!aparser.configString().empty()) {
+    const auto& configStr = aparser.configString();
+    if (!configStr.empty()) {
         auto app = generateParser();
-        std::istringstream sstr(aparser.configString());
+        std::istringstream sstr(configStr);
         app->parse_from_stream(sstr);
     }
 }
@@ -308,8 +310,8 @@ void App::loadConfigOptions(const Json::Value& element)
 }
 void App::initialize()
 {
-    auto md = fed->getCurrentMode();
-    if (md == Federate::Modes::STARTUP) {
+    auto currentMode = fed->getCurrentMode();
+    if (currentMode == Federate::Modes::STARTUP) {
         fed->enterInitializingMode();
     }
 }
