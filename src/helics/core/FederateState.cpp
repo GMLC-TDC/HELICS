@@ -2642,24 +2642,24 @@ std::string FederateState::processQueryActual(std::string_view query) const
             base["tags"] = tagBlock;
         }
         if (!queryCallbacks.empty()) {
-            for (auto& queryCallback : queryCallbacks) {
+            for (const auto& queryCallback : queryCallbacks) {
                 if (!queryCallback) {
                     continue;
                 }
-                auto potential = queryCallback("potential_interfaces");
-                if (!potential.empty()) {
-                    try {
-                        auto json = fileops::loadJsonStr(potential);
+            auto potential = queryCallback("potential_interfaces");
+            if (!potential.empty()) {
+                try {
+                    auto json = fileops::loadJsonStr(potential);
 
-                        if (!json.isMember("error")) {
-                            base["potential_interfaces"] = json;
-                            break;
-                        }
-                    }
-                    catch (const std::invalid_argument&) {
-                        ;
+                    if (!json.isMember("error")) {
+                        base["potential_interfaces"] = json;
+                        break;
                     }
                 }
+                catch (const std::invalid_argument&) {
+                    ;
+                }
+            }
             }
         }
         return fileops::generateJsonString(base);
@@ -2719,7 +2719,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
     }
 
     if (!queryCallbacks.empty()) {
-        for (auto& queryCallback : queryCallbacks) {
+        for (const auto& queryCallback : queryCallbacks) {
             if (!queryCallback) {
                 continue;
             }

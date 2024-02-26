@@ -1309,7 +1309,7 @@ static void
     static constexpr std::string_view errorMessage =
         R"(interface properties require "name" and "value" fields)";
     if (json.isMember("properties")) {
-        auto& props = json["properties"];
+        const auto& props = json["properties"];
         if (props.isArray()) {
             for (const auto& prop : props) {
                 if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
