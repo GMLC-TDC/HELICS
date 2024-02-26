@@ -237,14 +237,14 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
 {
     auto doc = fileops::loadJson(jsonString);
-    registerValueInterfacesJsonDetail(doc,false);
+    registerValueInterfacesJsonDetail(doc, false);
 }
 
 void ValueFederate::registerValueInterfacesJsonDetail(Json::Value& json, bool defaultGlobal)
 {
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 
-    Json::Value &iface=(json.isMember("interfaces"))?json["interfaces"]:json;
+    Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
 
     if (iface.isMember("publications")) {
         auto pubs = iface["publications"];
@@ -335,7 +335,7 @@ void ValueFederate::registerValueInterfacesJsonDetail(Json::Value& json, bool de
     }
 
     if (json.isMember("helics")) {
-        registerValueInterfacesJsonDetail(json["helics"],defaultGlobal);
+        registerValueInterfacesJsonDetail(json["helics"], defaultGlobal);
     }
 }
 

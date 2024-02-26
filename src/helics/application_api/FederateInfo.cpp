@@ -819,14 +819,13 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
             throw(InvalidIdentifier(clierror.what()));
         }
     }
-    
 }
 
 void FederateInfo::loadJsonConfig(Json::Value& json)
 {
     const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
-        Time arg) {
-            setProperty(propStringsTranslations.at(fname), arg);
+                                                                          Time arg) {
+        setProperty(propStringsTranslations.at(fname), arg);
     };
 
     for (const auto& prop : propStringsTranslations) {
@@ -842,8 +841,7 @@ void FederateInfo::loadJsonConfig(Json::Value& json)
         [](const std::string& value) { return getOptionValue(value); },
         [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
 
-    if (json.isMember("helics"))
-    {
+    if (json.isMember("helics")) {
         loadJsonConfig(json["helics"]);
     }
 }

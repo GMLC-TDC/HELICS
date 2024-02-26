@@ -18,7 +18,7 @@ class App;
 }
 
 namespace Json {
-    class Value;
+class Value;
 }
 
 namespace helics {
@@ -127,7 +127,7 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     /** do some additional configuration from config files */
     void config_additional(helicsCLI11App* app);
     /** method for loading info from json*/
-    void loadJsonConfig(Json::Value &json);
+    void loadJsonConfig(Json::Value& json);
 };
 
 /** generate a FederateInfo object from a config file or string (JSON, TOML)

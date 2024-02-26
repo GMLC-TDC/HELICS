@@ -216,19 +216,17 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
 void MessageFederate::registerMessageInterfacesJson(const std::string& jsonString)
 {
     auto doc = fileops::loadJson(jsonString);
-    registerMessageInterfacesJsonDetail(doc,false);
+    registerMessageInterfacesJsonDetail(doc, false);
 }
-
 
 void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, bool defaultGlobal)
 {
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 
-    Json::Value &iface=(json.isMember("interfaces"))?json["interfaces"]:json;
-
+    Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
 
     if (iface.isMember("endpoints")) {
-        for (const auto& ept :iface["endpoints"]) {
+        for (const auto& ept : iface["endpoints"]) {
             auto eptName = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
             const bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
@@ -247,7 +245,7 @@ void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, boo
         }
     }
     if (json.isMember("helics")) {
-        registerMessageInterfacesJsonDetail(json["helics"],defaultGlobal);
+        registerMessageInterfacesJsonDetail(json["helics"], defaultGlobal);
     }
 }
 

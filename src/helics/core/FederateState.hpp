@@ -477,21 +477,19 @@ class FederateState {
     /** set the query callback function
     @details function must have signature std::string(const std::string &query)
     */
-    void setQueryCallback(std::function<std::string(std::string_view)> queryCallbackFunction, int order)
+    void setQueryCallback(std::function<std::string(std::string_view)> queryCallbackFunction,
+                          int order)
     {
-        if (order <= 0)
-        {
-            order =1;
+        if (order <= 0) {
+            order = 1;
         }
-        if (order > 10)
-        {
-            order=10;
+        if (order > 10) {
+            order = 10;
         }
-        if (queryCallbacks.size() < order)
-        {
+        if (queryCallbacks.size() < order) {
             queryCallbacks.resize(order);
         }
-        queryCallbacks[order-1] = std::move(queryCallbackFunction);
+        queryCallbacks[order - 1] = std::move(queryCallbackFunction);
     }
     /** generate the result of a query string
     @param query a query string

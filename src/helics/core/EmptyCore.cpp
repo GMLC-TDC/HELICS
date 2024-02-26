@@ -473,7 +473,8 @@ void EmptyCore::setFederateOperator(LocalFederateId /*federateID */,
 }
 
 void EmptyCore::setQueryCallback(LocalFederateId /*federateID*/,
-                                 std::function<std::string(std::string_view)> /*queryFunction*/, int /*order*/)
+                                 std::function<std::string(std::string_view)> /*queryFunction*/,
+                                 int /*order*/)
 {
 }
 

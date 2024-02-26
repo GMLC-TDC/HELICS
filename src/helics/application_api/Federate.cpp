@@ -18,9 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../network/loadCores.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "ConnectorFederateManager.hpp"
-#include "PotentialInterfacesManager.hpp"
 #include "CoreApp.hpp"
 #include "Filters.hpp"
+#include "PotentialInterfacesManager.hpp"
 #include "Translator.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
@@ -251,15 +251,13 @@ void Federate::enterInitializingMode()
     switch (cmode) {
         case Modes::STARTUP:
             try {
-                if (hasPotentialInterfaces)
-                {
+                if (hasPotentialInterfaces) {
                     potentialInterfacesStartupSequence();
                 }
-      
+
                 if (coreObject->enterInitializingMode(fedID)) {
                     enteringInitializingMode(IterationResult::NEXT_STEP);
                 }
-               
             }
             catch (const HelicsException&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -1056,10 +1054,9 @@ iteration_time Federate::requestTimeIterativeComplete()
 
 void Federate::potentialInterfacesStartupSequence()
 {
-    if (potManager)
-    {
-        coreObject->enterInitializingMode(fedID,helics::IterationRequest::FORCE_ITERATION);
-        coreObject->enterInitializingMode(fedID,helics::IterationRequest::FORCE_ITERATION);
+    if (potManager) {
+        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
     }
 }
 
@@ -1351,7 +1348,6 @@ static void
 
 void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 {
-   
     auto doc = fileops::loadJson(jsonString);
     registerConnectorInterfacesJsonDetail(doc);
 }
@@ -1362,8 +1358,8 @@ void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
     bool defaultGlobal = false;
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 
-    Json::Value &iface=(json.isMember("interfaces"))?json["interfaces"]:json;
- 
+    Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
+
     if (iface.isMember("filters")) {
         for (const auto& filt : iface["filters"]) {
             const std::string key = getOrDefault(filt, "name", emptyStr);
@@ -1384,18 +1380,18 @@ void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
 
             addTargetVariations(filt, "source", "endpoints", [&filter](const std::string& target) {
                 filter.addSourceTarget(target);
-                });
+            });
             addTargetVariations(filt,
-                "destination",
-                "endpoints",
-                [&filter](const std::string& target) {
-                    filter.addDestinationTarget(target);
-                });
+                                "destination",
+                                "endpoints",
+                                [&filter](const std::string& target) {
+                                    filter.addDestinationTarget(target);
+                                });
 
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
-                    });
+                });
             }
 
             loadPropertiesJson(this, filter, filt, strictConfigChecking);
@@ -1421,73 +1417,71 @@ void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
                     throw(InvalidParameter(emessage));
                 }
                 logMessage(HELICS_LOG_LEVEL_WARNING,
-                    fmt::format("unrecognized translator operation:{}", ttype));
+                           fmt::format("unrecognized translator operation:{}", ttype));
                 continue;
             }
             auto& translator = generateTranslator(this, global, key, opType, etype, units);
             loadOptions(this, trans, translator);
 
             addTargetVariations(trans,
-                "source",
-                "endpoints",
-                [&translator](const std::string& target) {
-                    translator.addSourceEndpoint(target);
-                });
+                                "source",
+                                "endpoints",
+                                [&translator](const std::string& target) {
+                                    translator.addSourceEndpoint(target);
+                                });
             addTargetVariations(trans,
-                "destination",
-                "endpoints",
-                [&translator](const std::string& target) {
-                    translator.addDestinationEndpoint(target);
-                });
+                                "destination",
+                                "endpoints",
+                                [&translator](const std::string& target) {
+                                    translator.addDestinationEndpoint(target);
+                                });
             addTargetVariations(trans,
-                "source",
-                "publications",
-                [&translator](const std::string& target) {
-                    translator.addPublication(target);
-                });
+                                "source",
+                                "publications",
+                                [&translator](const std::string& target) {
+                                    translator.addPublication(target);
+                                });
             addTargetVariations(trans,
-                "destination",
-                "inputs",
-                [&translator](const std::string& target) {
-                    translator.addInputTarget(target);
-                });
+                                "destination",
+                                "inputs",
+                                [&translator](const std::string& target) {
+                                    translator.addInputTarget(target);
+                                });
             addTargetVariations(trans,
-                "source",
-                "filters",
-                [&translator](const std::string& target) {
-                    translator.addSourceFilter(target);
-                });
+                                "source",
+                                "filters",
+                                [&translator](const std::string& target) {
+                                    translator.addSourceFilter(target);
+                                });
             addTargetVariations(trans,
-                "destination",
-                "filters",
-                [&translator](const std::string& target) {
-                    translator.addDestinationFilter(target);
-                });
+                                "destination",
+                                "filters",
+                                [&translator](const std::string& target) {
+                                    translator.addDestinationFilter(target);
+                                });
             loadPropertiesJson(this, translator, trans, strictConfigChecking);
         }
     }
     arrayPairProcess(json, "globals", [this](std::string_view key, std::string_view val) {
         setGlobal(key, val);
-        });
+    });
     arrayPairProcess(json, "aliases", [this](std::string_view key, std::string_view val) {
         addAlias(key, val);
-        });
+    });
 
     loadTags(json, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
-        });
+    });
     if (json.isMember("helics")) {
         registerConnectorInterfacesJsonDetail(json["helics"]);
     }
 
-    if (json.isMember("potential_interfaces"))
-    {
-        if (!potManager)
-        {
-            potManager=std::make_unique<PotentialInterfacesManager>(coreObject.get());
+    if (json.isMember("potential_interfaces")) {
+        if (!potManager) {
+            potManager = std::make_unique<PotentialInterfacesManager>(coreObject.get());
         }
         potManager->loadPotentialInterfaces(json);
-        hasPotentialInterfaces=true;
+        hasPotentialInterfaces = true;
     }
 }
 
@@ -1821,7 +1815,7 @@ std::string Federate::queryComplete(QueryId queryIndex)  // NOLINT
 
 void Federate::setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction)
 {
-    coreObject->setQueryCallback(fedID, queryFunction,1);
+    coreObject->setQueryCallback(fedID, queryFunction, 1);
 }
 
 bool Federate::isQueryCompleted(QueryId queryIndex) const  // NOLINT

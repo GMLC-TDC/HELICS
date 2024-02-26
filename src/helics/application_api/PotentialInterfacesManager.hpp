@@ -6,27 +6,25 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <string_view>
-#include <string>
-#include <vector>
 #include <map>
+#include <string>
+#include <string_view>
+#include <vector>
 
-namespace Json
-{
-    class Value;
+namespace Json {
+class Value;
 }
 
-namespace helics
-{
-    class Core;
+namespace helics {
+class Core;
 
-    class PotentialInterfacesManager
-    {
-    public:
-        PotentialInterfacesManager(Core *core);
-        void loadPotentialInterfaces(Json::Value &json);
-        std::string generateQueryResponse(std::string_view query);
-    private:
-        Core *corePtr{nullptr};
-    };
-}
+class PotentialInterfacesManager {
+  public:
+    PotentialInterfacesManager(Core* core);
+    void loadPotentialInterfaces(Json::Value& json);
+    std::string generateQueryResponse(std::string_view query);
+
+  private:
+    Core* corePtr{nullptr};
+};
+}  // namespace helics

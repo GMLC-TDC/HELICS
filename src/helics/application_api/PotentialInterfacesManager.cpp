@@ -6,24 +6,23 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "PotentialInterfacesManager.hpp"
-#include "helics/core/Core.hpp"
 
 #include "helics/common/JsonProcessingFunctions.hpp"
+#include "helics/core/Core.hpp"
 
 #include <set>
 
-namespace helics
+namespace helics {
+PotentialInterfacesManager::PotentialInterfacesManager(Core* core): corePtr(core) {}
+
+void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
 {
-    PotentialInterfacesManager::PotentialInterfacesManager(Core* core) :corePtr(core) {}
-
-    void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
-    {
-        static const std::set<std::string> interfaceTypes{"publications","inputs","endpoints","filters","translators","datasink"};
-
-    }
-
-    std::string PotentialInterfacesManager::generateQueryResponse(std::string_view query)
-    {
-        return std::string{};
-     }
+    static const std::set<std::string> interfaceTypes{
+        "publications", "inputs", "endpoints", "filters", "translators", "datasink"};
 }
+
+std::string PotentialInterfacesManager::generateQueryResponse(std::string_view query)
+{
+    return std::string{};
+}
+}  // namespace helics

@@ -2588,7 +2588,8 @@ static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> ma
     {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
 
 void CommonCore::setQueryCallback(LocalFederateId federateID,
-                                  std::function<std::string(std::string_view)> queryFunction, int order)
+                                  std::function<std::string(std::string_view)> queryFunction,
+                                  int order)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {

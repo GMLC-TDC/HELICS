@@ -104,7 +104,8 @@ class HELICS_CXX_EXPORT Federate {
     /// pointer to a class defining the async call information
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>> asyncCallInfo;
     std::unique_ptr<ConnectorFederateManager> cManager;  //!< class for managing filter operations
-    std::unique_ptr<PotentialInterfacesManager> potManager; //!< class for managing potential interfaces
+    std::unique_ptr<PotentialInterfacesManager>
+        potManager;  //!< class for managing potential interfaces
     std::string mName;  //!< the name of the federate
     std::function<void(Time, Time, bool)> timeRequestEntryCallback;
     std::function<void(Time, bool)> timeUpdateCallback;
@@ -114,6 +115,7 @@ class HELICS_CXX_EXPORT Federate {
     std::function<void()> executingEntryCallback;
     std::function<void()> cosimulationTerminationCallback;
     std::function<void(int, std::string_view)> errorHandlerCallback;
+
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
@@ -863,7 +865,7 @@ received
     void registerConnectorInterfacesToml(const std::string& tomlString);
     /** check if a filter type and operation is valid
      */
-    void registerConnectorInterfacesJsonDetail(Json::Value &json);
+    void registerConnectorInterfacesJsonDetail(Json::Value& json);
     bool
         checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation) const;
 };
