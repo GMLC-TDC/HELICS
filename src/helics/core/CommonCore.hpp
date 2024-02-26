@@ -262,7 +262,7 @@ class CommonCore: public Core, public BrokerBase {
                               HelicsSequencingModes mode) override;
     virtual void
         setQueryCallback(LocalFederateId federateID,
-                         std::function<std::string(std::string_view)> queryFunction) override;
+                         std::function<std::string(std::string_view)> queryFunction, int order) override;
     virtual void setGlobal(std::string_view valueName, std::string_view value) override;
     virtual void sendCommand(std::string_view target,
                              std::string_view commandStr,

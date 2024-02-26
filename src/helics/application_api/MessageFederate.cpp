@@ -216,10 +216,19 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
 void MessageFederate::registerMessageInterfacesJson(const std::string& jsonString)
 {
     auto doc = fileops::loadJson(jsonString);
-    bool defaultGlobal = false;
-    fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
-    if (doc.isMember("endpoints")) {
-        for (const auto& ept : doc["endpoints"]) {
+    registerMessageInterfacesJsonDetail(doc,false);
+}
+
+
+void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, bool defaultGlobal)
+{
+    fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
+
+    Json::Value &iface=(json.isMember("interfaces"))?json["interfaces"]:json;
+
+
+    if (iface.isMember("endpoints")) {
+        for (const auto& ept :iface["endpoints"]) {
             auto eptName = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
             const bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
@@ -229,13 +238,16 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
             loadOptions(this, ept, epObj);
         }
     }
-    if (doc.isMember("datasinks")) {
-        for (const auto& ept : doc["datasinks"]) {
+    if (iface.isMember("datasinks")) {
+        for (const auto& ept : iface["datasinks"]) {
             auto eptName = fileops::getName(ept);
             Endpoint& epObj = registerDataSink(eptName);
 
             loadOptions(this, ept, epObj);
         }
+    }
+    if (json.isMember("helics")) {
+        registerMessageInterfacesJsonDetail(json["helics"],defaultGlobal);
     }
 }
 

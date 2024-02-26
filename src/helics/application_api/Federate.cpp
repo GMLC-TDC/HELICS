@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../network/loadCores.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "ConnectorFederateManager.hpp"
+#include "PotentialInterfacesManager.hpp"
 #include "CoreApp.hpp"
 #include "Filters.hpp"
 #include "Translator.hpp"
@@ -250,9 +251,15 @@ void Federate::enterInitializingMode()
     switch (cmode) {
         case Modes::STARTUP:
             try {
+                if (hasPotentialInterfaces)
+                {
+                    potentialInterfacesStartupSequence();
+                }
+      
                 if (coreObject->enterInitializingMode(fedID)) {
                     enteringInitializingMode(IterationResult::NEXT_STEP);
                 }
+               
             }
             catch (const HelicsException&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -1047,6 +1054,15 @@ iteration_time Federate::requestTimeIterativeComplete()
         "cannot call requestTimeIterativeComplete without first calling requestTimeIterativeAsync function"));
 }
 
+void Federate::potentialInterfacesStartupSequence()
+{
+    if (potManager)
+    {
+        coreObject->enterInitializingMode(fedID,helics::IterationRequest::FORCE_ITERATION);
+        coreObject->enterInitializingMode(fedID,helics::IterationRequest::FORCE_ITERATION);
+    }
+}
+
 void Federate::updateFederateMode(Modes newMode)
 {
     const Modes oldMode = currentMode.load();
@@ -1335,14 +1351,21 @@ static void
 
 void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 {
-    using fileops::getOrDefault;
+   
     auto doc = fileops::loadJson(jsonString);
+    registerConnectorInterfacesJsonDetail(doc);
+}
 
+void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
+{
+    using fileops::getOrDefault;
     bool defaultGlobal = false;
-    fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
+    fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 
-    if (doc.isMember("filters")) {
-        for (const auto& filt : doc["filters"]) {
+    Json::Value &iface=(json.isMember("interfaces"))?json["interfaces"]:json;
+ 
+    if (iface.isMember("filters")) {
+        for (const auto& filt : iface["filters"]) {
             const std::string key = getOrDefault(filt, "name", emptyStr);
             const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
@@ -1361,25 +1384,25 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 
             addTargetVariations(filt, "source", "endpoints", [&filter](const std::string& target) {
                 filter.addSourceTarget(target);
-            });
+                });
             addTargetVariations(filt,
-                                "destination",
-                                "endpoints",
-                                [&filter](const std::string& target) {
-                                    filter.addDestinationTarget(target);
-                                });
+                "destination",
+                "endpoints",
+                [&filter](const std::string& target) {
+                    filter.addDestinationTarget(target);
+                });
 
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
-                });
+                    });
             }
 
             loadPropertiesJson(this, filter, filt, strictConfigChecking);
         }
     }
-    if (doc.isMember("translators")) {
-        for (const auto& trans : doc["translators"]) {
+    if (iface.isMember("translators")) {
+        for (const auto& trans : iface["translators"]) {
             const std::string key = getOrDefault(trans, "name", emptyStr);
 
             std::string ttype = getOrDefault(trans, "type", std::string("custom"));
@@ -1398,61 +1421,74 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
                     throw(InvalidParameter(emessage));
                 }
                 logMessage(HELICS_LOG_LEVEL_WARNING,
-                           fmt::format("unrecognized translator operation:{}", ttype));
+                    fmt::format("unrecognized translator operation:{}", ttype));
                 continue;
             }
             auto& translator = generateTranslator(this, global, key, opType, etype, units);
             loadOptions(this, trans, translator);
 
             addTargetVariations(trans,
-                                "source",
-                                "endpoints",
-                                [&translator](const std::string& target) {
-                                    translator.addSourceEndpoint(target);
-                                });
+                "source",
+                "endpoints",
+                [&translator](const std::string& target) {
+                    translator.addSourceEndpoint(target);
+                });
             addTargetVariations(trans,
-                                "destination",
-                                "endpoints",
-                                [&translator](const std::string& target) {
-                                    translator.addDestinationEndpoint(target);
-                                });
+                "destination",
+                "endpoints",
+                [&translator](const std::string& target) {
+                    translator.addDestinationEndpoint(target);
+                });
             addTargetVariations(trans,
-                                "source",
-                                "publications",
-                                [&translator](const std::string& target) {
-                                    translator.addPublication(target);
-                                });
+                "source",
+                "publications",
+                [&translator](const std::string& target) {
+                    translator.addPublication(target);
+                });
             addTargetVariations(trans,
-                                "destination",
-                                "inputs",
-                                [&translator](const std::string& target) {
-                                    translator.addInputTarget(target);
-                                });
+                "destination",
+                "inputs",
+                [&translator](const std::string& target) {
+                    translator.addInputTarget(target);
+                });
             addTargetVariations(trans,
-                                "source",
-                                "filters",
-                                [&translator](const std::string& target) {
-                                    translator.addSourceFilter(target);
-                                });
+                "source",
+                "filters",
+                [&translator](const std::string& target) {
+                    translator.addSourceFilter(target);
+                });
             addTargetVariations(trans,
-                                "destination",
-                                "filters",
-                                [&translator](const std::string& target) {
-                                    translator.addDestinationFilter(target);
-                                });
+                "destination",
+                "filters",
+                [&translator](const std::string& target) {
+                    translator.addDestinationFilter(target);
+                });
             loadPropertiesJson(this, translator, trans, strictConfigChecking);
         }
     }
-    arrayPairProcess(doc, "globals", [this](std::string_view key, std::string_view val) {
+    arrayPairProcess(json, "globals", [this](std::string_view key, std::string_view val) {
         setGlobal(key, val);
-    });
-    arrayPairProcess(doc, "aliases", [this](std::string_view key, std::string_view val) {
+        });
+    arrayPairProcess(json, "aliases", [this](std::string_view key, std::string_view val) {
         addAlias(key, val);
-    });
+        });
 
-    loadTags(doc, [this](std::string_view tagname, std::string_view tagvalue) {
+    loadTags(json, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
-    });
+        });
+    if (json.isMember("helics")) {
+        registerConnectorInterfacesJsonDetail(json["helics"]);
+    }
+
+    if (json.isMember("potential_interfaces"))
+    {
+        if (!potManager)
+        {
+            potManager=std::make_unique<PotentialInterfacesManager>(coreObject.get());
+        }
+        potManager->loadPotentialInterfaces(json);
+        hasPotentialInterfaces=true;
+    }
 }
 
 static void arrayPairProcess(toml::value doc,
@@ -1785,7 +1821,7 @@ std::string Federate::queryComplete(QueryId queryIndex)  // NOLINT
 
 void Federate::setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction)
 {
-    coreObject->setQueryCallback(fedID, queryFunction);
+    coreObject->setQueryCallback(fedID, queryFunction,1);
 }
 
 bool Federate::isQueryCompleted(QueryId queryIndex) const  // NOLINT

@@ -161,6 +161,9 @@ class HELICS_CXX_EXPORT MessageFederate:
  */
     void registerMessageInterfacesJson(const std::string& jsonString);
 
+    /** details of the registration process*/
+    void registerMessageInterfacesJsonDetail(Json::Value& json, bool defaultGlobal);
+
     /** register a set Message interfaces using a toml file
   @details call is only valid in startup mode it is a protected call to add an
   @param tomlString  the location of the TOML to load to generate the interfaces

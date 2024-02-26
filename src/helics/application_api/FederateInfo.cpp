@@ -801,24 +801,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
     catch (const std::invalid_argument& iarg) {
         throw(helics::InvalidParameter(iarg.what()));
     }
-
-    const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
-                                                                          Time arg) {
-        setProperty(propStringsTranslations.at(fname), arg);
-    };
-
-    for (const auto& prop : propStringsTranslations) {
-        if (prop.second > 200) {
-            continue;
-        }
-        fileops::callIfMember(doc, std::string(prop.first), timeCall);
-    }
-
-    processOptions(
-        doc,
-        [](const std::string& option) { return getFlagIndex(option); },
-        [](const std::string& value) { return getOptionValue(value); },
-        [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
+    loadJsonConfig(doc);
 
     if (runArgParser) {
         auto app = makeCLIApp();
@@ -835,6 +818,33 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         catch (const CLI::Error& clierror) {
             throw(InvalidIdentifier(clierror.what()));
         }
+    }
+    
+}
+
+void FederateInfo::loadJsonConfig(Json::Value& json)
+{
+    const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
+        Time arg) {
+            setProperty(propStringsTranslations.at(fname), arg);
+    };
+
+    for (const auto& prop : propStringsTranslations) {
+        if (prop.second > 200) {
+            continue;
+        }
+        fileops::callIfMember(json, std::string(prop.first), timeCall);
+    }
+
+    processOptions(
+        json,
+        [](const std::string& option) { return getFlagIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
+
+    if (json.isMember("helics"))
+    {
+        loadJsonConfig(json["helics"]);
     }
 }
 

@@ -148,7 +148,7 @@ class FederateState {
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
 
     /** a callback for additional queries */
-    std::function<std::string(std::string_view)> queryCallback;
+    std::vector<std::function<std::string(std::string_view)>> queryCallbacks;
     std::shared_ptr<FederateOperator> fedCallbacks;  //!< storage for a callback federate
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
     std::atomic<bool> queueProcessing{false};
@@ -477,9 +477,21 @@ class FederateState {
     /** set the query callback function
     @details function must have signature std::string(const std::string &query)
     */
-    void setQueryCallback(std::function<std::string(std::string_view)> queryCallbackFunction)
+    void setQueryCallback(std::function<std::string(std::string_view)> queryCallbackFunction, int order)
     {
-        queryCallback = std::move(queryCallbackFunction);
+        if (order <= 0)
+        {
+            order =1;
+        }
+        if (order > 10)
+        {
+            order=10;
+        }
+        if (queryCallbacks.size() < order)
+        {
+            queryCallbacks.resize(order);
+        }
+        queryCallbacks[order-1] = std::move(queryCallbackFunction);
     }
     /** generate the result of a query string
     @param query a query string

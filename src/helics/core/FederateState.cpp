@@ -2641,7 +2641,13 @@ std::string FederateState::processQueryActual(std::string_view query) const
             }
             base["tags"] = tagBlock;
         }
-        if (queryCallback) {
+        if (!queryCallbacks.empty()) {
+            for (auto& queryCallback : queryCallbacks)
+            {
+                if (!queryCallback)
+                {
+                    continue;
+                }
             auto potential = queryCallback("potential_interfaces");
             if (!potential.empty()) {
                 try {
@@ -2649,11 +2655,13 @@ std::string FederateState::processQueryActual(std::string_view query) const
 
                     if (!json.isMember("error")) {
                         base["potential_interfaces"] = json;
+                        break;
                     }
                 }
                 catch (const std::invalid_argument&) {
                     ;
                 }
+            }
             }
         }
         return fileops::generateJsonString(base);
@@ -2712,11 +2720,19 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return fileops::generateJsonString(base);
     }
 
-    if (queryCallback) {
-        auto val = queryCallback(query);
-        if (!val.empty()) {
-            return val;
+    if (!queryCallbacks.empty()) {
+        for (auto& queryCallback : queryCallbacks)
+        {
+            if (!queryCallback)
+            {
+                continue;
+            }
+            auto val = queryCallback(query);
+            if (!val.empty()) {
+                return val;
+            }
         }
+        
     }
     // check existingTag value for a matching string
     for (const auto& tag : tags) {
