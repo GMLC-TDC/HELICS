@@ -1512,14 +1512,14 @@ static void
     static constexpr std::string_view errorMessage =
         R"(interface properties require "name" and "value" fields)";
     if (fileops::isMember(data, "properties")) {
-        auto& props = toml::find(data, "properties");
+        const auto& props = toml::find(data, "properties");
         if (props.is_array()) {
-            auto& propArray = props.as_array();
+            const auto& propArray = props.as_array();
             for (const auto& prop : propArray) {
                 std::string propname;
                 propname = toml::find_or(prop, "name", propname);
                 const toml::value uVal;
-                auto& propval = toml::find_or(prop, "value", uVal);
+                const auto& propval = toml::find_or(prop, "value", uVal);
 
                 if ((propname.empty()) || (propval.is_uninitialized())) {
                     if (strict) {
@@ -1539,7 +1539,7 @@ static void
         } else {
             std::string propname;
             propname = toml::find_or(props, "name", propname);
-            toml::value uVal;
+            const toml::value uVal;
             auto propval = toml::find_or(props, "value", uVal);
 
             if ((propname.empty()) || (propval.is_uninitialized())) {
