@@ -17,6 +17,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
+
+    void InterfaceInfo::reset()
+    {
+        publications.lock()->clear();
+        inputs.lock()->clear();
+        endpoints.lock()->clear();
+        only_update_on_change=false;
+    }
+
 void InterfaceInfo::createPublication(InterfaceHandle handle,
                                       std::string_view key,
                                       std::string_view type,

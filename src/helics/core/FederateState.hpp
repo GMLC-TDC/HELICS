@@ -73,6 +73,7 @@ class FederateState {
                                           //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
+    bool reentrant{false}; //!< flag indicating the federate can be reentrant
     bool mSourceOnly{false};  //!< flag indicating the federate is a source_only
     bool mCallbackBased{false};  //!< flag indicating the federate is a callback federate
     /// flag indicating that inputs should have strict type checking
@@ -169,9 +170,7 @@ class FederateState {
 
   public:
     /** reset the federate to created state*/
-    void reset();
-    /** reset the federate to the initializing state*/
-    void reInit();
+    void reset(const CoreFederateInfo& fedInfo);
     /** get the name of the federate*/
     const std::string& getIdentifier() const { return name; }
     /** get the current state of the federate*/

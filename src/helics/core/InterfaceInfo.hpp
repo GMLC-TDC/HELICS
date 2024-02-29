@@ -86,11 +86,12 @@ class InterfaceInfo {
     void generateDataFlowGraph(Json::Value& base) const;
     /** generate a list of unconnected interfaces*/
     void getUnconnectedInterfaces(Json::Value& base) const;
-
+    /** reset the interfaceInfo to a new state*/
+    void reset();
   private:
     std::atomic<GlobalFederateId> global_id;
-    bool only_update_on_change{
-        false};  //!< flag indicating that subscriptions values should only be updated on change
+    /// flag indicating that subscriptions values should only be updated on change
+    bool only_update_on_change{false};
     shared_guarded<
         gmlc::containers::DualMappedPointerVector<PublicationInfo, std::string, InterfaceHandle>>
         publications;  //!< storage for all the publications

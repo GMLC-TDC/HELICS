@@ -132,6 +132,8 @@ typedef enum { /* NOLINT */
                HELICS_FLAG_MULTI_THREAD_CORE = 28,
                /** flag indicating use of a single threaded core*/
                HELICS_FLAG_SINGLE_THREAD_CORE = 29,
+               /** flag indicating the federate can be reentrant*/
+               HELICS_FLAG_REENTRANT=38,
                /** used to not display warnings on mismatched requested times*/
                HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS = 67,
                /** specify that checking on configuration files should be strict and throw and error

@@ -147,6 +147,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 95> flagStringsTra
     {"interruptible", HELICS_FLAG_INTERRUPTIBLE},
     {"debugging", HELICS_FLAG_DEBUGGING},
     {"profiling", HELICS_FLAG_PROFILING},
+    {"reentrant", HELICS_FLAG_REENTRANT},
     {"local_profiling_capture", HELICS_FLAG_LOCAL_PROFILING_CAPTURE},
     {"profiling_marker", HELICS_FLAG_PROFILING_MARKER},
     {"only_update_on_change", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},

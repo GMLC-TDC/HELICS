@@ -494,39 +494,63 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         return;
     }
     auto fedName = command.name();
-    // this checks for duplicate federate names
-    if (mFederates.find(fedName) != mFederates.end()) {
-        sendFedErrorAck(command, duplicate_federate_name_error_code);
-        return;
+    bool newFed{true};
+    if (dynamicFed && checkActionFlag(command, reentrant_flag))
+    {
+         auto fedLoc=mFederates.find(fedName);
+         if (fedLoc != mFederates.end())
+         {
+             if (fedLoc->reentrant)
+             {
+                 fedLoc->route = getRoute(command.source_id);
+                 fedLoc->parent = command.source_id;
+                 fedLoc->state=ConnectionState::CONNECTED;
+                 newFed=false;
+             }
+             else
+             {
+                 sendFedErrorAck(command, duplicate_federate_name_error_code);
+                 return;
+             }
+         }
     }
-    mFederates.insert(fedName, no_search, fedName);
-    mFederates.back().route = getRoute(command.source_id);
-    mFederates.back().parent = command.source_id;
-    if (checkActionFlag(command, non_counting_flag)) {
-        mFederates.back().nonCounting = true;
-    }
-    if (checkActionFlag(command, observer_flag)) {
-        mFederates.back().observer = true;
-    }
-    mFederates.back().dynamic = dynamicFed;
-    auto lookupIndex = mFederates.size() - 1;
-    if (checkActionFlag(command, child_flag)) {
-        mFederates.back().global_id = GlobalFederateId(command.getExtraData());
-        if (!mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex)) {
-            sendFedErrorAck(command, duplicate_federate_id);
+
+    if (newFed){
+        // this checks for duplicate federate names
+        if (mFederates.find(fedName) != mFederates.end()) {
+            sendFedErrorAck(command, duplicate_federate_name_error_code);
             return;
         }
-    } else if (isRootc) {
-        if (command.counter > 0 && command.counter <= 16) {
-            mFederates.back().global_id = GlobalFederateId(
-                static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift +
-                command.counter * gGlobalPriorityBlockSize);
-        } else {
-            mFederates.back().global_id = GlobalFederateId(
-                static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift);
+        mFederates.insert(fedName, no_search, fedName);
+        mFederates.back().route = getRoute(command.source_id);
+        mFederates.back().parent = command.source_id;
+        if (checkActionFlag(command, non_counting_flag)) {
+            mFederates.back().nonCounting = true;
         }
-        mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex);
+        if (checkActionFlag(command, observer_flag)) {
+            mFederates.back().observer = true;
+        }
+        mFederates.back().dynamic = dynamicFed;
+        auto lookupIndex = mFederates.size() - 1;
+        if (checkActionFlag(command, child_flag)) {
+            mFederates.back().global_id = GlobalFederateId(command.getExtraData());
+            if (!mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex)) {
+                sendFedErrorAck(command, duplicate_federate_id);
+                return;
+            }
+        } else if (isRootc) {
+            if (command.counter > 0 && command.counter <= 16) {
+                mFederates.back().global_id = GlobalFederateId(
+                    static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift +
+                    command.counter * gGlobalPriorityBlockSize);
+            } else {
+                mFederates.back().global_id = GlobalFederateId(
+                    static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift);
+            }
+            mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex);
+        }
     }
+    
 
     if (!isRootc) {
         if (global_broker_id_local.isValid()) {
@@ -537,8 +561,8 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             delayTransmitQueue.push(command);
         }
     } else {
-        auto route_id = mFederates.back().route;
-        auto global_fedid = mFederates.back().global_id;
+        auto route_id = (newFed)?mFederates.back().route:mFederates.find(fedName)->route;
+        auto global_fedid = (newFed)?mFederates.back().global_id:mFederates.find(fedName)->global_id;
 
         routing_table.emplace(global_fedid, route_id);
         // don't bother with the federate_table

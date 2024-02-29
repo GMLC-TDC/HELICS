@@ -211,7 +211,7 @@ TEST_F(federateStateTests, basic_processmessage)
     EXPECT_EQ(fs->getState(), FederateStates::FINISHED);
 
     // Return to created state
-    fs->reset();
+    fs->reset(CoreFederateInfo());
 
     // Test CMD_FED_ACK message when no error
     cmd.setAction(helics::CMD_FED_ACK);
@@ -237,7 +237,7 @@ TEST_F(federateStateTests, basic_processmessage)
     EXPECT_EQ(fs->getState(), FederateStates::ERRORED);
 
     // Return to initializing state
-    fs->reInit();
+    fs->reset(CoreFederateInfo());
 
     // Test returning when an error occurs
     cmd.setAction(helics::CMD_ERROR);
@@ -245,7 +245,7 @@ TEST_F(federateStateTests, basic_processmessage)
         return fs->enterExecutingMode(IterationRequest::NO_ITERATIONS);
     });
     auto st = fs->getState();
-    EXPECT_TRUE((st == FederateStates::INITIALIZING) || (st == FederateStates::EXECUTING));
+    EXPECT_EQ(st,FederateStates::CREATED);
     fs->addAction(cmd);
     auto res = fs_process2.get();
     if (res.state != IterationResult::ERROR_RESULT) {
@@ -256,7 +256,7 @@ TEST_F(federateStateTests, basic_processmessage)
     EXPECT_TRUE(res.state == IterationResult::ERROR_RESULT);
     EXPECT_EQ(fs->getState(), FederateStates::ERRORED);
 
-    fs->reset();
+    fs->reset(CoreFederateInfo());
 
     // Test CMD_EXEC_REQUEST/CMD_EXEC_GRANT returns 0 if dependencies/dependents aren't done;
     // returns 1 if fs->iterating is true, 2 otherwise; if 1 ret false, if 2 ret true

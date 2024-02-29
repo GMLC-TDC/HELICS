@@ -61,6 +61,7 @@ class BasicFedInfo {
     bool nonCounting{false};  //!< indicator the federate shouldn't count toward limits or total
     bool observer{false};  //!, indicator that the federate is an observer only
     bool dynamic{false};  //!< indicator that the federate joined dynamically
+    bool reentrant{false}; //!< indicator that the federate can be reentrant
     explicit BasicFedInfo(std::string_view fedname): name(fedname) {}
 };
 

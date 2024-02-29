@@ -154,24 +154,81 @@ void FederateState::setState(FederateStates newState)
     }
 }
 
-void FederateState::reset()
+void FederateState::reset(const CoreFederateInfo& fedInfo)
 {
-    global_id = GlobalFederateId();
-    interfaceInformation.setGlobalId(GlobalFederateId());
-    local_id = LocalFederateId();
     state = FederateStates::CREATED;
     queue.clear();
     delayQueues.clear();
-    // TODO(PT): this probably needs to do a lot more
+    interfaceInformation.reset();
+
+    timeCoord=std::make_unique<TimeCoordinator>([this](const ActionMessage& msg) { routeMessage(msg); });
+
+    only_transmit_on_change=false;
+    realtime=false;
+    observer=false;
+    //reentrant should stay the same 
+    mSourceOnly=false;
+    mCallbackBased=false;
+    strict_input_type_checking=false;
+    ignore_unit_mismatch=false;
+    mSlowResponding=false;
+    // allow remote control needs to remain the same
+
+    mLogManager=std::make_unique<LogManager>();
+    maxLogLevel=HELICS_LOG_LEVEL_NO_PRINT;
+    init_transmitted=false;
+
+    wait_for_current_time=false;
+    ignore_time_mismatch_warnings=false;
+    mProfilerActive=false;
+    mLocalProfileCapture=false;
+    errorCode=0;
+    // leave mParent alone
+    //CommonCore* mParent{nullptr};  //!< pointer to the higher level;
+    errorString.clear();
+    rt_lag=timeZero;
+    Time rt_lead=timeZero;
+    Time grantTimeOutPeriod=timeZero;
+    realTimeTimerIndex=-1;
+    grantTimeoutTimeIndex=-1;
+    initRequested=false;
+    requestingMode=false;
+    initIterating=false;
+
+    iterating=false;
+    timeGranted_mode=false;
+    terminate_on_error=false;
+    lastIterationRequest=IterationRequest::NO_ITERATIONS;
+    timeMethod=TimeSynchronizationMethod::DISTRIBUTED;
+    mGrantCount=0;
+    commandQueue.clear();
+    interfaceFlags=0;
+
+    events.clear();
+    eventMessages.clear();
+    delayedFederates.clear();
+    time_granted=startupTime; 
+    allowed_send_time=startupTime;
+
+    queryCallback=nullptr;
+    fedCallbacks=nullptr;
+    tags.clear();
+    //now update with the new properties
+    for (const auto& prop : fedInfo.timeProps) {
+        setProperty(prop.first, prop.second);
+    }
+    for (const auto& prop : fedInfo.intProps) {
+        setProperty(prop.first, prop.second);
+    }
+    for (const auto& prop : fedInfo.flagProps) {
+        setOptionFlag(prop.first, prop.second);
+    }
+    mLogManager->setTransmitCallback(
+        [this](ActionMessage&& message) { mParent->addActionMessage(std::move(message)); });
+    maxLogLevel = mLogManager->getMaxLevel();
+
 }
-/** reset the federate to the initializing state*/
-void FederateState::reInit()
-{
-    state = FederateStates::INITIALIZING;
-    queue.clear();
-    delayQueues.clear();
-    // TODO(PT): this needs to reset a bunch of stuff as well as check a few things
-}
+
 FederateStates FederateState::getState() const
 {
     return state.load();
@@ -196,6 +253,7 @@ void FederateState::generateConfig(Json::Value& base) const
     base["only_transmit_on_change"] = only_transmit_on_change;
     base["realtime"] = realtime;
     base["observer"] = observer;
+    base["reentrant"] = reentrant;
     base["source_only"] = mSourceOnly;
     base["strict_input_type_checking"] = strict_input_type_checking;
     base["slow_responding"] = mSlowResponding;
@@ -2107,6 +2165,11 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
                 }
             }
             break;
+        case defs::Flags::REENTRANT:
+            if (state == FederateStates::CREATED) {
+                reentrant = value;
+            }
+            break;
         case defs::Flags::CALLBACK_FEDERATE:
             if (state == FederateStates::CREATED) {
                 mCallbackBased = value;
@@ -2173,6 +2236,8 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return realtime;
         case defs::Flags::OBSERVER:
             return observer;
+        case defs::Flags::REENTRANT:
+            return reentrant;
         case defs::Flags::CALLBACK_FEDERATE:
             return mCallbackBased;
         case defs::Flags::SOURCE_ONLY:
