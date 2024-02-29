@@ -739,25 +739,20 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
             local_id = LocalFederateId(static_cast<int32_t>(*fedid));
             fed = (*feds)[*fedid];
         } else {
-            if (dynamicFederation)
-            {
-                fed=feds->find(std::string(name));
-                local_id=fed->local_id;
-                if (!(fed->getOptionFlag(HELICS_FLAG_REENTRANT) && fed->getState() == FederateStates::FINISHED))
-                {
-                    throw(RegistrationFailure(
-                        fmt::format("duplicate names {} detected: multiple federates with the same name",
-                            name)));
-                }
-                newFed=false;
-            }
-            else
-            {
-                throw(RegistrationFailure(
-                    fmt::format("duplicate names {} detected: multiple federates with the same name",
+            if (dynamicFederation) {
+                fed = feds->find(std::string(name));
+                local_id = fed->local_id;
+                if (!(fed->getOptionFlag(HELICS_FLAG_REENTRANT) &&
+                      fed->getState() == FederateStates::FINISHED)) {
+                    throw(RegistrationFailure(fmt::format(
+                        "duplicate names {} detected: multiple federates with the same name",
                         name)));
+                }
+                newFed = false;
+            } else {
+                throw(RegistrationFailure(fmt::format(
+                    "duplicate names {} detected: multiple federates with the same name", name)));
             }
-           
         }
 
         if (feds->size() == 1 && newFed) {
@@ -767,23 +762,21 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     if (fed == nullptr) {
         throw(RegistrationFailure("unknown allocation error occurred"));
     }
-    if (newFed)
-    {
+    if (newFed) {
         // setting up the Logger
         // auto ptr = fed.get();
-        // if we are using the Logger, log all messages coming from the federates so they can control
-        // the level*/
+        // if we are using the Logger, log all messages coming from the federates so they can
+        // control the level*/
         fed->setLogger([this](int level, std::string_view ident, std::string_view message) {
             sendToLogger(parent_broker_id, LogLevels::FED + level, ident, message);
-            });
+        });
 
         fed->local_id = local_id;
         fed->setParent(this);
         if (enable_profiling) {
             fed->setOptionFlag(defs::PROFILING, true);
         }
-    }
-    else {
+    } else {
         fed->reset(info);
     }
     ActionMessage reg(CMD_REG_FED);
@@ -791,9 +784,8 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     if (observer || fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
         setActionFlag(reg, observer_flag);
     }
-    if (fed->getOptionFlag(HELICS_FLAG_REENTRANT))
-    {
-        setActionFlag(reg,reentrant_flag);
+    if (fed->getOptionFlag(HELICS_FLAG_REENTRANT)) {
+        setActionFlag(reg, reentrant_flag);
     }
     if (fed->indexGroup > 0) {
         reg.counter = static_cast<int16_t>(fed->indexGroup);

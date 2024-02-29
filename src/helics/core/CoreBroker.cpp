@@ -495,27 +495,22 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
     }
     auto fedName = command.name();
     bool newFed{true};
-    if (dynamicFed && checkActionFlag(command, reentrant_flag))
-    {
-         auto fedLoc=mFederates.find(fedName);
-         if (fedLoc != mFederates.end())
-         {
-             if (fedLoc->reentrant)
-             {
-                 fedLoc->route = getRoute(command.source_id);
-                 fedLoc->parent = command.source_id;
-                 fedLoc->state=ConnectionState::CONNECTED;
-                 newFed=false;
-             }
-             else
-             {
-                 sendFedErrorAck(command, duplicate_federate_name_error_code);
-                 return;
-             }
-         }
+    if (dynamicFed && checkActionFlag(command, reentrant_flag)) {
+        auto fedLoc = mFederates.find(fedName);
+        if (fedLoc != mFederates.end()) {
+            if (fedLoc->reentrant) {
+                fedLoc->route = getRoute(command.source_id);
+                fedLoc->parent = command.source_id;
+                fedLoc->state = ConnectionState::CONNECTED;
+                newFed = false;
+            } else {
+                sendFedErrorAck(command, duplicate_federate_name_error_code);
+                return;
+            }
+        }
     }
 
-    if (newFed){
+    if (newFed) {
         // this checks for duplicate federate names
         if (mFederates.find(fedName) != mFederates.end()) {
             sendFedErrorAck(command, duplicate_federate_name_error_code);
@@ -550,7 +545,6 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex);
         }
     }
-    
 
     if (!isRootc) {
         if (global_broker_id_local.isValid()) {
@@ -561,8 +555,9 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             delayTransmitQueue.push(command);
         }
     } else {
-        auto route_id = (newFed)?mFederates.back().route:mFederates.find(fedName)->route;
-        auto global_fedid = (newFed)?mFederates.back().global_id:mFederates.find(fedName)->global_id;
+        auto route_id = (newFed) ? mFederates.back().route : mFederates.find(fedName)->route;
+        auto global_fedid =
+            (newFed) ? mFederates.back().global_id : mFederates.find(fedName)->global_id;
 
         routing_table.emplace(global_fedid, route_id);
         // don't bother with the federate_table

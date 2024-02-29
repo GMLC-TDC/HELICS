@@ -88,6 +88,7 @@ class InterfaceInfo {
     void getUnconnectedInterfaces(Json::Value& base) const;
     /** reset the interfaceInfo to a new state*/
     void reset();
+
   private:
     std::atomic<GlobalFederateId> global_id;
     /// flag indicating that subscriptions values should only be updated on change

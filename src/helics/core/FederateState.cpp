@@ -161,59 +161,60 @@ void FederateState::reset(const CoreFederateInfo& fedInfo)
     delayQueues.clear();
     interfaceInformation.reset();
 
-    timeCoord=std::make_unique<TimeCoordinator>([this](const ActionMessage& msg) { routeMessage(msg); });
+    timeCoord =
+        std::make_unique<TimeCoordinator>([this](const ActionMessage& msg) { routeMessage(msg); });
 
-    only_transmit_on_change=false;
-    realtime=false;
-    observer=false;
-    //reentrant should stay the same 
-    mSourceOnly=false;
-    mCallbackBased=false;
-    strict_input_type_checking=false;
-    ignore_unit_mismatch=false;
-    mSlowResponding=false;
+    only_transmit_on_change = false;
+    realtime = false;
+    observer = false;
+    // reentrant should stay the same
+    mSourceOnly = false;
+    mCallbackBased = false;
+    strict_input_type_checking = false;
+    ignore_unit_mismatch = false;
+    mSlowResponding = false;
     // allow remote control needs to remain the same
 
-    mLogManager=std::make_unique<LogManager>();
-    maxLogLevel=HELICS_LOG_LEVEL_NO_PRINT;
-    init_transmitted=false;
+    mLogManager = std::make_unique<LogManager>();
+    maxLogLevel = HELICS_LOG_LEVEL_NO_PRINT;
+    init_transmitted = false;
 
-    wait_for_current_time=false;
-    ignore_time_mismatch_warnings=false;
-    mProfilerActive=false;
-    mLocalProfileCapture=false;
-    errorCode=0;
+    wait_for_current_time = false;
+    ignore_time_mismatch_warnings = false;
+    mProfilerActive = false;
+    mLocalProfileCapture = false;
+    errorCode = 0;
     // leave mParent alone
-    //CommonCore* mParent{nullptr};  //!< pointer to the higher level;
+    // CommonCore* mParent{nullptr};  //!< pointer to the higher level;
     errorString.clear();
-    rt_lag=timeZero;
-    Time rt_lead=timeZero;
-    Time grantTimeOutPeriod=timeZero;
-    realTimeTimerIndex=-1;
-    grantTimeoutTimeIndex=-1;
-    initRequested=false;
-    requestingMode=false;
-    initIterating=false;
+    rt_lag = timeZero;
+    Time rt_lead = timeZero;
+    Time grantTimeOutPeriod = timeZero;
+    realTimeTimerIndex = -1;
+    grantTimeoutTimeIndex = -1;
+    initRequested = false;
+    requestingMode = false;
+    initIterating = false;
 
-    iterating=false;
-    timeGranted_mode=false;
-    terminate_on_error=false;
-    lastIterationRequest=IterationRequest::NO_ITERATIONS;
-    timeMethod=TimeSynchronizationMethod::DISTRIBUTED;
-    mGrantCount=0;
+    iterating = false;
+    timeGranted_mode = false;
+    terminate_on_error = false;
+    lastIterationRequest = IterationRequest::NO_ITERATIONS;
+    timeMethod = TimeSynchronizationMethod::DISTRIBUTED;
+    mGrantCount = 0;
     commandQueue.clear();
-    interfaceFlags=0;
+    interfaceFlags = 0;
 
     events.clear();
     eventMessages.clear();
     delayedFederates.clear();
-    time_granted=startupTime; 
-    allowed_send_time=startupTime;
+    time_granted = startupTime;
+    allowed_send_time = startupTime;
 
-    queryCallback=nullptr;
-    fedCallbacks=nullptr;
+    queryCallback = nullptr;
+    fedCallbacks = nullptr;
     tags.clear();
-    //now update with the new properties
+    // now update with the new properties
     for (const auto& prop : fedInfo.timeProps) {
         setProperty(prop.first, prop.second);
     }
@@ -226,7 +227,6 @@ void FederateState::reset(const CoreFederateInfo& fedInfo)
     mLogManager->setTransmitCallback(
         [this](ActionMessage&& message) { mParent->addActionMessage(std::move(message)); });
     maxLogLevel = mLogManager->getMaxLevel();
-
 }
 
 FederateStates FederateState::getState() const

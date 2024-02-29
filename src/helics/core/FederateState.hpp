@@ -73,7 +73,7 @@ class FederateState {
                                           //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
-    bool reentrant{false}; //!< flag indicating the federate can be reentrant
+    bool reentrant{false};  //!< flag indicating the federate can be reentrant
     bool mSourceOnly{false};  //!< flag indicating the federate is a source_only
     bool mCallbackBased{false};  //!< flag indicating the federate is a callback federate
     /// flag indicating that inputs should have strict type checking

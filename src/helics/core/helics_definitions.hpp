@@ -28,11 +28,11 @@ namespace defs {
         If the federate goes offline there is no good way to detect it so use with caution
         */
         SLOW_RESPONDING = HELICS_FLAG_SLOW_RESPONDING,
-         /** flag indicating that a federate is observe only*/
+        /** flag indicating that a federate is observe only*/
         REENTRANT = HELICS_FLAG_REENTRANT,
         /** flag specifying that a federate encountering an internal error should cause and abort
-        * for the entire co-simulation
-        */
+         * for the entire co-simulation
+         */
         TERMINATE_ON_ERROR = HELICS_FLAG_TERMINATE_ON_ERROR,
         /** flag indicating that a federate/interface is a signal generator only*/
         SOURCE_ONLY = HELICS_FLAG_SOURCE_ONLY,
