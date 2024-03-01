@@ -188,8 +188,8 @@ void FederateState::reset(const CoreFederateInfo& fedInfo)
     // CommonCore* mParent{nullptr};  //!< pointer to the higher level;
     errorString.clear();
     rt_lag = timeZero;
-    Time rt_lead = timeZero;
-    Time grantTimeOutPeriod = timeZero;
+    rt_lead=timeZero;
+    grantTimeOutPeriod=timeZero;
     realTimeTimerIndex = -1;
     grantTimeoutTimeIndex = -1;
     initRequested = false;
