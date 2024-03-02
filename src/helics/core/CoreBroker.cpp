@@ -525,6 +525,9 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         if (checkActionFlag(command, observer_flag)) {
             mFederates.back().observer = true;
         }
+        if (checkActionFlag(command, reentrant_flag)) {
+            mFederates.back().reentrant = true;
+        }
         mFederates.back().dynamic = dynamicFed;
         auto lookupIndex = mFederates.size() - 1;
         if (checkActionFlag(command, child_flag)) {
@@ -558,8 +561,12 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         auto route_id = (newFed) ? mFederates.back().route : mFederates.find(fedName)->route;
         auto global_fedid =
             (newFed) ? mFederates.back().global_id : mFederates.find(fedName)->global_id;
-
-        routing_table.emplace(global_fedid, route_id);
+        auto res=routing_table.emplace(global_fedid, route_id);
+        if (!res.second && !newFed)
+        {
+            res.first->second=route_id;
+        }
+        
         // don't bother with the federate_table
         // transmit the response
         ActionMessage fedReply(CMD_FED_ACK);
@@ -1973,7 +1980,7 @@ bool CoreBroker::checkInterfaceCreation(ActionMessage& message, InterfaceType ty
                 propagateError(std::move(eret));
                 return false;
             }
-            if (!(fed->observer && (!fed->dynamic || fed->state != ConnectionState::CONNECTED))) {
+            if (fed->observer || !fed->dynamic || fed->state != ConnectionState::CONNECTED) {
                 ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, message.source_id);
                 eret.dest_handle = message.source_handle;
                 eret.messageID = defs::Errors::REGISTRATION_FAILURE;

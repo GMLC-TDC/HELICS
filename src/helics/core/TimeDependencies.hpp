@@ -148,6 +148,8 @@ class TimeDependencies {
     bool addDependent(GlobalFederateId gid);
     /** remove  dependent from consideration*/
     void removeDependent(GlobalFederateId gid);
+    /** reset a dependency for reentrant connection*/
+    void resetDependency(GlobalFederateId id);
     /** remove an interdependency from consideration*/
     void removeInterdependence(GlobalFederateId gid);
     /** update the info about a dependency based on a message*/

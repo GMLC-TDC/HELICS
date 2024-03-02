@@ -88,6 +88,8 @@ class InterfaceInfo {
     void getUnconnectedInterfaces(Json::Value& base) const;
     /** reset the interfaceInfo to a new state*/
     void reset();
+    /** disconnect a federate from communications */
+    void disconnectFederate(GlobalFederateId fedToDisconnect,Time disconnectTime);
 
   private:
     std::atomic<GlobalFederateId> global_id;

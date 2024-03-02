@@ -446,7 +446,6 @@ void InterfaceInfo::generateDataFlowGraph(Json::Value& base) const
 {
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
-        base["inputs"] = Json::arrayValue;
         for (const auto& ipt : ihandle) {
             Json::Value ibase;
             if (!ipt->key.empty()) {
@@ -481,11 +480,15 @@ void InterfaceInfo::generateDataFlowGraph(Json::Value& base) const
             if (!pub->subscribers.empty()) {
                 pbase["targets"] = Json::arrayValue;
                 for (auto& target : pub->subscribers) {
+                    if (!target.active)
+                    {
+                        continue;
+                    }
                     Json::Value sid;
-                    sid["federate"] = target.first.fed_id.baseValue();
-                    sid["handle"] = target.first.handle.baseValue();
-                    if (!target.second.empty()) {
-                        sid["key"] = target.second;
+                    sid["federate"] = target.id.fed_id.baseValue();
+                    sid["handle"] = target.id.handle.baseValue();
+                    if (!target.key.empty()) {
+                        sid["key"] = target.key;
                     }
                     pbase["targets"].append(sid);
                 }
@@ -508,6 +511,33 @@ void InterfaceInfo::generateDataFlowGraph(Json::Value& base) const
             base["endpoints"].append(std::move(ebase));
         }
     }
+    ehandle.unlock();
+}
+
+
+void InterfaceInfo::disconnectFederate(GlobalFederateId fedToDisconnect,Time disconnectTime)
+{
+    if (disconnectTime < cBigTime)
+    {
+        auto ihandle = inputs.lock_shared();
+        for (auto& ipt : ihandle) {
+            ipt->disconnectFederate(fedToDisconnect,disconnectTime);
+        }
+        ihandle.unlock();
+    }
+    
+    auto phandle = publications.lock();
+
+        for (auto& pub : phandle) {
+            pub->disconnectFederate(fedToDisconnect);
+        }
+    phandle.unlock();
+
+    auto ehandle = endpoints.lock_shared();
+   
+        for (auto& ept : ehandle) {
+            ept->disconnectFederate(fedToDisconnect);
+        }
     ehandle.unlock();
 }
 

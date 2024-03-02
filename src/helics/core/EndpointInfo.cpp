@@ -230,6 +230,27 @@ void EndpointInfo::removeTarget(GlobalHandle targetId)
     }
 }
 
+void EndpointInfo::disconnectFederate(GlobalFederateId fedToDisconnect)
+{
+    auto tinfo = targetInformation.begin();
+    while (tinfo != targetInformation.end()) {
+        if (tinfo->id.fed_id == fedToDisconnect) {
+            targetInformation.erase(tinfo);
+            targets.clear();
+            for (const auto& targetInfo : targetInformation) {
+                targets.emplace_back(targetInfo.id, targetInfo.key);
+            }
+            break;
+        }
+    }
+    auto sinfo = sourceInformation.begin();
+    while (sinfo != sourceInformation.end()) {
+        if (sinfo->id.fed_id == fedToDisconnect) {
+            sourceInformation.erase(sinfo);
+            return;
+        }
+    }
+}
 const std::string& EndpointInfo::getSourceTargets() const
 {
     if (sourceTargets.empty()) {

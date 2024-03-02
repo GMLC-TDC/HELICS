@@ -443,7 +443,7 @@ void FederateState::closeInterface(InterfaceHandle handle, InterfaceType type)
                 rem.setSource(pub->id);
                 rem.actionTime = time_granted;
                 for (const auto& sub : pub->subscribers) {
-                    rem.setDestination(sub.first);
+                    rem.setDestination(sub.id);
                     routeMessage(rem);
                 }
                 pub->subscribers.clear();
@@ -672,7 +672,10 @@ std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
     auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
         for (const auto& sub : pubInfo->subscribers) {
-            subs.emplace_back(sub.first);
+            if (sub.active)
+            {
+                subs.emplace_back(sub.id);
+            }
         }
     }
     return subs;
@@ -1518,9 +1521,10 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     routeMessage(cmd);
                 }
             } else {
+                Time lastTime=timeCoord->getLastGrant(cmd.source_id);
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case TimeProcessingResult::DELAY_PROCESSING:
-                        addFederateToDelay(GlobalFederateId(cmd.source_id));
+                        addFederateToDelay(cmd.source_id);
                         return MessageProcessingResult::DELAY_MESSAGE;
                     case TimeProcessingResult::NOT_PROCESSED:
                         return MessageProcessingResult::CONTINUE_PROCESSING;
@@ -1530,6 +1534,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 if (state != FederateStates::EXECUTING) {
                     break;
                 }
+               
+                interfaceInformation.disconnectFederate(cmd.source_id,lastTime);
                 if (!timeGranted_mode) {
                     auto ret = timeCoord->checkTimeGrant();
                     if (returnableResult(ret)) {
@@ -1710,7 +1716,13 @@ void FederateState::processDataConnectionMessage(ActionMessage& cmd)
                         addDependent(cmd.source_id);
                     }
                 }
+                
                 if (getState() > FederateStates::CREATED) {
+                    if (getState() == FederateStates::EXECUTING && timeMethod == TimeSynchronizationMethod::DISTRIBUTED)
+                    {
+                         resetDependency(cmd.source_id);
+                         addDependent(cmd.source_id);
+                    }
                     if (!pubI->data.empty() && pubI->lastPublishTime > Time::minVal()) {
                         ActionMessage pub(CMD_PUB);
                         pub.setSource(pubI->id);
@@ -2333,6 +2345,11 @@ void FederateState::addDependency(GlobalFederateId fedToDependOn)
 void FederateState::addDependent(GlobalFederateId fedThatDependsOnThis)
 {
     timeCoord->addDependent(fedThatDependsOnThis);
+}
+
+void FederateState::resetDependency(GlobalFederateId gid)
+{
+    timeCoord->resetDependency(gid);
 }
 
 int FederateState::checkInterfaces()

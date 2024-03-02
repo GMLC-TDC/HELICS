@@ -568,6 +568,8 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         "--json",
         useJsonSerialization,
         "tell the core and federate to use JSON based serialization for all messages, to ensure compatibility");
+    app->add_flag_callback("--reentrant",[this]() { setFlagOption(HELICS_FLAG_REENTRANT, true); },
+        "specify that the federate can be reentrant(meaning can stop and be restarted with the same name");
     app->add_option(
            "--profiler",
            profilerFileName,

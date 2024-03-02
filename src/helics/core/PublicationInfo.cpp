@@ -39,13 +39,24 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck,
 
 bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber, std::string_view subscriberName)
 {
-    for (const auto& sub : subscribers) {
-        if (sub.first == newSubscriber) {
-            return false;
+    for (auto& sub : subscribers) {
+        if (sub.id == newSubscriber) {
+            auto rval=!sub.active;
+            sub.active=true;
+            return rval;
         }
     }
     subscribers.emplace_back(newSubscriber, subscriberName);
     return true;
+}
+
+void PublicationInfo::disconnectFederate(GlobalFederateId fedToDisconnect)
+{
+    for (auto& sub : subscribers) {
+        if (sub.id.fed_id == fedToDisconnect) {
+            sub.active=false;
+        }
+    }
 }
 
 void PublicationInfo::removeSubscriber(GlobalHandle subscriberToRemove)
@@ -53,7 +64,7 @@ void PublicationInfo::removeSubscriber(GlobalHandle subscriberToRemove)
     subscribers.erase(std::remove_if(subscribers.begin(),
                                      subscribers.end(),
                                      [subscriberToRemove](const auto& val) {
-                                         return val.first == subscriberToRemove;
+                                         return val.id == subscriberToRemove;
                                      }),
                       subscribers.end());
 }
@@ -128,11 +139,11 @@ const std::string& PublicationInfo::getTargets() const
     if (destTargets.empty()) {
         if (!subscribers.empty()) {
             if (subscribers.size() == 1) {
-                destTargets = subscribers.front().second;
+                destTargets = subscribers.front().key;
             } else {
                 destTargets.push_back('[');
                 for (const auto& sub : subscribers) {
-                    destTargets.append(generateJsonQuotedString(sub.second));
+                    destTargets.append(generateJsonQuotedString(sub.key));
                     destTargets.push_back(',');
                 }
                 destTargets.back() = ']';

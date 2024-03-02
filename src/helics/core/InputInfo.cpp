@@ -177,6 +177,21 @@ bool InputInfo::addSource(GlobalHandle newSource,
     return true;
 }
 
+void InputInfo::disconnectFederate(GlobalFederateId fedToDisconnect, Time minTime)
+{
+    // the inputUnits and type are not determined anymore since the source list has changed
+    inputUnits.clear();
+    inputType.clear();
+    for (size_t ii = 0; ii < input_sources.size(); ++ii) {
+        if (input_sources[ii].fed_id == fedToDisconnect) {
+            if (minTime < deactivated[ii]) {
+                deactivated[ii] = minTime;
+            }
+        }
+        // there could be duplicate sources so we need to do the full loop
+    }
+}
+
 void InputInfo::removeSource(GlobalHandle sourceToRemove, Time minTime)
 {
     // the inputUnits and type are not determined anymore since the source list has changed

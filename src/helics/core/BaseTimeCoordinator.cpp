@@ -229,6 +229,11 @@ void BaseTimeCoordinator::removeDependent(GlobalFederateId fedID)
     dependencies.removeDependent(fedID);
 }
 
+void BaseTimeCoordinator::resetDependency(GlobalFederateId fedID)
+{
+    dependencies.resetDependency(fedID);
+}
+
 const DependencyInfo* BaseTimeCoordinator::getDependencyInfo(GlobalFederateId ofed) const
 {
     return dependencies.getDependencyInfo(ofed);
@@ -254,6 +259,12 @@ std::vector<GlobalFederateId> BaseTimeCoordinator::getDependents() const
         }
     }
     return deps;
+}
+
+Time BaseTimeCoordinator::getLastGrant(GlobalFederateId fedId) const
+{
+    const auto *dep=dependencies.getDependencyInfo(fedId);
+    return (dep==nullptr)?timeZero:dep->lastGrant;
 }
 
 bool BaseTimeCoordinator::hasActiveTimeDependencies() const

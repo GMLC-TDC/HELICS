@@ -346,6 +346,9 @@ class FederateState {
     void addDependency(GlobalFederateId fedToDependOn);
     /** add a dependent federate*/
     void addDependent(GlobalFederateId fedThatDependsOnThis);
+    /** for dynamic reentrant federates reset the connection*/
+    void resetDependency(GlobalFederateId gid);
+
     /** check the interfaces for any issues*/
     int checkInterfaces();
     /** generate results from a query*/

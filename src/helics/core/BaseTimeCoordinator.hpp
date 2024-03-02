@@ -56,7 +56,9 @@ class BaseTimeCoordinator {
     std::vector<GlobalFederateId> getDependencies() const;
     /** get a reference to the dependents vector*/
     std::vector<GlobalFederateId> getDependents() const;
-
+    /** get the last time grant from a federate */
+    Time getLastGrant(GlobalFederateId fedId) const;
+   /** set the source id for the time coordinator*/
     void setSourceId(GlobalFederateId sourceId) { mSourceId = sourceId; }
     GlobalFederateId sourceId() const { return mSourceId; }
     /** compute updates to time values
@@ -103,6 +105,9 @@ class BaseTimeCoordinator {
     /** remove a dependent
     @param fedID the identifier of the federate to remove*/
     virtual void removeDependent(GlobalFederateId fedID);
+    /** reset a dependency that has been reintroduced
+    @param fedID the identifier of the federate to reset*/
+    virtual void resetDependency(GlobalFederateId fedID);
 
     void setAsChild(GlobalFederateId fedID);
     void setAsParent(GlobalFederateId fedID);
