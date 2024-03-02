@@ -219,7 +219,7 @@ static void useFile2(const std::string& corename, const std::string& file)
 }
 
 // this is the same as another test in test recorders
-TEST(combo_tests, save_load_file1)
+TEST(combo, save_load_file1)
 {
     auto filename1 = std::filesystem::temp_directory_path() / "savefile.txt";
 
@@ -234,7 +234,7 @@ TEST(combo_tests, save_load_file1)
 }
 
 // this is the same as another test in test recorders
-TEST(combo_tests, save_load_file2)
+TEST(combo, save_load_file2)
 {
     auto filename1 = std::filesystem::temp_directory_path() / "savefile2.txt";
 
@@ -360,7 +360,7 @@ static void useFileBinary(const std::string& corename, const std::string& file)
     std::filesystem::remove(file);
 }
 
-TEST(combo_tests, save_load_file_binary)
+TEST(combo, save_load_file_binary)
 {
     auto tpath = std::filesystem::temp_directory_path();
 
@@ -376,7 +376,7 @@ TEST(combo_tests, save_load_file_binary)
     useFileBinary("ccore7", filename2.string());
 }
 
-TEST(combo_tests, check_combination_file_load)
+TEST(combo, check_combination_file_load)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "ccore_combo";
