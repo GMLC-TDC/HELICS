@@ -210,45 +210,53 @@ void EndpointInfo::addSource(GlobalHandle source,
 /** remove a target from connection*/
 void EndpointInfo::removeTarget(GlobalHandle targetId)
 {
-    if (!targetInformation.empty())
-    {
+    if (!targetInformation.empty()) {
         auto tinfo = targetInformation.begin();
-        auto removeIterator=std::remove_if(targetInformation.begin(),targetInformation.end(),[targetId](const auto &tinfo){return tinfo.id==targetId;});
-        if (removeIterator != targetInformation.end())
-        {
-            targetInformation.erase(removeIterator,targetInformation.end());
+        auto removeIterator =
+            std::remove_if(targetInformation.begin(),
+                           targetInformation.end(),
+                           [targetId](const auto& tinfo) { return tinfo.id == targetId; });
+        if (removeIterator != targetInformation.end()) {
+            targetInformation.erase(removeIterator, targetInformation.end());
             targets.clear();
             for (const auto& targetInfo : targetInformation) {
                 targets.emplace_back(targetInfo.id, targetInfo.key);
             }
         }
     }
-    if (!sourceInformation.empty())
-    {
-        auto removeIterator=std::remove_if(sourceInformation.begin(),sourceInformation.end(),[targetId](const auto &sinfo){return sinfo.id==targetId;});
-        sourceInformation.erase(removeIterator,sourceInformation.end());
+    if (!sourceInformation.empty()) {
+        auto removeIterator =
+            std::remove_if(sourceInformation.begin(),
+                           sourceInformation.end(),
+                           [targetId](const auto& sinfo) { return sinfo.id == targetId; });
+        sourceInformation.erase(removeIterator, sourceInformation.end());
     }
 }
 
 void EndpointInfo::disconnectFederate(GlobalFederateId fedToDisconnect)
 {
-    if (!targetInformation.empty())
-    {
+    if (!targetInformation.empty()) {
         auto tinfo = targetInformation.begin();
-        auto removeIterator=std::remove_if(targetInformation.begin(),targetInformation.end(),[fedToDisconnect](const auto &tinfo){return tinfo.id.fed_id==fedToDisconnect;});
-        if (removeIterator != targetInformation.end())
-        {
-            targetInformation.erase(removeIterator,targetInformation.end());
+        auto removeIterator = std::remove_if(targetInformation.begin(),
+                                             targetInformation.end(),
+                                             [fedToDisconnect](const auto& tinfo) {
+                                                 return tinfo.id.fed_id == fedToDisconnect;
+                                             });
+        if (removeIterator != targetInformation.end()) {
+            targetInformation.erase(removeIterator, targetInformation.end());
             targets.clear();
             for (const auto& targetInfo : targetInformation) {
                 targets.emplace_back(targetInfo.id, targetInfo.key);
             }
         }
     }
-    if (!sourceInformation.empty())
-    {
-        auto removeIterator=std::remove_if(sourceInformation.begin(),sourceInformation.end(),[fedToDisconnect](const auto &sinfo){return sinfo.id.fed_id==fedToDisconnect;});
-        sourceInformation.erase(removeIterator,sourceInformation.end());
+    if (!sourceInformation.empty()) {
+        auto removeIterator = std::remove_if(sourceInformation.begin(),
+                                             sourceInformation.end(),
+                                             [fedToDisconnect](const auto& sinfo) {
+                                                 return sinfo.id.fed_id == fedToDisconnect;
+                                             });
+        sourceInformation.erase(removeIterator, sourceInformation.end());
     }
 }
 const std::string& EndpointInfo::getSourceTargets() const
