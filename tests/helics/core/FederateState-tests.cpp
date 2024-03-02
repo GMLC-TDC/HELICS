@@ -245,7 +245,7 @@ TEST_F(FederateStateTests, basic_processmessage)
         return fs->enterExecutingMode(IterationRequest::NO_ITERATIONS);
     });
     auto currentState = fs->getState();
-    EXPECT_EQ(currentState,FederateStates::CREATED);
+    EXPECT_EQ(currentState, FederateStates::CREATED);
     fs->addAction(cmd);
     auto res = fs_process2.get();
     if (res.state != IterationResult::ERROR_RESULT) {

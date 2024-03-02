@@ -480,8 +480,7 @@ void InterfaceInfo::generateDataFlowGraph(Json::Value& base) const
             if (!pub->subscribers.empty()) {
                 pbase["targets"] = Json::arrayValue;
                 for (auto& target : pub->subscribers) {
-                    if (!target.active)
-                    {
+                    if (!target.active) {
                         continue;
                     }
                     Json::Value sid;
@@ -514,30 +513,28 @@ void InterfaceInfo::generateDataFlowGraph(Json::Value& base) const
     ehandle.unlock();
 }
 
-
-void InterfaceInfo::disconnectFederate(GlobalFederateId fedToDisconnect,Time disconnectTime)
+void InterfaceInfo::disconnectFederate(GlobalFederateId fedToDisconnect, Time disconnectTime)
 {
-    if (disconnectTime < cBigTime)
-    {
+    if (disconnectTime < cBigTime) {
         auto ihandle = inputs.lock_shared();
         for (auto& ipt : ihandle) {
-            ipt->disconnectFederate(fedToDisconnect,disconnectTime);
+            ipt->disconnectFederate(fedToDisconnect, disconnectTime);
         }
         ihandle.unlock();
     }
-    
+
     auto phandle = publications.lock();
 
-        for (auto& pub : phandle) {
-            pub->disconnectFederate(fedToDisconnect);
-        }
+    for (auto& pub : phandle) {
+        pub->disconnectFederate(fedToDisconnect);
+    }
     phandle.unlock();
 
     auto ehandle = endpoints.lock_shared();
-   
-        for (auto& ept : ehandle) {
-            ept->disconnectFederate(fedToDisconnect);
-        }
+
+    for (auto& ept : ehandle) {
+        ept->disconnectFederate(fedToDisconnect);
+    }
     ehandle.unlock();
 }
 

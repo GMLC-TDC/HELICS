@@ -58,7 +58,7 @@ class BaseTimeCoordinator {
     std::vector<GlobalFederateId> getDependents() const;
     /** get the last time grant from a federate */
     Time getLastGrant(GlobalFederateId fedId) const;
-   /** set the source id for the time coordinator*/
+    /** set the source id for the time coordinator*/
     void setSourceId(GlobalFederateId sourceId) { mSourceId = sourceId; }
     GlobalFederateId sourceId() const { return mSourceId; }
     /** compute updates to time values

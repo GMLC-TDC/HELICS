@@ -263,8 +263,8 @@ std::vector<GlobalFederateId> BaseTimeCoordinator::getDependents() const
 
 Time BaseTimeCoordinator::getLastGrant(GlobalFederateId fedId) const
 {
-    const auto *dep=dependencies.getDependencyInfo(fedId);
-    return (dep==nullptr)?timeZero:dep->lastGrant;
+    const auto* dep = dependencies.getDependencyInfo(fedId);
+    return (dep == nullptr) ? timeZero : dep->lastGrant;
 }
 
 bool BaseTimeCoordinator::hasActiveTimeDependencies() const

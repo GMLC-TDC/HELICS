@@ -16,16 +16,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-    struct SubscriberInformation {
-        GlobalHandle id;
-        std::string key;
-        bool active;
-        SubscriberInformation() = default;
-        SubscriberInformation(GlobalHandle gid, std::string_view key_):
-            id(gid), key(key_), active(true)
-        {
-        }
-    };
+struct SubscriberInformation {
+    GlobalHandle id;
+    std::string key;
+    bool active;
+    SubscriberInformation() = default;
+    SubscriberInformation(GlobalHandle gid, std::string_view key_): id(gid), key(key_), active(true)
+    {
+    }
+};
 
 /** data class containing the information about a publication*/
 class PublicationInfo {

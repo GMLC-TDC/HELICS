@@ -188,8 +188,8 @@ void FederateState::reset(const CoreFederateInfo& fedInfo)
     // CommonCore* mParent{nullptr};  //!< pointer to the higher level;
     errorString.clear();
     rt_lag = timeZero;
-    rt_lead=timeZero;
-    grantTimeOutPeriod=timeZero;
+    rt_lead = timeZero;
+    grantTimeOutPeriod = timeZero;
     realTimeTimerIndex = -1;
     grantTimeoutTimeIndex = -1;
     initRequested = false;
@@ -672,8 +672,7 @@ std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
     auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
         for (const auto& sub : pubInfo->subscribers) {
-            if (sub.active)
-            {
+            if (sub.active) {
                 subs.emplace_back(sub.id);
             }
         }
@@ -1521,7 +1520,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     routeMessage(cmd);
                 }
             } else {
-                Time lastTime=timeCoord->getLastGrant(cmd.source_id);
+                Time lastTime = timeCoord->getLastGrant(cmd.source_id);
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case TimeProcessingResult::DELAY_PROCESSING:
                         addFederateToDelay(cmd.source_id);
@@ -1534,8 +1533,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 if (state != FederateStates::EXECUTING) {
                     break;
                 }
-               
-                interfaceInformation.disconnectFederate(cmd.source_id,lastTime);
+
+                interfaceInformation.disconnectFederate(cmd.source_id, lastTime);
                 if (!timeGranted_mode) {
                     auto ret = timeCoord->checkTimeGrant();
                     if (returnableResult(ret)) {
@@ -1716,12 +1715,12 @@ void FederateState::processDataConnectionMessage(ActionMessage& cmd)
                         addDependent(cmd.source_id);
                     }
                 }
-                
+
                 if (getState() > FederateStates::CREATED) {
-                    if (getState() == FederateStates::EXECUTING && timeMethod == TimeSynchronizationMethod::DISTRIBUTED)
-                    {
-                         resetDependency(cmd.source_id);
-                         addDependent(cmd.source_id);
+                    if (getState() == FederateStates::EXECUTING &&
+                        timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
+                        resetDependency(cmd.source_id);
+                        addDependent(cmd.source_id);
                     }
                     if (!pubI->data.empty() && pubI->lastPublishTime > Time::minVal()) {
                         ActionMessage pub(CMD_PUB);

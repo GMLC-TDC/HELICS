@@ -428,9 +428,8 @@ void TimeDependencies::resetDependency(GlobalFederateId gid)
     auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
     if (dep != dependencies.end()) {
         if (dep->fedID == gid) {
-            if (dep->mTimeState == TimeState::time_granted && dep->lastGrant >= cBigTime)
-            {
-                *dep=DependencyInfo(dep->fedID);
+            if (dep->mTimeState == TimeState::time_granted && dep->lastGrant >= cBigTime) {
+                *dep = DependencyInfo(dep->fedID);
             }
         }
     }

@@ -41,8 +41,8 @@ bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber, std::string_view
 {
     for (auto& sub : subscribers) {
         if (sub.id == newSubscriber) {
-            auto rval=!sub.active;
-            sub.active=true;
+            auto rval = !sub.active;
+            sub.active = true;
             return rval;
         }
     }
@@ -54,7 +54,7 @@ void PublicationInfo::disconnectFederate(GlobalFederateId fedToDisconnect)
 {
     for (auto& sub : subscribers) {
         if (sub.id.fed_id == fedToDisconnect) {
-            sub.active=false;
+            sub.active = false;
         }
     }
 }

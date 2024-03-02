@@ -312,12 +312,10 @@ TEST_F(dynFed, dynamicPubSubs_2fed_pubStore)
     EXPECT_FALSE(brokers[0]->isOpenToNewFederates());
 }
 
-
-
 TEST_F(dynFed, reentrant_fed_input)
 {
     extraBrokerArgs = "--dynamic";
-    extraFederateArgs =" --reentrant";
+    extraFederateArgs = " --reentrant";
     SetupTest<helics::ValueFederate>("test_2", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
@@ -343,40 +341,39 @@ TEST_F(dynFed, reentrant_fed_input)
     EXPECT_EQ(tres, 2.0);
     EXPECT_DOUBLE_EQ(in1.getDouble(), 12.0);
 
-    auto vFed2Name=vFed2->getName();
+    auto vFed2Name = vFed2->getName();
     vFed2->disconnect();
-    vFed1->query("root","globalflush");
+    vFed1->query("root", "globalflush");
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
-    fedInfo.loadInfoFromArgs(std::string("--reentrant --force_new_core --dynamic --broker=")+brokers[0]->getIdentifier()+" --period=1.0s");
+    fedInfo.loadInfoFromArgs(std::string("--reentrant --force_new_core --dynamic --broker=") +
+                             brokers[0]->getIdentifier() + " --period=1.0s");
 
-    helics::ValueFederate vFed2Redo(vFed2Name,fedInfo);
-    EXPECT_EQ(vFed2Redo.getTimeProperty(HELICS_PROPERTY_TIME_PERIOD),1.0);
+    helics::ValueFederate vFed2Redo(vFed2Name, fedInfo);
+    EXPECT_EQ(vFed2Redo.getTimeProperty(HELICS_PROPERTY_TIME_PERIOD), 1.0);
     auto& in1redo = vFed2Redo.registerSubscription("pub1");
     vFed2Redo.enterExecutingModeAsync();
     vFed1->requestTimeAsync(helics::timeZero);
     vFed2Redo.enterExecutingModeComplete();
-    tres=vFed2Redo.getCurrentTime();
-    EXPECT_LE(tres,3.0);
+    tres = vFed2Redo.getCurrentTime();
+    EXPECT_LE(tres, 3.0);
     vFed2Redo.requestTimeAsync(helics::timeZero);
-    tres=vFed1->requestTimeComplete();
-    EXPECT_EQ(tres,3.0);
+    tres = vFed1->requestTimeComplete();
+    EXPECT_EQ(tres, 3.0);
     pub1.publish(19.45);
     vFed1->requestTimeAsync(helics::timeZero);
 
-    tres=vFed2Redo.requestTimeComplete();
-    EXPECT_EQ(tres,3.0);
+    tres = vFed2Redo.requestTimeComplete();
+    EXPECT_EQ(tres, 3.0);
 
     vFed2Redo.requestTimeAsync(helics::timeZero);
-    tres=vFed1->requestTimeComplete();
-    EXPECT_EQ(tres,4.0);
+    tres = vFed1->requestTimeComplete();
+    EXPECT_EQ(tres, 4.0);
     vFed1->disconnect();
 
-    tres=vFed2Redo.requestTimeComplete();
-    EXPECT_EQ(tres,4.0);
+    tres = vFed2Redo.requestTimeComplete();
+    EXPECT_EQ(tres, 4.0);
 
     EXPECT_DOUBLE_EQ(in1redo.getDouble(), 19.45);
 
     vFed2Redo.disconnect();
-   
-
 }

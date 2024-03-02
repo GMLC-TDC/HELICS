@@ -561,12 +561,11 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         auto route_id = (newFed) ? mFederates.back().route : mFederates.find(fedName)->route;
         auto global_fedid =
             (newFed) ? mFederates.back().global_id : mFederates.find(fedName)->global_id;
-        auto res=routing_table.emplace(global_fedid, route_id);
-        if (!res.second && !newFed)
-        {
-            res.first->second=route_id;
+        auto res = routing_table.emplace(global_fedid, route_id);
+        if (!res.second && !newFed) {
+            res.first->second = route_id;
         }
-        
+
         // don't bother with the federate_table
         // transmit the response
         ActionMessage fedReply(CMD_FED_ACK);

@@ -743,7 +743,7 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
                 fed = feds->find(std::string(name));
                 local_id = fed->local_id;
                 if (!fed->getOptionFlag(HELICS_FLAG_REENTRANT) ||
-                      fed->getState() != FederateStates::FINISHED) {
+                    fed->getState() != FederateStates::FINISHED) {
                     throw(RegistrationFailure(fmt::format(
                         "duplicate names {} detected: multiple federates with the same name",
                         name)));
