@@ -343,7 +343,9 @@ TEST_F(dynFed, reentrant_fed_input)
 
     auto vFed2Name = vFed2->getName();
     vFed2->disconnect();
-    vFed1->query("root", "globalflush");
+    tres=vFed1->requestTime(helics::timeZero);
+    EXPECT_LE(tres, 3.0);
+
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.loadInfoFromArgs(std::string("--reentrant --force_new_core --dynamic --broker=") +
                              brokers[0]->getIdentifier() + " --period=1.0s");
@@ -351,18 +353,16 @@ TEST_F(dynFed, reentrant_fed_input)
     helics::ValueFederate vFed2Redo(vFed2Name, fedInfo);
     EXPECT_EQ(vFed2Redo.getTimeProperty(HELICS_PROPERTY_TIME_PERIOD), 1.0);
     auto& in1redo = vFed2Redo.registerSubscription("pub1");
-    vFed2Redo.enterExecutingModeAsync();
-    vFed1->requestTimeAsync(helics::timeZero);
-    vFed2Redo.enterExecutingModeComplete();
+    vFed2Redo.enterExecutingMode();
     tres = vFed2Redo.getCurrentTime();
     EXPECT_LE(tres, 3.0);
     vFed2Redo.requestTimeAsync(helics::timeZero);
-    tres = vFed1->requestTimeComplete();
-    EXPECT_EQ(tres, 3.0);
+    
     pub1.publish(19.45);
     vFed1->requestTimeAsync(helics::timeZero);
 
     tres = vFed2Redo.requestTimeComplete();
+
     EXPECT_EQ(tres, 3.0);
 
     vFed2Redo.requestTimeAsync(helics::timeZero);
