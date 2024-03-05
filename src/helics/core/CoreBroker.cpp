@@ -1215,6 +1215,11 @@ void CoreBroker::processCommand(ActionMessage&& command)
             auto fed = mFederates.find(command.source_id);
             if (fed != mFederates.end()) {
                 fed->state = ConnectionState::DISCONNECTED;
+                if (fed->reentrant)
+                {
+                    //for reentrant federates the interface can be recreated later so needs to be removed
+                    handles.removeFederateHandles(command.source_id);
+                }
             }
             if (!isRootc) {
                 transmit(parent_route_id, command);
@@ -1659,6 +1664,37 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
 void CoreBroker::checkForNamedInterface(ActionMessage& command)
 {
     bool foundInterface = false;
+    if (checkActionFlag(command, reconnectable_flag))
+    {
+        if (isRootc) {
+            switch (command.action()) {
+            case CMD_ADD_NAMED_PUBLICATION:
+                unknownHandles.addReconnectablePublication(command.name(),
+                    command.getSource(),
+                    command.flags);
+                break;
+            case CMD_ADD_NAMED_INPUT:
+                unknownHandles.addReconnectableInput(command.name(),
+                    command.getSource(),
+                    command.flags);
+                
+                break;
+            case CMD_ADD_NAMED_ENDPOINT:
+                unknownHandles.addReconnectableEndpoint(command.name(),
+                    command.getSource(),
+                    command.flags);
+               
+                break;
+            case CMD_ADD_NAMED_FILTER:
+                unknownHandles.addReconnectableFilter(command.name(),
+                    command.getSource(),
+                    command.flags);
+                break;
+            default:
+                break;
+            }
+        }
+    }
     switch (command.action()) {
         case CMD_ADD_NAMED_PUBLICATION: {
             auto* pub = handles.getInterfaceHandle(command.name(), InterfaceType::PUBLICATION);
@@ -1779,7 +1815,8 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
         default:
             break;
     }
-    if (!foundInterface) {
+
+    if (!foundInterface ) {
         if (isRootc) {
             switch (command.action()) {
                 case CMD_ADD_NAMED_PUBLICATION:
@@ -1840,6 +1877,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             routeMessage(command);
         }
     }
+
 }
 
 void CoreBroker::removeNamedTarget(ActionMessage& command)
@@ -2895,6 +2933,31 @@ void CoreBroker::findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const st
     if (!Handles.empty()) {
         unknownHandles.clearInput(key);
     }
+    if (getBrokerState() == BrokerState::OPERATING)
+    {
+        Handles = unknownHandles.checkForReconnectionInputs(key);
+        for (auto& target : Handles) {
+            auto* pub = handles.findHandle(target.first);
+            if (pub == nullptr) {
+                connectInterfaces(handleInfo,
+                    handleInfo.flags,
+                    BasicHandleInfo(target.first.fed_id,
+                        target.first.handle,
+                        InterfaceType::PUBLICATION),
+
+                    target.second,
+                    std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
+            }
+            else {
+                connectInterfaces(handleInfo,
+                    handleInfo.flags,
+                    *pub,
+
+                    target.second,
+                    std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
+            }
+        }
+    }
 }
 
 void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
@@ -2919,6 +2982,18 @@ void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
     }
     if (!(subHandles.empty() && Pubtargets.empty())) {
         unknownHandles.clearPublication(key);
+    }
+    if (getBrokerState() == BrokerState::OPERATING)
+    {
+        subHandles = unknownHandles.checkForReconnectionPublications(key);
+        for (const auto& sub : subHandles) {
+            connectInterfaces(handleInfo,
+                sub.second,
+                BasicHandleInfo(sub.first.fed_id, sub.first.handle, InterfaceType::INPUT),
+
+                handleInfo.flags,
+                std::make_pair(CMD_ADD_PUBLISHER, CMD_ADD_SUBSCRIBER));
+        }
     }
 }
 
@@ -2956,6 +3031,28 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
     if (!(uHandles.empty() && eptTargets.empty())) {
         unknownHandles.clearEndpoint(key);
     }
+
+    if (getBrokerState() == BrokerState::OPERATING)
+    {
+        uHandles = unknownHandles.checkForReconnectionEndpoints(key);
+        for (const auto& target : uHandles) {
+            const auto* iface = handles.findHandle(target.first);
+            auto destFlags = target.second;
+            if (iface->handleType != InterfaceType::FILTER) {
+                destFlags = toggle_flag(destFlags, destination_target);
+            }
+
+            connectInterfaces(handleInfo,
+                target.second,
+                *iface,
+
+                destFlags,
+                std::make_pair(CMD_ADD_ENDPOINT,
+                    (iface->handleType != InterfaceType::FILTER) ?
+                    CMD_ADD_ENDPOINT :
+                    CMD_ADD_FILTER));
+        }
+    }
 }
 
 void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key)
@@ -2967,13 +3064,13 @@ void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const s
             flags |= make_flags(clone_flag);
         }
         connectInterfaces(handleInfo,
-                          flags,
-                          BasicHandleInfo(target.first.fed_id,
-                                          target.first.handle,
-                                          InterfaceType::ENDPOINT),
+            flags,
+            BasicHandleInfo(target.first.fed_id,
+                target.first.handle,
+                InterfaceType::ENDPOINT),
 
-                          flags,
-                          std::make_pair(CMD_ADD_FILTER, CMD_ADD_ENDPOINT));
+            flags,
+            std::make_pair(CMD_ADD_FILTER, CMD_ADD_ENDPOINT));
     }
 
     auto FiltDestTargets = unknownHandles.checkForFilterDestTargets(key);
@@ -3003,6 +3100,24 @@ void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const s
     if (!(Handles.empty() && FiltDestTargets.empty() && FiltSourceTargets.empty())) {
         unknownHandles.clearFilter(key);
     }
+    if (getBrokerState() == BrokerState::OPERATING)
+    {
+    Handles = unknownHandles.checkForFilters(key);
+    for (const auto& target : Handles) {
+        auto flags = target.second;
+        if (checkActionFlag(handleInfo, clone_flag)) {
+            flags |= make_flags(clone_flag);
+        }
+        connectInterfaces(handleInfo,
+            flags,
+            BasicHandleInfo(target.first.fed_id,
+                target.first.handle,
+                InterfaceType::ENDPOINT),
+
+            flags,
+            std::make_pair(CMD_ADD_FILTER, CMD_ADD_ENDPOINT));
+    }
+}
 }
 
 void CoreBroker::processError(ActionMessage& command)
@@ -3248,6 +3363,10 @@ void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
         if (fed.parent == brkid) {
             if (fed.state != ConnectionState::ERROR_STATE) {
                 fed.state = ConnectionState::DISCONNECTED;
+                if (fed.reentrant)
+                {
+                    handles.removeFederateHandles(fed.global_id);
+                }
             }
         }
     }

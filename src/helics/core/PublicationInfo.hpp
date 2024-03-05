@@ -19,9 +19,8 @@ namespace helics {
 struct SubscriberInformation {
     GlobalHandle id;
     std::string key;
-    bool active;
     SubscriberInformation() = default;
-    SubscriberInformation(GlobalHandle gid, std::string_view key_): id(gid), key(key_), active(true)
+    SubscriberInformation(GlobalHandle gid, std::string_view key_): id(gid), key(key_)
     {
     }
 };
@@ -62,7 +61,7 @@ class PublicationInfo {
 
     /** remove a subscriber*/
     void removeSubscriber(GlobalHandle subscriberToRemove);
-
+    /** disconnect a federate from the subscriber*/
     void disconnectFederate(GlobalFederateId fedToDisconnect);
     void setProperty(int32_t option, int32_t value);
     int32_t getProperty(int32_t option) const;

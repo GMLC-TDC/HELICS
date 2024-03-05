@@ -85,6 +85,17 @@ void HandleManager::removeHandle(GlobalHandle handle)
     new (&(handles[index])) BasicHandleInfo;
 }
 
+void HandleManager::removeFederateHandles(GlobalFederateId fedToRemove)
+{
+    for (auto& handle : handles)
+    {
+        if (handle.getFederateId() == fedToRemove)
+        {
+            removeHandle(handle.handle);
+        }
+    }
+}
+
 void HandleManager::addHandleAtIndex(const BasicHandleInfo& otherHandle, int32_t index)
 {
     if (index == static_cast<int32_t>(handles.size())) {

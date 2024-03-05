@@ -51,8 +51,7 @@ enum class ConnectionState : std::uint8_t {
 enum class QueryReuse : std::uint8_t;
 
 /** class defining the common information for a federate*/
-class BasicFedInfo {
-  public:
+struct BasicFedInfo {
     const std::string name;  //!< name of the federate
     GlobalFederateId global_id;  //!< the identification code for the federate
     route_id route;  //!< the routing information for data to be sent to the federate

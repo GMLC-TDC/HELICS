@@ -27,9 +27,10 @@ class UnknownHandleManager {
     std::unordered_multimap<std::string, TargetInfo>
         unknown_endpoints;  //!< map of all unknown endpoints
     std::unordered_multimap<std::string, TargetInfo>
-        unknown_inputs;  //!< map of all unknown endpoints
+        unknown_inputs;  //!< map of all unknown inputs
     std::unordered_multimap<std::string, TargetInfo>
         unknown_filters;  //!< map of all unknown filters
+
     std::unordered_multimap<std::string, std::string>
         unknown_links;  //!< map where links on either side is not known
     std::unordered_multimap<std::string, std::string>
@@ -38,18 +39,36 @@ class UnknownHandleManager {
         unknown_src_filters;  //!< map connecting source filters to endpoints
     std::unordered_multimap<std::string, std::string>
         unknown_dest_filters;  //!< map connecting destination filters to endpoints
+
+    std::unordered_multimap<std::string, TargetInfo>
+        reconnectable_publications;  //!< map of all reconnectable publications
+    std::unordered_multimap<std::string, TargetInfo>
+        reconnectable_endpoints;  //!< map of all reconnectable endpoints
+    std::unordered_multimap<std::string, TargetInfo>
+        reconnectable_inputs;  //!< map of all reconnectable inputs
+    std::unordered_multimap<std::string, TargetInfo>
+        reconnectable_filters;  //!< map of all reconnectable filters
   public:
     /** default constructor*/
     UnknownHandleManager() = default;
-    /** add a missingPublication*/
+    /** add a missing Publication*/
     void addUnknownPublication(std::string_view key, GlobalHandle target, uint16_t flags);
-    /** add a missingPublication*/
+    /** add a missing Input*/
     void addUnknownInput(std::string_view key, GlobalHandle target, uint16_t flags);
-    /** add a missing source endpoint*/
+    /** add a missing endpoint*/
     void addUnknownEndpoint(std::string_view key, GlobalHandle target, uint16_t flags);
-
     /** add a missing source filter*/
     void addUnknownFilter(std::string_view key, GlobalHandle target, uint16_t flags);
+
+    /** add a reconnectable Publication*/
+    void addReconnectablePublication(std::string_view key, GlobalHandle target, uint16_t flags);
+    /** add a reconnectable Input*/
+    void addReconnectableInput(std::string_view key, GlobalHandle target, uint16_t flags);
+    /** add a reconnectable endpoint*/
+    void addReconnectableEndpoint(std::string_view key, GlobalHandle target, uint16_t flags);
+    /** add a reconnectable filter*/
+    void addReconnectableFilter(std::string_view key, GlobalHandle target, uint16_t flags);
+
     /** add a data link where neither side is known*/
     void addDataLink(std::string_view source, std::string_view target);
     /** add an endpoint link where neither side is known*/
@@ -66,6 +85,16 @@ class UnknownHandleManager {
 
     /** specify a found Source Filter*/
     std::vector<TargetInfo> checkForFilters(const std::string& newFilter) const;
+
+    /** specify a found input*/
+    std::vector<TargetInfo> checkForReconnectionInputs(const std::string& newInput) const;
+    /** specify a found input*/
+    std::vector<TargetInfo> checkForReconnectionPublications(const std::string& newPublication) const;
+    /** specify a found input*/
+    std::vector<TargetInfo> checkForReconnectionEndpoints(const std::string& newEndpoint) const;
+
+    /** specify a found Source Filter*/
+    std::vector<TargetInfo> checkForReconnectionFilters(const std::string& newFilter) const;
 
     /** specify found data links*/
     std::vector<std::string> checkForLinks(const std::string& newSource) const;

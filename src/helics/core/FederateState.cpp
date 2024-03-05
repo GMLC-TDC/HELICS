@@ -672,9 +672,7 @@ std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
     auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
         for (const auto& sub : pubInfo->subscribers) {
-            if (sub.active) {
-                subs.emplace_back(sub.id);
-            }
+            subs.emplace_back(sub.id);
         }
     }
     return subs;
@@ -2196,6 +2194,13 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             break;
         case defs::Options::BUFFER_DATA:
             break;
+        case defs::Options::RECONNECTABLE:
+            if (value) {
+                interfaceFlags |= make_flags(reconnectable_flag);
+            } else {
+                interfaceFlags &= ~(make_flags(reconnectable_flag));
+            }
+            break;
         case defs::Flags::CONNECTIONS_REQUIRED:
             if (value) {
                 interfaceFlags |= make_flags(required_flag);
@@ -2262,6 +2267,8 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return ((interfaceFlags.load() & make_flags(required_flag)) != 0);
         case defs::Flags::CONNECTIONS_OPTIONAL:
             return ((interfaceFlags.load() & make_flags(optional_flag)) != 0);
+        case defs::Options::RECONNECTABLE:
+            return  ((interfaceFlags.load() & make_flags(reconnectable_flag)) != 0);
         case defs::Flags::STRICT_INPUT_TYPE_CHECKING:
             return strict_input_type_checking;
         case defs::Flags::IGNORE_INPUT_UNIT_MISMATCH:

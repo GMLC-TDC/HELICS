@@ -41,6 +41,35 @@ void UnknownHandleManager::addUnknownFilter(std::string_view key,
     unknown_filters.emplace(key, std::make_pair(target, flags));
 }
 
+void UnknownHandleManager::addReconnectablePublication(std::string_view key,
+    GlobalHandle target,
+    uint16_t flags)
+{
+    reconnectable_publications.emplace(key, std::make_pair(target, flags));
+}
+/** add a missingPublication*/
+void UnknownHandleManager::addReconnectableInput(std::string_view key,
+    GlobalHandle target,
+    uint16_t flags)
+{
+    reconnectable_inputs.emplace(key, std::make_pair(target, flags));
+}
+
+/** add a missing destination endpoint*/
+void UnknownHandleManager::addReconnectableEndpoint(std::string_view key,
+    GlobalHandle target,
+    uint16_t flags)
+{
+    reconnectable_endpoints.emplace(key, std::make_pair(target, flags));
+}
+/** add a missing filter*/
+void UnknownHandleManager::addReconnectableFilter(std::string_view key,
+    GlobalHandle target,
+    uint16_t flags)
+{
+    reconnectable_filters.emplace(key, std::make_pair(target, flags));
+}
+
 void UnknownHandleManager::addDataLink(std::string_view source, std::string_view target)
 {
     unknown_links.emplace(source, target);
@@ -93,13 +122,11 @@ static auto getTargets(const std::unordered_multimap<std::string, std::string>& 
     return targets;
 }
 
-/** specify a found input*/
 std::vector<UnknownHandleManager::TargetInfo>
     UnknownHandleManager::checkForInputs(const std::string& newInput) const
 {
     return getTargets(unknown_inputs, newInput);
 }
-/** specify a found input*/
 std::vector<UnknownHandleManager::TargetInfo>
     UnknownHandleManager::checkForPublications(const std::string& newPublication) const
 {
@@ -117,14 +144,12 @@ std::vector<std::string>
     return getTargets(unknown_endpoint_links, newSource);
 }
 
-/** specify a found input*/
 std::vector<UnknownHandleManager::TargetInfo>
     UnknownHandleManager::checkForEndpoints(const std::string& newEndpoint) const
 {
     return getTargets(unknown_endpoints, newEndpoint);
 }
 
-/** specify a found input*/
 std::vector<UnknownHandleManager::TargetInfo>
     UnknownHandleManager::checkForFilters(const std::string& newFilter) const
 {
@@ -141,6 +166,30 @@ std::vector<std::string>
     UnknownHandleManager::checkForFilterDestTargets(const std::string& newFilter) const
 {
     return getTargets(unknown_dest_filters, newFilter);
+}
+
+
+std::vector<UnknownHandleManager::TargetInfo>
+UnknownHandleManager::checkForReconnectionInputs(const std::string& newInput) const
+{
+    return getTargets(reconnectable_inputs, newInput);
+}
+std::vector<UnknownHandleManager::TargetInfo>
+UnknownHandleManager::checkForReconnectionPublications(const std::string& newPublication) const
+{
+    return getTargets(reconnectable_publications, newPublication);
+}
+
+std::vector<UnknownHandleManager::TargetInfo>
+UnknownHandleManager::checkForReconnectionEndpoints(const std::string& newEndpoint) const
+{
+    return getTargets(reconnectable_endpoints, newEndpoint);
+}
+
+std::vector<UnknownHandleManager::TargetInfo>
+UnknownHandleManager::checkForReconnectionFilters(const std::string& newFilter) const
+{
+    return getTargets(reconnectable_filters, newFilter);
 }
 
 bool UnknownHandleManager::hasUnknowns() const

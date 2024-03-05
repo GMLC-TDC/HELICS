@@ -48,7 +48,7 @@ enum InterfaceFlags : uint16_t {
     /// flag indicating that the values should only be updated on change
     only_update_on_change_flag = 6,
     /// flag indicating that the target is mapped
-    mapped_flag = 7,
+    reconnectable_flag = 7,
     /// flag indicating that a connection is optional and may not be matched
     optional_flag = 8,
 

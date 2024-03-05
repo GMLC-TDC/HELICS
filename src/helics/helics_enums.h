@@ -355,6 +355,8 @@ typedef enum { /* NOLINT */
                /** specify that the last data should be buffered and sent on subscriptions after
                   init*/
                HELICS_HANDLE_OPTION_BUFFER_DATA = 411,
+               /** specify that the handle can be reconnected for reentrant federates*/
+               HELICS_HANDLE_OPTION_RECONNECTABLE = 412,
                /** specify that the types should be checked strictly for pub/sub and filters*/
                HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING = 414,
                /** specify that the handle is receive only*/

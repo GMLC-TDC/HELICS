@@ -480,9 +480,6 @@ void InterfaceInfo::generateDataFlowGraph(Json::Value& base) const
             if (!pub->subscribers.empty()) {
                 pbase["targets"] = Json::arrayValue;
                 for (auto& target : pub->subscribers) {
-                    if (!target.active) {
-                        continue;
-                    }
                     Json::Value sid;
                     sid["federate"] = target.id.fed_id.baseValue();
                     sid["handle"] = target.id.handle.baseValue();
