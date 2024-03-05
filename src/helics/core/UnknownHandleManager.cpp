@@ -42,30 +42,30 @@ void UnknownHandleManager::addUnknownFilter(std::string_view key,
 }
 
 void UnknownHandleManager::addReconnectablePublication(std::string_view key,
-    GlobalHandle target,
-    uint16_t flags)
+                                                       GlobalHandle target,
+                                                       uint16_t flags)
 {
     reconnectable_publications.emplace(key, std::make_pair(target, flags));
 }
 /** add a missingPublication*/
 void UnknownHandleManager::addReconnectableInput(std::string_view key,
-    GlobalHandle target,
-    uint16_t flags)
+                                                 GlobalHandle target,
+                                                 uint16_t flags)
 {
     reconnectable_inputs.emplace(key, std::make_pair(target, flags));
 }
 
 /** add a missing destination endpoint*/
 void UnknownHandleManager::addReconnectableEndpoint(std::string_view key,
-    GlobalHandle target,
-    uint16_t flags)
+                                                    GlobalHandle target,
+                                                    uint16_t flags)
 {
     reconnectable_endpoints.emplace(key, std::make_pair(target, flags));
 }
 /** add a missing filter*/
 void UnknownHandleManager::addReconnectableFilter(std::string_view key,
-    GlobalHandle target,
-    uint16_t flags)
+                                                  GlobalHandle target,
+                                                  uint16_t flags)
 {
     reconnectable_filters.emplace(key, std::make_pair(target, flags));
 }
@@ -168,26 +168,25 @@ std::vector<std::string>
     return getTargets(unknown_dest_filters, newFilter);
 }
 
-
 std::vector<UnknownHandleManager::TargetInfo>
-UnknownHandleManager::checkForReconnectionInputs(const std::string& newInput) const
+    UnknownHandleManager::checkForReconnectionInputs(const std::string& newInput) const
 {
     return getTargets(reconnectable_inputs, newInput);
 }
 std::vector<UnknownHandleManager::TargetInfo>
-UnknownHandleManager::checkForReconnectionPublications(const std::string& newPublication) const
+    UnknownHandleManager::checkForReconnectionPublications(const std::string& newPublication) const
 {
     return getTargets(reconnectable_publications, newPublication);
 }
 
 std::vector<UnknownHandleManager::TargetInfo>
-UnknownHandleManager::checkForReconnectionEndpoints(const std::string& newEndpoint) const
+    UnknownHandleManager::checkForReconnectionEndpoints(const std::string& newEndpoint) const
 {
     return getTargets(reconnectable_endpoints, newEndpoint);
 }
 
 std::vector<UnknownHandleManager::TargetInfo>
-UnknownHandleManager::checkForReconnectionFilters(const std::string& newFilter) const
+    UnknownHandleManager::checkForReconnectionFilters(const std::string& newFilter) const
 {
     return getTargets(reconnectable_filters, newFilter);
 }

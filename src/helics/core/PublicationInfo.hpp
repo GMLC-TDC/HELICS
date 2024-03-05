@@ -20,9 +20,7 @@ struct SubscriberInformation {
     GlobalHandle id;
     std::string key;
     SubscriberInformation() = default;
-    SubscriberInformation(GlobalHandle gid, std::string_view key_): id(gid), key(key_)
-    {
-    }
+    SubscriberInformation(GlobalHandle gid, std::string_view key_): id(gid), key(key_) {}
 };
 
 /** data class containing the information about a publication*/

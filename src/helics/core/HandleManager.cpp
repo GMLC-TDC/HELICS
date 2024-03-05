@@ -87,10 +87,8 @@ void HandleManager::removeHandle(GlobalHandle handle)
 
 void HandleManager::removeFederateHandles(GlobalFederateId fedToRemove)
 {
-    for (auto& handle : handles)
-    {
-        if (handle.getFederateId() == fedToRemove)
-        {
+    for (auto& handle : handles) {
+        if (handle.getFederateId() == fedToRemove) {
             removeHandle(handle.handle);
         }
     }

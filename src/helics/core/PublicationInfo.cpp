@@ -51,11 +51,11 @@ bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber, std::string_view
 void PublicationInfo::disconnectFederate(GlobalFederateId fedToDisconnect)
 {
     subscribers.erase(std::remove_if(subscribers.begin(),
-        subscribers.end(),
-        [fedToDisconnect](const auto& val) {
-            return val.id.fed_id == fedToDisconnect;
-        }),
-        subscribers.end());
+                                     subscribers.end(),
+                                     [fedToDisconnect](const auto& val) {
+                                         return val.id.fed_id == fedToDisconnect;
+                                     }),
+                      subscribers.end());
 }
 
 void PublicationInfo::removeSubscriber(GlobalHandle subscriberToRemove)

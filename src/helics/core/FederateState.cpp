@@ -2268,7 +2268,7 @@ bool FederateState::getOptionFlag(int optionFlag) const
         case defs::Flags::CONNECTIONS_OPTIONAL:
             return ((interfaceFlags.load() & make_flags(optional_flag)) != 0);
         case defs::Options::RECONNECTABLE:
-            return  ((interfaceFlags.load() & make_flags(reconnectable_flag)) != 0);
+            return ((interfaceFlags.load() & make_flags(reconnectable_flag)) != 0);
         case defs::Flags::STRICT_INPUT_TYPE_CHECKING:
             return strict_input_type_checking;
         case defs::Flags::IGNORE_INPUT_UNIT_MISMATCH:

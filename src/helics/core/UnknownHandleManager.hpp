@@ -26,8 +26,7 @@ class UnknownHandleManager {
         unknown_publications;  //!< map of all unknown publications
     std::unordered_multimap<std::string, TargetInfo>
         unknown_endpoints;  //!< map of all unknown endpoints
-    std::unordered_multimap<std::string, TargetInfo>
-        unknown_inputs;  //!< map of all unknown inputs
+    std::unordered_multimap<std::string, TargetInfo> unknown_inputs;  //!< map of all unknown inputs
     std::unordered_multimap<std::string, TargetInfo>
         unknown_filters;  //!< map of all unknown filters
 
@@ -89,7 +88,8 @@ class UnknownHandleManager {
     /** specify a found input*/
     std::vector<TargetInfo> checkForReconnectionInputs(const std::string& newInput) const;
     /** specify a found input*/
-    std::vector<TargetInfo> checkForReconnectionPublications(const std::string& newPublication) const;
+    std::vector<TargetInfo>
+        checkForReconnectionPublications(const std::string& newPublication) const;
     /** specify a found input*/
     std::vector<TargetInfo> checkForReconnectionEndpoints(const std::string& newEndpoint) const;
 

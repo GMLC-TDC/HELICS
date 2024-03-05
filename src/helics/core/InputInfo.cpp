@@ -163,10 +163,10 @@ bool InputInfo::addSource(GlobalHandle newSource,
     for (const auto& is : input_sources) {
         if (is == newSource) {
             if (deactivated[index] < Time::maxVal()) {
-                //this is a reconnection
-                deactivated[index]=Time::maxVal();
-                source_info[index].units=sunits;
-                source_info[index].type=sunits;
+                // this is a reconnection
+                deactivated[index] = Time::maxVal();
+                source_info[index].units = sunits;
+                source_info[index].type = sunits;
                 return true;
             }
             return false;
