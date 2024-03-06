@@ -1747,6 +1747,10 @@ void FederateState::processDataConnectionMessage(ActionMessage& cmd)
                     if (eptI->targetedEndpoint) {
                         if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                             addDependency(cmd.source_id);
+                            if (getState() == FederateStates::EXECUTING)
+                            {
+                                minimumReceiveTime=time_granted;
+                            }
                         }
                     }
                 }
@@ -1792,6 +1796,10 @@ void FederateState::processDataMessage(ActionMessage& cmd)
         case CMD_SEND_MESSAGE: {
             auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (epi != nullptr && !epi->sourceOnly) {
+                if (cmd.actionTime < minimumReceiveTime)
+                {
+                    cmd.actionTime=minimumReceiveTime;
+                }
                 // if (!epi->not_interruptible)
                 {
                     timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);

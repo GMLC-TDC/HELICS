@@ -146,6 +146,7 @@ class FederateState {
     std::vector<GlobalFederateId> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted{startupTime};  //!< the most recent granted time;
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
+    Time minimumReceiveTime{startupTime}; //!< minimum receive time for messages
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
 
     /** a callback for additional queries */

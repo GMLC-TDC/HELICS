@@ -363,6 +363,13 @@ bool TimeDependencies::addDependency(GlobalFederateId gid)
         if (dep->fedID == gid) {
             auto rval = dep->dependency;
             dep->dependency = true;
+            if (dep->next == Time::maxVal())
+            {
+                dep->next=negEpsilon;
+                dep->lastGrant=timeZero;
+                dep->mTimeState=TimeState::initialized;
+                return true;
+            }
             // the dependency is already present
             return !rval;
         }

@@ -194,7 +194,13 @@ void HandleManager::setHandleOption(InterfaceHandle handle, int32_t option, int3
                     }
                 }
                 break;
-
+            case HELICS_HANDLE_OPTION_RECONNECTABLE:
+                if (val != 0) {
+                    setActionFlag(handles[index], reconnectable_flag);
+                } else {
+                    clearActionFlag(handles[index], reconnectable_flag);
+                }
+                break;
             default:
                 break;
         }
@@ -221,6 +227,9 @@ int32_t HandleManager::getHandleOption(InterfaceHandle handle, int32_t option) c
                 break;
             case HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY:
                 rvalue = checkActionFlag(handles[index], single_connection_flag);
+                break;
+            case HELICS_HANDLE_OPTION_RECONNECTABLE:
+                rvalue=checkActionFlag(handles[index],reconnectable_flag);
                 break;
             case HELICS_HANDLE_OPTION_RECEIVE_ONLY:
                 rvalue = checkActionFlag(handles[index], receive_only_flag);
