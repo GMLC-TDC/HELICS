@@ -363,10 +363,11 @@ bool CommonCore::isConfigured() const
 bool CommonCore::isOpenToNewFederates() const
 {
     auto cBrokerState = getBrokerState();
-        return ((cBrokerState != BrokerState::CREATED) && (cBrokerState < (dynamicFederation?BrokerState::TERMINATING:BrokerState::OPERATING)) &&
-            (maxFederateCount == std::numeric_limits<int32_t>::max() ||
-                (federates.lock_shared()->size() < static_cast<size_t>(maxFederateCount))));
-    
+    return (
+        (cBrokerState != BrokerState::CREATED) &&
+        (cBrokerState < (dynamicFederation ? BrokerState::TERMINATING : BrokerState::OPERATING)) &&
+        (maxFederateCount == std::numeric_limits<int32_t>::max() ||
+         (federates.lock_shared()->size() < static_cast<size_t>(maxFederateCount))));
 }
 
 bool CommonCore::hasError() const
@@ -3179,28 +3180,25 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 routeMessage(pngrep);
             }
             break;
-        case CMD_REG_FED:
-        {
+        case CMD_REG_FED: {
             // this one in the core needs to be the thread-safe version of getFederate
-            auto insertRes=loopFederates.insert(command.name(), no_search, getFederate(command.name()));
-            if (!insertRes && checkActionFlag(command, reentrant_flag))
-            {
-                auto lfed=loopFederates.find(command.name());
-                lfed->state=OperatingState::OPERATING;
+            auto insertRes =
+                loopFederates.insert(command.name(), no_search, getFederate(command.name()));
+            if (!insertRes && checkActionFlag(command, reentrant_flag)) {
+                auto lfed = loopFederates.find(command.name());
+                lfed->state = OperatingState::OPERATING;
             }
-            
+
             if (global_broker_id_local != parent_broker_id) {
                 // forward on to Broker
                 command.source_id = global_broker_id_local;
                 transmit(parent_route_id, std::move(command));
-            }
-            else {
+            } else {
                 // this will get processed when this core is assigned a global hid
                 delayTransmitQueue.push(std::move(command));
             }
-            
-        }
-            break;
+
+        } break;
         case CMD_BROKER_LOCATION: {
             command.setAction(CMD_PROTOCOL);
             command.messageID = NEW_BROKER_INFORMATION;
@@ -4640,7 +4638,7 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                     }
                     cmd.source_id = global_broker_id_local;
                     transmit(parent_route_id, cmd);
-                } else if (checkActionFlag(cmd, observer)||dynamicFederation) {
+                } else if (checkActionFlag(cmd, observer) || dynamicFederation) {
                     cmd.source_id = global_broker_id_local;
                     transmit(parent_route_id, cmd);
                 }
@@ -4689,7 +4687,11 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                     }
                 } else if (checkActionFlag(cmd, observer_flag) ||
                            checkActionFlag(cmd, dynamic_join_flag)) {
-                    loopFederates.apply([&cmd](auto& fed) { if (fed->getState() == FederateStates::CREATED) { fed->addAction(cmd); } });
+                    loopFederates.apply([&cmd](auto& fed) {
+                        if (fed->getState() == FederateStates::CREATED) {
+                            fed->addAction(cmd);
+                        }
+                    });
                 }
             }
 

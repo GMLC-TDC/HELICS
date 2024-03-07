@@ -1504,8 +1504,7 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             if (brk == nullptr) {
                 break;
             }
-            if (brk->state == ConnectionState::CONNECTED)
-            {
+            if (brk->state == ConnectionState::CONNECTED) {
                 brk->state = ConnectionState::INIT_REQUESTED;
             }
 

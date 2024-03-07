@@ -453,8 +453,6 @@ TEST_F(dynFed, reentrant_fed_publication)
     vFed2Redo.disconnect();
 }
 
-
-
 TEST_F(dynFed, reentrant_fed_input_single_core)
 {
     extraBrokerArgs = "--dynamic";
