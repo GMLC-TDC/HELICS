@@ -1504,7 +1504,10 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             if (brk == nullptr) {
                 break;
             }
-            brk->state = ConnectionState::INIT_REQUESTED;
+            if (brk->state == ConnectionState::CONNECTED)
+            {
+                brk->state = ConnectionState::INIT_REQUESTED;
+            }
 
             if ((dynamicFederation || brk->_observer) &&
                 getBrokerState() >= BrokerState::OPERATING) {
