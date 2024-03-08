@@ -12,7 +12,7 @@ Dynamic federations can be thought of as being composed of features in increasin
 4. Allowing federates to join the co-simulation after execution has begun and create arbitrary interfaces (publications, subscriptions, endpoints, etc). This relies on all previous levels of complexity being implemented.
 5. Allowing federate to disconnect and reconnect throughout the simulation
 
-HELICS v3.1 supported levels 1 and 2. HELICS v3.4 supports full dynamic federations (level 4). Level 5 is supported as of version v3.5.1.   
+HELICS v3.1 supported levels 1 and 2. HELICS v3.4 supports full dynamic federations (level 4). Level 5 is supported as of version v3.5.1.
 
 ## Dynamic Subscriptions
 
@@ -60,9 +60,9 @@ Dynamic publications and endpoints are implemented as of HELICS v3.4. For any la
 
 Given the above limitations, as of HELICS v3.4 fully dynamic federations are supported. By setting the `--dynamic` flag on the root broker of a federation and any intermediate brokers or cores to which dynamic federates may be added, federates may join the federation late. (HELICS have always been able to leave a federation early.) And as with observer federates, after calling `helicsFederateEnterExecutingMode()`
 
-## Reentrant federates 
+## Reentrant federates
 
-As of v3.5.1 reentrant federates are allowed.  They must be specified with the reentrant flag (`--reentrant`) and be used in a dynamic federation.   This allows a federate to disconnect, then rejoin with the same name at a later time in the co-simulation.   The second and later joins are like a dynamic federate in terms of timing.   Interface connecting to a reentrant federate may use the HELICS_OPTION_FLAG_RECONNECTABLE to allow for dynamic/automatic reconnections when an interface with the same name is created from a reentrant federate.   This may be done on the same core or a new/different core.   The new(reentrant) federate does not inherit any properties (other than the name) from the previous federate with the same name.   
+As of v3.5.1 reentrant federates are allowed. They must be specified with the reentrant flag (`--reentrant`) and be used in a dynamic federation. This allows a federate to disconnect, then rejoin with the same name at a later time in the co-simulation. The second and later joins are like a dynamic federate in terms of timing. Interface connecting to a reentrant federate may use the HELICS_OPTION_FLAG_RECONNECTABLE to allow for dynamic/automatic reconnections when an interface with the same name is created from a reentrant federate. This may be done on the same core or a new/different core. The new(reentrant) federate does not inherit any properties (other than the name) from the previous federate with the same name.
 
 ## Example
 
