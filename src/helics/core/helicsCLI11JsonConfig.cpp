@@ -15,29 +15,25 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-
-    static Json::Value getSection(Json::Value& base, const std::string& subSection, int16_t configIndex)
-    {
-        if (!subSection.empty()) {
-            auto cfg = base[subSection];
-            if (cfg.isObject()) {
-                return cfg;
-            } else if (cfg.isArray()) {
-                return cfg[configIndex];
+static Json::Value getSection(Json::Value& base, const std::string& subSection, int16_t configIndex)
+{
+    if (!subSection.empty()) {
+        auto cfg = base[subSection];
+        if (cfg.isObject()) {
+            return cfg;
+        } else if (cfg.isArray()) {
+            return cfg[configIndex];
+        } else if (cfg.isNull() && subSection.find_first_of('.') != std::string::npos) {
+            auto dotloc = subSection.find_first_of('.');
+            auto sub1 = base[subSection.substr(0, dotloc)];
+            if (!sub1.isNull()) {
+                return getSection(sub1, subSection.substr(dotloc + 1), configIndex);
             }
-            else if (cfg.isNull() && subSection.find_first_of('.') != std::string::npos)
-            {
-                auto dotloc=subSection.find_first_of('.');
-                auto sub1=base[subSection.substr(0,dotloc)];
-                if (!sub1.isNull())
-                {
-                    return getSection(sub1,subSection.substr(dotloc+1),configIndex);
-                }
-            }
-            return Json::nullValue;
         }
-        return base;
+        return Json::nullValue;
     }
+    return base;
+}
 
 std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) const
 {
@@ -47,14 +43,13 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
     if (!mSkipJson) {
         Json::Value config;
         if (Json::parseFromStream(rbuilder, input, &config, &errs)) {
-                config=getSection(config,section(),configIndex);
-                if (config.isNull())
-                {
-                    if (mFallbackToDefault) {
-                        return ConfigBase::from_config(input);
-                    }
-                    return {};
+            config = getSection(config, section(), configIndex);
+            if (config.isNull()) {
+                if (mFallbackToDefault) {
+                    return ConfigBase::from_config(input);
                 }
+                return {};
+            }
             return fromConfigInternal(config);
         }
         if (mThrowJsonErrors && !errs.empty()) {
@@ -131,8 +126,7 @@ HelicsConfigJSON* addJsonConfig(CLI::App* app)
         ->configurable(false)
         ->trigger_on_parse();
     app->get_config_ptr()->check([fmtr](const std::string& filename) {
-        if (CLI::ExistingFile(filename).empty())
-        {
+        if (CLI::ExistingFile(filename).empty()) {
             fmtr->skipJson(!fileops::hasJsonExtension(filename));
         }
         return std::string{};

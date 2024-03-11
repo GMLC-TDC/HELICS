@@ -2646,20 +2646,20 @@ std::string FederateState::processQueryActual(std::string_view query) const
                 if (!queryCallback) {
                     continue;
                 }
-            auto potential = queryCallback("potential_interfaces");
-            if (!potential.empty()) {
-                try {
-                    auto json = fileops::loadJsonStr(potential);
+                auto potential = queryCallback("potential_interfaces");
+                if (!potential.empty()) {
+                    try {
+                        auto json = fileops::loadJsonStr(potential);
 
-                    if (!json.isMember("error")) {
-                        base["potential_interfaces"] = json;
-                        break;
+                        if (!json.isMember("error")) {
+                            base["potential_interfaces"] = json;
+                            break;
+                        }
+                    }
+                    catch (const std::invalid_argument&) {
+                        ;
                     }
                 }
-                catch (const std::invalid_argument&) {
-                    ;
-                }
-            }
             }
         }
         return fileops::generateJsonString(base);

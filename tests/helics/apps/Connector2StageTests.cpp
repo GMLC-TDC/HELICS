@@ -45,7 +45,7 @@ class CheckFed {
             auto cmd = vFed->getCommand();
             hasCommand = !cmd.first.empty();
             if (hasCommand) {
-                receivedCommand=true;
+                receivedCommand = true;
                 auto json = helics::fileops::loadJsonStr(cmd.first);
                 if (json.isMember("command")) {
                     if (json["command"] == "register_interfaces") {
@@ -85,10 +85,9 @@ class CheckFed {
                     }
                 }
             }
-            if (!receivedCommand)
-            {
+            if (!receivedCommand) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                hasCommand=true;
+                hasCommand = true;
             }
         }
         values.resize(vFed->getInputCount());
