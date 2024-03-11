@@ -802,7 +802,12 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         throw(helics::InvalidParameter(iarg.what()));
     }
     loadJsonConfig(doc);
-
+    bool hasHelicsSection=doc.isMember("helics");
+    bool hasHelicsSubSection{false};
+    if (hasHelicsSection)
+    {
+        hasHelicsSubSection=doc["helics"].isMember("helics");
+    }
     if (runArgParser) {
         auto app = makeCLIApp();
         app->allow_extras();
@@ -810,9 +815,35 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
             if (jsonString.find('{') != std::string::npos) {
                 std::istringstream jstring(jsonString);
                 app->parse_from_stream(jstring);
+                if (hasHelicsSection)
+                {
+                    app->get_config_formatter_base()->section("helics");
+                    std::istringstream jstringHelics(jsonString);
+                    app->parse_from_stream(jstringHelics);
+                    if (hasHelicsSubSection)
+                    {
+                        app->get_config_formatter_base()->section("helics.helics");
+                        std::istringstream jstringHelicsSub(jsonString);
+                        app->parse_from_stream(jstringHelicsSub);
+                    }
+                }
             } else {
                 std::ifstream file(jsonString);
                 app->parse_from_stream(file);
+                if (hasHelicsSection)
+                {
+                    file.clear();
+                    file.seekg(0);
+                    app->get_config_formatter_base()->section("helics");
+                    app->parse_from_stream(file);
+                    if (hasHelicsSubSection)
+                    {
+                        file.clear();
+                        file.seekg(0);
+                        app->get_config_formatter_base()->section("helics.helics");
+                        app->parse_from_stream(file);
+                    }
+                }
             }
         }
         catch (const CLI::Error& clierror) {

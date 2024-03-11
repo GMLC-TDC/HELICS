@@ -484,11 +484,19 @@ INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          testNamer);
 
 static constexpr const char* config_files[] = {"example_message_fed.json",
-                                               "example_message_fed.toml"};
+                                               "example_message_fed.toml",
+"example_message_fed_helics.json","example_message_fed_helics2.json"};
 
 class mfed_file_config_files:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {};
+
+TEST_P(mfed_file_config_files, info_file_load)
+{
+   helics::FederateInfo fedInfo=helics::loadFederateInfo(std::string(TEST_DIR) + GetParam());
+
+   EXPECT_EQ(fedInfo.coreInitString," --autobroker");
+}
 
 TEST_P(mfed_file_config_files, test_file_load)
 {
