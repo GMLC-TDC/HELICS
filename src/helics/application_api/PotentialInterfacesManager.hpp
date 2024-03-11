@@ -19,12 +19,13 @@ namespace helics {
 class Core;
 
 class PotentialInterfacesManager {
-  public:
-    explicit PotentialInterfacesManager(Core* core);
-    void loadPotentialInterfaces(Json::Value& json);
-    std::string generateQueryResponse(std::string_view query);
+    public:
+        PotentialInterfacesManager(Core *core, Federate *fed);
+        void loadPotentialInterfaces(Json::Value& json);
+        std::string generateQueryResponse(std::string_view query);
 
-  private:
+    private:
     Core* corePtr{nullptr};
+    Federate *fedPtre{nullptr};
 };
 }  // namespace helics

@@ -1478,7 +1478,7 @@ void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
 
     if (json.isMember("potential_interfaces")) {
         if (!potManager) {
-            potManager = std::make_unique<PotentialInterfacesManager>(coreObject.get());
+            potManager = std::make_unique<PotentialInterfacesManager>(coreObject.get(), this);
         }
         potManager->loadPotentialInterfaces(json);
         hasPotentialInterfaces = true;
