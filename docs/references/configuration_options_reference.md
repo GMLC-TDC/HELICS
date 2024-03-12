@@ -405,7 +405,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 
 _Property's enumerated name:_ `HELICS_FLAG_REENTRANT` [38]
 
-Used to indicate to the federation that this federate my be disconnected and reconnect at a later time. This is only applicable if the dynamic flag is also set in the federation. A reconnecting federate is a new federate with the same name as a previous version.
+Used to indicate to the broker that this federate may disconnect and reconnect at a later time. This flag is only has an effect if the "dynamic" flag is also set on the broker. A reconnecting federate is a new federate with the same name as a previous version.
 
 ---
 
