@@ -1055,8 +1055,36 @@ iteration_time Federate::requestTimeIterativeComplete()
 void Federate::potentialInterfacesStartupSequence()
 {
     if (potManager) {
-        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
-        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+        switch (potInterfacesSequence.load())
+        {
+        case 0:
+            potManager->initialize();
+            potInterfacesSequence.store(1);
+            [[fallthrough]];
+        case 1:
+            coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+            potInterfacesSequence.store(2);
+            [[fallthrough]];
+        case 2: {
+            //respond to query
+            coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+            // now check for commands
+            auto cmd = coreObject->getCommand(fedID);
+            if (cmd.first.empty())
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                while (!cmd.first.empty())
+                {
+                    potManager->processCommand(std::move(cmd));
+                    cmd = coreObject->getCommand(fedID);
+                }
+            }
+            potInterfacesSequence.store(2);
+        }
+              break;
+        default:
+            break;
+        }
     }
 }
 
@@ -1850,11 +1878,25 @@ void Federate::sendCommand(std::string_view target,
 
 std::pair<std::string, std::string> Federate::getCommand()
 {
+    if (hasPotentialInterfaces)
+    {
+        if (potManager->hasExtraCommands())
+        {
+            return potManager->getCommand();
+        }
+    }
     return coreObject->getCommand(fedID);
 }
 
 std::pair<std::string, std::string> Federate::waitCommand()
 {
+    if (hasPotentialInterfaces)
+    {
+        if (potManager->hasExtraCommands())
+        {
+            return potManager->getCommand();
+        }
+    }
     return coreObject->waitCommand(fedID);
 }
 

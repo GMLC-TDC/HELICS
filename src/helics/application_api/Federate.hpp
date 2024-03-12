@@ -104,8 +104,9 @@ class HELICS_CXX_EXPORT Federate {
     /// pointer to a class defining the async call information
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>> asyncCallInfo;
     std::unique_ptr<ConnectorFederateManager> cManager;  //!< class for managing filter operations
-    std::unique_ptr<PotentialInterfacesManager>
-        potManager;  //!< class for managing potential interfaces
+    /// class for managing potential interfaces
+    std::unique_ptr<PotentialInterfacesManager> potManager;
+    std::atomic<int> potInterfacesSequence{0};
     std::string mName;  //!< the name of the federate
     std::function<void(Time, Time, bool)> timeRequestEntryCallback;
     std::function<void(Time, bool)> timeUpdateCallback;
