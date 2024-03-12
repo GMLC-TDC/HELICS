@@ -375,41 +375,37 @@ void Federate::enterInitializingModeIterative()
         case Modes::STARTUP:
             try {
                 if (hasPotentialInterfaces && potManager) {
-                    switch (potInterfacesSequence.load())
-                    {
-                    case 0:
-                        potManager->initialize();
-                        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
-                        potInterfacesSequence.store(2);
-                        break;
-                    case 2: {
-                        //respond to query
-                        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
-                        // now check for commands
-                        auto cmd = coreObject->getCommand(fedID);
-                        if (cmd.first.empty())
-                        {
-                            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                            cmd = coreObject->getCommand(fedID);
-                        }
-                        while (!cmd.first.empty())
-                        {
-                            potManager->processCommand(std::move(cmd));
-                            cmd = coreObject->getCommand(fedID);
-                        }
-                        potInterfacesSequence.store(3);
+                    switch (potInterfacesSequence.load()) {
+                        case 0:
+                            potManager->initialize();
+                            coreObject->enterInitializingMode(
+                                fedID, helics::IterationRequest::FORCE_ITERATION);
+                            potInterfacesSequence.store(2);
+                            break;
+                        case 2: {
+                            // respond to query
+                            coreObject->enterInitializingMode(
+                                fedID, helics::IterationRequest::FORCE_ITERATION);
+                            // now check for commands
+                            auto cmd = coreObject->getCommand(fedID);
+                            if (cmd.first.empty()) {
+                                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                                cmd = coreObject->getCommand(fedID);
+                            }
+                            while (!cmd.first.empty()) {
+                                potManager->processCommand(std::move(cmd));
+                                cmd = coreObject->getCommand(fedID);
+                            }
+                            potInterfacesSequence.store(3);
+                        } break;
+                        default:
+                            coreObject->enterInitializingMode(
+                                fedID, helics::IterationRequest::FORCE_ITERATION);
+                            break;
                     }
-                          break;
-                    default:
-                        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
-                        break;
-                    }
-                }
-                else
-                {
+                } else {
                     coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
                 }
-                
             }
             catch (const HelicsException&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -1093,36 +1089,32 @@ iteration_time Federate::requestTimeIterativeComplete()
 void Federate::potentialInterfacesStartupSequence()
 {
     if (potManager) {
-        switch (potInterfacesSequence.load())
-        {
-        case 0:
-            potManager->initialize();
-            potInterfacesSequence.store(1);
-            [[fallthrough]];
-        case 1:
-            coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
-            potInterfacesSequence.store(2);
-            [[fallthrough]];
-        case 2: {
-            //respond to query
-            coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
-            // now check for commands
-            auto cmd = coreObject->getCommand(fedID);
-            if (cmd.first.empty())
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                cmd = coreObject->getCommand(fedID);
-            }
-            while (!cmd.first.empty())
-            {
-                potManager->processCommand(std::move(cmd));
-                cmd = coreObject->getCommand(fedID);
-            }
-            potInterfacesSequence.store(3);
-        }
-              break;
-        default:
-            break;
+        switch (potInterfacesSequence.load()) {
+            case 0:
+                potManager->initialize();
+                potInterfacesSequence.store(1);
+                [[fallthrough]];
+            case 1:
+                coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+                potInterfacesSequence.store(2);
+                [[fallthrough]];
+            case 2: {
+                // respond to query
+                coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+                // now check for commands
+                auto cmd = coreObject->getCommand(fedID);
+                if (cmd.first.empty()) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                    cmd = coreObject->getCommand(fedID);
+                }
+                while (!cmd.first.empty()) {
+                    potManager->processCommand(std::move(cmd));
+                    cmd = coreObject->getCommand(fedID);
+                }
+                potInterfacesSequence.store(3);
+            } break;
+            default:
+                break;
         }
     }
 }
@@ -1917,10 +1909,8 @@ void Federate::sendCommand(std::string_view target,
 
 std::pair<std::string, std::string> Federate::getCommand()
 {
-    if (hasPotentialInterfaces)
-    {
-        if (potManager->hasExtraCommands())
-        {
+    if (hasPotentialInterfaces) {
+        if (potManager->hasExtraCommands()) {
             return potManager->getCommand();
         }
     }
@@ -1929,10 +1919,8 @@ std::pair<std::string, std::string> Federate::getCommand()
 
 std::pair<std::string, std::string> Federate::waitCommand()
 {
-    if (hasPotentialInterfaces)
-    {
-        if (potManager->hasExtraCommands())
-        {
+    if (hasPotentialInterfaces) {
+        if (potManager->hasExtraCommands()) {
             return potManager->getCommand();
         }
     }

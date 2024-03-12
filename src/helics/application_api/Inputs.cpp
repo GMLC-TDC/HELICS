@@ -800,14 +800,14 @@ void integerExtractAndConvert(defV& store,
 
 data_view Input::checkAndGetFedUpdate()
 {
-    return ((fed!=nullptr)&&(fed->isUpdated(*this) || allowDirectFederateUpdate())) ? (fed->getBytes(*this)) :
-                                                                    data_view{};
+    return ((fed != nullptr) && (fed->isUpdated(*this) || allowDirectFederateUpdate())) ?
+        (fed->getBytes(*this)) :
+        data_view{};
 }
 
 void Input::forceCoreDataUpdate()
 {
-    if (fed == nullptr)
-    {
+    if (fed == nullptr) {
         return;
     }
     auto dv = fed->getBytes(*this);

@@ -219,27 +219,27 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
     registerMessageInterfacesJsonDetail(doc, false);
 }
 
-Endpoint& MessageFederate::registerEndpoint(std::string_view eptName, std::string_view type, bool global, bool targeted)
+Endpoint& MessageFederate::registerEndpoint(std::string_view eptName,
+                                            std::string_view type,
+                                            bool global,
+                                            bool targeted)
 {
-    if (targeted)
-    {
-        if (global)
-        {
-            return registerGlobalTargetedEndpoint(eptName,type);
+    if (targeted) {
+        if (global) {
+            return registerGlobalTargetedEndpoint(eptName, type);
         }
-        return registerTargetedEndpoint(eptName,type);
+        return registerTargetedEndpoint(eptName, type);
     }
-    if (global)
-    {
-        return registerGlobalEndpoint(eptName,type);
+    if (global) {
+        return registerGlobalEndpoint(eptName, type);
     }
-    return registerEndpoint(eptName,type);
+    return registerEndpoint(eptName, type);
 }
 
 void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, bool defaultGlobal)
 {
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
-    bool defaultTargeted=fileops::getOrDefault(json,"targeted",false);
+    bool defaultTargeted = fileops::getOrDefault(json, "targeted", false);
 
     Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
 
@@ -248,8 +248,8 @@ void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, boo
             auto eptName = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
             const bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
-            const bool targeted=fileops::getOrDefault(ept,"targeted",defaultTargeted);
-            Endpoint& epObj = registerEndpoint(eptName, type,global,targeted);
+            const bool targeted = fileops::getOrDefault(ept, "targeted", defaultTargeted);
+            Endpoint& epObj = registerEndpoint(eptName, type, global, targeted);
 
             loadOptions(this, ept, epObj);
         }
@@ -278,7 +278,7 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
     }
     bool defaultGlobal = false;
     fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
-    bool defaultTargeted=fileops::getOrDefault(doc,"targeted",false);
+    bool defaultTargeted = fileops::getOrDefault(doc, "targeted", false);
     if (fileops::isMember(doc, "endpoints")) {
         auto& epts = toml::find(doc, "endpoints");
         if (!epts.is_array()) {
@@ -289,8 +289,8 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
             auto eptName = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
             const bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
-            const bool targeted=fileops::getOrDefault(ept,"targeted",defaultTargeted);
-            Endpoint& epObj = registerEndpoint(eptName, type,global,targeted);
+            const bool targeted = fileops::getOrDefault(ept, "targeted", defaultTargeted);
+            Endpoint& epObj = registerEndpoint(eptName, type, global, targeted);
 
             loadOptions(this, ept, epObj);
         }

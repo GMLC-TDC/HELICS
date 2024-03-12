@@ -171,7 +171,11 @@ class HELICS_CXX_EXPORT MessageFederate:
     void registerMessageInterfacesToml(const std::string& tomlString);
 
     /** register an endpoint with the particular properties*/
-    Endpoint &registerEndpoint(std::string_view eptName,std::string_view type, bool global, bool targeted);
+    Endpoint& registerEndpoint(std::string_view eptName,
+                               std::string_view type,
+                               bool global,
+                               bool targeted);
+
   public:
     /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint
     @param ept the specified endpoint to deliver the values

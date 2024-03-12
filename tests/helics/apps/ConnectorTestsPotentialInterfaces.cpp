@@ -32,13 +32,13 @@ TEST(connector_potential_interfaces, simple_connector)
 
     helics::ValueFederate vfed("c1", fedInfo);
     vfed.registerInterfaces(std::string(testdir) + "simple_interfaces.json");
-   
+
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    EXPECT_EQ(vfed.getPublicationCount(),1);
-    EXPECT_EQ(vfed.getInputCount(),1);
-    auto &pub1=vfed.getPublication(0);
-    auto &inp1=vfed.getInput(0);
+    EXPECT_EQ(vfed.getPublicationCount(), 1);
+    EXPECT_EQ(vfed.getInputCount(), 1);
+    auto& pub1 = vfed.getPublication(0);
+    auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
@@ -70,10 +70,10 @@ TEST(connector_potential_interfaces, simple_connector_async)
     vfed.enterInitializingModeComplete();
     vfed.enterExecutingMode();
 
-    EXPECT_EQ(vfed.getPublicationCount(),1);
-    EXPECT_EQ(vfed.getInputCount(),1);
-    auto &pub1=vfed.getPublication(0);
-    auto &inp1=vfed.getInput(0);
+    EXPECT_EQ(vfed.getPublicationCount(), 1);
+    EXPECT_EQ(vfed.getInputCount(), 1);
+    auto& pub1 = vfed.getPublication(0);
+    auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
@@ -104,10 +104,10 @@ TEST(connector_potential_interfaces, simple_connector_init_iteration)
     vfed.enterInitializingModeIterative();
     vfed.enterExecutingMode();
 
-    EXPECT_EQ(vfed.getPublicationCount(),1);
-    EXPECT_EQ(vfed.getInputCount(),1);
-    auto &pub1=vfed.getPublication(0);
-    auto &inp1=vfed.getInput(0);
+    EXPECT_EQ(vfed.getPublicationCount(), 1);
+    EXPECT_EQ(vfed.getInputCount(), 1);
+    auto& pub1 = vfed.getPublication(0);
+    auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
@@ -119,7 +119,6 @@ TEST(connector_potential_interfaces, simple_connector_init_iteration)
     fut.get();
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
-
 
 TEST(connector_potential_interfaces, simple_connector_init_iteration2)
 {
@@ -141,10 +140,10 @@ TEST(connector_potential_interfaces, simple_connector_init_iteration2)
     vfed.enterInitializingModeIterative();
     vfed.enterExecutingMode();
 
-    EXPECT_EQ(vfed.getPublicationCount(),1);
-    EXPECT_EQ(vfed.getInputCount(),1);
-    auto &pub1=vfed.getPublication(0);
-    auto &inp1=vfed.getInput(0);
+    EXPECT_EQ(vfed.getPublicationCount(), 1);
+    EXPECT_EQ(vfed.getInputCount(), 1);
+    auto& pub1 = vfed.getPublication(0);
+    auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
@@ -173,10 +172,10 @@ TEST(connector_potential_interfaces, simple_connector2)
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    EXPECT_EQ(vfed.getPublicationCount(),1);
-    EXPECT_EQ(vfed.getInputCount(),1);
-    auto &pub1=vfed.getPublication(0);
-    auto &inp1=vfed.getInput(0);
+    EXPECT_EQ(vfed.getPublicationCount(), 1);
+    EXPECT_EQ(vfed.getInputCount(), 1);
+    auto& pub1 = vfed.getPublication(0);
+    auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
@@ -188,8 +187,6 @@ TEST(connector_potential_interfaces, simple_connector2)
     fut.get();
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
-
-
 
 TEST(connector_potential_interfaces, endpoint_connector)
 {
@@ -208,9 +205,9 @@ TEST(connector_potential_interfaces, endpoint_connector)
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
-    EXPECT_EQ(vfed.getEndpointCount(),2);
-    auto &ept1=vfed.getEndpoint("ept1");
-    auto &ept12=vfed.getEndpoint("ept12");
+    EXPECT_EQ(vfed.getEndpointCount(), 2);
+    auto& ept1 = vfed.getEndpoint("ept1");
+    auto& ept12 = vfed.getEndpoint("ept12");
     constexpr std::string_view testValue = "this is a test string";
     ept1.send(testValue);
     auto retTime = vfed.requestTime(5);
@@ -221,7 +218,6 @@ TEST(connector_potential_interfaces, endpoint_connector)
     vfed.finalize();
     fut.get();
 }
-
 
 TEST(connector_potential_interfaces, simple_connector_additional_command)
 {
@@ -238,15 +234,15 @@ TEST(connector_potential_interfaces, simple_connector_additional_command)
     vfed.registerInterfaces(std::string(testdir) + "simple_interfaces.json");
 
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
-    vfed.sendCommand("c1","test");
+    vfed.sendCommand("c1", "test");
     vfed.enterExecutingMode();
-    auto cmd=vfed.getCommand();
+    auto cmd = vfed.getCommand();
 
-    EXPECT_EQ(cmd.first,"test");
-    EXPECT_EQ(vfed.getPublicationCount(),1);
-    EXPECT_EQ(vfed.getInputCount(),1);
-    auto &pub1=vfed.getPublication(0);
-    auto &inp1=vfed.getInput(0);
+    EXPECT_EQ(cmd.first, "test");
+    EXPECT_EQ(vfed.getPublicationCount(), 1);
+    EXPECT_EQ(vfed.getInputCount(), 1);
+    auto& pub1 = vfed.getPublication(0);
+    auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
