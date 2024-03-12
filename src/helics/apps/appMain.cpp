@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "Clone.hpp"
+#include "Connector.hpp"
 #include "Echo.hpp"
 #include "Player.hpp"
 #include "Probe.hpp"
@@ -59,6 +60,18 @@ int main(int argc, char* argv[])
         })
         ->footer([] {
             helics::apps::Clone rec({"-?"});
+            return std::string{};
+        });
+    app.add_subcommand("connector", "Helics Connector App")
+        ->callback([&app]() {
+            helics::apps::Connector connector(app.remaining_for_passthrough(true));
+            std::cout << "clone subcommand\n";
+            if (connector.isActive()) {
+                connector.run();
+            }
+        })
+        ->footer([] {
+            helics::apps::Connector conn({"-?"});
             return std::string{};
         });
     app.add_subcommand("echo", "Helics Echo App")

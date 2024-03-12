@@ -1,0 +1,100 @@
+{
+  "name": "Controller",
+  "core_name": "controller_core",
+  "log_level": "warning",
+  "core_type": "test",
+  "time_delta": 1,
+  "uninterruptible": false,
+  "terminate_on_error": true,
+  "translators": [
+    {
+      "name": "EV_1_translator",
+      "type": "json",
+      "global": true,
+      "info": "",
+      "source_endpoint": "Charger/EV1.soc",
+      "destination_input": "Controller/EV1.soc"
+    },
+    {
+      "name": "EV_2_translator",
+      "type": "json",
+      "global": true,
+      "info": "",
+      "source_endpoint": "Charger/EV2.soc",
+      "destination_input": "Controller/EV2.soc"
+    },
+    {
+      "name": "EV_3_translator",
+      "type": "json",
+      "global": true,
+      "info": "",
+      "source_endpoint": "Charger/EV3.soc",
+      "destination_input": "Controller/EV3.soc"
+    },
+    {
+      "name": "EV_4_translator",
+      "type": "json",
+      "global": true,
+      "info": "",
+      "source_endpoint": "Charger/EV4.soc",
+      "destination_input": "Controller/EV4.soc"
+    },
+    {
+      "name": "EV_5_translator",
+      "type": "json",
+      "global": true,
+      "info": "",
+      "source_endpoint": "Charger/EV5.soc",
+      "destination_input": "Controller/EV5.soc"
+    }
+  ],
+  "inputs": [
+    {
+      "key": "Controller/EV1.soc",
+      "type": "double",
+      "global": true
+    },
+    {
+      "key": "Controller/EV2.soc",
+      "type": "double",
+      "global": true
+    },
+    {
+      "key": "Controller/EV3.soc",
+      "type": "double",
+      "global": true
+    },
+    {
+      "key": "Controller/EV4.soc",
+      "type": "double",
+      "global": true
+    },
+    {
+      "key": "Controller/EV5.soc",
+      "type": "double",
+      "global": true
+    }
+  ],
+  "endpoints": [
+    {
+      "name": "Charger/EV1.soc",
+      "global": true
+    },
+    {
+      "name": "Charger/EV2.soc",
+      "global": true
+    },
+    {
+      "name": "Charger/EV3.soc",
+      "global": true
+    },
+    {
+      "name": "Charger/EV4.soc",
+      "global": true
+    },
+    {
+      "name": "Charger/EV5.soc",
+      "global": true
+    }
+  ]
+}

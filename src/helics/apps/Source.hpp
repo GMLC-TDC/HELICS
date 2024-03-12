@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -156,12 +156,15 @@ external protection, that will result in undefined behavior
         std::shared_ptr<SignalGenerator> getGenerator(int index);
 
       private:
+        /** run any initial setup operations including file loading*/
+        void initialSetup();
         /** process remaining command line arguments*/
         void processArgs();
         /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
-        virtual void loadJsonFile(const std::string& jsonString) override;
+        virtual void loadJsonFile(const std::string& jsonString,
+                                  bool enableFederateInterfaceRegistration) override;
         /** execute a source object and update its time return the next execution time*/
         Time runSource(SourceObject& obj, Time currentTime);
         /** execute all the sources*/

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "typeOperations.hpp"
 
 #include "../core/coreTypeOperations.hpp"
+#include "../core/helicsVersion.hpp"
 
 namespace helics {
 std::string to_string(CoreType type)
@@ -23,4 +24,10 @@ bool isCoreTypeAvailable(CoreType type) noexcept
 {
     return core::isCoreTypeAvailable(type);
 }
+
+std::string systemInfo()
+{
+    return core::systemInfo();
+}
+
 }  // namespace helics

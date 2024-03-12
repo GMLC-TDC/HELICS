@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -68,7 +68,7 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     /** check if the filter is a cloning filter*/
     bool isCloningFilter() const { return cloning; }
     /** set a message operator to process the message*/
-    void setOperator(std::shared_ptr<FilterOperator> mo);
+    void setOperator(std::shared_ptr<FilterOperator> filterOp);
 
     virtual const std::string& getDisplayName() const override { return getName(); }
 
@@ -85,6 +85,9 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     virtual void setString(std::string_view property, std::string_view val);
 
     void addTarget(std::string_view target) { addSourceTarget(target); }
+
+    /** set the type of operations specifying how the filter should operate*/
+    void setFilterType(std::int32_t type);
 
   protected:
     /** set a filter operations object */
@@ -159,23 +162,23 @@ HELICS_CXX_EXPORT Filter& make_filter(InterfaceVisibility locality,
 
 /** create a filter
 @param type the type of filter to create
-@param cr the core to create the filter through
+@param core the core to create the filter through
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
-    make_filter(FilterTypes type, Core* cr, std::string_view name = EMPTY_STRING);
+    make_filter(FilterTypes type, Core* core, std::string_view name = EMPTY_STRING);
 
 /** create a filter
 @param type the type of filter to create
-@param cr the core to create the filter through
+@param core the core to create the filter through
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
-    make_filter(FilterTypes type, CoreApp& cr, std::string_view name = EMPTY_STRING);
+    make_filter(FilterTypes type, CoreApp& core, std::string_view name = EMPTY_STRING);
 
 /** create a  filter
 @param type the type of filter to create
@@ -207,7 +210,7 @@ HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(InterfaceVisibility localit
 
 /** create a cloning filter with a delivery location
 @param type the type of filter to create
-@param cr the core to create the filter through
+@param core the core to create the filter through
 @param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate
@@ -215,13 +218,13 @@ the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
     make_cloning_filter(FilterTypes type,
-                        Core* cr,
+                        Core* core,
                         std::string_view delivery,
                         std::string_view name = EMPTY_STRING);
 
 /** create a cloning filter with a delivery location
 @param type the type of filter to create
-@param cr the core to create the filter through
+@param core the core to create the filter through
 @param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate
@@ -229,7 +232,7 @@ the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
     make_cloning_filter(FilterTypes type,
-                        CoreApp& cr,
+                        CoreApp& core,
                         std::string_view delivery,
                         std::string_view name = EMPTY_STRING);
 

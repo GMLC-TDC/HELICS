@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -25,31 +25,31 @@ class HELICS_CXX_EXPORT MessageFederate:
   public:
     /**constructor taking a federate information structure and using the default core
     @param fedName the name of the messageFederate, can be left empty to use a default or one from
-    fi
-    @param fi  a federate information structure
+    fedInfo
+    @param fedInfo  a federate information structure
     */
-    MessageFederate(std::string_view fedName, const FederateInfo& fi);
-    /**constructor taking a core and a federate information structure, core information in fi is
-    ignored
+    MessageFederate(std::string_view fedName, const FederateInfo& fedInfo);
+    /**constructor taking a core and a federate information structure, core information in fedInfo
+    is ignored
     @param fedName the name of the messageFederate, can be left empty to use a default or one from
-    fi
+    fedInfo
     @param core a shared ptr to a core to join
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
     MessageFederate(std::string_view fedName,
                     const std::shared_ptr<Core>& core,
-                    const FederateInfo& fi = FederateInfo{});
+                    const FederateInfo& fedInfo = FederateInfo{});
 
-    /**constructor taking a core and a federate information structure, core information in fi is
-    ignored
+    /**constructor taking a core and a federate information structure, core information in fedInfo
+    is ignored
     @param fedName the name of the messageFederate, can be left empty to use a default or one from
-    fi
+    fedInfo
     @param core a CoreApp object representing the core to connect to
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
     MessageFederate(std::string_view fedName,
                     CoreApp& core,
-                    const FederateInfo& fi = FederateInfo{});
+                    const FederateInfo& fedInfo = FederateInfo{});
 
     /**constructor taking a string with the required information
     @param name the name of the federate, can be empty to get name from config
@@ -153,6 +153,8 @@ class HELICS_CXX_EXPORT MessageFederate:
     void registerMessageInterfaces(const std::string& configString);
 
   private:
+    /** function to register the federate with the core*/
+    void loadFederateData();
     /** register a set Message interfaces from JSON
  @details call is only valid in startup mode it is a protected call to add an
  @param jsonString  the location of the file or JSON String to load to generate the interfaces

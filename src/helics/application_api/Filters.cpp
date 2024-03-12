@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -44,6 +44,11 @@ FilterTypes filterTypeFromString(std::string_view filterType) noexcept
     return FilterTypes::UNRECOGNIZED;
 }
 
+void Filter::setFilterType(std::int32_t type)
+{
+    addOperations(this, static_cast<FilterTypes>(type), nullptr);
+}
+
 void addOperations(Filter* filt, FilterTypes type, Core* /*cptr*/)
 {
     switch (type) {
@@ -51,28 +56,28 @@ void addOperations(Filter* filt, FilterTypes type, Core* /*cptr*/)
         default:
             break;
         case FilterTypes::RANDOM_DELAY: {
-            auto op = std::make_shared<RandomDelayFilterOperation>();
-            filt->setFilterOperations(std::move(op));
+            auto operation = std::make_shared<RandomDelayFilterOperation>();
+            filt->setFilterOperations(std::move(operation));
         } break;
         case FilterTypes::DELAY: {
-            auto op = std::make_shared<DelayFilterOperation>();
-            filt->setFilterOperations(std::move(op));
+            auto operation = std::make_shared<DelayFilterOperation>();
+            filt->setFilterOperations(std::move(operation));
         } break;
         case FilterTypes::RANDOM_DROP: {
-            auto op = std::make_shared<RandomDropFilterOperation>();
-            filt->setFilterOperations(std::move(op));
+            auto operation = std::make_shared<RandomDropFilterOperation>();
+            filt->setFilterOperations(std::move(operation));
         } break;
         case FilterTypes::REROUTE: {
-            auto op = std::make_shared<RerouteFilterOperation>();
-            filt->setFilterOperations(std::move(op));
+            auto operation = std::make_shared<RerouteFilterOperation>();
+            filt->setFilterOperations(std::move(operation));
         } break;
         case FilterTypes::CLONE: {
-            auto op = std::make_shared<CloneFilterOperation>();
-            filt->setFilterOperations(std::move(op));
+            auto operation = std::make_shared<CloneFilterOperation>();
+            filt->setFilterOperations(std::move(operation));
         } break;
         case FilterTypes::FIREWALL: {
-            auto op = std::make_shared<FirewallFilterOperation>();
-            filt->setFilterOperations(std::move(op));
+            auto operation = std::make_shared<FirewallFilterOperation>();
+            filt->setFilterOperations(std::move(operation));
         } break;
     }
 }
@@ -106,18 +111,18 @@ Filter::Filter(InterfaceVisibility locality, Federate* ffed, std::string_view fi
 
 Filter::Filter(Core* core, std::string_view filtName): Interface(core, InterfaceHandle(), filtName)
 {
-    handle = cr->registerFilter(filtName, std::string_view{}, std::string_view{});
+    handle = core->registerFilter(filtName, std::string_view{}, std::string_view{});
 }
 
-void Filter::setOperator(std::shared_ptr<FilterOperator> mo)
+void Filter::setOperator(std::shared_ptr<FilterOperator> filterOp)
 {
-    cr->setFilterOperator(handle, std::move(mo));
+    mCore->setFilterOperator(handle, std::move(filterOp));
 }
 
 void Filter::setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
 {
     filtOp = std::move(filterOps);
-    cr->setFilterOperator(handle, (filtOp) ? filtOp->getOperator() : nullptr);
+    mCore->setFilterOperator(handle, (filtOp) ? filtOp->getOperator() : nullptr);
 }
 
 void Filter::set(std::string_view property, double val)
@@ -137,7 +142,7 @@ void Filter::setString(std::string_view property, std::string_view val)
 CloningFilter::CloningFilter(Core* core, std::string_view filtName):
     Filter(core, filtName, InterfaceHandle())
 {
-    handle = cr->registerCloningFilter(filtName, std::string_view(), std::string_view());
+    handle = mCore->registerCloningFilter(filtName, std::string_view(), std::string_view());
     setFilterOperations(std::make_shared<CloneFilterOperation>());
 }
 
@@ -231,22 +236,22 @@ Filter& make_filter(InterfaceVisibility locality,
     return dfilt;
 }
 
-std::unique_ptr<Filter> make_filter(FilterTypes type, Core* cr, std::string_view name)
+std::unique_ptr<Filter> make_filter(FilterTypes type, Core* core, std::string_view name)
 {
     if (type == FilterTypes::CLONE) {
-        std::unique_ptr<Filter> dfilt = std::make_unique<CloningFilter>(cr, name);
-        addOperations(dfilt.get(), type, cr);
+        std::unique_ptr<Filter> dfilt = std::make_unique<CloningFilter>(core, name);
+        addOperations(dfilt.get(), type, core);
         dfilt->setString("delivery", name);
         return dfilt;
     }
-    auto dfilt = std::make_unique<Filter>(cr, name);
-    addOperations(dfilt.get(), type, cr);
+    auto dfilt = std::make_unique<Filter>(core, name);
+    addOperations(dfilt.get(), type, core);
     return dfilt;
 }
 
-std::unique_ptr<Filter> make_filter(FilterTypes type, CoreApp& cr, std::string_view name)
+std::unique_ptr<Filter> make_filter(FilterTypes type, CoreApp& core, std::string_view name)
 {
-    return make_filter(type, cr.getCopyofCorePointer().get(), name);
+    return make_filter(type, core.getCopyofCorePointer().get(), name);
 }
 
 CloningFilter& make_cloning_filter(FilterTypes type,
@@ -280,13 +285,13 @@ CloningFilter& make_cloning_filter(InterfaceVisibility locality,
 }
 
 std::unique_ptr<CloningFilter> make_cloning_filter(FilterTypes type,
-                                                   Core* cr,
+                                                   Core* core,
                                                    std::string_view delivery,
                                                    std::string_view name)
 
 {
-    auto dfilt = std::make_unique<CloningFilter>(cr, name);
-    addOperations(dfilt.get(), type, cr);
+    auto dfilt = std::make_unique<CloningFilter>(core, name);
+    addOperations(dfilt.get(), type, core);
     if (!delivery.empty()) {
         dfilt->addDeliveryEndpoint(delivery);
     }
@@ -294,12 +299,12 @@ std::unique_ptr<CloningFilter> make_cloning_filter(FilterTypes type,
 }
 
 std::unique_ptr<CloningFilter> make_cloning_filter(FilterTypes type,
-                                                   CoreApp& cr,
+                                                   CoreApp& core,
                                                    std::string_view delivery,
                                                    std::string_view name)
 
 {
-    return make_cloning_filter(type, cr.getCopyofCorePointer().get(), delivery, name);
+    return make_cloning_filter(type, core.getCopyofCorePointer().get(), delivery, name);
 }
 
 }  // namespace helics

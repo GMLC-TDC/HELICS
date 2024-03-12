@@ -47,6 +47,7 @@ WarningsAsErrors: "
   clang-analyzer-*,
   bugprone-*,
   -bugprone-narrowing-conversions,
+  -bugprone-easily-swappable-parameters,
   misc-*,
   -misc-non-private-member-variables-in-classes,
   portability-*,
@@ -299,7 +300,7 @@ CheckOptions:
   - key: readability-identifier-naming.MethodSuffix
     value: ""
   - key: readability-identifier-naming.NamespaceCase
-    value: lowercase
+    value: lower_case
   - key: readability-identifier-naming.NamespacePrefix
     value: ""
   - key: readability-identifier-naming.NamespaceSuffix

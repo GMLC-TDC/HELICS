@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2024, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -19,6 +19,15 @@ endif()
 
 if(CMAKE_CXX_STANDARD LESS 17)
     message(FATAL_ERROR "{$PROJECT_NAME} requires C++17 or greater")
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
+    if(CMAKE_CXX_STANDARD LESS 20)
+        message(
+            FATAL_ERROR
+                " using gcc>=13.0 {$PROJECT_NAME} requires setting C++ standard to C++20 or greater"
+        )
+    endif()
 endif()
 
 if(MSVC)

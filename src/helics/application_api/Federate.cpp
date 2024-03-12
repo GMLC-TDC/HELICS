@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -78,9 +78,6 @@ Federate::Federate(std::string_view fedName,
 Federate::Federate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
-    if (looksLikeFile(configString)) {
-        registerConnectorInterfaces(configString);
-    }
 }
 
 Federate::Federate(const std::string& configString): Federate(std::string_view{}, configString) {}
@@ -233,6 +230,7 @@ void Federate::registerFederate(const FederateInfo& fedInfo)
 
     useJsonSerialization = fedInfo.useJsonSerialization;
     observerMode = fedInfo.observer;
+    configFile = fedInfo.fileInUse;
     mCurrentTime = coreObject->getCurrentTime(fedID);
     if (!singleThreadFederate) {
         asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
@@ -241,6 +239,9 @@ void Federate::registerFederate(const FederateInfo& fedInfo)
                                                           this,
                                                           fedID,
                                                           singleThreadFederate);
+    if (!configFile.empty()) {
+        registerConnectorInterfaces(configFile);
+    }
 }
 
 void Federate::enterInitializingMode()
@@ -1155,13 +1156,28 @@ void Federate::registerConnectorInterfaces(const std::string& configString)
     }
 }
 
+static Translator& generateTranslator(Federate* fed,
+                                      bool global,
+                                      std::string_view name,
+                                      TranslatorTypes ttype,
+                                      std::string_view endpointType,
+                                      std::string_view units)
+{
+    Translator& trans = (global) ? fed->registerGlobalTranslator(name, endpointType, units) :
+                                   fed->registerTranslator(name, endpointType, units);
+    if (ttype != TranslatorTypes::CUSTOM) {
+        trans.setTranslatorType(static_cast<std::int32_t>(ttype));
+    }
+    return trans;
+}
+
 static Filter& generateFilter(Federate* fed,
                               bool global,
                               bool cloning,
-                              const std::string& name,
+                              std::string_view name,
                               FilterTypes operation,
-                              const std::string& inputType,
-                              const std::string& outputType)
+                              std::string_view inputType,
+                              std::string_view outputType)
 {
     const bool useTypes = !((inputType.empty()) && (outputType.empty()));
     if (useTypes) {
@@ -1173,48 +1189,54 @@ static Filter& generateFilter(Federate* fed,
                           fed->registerFilter(name, inputType, outputType);
     }
     if (cloning) {
-        return (global) ? make_cloning_filter(InterfaceVisibility::GLOBAL, operation, fed, name) :
-                          make_cloning_filter(operation, fed, name);
+        Filter& filt =
+            (global) ? fed->registerGlobalCloningFilter(name) : fed->registerCloningFilter(name);
+        if (operation != FilterTypes::CUSTOM) {
+            filt.setFilterType(static_cast<std::int32_t>(operation));
+        }
+        return filt;
     }
-    return (global) ? make_filter(InterfaceVisibility::GLOBAL, operation, fed, name) :
-                      make_filter(operation, fed, name);
+    Filter& filt = (global) ? fed->registerCloningFilter(name) : fed->registerFilter(name);
+    if (operation != FilterTypes::CUSTOM) {
+        filt.setFilterType(static_cast<std::int32_t>(operation));
+    }
+    return filt;
 }
 
 static constexpr std::string_view emptyStr;
 
-template<class Inp>
-static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
+template<class Inp, class INTERFACE>
+static void loadOptions(Federate* fed, const Inp& data, INTERFACE& iface)
 {
-    addTargets(data, "flags", [&filt, fed](const std::string& target) {
+    addTargets(data, "flags", [&iface, fed](const std::string& target) {
         auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
         const int val = (target.front() != '-') ? 1 : 0;
         if (oindex == HELICS_INVALID_OPTION_INDEX) {
             fed->logWarningMessage(target + " is not a recognized flag");
             return;
         }
-        filt.setOption(oindex, val);
+        iface.setOption(oindex, val);
     });
     processOptions(
         data,
         [](const std::string& option) { return getOptionIndex(option); },
         [](const std::string& value) { return getOptionValue(value); },
-        [&filt](int32_t option, int32_t value) { filt.setOption(option, value); });
+        [&iface](int32_t option, int32_t value) { iface.setOption(option, value); });
 
     auto info = fileops::getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
-        filt.setInfo(info);
+        iface.setInfo(info);
     }
-    loadTags(data, [&filt](std::string_view tagname, std::string_view tagvalue) {
-        filt.setTag(tagname, tagvalue);
+    loadTags(data, [&iface](std::string_view tagname, std::string_view tagvalue) {
+        iface.setTag(tagname, tagvalue);
     });
-    auto asrc = [&filt](const std::string& target) { filt.addSourceTarget(target); };
-    auto adest = [&filt](const std::string& target) { filt.addDestinationTarget(target); };
-    addTargets(data, "sourcetargets", asrc);
-    addTargets(data, "sourceTargets", asrc);
-    addTargets(data, "source_targets", asrc);
-    addTargets(data, "destinationTargets", adest);
-    addTargets(data, "destinationtargets", adest);
-    addTargets(data, "destination_targets", adest);
+
+    addTargetVariations(data, "source", "targets", [&iface](const std::string& target) {
+        iface.addSourceTarget(target);
+    });
+    addTargetVariations(data, "destination", "targets", [&iface](const std::string& target) {
+        iface.addDestinationTarget(target);
+    });
 }
 
 static void arrayPairProcess(Json::Value doc,
@@ -1235,10 +1257,89 @@ static void arrayPairProcess(Json::Value doc,
     }
 }
 
+bool Federate::checkValidFilterType(bool useTypes,
+                                    FilterTypes opType,
+                                    const std::string& operation) const
+{
+    if ((useTypes) && (operation != "custom")) {
+        if (strictConfigChecking) {
+            logMessage(HELICS_LOG_LEVEL_ERROR,
+                       "input and output types may only be specified for custom filters");
+            throw(InvalidParameter(
+                "input and output types may only be specified for custom filters"));
+        }
+        logMessage(HELICS_LOG_LEVEL_WARNING,
+                   "input and output types may only be specified for custom filters");
+        return false;
+    }
+    if (!useTypes) {
+        if (opType == FilterTypes::UNRECOGNIZED) {
+            if (strictConfigChecking) {
+                const std::string emessage =
+                    fmt::format("unrecognized filter operation:{}", operation);
+                logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
+
+                throw(InvalidParameter(emessage));
+            }
+            logMessage(HELICS_LOG_LEVEL_WARNING,
+                       fmt::format("unrecognized filter operation:{}", operation));
+            return false;
+        }
+    }
+    return true;
+}
+
+template<class INTERFACE>
+static void
+    loadPropertiesJson(Federate* fed, INTERFACE& iface, const Json::Value& json, bool strict)
+{
+    static constexpr std::string_view errorMessage =
+        R"(interface properties require "name" and "value" fields)";
+    if (json.isMember("properties")) {
+        auto& props = json["properties"];
+        if (props.isArray()) {
+            for (const auto& prop : props) {
+                if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
+                    if (strict) {
+                        fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
+
+                        throw(InvalidParameter(errorMessage));
+                    }
+                    fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
+                    continue;
+                }
+                if (prop["value"].isDouble()) {
+                    iface.set(prop["name"].asString(), prop["value"].asDouble());
+                } else {
+                    iface.setString(prop["name"].asString(), prop["value"].asString());
+                }
+            }
+        } else {
+            if ((!props.isMember("name")) || (!props.isMember("value"))) {
+                if (strict) {
+                    fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
+
+                    throw(InvalidParameter(errorMessage));
+                }
+                fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
+            } else {
+                if (props["value"].isDouble()) {
+                    iface.set(props["name"].asString(), props["value"].asDouble());
+                } else {
+                    iface.setString(props["name"].asString(), props["value"].asString());
+                }
+            }
+        }
+    }
+}
+
 void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 {
     using fileops::getOrDefault;
     auto doc = fileops::loadJson(jsonString);
+
+    bool defaultGlobal = false;
+    fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
 
     if (doc.isMember("filters")) {
         for (const auto& filt : doc["filters"]) {
@@ -1247,87 +1348,99 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
             const bool cloningflag = getOrDefault(filt, "cloning", false);
             const bool useTypes = !((inputType.empty()) && (outputType.empty()));
-
+            const bool global = fileops::getOrDefault(filt, "global", defaultGlobal);
             const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
-            if ((useTypes) && (operation != "custom")) {
-                if (strictConfigChecking) {
-                    logMessage(HELICS_LOG_LEVEL_ERROR,
-                               "input and output types may only be specified for custom filters");
-                    throw(InvalidParameter(
-                        "input and output types may only be specified for custom filters"));
-                }
-                logMessage(HELICS_LOG_LEVEL_WARNING,
-                           "input and output types may only be specified for custom filters");
+            if (!checkValidFilterType(useTypes, opType, operation)) {
                 continue;
             }
-            if (!useTypes) {
-                if (opType == FilterTypes::UNRECOGNIZED) {
-                    if (strictConfigChecking) {
-                        const std::string emessage =
-                            fmt::format("unrecognized filter operation:{}", operation);
-                        logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
-
-                        throw(InvalidParameter(emessage));
-                    }
-                    logMessage(HELICS_LOG_LEVEL_WARNING,
-                               fmt::format("unrecognized filter operation:{}", operation));
-                    continue;
-                }
-            }
             auto& filter =
-                generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
+                generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
             loadOptions(this, filt, filter);
+
+            addTargetVariations(filt, "source", "endpoints", [&filter](const std::string& target) {
+                filter.addSourceTarget(target);
+            });
+            addTargetVariations(filt,
+                                "destination",
+                                "endpoints",
+                                [&filter](const std::string& target) {
+                                    filter.addDestinationTarget(target);
+                                });
+
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
                 });
             }
 
-            if (filt.isMember("properties")) {
-                auto props = filt["properties"];
-                if (props.isArray()) {
-                    for (const auto& prop : props) {
-                        if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
-                            if (strictConfigChecking) {
-                                logMessage(
-                                    HELICS_LOG_LEVEL_ERROR,
-                                    R"(filter properties require "name" and "value" fields)");
+            loadPropertiesJson(this, filter, filt, strictConfigChecking);
+        }
+    }
+    if (doc.isMember("translators")) {
+        for (const auto& trans : doc["translators"]) {
+            const std::string key = getOrDefault(trans, "name", emptyStr);
 
-                                throw(InvalidParameter(
-                                    R"(filter properties require "name" and "value" fields)"));
-                            }
-                            logMessage(HELICS_LOG_LEVEL_WARNING,
-                                       R"(filter properties require "name" and "value" fields)");
-                            continue;
-                        }
-                        if (prop["value"].isDouble()) {
-                            filter.set(prop["name"].asString(), prop["value"].asDouble());
-                        } else {
-                            filter.setString(prop["name"].asString(), prop["value"].asString());
-                        }
-                    }
-                } else {
-                    if ((!props.isMember("name")) || (!props.isMember("value"))) {
-                        if (strictConfigChecking) {
-                            logMessage(HELICS_LOG_LEVEL_ERROR,
-                                       R"(filter properties require "name" and "value" fields)");
+            std::string ttype = getOrDefault(trans, "type", std::string("custom"));
+            auto opType = translatorTypeFromString(ttype);
+            auto etype = fileops::getOrDefault(trans, "endpointtype", emptyStr);
+            auto units = fileops::getOrDefault(trans, "unit", emptyStr);
+            fileops::replaceIfMember(trans, "units", units);
+            const bool global = fileops::getOrDefault(trans, "global", defaultGlobal);
 
-                            throw(InvalidParameter(
-                                R"(filter properties require "name" and "value" fields)"));
-                        }
-                        logMessage(HELICS_LOG_LEVEL_WARNING,
-                                   R"(filter properties require "name" and "value" fields)");
-                        continue;
-                    }
-                    if (props["value"].isDouble()) {
-                        filter.set(props["name"].asString(), props["value"].asDouble());
-                    } else {
-                        filter.setString(props["name"].asString(), props["value"].asString());
-                    }
+            if (opType == TranslatorTypes::UNRECOGNIZED) {
+                if (strictConfigChecking) {
+                    const std::string emessage =
+                        fmt::format("unrecognized translator type:{}", ttype);
+                    logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
+
+                    throw(InvalidParameter(emessage));
                 }
+                logMessage(HELICS_LOG_LEVEL_WARNING,
+                           fmt::format("unrecognized translator operation:{}", ttype));
+                continue;
             }
+            auto& translator = generateTranslator(this, global, key, opType, etype, units);
+            loadOptions(this, trans, translator);
+
+            addTargetVariations(trans,
+                                "source",
+                                "endpoints",
+                                [&translator](const std::string& target) {
+                                    translator.addSourceEndpoint(target);
+                                });
+            addTargetVariations(trans,
+                                "destination",
+                                "endpoints",
+                                [&translator](const std::string& target) {
+                                    translator.addDestinationEndpoint(target);
+                                });
+            addTargetVariations(trans,
+                                "source",
+                                "publications",
+                                [&translator](const std::string& target) {
+                                    translator.addPublication(target);
+                                });
+            addTargetVariations(trans,
+                                "destination",
+                                "inputs",
+                                [&translator](const std::string& target) {
+                                    translator.addInputTarget(target);
+                                });
+            addTargetVariations(trans,
+                                "source",
+                                "filters",
+                                [&translator](const std::string& target) {
+                                    translator.addSourceFilter(target);
+                                });
+            addTargetVariations(trans,
+                                "destination",
+                                "filters",
+                                [&translator](const std::string& target) {
+                                    translator.addDestinationFilter(target);
+                                });
+            loadPropertiesJson(this, translator, trans, strictConfigChecking);
         }
     }
     arrayPairProcess(doc, "globals", [this](std::string_view key, std::string_view val) {
@@ -1348,7 +1461,7 @@ static void arrayPairProcess(toml::value doc,
 {
     using fileops::isMember;
     if (isMember(doc, key)) {
-        auto info = toml::find(doc, key);
+        auto& info = toml::find(doc, key);
         if (info.is_array()) {
             for (auto& val : info.as_array()) {
                 pairOp(static_cast<std::string_view>(val.as_array()[0].as_string()),
@@ -1362,10 +1475,66 @@ static void arrayPairProcess(toml::value doc,
     }
 }
 
+template<class INTERFACE>
+static void
+    loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::value& data, bool strict)
+{
+    static constexpr std::string_view errorMessage =
+        R"(interface properties require "name" and "value" fields)";
+    if (fileops::isMember(data, "properties")) {
+        auto& props = toml::find(data, "properties");
+        if (props.is_array()) {
+            auto& propArray = props.as_array();
+            for (const auto& prop : propArray) {
+                std::string propname;
+                propname = toml::find_or(prop, "name", propname);
+                const toml::value uVal;
+                auto& propval = toml::find_or(prop, "value", uVal);
+
+                if ((propname.empty()) || (propval.is_uninitialized())) {
+                    if (strict) {
+                        fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
+
+                        throw(InvalidParameter(errorMessage));
+                    }
+                    fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
+                    continue;
+                }
+                if (propval.is_floating()) {
+                    iface.set(propname, propval.as_floating());
+                } else {
+                    iface.setString(propname, static_cast<std::string_view>(propval.as_string()));
+                }
+            }
+        } else {
+            std::string propname;
+            propname = toml::find_or(props, "name", propname);
+            toml::value uVal;
+            auto propval = toml::find_or(props, "value", uVal);
+
+            if ((propname.empty()) || (propval.is_uninitialized())) {
+                if (strict) {
+                    fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
+
+                    throw(InvalidParameter(errorMessage));
+                }
+                fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
+            } else {
+                if (propval.is_floating()) {
+                    iface.set(propname, propval.as_floating());
+                } else {
+                    iface.setString(propname, static_cast<std::string_view>(propval.as_string()));
+                }
+            }
+        }
+    }
+}
+
 void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
 {
     using fileops::getOrDefault;
     using fileops::isMember;
+    using fileops::replaceIfMember;
 
     toml::value doc;
     try {
@@ -1374,9 +1543,11 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));
     }
+    bool defaultGlobal = false;
+    replaceIfMember(doc, "defaultglobal", defaultGlobal);
 
     if (isMember(doc, "filters")) {
-        auto filts = toml::find(doc, "filters");
+        auto& filts = toml::find(doc, "filters");
         if (!filts.is_array()) {
             throw(helics::InvalidParameter("filters section in toml file must be an array"));
         }
@@ -1387,98 +1558,114 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
             const bool useTypes = !((inputType.empty()) && (outputType.empty()));
-
-            std::string operation = getOrDefault(filt, "operation", std::string("custom"));
+            const bool global = getOrDefault(filt, "global", defaultGlobal);
+            const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
-            if ((useTypes) && (operation != "custom")) {
-                if (strictConfigChecking) {
-                    logMessage(HELICS_LOG_LEVEL_ERROR,
-                               "input and output types may only be specified for custom filters");
-                    throw(InvalidParameter(
-                        "input and output types may only be specified for custom filters"));
-                }
-                logMessage(HELICS_LOG_LEVEL_WARNING,
-                           "input and output types may only be specified for custom filters");
+            if (!checkValidFilterType(useTypes, opType, operation)) {
                 continue;
             }
-            if (!useTypes) {
-                if (opType == FilterTypes::UNRECOGNIZED) {
-                    auto emessage = fmt::format("unrecognized filter operation:{}", operation);
-                    if (strictConfigChecking) {
-                        logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
-
-                        throw(InvalidParameter(emessage));
-                    }
-                    logMessage(HELICS_LOG_LEVEL_WARNING, emessage);
-                    continue;
-                }
-            }
             auto& filter =
-                generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
+                generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
 
             loadOptions(this, filt, filter);
-
+            addTargetVariations(filt, "source", "endpoints", [&filter](const std::string& target) {
+                filter.addSourceTarget(target);
+            });
+            addTargetVariations(filt,
+                                "destination",
+                                "endpoints",
+                                [&filter](const std::string& target) {
+                                    filter.addDestinationTarget(target);
+                                });
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
                 });
             }
-            if (isMember(filt, "properties")) {
-                auto props = toml::find(filt, "properties");
-                if (props.is_array()) {
-                    auto& propArray = props.as_array();
-                    for (const auto& prop : propArray) {
-                        std::string propname;
-                        propname = toml::find_or(prop, "name", propname);
-                        const toml::value uVal;
-                        auto propval = toml::find_or(prop, "value", uVal);
+            loadPropertiesToml(this, filter, filt, strictConfigChecking);
+        }
+    }
+    if (isMember(doc, "translators")) {
+        auto& transs = toml::find(doc, "translators");
+        if (!transs.is_array()) {
+            throw(helics::InvalidParameter("translators section in toml file must be an array"));
+        }
+        auto& transArray = transs.as_array();
+        for (const auto& trans : transArray) {
+            const std::string key = getOrDefault(trans, "name", emptyStr);
 
-                        if ((propname.empty()) || (propval.is_uninitialized())) {
-                            if (strictConfigChecking) {
-                                logMessage(
-                                    HELICS_LOG_LEVEL_ERROR,
-                                    R"(filter properties require "name" and "value" fields)");
+            std::string ttype = getOrDefault(trans, "type", std::string("custom"));
+            auto opType = translatorTypeFromString(ttype);
+            auto etype = fileops::getOrDefault(trans, "endpointtype", emptyStr);
+            auto units = fileops::getOrDefault(trans, "unit", emptyStr);
+            fileops::replaceIfMember(trans, "units", units);
+            const bool global = fileops::getOrDefault(trans, "global", defaultGlobal);
 
-                                throw(InvalidParameter(
-                                    R"(filter properties require "name" and "value" fields)"));
-                            }
-                            logMessage(HELICS_LOG_LEVEL_WARNING,
-                                       R"(filter properties require "name" and "value" fields)");
-                            continue;
-                        }
-                        if (propval.is_floating()) {
-                            filter.set(propname, propval.as_floating());
-                        } else {
-                            filter.setString(propname,
-                                             static_cast<std::string_view>(propval.as_string()));
-                        }
-                    }
-                } else {
-                    std::string propname;
-                    propname = toml::find_or(props, "name", propname);
-                    toml::value uVal;
-                    auto propval = toml::find_or(props, "value", uVal);
+            if (opType == TranslatorTypes::UNRECOGNIZED) {
+                if (strictConfigChecking) {
+                    const std::string emessage =
+                        fmt::format("unrecognized translator type:{}", ttype);
+                    logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
 
-                    if ((propname.empty()) || (propval.is_uninitialized())) {
-                        if (strictConfigChecking) {
-                            logMessage(HELICS_LOG_LEVEL_ERROR,
-                                       R"(filter properties require "name" and "value" fields)");
-
-                            throw(InvalidParameter(
-                                R"(filter properties require "name" and "value" fields)"));
-                        }
-                        logMessage(HELICS_LOG_LEVEL_WARNING,
-                                   R"(filter properties require "name" and "value" fields)");
-                        continue;
-                    }
-                    if (propval.is_floating()) {
-                        filter.set(propname, propval.as_floating());
-                    } else {
-                        filter.setString(propname,
-                                         static_cast<std::string_view>(propval.as_string()));
-                    }
+                    throw(InvalidParameter(emessage));
                 }
+                logMessage(HELICS_LOG_LEVEL_WARNING,
+                           fmt::format("unrecognized filter operation:{}", ttype));
+                continue;
+            }
+            auto& translator = generateTranslator(this, global, key, opType, etype, units);
+            loadOptions(this, trans, translator);
+
+            addTargetVariations(trans,
+                                "source",
+                                "endpoints",
+                                [&translator](const std::string& target) {
+                                    translator.addSourceEndpoint(target);
+                                });
+            addTargetVariations(trans,
+                                "destination",
+                                "endpoints",
+                                [&translator](const std::string& target) {
+                                    translator.addDestinationEndpoint(target);
+                                });
+            addTargetVariations(trans,
+                                "source",
+                                "publications",
+                                [&translator](const std::string& target) {
+                                    translator.addPublication(target);
+                                });
+            addTargetVariations(trans,
+                                "destination",
+                                "inputs",
+                                [&translator](const std::string& target) {
+                                    translator.addInputTarget(target);
+                                });
+            addTargetVariations(trans,
+                                "source",
+                                "filters",
+                                [&translator](const std::string& target) {
+                                    translator.addSourceFilter(target);
+                                });
+            addTargetVariations(trans,
+                                "destination",
+                                "filters",
+                                [&translator](const std::string& target) {
+                                    translator.addDestinationFilter(target);
+                                });
+            loadPropertiesToml(this, translator, trans, strictConfigChecking);
+        }
+    }
+    if (isMember(doc, "globals")) {
+        auto& globals = toml::find(doc, "globals");
+        if (globals.is_array()) {
+            for (auto& val : globals.as_array()) {
+                setGlobal(static_cast<std::string_view>(val.as_array()[0].as_string()),
+                          static_cast<std::string_view>(val.as_array()[1].as_string()));
+            }
+        } else {
+            for (const auto& val : globals.as_table()) {
+                setGlobal(val.first, static_cast<std::string_view>(val.second.as_string()));
             }
         }
     }
@@ -1779,99 +1966,99 @@ Interface::Interface(Federate* federate, InterfaceHandle hid, std::string_view a
     if (federate != nullptr) {
         const auto& crp = federate->getCorePointer();
         if (crp) {
-            cr = crp.get();
+            mCore = crp.get();
         }
     }
 }
 
 const std::string& Interface::getName() const
 {
-    return cr->getHandleName(handle);
+    return mCore->getHandleName(handle);
 }
 
 const std::string& Interface::getTarget() const
 {
-    return cr->getSourceTargets(handle);
+    return mCore->getSourceTargets(handle);
 }
 
 void Interface::addSourceTarget(std::string_view newTarget, InterfaceType hint)
 {
-    cr->addSourceTarget(handle, newTarget, hint);
+    mCore->addSourceTarget(handle, newTarget, hint);
 }
 
 void Interface::addDestinationTarget(std::string_view newTarget, InterfaceType hint)
 {
-    cr->addDestinationTarget(handle, newTarget, hint);
+    mCore->addDestinationTarget(handle, newTarget, hint);
 }
 
 void Interface::removeTarget(std::string_view targetToRemove)
 {
-    cr->removeTarget(handle, targetToRemove);
+    mCore->removeTarget(handle, targetToRemove);
 }
 
 void Interface::addAlias(std::string_view alias)
 {
-    cr->addAlias(getName(), alias);
+    mCore->addAlias(getName(), alias);
 }
 
 const std::string& Interface::getInfo() const
 {
-    return cr->getInterfaceInfo(handle);
+    return mCore->getInterfaceInfo(handle);
 }
 
 void Interface::setInfo(std::string_view info)
 {
-    cr->setInterfaceInfo(handle, info);
+    mCore->setInterfaceInfo(handle, info);
 }
 
 const std::string& Interface::getTag(std::string_view tag) const
 {
-    return cr->getInterfaceTag(handle, tag);
+    return mCore->getInterfaceTag(handle, tag);
 }
 
 void Interface::setTag(std::string_view tag, std::string_view value)
 {
-    cr->setInterfaceTag(handle, tag, value);
+    mCore->setInterfaceTag(handle, tag, value);
 }
 
 void Interface::setOption(int32_t option, int32_t value)
 {
-    cr->setHandleOption(handle, option, value);
+    mCore->setHandleOption(handle, option, value);
 }
 
 int32_t Interface::getOption(int32_t option) const
 {
-    return cr->getHandleOption(handle, option);
+    return mCore->getHandleOption(handle, option);
 }
 
 const std::string& Interface::getInjectionType() const
 {
-    return cr->getInjectionType(handle);
+    return mCore->getInjectionType(handle);
 }
 
 const std::string& Interface::getExtractionType() const
 {
-    return cr->getExtractionType(handle);
+    return mCore->getExtractionType(handle);
 }
 
 const std::string& Interface::getInjectionUnits() const
 {
-    return cr->getInjectionUnits(handle);
+    return mCore->getInjectionUnits(handle);
 }
 
 const std::string& Interface::getExtractionUnits() const
 {
-    return cr->getExtractionUnits(handle);
+    return mCore->getExtractionUnits(handle);
 }
 
 const std::string& Interface::getSourceTargets() const
 {
-    return cr->getSourceTargets(handle);
+    return mCore->getSourceTargets(handle);
 }
 
 const std::string& Interface::getDestinationTargets() const
 {
-    return cr->getDestinationTargets(handle);
+    return mCore->getDestinationTargets(handle);
 }
 
 const std::string& Interface::getDisplayName() const
@@ -1881,13 +2068,13 @@ const std::string& Interface::getDisplayName() const
 
 void Interface::close()
 {
-    cr->closeHandle(handle);
-    cr = CoreFactory::getEmptyCorePtr();
+    mCore->closeHandle(handle);
+    mCore = CoreFactory::getEmptyCorePtr();
 }
 
 void Interface::disconnectFromCore()
 {
-    cr = CoreFactory::getEmptyCorePtr();
+    mCore = CoreFactory::getEmptyCorePtr();
 }
 
 }  // namespace helics

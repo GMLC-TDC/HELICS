@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -641,44 +641,94 @@ HELICS_EXPORT void* helicsDataBufferData(HelicsDataBuffer data);
 @return HELICS_TRUE if the reservation was successful HELICS_FALSE otherwise*/
 HELICS_EXPORT HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity);
 
-/** create a new data buffer and copy an existing buffer*/
+/** create a new data buffer and copy an existing buffer
+@return a data buffer object with a copy of the data
+*/
 HELICS_EXPORT HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data);
 
-/** convert an integer to serialized bytes*/
-HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data);
+/** convert an integer to serialized bytes in a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromInteger(HelicsDataBuffer data, int64_t value);
 
-/** convert a double to serialized bytes*/
-HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
+/** convert a double to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromDouble(HelicsDataBuffer data, double value);
 
-/** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char* value, HelicsDataBuffer data);
+/** convert a string to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromString(HelicsDataBuffer data, const char* value);
 
-/** convert a raw string (may contain nulls) to serialized bytes*/
-HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data);
+/** convert a raw string (may contain nulls) to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromRawString(HelicsDataBuffer data, const char* str, int stringSize);
 
-/** convert a bool to serialized bytes*/
-HELICS_EXPORT int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data);
+/** convert a bool to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromBoolean(HelicsDataBuffer data, HelicsBool value);
 
-/** convert a char to serialized bytes*/
-HELICS_EXPORT int32_t helicsCharToBytes(char value, HelicsDataBuffer data);
+/** convert a char to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromChar(HelicsDataBuffer data, char value);
 
-/** convert a time to serialized bytes*/
-HELICS_EXPORT int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data);
+/** convert a time to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromTime(HelicsDataBuffer data, HelicsTime value);
 
-/** convert a complex pair to serialized bytes*/
-HELICS_EXPORT int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data);
+/** convert a complex pair to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromComplex(HelicsDataBuffer data, double real, double imag);
 
-/** convert a complex object to serialized bytes*/
-HELICS_EXPORT int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsDataBuffer data);
+/** convert a complex object to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromComplexObject(HelicsDataBuffer data, HelicsComplex value);
 
-/** convert a real vector to serialized bytes*/
-HELICS_EXPORT int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
+/** convert a real vector to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromVector(HelicsDataBuffer data, const double* value, int dataSize);
 
-/** convert a named point to serialized bytes*/
-HELICS_EXPORT int32_t helicsNamedPointToBytes(const char* name, double value, HelicsDataBuffer data);
+/** convert a named point to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromNamedPoint(HelicsDataBuffer data, const char* name, double value);
 
-/** convert a complex vector to serialized bytes*/
-HELICS_EXPORT int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
+/** convert a complex vector to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromComplexVector(HelicsDataBuffer data, const double* value, int dataSize);
 
 /** extract the data type from the data buffer, if the type isn't recognized UNKNOWN is returned*/
 HELICS_EXPORT int helicsDataBufferType(HelicsDataBuffer data);
@@ -1205,15 +1255,15 @@ HELICS_EXPORT void helicsBrokerFree(HelicsBroker broker);
  *
  * @details HelicsFederate objects can be used in all functions that take a HelicsFederate or HelicsFederate object as an argument.
  *
- * @param fedName The name of the federate to create, can NULL or an empty string to use the default name from fi or an assigned name.
- * @param fi The federate info object that contains details on the federate.
+ * @param fedName The name of the federate to create, can NULL or an empty string to use the default name from fedInfo or an assigned name.
+ * @param fedInfo The federate info object that contains details on the federate.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  *
  * @return An opaque value federate object.
  */
-HELICS_EXPORT HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
  * Create a value federate from a JSON file, JSON string, or TOML file.
@@ -1236,14 +1286,14 @@ HELICS_EXPORT HelicsFederate helicsCreateValueFederateFromConfig(const char* con
  * argument.
  *
  * @param fedName The name of the federate to create.
- * @param fi The federate info object that contains details on the federate.
+ * @param fedInfo The federate info object that contains details on the federate.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  *
  * @return An opaque message federate object.
  */
-HELICS_EXPORT HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
  * Create a message federate from a JSON file or JSON string or TOML file.
@@ -1266,15 +1316,15 @@ HELICS_EXPORT HelicsFederate helicsCreateMessageFederateFromConfig(const char* c
  * @details Combination federates are both value federates and message federates, objects can be used in all functions
  *                      that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument
  *
- * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
- * @param fi The federate info object that contains details on the federate.
+ * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fedInfo.
+ * @param fedInfo The federate info object that contains details on the federate.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  *
  * @return An opaque value federate object nullptr if the object creation failed.
  */
-HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
  * Create a combination federate from a JSON file or JSON string or TOML file.
@@ -1296,15 +1346,15 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const cha
 *
 * @details Callback federates are combination federates that run a series of callback for execution in a completely automated fashion.
 *
-* @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
-* @param fi The federate info object that contains details on the federate.
+* @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fedInfo.
+* @param fedInfo The federate info object that contains details on the federate.
 *
 * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
 *
 * @return An opaque value federate object; nullptr if the object creation failed.
 */
-HELICS_EXPORT HelicsFederate helicsCreateCallbackFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateCallbackFederate(const char* fedName, HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
 * Create a callback federate from a JSON file or JSON string or TOML file.
@@ -1381,42 +1431,42 @@ HELICS_EXPORT HelicsFederateInfo helicsCreateFederateInfo(void);
 /**
  * Create a federate info object from an existing one and clone the information.
  *
- * @param fi A federateInfo object to duplicate.
+ * @param fedInfo A federateInfo object to duplicate.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  *
  *  @return A HelicsFederateInfo object which is a reference to the created object.
  */
-HELICS_EXPORT HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fi, HelicsError* err);
+HELICS_EXPORT HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fedInfo, HelicsError* err);
 
 /**
  * Load federate info from command line arguments.
  *
- * @param fi A federateInfo object.
+ * @param fedInfo A federateInfo object.
  * @param argc The number of command line arguments.
  * @param argv An array of strings from the command line.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char* const* argv, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fedInfo, int argc, const char* const* argv, HelicsError* err);
 
 /**
  * Load federate info from command line arguments contained in a string.
  *
- * @param fi A federateInfo object.
+ * @param fedInfo A federateInfo object.
  * @param args Command line arguments specified in a string.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char* args, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoLoadFromString(HelicsFederateInfo fedInfo, const char* args, HelicsError* err);
 
 /**
  * Delete the memory associated with a federate info object.
  */
-HELICS_EXPORT void helicsFederateInfoFree(HelicsFederateInfo fi);
+HELICS_EXPORT void helicsFederateInfoFree(HelicsFederateInfo fedInfo);
 
 /**
  * Check if a federate_object is valid.
@@ -1428,107 +1478,107 @@ HELICS_EXPORT HelicsBool helicsFederateIsValid(HelicsFederate fed);
 /**
  * Set the name of the core to link to for a federate.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param corename The identifier for a core to link to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreName(HelicsFederateInfo fi, const char* corename, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreName(HelicsFederateInfo fedInfo, const char* corename, HelicsError* err);
 
 /**
  * Set the initialization string for the core usually in the form of command line arguments.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param coreInit A string containing command line arguments to be passed to the core.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreInitString(HelicsFederateInfo fi, const char* coreInit, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreInitString(HelicsFederateInfo fedInfo, const char* coreInit, HelicsError* err);
 
 /**
  * Set the initialization string that a core will pass to a generated broker usually in the form of command line arguments.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param brokerInit A string with command line arguments for a generated broker.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(HelicsFederateInfo fi, const char* brokerInit, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(HelicsFederateInfo fedInfo, const char* brokerInit, HelicsError* err);
 
 /**
  * Set the core type by integer code.
  *
  * @details Valid values available by definitions in api-data.h.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param coretype An numerical code for a core type see /ref helics_CoreType.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreType(HelicsFederateInfo fi, int coretype, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreType(HelicsFederateInfo fedInfo, int coretype, HelicsError* err);
 
 /**
  * Set the core type from a string.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param coretype A string naming a core type.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fi, const char* coretype, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fedInfo, const char* coretype, HelicsError* err);
 
 /**
  * Set the name or connection information for a broker.
  *
  * @details This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param broker A string which defines the connection information for a broker either a name or an address.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetBroker(HelicsFederateInfo fi, const char* broker, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBroker(HelicsFederateInfo fedInfo, const char* broker, HelicsError* err);
 
 /**
  * Set the key for a broker connection.
  *
  * @details This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param brokerkey A string containing a key for the broker to connect.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerKey(HelicsFederateInfo fi, const char* brokerkey, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerKey(HelicsFederateInfo fedInfo, const char* brokerkey, HelicsError* err);
 
 /**
  * Set the port to use for the broker.
  *
  * @details This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
  * This will only be useful for network broker connections.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param brokerPort The integer port number to use for connection with a broker.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerPort(HelicsFederateInfo fi, int brokerPort, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerPort(HelicsFederateInfo fedInfo, int brokerPort, HelicsError* err);
 
 /**
  * Set the local port to use.
  *
  * @details This is only used if the core is automatically created, the port information will be transferred to the core for connection.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param localPort A string with the port information to use as the local server port can be a number or "auto" or "os_local".
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoSetLocalPort(HelicsFederateInfo fi, const char* localPort, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetLocalPort(HelicsFederateInfo fedInfo, const char* localPort, HelicsError* err);
 
 /**
  * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty,
@@ -1579,36 +1629,37 @@ HELICS_EXPORT int helicsGetDataType(const char* val);
  * Set a flag in the info structure.
  *
  * @details Valid flags are available /ref helics_federate_flags.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param flag A numerical index for a flag.
  * @param value The desired value of the flag HELICS_TRUE or HELICS_FALSE.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool value, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetFlagOption(HelicsFederateInfo fedInfo, int flag, HelicsBool value, HelicsError* err);
 
 /**
  * Set the separator character in the info structure.
  *
  * @details The separator character is the separation character for local publications/endpoints in creating their global name.
  * For example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName.
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param separator The character to use as a separator.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char separator, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fedInfo, char separator, HelicsError* err);
 
 /**
  * Set the output delay for a federate.
  *
- * @param fi The federate info object to alter.
+ * @param fedInfo The federate info object to alter.
  * @param timeProperty An integer representation of the time based property to set see /ref helics_properties.
  * @param propertyValue The value of the property to set the timeProperty to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
+HELICS_EXPORT void
+    helicsFederateInfoSetTimeProperty(HelicsFederateInfo fedInfo, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 
 // TODO(Dheepak): what are known properties. The docstring should reference all properties that can be passed here.
 /**
@@ -1616,13 +1667,13 @@ HELICS_EXPORT void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int 
  *
  * @details Set known properties.
  *
- * @param fi The federateInfo object to alter.
+ * @param fedInfo The federateInfo object to alter.
  * @param intProperty An int identifying the property.
  * @param propertyValue The value to set the property to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fi, int intProperty, int propertyValue, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fedInfo, int intProperty, int propertyValue, HelicsError* err);
 
 /**
  * Load interfaces from a file.
@@ -2980,6 +3031,17 @@ HELICS_EXPORT void
 HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* field, double val, HelicsError* err);
 
 /**
+* Publish the contents of a helicsDataBuffer.
+*
+* @param pub The publication to publish for.
+* @param buffer a HelicsDataBuffer object containing the data to publish
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+
+*/
+HELICS_EXPORT void helicsPublicationPublishDataBuffer(HelicsPublication pub, HelicsDataBuffer buffer, HelicsError* err);
+
+/**
  * Add a named input to the list of targets a publication publishes to.
  *
  * @param pub The publication to add the target for.
@@ -3037,6 +3099,16 @@ HELICS_EXPORT int helicsInputGetByteCount(HelicsInput ipt);
  * @param[in,out] err A pointer to an error object for catching errors.
  */
 HELICS_EXPORT void helicsInputGetBytes(HelicsInput ipt, void* data, int maxDataLength, int* actualSize, HelicsError* err);
+
+/**
+ * Get a copy of the raw data in a HelicsDataBuffer
+ *
+ * @param inp The input to get the data for.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @return A HelicsDataBuffer object containing the data
+ */
+HELICS_EXPORT HelicsDataBuffer helicsInputGetDataBuffer(HelicsInput inp, HelicsError* err);
 
 /**
  * Get the size of a value for an input assuming return as a string.
@@ -4177,6 +4249,15 @@ HELICS_EXPORT void helicsMessageGetBytes(HelicsMessage message, void* data, int 
 HELICS_EXPORT void* helicsMessageGetBytesPointer(HelicsMessage message);
 
 /**
+ * Get a data buffer to the message object
+ *
+ * @param message A message object to get the dataBuffer for
+ *
+ * @return A HelicsDataBuffer object to the data in a message.  Modifying the buffer will directly modify the message contents.
+ */
+HELICS_EXPORT HelicsDataBuffer helicsMessageDataBuffer(HelicsMessage message, HelicsError* err);
+
+/**
  * A check if the message contains a valid payload.
  *
  * @param message The message object in question.
@@ -4310,6 +4391,16 @@ HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* dat
  * @param[in,out] err An error object to fill out in case of an error.
  */
 HELICS_EXPORT void helicsMessageSetData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err);
+
+/**
+ * Set the data payload of a message from a HelicsDataBuffer Object
+ *
+ * @param message The message object in question.
+ * @param data the dataBuffer containing the appropriate data, if null will clear the message payload
+ *
+ * @param[in,out] err An error object to fill out in case of an error.
+ */
+HELICS_EXPORT void helicsMessageSetDataBuffer(HelicsMessage message, HelicsDataBuffer data, HelicsError* err);
 
 /**
  * Append data to the payload.

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -42,28 +42,26 @@ static std::string encode(std::string_view str2encode)
 namespace helics::apps {
 Recorder::Recorder(std::string_view appName, FederateInfo& fedInfo): App(appName, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
+    initialSetup();
 }
 
 Recorder::Recorder(std::vector<std::string> args): App("recorder", std::move(args))
 {
     processArgs();
+    initialSetup();
 }
 
 Recorder::Recorder(int argc, char* argv[]): App("recorder", argc, argv)
 {
     processArgs();
+    initialSetup();
 }
 
 void Recorder::processArgs()
 {
     auto app = buildArgParserApp();
     if (!deactivated) {
-        fed->setFlagOption(HELICS_FLAG_OBSERVER);
         app->parse(remArgs);
-        if (!masterFileName.empty()) {
-            loadFile(masterFileName);
-        }
     } else if (helpMode) {
         app->remove_helics_specifics();
         std::cout << app->help();
@@ -75,20 +73,20 @@ Recorder::Recorder(std::string_view appName,
                    const FederateInfo& fedInfo):
     App(appName, core, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
+    initialSetup();
 }
 
 Recorder::Recorder(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
     App(appName, core, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
+    initialSetup();
 }
 
 Recorder::Recorder(std::string_view appName, const std::string& jsonString):
     App(appName, jsonString)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
-    Recorder::loadJsonFile(jsonString);
+    processArgs();
+    initialSetup();
 }
 
 Recorder::~Recorder()
@@ -100,9 +98,17 @@ Recorder::~Recorder()
     }
 }
 
-void Recorder::loadJsonFile(const std::string& jsonString)
+void Recorder::initialSetup()
 {
-    loadJsonFileConfiguration("recorder", jsonString);
+    if (!deactivated) {
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
+        loadInputFiles();
+    }
+}
+
+void Recorder::loadJsonFile(const std::string& jsonString, bool enableFederateInterfaceRegistration)
+{
+    loadJsonFileConfiguration("recorder", jsonString, enableFederateInterfaceRegistration);
 
     auto subCount = fed->getInputCount();
     for (int ii = 0; ii < subCount; ++ii) {

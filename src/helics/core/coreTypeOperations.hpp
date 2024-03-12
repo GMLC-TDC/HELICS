@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -36,4 +36,8 @@ bool isCoreTypeAvailable(CoreType type) noexcept;
 @return true if the types are compatible with each other
 */
 bool matchingTypes(std::string_view type1, std::string_view type2);
+
+/** generate an extended version and system info string in json format*/
+std::string systemInfo();
+
 }  // namespace helics::core

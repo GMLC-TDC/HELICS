@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -58,7 +58,7 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     Translator& operator=(const Translator& trans) = default;
 
     /** set a message operator to process the message*/
-    void setOperator(std::shared_ptr<TranslatorOperator> mo);
+    void setOperator(std::shared_ptr<TranslatorOperator> operation);
 
     virtual const std::string& getDisplayName() const override { return getName(); }
 

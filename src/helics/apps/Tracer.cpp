@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -39,22 +39,20 @@ Tracer::Tracer(std::string_view appName, FederateInfo& fedInfo): App(appName, fe
 Tracer::Tracer(std::vector<std::string> args): App("tracer", std::move(args))
 {
     processArgs();
+    initialSetup();
 }
 
 Tracer::Tracer(int argc, char* argv[]): App("tracer", argc, argv)
 {
     processArgs();
+    initialSetup();
 }
 
 void Tracer::processArgs()
 {
     auto app = buildArgParserApp();
     if (!deactivated) {
-        fed->setFlagOption(HELICS_FLAG_OBSERVER);
         app->parse(remArgs);
-        if (!masterFileName.empty()) {
-            loadFile(masterFileName);
-        }
     } else if (helpMode) {
         app->remove_helics_specifics();
         std::cout << app->help();
@@ -65,26 +63,34 @@ Tracer::Tracer(std::string_view appName,
                const FederateInfo& fedInfo):
     App(appName, core, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
+    initialSetup();
 }
 
 Tracer::Tracer(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
     App(appName, core, fedInfo)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
+    initialSetup();
 }
 
-Tracer::Tracer(std::string_view name, const std::string& file): App(name, file)
+Tracer::Tracer(std::string_view name, const std::string& configString): App(name, configString)
 {
-    fed->setFlagOption(HELICS_FLAG_OBSERVER);
-    Tracer::loadJsonFile(file);
+    processArgs();
+    initialSetup();
 }
 
 Tracer::~Tracer() = default;
 
-void Tracer::loadJsonFile(const std::string& jsonString)
+void Tracer::initialSetup()
 {
-    loadJsonFileConfiguration("tracer", jsonString);
+    if (!deactivated) {
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
+        loadInputFiles();
+    }
+}
+
+void Tracer::loadJsonFile(const std::string& jsonString, bool enableFederateInterfaceRegistration)
+{
+    loadJsonFileConfiguration("tracer", jsonString, enableFederateInterfaceRegistration);
 
     auto subCount = fed->getInputCount();
     for (int ii = 0; ii < subCount; ++ii) {

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -1523,11 +1523,17 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                         "translators cannot have publications as destination targets"));
                     break;
                 case InterfaceType::ENDPOINT:
-                default:
                     cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
                     break;
                 case InterfaceType::FILTER:
                     cmd.setAction(CMD_ADD_NAMED_FILTER);
+                    break;
+                default:
+                    // translators have two outputs
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    // need to send 2 messages then one now and one at the end
+                    addActionMessage(cmd);
+                    cmd.setAction(CMD_ADD_NAMED_INPUT);
                     break;
             }
             break;
@@ -1589,9 +1595,9 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
         case InterfaceType::TRANSLATOR:
             switch (hint) {
                 case InterfaceType::PUBLICATION:
-                default:
                     cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
                     break;
+
                 case InterfaceType::INPUT:
                     throw(InvalidIdentifier("translators cannot have inputs as a source"));
                     break;
@@ -1600,6 +1606,12 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                     break;
                 case InterfaceType::FILTER:
                     cmd.setAction(CMD_ADD_NAMED_FILTER);
+                    break;
+                default:
+                    // translators can have two inputs
+                    cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
+                    addActionMessage(cmd);
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
                     break;
             }
             break;
@@ -2572,6 +2584,7 @@ static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> ma
     {"barriers", {BARRIERS, QueryReuse::DISABLED}},
     {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
     {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
+    {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
     {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
 
 void CommonCore::setQueryCallback(LocalFederateId federateID,
@@ -2808,6 +2821,15 @@ void CommonCore::initializeMapBuilder(std::string_view request,
             if (timeCoord && !timeCoord->empty()) {
                 base["time"] = Json::Value();
                 timeCoord->generateDebuggingTimeInfo(base["time"]);
+            }
+            break;
+        case UNCONNECTED_INTERFACES:
+            if (!tags.empty()) {
+                Json::Value tagBlock = Json::objectValue;
+                for (const auto& tag : tags) {
+                    tagBlock[tag.first] = tag.second;
+                }
+                base["tags"] = tagBlock;
             }
             break;
         default:
@@ -3610,7 +3632,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_CORE_TAG:
             if (command.source_id == global_broker_id_local &&
                 command.dest_id == global_broker_id_local) {
-                auto keyTag = command.getString(0);
+                const auto& keyTag = command.getString(0);
                 for (auto& tag : tags) {
                     if (tag.first == keyTag) {
                         tag.second = command.getString(1);
@@ -3634,7 +3656,6 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_INIT_GRANT:
             processInitRequest(command);
             break;
-
         case CMD_SEND_MESSAGE:
             if (checkActionFlag(command, filter_processing_required_flag) ||
                 ((command.dest_id == parent_broker_id) && (isLocal(command.source_id)))) {
@@ -4602,6 +4623,8 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                     if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
                         loopFederates.apply([&cmd](auto& fed) {
                             if (fed->initIterating.load()) {
+                                fed->initIterating.store(false);
+                                fed->init_transmitted = false;
                                 fed->addAction(cmd);
                             }
                         });

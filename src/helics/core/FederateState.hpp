@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -20,8 +20,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <deque>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -159,7 +161,7 @@ class FederateState {
     void setState(FederateStates newState);
 
     /** check if a message should be delayed*/
-    bool messageShouldBeDelayed(const ActionMessage& cmd) const;
+    bool messageShouldBeDelayed(const ActionMessage& cmd) const noexcept;
     /** add a federate to the delayed list*/
     void addFederateToDelay(GlobalFederateId gid);
     /** generate a component of json config string*/
@@ -189,11 +191,11 @@ class FederateState {
     */
     int32_t getCurrentIteration() const;
     /** get the next available message for an endpoint
-    @param id the handle of an endpoint or filter
+    @param hid the handle of an endpoint or filter
     @return a pointer to a message -the ownership of the message is transferred to the caller*/
     std::unique_ptr<Message> receive(InterfaceHandle hid);
     /** get any message ready for reception
-    @param[out] id the endpoint related to the message*/
+    @param[out] hid the endpoint related to the message*/
     std::unique_ptr<Message> receiveAny(InterfaceHandle& hid);
     /**
      * Return the data for the specified handle or the latest input
@@ -276,7 +278,7 @@ class FederateState {
     /** set a tag (key-value pair)*/
     void setTag(std::string_view tag, std::string_view value);
     /** search for a tag by name*/
-    const std::string& getTag(std::string_view keyTag) const;
+    const std::string& getTag(std::string_view tag) const;
     /** get a tag (key-value pair) by index*/
     const std::pair<std::string, std::string>& getTagByIndex(size_t index) const
     {
@@ -309,10 +311,26 @@ class FederateState {
     @return a convergence state value with an indicator of return reason and state of convergence
     */
     MessageProcessingResult processDelayQueue() noexcept;
+
+    std::optional<MessageProcessingResult>
+        checkProcResult(std::tuple<FederateStates, MessageProcessingResult, bool>& proc_result,
+                        ActionMessage& cmd);
     /** process a single message
     @return a convergence state value with an indicator of return reason and state of convergence
     */
     MessageProcessingResult processActionMessage(ActionMessage& cmd);
+
+    /** process a data connection management message
+     */
+    void processDataConnectionMessage(ActionMessage& cmd);
+
+    /** process a message containing data
+     */
+    void processDataMessage(ActionMessage& cmd);
+    /** run a timeout check*/
+    void timeoutCheck(ActionMessage& cmd);
+    /** process a logging message*/
+    void processLoggingMessage(ActionMessage& cmd);
     /** fill event list
     @param currentTime the time of the update
     */

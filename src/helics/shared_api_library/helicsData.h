@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -41,44 +41,94 @@ HELICS_EXPORT void* helicsDataBufferData(HelicsDataBuffer data);
 @return HELICS_TRUE if the reservation was successful HELICS_FALSE otherwise*/
 HELICS_EXPORT HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity);
 
-/** create a new data buffer and copy an existing buffer*/
+/** create a new data buffer and copy an existing buffer
+@return a data buffer object with a copy of the data
+*/
 HELICS_EXPORT HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data);
 
-/** convert an integer to serialized bytes*/
-HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data);
+/** convert an integer to serialized bytes in a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromInteger(HelicsDataBuffer data, int64_t value);
 
-/** convert a double to serialized bytes*/
-HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
+/** convert a double to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromDouble(HelicsDataBuffer data, double value);
 
-/** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char* value, HelicsDataBuffer data);
+/** convert a string to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromString(HelicsDataBuffer data, const char* value);
 
-/** convert a raw string (may contain nulls) to serialized bytes*/
-HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data);
+/** convert a raw string (may contain nulls) to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromRawString(HelicsDataBuffer data, const char* str, int stringSize);
 
-/** convert a bool to serialized bytes*/
-HELICS_EXPORT int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data);
+/** convert a bool to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromBoolean(HelicsDataBuffer data, HelicsBool value);
 
-/** convert a char to serialized bytes*/
-HELICS_EXPORT int32_t helicsCharToBytes(char value, HelicsDataBuffer data);
+/** convert a char to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromChar(HelicsDataBuffer data, char value);
 
-/** convert a time to serialized bytes*/
-HELICS_EXPORT int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data);
+/** convert a time to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromTime(HelicsDataBuffer data, HelicsTime value);
 
-/** convert a complex pair to serialized bytes*/
-HELICS_EXPORT int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data);
+/** convert a complex pair to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromComplex(HelicsDataBuffer data, double real, double imag);
 
-/** convert a complex object to serialized bytes*/
-HELICS_EXPORT int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsDataBuffer data);
+/** convert a complex object to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromComplexObject(HelicsDataBuffer data, HelicsComplex value);
 
-/** convert a real vector to serialized bytes*/
-HELICS_EXPORT int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
+/** convert a real vector to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromVector(HelicsDataBuffer data, const double* value, int dataSize);
 
-/** convert a named point to serialized bytes*/
-HELICS_EXPORT int32_t helicsNamedPointToBytes(const char* name, double value, HelicsDataBuffer data);
+/** convert a named point to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromNamedPoint(HelicsDataBuffer data, const char* name, double value);
 
-/** convert a complex vector to serialized bytes*/
-HELICS_EXPORT int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
+/** convert a complex vector to serialized bytesin a buffer
+* @param data the HelicsDataBuffer to fill
+* @param value the value to serialize into the dataBuffer
+@return the buffer size after filling
+*/
+HELICS_EXPORT int32_t helicsDataBufferFillFromComplexVector(HelicsDataBuffer data, const double* value, int dataSize);
 
 /** extract the data type from the data buffer, if the type isn't recognized UNKNOWN is returned*/
 HELICS_EXPORT int helicsDataBufferType(HelicsDataBuffer data);

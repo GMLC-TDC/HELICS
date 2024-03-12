@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2024, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -50,5 +50,8 @@ if(NOT TARGET fmt::fmt)
         hide_variable(FMT_INC_DIR)
         hide_variable(FMT_MODULE)
         hide_variable(FMT_SYSTEM_HEADERS)
+        hide_variable(FMT_PKGCONFIG_DIR)
+        hide_variable(FMT_CMAKE_DIR)
+        hide_variable(FMT_LIB_DIR)
     endif()
 endif()

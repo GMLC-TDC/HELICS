@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -415,8 +415,8 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
     if (data[0] == std::byte{'{'}) {
         return 0;
     }
-    const std::size_t size = 256UL * 256UL * (std::to_integer<std::size_t>(data[1])) +
-        256UL * std::to_integer<std::size_t>(data[2]) + std::to_integer<std::size_t>(data[3]);
+    const std::size_t size = 256ULL * 256ULL * (std::to_integer<std::size_t>(data[1])) +
+        256ULL * std::to_integer<std::size_t>(data[2]) + std::to_integer<std::size_t>(data[3]);
     tsize += size;
     if (buffer_size < tsize) {
         messageAction = CMD_INVALID;

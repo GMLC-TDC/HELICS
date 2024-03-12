@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -94,8 +94,6 @@ TEST(clone_tests, simple_clone_test_pub2)
     fi2.coreInitString = "--autobroker";
     fi2.coreType = helics::CoreType::TEST;
     helics::apps::Player p1("p1", fi2);
-    p1.loadFile("pubtest2.json");
-
     p1.initialize();
 
     EXPECT_EQ(p1.pointCount(), 3U);
@@ -144,7 +142,6 @@ TEST(clone_tests, simple_clone_test_message)
     fi2.coreInitString = "--autobroker";
     fi2.coreType = helics::CoreType::TEST;
     helics::apps::Player p1("p1", fi2);
-    p1.loadFile("eptsave.json");
 
     p1.initialize();
 
@@ -222,7 +219,6 @@ TEST(clone_tests, simple_clone_test_combo)
     fi2.coreInitString = "--autobroker";
     fi2.coreType = helics::CoreType::TEST;
     helics::apps::Player p1("p1", fi2);
-    p1.loadFile("combsave.json");
 
     p1.initialize();
 
@@ -295,7 +291,6 @@ TEST(clone_tests, simple_clone_test_sub)
     fi2.coreInitString = "--autobroker";
     fi2.coreType = helics::CoreType::TEST;
     helics::apps::Player p1("p1", fi2);
-    p1.loadFile("subtest.json");
 
     p1.initialize();
 

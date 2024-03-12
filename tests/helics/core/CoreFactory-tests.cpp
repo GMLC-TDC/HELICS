@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2023,
+Copyright (c) 2017-2024,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <thread>
 
-static const bool ld = helics::loadCores();
+static const bool loaded = helics::loadCores();
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 TEST(CoreFactory, ZmqCore)
@@ -40,10 +40,10 @@ TEST(CoreFactory, ZmqCore)
 TEST(CoreFactory,MpiCore)
 {
     EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::CoreType::MPI), true);
-    auto core = helics::CoreFactory::create (helics::CoreType::MPI, "");
-    ASSERT_TRUE (core != nullptr);
-    helics::CoreFactory::unregisterCore (core->getIdentifier ());
-    core = nullptr;
+    auto coretype = helics::CoreFactory::create (helics::CoreType::MPI, "");
+    ASSERT_TRUE (coretype != nullptr);
+    helics::CoreFactory::unregisterCore (coretype->getIdentifier ());
+    coretype = nullptr;
 }
 #else
 TEST(CoreFactory,MpiCore)
@@ -159,24 +159,24 @@ TEST(core, core_log_command_failures)
 
 TEST(CoreFactory, availableCores)
 {
-    auto ac = helics::CoreFactory::getAvailableCoreTypes();
-    for (const auto& ct : ac) {
-        EXPECT_TRUE(helics::core::isCoreTypeAvailable(helics::core::coreTypeFromString(ct)));
+    auto availableCores = helics::CoreFactory::getAvailableCoreTypes();
+    for (const auto& coretype : availableCores) {
+        EXPECT_TRUE(helics::core::isCoreTypeAvailable(helics::core::coreTypeFromString(coretype)));
     }
 }
 
 TEST(core, systemInfo)
 {
-    auto eVers = helics::systemInfo();
+    auto eVers = helics::core::systemInfo();
 
-    auto jv = helics::fileops::loadJsonStr(eVers);
-    EXPECT_FALSE(jv.isNull());
+    auto json = helics::fileops::loadJsonStr(eVers);
+    EXPECT_FALSE(json.isNull());
 
-    EXPECT_FALSE(jv["version"].isNull());
+    EXPECT_FALSE(json["version"].isNull());
 
-    ASSERT_FALSE(jv["cores"].isNull());
-    for (const auto& cr : jv["cores"]) {
-        auto cname = cr.asString();
+    ASSERT_FALSE(json["cores"].isNull());
+    for (const auto& coretype : json["cores"]) {
+        auto cname = coretype.asString();
         EXPECT_TRUE(helics::core::isCoreTypeAvailable(helics::core::coreTypeFromString(cname)));
     }
 }

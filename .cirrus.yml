@@ -1,5 +1,5 @@
 freebsd_instance:
-  image_family: freebsd-12-2
+  image_family: freebsd-14-0
 
 task:
   skip: $CIRRUS_BRANCH == 'pre-commit/.*'
