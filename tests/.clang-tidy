@@ -24,6 +24,7 @@ Checks: "
   readability-*,
   -readability-magic-numbers,
   -readability-qualified-auto,
+  -readability-function-cognitive-complexity,
   performance-*
   "
 
@@ -41,10 +42,12 @@ WarningsAsErrors: "
   clang-analyzer-*,
   bugprone-*,
   -bugprone-narrowing-conversions,
+  -bugprone-easily-swappable-parameters,
   portability-*,
   readability-*,
   -readability-magic-numbers,
   -readability-qualified-auto,
+  -readability-function-cognitive-complexity,
   performance-*
   "
 
@@ -157,7 +160,7 @@ CheckOptions:
   - key: readability-function-size.StatementThreshold
     value: "800"
   - key: readability-identifier-naming.AbstractClassCase
-    value: CamelCase
+    value: aNy_CasE
   - key: readability-identifier-naming.AbstractClassPrefix
     value: ""
   - key: readability-identifier-naming.AbstractClassSuffix
