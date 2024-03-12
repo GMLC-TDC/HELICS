@@ -31,5 +31,3 @@ T. Hardy, B. Palmintier, P. Top, D. Krishnamurthy and J. Fuller, "HELICS: A Co-S
    quick-links
 
 ```
-
-

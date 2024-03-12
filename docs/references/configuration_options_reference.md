@@ -912,7 +912,6 @@ _Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL` [402]
 
 When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.
 
-
 ---
 
 ### `default_global` [false]
@@ -924,7 +923,6 @@ _API:_ (no API interface)
 Set to `true` to force all handles to act as globals; see "global" below for further details.
 
 ---
-
 
 ## Subscription, Input, and/or Publication Options
 
