@@ -14,16 +14,18 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value federates
  */
 
-class vfed_simple_type_tests:
-    public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {};
+class vfedSimpleType: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
-class vfed_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
+class cfedType: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
-class vfed_single_tests: public ::testing::Test, public FederateTestFixture {};
+class vfedSingle: public ::testing::Test, public FederateTestFixture {};
+
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
 
 /** test simple creation and destruction*/
-TEST_P(vfed_simple_type_tests, initialize_tests)
+TEST_P(vfedSimpleType, initialize_tests)
 {
     SetupTest(helicsCreateValueFederate, GetParam(), 1);
     auto vFed1 = GetFederateAt(0);
@@ -45,7 +47,7 @@ TEST_P(vfed_simple_type_tests, initialize_tests)
     NoFree = true;
 }
 
-TEST_F(vfed_single_tests, publisher_registration)
+TEST_F(vfedSingle, publisher_registration)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -62,10 +64,10 @@ TEST_F(vfed_single_tests, publisher_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsPublicationGetName(pubid);
-    auto sv2 = helicsPublicationGetName(pubid2);
-    EXPECT_STREQ(sv, "fed0/pub1");
-    EXPECT_STREQ(sv2, "pub2");
+    auto pubname = helicsPublicationGetName(pubid);
+    auto pubname2 = helicsPublicationGetName(pubid2);
+    EXPECT_STREQ(pubname, "fed0/pub1");
+    EXPECT_STREQ(pubname2, "pub2");
     auto pub3name = helicsPublicationGetName(pubid3);
     EXPECT_STREQ(pub3name, "fed0/pub3");
 
@@ -85,7 +87,7 @@ TEST_F(vfed_single_tests, publisher_registration)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_F(vfed_single_tests, subscription_registration)
+TEST_F(vfedSingle, subscription_registration)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -101,10 +103,10 @@ TEST_F(vfed_single_tests, subscription_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsInputGetTarget(subid);
-    auto sv2 = helicsInputGetTarget(subid2);
-    EXPECT_STREQ(sv, "sub1");
-    EXPECT_STREQ(sv2, "sub2");
+    auto target1 = helicsInputGetTarget(subid);
+    auto target2 = helicsInputGetTarget(subid2);
+    EXPECT_STREQ(target1, "sub1");
+    EXPECT_STREQ(target2, "sub2");
 
     auto sub3name = helicsInputGetTarget(subid3);
 
@@ -122,7 +124,7 @@ TEST_F(vfed_single_tests, subscription_registration)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_F(vfed_single_tests, subscription_and_publication_registration)
+TEST_F(vfedSingle, subscription_and_publication_registration)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -146,11 +148,11 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsInputGetTarget(subid);
-    auto sv2 = helicsInputGetTarget(subid2);
+    auto target1 = helicsInputGetTarget(subid);
+    auto target2 = helicsInputGetTarget(subid2);
 
-    EXPECT_STREQ(sv, "sub1");
-    EXPECT_STREQ(sv2, "sub2");
+    EXPECT_STREQ(target1, "sub1");
+    EXPECT_STREQ(target2, "sub2");
     auto sub3name = helicsInputGetTarget(subid3);
     EXPECT_STREQ(sub3name, "sub3");
 
@@ -167,10 +169,10 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
     EXPECT_STREQ(tmp, "V");
     // check publications
 
-    sv = helicsPublicationGetName(pubid);
-    sv2 = helicsPublicationGetName(pubid2);
-    EXPECT_STREQ(sv, "fed0/pub1");
-    EXPECT_STREQ(sv2, "pub2");
+    target1 = helicsPublicationGetName(pubid);
+    target2 = helicsPublicationGetName(pubid2);
+    EXPECT_STREQ(target1, "fed0/pub1");
+    EXPECT_STREQ(target2, "pub2");
     auto pub3name = helicsPublicationGetName(pubid3);
     EXPECT_STREQ(pub3name, "fed0/pub3");
 
@@ -201,7 +203,7 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_F(vfed_single_tests, default_value_tests)
+TEST_F(vfedSingle, default_value_tests)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -264,8 +266,8 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     EXPECT_EQ(helicsInputGetPublicationDataType(inp_double), HELICS_DATA_TYPE_INT);
 
-    auto c2 = helicsInputGetChar(inp_char, &err);
-    EXPECT_EQ(c2, 'q');
+    auto char2 = helicsInputGetChar(inp_char, &err);
+    EXPECT_EQ(char2, 'q');
     int actSize = 56;
     // this should not be an error
     helicsInputGetVector(inp_vect, nullptr, 5, &actSize, &err);
@@ -322,7 +324,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsFederateFinalize(vFed1, &err);
 }
 
-TEST_F(vfed_single_tests, publication_registration)
+TEST_F(vfedSingle, publication_registration)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -339,10 +341,10 @@ TEST_F(vfed_single_tests, publication_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsPublicationGetName(pubid);
-    EXPECT_STREQ(sv, "fed0/pub1");
-    auto sv2 = helicsPublicationGetName(pubid2);
-    EXPECT_STREQ(sv2, "pub2");
+    auto stringval1 = helicsPublicationGetName(pubid);
+    EXPECT_STREQ(stringval1, "fed0/pub1");
+    auto stringval2 = helicsPublicationGetName(pubid2);
+    EXPECT_STREQ(stringval2, "pub2");
     auto pub3name = helicsPublicationGetName(pubid3);
     EXPECT_STREQ(pub3name, "fed0/pub3");
 
@@ -360,12 +362,12 @@ TEST_F(vfed_single_tests, publication_registration)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_P(vfed_type_tests, single_transfer)
+TEST_P(cfedType, single_transfer)
 {
     // HelicsTime stime = 1.0;
     HelicsTime gtime;
-#define STRINGLEN 100
-    char s[STRINGLEN] = "n2";
+    static constexpr int STRINGLEN{100};
+    char string1[STRINGLEN] = "n2";
 
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
     auto vFed = GetFederateAt(0);
@@ -383,10 +385,10 @@ TEST_P(vfed_type_tests, single_transfer)
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
-    CE(helicsInputGetString(subid, s, STRINGLEN, nullptr, &err));
+    CE(helicsInputGetString(subid, string1, STRINGLEN, nullptr, &err));
 
     // make sure the string is what we expect
-    EXPECT_STREQ(s, "string1");
+    EXPECT_STREQ(string1, "string1");
     // check the time
     auto time = helicsInputLastUpdateTime(subid);
     EXPECT_EQ(time, 1.0);
@@ -395,8 +397,8 @@ TEST_P(vfed_type_tests, single_transfer)
 
     int actualLen;
     // make sure the value is still what we expect
-    CE(helicsInputGetString(subid, s, STRINGLEN, &actualLen, &err));
-    EXPECT_STREQ(s, "string1");
+    CE(helicsInputGetString(subid, string1, STRINGLEN, &actualLen, &err));
+    EXPECT_STREQ(string1, "string1");
 
     // advance time
     CE(gtime = helicsFederateRequestTime(vFed, 2.0, &err));
@@ -405,10 +407,10 @@ TEST_P(vfed_type_tests, single_transfer)
     EXPECT_EQ(gtime, 2.0);
 
     // make sure the string is what we expect
-    CE(helicsInputGetString(subid, s, STRINGLEN, &actualLen, &err));
+    CE(helicsInputGetString(subid, string1, STRINGLEN, &actualLen, &err));
 
     EXPECT_EQ(actualLen, 8);  // 8 = strlen("string2")+ 1 for the null character
-    EXPECT_STREQ(s, "string2");
+    EXPECT_STREQ(string1, "string2");
 
     CE(helicsFederateFinalize(vFed, &err));
 }
@@ -500,10 +502,10 @@ void runFederateTestComplex(const char* core,
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
-    CE(HelicsComplex hc = helicsInputGetComplexObject(subid, &err));
+    CE(HelicsComplex valComplex = helicsInputGetComplexObject(subid, &err));
     // make sure the string is what we expect
-    EXPECT_EQ(hc.real, testValue1_r);
-    EXPECT_EQ(hc.imag, testValue1_i);
+    EXPECT_EQ(valComplex.real, testValue1_r);
+    EXPECT_EQ(valComplex.imag, testValue1_i);
 
     // publish a second value
     CE(helicsPublicationPublishComplex(pubid, testValue2_r, testValue2_i, &err));
@@ -517,9 +519,9 @@ void runFederateTestComplex(const char* core,
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
 
-    CE(hc = helicsInputGetComplexObject(subid, &err));
-    EXPECT_EQ(hc.real, testValue2_r);
-    EXPECT_EQ(hc.imag, testValue2_i);
+    CE(valComplex = helicsInputGetComplexObject(subid, &err));
+    EXPECT_EQ(valComplex.real, testValue2_r);
+    EXPECT_EQ(valComplex.imag, testValue2_i);
 
     CE(helicsFederateFinalize(vFed, &err));
 }
@@ -558,10 +560,10 @@ void runFederateTestComplex2(const char* core,
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
-    CE(HelicsComplex hc = helicsInputGetComplexObject(subid, &err));
+    CE(HelicsComplex cobject = helicsInputGetComplexObject(subid, &err));
     // make sure the string is what we expect
-    EXPECT_EQ(hc.real, testValue1_r);
-    EXPECT_EQ(hc.imag, testValue1_i);
+    EXPECT_EQ(cobject.real, testValue1_r);
+    EXPECT_EQ(cobject.imag, testValue1_i);
 
     // publish a second value
     CE(helicsPublicationPublishComplex(pubid, testValue2_r, testValue2_i, &err));
@@ -575,9 +577,9 @@ void runFederateTestComplex2(const char* core,
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
 
-    CE(hc = helicsInputGetComplexObject(subid, &err));
-    EXPECT_EQ(hc.real, testValue2_r);
-    EXPECT_EQ(hc.imag, testValue2_i);
+    CE(cobject = helicsInputGetComplexObject(subid, &err));
+    EXPECT_EQ(cobject.real, testValue2_r);
+    EXPECT_EQ(cobject.imag, testValue2_i);
 
     CE(helicsFederateFinalize(vFed, &err));
 }
@@ -790,7 +792,7 @@ void runFederateTestVectorD(const char* core,
     actualLen = helicsInputGetStringSize(subid);
     std::string buf;
     buf.resize(static_cast<size_t>(actualLen) + 2);
-    CE(helicsInputGetString(subid, &(buf[0]), static_cast<int>(buf.size()), &actualLen, &err));
+    CE(helicsInputGetString(subid, buf.data(), static_cast<int>(buf.size()), &actualLen, &err));
     buf.resize(static_cast<size_t>(actualLen) - 1);
     EXPECT_EQ(buf[0], '[');
     EXPECT_EQ(buf.back(), ']');
@@ -834,7 +836,7 @@ void runFederateTestVectorCD(const char* core,
     HelicsTime gtime;
     int maxlen = (len1 > len2) ? len1 : len2;
     maxlen = (maxlen > len) ? maxlen : len;
-    auto* val = new double[maxlen * 2];
+    auto* val = new double[static_cast<std::size_t>(maxlen) * 2];
     HelicsError err = helicsErrorInitialize();
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
@@ -877,7 +879,7 @@ void runFederateTestVectorCD(const char* core,
     actualLen = helicsInputGetStringSize(subid);
     std::string buf;
     buf.resize(static_cast<size_t>(actualLen) + 2);
-    CE(helicsInputGetString(subid, &(buf[0]), static_cast<int>(buf.size()), &actualLen, &err));
+    CE(helicsInputGetString(subid, buf.data(), static_cast<int>(buf.size()), &actualLen, &err));
     buf.resize(static_cast<size_t>(actualLen) - 1);
     EXPECT_EQ(buf[0], '[');
     EXPECT_EQ(buf.back(), ']');
@@ -973,36 +975,36 @@ void runFederateTestNamedPoint(const char* core,
     CE(helicsFederateFinalize(vFed, &err));
 }
 
-TEST_P(vfed_type_tests, single_transfer_double1)
+TEST_P(cfedType, single_transfer_double1)
 {
     runFederateTestDouble(GetParam(), 10.3, 45.3, 22.7);
 }
 
-TEST_P(vfed_type_tests, single_transfer_double2)
+TEST_P(cfedType, single_transfer_double2)
 {
     runFederateTestDouble(GetParam(), 1.0, 0.0, 3.0);
 }
 
-TEST_P(vfed_type_tests, single_transfer_integer1)
+TEST_P(cfedType, single_transfer_integer1)
 {
     runFederateTestInteger(GetParam(), 5, 8, 43);
 }
 
-TEST_P(vfed_type_tests, single_transfer_integer2)
+TEST_P(cfedType, single_transfer_integer2)
 {
     runFederateTestInteger(GetParam(), -5, 1241515, -43);
 }
 
-TEST_P(vfed_type_tests, single_transfer_complex)
+TEST_P(cfedType, single_transfer_complex)
 {
     runFederateTestComplex(GetParam(), 54.23233, 0.7, -9.7, 3.2, -3e45, 1e-23);
 }
 
-TEST_F(vfed_single_tests, single_transfer_complex2)
+TEST_F(vfedSingle, single_transfer_complex2)
 {
     runFederateTestComplex2("test", 54.23233, 0.7, -9.7, 3.2, -3e45, 1e-23);
 }
-TEST_P(vfed_type_tests, single_transfer_string)
+TEST_P(cfedType, single_transfer_string)
 {
     runFederateTestString(GetParam(),
                           "start",
@@ -1010,7 +1012,7 @@ TEST_P(vfed_type_tests, single_transfer_string)
                           "I am a string");
 }
 
-TEST_P(vfed_type_tests, single_transfer_named_point)
+TEST_P(cfedType, single_transfer_named_point)
 {
     runFederateTestNamedPoint(GetParam(),
                               "start",
@@ -1021,12 +1023,12 @@ TEST_P(vfed_type_tests, single_transfer_named_point)
                               0.0);
 }
 
-TEST_P(vfed_type_tests, single_transfer_boolean)
+TEST_P(cfedType, single_transfer_boolean)
 {
     runFederateTestBool(GetParam(), true, true, false);
 }
 
-TEST_P(vfed_type_tests, single_transfer_vector)
+TEST_P(cfedType, single_transfer_vector)
 {
     const double val1[] = {34.3, 24.2};
     const double val2[] = {12.4, 14.7, 16.34, 18.17};
@@ -1034,15 +1036,15 @@ TEST_P(vfed_type_tests, single_transfer_vector)
     runFederateTestVectorD(GetParam(), val1, val2, val3, 2, 4, 3);
 }
 
-TEST_P(vfed_type_tests, single_transfer_vector2)
+TEST_P(cfedType, single_transfer_vector2)
 {
-    std::vector<double> V1(34, 39.4491966662);
-    std::vector<double> V2(100, 45.236262626221);
-    std::vector<double> V3(452, -25.25263858741);
-    runFederateTestVectorD(GetParam(), V1.data(), V2.data(), V3.data(), 34, 100, 452);
+    std::vector<double> val1(34, 39.4491966662);
+    std::vector<double> val2(100, 45.236262626221);
+    std::vector<double> val3(452, -25.25263858741);
+    runFederateTestVectorD(GetParam(), val1.data(), val2.data(), val3.data(), 34, 100, 452);
 }
 
-TEST_P(vfed_type_tests, single_transfer_complex_vector)
+TEST_P(cfedType, single_transfer_complex_vector)
 {
     const double val1[] = {34.3, -24.2};
     const double val2[] = {12.4, 14.7, 16.34, -18.17};
@@ -1050,8 +1052,9 @@ TEST_P(vfed_type_tests, single_transfer_complex_vector)
     runFederateTestVectorCD(GetParam(), val1, val2, val3, 1, 2, 3);
 }
 
-TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
+TEST_P(cfedType, subscriber_and_publisher_registration)
 {
+    helicsCleanupLibrary();
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
     auto vFed = GetFederateAt(0);
 
@@ -1104,14 +1107,17 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
     EXPECT_STREQ(pubunit3, "V");
 
     CE(helicsFederateFinalize(vFed, &err));
+    helicsCleanupLibrary();
 }
 
-TEST_P(vfed_type_tests, single_transfer_publisher)
+TEST_P(cfedType, single_transfer_publisher)
 {
+    static constexpr int STRINGLEN{100};
+
     //    HelicsTime stime = 1.0;
     HelicsTime gtime;
 
-    char s[STRINGLEN] = "n2";
+    char string1[STRINGLEN] = "n2";
     int len = 0;
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
     auto vFed = GetFederateAt(0);
@@ -1128,30 +1134,30 @@ TEST_P(vfed_type_tests, single_transfer_publisher)
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
-    CE(helicsInputGetString(subid, s, STRINGLEN, &len, &err));
+    CE(helicsInputGetString(subid, string1, STRINGLEN, &len, &err));
     // make sure the string is what we expect
-    EXPECT_STREQ(s, "string1");
+    EXPECT_STREQ(string1, "string1");
 
     // publish a second string
     CE(helicsPublicationPublishString(pubid, "string2", &err));
 
     // make sure the value is still what we expect
-    CE(helicsInputGetString(subid, s, STRINGLEN, &len, &err));
-    EXPECT_STREQ(s, "string1");
+    CE(helicsInputGetString(subid, string1, STRINGLEN, &len, &err));
+    EXPECT_STREQ(string1, "string1");
     EXPECT_EQ(len - 1, static_cast<int>(strlen("string1")));
 
     // advance time
     CE(gtime = helicsFederateRequestTime(vFed, 2.0, &err));
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    CE(helicsInputGetString(subid, s, STRINGLEN, &len, &err));
-    EXPECT_STREQ(s, "string2");
+    CE(helicsInputGetString(subid, string1, STRINGLEN, &len, &err));
+    EXPECT_STREQ(string1, "string2");
 
     CE(helicsFederateFinalize(vFed, &err));
 }
 
 /** test info field for multiple publications */
-TEST_P(vfed_simple_type_tests, test_info_field)
+TEST_P(vfedSimpleType, test_info_field)
 {
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
     auto vFed = GetFederateAt(0);
@@ -1172,20 +1178,23 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     EXPECT_STREQ(helicsPublicationGetInfo(pubid1), "pub1_test");
     EXPECT_STREQ(helicsPublicationGetInfo(pubid2), "pub2_test");
 
-    CE(auto cr = helicsFederateGetCore(vFed, &err));
+    CE(auto core = helicsFederateGetCore(vFed, &err));
     CE(helicsFederateFinalize(vFed, &err));
 
-    CE(auto wait = helicsCoreWaitForDisconnect(cr, 70, &err));
+    CE(auto wait = helicsCoreWaitForDisconnect(core, 70, &err));
     if (wait == HELICS_FALSE) {
-        wait = helicsCoreWaitForDisconnect(cr, 500, &err);
+        wait = helicsCoreWaitForDisconnect(core, 500, &err);
     }
     EXPECT_EQ(wait, HELICS_TRUE);
 }
 
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(vfed_tests,
+                         vfedSimpleType,
+                         ::testing::ValuesIn(CoreTypes_simple),
+                         testNamer);
+INSTANTIATE_TEST_SUITE_P(vfed_tests, cfedType, ::testing::ValuesIn(CoreTypes), testNamer);
 
-TEST_F(vfed_single_tests, buffer_tests)
+TEST_F(vfedSingle, buffer_tests)
 {
     HelicsTime gtime;
     double val1 = 0;
