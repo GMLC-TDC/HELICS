@@ -32,8 +32,7 @@ ValueFederate::ValueFederate(std::string_view fedName, const FederateInfo& fedIn
 }
 ValueFederate::ValueFederate(std::string_view fedName,
                              const std::shared_ptr<Core>& core,
-                             const FederateInfo& fedInfo):
-    Federate(fedName, core, fedInfo)
+                             const FederateInfo& fedInfo): Federate(fedName, core, fedInfo)
 {
     loadFederateData();
 }

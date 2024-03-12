@@ -29,8 +29,7 @@ class HelicsException: public std::exception {
 class FunctionExecutionFailure: public HelicsException {
   public:
     explicit FunctionExecutionFailure(
-        std::string_view message = "HELICS execution failure") noexcept:
-        HelicsException(message)
+        std::string_view message = "HELICS execution failure") noexcept: HelicsException(message)
     {
     }
 };

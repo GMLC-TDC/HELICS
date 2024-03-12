@@ -91,8 +91,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     Input(FedPtr& valueFed,
           std::string_view key,
           std::string_view defaultType = "def",
-          std::string_view units = {}):
-        Input(std::addressof(*valueFed), key, defaultType, units)
+          std::string_view units = {}): Input(std::addressof(*valueFed), key, defaultType, units)
     {
         static_assert(
             std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value,
@@ -121,8 +120,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     Input(ValueFederate* valueFed,
           std::string_view key,
           DataType defType,
-          std::string_view units = {}):
-        Input(valueFed, key, typeNameStringRef(defType), units)
+          std::string_view units = {}): Input(valueFed, key, typeNameStringRef(defType), units)
     {
     }
 
@@ -135,8 +133,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     Input(InterfaceVisibility locality,
           ValueFederate* valueFed,
           std::string_view key,
-          std::string_view units = {}):
-        Input(locality, valueFed, key, "def", units)
+          std::string_view units = {}): Input(locality, valueFed, key, "def", units)
     {
     }
 
@@ -144,8 +141,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     Input(InterfaceVisibility locality,
           FedPtr& valueFed,
           std::string_view key,
-          std::string_view units = {}):
-        Input(locality, valueFed, key, "def", units)
+          std::string_view units = {}): Input(locality, valueFed, key, "def", units)
     {
     }
 

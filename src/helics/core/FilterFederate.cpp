@@ -24,8 +24,7 @@ FilterFederate::FilterFederate(GlobalFederateId fedID,
                                std::string name,
                                GlobalBrokerId coreID,
                                Core* /*core*/):
-    mFedID(fedID),
-    mCoreID(coreID), mName(std::move(name)), /*mCore(core),*/
+    mFedID(fedID), mCoreID(coreID), mName(std::move(name)), /*mCore(core),*/
     mCoord([this](const ActionMessage& msg) { routeMessage(msg); })
 {
     mCoord.setSourceId(fedID);

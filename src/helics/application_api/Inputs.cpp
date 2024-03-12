@@ -21,9 +21,7 @@ namespace helics {
 Input::Input(ValueFederate* valueFed,
              InterfaceHandle id,
              std::string_view actName,
-             std::string_view unitsOut):
-    Interface(valueFed, id, actName),
-    fed(valueFed)
+             std::string_view unitsOut): Interface(valueFed, id, actName), fed(valueFed)
 {
     if (!unitsOut.empty()) {
         outputUnits =

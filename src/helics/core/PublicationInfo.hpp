@@ -22,9 +22,7 @@ class PublicationInfo {
     PublicationInfo(GlobalHandle pid,
                     std::string_view pkey,
                     std::string_view ptype,
-                    std::string_view punits):
-        id(pid),
-        key(pkey), type(ptype), units(punits)
+                    std::string_view punits): id(pid), key(pkey), type(ptype), units(punits)
     {
     }
     const GlobalHandle id;  //!< the identifier for the containing federate

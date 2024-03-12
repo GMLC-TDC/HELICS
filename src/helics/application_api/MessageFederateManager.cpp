@@ -19,9 +19,8 @@ MessageFederateManager::MessageFederateManager(Core* coreOb,
                                                MessageFederate* fed,
                                                LocalFederateId id,
                                                bool singleThreaded):
-    mLocalEndpoints(!singleThreaded),
-    coreObject(coreOb), mFed(fed), fedID(id), eptData(!singleThreaded),
-    messageOrder(!singleThreaded)
+    mLocalEndpoints(!singleThreaded), coreObject(coreOb), mFed(fed), fedID(id),
+    eptData(!singleThreaded), messageOrder(!singleThreaded)
 {
 }
 MessageFederateManager::~MessageFederateManager() = default;

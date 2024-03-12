@@ -35,8 +35,7 @@ ActionMessage::ActionMessage(action_message_def::action_t startingAction):
 ActionMessage::ActionMessage(action_message_def::action_t startingAction,
                              GlobalFederateId sourceId,
                              GlobalFederateId destId):
-    messageAction(startingAction),
-    source_id(sourceId), dest_id(destId)
+    messageAction(startingAction), source_id(sourceId), dest_id(destId)
 {
 }
 

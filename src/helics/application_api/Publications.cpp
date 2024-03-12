@@ -22,8 +22,7 @@ Publication::Publication(ValueFederate* valueFed,
                          std::string_view key,
                          std::string_view type,
                          std::string_view units):
-    Interface(valueFed, id, key),
-    fed(valueFed), pubUnits(units)
+    Interface(valueFed, id, key), fed(valueFed), pubUnits(units)
 {
     pubType = getTypeFromString(type);
     if (!units.empty()) {

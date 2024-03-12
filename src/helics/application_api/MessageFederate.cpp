@@ -25,16 +25,14 @@ MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& f
 }
 MessageFederate::MessageFederate(std::string_view fedName,
                                  const std::shared_ptr<Core>& core,
-                                 const FederateInfo& fedInfo):
-    Federate(fedName, core, fedInfo)
+                                 const FederateInfo& fedInfo): Federate(fedName, core, fedInfo)
 {
     loadFederateData();
 }
 
 MessageFederate::MessageFederate(std::string_view fedName,
                                  CoreApp& core,
-                                 const FederateInfo& fedInfo):
-    Federate(fedName, core, fedInfo)
+                                 const FederateInfo& fedInfo): Federate(fedName, core, fedInfo)
 {
     loadFederateData();
 }
