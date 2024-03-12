@@ -246,3 +246,7 @@ Options:
 also permissible are all arguments allowed for federates and any specific broker specified:
 
 [Command line reference](cmdArgs.md)
+
+## Federate Support
+
+The federate object has support for linking with connector operation.  Interface definitions placed in a `"potential_interfaces"` object in a json configuration file will activate the potential interfaces sequence automatically.  And based on the response of the connector will automatically create the interfaces defined if they are used.   The interface objects can later be retreived through normal means.  No additional sequence or callbacks is needed on the federate.  Json configuration is currently the only means to trigger this feature.  The definitions for the interfaces in the potential interfaces is exactly the same as normally defining an interface in json.     

@@ -73,14 +73,25 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
 
 void PotentialInterfacesManager::processCommand(std::pair<std::string,std::string> command)
 {
-    auto json = helics::fileops::loadJsonStr(command.first);
+    Json::Value json;
+    try {
+        json = fileops::loadJsonStr(command.first);
+    }
+    catch (const std::invalid_argument&)
+    {
+        extraCommands.push_back(std::move(command));
+        return;
+    }
     if (json.isMember("command")) {
         if (json["command"] == "register_interfaces") {
             Json::Value generator;
-
             for (auto& iType : potInterfaces)
             {
                 if (json.isMember(iType.first)) {
+                    if (iType.first == "endpoints")
+                    {
+                        generator["targeted"]=true;
+                    }
                         generator[iType.first] = Json::arrayValue;
                         iMap& pInterfaces = iType.second;
                         for (const auto& iface : json[iType.first]) {

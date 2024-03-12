@@ -297,6 +297,9 @@ void Federate::enterInitializingModeAsync()
         auto asyncInfo = asyncCallInfo->lock();
         if (currentMode.compare_exchange_strong(cmode, Modes::PENDING_INIT)) {
             asyncInfo->initFuture = std::async(std::launch::async, [this]() {
+                if (hasPotentialInterfaces) {
+                    potentialInterfacesStartupSequence();
+                }
                 return coreObject->enterInitializingMode(fedID);
             });
         }
@@ -371,7 +374,42 @@ void Federate::enterInitializingModeIterative()
     switch (cmode) {
         case Modes::STARTUP:
             try {
-                coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
+                if (hasPotentialInterfaces && potManager) {
+                    switch (potInterfacesSequence.load())
+                    {
+                    case 0:
+                        potManager->initialize();
+                        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+                        potInterfacesSequence.store(2);
+                        break;
+                    case 2: {
+                        //respond to query
+                        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+                        // now check for commands
+                        auto cmd = coreObject->getCommand(fedID);
+                        if (cmd.first.empty())
+                        {
+                            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                            cmd = coreObject->getCommand(fedID);
+                        }
+                        while (!cmd.first.empty())
+                        {
+                            potManager->processCommand(std::move(cmd));
+                            cmd = coreObject->getCommand(fedID);
+                        }
+                        potInterfacesSequence.store(3);
+                    }
+                          break;
+                    default:
+                        coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+                        break;
+                    }
+                }
+                else
+                {
+                    coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
+                }
+                
             }
             catch (const HelicsException&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -1073,13 +1111,14 @@ void Federate::potentialInterfacesStartupSequence()
             if (cmd.first.empty())
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                while (!cmd.first.empty())
-                {
-                    potManager->processCommand(std::move(cmd));
-                    cmd = coreObject->getCommand(fedID);
-                }
+                cmd = coreObject->getCommand(fedID);
             }
-            potInterfacesSequence.store(2);
+            while (!cmd.first.empty())
+            {
+                potManager->processCommand(std::move(cmd));
+                cmd = coreObject->getCommand(fedID);
+            }
+            potInterfacesSequence.store(3);
         }
               break;
         default:
