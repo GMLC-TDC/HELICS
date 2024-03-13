@@ -70,8 +70,7 @@ void Recorder::processArgs()
 
 Recorder::Recorder(std::string_view appName,
                    const std::shared_ptr<Core>& core,
-                   const FederateInfo& fedInfo):
-    App(appName, core, fedInfo)
+                   const FederateInfo& fedInfo): App(appName, core, fedInfo)
 {
     initialSetup();
 }

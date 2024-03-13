@@ -50,8 +50,7 @@ CallbackFederate::CallbackFederate(std::string_view fedName, const FederateInfo&
 CallbackFederate::CallbackFederate(std::string_view fedName,
                                    const std::shared_ptr<Core>& core,
                                    const FederateInfo& fi):
-    Federate(fedName, core, fi),
-    CombinationFederate(fedName, core, fi)
+    Federate(fedName, core, fi), CombinationFederate(fedName, core, fi)
 {
     loadOperator();
 }

@@ -28,9 +28,8 @@ class BasicHandleInfo {
                     std::string_view key_name,
                     std::string_view type_name,
                     std::string_view unit_name):
-        handle{federate_id, handle_id},
-        handleType(type_of_handle), key(key_name), type(type_name), units(unit_name), type_in(type),
-        type_out(units)
+        handle{federate_id, handle_id}, handleType(type_of_handle), key(key_name), type(type_name),
+        units(unit_name), type_in(type), type_out(units)
 
     {
     }
@@ -38,8 +37,7 @@ class BasicHandleInfo {
     BasicHandleInfo(GlobalFederateId federate_id,
                     InterfaceHandle handle_id,
                     InterfaceType type_of_handle) noexcept:
-        handle{federate_id, handle_id},
-        handleType(type_of_handle), type_in(type), type_out(units)
+        handle{federate_id, handle_id}, handleType(type_of_handle), type_in(type), type_out(units)
     {
     }
 
