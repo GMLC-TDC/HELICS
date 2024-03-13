@@ -25,7 +25,7 @@ static TimeProcessingResult processMessage(const ActionMessage& cmd, DependencyI
         case CMD_EXEC_REQUEST:
             dep.mTimeState = checkActionFlag(cmd, iteration_requested_flag) ?
                 (checkActionFlag(cmd, required_flag) ? TimeState::exec_requested_require_iteration :
-                                                     TimeState::exec_requested_iterative) :
+                                                       TimeState::exec_requested_iterative) :
                 TimeState::exec_requested;
             delayed = checkActionFlag(cmd, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
@@ -70,7 +70,7 @@ static TimeProcessingResult processMessage(const ActionMessage& cmd, DependencyI
             }
             dep.mTimeState = checkActionFlag(cmd, iteration_requested_flag) ?
                 (checkActionFlag(cmd, required_flag) ? TimeState::time_requested_require_iteration :
-                                                     TimeState::time_requested_iterative) :
+                                                       TimeState::time_requested_iterative) :
                 TimeState::time_requested;
             //   printf("%d Request from %d time %f, te=%f, Tdemin=%f\n", fedID, m.source_id,
             //   static_cast<double>(m.actionTime), static_cast<double>(m.Te),
@@ -479,24 +479,24 @@ bool TimeDependencies::checkIfAllDependenciesArePastExec(bool iterating) const
 
 static bool iteratingWaitingDependencyCheck(const DependencyInfo& dep)
 {
-                if (!dep.dependency) {
+    if (!dep.dependency) {
         return true;
-                }
-                if (dep.connection == ConnectionType::SELF) {
+    }
+    if (dep.connection == ConnectionType::SELF) {
         return true;
-                }
-                if (dep.mTimeState == TimeState::initialized) {
-                    if (dep.grantedIteration == 0) {
-                        return false;
-                    }
-                }
-                if (dep.mTimeState == TimeState::exec_requested_iterative ||
-                    dep.mTimeState == TimeState::exec_requested_require_iteration) {
-                    if (dep.sequenceCounter < dep.grantedIteration) {
-                        return false;
-                    }
-                }
-            return true;
+    }
+    if (dep.mTimeState == TimeState::initialized) {
+        if (dep.grantedIteration == 0) {
+            return false;
+        }
+    }
+    if (dep.mTimeState == TimeState::exec_requested_iterative ||
+        dep.mTimeState == TimeState::exec_requested_require_iteration) {
+        if (dep.sequenceCounter < dep.grantedIteration) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) const
@@ -523,30 +523,30 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
 }
 
 static bool iteratingTimeGrantCheck(const DependencyInfo& dep,
-                                                Time desiredGrantTime,
+                                    Time desiredGrantTime,
                                     GrantDelayMode delayMode)
 {
-            if (!dep.dependency || dep.next >= cBigTime) {
+    if (!dep.dependency || dep.next >= cBigTime) {
         return true;
-            }
-            if (dep.connection == ConnectionType::SELF) {
+    }
+    if (dep.connection == ConnectionType::SELF) {
         return true;
-            }
-            if (dep.next < desiredGrantTime) {
+    }
+    if (dep.next < desiredGrantTime) {
+        return false;
+    }
+    if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
+        return false;
+    }
+    if (delayMode == GrantDelayMode::WAITING) {
+        if (dep.mTimeState == TimeState::time_requested_iterative ||
+            dep.mTimeState == TimeState::time_requested_require_iteration) {
+            if (dep.sequenceCounter < dep.grantedIteration) {
                 return false;
             }
-            if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
-                return false;
-            }
-            if (delayMode == GrantDelayMode::WAITING) {
-                if (dep.mTimeState == TimeState::time_requested_iterative ||
-                    dep.mTimeState == TimeState::time_requested_require_iteration) {
-                    if (dep.sequenceCounter < dep.grantedIteration) {
-                        return false;
-                    }
-                }
-            }
-        return true;
+        }
+    }
+    return true;
 }
 
 bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
@@ -639,7 +639,7 @@ bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sequenceCou
                        dependencies.end(),
                        [tmin, sequenceCount](const auto& dep) {
                            return checkSequenceCounter(dep, tmin, sequenceCount);
-    });
+                       });
 }
 int TimeDependencies::activeDependencyCount() const
 {
