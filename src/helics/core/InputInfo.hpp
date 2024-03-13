@@ -33,8 +33,7 @@ class InputInfo {
         dataRecord(Time recordTime,
                    unsigned int recordIteration,
                    std::shared_ptr<const SmallBuffer> recordData):
-            time(recordTime),
-            iteration(recordIteration), data(std::move(recordData))
+            time(recordTime), iteration(recordIteration), data(std::move(recordData))
         {
         }
     };
@@ -53,9 +52,7 @@ class InputInfo {
     InputInfo(GlobalHandle handle,
               std::string_view key_,
               std::string_view type_,
-              std::string_view units_):
-        id(handle),
-        key(key_), type(type_), units(units_)
+              std::string_view units_): id(handle), key(key_), type(type_), units(units_)
     {
     }
 

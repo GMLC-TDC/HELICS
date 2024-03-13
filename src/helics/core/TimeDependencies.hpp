@@ -88,8 +88,7 @@ class TimeData {
     explicit TimeData(Time start,
                       TimeState startState = TimeState::initialized,
                       std::uint8_t resLevel = 0U):
-        next{start},
-        Te{start}, minDe{start}, TeAlt{start}, mTimeState{startState},
+        next{start}, Te{start}, minDe{start}, TeAlt{start}, mTimeState{startState},
         restrictionLevel{resLevel} {};
     /** check if there is an update to the current dependency info and assign*/
     bool update(const TimeData& update);

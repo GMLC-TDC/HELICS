@@ -36,8 +36,7 @@ class TranslatorInfo {
                    std::string_view key_,
                    std::string_view endpointType,
                    std::string_view units):
-        id(handle),
-        key(key_), pub(handle, key_, "any", units), ipt(handle, key_, "any", units),
+        id(handle), key(key_), pub(handle, key_, "any", units), ipt(handle, key_, "any", units),
         ept(handle, key_, endpointType)
     {
     }

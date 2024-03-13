@@ -21,8 +21,7 @@ static constexpr char localHostString[] = "localhost";
 
 NetworkCommsInterface::NetworkCommsInterface(gmlc::networking::InterfaceTypes type,
                                              CommsInterface::thread_generation threads) noexcept:
-    CommsInterface(threads),
-    networkType(type)
+    CommsInterface(threads), networkType(type)
 {
 }
 

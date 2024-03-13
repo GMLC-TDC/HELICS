@@ -365,8 +365,7 @@ Connector::Connector(std::string_view appName, const FederateInfo& fedInfo):
 Connector::Connector(std::string_view appName,
                      const std::shared_ptr<Core>& core,
                      const FederateInfo& fedInfo):
-    App(appName, core, fedInfo),
-    core((fed) ? fed->getCorePointer() : nullptr)
+    App(appName, core, fedInfo), core((fed) ? fed->getCorePointer() : nullptr)
 {
     initialSetup();
 }

@@ -62,9 +62,7 @@ Federate::Federate(std::string_view fedname, CoreApp& core, const FederateInfo& 
 
 Federate::Federate(std::string_view fedName,
                    const std::shared_ptr<Core>& core,
-                   const FederateInfo& fedInfo):
-    coreObject(core),
-    mName(fedName)
+                   const FederateInfo& fedInfo): coreObject(core), mName(fedName)
 {
     if (mName.empty()) {
         mName = fedInfo.defName;
