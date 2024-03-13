@@ -29,8 +29,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/format.h>
 #include <iostream>
 #include <string>
-#include <utility>
 #include <thread>
+#include <utility>
 
 namespace helics {
 // a key link that does very little yet, but forces linking to a particular file
