@@ -486,7 +486,7 @@ class FederateState {
         if (order > 10) {
             order = 10;
         }
-        if (queryCallbacks.size() < order) {
+        if (static_cast<int>(queryCallbacks.size()) < order) {
             queryCallbacks.resize(order);
         }
         queryCallbacks[order - 1] = std::move(queryCallbackFunction);
