@@ -444,7 +444,6 @@ void TimeDependencies::resetDependency(GlobalFederateId gid)
 void TimeDependencies::removeInterdependence(GlobalFederateId gid)
 {
     auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
-    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
     if (dep != dependencies.end()) {
         if (dep->fedID == gid) {
             dependencies.erase(dep);
