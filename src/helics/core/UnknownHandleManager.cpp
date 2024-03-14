@@ -47,7 +47,7 @@ void UnknownHandleManager::addReconnectablePublication(std::string_view key,
 {
     reconnectable_publications.emplace(key, std::make_pair(target, flags));
 }
-/** add a missingPublication*/
+/** add a missing publication*/
 void UnknownHandleManager::addReconnectableInput(std::string_view key,
                                                  GlobalHandle target,
                                                  uint16_t flags)

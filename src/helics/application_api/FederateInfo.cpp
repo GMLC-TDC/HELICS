@@ -573,7 +573,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag_callback(
         "--reentrant",
         [this]() { setFlagOption(HELICS_FLAG_REENTRANT, true); },
-        "specify that the federate can be reentrant(meaning can stop and be restarted with the same name");
+        "specify that the federate can be reentrant (meaning it can stop and be restarted with the same name");
     app->add_option(
            "--profiler",
            profilerFileName,
