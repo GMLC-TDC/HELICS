@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/BlockingQueue.hpp"
 #include "helicsTime.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <deque>
@@ -26,7 +27,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 namespace helics {
 class SubscriptionInfo;
@@ -481,7 +481,7 @@ class FederateState {
     void setQueryCallback(std::function<std::string(std::string_view)> queryCallbackFunction,
                           int order)
     {
-        order=std::clamp(order,1,10);
+        order = std::clamp(order, 1, 10);
 
         if (static_cast<int>(queryCallbacks.size()) < order) {
             queryCallbacks.resize(order);

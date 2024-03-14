@@ -848,7 +848,9 @@ class Core {
     @param queryFunction  a function object that returns a string as a result of a query in the form
     of const string ref. This callback will be called when a federate received a query that cannot
     be answered that directed at a particular federate
-    @param order indicator of the execution order slot for query callbacks value is bound [1,10] inclusive given values outside this range are clamped to the boundary values. The callback is overwritten if multiple callbacks at the same index are given.
+    @param order indicator of the execution order slot for query callbacks value is bound [1,10]
+    inclusive given values outside this range are clamped to the boundary values. The callback is
+    overwritten if multiple callbacks at the same index are given.
     */
     virtual void setQueryCallback(LocalFederateId federateID,
                                   std::function<std::string(std::string_view)> queryFunction,
