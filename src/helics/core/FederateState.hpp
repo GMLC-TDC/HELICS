@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 namespace helics {
 class SubscriptionInfo;
@@ -480,12 +481,8 @@ class FederateState {
     void setQueryCallback(std::function<std::string(std::string_view)> queryCallbackFunction,
                           int order)
     {
-        if (order <= 0) {
-            order = 1;
-        }
-        if (order > 10) {
-            order = 10;
-        }
+        order=std::clamp(order,1,10);
+
         if (static_cast<int>(queryCallbacks.size()) < order) {
             queryCallbacks.resize(order);
         }

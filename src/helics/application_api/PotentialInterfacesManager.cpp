@@ -22,7 +22,7 @@ PotentialInterfacesManager::PotentialInterfacesManager(Core* core, Federate* fed
 void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
 {
     static const std::set<std::string> interfaceTypes{
-        "publications", "inputs", "endpoints", "filters", "translators", "datasink"};
+        "publications", "inputs", "endpoints", "filters", "translators", "datasinks"};
     if (!json.isMember("potential_interfaces")) {
         return;
     }
