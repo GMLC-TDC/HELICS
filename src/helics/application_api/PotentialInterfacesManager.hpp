@@ -46,6 +46,8 @@ class PotentialInterfacesManager {
     std::atomic<bool> respondedToCommand{false};
     using iMap = std::unordered_map<std::string, Json::Value>;
     std::map<std::string, iMap> potInterfaces;
+    std::map<std::string, iMap> potInterfaceTemplates;
+    /// @brief  storage for unrelated commands that come through
     std::deque<std::pair<std::string, std::string>> extraCommands;
 };
 }  // namespace helics

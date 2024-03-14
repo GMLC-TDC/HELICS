@@ -28,15 +28,26 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
     }
     auto interfaces = json["potential_interfaces"];
     for (auto& itype : interfaceTypes) {
-        if (!interfaces.isMember(itype)) {
-            continue;
+        if (interfaces.isMember(itype)) {
+            auto tInterface = interfaces[itype];
+            auto& pMap = potInterfaces[itype];
+            for (auto& ispec : tInterface) {
+                auto name = fileops::getName(ispec);
+                pMap[name] = ispec;
+            }
         }
-        auto tInterface = interfaces[itype];
-        auto& pMap = potInterfaces[itype];
-        for (auto& ispec : tInterface) {
-            auto name = fileops::getName(ispec);
-            pMap[name] = ispec;
+        auto tempString=itype;
+        tempString.pop_back();
+        tempString+="_templates";
+        if (interfaces.isMember(tempString)) {
+            auto templateInterfaces = interfaces[tempString];
+            auto& tMap = potInterfaceTemplates[itype];
+            for (auto& tspec :templateInterfaces) {
+                auto name = fileops::getName(tspec);
+                tMap[name] = tspec;
+            }
         }
+        
     }
 }
 
@@ -60,6 +71,15 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
             interfaces[iType.first] = Json::arrayValue;
             for (auto& ispec : iType.second) {
                 interfaces[iType.first].append(ispec.first);
+            }
+        }
+        for (const auto& iType : potInterfaceTemplates) {
+            std::string templateKey=iType.first;
+            templateKey.pop_back();
+            templateKey+="_templates";
+            interfaces[templateKey] = Json::arrayValue;
+            for (auto& ispec : iType.second) {
+                interfaces[templateKey].append(ispec.second);
             }
         }
         return fileops::generateJsonString(interfaces);
