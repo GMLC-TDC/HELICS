@@ -65,6 +65,8 @@ class HandleManager {
     void addHandleAtIndex(const BasicHandleInfo& otherHandle, int32_t index);
     /** remove the information at the specified handle*/
     void removeHandle(GlobalHandle handle);
+    /** remove all handles from a specific federate*/
+    void removeFederateHandles(GlobalFederateId fedToRemove);
     /** get a handle by index*/
     BasicHandleInfo* getHandleInfo(int32_t index);
     /** get a const handle by index*/

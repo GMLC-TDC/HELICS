@@ -147,6 +147,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 95> flagStringsTra
     {"interruptible", HELICS_FLAG_INTERRUPTIBLE},
     {"debugging", HELICS_FLAG_DEBUGGING},
     {"profiling", HELICS_FLAG_PROFILING},
+    {"reentrant", HELICS_FLAG_REENTRANT},
     {"local_profiling_capture", HELICS_FLAG_LOCAL_PROFILING_CAPTURE},
     {"profiling_marker", HELICS_FLAG_PROFILING_MARKER},
     {"only_update_on_change", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
@@ -215,6 +216,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 95> flagStringsTra
     {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferdata", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
+    {"reconnectable", HELICS_HANDLE_OPTION_RECONNECTABLE},
     {"connection_required", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
     {"connectionrequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
     {"connectionRequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
@@ -235,6 +237,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 41> optionStringsT
     {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferdata", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
+    {"reconnectable", HELICS_HANDLE_OPTION_RECONNECTABLE},
     {"connectionoptional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
     {"connection_optional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
     {"connectionOptional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
@@ -567,6 +570,10 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         "--json",
         useJsonSerialization,
         "tell the core and federate to use JSON based serialization for all messages, to ensure compatibility");
+    app->add_flag_callback(
+        "--reentrant",
+        [this]() { setFlagOption(HELICS_FLAG_REENTRANT, true); },
+        "specify that the federate can be reentrant (meaning it can stop and be restarted with the same name");
     app->add_option(
            "--profiler",
            profilerFileName,

@@ -16,15 +16,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <memory>
 
-struct federateStateTests: public ::testing::Test {
-    federateStateTests():
+struct FederateStateTests: public ::testing::Test {
+    FederateStateTests():
         fs(std::make_unique<helics::FederateState>("fed_name", helics::CoreFederateInfo()))
     {
     }
     std::unique_ptr<helics::FederateState> fs;
 };
 
-TEST_F(federateStateTests, constructor)
+TEST_F(FederateStateTests, constructor)
 {
     // Check setting of name, initial state, and info by the constructor
     EXPECT_EQ(fs->getIdentifier(), "fed_name");
@@ -60,7 +60,7 @@ TEST_F(federateStateTests, constructor)
     EXPECT_EQ(fs->getIntegerProperty(helics::defs::Properties::MAX_ITERATIONS), 50);
 }
 
-TEST_F(federateStateTests, create_input)
+TEST_F(FederateStateTests, create_input)
 {
     using namespace helics;
     fs->interfaces().createInput(InterfaceHandle(0), "first!", "type", "units", 0);
@@ -99,7 +99,7 @@ TEST_F(federateStateTests, create_input)
     EXPECT_EQ(info->key, "last");
 }
 
-TEST_F(federateStateTests, create_publication)
+TEST_F(FederateStateTests, create_publication)
 {
     fs->interfaces().createPublication(helics::InterfaceHandle(0), "first!", "type", "units", 0);
     fs->interfaces().createPublication(helics::InterfaceHandle(1), "second", "type", "units", 0);
@@ -138,7 +138,7 @@ TEST_F(federateStateTests, create_publication)
     EXPECT_EQ(info->key, "last");
 }
 
-TEST_F(federateStateTests, create_endpoint)
+TEST_F(FederateStateTests, create_endpoint)
 {
     using namespace helics;
     fs->interfaces().createEndpoint(InterfaceHandle(0), "first!", "type", 0);
@@ -177,7 +177,7 @@ TEST_F(federateStateTests, create_endpoint)
     EXPECT_EQ(info->key, "last");
 }
 
-TEST_F(federateStateTests, basic_processmessage)
+TEST_F(FederateStateTests, basic_processmessage)
 {
     using namespace helics;
     ActionMessage cmd;
@@ -211,7 +211,7 @@ TEST_F(federateStateTests, basic_processmessage)
     EXPECT_EQ(fs->getState(), FederateStates::FINISHED);
 
     // Return to created state
-    fs->reset();
+    fs->reset(CoreFederateInfo());
 
     // Test CMD_FED_ACK message when no error
     cmd.setAction(helics::CMD_FED_ACK);
@@ -237,15 +237,15 @@ TEST_F(federateStateTests, basic_processmessage)
     EXPECT_EQ(fs->getState(), FederateStates::ERRORED);
 
     // Return to initializing state
-    fs->reInit();
+    fs->reset(CoreFederateInfo());
 
     // Test returning when an error occurs
     cmd.setAction(helics::CMD_ERROR);
     fs_process2 = std::async(std::launch::async, [&]() {
         return fs->enterExecutingMode(IterationRequest::NO_ITERATIONS);
     });
-    auto st = fs->getState();
-    EXPECT_TRUE((st == FederateStates::INITIALIZING) || (st == FederateStates::EXECUTING));
+    auto currentState = fs->getState();
+    EXPECT_EQ(currentState, FederateStates::CREATED);
     fs->addAction(cmd);
     auto res = fs_process2.get();
     if (res.state != IterationResult::ERROR_RESULT) {
@@ -256,7 +256,7 @@ TEST_F(federateStateTests, basic_processmessage)
     EXPECT_TRUE(res.state == IterationResult::ERROR_RESULT);
     EXPECT_EQ(fs->getState(), FederateStates::ERRORED);
 
-    fs->reset();
+    fs->reset(CoreFederateInfo());
 
     // Test CMD_EXEC_REQUEST/CMD_EXEC_GRANT returns 0 if dependencies/dependents aren't done;
     // returns 1 if fs->iterating is true, 2 otherwise; if 1 ret false, if 2 ret true
@@ -276,12 +276,12 @@ TEST_F(federateStateTests, basic_processmessage)
     */
 }
 
-TEST_F(federateStateTests, pubsub)
+TEST_F(FederateStateTests, pubsub)
 {
     // auto fs_process = std::async(std::launch::async, [&]() { return fs->processQueue(); });
 }
 
-TEST_F(federateStateTests, message)
+TEST_F(FederateStateTests, message)
 {
     // auto fs_process = std::async(std::launch::async, [&]() { return fs->processQueue(); });
 }

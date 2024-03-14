@@ -128,6 +128,8 @@ class InputInfo {
     void removeSource(GlobalHandle sourceToRemove, Time minTime);
     /** remove a source */
     void removeSource(std::string_view sourceName, Time minTime);
+    /** disconnect a Federate*/
+    void disconnectFederate(GlobalFederateId fedToDisconnect, Time minTime);
     /** clear all non-current data*/
     void clearFutureData();
 

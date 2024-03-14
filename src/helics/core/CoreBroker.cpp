@@ -494,38 +494,59 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         return;
     }
     auto fedName = command.name();
-    // this checks for duplicate federate names
-    if (mFederates.find(fedName) != mFederates.end()) {
-        sendFedErrorAck(command, duplicate_federate_name_error_code);
-        return;
+    bool newFed{true};
+    if (dynamicFed && checkActionFlag(command, reentrant_flag)) {
+        auto fedLoc = mFederates.find(fedName);
+        if (fedLoc != mFederates.end()) {
+            if (fedLoc->reentrant) {
+                fedLoc->route = getRoute(command.source_id);
+                fedLoc->parent = command.source_id;
+                fedLoc->state = ConnectionState::CONNECTED;
+                newFed = false;
+            } else {
+                sendFedErrorAck(command, duplicate_federate_name_error_code);
+                return;
+            }
+        }
     }
-    mFederates.insert(fedName, no_search, fedName);
-    mFederates.back().route = getRoute(command.source_id);
-    mFederates.back().parent = command.source_id;
-    if (checkActionFlag(command, non_counting_flag)) {
-        mFederates.back().nonCounting = true;
-    }
-    if (checkActionFlag(command, observer_flag)) {
-        mFederates.back().observer = true;
-    }
-    mFederates.back().dynamic = dynamicFed;
-    auto lookupIndex = mFederates.size() - 1;
-    if (checkActionFlag(command, child_flag)) {
-        mFederates.back().global_id = GlobalFederateId(command.getExtraData());
-        if (!mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex)) {
-            sendFedErrorAck(command, duplicate_federate_id);
+
+    if (newFed) {
+        // this checks for duplicate federate names
+        if (mFederates.find(fedName) != mFederates.end()) {
+            sendFedErrorAck(command, duplicate_federate_name_error_code);
             return;
         }
-    } else if (isRootc) {
-        if (command.counter > 0 && command.counter <= 16) {
-            mFederates.back().global_id = GlobalFederateId(
-                static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift +
-                command.counter * gGlobalPriorityBlockSize);
-        } else {
-            mFederates.back().global_id = GlobalFederateId(
-                static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift);
+        mFederates.insert(fedName, no_search, fedName);
+        mFederates.back().route = getRoute(command.source_id);
+        mFederates.back().parent = command.source_id;
+        if (checkActionFlag(command, non_counting_flag)) {
+            mFederates.back().nonCounting = true;
         }
-        mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex);
+        if (checkActionFlag(command, observer_flag)) {
+            mFederates.back().observer = true;
+        }
+        if (checkActionFlag(command, reentrant_flag)) {
+            mFederates.back().reentrant = true;
+        }
+        mFederates.back().dynamic = dynamicFed;
+        auto lookupIndex = mFederates.size() - 1;
+        if (checkActionFlag(command, child_flag)) {
+            mFederates.back().global_id = GlobalFederateId(command.getExtraData());
+            if (!mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex)) {
+                sendFedErrorAck(command, duplicate_federate_id);
+                return;
+            }
+        } else if (isRootc) {
+            if (command.counter > 0 && command.counter <= 16) {
+                mFederates.back().global_id = GlobalFederateId(
+                    static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift +
+                    command.counter * gGlobalPriorityBlockSize);
+            } else {
+                mFederates.back().global_id = GlobalFederateId(
+                    static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift);
+            }
+            mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex);
+        }
     }
 
     if (!isRootc) {
@@ -537,10 +558,14 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             delayTransmitQueue.push(command);
         }
     } else {
-        auto route_id = mFederates.back().route;
-        auto global_fedid = mFederates.back().global_id;
+        auto route_id = (newFed) ? mFederates.back().route : mFederates.find(fedName)->route;
+        auto global_fedid =
+            (newFed) ? mFederates.back().global_id : mFederates.find(fedName)->global_id;
+        auto res = routing_table.emplace(global_fedid, route_id);
+        if (!res.second && !newFed) {
+            res.first->second = route_id;
+        }
 
-        routing_table.emplace(global_fedid, route_id);
         // don't bother with the federate_table
         // transmit the response
         ActionMessage fedReply(CMD_FED_ACK);
@@ -1190,6 +1215,11 @@ void CoreBroker::processCommand(ActionMessage&& command)
             auto fed = mFederates.find(command.source_id);
             if (fed != mFederates.end()) {
                 fed->state = ConnectionState::DISCONNECTED;
+                if (fed->reentrant) {
+                    // for reentrant federates the interface can be recreated later so needs to be
+                    // removed
+                    handles.removeFederateHandles(command.source_id);
+                }
             }
             if (!isRootc) {
                 transmit(parent_route_id, command);
@@ -1474,7 +1504,9 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             if (brk == nullptr) {
                 break;
             }
-            brk->state = ConnectionState::INIT_REQUESTED;
+            if (brk->state == ConnectionState::CONNECTED) {
+                brk->state = ConnectionState::INIT_REQUESTED;
+            }
 
             if ((dynamicFederation || brk->_observer) &&
                 getBrokerState() >= BrokerState::OPERATING) {
@@ -1634,6 +1666,36 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
 void CoreBroker::checkForNamedInterface(ActionMessage& command)
 {
     bool foundInterface = false;
+    if (checkActionFlag(command, reconnectable_flag)) {
+        if (isRootc) {
+            switch (command.action()) {
+                case CMD_ADD_NAMED_PUBLICATION:
+                    unknownHandles.addReconnectablePublication(command.name(),
+                                                               command.getSource(),
+                                                               command.flags);
+                    break;
+                case CMD_ADD_NAMED_INPUT:
+                    unknownHandles.addReconnectableInput(command.name(),
+                                                         command.getSource(),
+                                                         command.flags);
+
+                    break;
+                case CMD_ADD_NAMED_ENDPOINT:
+                    unknownHandles.addReconnectableEndpoint(command.name(),
+                                                            command.getSource(),
+                                                            command.flags);
+
+                    break;
+                case CMD_ADD_NAMED_FILTER:
+                    unknownHandles.addReconnectableFilter(command.name(),
+                                                          command.getSource(),
+                                                          command.flags);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
     switch (command.action()) {
         case CMD_ADD_NAMED_PUBLICATION: {
             auto* pub = handles.getInterfaceHandle(command.name(), InterfaceType::PUBLICATION);
@@ -1754,6 +1816,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
         default:
             break;
     }
+
     if (!foundInterface) {
         if (isRootc) {
             switch (command.action()) {
@@ -1954,7 +2017,7 @@ bool CoreBroker::checkInterfaceCreation(ActionMessage& message, InterfaceType ty
                 propagateError(std::move(eret));
                 return false;
             }
-            if (!(fed->observer && (!fed->dynamic || fed->state != ConnectionState::CONNECTED))) {
+            if (fed->observer || !fed->dynamic || fed->state != ConnectionState::CONNECTED) {
                 ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, message.source_id);
                 eret.dest_handle = message.source_handle;
                 eret.messageID = defs::Errors::REGISTRATION_FAILURE;
@@ -2870,6 +2933,29 @@ void CoreBroker::findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const st
     if (!Handles.empty()) {
         unknownHandles.clearInput(key);
     }
+    if (getBrokerState() == BrokerState::OPERATING) {
+        Handles = unknownHandles.checkForReconnectionInputs(key);
+        for (auto& target : Handles) {
+            auto* pub = handles.findHandle(target.first);
+            if (pub == nullptr) {
+                connectInterfaces(handleInfo,
+                                  handleInfo.flags,
+                                  BasicHandleInfo(target.first.fed_id,
+                                                  target.first.handle,
+                                                  InterfaceType::PUBLICATION),
+
+                                  target.second,
+                                  std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
+            } else {
+                connectInterfaces(handleInfo,
+                                  handleInfo.flags,
+                                  *pub,
+
+                                  target.second,
+                                  std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
+            }
+        }
+    }
 }
 
 void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
@@ -2894,6 +2980,19 @@ void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
     }
     if (!(subHandles.empty() && Pubtargets.empty())) {
         unknownHandles.clearPublication(key);
+    }
+    if (getBrokerState() == BrokerState::OPERATING) {
+        subHandles = unknownHandles.checkForReconnectionPublications(key);
+        for (const auto& sub : subHandles) {
+            connectInterfaces(handleInfo,
+                              sub.second,
+                              BasicHandleInfo(sub.first.fed_id,
+                                              sub.first.handle,
+                                              InterfaceType::INPUT),
+
+                              handleInfo.flags,
+                              std::make_pair(CMD_ADD_PUBLISHER, CMD_ADD_SUBSCRIBER));
+        }
     }
 }
 
@@ -2930,6 +3029,27 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
 
     if (!(uHandles.empty() && eptTargets.empty())) {
         unknownHandles.clearEndpoint(key);
+    }
+
+    if (getBrokerState() == BrokerState::OPERATING) {
+        uHandles = unknownHandles.checkForReconnectionEndpoints(key);
+        for (const auto& target : uHandles) {
+            const auto* iface = handles.findHandle(target.first);
+            auto destFlags = target.second;
+            if (iface->handleType != InterfaceType::FILTER) {
+                destFlags = toggle_flag(destFlags, destination_target);
+            }
+
+            connectInterfaces(handleInfo,
+                              target.second,
+                              *iface,
+
+                              destFlags,
+                              std::make_pair(CMD_ADD_ENDPOINT,
+                                             (iface->handleType != InterfaceType::FILTER) ?
+                                                 CMD_ADD_ENDPOINT :
+                                                 CMD_ADD_FILTER));
+        }
     }
 }
 
@@ -2977,6 +3097,23 @@ void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const s
     }
     if (!(Handles.empty() && FiltDestTargets.empty() && FiltSourceTargets.empty())) {
         unknownHandles.clearFilter(key);
+    }
+    if (getBrokerState() == BrokerState::OPERATING) {
+        Handles = unknownHandles.checkForFilters(key);
+        for (const auto& target : Handles) {
+            auto flags = target.second;
+            if (checkActionFlag(handleInfo, clone_flag)) {
+                flags |= make_flags(clone_flag);
+            }
+            connectInterfaces(handleInfo,
+                              flags,
+                              BasicHandleInfo(target.first.fed_id,
+                                              target.first.handle,
+                                              InterfaceType::ENDPOINT),
+
+                              flags,
+                              std::make_pair(CMD_ADD_FILTER, CMD_ADD_ENDPOINT));
+        }
     }
 }
 
@@ -3223,6 +3360,9 @@ void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
         if (fed.parent == brkid) {
             if (fed.state != ConnectionState::ERROR_STATE) {
                 fed.state = ConnectionState::DISCONNECTED;
+                if (fed.reentrant) {
+                    handles.removeFederateHandles(fed.global_id);
+                }
             }
         }
     }

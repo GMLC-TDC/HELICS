@@ -39,8 +39,8 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck,
 
 bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber, std::string_view subscriberName)
 {
-    for (const auto& sub : subscribers) {
-        if (sub.first == newSubscriber) {
+    for (auto& sub : subscribers) {
+        if (sub.id == newSubscriber) {
             return false;
         }
     }
@@ -48,12 +48,22 @@ bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber, std::string_view
     return true;
 }
 
+void PublicationInfo::disconnectFederate(GlobalFederateId fedToDisconnect)
+{
+    subscribers.erase(std::remove_if(subscribers.begin(),
+                                     subscribers.end(),
+                                     [fedToDisconnect](const auto& val) {
+                                         return val.id.fed_id == fedToDisconnect;
+                                     }),
+                      subscribers.end());
+}
+
 void PublicationInfo::removeSubscriber(GlobalHandle subscriberToRemove)
 {
     subscribers.erase(std::remove_if(subscribers.begin(),
                                      subscribers.end(),
                                      [subscriberToRemove](const auto& val) {
-                                         return val.first == subscriberToRemove;
+                                         return val.id == subscriberToRemove;
                                      }),
                       subscribers.end());
 }
@@ -128,11 +138,11 @@ const std::string& PublicationInfo::getTargets() const
     if (destTargets.empty()) {
         if (!subscribers.empty()) {
             if (subscribers.size() == 1) {
-                destTargets = subscribers.front().second;
+                destTargets = subscribers.front().key;
             } else {
                 destTargets.push_back('[');
                 for (const auto& sub : subscribers) {
-                    destTargets.append(generateJsonQuotedString(sub.second));
+                    destTargets.append(generateJsonQuotedString(sub.key));
                     destTargets.push_back(',');
                 }
                 destTargets.back() = ']';

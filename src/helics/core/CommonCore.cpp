@@ -363,9 +363,11 @@ bool CommonCore::isConfigured() const
 bool CommonCore::isOpenToNewFederates() const
 {
     auto cBrokerState = getBrokerState();
-    return ((cBrokerState != BrokerState::CREATED) && (cBrokerState < BrokerState::OPERATING) &&
-            (maxFederateCount == std::numeric_limits<int32_t>::max() ||
-             (federates.lock_shared()->size() < static_cast<size_t>(maxFederateCount))));
+    return (
+        (cBrokerState != BrokerState::CREATED) &&
+        (cBrokerState < (dynamicFederation ? BrokerState::TERMINATING : BrokerState::OPERATING)) &&
+        (maxFederateCount == std::numeric_limits<int32_t>::max() ||
+         (federates.lock_shared()->size() < static_cast<size_t>(maxFederateCount))));
 }
 
 bool CommonCore::hasError() const
@@ -726,6 +728,7 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     }
     FederateState* fed = nullptr;
     bool checkProperties{false};
+    bool newFed{true};
     LocalFederateId local_id;
     {
         auto feds = federates.lock();
@@ -738,35 +741,53 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
             local_id = LocalFederateId(static_cast<int32_t>(*fedid));
             fed = (*feds)[*fedid];
         } else {
-            throw(RegistrationFailure(
-                fmt::format("duplicate names {} detected: multiple federates with the same name",
-                            name)));
+            if (dynamicFederation) {
+                fed = feds->find(std::string(name));
+                local_id = fed->local_id;
+                if (!fed->getOptionFlag(HELICS_FLAG_REENTRANT) ||
+                    fed->getState() != FederateStates::FINISHED) {
+                    throw(RegistrationFailure(fmt::format(
+                        "duplicate names {} detected: multiple federates with the same name",
+                        name)));
+                }
+                newFed = false;
+            } else {
+                throw(RegistrationFailure(fmt::format(
+                    "duplicate names {} detected: multiple federates with the same name", name)));
+            }
         }
 
-        if (feds->size() == 1) {
+        if (feds->size() == 1 && newFed) {
             checkProperties = true;
         }
     }
     if (fed == nullptr) {
         throw(RegistrationFailure("unknown allocation error occurred"));
     }
-    // setting up the Logger
-    // auto ptr = fed.get();
-    // if we are using the Logger, log all messages coming from the federates so they can control
-    // the level*/
-    fed->setLogger([this](int level, std::string_view ident, std::string_view message) {
-        sendToLogger(parent_broker_id, LogLevels::FED + level, ident, message);
-    });
+    if (newFed) {
+        // setting up the Logger
+        // auto ptr = fed.get();
+        // if we are using the Logger, log all messages coming from the federates so they can
+        // control the level*/
+        fed->setLogger([this](int level, std::string_view ident, std::string_view message) {
+            sendToLogger(parent_broker_id, LogLevels::FED + level, ident, message);
+        });
 
-    fed->local_id = local_id;
-    fed->setParent(this);
-    if (enable_profiling) {
-        fed->setOptionFlag(defs::PROFILING, true);
+        fed->local_id = local_id;
+        fed->setParent(this);
+        if (enable_profiling) {
+            fed->setOptionFlag(defs::PROFILING, true);
+        }
+    } else {
+        fed->reset(info);
     }
     ActionMessage reg(CMD_REG_FED);
     reg.name(name);
     if (observer || fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
         setActionFlag(reg, observer_flag);
+    }
+    if (fed->getOptionFlag(HELICS_FLAG_REENTRANT)) {
+        setActionFlag(reg, reentrant_flag);
     }
     if (fed->indexGroup > 0) {
         reg.counter = static_cast<int16_t>(fed->indexGroup);
@@ -3159,9 +3180,15 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 routeMessage(pngrep);
             }
             break;
-        case CMD_REG_FED:
+        case CMD_REG_FED: {
             // this one in the core needs to be the thread-safe version of getFederate
-            loopFederates.insert(command.name(), no_search, getFederate(command.name()));
+            auto insertRes =
+                loopFederates.insert(command.name(), no_search, getFederate(command.name()));
+            if (!insertRes && checkActionFlag(command, reentrant_flag)) {
+                auto lfed = loopFederates.find(command.name());
+                lfed->state = OperatingState::OPERATING;
+            }
+
             if (global_broker_id_local != parent_broker_id) {
                 // forward on to Broker
                 command.source_id = global_broker_id_local;
@@ -3170,7 +3197,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 // this will get processed when this core is assigned a global hid
                 delayTransmitQueue.push(std::move(command));
             }
-            break;
+
+        } break;
         case CMD_BROKER_LOCATION: {
             command.setAction(CMD_PROTOCOL);
             command.messageID = NEW_BROKER_INFORMATION;
@@ -4610,7 +4638,7 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                     }
                     cmd.source_id = global_broker_id_local;
                     transmit(parent_route_id, cmd);
-                } else if (checkActionFlag(cmd, observer)) {
+                } else if (checkActionFlag(cmd, observer) || dynamicFederation) {
                     cmd.source_id = global_broker_id_local;
                     transmit(parent_route_id, cmd);
                 }
@@ -4659,7 +4687,11 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                     }
                 } else if (checkActionFlag(cmd, observer_flag) ||
                            checkActionFlag(cmd, dynamic_join_flag)) {
-                    routeMessage(cmd);
+                    loopFederates.apply([&cmd](auto& fed) {
+                        if (fed->getState() == FederateStates::CREATED) {
+                            fed->addAction(cmd);
+                        }
+                    });
                 }
             }
 

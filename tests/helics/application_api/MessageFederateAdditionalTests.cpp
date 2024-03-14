@@ -1119,3 +1119,101 @@ TEST_F(mfed_tests, targeted_endpoint_send_all)
     mFed2->finalize();
     mFed1->finalize();
 }
+
+TEST_F(mfed_tests, reentrant_fed_endpoint)
+{
+    extraBrokerArgs = "--dynamic";
+    extraFederateArgs = " --reentrant";
+    SetupTest<helics::MessageFederate>("test_2", 2, 1.0);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& ept1 = mFed1->registerGlobalTargetedEndpoint("ept1");
+
+    auto& ept2 = mFed2->registerGlobalTargetedEndpoint("ept2");
+    ept1.setOption(HELICS_HANDLE_OPTION_RECONNECTABLE);
+
+    ept1.addDestinationEndpoint("ept2");
+    ept1.addSourceEndpoint("ept2");
+
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+
+    mFed1->requestTimeAsync(helics::timeZero);
+    mFed2->requestNextStep();
+    auto tres = mFed1->requestTimeComplete();
+    EXPECT_EQ(tres, 1.0);
+
+    ept1.send("test_from1");
+    ept2.send("test_from2");
+    mFed1->requestTimeAsync(helics::timeZero);
+    mFed2->requestNextStep();
+    tres = mFed1->requestTimeComplete();
+    EXPECT_EQ(tres, 2.0);
+    // check the messages
+    EXPECT_TRUE(ept1.hasMessage());
+    EXPECT_TRUE(ept2.hasMessage());
+    auto m = ept1.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test_from2");
+    }
+
+    m = ept2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test_from1");
+    }
+    // close and reconnect federate
+    auto mFed2Name = mFed2->getName();
+    mFed2->disconnect();
+    tres = mFed1->requestTime(helics::timeZero);
+    EXPECT_LE(tres, 3.0);
+
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.loadInfoFromArgs(std::string("--reentrant --force_new_core --dynamic --broker=") +
+                             brokers[0]->getIdentifier() + " --period=1.0s");
+
+    helics::MessageFederate mFed2Redo(mFed2Name, fedInfo);
+    EXPECT_EQ(mFed2Redo.getTimeProperty(HELICS_PROPERTY_TIME_PERIOD), 1.0);
+    auto& ept2redo = mFed2Redo.registerGlobalTargetedEndpoint("ept2");
+
+    mFed2Redo.enterExecutingMode();
+    tres = mFed2Redo.getCurrentTime();
+    EXPECT_LE(tres, 3.0);
+    ept2redo.send("test_from2_part2");
+
+    mFed2Redo.requestTimeAsync(helics::timeZero);
+    mFed1->requestTimeAsync(helics::timeZero);
+
+    tres = mFed2Redo.requestTimeComplete();
+
+    EXPECT_EQ(tres, 3.0);
+
+    mFed2Redo.requestTimeAsync(helics::timeZero);
+    tres = mFed1->requestTimeComplete();
+
+    ept1.send("test_from1_part2");
+
+    EXPECT_EQ(tres, 4.0);
+    // check the new messages
+    EXPECT_TRUE(ept1.hasMessage());
+
+    m = ept1.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test_from2_part2");
+    }
+
+    mFed1->disconnect();
+
+    tres = mFed2Redo.requestTimeComplete();
+    EXPECT_EQ(tres, 4.0);
+
+    tres = mFed2Redo.requestNextStep();
+    EXPECT_EQ(tres, 5.0);
+    EXPECT_TRUE(ept2redo.hasMessage());
+    m = ept2redo.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test_from1_part2");
+    }
+    mFed2Redo.disconnect();
+}

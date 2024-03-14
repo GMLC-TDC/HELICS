@@ -51,8 +51,7 @@ enum class ConnectionState : std::uint8_t {
 enum class QueryReuse : std::uint8_t;
 
 /** class defining the common information for a federate*/
-class BasicFedInfo {
-  public:
+struct BasicFedInfo {
     const std::string name;  //!< name of the federate
     GlobalFederateId global_id;  //!< the identification code for the federate
     route_id route;  //!< the routing information for data to be sent to the federate
@@ -61,6 +60,7 @@ class BasicFedInfo {
     bool nonCounting{false};  //!< indicator the federate shouldn't count toward limits or total
     bool observer{false};  //!, indicator that the federate is an observer only
     bool dynamic{false};  //!< indicator that the federate joined dynamically
+    bool reentrant{false};  //!< indicator that the federate can be reentrant
     explicit BasicFedInfo(std::string_view fedname): name(fedname) {}
 };
 
