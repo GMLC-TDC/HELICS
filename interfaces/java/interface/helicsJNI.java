@@ -54,6 +54,7 @@ public class helicsJNI {
   public final static native int HELICS_FLAG_SINGLE_THREAD_FEDERATE_get();
   public final static native int HELICS_FLAG_MULTI_THREAD_CORE_get();
   public final static native int HELICS_FLAG_SINGLE_THREAD_CORE_get();
+  public final static native int HELICS_FLAG_REENTRANT_get();
   public final static native int HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS_get();
   public final static native int HELICS_FLAG_STRICT_CONFIG_CHECKING_get();
   public final static native int HELICS_FLAG_USE_JSON_SERIALIZATION_get();
@@ -136,6 +137,7 @@ public class helicsJNI {
   public final static native int HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY_get();
   public final static native int HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED_get();
   public final static native int HELICS_HANDLE_OPTION_BUFFER_DATA_get();
+  public final static native int HELICS_HANDLE_OPTION_RECONNECTABLE_get();
   public final static native int HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING_get();
   public final static native int HELICS_HANDLE_OPTION_RECEIVE_ONLY_get();
   public final static native int HELICS_HANDLE_OPTION_SOURCE_ONLY_get();
