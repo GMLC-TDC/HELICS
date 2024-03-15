@@ -215,7 +215,7 @@ void EndpointInfo::removeTarget(GlobalHandle targetId)
         auto removeIterator =
             std::remove_if(targetInformation.begin(),
                            targetInformation.end(),
-                           [targetId](const auto& tinfo) { return tinfo.id == targetId; });
+                           [targetId](const auto& targetInfo) { return targetInfo.id == targetId; });
         if (removeIterator != targetInformation.end()) {
             targetInformation.erase(removeIterator, targetInformation.end());
             targets.clear();
@@ -239,8 +239,8 @@ void EndpointInfo::disconnectFederate(GlobalFederateId fedToDisconnect)
         auto tinfo = targetInformation.begin();
         auto removeIterator = std::remove_if(targetInformation.begin(),
                                              targetInformation.end(),
-                                             [fedToDisconnect](const auto& tinfo) {
-                                                 return tinfo.id.fed_id == fedToDisconnect;
+                                             [fedToDisconnect](const auto& targetInfo) {
+                                                 return targetInfo.id.fed_id == fedToDisconnect;
                                              });
         if (removeIterator != targetInformation.end()) {
             targetInformation.erase(removeIterator, targetInformation.end());
