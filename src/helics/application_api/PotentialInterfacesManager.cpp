@@ -117,6 +117,42 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                     }
                 }
             }
+            for (auto& iType : potInterfaceTemplates) {
+                std::string templateKey{"templated_"};
+                templateKey.append(iType.first);
+                if (json.isMember(templateKey)) {
+                    if (iType.first == "endpoints") {
+                        generator["targeted"] = true;
+                    }
+                    for (auto& templateInterfaces : json[templateKey])
+                    {
+                        auto templateName=fileops::getName(templateInterfaces);
+
+                        auto templateLoc=iType.second.find(templateName);
+                        if (templateLoc == iType.second.end())
+                        {
+                            continue;
+                        }
+                        auto& templateGenerator=templateLoc->second;
+                        for (auto& interfaceName :templateInterfaces[iType.first])
+                        {
+                            Json::Value interfaceSpec=Json::nullValue;
+                            interfaceSpec.copy(templateGenerator["template"]);
+                            if (interfaceName.isArray())
+                            {
+                                interfaceSpec["name"] = interfaceName[0];
+                                interfaceSpec["type"]=interfaceName[1];
+                            }
+                            else
+                            {
+                                interfaceSpec["name"] = interfaceName.asString();
+                            }
+                            generator[iType.first].append(interfaceSpec);
+                        }
+
+                    }
+                }
+            }
             std::string generatorList = fileops::generateJsonString(generator);
             fedPtr->registerInterfaces(generatorList);
             respondedToCommand.store(true);

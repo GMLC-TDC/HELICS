@@ -35,6 +35,18 @@ struct PotentialConnections {
     bool used{false};
 };
 
+class TemplateMatcher
+{
+public:
+    std::string templateName;
+    std::string_view federate;
+    std::vector<std::unordered_map<std::string,std::string>> templatePossibilities;
+    std::optional<std::pair<std::string_view,std::string_view>> isTemplateMatch(std::string_view testString) const;
+    void setAsUsed(std::pair<std::string_view,std::string_view> match);
+    std::vector<std::pair<std::string,std::string>> usedTemplates;
+    std::vector<std::string> intermediaries;
+
+};
 /** data class for information from queries*/
 struct ConnectionsList {
     std::unordered_multimap<std::string_view, std::string_view> aliases;
@@ -56,6 +68,9 @@ struct ConnectionsList {
     std::vector<std::string> unknownEndpoints;
     std::vector<std::string> tagStrings;
     std::vector<std::size_t> tagCodes;
+    std::vector<TemplateMatcher> potentialPublicationTemplates;
+    std::vector<TemplateMatcher> potentialInputTemplates;
+    std::vector<TemplateMatcher> potentialEndpointTemplates;
     bool hasPotentialInterfaces{false};
 };
 
@@ -74,6 +89,119 @@ static void loadTags(ConnectionsList& connections, const Json::Value& tags)
         }
     }
 }
+static void loadTemplate(const Json::Value& iTemplate,std::string_view federateName, std::vector<TemplateMatcher> &templates)
+{
+    TemplateMatcher temp;
+    temp.federate=federateName;
+    temp.templateName=fileops::getName(iTemplate);
+
+    auto tnameIndex=temp.templateName.find_first_of("$<");
+    if (tnameIndex == 0)
+    {
+        temp.intermediaries.push_back("");
+    }
+    else
+    {
+        temp.intermediaries.push_back(temp.templateName.substr(0,tnameIndex));
+    }
+    int index{0};
+    while (tnameIndex != std::string::npos)
+    {
+        auto close=temp.templateName.find_first_of('>',tnameIndex);
+        std::string tname=temp.templateName.substr(tnameIndex+2,close-tnameIndex-2);
+        if (!iTemplate.isMember(tname))
+        {
+            return;
+        }
+        temp.templatePossibilities.emplace_back();
+        for (auto& val : iTemplate[tname])
+        {
+            if (val.isArray())
+            {
+                temp.templatePossibilities[index].emplace(val[0].asString(), val[1].asString());
+            }
+            else
+            {
+                temp.templatePossibilities[index].emplace(val.asString(),"");
+            }
+        }
+        tnameIndex=temp.templateName.find_first_of("$<",close+1);
+        if (tnameIndex == close + 1)
+        {
+            return;
+        }
+        if (tnameIndex == std::string::npos)
+        {
+            temp.intermediaries.push_back(temp.templateName.substr(close+1));
+        }
+        else
+        {
+            temp.intermediaries.push_back(temp.templateName.substr(close+1,tnameIndex-close-1));
+        }
+        
+        ++index;
+    }
+    templates.push_back(std::move(temp));
+
+}
+
+std::optional<std::pair<std::string_view,std::string_view>>  TemplateMatcher::isTemplateMatch(std::string_view testString) const
+{
+    std::vector<std::size_t> intermediateIndices;
+    intermediateIndices.reserve(intermediaries.size());
+    std::size_t index{0};
+    for (auto& intermedial : intermediaries)
+    {
+        if (intermedial.empty())
+        {
+            if (intermediateIndices.empty())
+            {
+                intermediateIndices.push_back(index);
+            }
+            else
+            {
+                intermediateIndices.push_back(std::string::npos);
+            }
+            
+        }
+        else
+        {
+            index=testString.find_first_of(intermedial,index);
+            if (index == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+            intermediateIndices.push_back(index);
+            index+=intermedial.size();
+        }
+    }
+    index=0;
+    std::string_view iType;
+    while (index < intermediateIndices.size()-1)
+    {
+        auto index1=intermediateIndices[index]+intermediaries[index].size();
+        auto length=intermediateIndices[index+1]-index1;
+        auto tString=testString.substr(index1,length);
+        auto loc=templatePossibilities[index].find(std::string(tString));
+        if (loc == templatePossibilities[index].end())
+        {
+            return std::nullopt;
+        }
+        if (!loc->second.empty())
+        {
+            iType=loc->second;
+        }
+        ++index;
+    }
+    return {std::make_pair(testString,iType)};
+
+}
+
+void TemplateMatcher::setAsUsed(std::pair<std::string_view,std::string_view> match)
+{
+    usedTemplates.emplace_back(match.first,match.second);
+}
+
 static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
 {
     if (core.isMember("tags")) {
@@ -204,6 +332,30 @@ static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
                             }
                         }
                     }
+                    if (potInterfaces.isMember("publication_templates"))
+                    {
+                        for (const auto& pubTemplate : potInterfaces["publication_templates"]) {
+                            if (pubTemplate.isObject()) {
+                                loadTemplate(pubTemplate,federateName,connections.potentialPublicationTemplates);
+                            }
+                        }
+                    }
+                    if (potInterfaces.isMember("input_templates"))
+                    {
+                        for (const auto& inpTemplate : potInterfaces["input_templates"]) {
+                            if (inpTemplate.isObject()) {
+                                loadTemplate(inpTemplate,federateName,connections.potentialInputTemplates);
+                            }
+                        }
+                    }
+                    if (potInterfaces.isMember("endpoint_templates"))
+                    {
+                        for (const auto& endTemplate : potInterfaces["endpoint_templates"]) {
+                            if (endTemplate.isObject()) {
+                                loadTemplate(endTemplate,federateName,connections.potentialEndpointTemplates);
+                            }
+                        }
+                    }
                 }
             }
             catch (const Json::Exception& /*ev*/) {
@@ -270,6 +422,8 @@ static ConnectionsList generateConnectionsList(const std::string& connectionData
                    std::hash<std::string>());
     return connections;
 }
+
+
 
 Connector::Connector(std::vector<std::string> args):
     App("connector", std::move(args)), core((fed) ? fed->getCorePointer() : nullptr)
