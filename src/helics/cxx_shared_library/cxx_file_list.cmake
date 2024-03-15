@@ -41,6 +41,7 @@ set(helics_shared_private_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/FilterOperations.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/TranslatorOperations.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/ConnectorFederateManager.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/application_api/PotentialInterfacesManager.hpp
 )
 
 set(conv_headers
@@ -77,6 +78,7 @@ set(helics_apps_public_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/Source.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/Tracer.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/helicsApp.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/apps/Connector.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/Clone.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/CoreApp.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/BrokerApp.hpp

@@ -45,6 +45,7 @@ class CheckFed {
             auto cmd = vFed->getCommand();
             hasCommand = !cmd.first.empty();
             if (hasCommand) {
+                receivedCommand = true;
                 auto json = helics::fileops::loadJsonStr(cmd.first);
                 if (json.isMember("command")) {
                     if (json["command"] == "register_interfaces") {
@@ -83,6 +84,10 @@ class CheckFed {
                         }
                     }
                 }
+            }
+            if (!receivedCommand) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                hasCommand = true;
             }
         }
         values.resize(vFed->getInputCount());
@@ -248,7 +253,7 @@ class CheckFed {
     std::vector<std::vector<double>> values;
     std::vector<std::vector<std::string>> messages;
     std::vector<std::string> messageNames;
-    bool receivedCommand = true;
+    bool receivedCommand{false};
 };
 
 TEST(connector_2stage, simple_connector)
@@ -272,6 +277,7 @@ TEST(connector_2stage, simple_connector)
     cfed1.executing();
     cfed1.run(5);
     cfed1.finalize();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
@@ -299,6 +305,7 @@ TEST(connector_2stage, simple_connector_struct)
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
     cfed1.executing();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
@@ -325,6 +332,7 @@ TEST(connector_2stage, simple_endpoint_connector)
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
     cfed1.executing();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
@@ -352,6 +360,7 @@ TEST(connector_2stage, simple_endpoint_connector_struct)
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
     cfed1.executing();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
@@ -379,6 +388,7 @@ TEST(connector_2stage, evil_federate)
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
     cfed1.executing();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     cfed1.run(5);
     cfed1.finalize();
     EXPECT_NO_THROW(fut.get());
@@ -402,6 +412,7 @@ TEST(connector_2stage, simple_endpoint_connector_one_way)
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
     cfed1.executing();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
@@ -429,6 +440,7 @@ TEST(connector_2stage, no_connections)
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
     cfed1.executing();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
@@ -455,6 +467,7 @@ TEST(connector_2stage, simple_endpoint_connector_one_way_reverse)
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     cfed1.initialize();
     cfed1.executing();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
@@ -501,6 +514,7 @@ TEST(connector_2stage, three_fed)
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -541,6 +555,7 @@ TEST(connector_2stage, three_fed_endpoint)
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 1);
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -581,6 +596,7 @@ TEST(connector_2stage, three_fed_endpoint_bi)
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 1);
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 2);
 }
 
@@ -621,6 +637,7 @@ TEST(connector_2stage, three_fed_reverse)
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -668,6 +685,7 @@ TEST(connector_2stage, three_fed_input)
     fut2.get();
     EXPECT_GE(data.size(), 1);
     EXPECT_EQ(conn1.madeConnections(), 1);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
 }
 
 TEST(connector_2stage, three_fed_input_regex)
@@ -713,6 +731,7 @@ TEST(connector_2stage, three_fed_input_regex)
     vFed2.disconnect();
     fut.get();
     fut2.get();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_GE(data.size(), 1);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
@@ -759,6 +778,7 @@ TEST(connector_2stage, three_fed_input_alias)
     vFed2.disconnect();
     fut.get();
     fut2.get();
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_GE(data.size(), 1);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
@@ -801,6 +821,7 @@ TEST(connector_2stage, three_fed_alias_reverse)
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -845,6 +866,7 @@ TEST(connector_2stage, three_fed_potential_alias)
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -889,6 +911,7 @@ TEST(connector_2stage, three_fed_potential_alias_reverse)
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -935,6 +958,7 @@ TEST(connector_2stage, three_fed_potential_cascade_alias_reverse)
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
@@ -978,6 +1002,7 @@ TEST(connector_2stage, three_fed_alias_unmatched_connection)
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     // no connections through the connector made
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
@@ -1029,6 +1054,7 @@ TEST(connector_2stage, three_fed_unknown_pub_alias)
     fut.get();
     fut2.get();
     EXPECT_GE(data.size(), 1);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
 
@@ -1073,6 +1099,7 @@ TEST(connector_2stage, three_fed_endpoint_bi_alias)
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 1);
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 2);
 }
 
@@ -1119,6 +1146,7 @@ TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 7);
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 6);
 }
 
@@ -1150,6 +1178,7 @@ TEST(connector_2stage, two_sided_broker_connection)
     ASSERT_EQ(cfed1.getValueNames().size(), 2);
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_FALSE(cfed1.getValues("inp2").empty());
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
@@ -1186,6 +1215,7 @@ TEST(connector_2stage, two_sided_broker_connection_alias)
     ASSERT_EQ(cfed1.getValueNames().size(), 2);
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_FALSE(cfed1.getValues("inp2").empty());
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
@@ -1219,6 +1249,7 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
     EXPECT_FALSE(cfed1.getMessages("e2").empty()) << " endpoint " << cfed1.getMessageNames()[1];
     EXPECT_TRUE(cfed1.getMessages("e3").empty()) << " endpoint " << cfed1.getMessageNames()[2];
     EXPECT_FALSE(cfed1.getMessages("e4").empty()) << " endpoint " << cfed1.getMessageNames()[3];
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
@@ -1256,6 +1287,7 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
     EXPECT_FALSE(cfed1.getMessages("e2").empty());
     EXPECT_TRUE(cfed1.getMessages("e3").empty());
     EXPECT_FALSE(cfed1.getMessages("e4").empty());
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
@@ -1298,10 +1330,12 @@ TEST(connector_2stage, multiCheckFed)
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_TRUE(cfed1.getValues("inp2").empty());
+    EXPECT_TRUE(cfed1.hasReceivedCommand());
 
     ASSERT_EQ(cfed2.getValueNames().size(), 1);
     EXPECT_FALSE(cfed2.getValues("inpA").empty());
     EXPECT_TRUE(cfed2.getValues("inpB").empty());
+    EXPECT_TRUE(cfed2.hasReceivedCommand());
     // not making any connections
     EXPECT_EQ(conn1.madeConnections(), 2);
 }

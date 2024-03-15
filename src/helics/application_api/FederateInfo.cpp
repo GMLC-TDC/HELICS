@@ -808,7 +808,54 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
     catch (const std::invalid_argument& iarg) {
         throw(helics::InvalidParameter(iarg.what()));
     }
+    loadJsonConfig(doc);
+    bool hasHelicsSection = doc.isMember("helics");
+    bool hasHelicsSubSection{false};
+    if (hasHelicsSection) {
+        hasHelicsSubSection = doc["helics"].isMember("helics");
+    }
+    if (runArgParser) {
+        auto app = makeCLIApp();
+        app->allow_extras();
+        try {
+            if (jsonString.find('{') != std::string::npos) {
+                std::istringstream jstring(jsonString);
+                app->parse_from_stream(jstring);
+                if (hasHelicsSection) {
+                    app->get_config_formatter_base()->section("helics");
+                    std::istringstream jstringHelics(jsonString);
+                    app->parse_from_stream(jstringHelics);
+                    if (hasHelicsSubSection) {
+                        app->get_config_formatter_base()->section("helics.helics");
+                        std::istringstream jstringHelicsSub(jsonString);
+                        app->parse_from_stream(jstringHelicsSub);
+                    }
+                }
+            } else {
+                std::ifstream file(jsonString);
+                app->parse_from_stream(file);
+                if (hasHelicsSection) {
+                    file.clear();
+                    file.seekg(0);
+                    app->get_config_formatter_base()->section("helics");
+                    app->parse_from_stream(file);
+                    if (hasHelicsSubSection) {
+                        file.clear();
+                        file.seekg(0);
+                        app->get_config_formatter_base()->section("helics.helics");
+                        app->parse_from_stream(file);
+                    }
+                }
+            }
+        }
+        catch (const CLI::Error& clierror) {
+            throw(InvalidIdentifier(clierror.what()));
+        }
+    }
+}
 
+void FederateInfo::loadJsonConfig(Json::Value& json)
+{
     const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
                                                                           Time arg) {
         setProperty(propStringsTranslations.at(fname), arg);
@@ -818,30 +865,17 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         if (prop.second > 200) {
             continue;
         }
-        fileops::callIfMember(doc, std::string(prop.first), timeCall);
+        fileops::callIfMember(json, std::string(prop.first), timeCall);
     }
 
     processOptions(
-        doc,
+        json,
         [](const std::string& option) { return getFlagIndex(option); },
         [](const std::string& value) { return getOptionValue(value); },
         [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
 
-    if (runArgParser) {
-        auto app = makeCLIApp();
-        app->allow_extras();
-        try {
-            if (jsonString.find('{') != std::string::npos) {
-                std::istringstream jstring(jsonString);
-                app->parse_from_stream(jstring);
-            } else {
-                std::ifstream file(jsonString);
-                app->parse_from_stream(file);
-            }
-        }
-        catch (const CLI::Error& clierror) {
-            throw(InvalidIdentifier(clierror.what()));
-        }
+    if (json.isMember("helics")) {
+        loadJsonConfig(json["helics"]);
     }
 }
 

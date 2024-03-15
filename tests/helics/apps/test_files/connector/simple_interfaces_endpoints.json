@@ -1,0 +1,16 @@
+{
+  "potential_interfaces": {
+    "publications": [
+      { "name": "pub1", "global": true, "type": "double" },
+      { "name": "pub2", "global": true, "type": "double" }
+    ],
+    "inputs": [
+      { "name": "inp2", "global": true, "type": "double" },
+      { "name": "inp1", "global": true, "type": "double" }
+    ],
+    "endpoints": [
+      { "name": "ept1", "global": true, "targeted": true },
+      { "name": "ept12", "global": true, "targeted": true }
+    ]
+  }
+}
