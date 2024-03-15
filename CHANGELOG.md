@@ -25,9 +25,8 @@ Patch release including beta version of reentrant federates and support for "pot
 
 - automatic handling of potential interface sequence from Federate class
 - support for potential_interface templates
-- support for reentrant federates:  federates with the same name that can come and go, and support for reconnecting interfaces to the reentrant federate.
+- support for reentrant federates: federates with the same name that can come and go, and support for reconnecting interfaces to the reentrant federate.
 - support for a "helics" section in the configuration json files
-
 
 ## [3.5.0][] - 2024-02-05
 
