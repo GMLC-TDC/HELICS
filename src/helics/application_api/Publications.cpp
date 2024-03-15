@@ -69,7 +69,7 @@ Publication::Publication(InterfaceVisibility locality,
 
 void Publication::publish(double val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
             prevValue = val;
@@ -85,7 +85,7 @@ void Publication::publish(double val)
 
 void Publication::publishInt(int64_t val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
             prevValue = val;
@@ -117,7 +117,7 @@ void Publication::publish(char val)
 
 void Publication::publish(Time val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
             prevValue = val.getBaseTimeCode();
@@ -133,7 +133,7 @@ void Publication::publish(Time val)
 
 void Publication::publish(bool val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     std::string_view bstring = val ? "1" : "0";
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, bstring, delta)) {
@@ -150,7 +150,7 @@ void Publication::publish(bool val)
 
 void Publication::publishString(std::string_view val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
             prevValue = std::string(val);
@@ -168,7 +168,7 @@ void Publication::publish(const std::vector<std::string>& val)
 {
     auto buffer = ValueConverter<std::vector<std::string>>::convert(val);
     auto str = ValueConverter<std::string_view>::interpret(buffer);
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, str, delta)) {
             prevValue = std::string(str);
@@ -183,7 +183,7 @@ void Publication::publish(const std::vector<std::string>& val)
 
 void Publication::publish(const std::vector<double>& val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
             prevValue = val;
@@ -199,7 +199,7 @@ void Publication::publish(const std::vector<double>& val)
 
 void Publication::publish(const std::vector<std::complex<double>>& val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
             prevValue = val;
@@ -215,7 +215,7 @@ void Publication::publish(const std::vector<std::complex<double>>& val)
 
 void Publication::publish(const double* vals, int size)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, vals, size, delta)) {
             prevValue = std::vector<double>(vals, vals + size);
@@ -250,7 +250,7 @@ void Publication::publishComplex(const double* vals, int size)
 
 void Publication::publish(std::complex<double> val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
             prevValue = val;
@@ -266,7 +266,7 @@ void Publication::publish(std::complex<double> val)
 
 void Publication::publish(const NamedPoint& np)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, np, delta)) {
             prevValue = np;
@@ -282,7 +282,7 @@ void Publication::publish(const NamedPoint& np)
 
 void Publication::publish(std::string_view field, double val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         NamedPoint np(field, val);
         if (changeDetected(prevValue, np, delta)) {
@@ -320,7 +320,7 @@ void Publication::publish(double val, const units::precise_unit& units)
 
 void Publication::publishDefV(const defV& val)
 {
-    bool doPublish = true;
+    bool doPublish = (fed != nullptr);
     if (changeDetectionEnabled) {
         if (prevValue != val) {
             prevValue = val;

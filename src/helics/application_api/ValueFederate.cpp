@@ -236,10 +236,17 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
 {
     auto doc = fileops::loadJson(jsonString);
-    bool defaultGlobal = false;
-    fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
-    if (doc.isMember("publications")) {
-        auto pubs = doc["publications"];
+    registerValueInterfacesJsonDetail(doc, false);
+}
+
+void ValueFederate::registerValueInterfacesJsonDetail(Json::Value& json, bool defaultGlobal)
+{
+    fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
+
+    Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
+
+    if (iface.isMember("publications")) {
+        auto pubs = iface["publications"];
         for (const auto& pub : pubs) {
             auto name = fileops::getName(pub);
 
@@ -264,8 +271,8 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             addTargetVariations(pub, "destination", "targets", addDestTarget);
         }
     }
-    if (doc.isMember("subscriptions")) {
-        auto& subs = doc["subscriptions"];
+    if (iface.isMember("subscriptions")) {
+        auto& subs = iface["subscriptions"];
         for (const auto& sub : subs) {
             bool skipNameTarget{false};
             auto name = fileops::getName(sub);
@@ -296,8 +303,8 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             addTargetVariations(sub, "source", "targets", addSourceTarget);
         }
     }
-    if (doc.isMember("inputs")) {
-        auto ipts = doc["inputs"];
+    if (iface.isMember("inputs")) {
+        auto ipts = iface["inputs"];
         for (const auto& ipt : ipts) {
             auto name = fileops::getName(ipt);
 
@@ -324,6 +331,10 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             addTargetVariations(ipt, "source", "publications", addSourceTarget);
             addTargetVariations(ipt, "source", "targets", addSourceTarget);
         }
+    }
+
+    if (json.isMember("helics")) {
+        registerValueInterfacesJsonDetail(json["helics"], defaultGlobal);
     }
 }
 

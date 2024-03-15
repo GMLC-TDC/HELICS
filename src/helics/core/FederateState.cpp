@@ -2735,18 +2735,24 @@ std::string FederateState::processQueryActual(std::string_view query) const
             }
             base["tags"] = tagBlock;
         }
-        if (queryCallback) {
-            auto potential = queryCallback("potential_interfaces");
-            if (!potential.empty()) {
-                try {
-                    auto json = fileops::loadJsonStr(potential);
-
-                    if (!json.isMember("error")) {
-                        base["potential_interfaces"] = json;
-                    }
+        if (!queryCallbacks.empty()) {
+            for (const auto& queryCallback : queryCallbacks) {
+                if (!queryCallback) {
+                    continue;
                 }
-                catch (const std::invalid_argument&) {
-                    ;
+                auto potential = queryCallback("potential_interfaces");
+                if (!potential.empty()) {
+                    try {
+                        auto json = fileops::loadJsonStr(potential);
+
+                        if (!json.isMember("error")) {
+                            base["potential_interfaces"] = json;
+                            break;
+                        }
+                    }
+                    catch (const std::invalid_argument&) {
+                        ;
+                    }
                 }
             }
         }
@@ -2806,10 +2812,15 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return fileops::generateJsonString(base);
     }
 
-    if (queryCallback) {
-        auto val = queryCallback(query);
-        if (!val.empty()) {
-            return val;
+    if (!queryCallbacks.empty()) {
+        for (const auto& queryCallback : queryCallbacks) {
+            if (!queryCallback) {
+                continue;
+            }
+            auto val = queryCallback(query);
+            if (!val.empty()) {
+                return val;
+            }
         }
     }
     // check existingTag value for a matching string
