@@ -15,18 +15,18 @@ Patch release including beta version of reentrant federates and support for "pot
 
 ### Fixed
 
-- fixed an issue related to disconnection of federates with endpoints while still executing, that could potentially have resulted in an infinite loop.
+- Fixed an issue related to disconnection of federates with endpoints while still executing, that could potentially have resulted in an infinite loop
 
 ### Changed
 
-- Updated 3rd party libraries include cli11, fmt, and spdlog
+- Updated 3rd party libraries including cli11, fmt, spdlog, and asio
 
 ### Added
 
-- automatic handling of potential interface sequence from Federate class
-- support for potential_interface templates
-- support for reentrant federates: federates with the same name that can come and go, and support for reconnecting interfaces to the reentrant federate.
-- support for a "helics" section in the configuration json files
+- Automatic handling of potential interface sequence from Federate class
+- Support for potential_interface templates
+- Support for reentrant federates: federates with the same name that can come and go, and support for reconnecting interfaces to the reentrant federate
+- Support for a "helics" section in the configuration json files
 
 ## [3.5.0][] - 2024-02-05
 
