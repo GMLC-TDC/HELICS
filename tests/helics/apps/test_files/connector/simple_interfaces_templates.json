@@ -10,7 +10,7 @@
     ],
     "publication_templates": [
       {
-        "name": "$<field1>/$<field2>",
+        "name": "${field1}/${field2}",
         "field1": ["obj1", "obj2", "obj3"],
         "field2": [
           ["type1", "double"],

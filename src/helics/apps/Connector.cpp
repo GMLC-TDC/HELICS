@@ -109,7 +109,7 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
 {
     templateName = fileops::getName(iTemplate);
 
-    auto tnameIndex = templateName.find("$<");
+    auto tnameIndex = templateName.find("${");
     if (tnameIndex == std::string::npos) {
         return false;
     }
@@ -121,14 +121,14 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
     std::vector<std::string> valueNames;
     int index{0};
     while (tnameIndex != std::string::npos) {
-        auto close = templateName.find_first_of('>', tnameIndex);
+        auto close = templateName.find_first_of('}', tnameIndex);
         const std::string tname = templateName.substr(tnameIndex + 2, close - tnameIndex - 2);
         if (!iTemplate.isMember(tname)) {
             return false;
         }
         valueNames.push_back(tname);
 
-        tnameIndex = templateName.find("$<", close + 1);
+        tnameIndex = templateName.find("${", close + 1);
         if (tnameIndex == close + 1) {
             return false;
         }

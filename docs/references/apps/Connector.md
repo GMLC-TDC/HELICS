@@ -260,7 +260,7 @@ The federate object and the connector also support interface definition template
   "potential_interfaces": {
     "endpoint_templates": [
       {
-        "name": "obj$<number>/ept$<letter>/type$<letter>/mode$<letter>",
+        "name": "obj${number}/ept${letter}/type${letter}/mode${letter}",
         "number": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
         "letter": [
           "A",
@@ -312,7 +312,7 @@ or
     ],
     "publication_templates": [
       {
-        "name": "$<field1>/$<field2>",
+        "name": "${field1}/${field2}",
         "field1": ["obj1", "obj2", "obj3"],
         "field2": [
           ["type1", "double"],
@@ -324,7 +324,7 @@ or
     ],
     "input_templates": [
       {
-        "name": "$<field1>/$<field2>",
+        "name": "${field1}/${field2}",
         "field1": ["objA", "objB", "objC"],
         "field2": [
           ["typeA", "double", "W"],
@@ -338,4 +338,4 @@ or
 }
 ```
 
-The connector will evaluate all possibilities for the template for possible connections. The field name in `$<fieldName>` is searched for in the json file. They may be duplicated, but are treated as independent for evaluation purposes as in the first example. The first template example defines over 175,000 different possible interfaces. The type of the interface can be defined as part of the template name, with the particular name as the key.
+The connector will evaluate all possibilities for the template for possible connections. The field name in `${fieldName}` is searched for in the json file. They may be duplicated, but are treated as independent for evaluation purposes as in the first example. The first template example defines over 175,000 different possible interfaces. The type of the interface can be defined as part of the template name, with the particular name as the key.

@@ -45,9 +45,9 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
             auto& tMap = potInterfaceTemplates[itype];
             for (auto& tspec : templateInterfaces) {
                 auto name = fileops::getName(tspec);
-                if (name.find(">$<") != std::string::npos) {
+                if (name.find("}${") != std::string::npos) {
                     throw(helics::InvalidParameter(
-                        "template key definitions must not be adjacent, they must have separator characters"));
+                        std::string("template key definitions must not be adjacent, they must have separator characters [")+name+']'));
                 }
                 tMap[name] = tspec;
             }
