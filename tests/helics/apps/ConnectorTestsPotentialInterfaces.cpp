@@ -440,6 +440,41 @@ TEST(connector_potential_interfaces, input_pub_template_alias)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
+TEST(connector_potential_interfaces, input_pub_template_with_units)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = "ccore_template6";
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+    conn1.addConnection("inputA", "Publication_key", InterfaceDirection::FROM_TO);
+    helics::ValueFederate vfed("c1", fedInfo);
+    vfed.registerInterfaces(std::string(testdir) + "simple_interfaces_templates_with_units.json");
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    vfed.addAlias("obj2/type3", "Publication_key");
+    vfed.addAlias("objA/typeC", "inputA");
+    vfed.enterExecutingMode();
+    EXPECT_EQ(vfed.getPublicationCount(), 1);
+    EXPECT_EQ(vfed.getInputCount(), 1);
+    auto& pub1 = vfed.getPublication(0);
+    auto& inp1 = vfed.getInput(0);
+
+    EXPECT_EQ(pub1.getUnits(),"kV");
+    EXPECT_EQ(inp1.getUnits(),"V");
+    const double testValue = 3452.562;
+    pub1.publish(testValue);
+    auto retTime = vfed.requestTime(5);
+    EXPECT_EQ(retTime, 1.0);
+    auto val = inp1.getDouble();
+    EXPECT_EQ(val, testValue*1000.0);
+
+    vfed.finalize();
+    fut.get();
+    EXPECT_EQ(conn1.madeConnections(), 1);
+}
+
 TEST(connector_potential_interfaces, endpoint_template)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);

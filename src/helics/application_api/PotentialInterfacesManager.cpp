@@ -28,7 +28,7 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
         return;
     }
     const auto& interfaces = json["potential_interfaces"];
-    for (auto& itype : interfaceTypes) {
+    for (const auto& itype : interfaceTypes) {
         if (interfaces.isMember(itype)) {
             auto tInterface = interfaces[itype];
             auto& pMap = potInterfaces[itype];
@@ -73,7 +73,7 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
         Json::Value interfaces;
         for (const auto& iType : potInterfaces) {
             interfaces[iType.first] = Json::arrayValue;
-            for (auto& ispec : iType.second) {
+            for (const auto& ispec : iType.second) {
                 interfaces[iType.first].append(ispec.first);
             }
         }
@@ -82,14 +82,13 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
             templateKey.pop_back();
             templateKey += "_templates";
             interfaces[templateKey] = Json::arrayValue;
-            for (auto& ispec : iType.second) {
+            for (const auto& ispec : iType.second) {
                 interfaces[templateKey].append(ispec.second);
             }
         }
         return fileops::generateJsonString(interfaces);
-    } else {
-        return std::string{};
     }
+    return std::string{};
 }
 
 void PotentialInterfacesManager::processCommand(std::pair<std::string, std::string> command)
@@ -125,8 +124,10 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                 std::string templateKey{"templated_"};
                 templateKey.append(iType.first);
                 if (json.isMember(templateKey)) {
+                    bool noUnits{false};
                     if (iType.first == "endpoints") {
                         generator["targeted"] = true;
+                        noUnits=true;
                     }
                     for (auto& templateInterfaces : json[templateKey]) {
                         auto templateName = fileops::getName(templateInterfaces);
@@ -145,7 +146,13 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                                 if (!str.empty()) {
                                     interfaceSpec["type"] = interfaceName[1];
                                 }
-
+                                if (!noUnits)
+                                {
+                                    str = interfaceName[2].asString();
+                                    if (!str.empty()) {
+                                        interfaceSpec["units"] = interfaceName[2];
+                                    }
+                                }
                             } else {
                                 interfaceSpec["name"] = interfaceName.asString();
                             }
@@ -154,7 +161,7 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                     }
                 }
             }
-            std::string generatorList = fileops::generateJsonString(generator);
+            const std::string generatorList = fileops::generateJsonString(generator);
             fedPtr->registerInterfaces(generatorList);
             respondedToCommand.store(true);
             return;

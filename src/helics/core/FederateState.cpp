@@ -1518,7 +1518,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     routeMessage(cmd);
                 }
             } else {
-                Time lastTime = timeCoord->getLastGrant(cmd.source_id);
+                const Time lastTime = timeCoord->getLastGrant(cmd.source_id);
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case TimeProcessingResult::DELAY_PROCESSING:
                         addFederateToDelay(cmd.source_id);
