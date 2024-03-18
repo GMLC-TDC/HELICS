@@ -17,7 +17,7 @@ BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
                                           std::string_view units)
 {
     InterfaceHandle local_id(static_cast<InterfaceHandle::BaseType>(handles.size()));
-    std::string actKey = (!key.empty()) ? std::string(key) : generateName(what);
+    const std::string actKey = (!key.empty()) ? std::string(key) : generateName(what);
     handles.emplace_back(fed_id, local_id, what, actKey, type, units);
     addSearchFields(handles.back(), local_id.baseValue());
     return handles.back();
@@ -31,7 +31,7 @@ BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
                                           std::string_view units)
 {
     auto index = static_cast<int32_t>(handles.size());
-    std::string actKey = (!key.empty()) ? std::string{key} : generateName(what);
+    const std::string actKey = (!key.empty()) ? std::string{key} : generateName(what);
     handles.emplace_back(fed_id, local_id, what, actKey, type, units);
     addSearchFields(handles.back(), index);
     return handles.back();
@@ -350,10 +350,10 @@ std::vector<GlobalHandle> HandleManager::regexSearch(const std::string& regexExp
         rex = ".*";
     }
     try {
-        std::regex rgx(rex);
+        const std::regex rgx(rex);
         for (const auto& mres : imap) {
             if (std::regex_match(mres.first.data(), rgx)) {
-                auto* handle = getHandleInfo(mres.second);
+                const auto* handle = getHandleInfo(mres.second);
                 matches.push_back(handle->handle);
             }
         }
@@ -410,12 +410,12 @@ void HandleManager::addAlias(std::string_view interfaceName, std::string_view al
 
     if (cascade) {
         auto& aliasRange = aliases[interfaceStableName];
-        for (auto& I : aliasRange) {
-            if (I != alias) {
-                addPublicationAlias(I, interfaceStableName);
-                addInputAlias(I, interfaceStableName);
-                addEndpointAlias(I, interfaceStableName);
-                addFilterAlias(I, interfaceStableName);
+        for (auto& interfaceAlias : aliasRange) {
+            if (interfaceAlias != alias) {
+                addPublicationAlias(interfaceAlias, interfaceStableName);
+                addInputAlias(interfaceAlias, interfaceStableName);
+                addEndpointAlias(interfaceAlias, interfaceStableName);
+                addFilterAlias(interfaceAlias, interfaceStableName);
             }
         }
     }
@@ -431,12 +431,12 @@ void HandleManager::addAlias(std::string_view interfaceName, std::string_view al
 
     if (cascade) {
         auto& aliasRange = aliases[aliasStableName];
-        for (auto& I : aliasRange) {
-            if (I != alias) {
-                addPublicationAlias(I, aliasStableName);
-                addInputAlias(I, aliasStableName);
-                addEndpointAlias(I, aliasStableName);
-                addFilterAlias(I, aliasStableName);
+        for (auto& interfaceAlias : aliasRange) {
+            if (interfaceAlias != alias) {
+                addPublicationAlias(interfaceAlias, aliasStableName);
+                addInputAlias(interfaceAlias, aliasStableName);
+                addEndpointAlias(interfaceAlias, aliasStableName);
+                addFilterAlias(interfaceAlias, aliasStableName);
             }
         }
     }
@@ -518,17 +518,17 @@ bool HandleManager::addAliasName(std::string_view interfaceName, std::string_vie
         return false;
     }
     bool cascading{false};
-    auto iN = aliases.find(interfaceName);
-    if (iN == aliases.end()) {
+    auto fnd = aliases.find(interfaceName);
+    if (fnd == aliases.end()) {
         aliases[interfaceName].emplace_back(alias);
         cascading = addAliasName(alias, interfaceName);
     } else {
-        auto& v = aliases[interfaceName];
-        auto it = std::lower_bound(v.begin(), v.end(), alias);
-        if (it == v.end() || *it != alias) {
-            v.insert(it, alias);
+        auto& aliasVector = aliases[interfaceName];
+        auto aliasIterator = std::lower_bound(aliasVector.begin(), aliasVector.end(), alias);
+        if (aliasIterator == aliasVector.end() || *aliasIterator != alias) {
+            aliasVector.insert(aliasIterator, alias);
             cascading = true;
-            for (auto& otherAlias : v) {
+            for (auto& otherAlias : aliasVector) {
                 addAliasName(otherAlias, alias);
             }
             addAliasName(alias, interfaceName);
