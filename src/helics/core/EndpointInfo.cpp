@@ -212,10 +212,11 @@ void EndpointInfo::removeTarget(GlobalHandle targetId)
 {
     if (!targetInformation.empty()) {
         auto tinfo = targetInformation.begin();
-        auto removeIterator =
-            std::remove_if(targetInformation.begin(),
-                           targetInformation.end(),
-                           [targetId](const auto& targetInfo) { return targetInfo.id == targetId; });
+        auto removeIterator = std::remove_if(targetInformation.begin(),
+                                             targetInformation.end(),
+                                             [targetId](const auto& targetInfo) {
+                                                 return targetInfo.id == targetId;
+                                             });
         if (removeIterator != targetInformation.end()) {
             targetInformation.erase(removeIterator, targetInformation.end());
             targets.clear();
