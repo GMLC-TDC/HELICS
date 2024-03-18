@@ -602,6 +602,26 @@ TEST_F(mfed_tests, endpoint_linking_dest_alias)
     mFed1->finalize();
 }
 
+TEST_F(mfed_tests, endpoint_linking_dest_alias_rev)
+{
+    SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    helics::CoreApp core(mFed1->getCorePointer());
+
+    core->linkEndpoints("source_endpoint", "dest");
+    auto& ept2 = mFed1->registerGlobalTargetedEndpoint("dest_endpoint");
+
+    auto& ept1 = mFed1->registerGlobalTargetedEndpoint("source_endpoint");
+    core->addAlias( "dest","dest_endpoint");
+    mFed1->enterExecutingMode();
+    ept1.send("test message");
+    mFed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    auto m = ept2.getMessage();
+    EXPECT_EQ(m->to_string(), "test message");
+    mFed1->finalize();
+}
+
 class mfed_permutation_tests: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
 TEST_P(mfed_permutation_tests, endpoint_linking_order_permutations)

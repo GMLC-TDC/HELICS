@@ -421,10 +421,31 @@ void HandleManager::addAlias(std::string_view interfaceName, std::string_view al
     }
 
     // add aliases for existing interfaces
-    addPublicationAlias(interfaceName, *aliasName);
-    addInputAlias(interfaceName, *aliasName);
-    addEndpointAlias(interfaceName, *aliasName);
-    addFilterAlias(interfaceName, *aliasName);
+    addPublicationAlias(*iName, *aliasName);
+    addInputAlias(*iName, *aliasName);
+    addEndpointAlias(*iName, *aliasName);
+    addFilterAlias(*iName, *aliasName);
+
+    /** aliases should be reciprocal*/
+    cascade = addAliasName( aliasStableName,interfaceStableName);
+
+    if (cascade) {
+        auto& aliasRange = aliases[aliasStableName];
+        for (auto& I : aliasRange) {
+            if (I != alias) {
+                addPublicationAlias(I, aliasStableName);
+                addInputAlias(I, aliasStableName);
+                addEndpointAlias(I, aliasStableName);
+                addFilterAlias(I, aliasStableName);
+            }
+        }
+    }
+
+    // add aliases for existing interfaces
+    addPublicationAlias(*aliasName,*iName);
+    addInputAlias(*aliasName,*iName);
+    addEndpointAlias(*aliasName,*iName);
+    addFilterAlias(*aliasName,*iName);
 }
 
 void HandleManager::addPublicationAlias(std::string_view interfaceName, std::string_view alias)
@@ -433,7 +454,7 @@ void HandleManager::addPublicationAlias(std::string_view interfaceName, std::str
     if (fnd != publications.end()) {
         auto res = publications.try_emplace(alias, fnd->second.baseValue());
         if (!res.second && res.first->second != fnd->second) {
-            throw std::runtime_error("publication name already exists");
+            throw std::runtime_error("publication name and alias already exists");
         }
     } else {
         fnd = publications.find(alias);
@@ -449,7 +470,7 @@ void HandleManager::addEndpointAlias(std::string_view interfaceName, std::string
     if (fnd != endpoints.end()) {
         auto res = endpoints.try_emplace(alias, fnd->second.baseValue());
         if (!res.second && res.first->second != fnd->second) {
-            throw std::runtime_error("endpoint name already exists");
+            throw std::runtime_error("endpoint name and alias already exists");
         }
     } else {
         fnd = endpoints.find(alias);
@@ -465,7 +486,7 @@ void HandleManager::addFilterAlias(std::string_view interfaceName, std::string_v
     if (fnd != filters.end()) {
         auto res = filters.try_emplace(alias, fnd->second.baseValue());
         if (!res.second && res.first->second != fnd->second) {
-            throw std::runtime_error("filter name already exists");
+            throw std::runtime_error("filter name and alias already exists");
         }
     } else {
         fnd = filters.find(alias);
@@ -481,7 +502,7 @@ void HandleManager::addInputAlias(std::string_view interfaceName, std::string_vi
     if (fnd != inputs.end()) {
         auto res = inputs.try_emplace(alias, fnd->second.baseValue());
         if (!res.second && res.first->second != fnd->second) {
-            throw std::runtime_error("input name already exists");
+            throw std::runtime_error("input name and alias already exists");
         }
     } else {
         fnd = inputs.find(alias);
