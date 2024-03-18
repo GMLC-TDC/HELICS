@@ -30,6 +30,7 @@ struct Connection {
 struct ConnectionsList;
 struct PotentialConnections;
 class RegexMatcher;
+class TemplateMatcher;
 
 /** class implementing a Connector object, which is capable of automatically connecting interfaces
 in HELICS
@@ -136,6 +137,18 @@ necessary
     bool addConnectionVector(const std::vector<std::string>& connection);
     /** go through and make potential connections between interfaces*/
     void establishPotentialInterfaces(ConnectionsList& possibleConnections);
+
+    /** scan the defined Potential Interfaces For Connections*/
+    void scanPotentialInterfaces(ConnectionsList& possibleConnections);
+
+    /** scan the potential interface Templates for connections*/
+    void scanPotentialInterfaceTemplates(ConnectionsList& possibleConnections);
+
+    /** scan unconnected interfaces for possible connections to potential interfaces*/
+    void scanUnconnectedInterfaces(ConnectionsList& possibleConnections);
+    /** scan unknown interfaces for possible connections to potential interfaces*/
+    void scanUnknownInterfaces(ConnectionsList& possibleConnections);
+
     /** actually go through and make connections*/
     void makeConnections(ConnectionsList& possibleConnections);
     /** try to make a connection for an input*/
@@ -151,11 +164,18 @@ necessary
         std::unordered_map<std::string_view, PotentialConnections>& potentials,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
 
+    bool makePotentialTemplateConnection(
+        std::string_view interfaceName,
+        const std::vector<std::size_t>& tags,
+        std::vector<TemplateMatcher>& potentialTemplates,
+        const std::unordered_multimap<std::string_view, std::string_view>& aliases);
+
     bool checkPotentialConnection(
         std::string_view interface,
         const std::vector<std::size_t>& tags,
         std::unordered_set<std::string_view>& possibleConnections,
         std::unordered_map<std::string_view, PotentialConnections>& potentials,
+        std::vector<TemplateMatcher>& potentialTemplates,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
     /** get a list of the possible connections to based on the connections map*/
     std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface,

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/Core.hpp"
+#include "../core/core-exceptions.hpp"
 
 #include <set>
 
@@ -26,7 +27,7 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
     if (!json.isMember("potential_interfaces")) {
         return;
     }
-    auto interfaces = json["potential_interfaces"];
+    const auto &interfaces = json["potential_interfaces"];
     for (auto& itype : interfaceTypes) {
         if (interfaces.isMember(itype)) {
             auto tInterface = interfaces[itype];
@@ -36,7 +37,7 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
                 pMap[name] = ispec;
             }
         }
-        auto tempString=itype;
+        std::string tempString=itype;
         tempString.pop_back();
         tempString+="_templates";
         if (interfaces.isMember(tempString)) {
@@ -44,6 +45,10 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
             auto& tMap = potInterfaceTemplates[itype];
             for (auto& tspec :templateInterfaces) {
                 auto name = fileops::getName(tspec);
+                if (name.find(">$<") != std::string::npos)
+                {
+                    throw(helics::InvalidParameter("template key definitions must not be adjacent, they must have separator characters"));
+                }
                 tMap[name] = tspec;
             }
         }
@@ -134,14 +139,19 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                             continue;
                         }
                         auto& templateGenerator=templateLoc->second;
-                        for (auto& interfaceName :templateInterfaces[iType.first])
+                        for (auto& interfaceName :templateInterfaces["interfaces"])
                         {
                             Json::Value interfaceSpec=Json::nullValue;
                             interfaceSpec.copy(templateGenerator["template"]);
                             if (interfaceName.isArray())
                             {
                                 interfaceSpec["name"] = interfaceName[0];
-                                interfaceSpec["type"]=interfaceName[1];
+                                std::string str=interfaceName[1].asString();
+                                if (!str.empty())
+                                {
+                                    interfaceSpec["type"]=interfaceName[1];
+                                }
+                               
                             }
                             else
                             {

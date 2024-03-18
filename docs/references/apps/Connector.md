@@ -249,4 +249,59 @@ also permissible are all arguments allowed for federates and any specific broker
 
 ## Federate Support
 
-The federate object has support for linking with connector operation. Interface definitions placed in a `"potential_interfaces"` object in a json configuration file will activate the potential interfaces sequence automatically. And based on the response of the connector will automatically create the interfaces defined if they are used. The interface objects can later be retrieved through normal means. No additional sequence or callbacks is needed on the federate. Json configuration is currently the only means to trigger this feature. The definitions for the interfaces in the potential interfaces is exactly the same as normally defining an interface in json.
+The federate object has support for linking with connector operation. Interface definitions placed in a `"potential_interfaces"` object in a json configuration file will activate the potential interfaces sequence automatically. And based on the response of the connector will automatically create the interfaces defined if they are used. The interface objects can later be retrieved through normal means. No additional sequence or callbacks is needed on the federate. Json configuration is currently the only means to trigger this feature. The definitions for the interfaces in the potential interfaces are exactly the same as normally defining an interface in json.
+
+### interface Templates
+
+The federate object and the connector also support interface definition templates, for example
+
+```json
+{
+    "potential_interfaces": {
+      
+      "endpoint_templates":[
+          {
+              "name":"obj$<number>/ept$<letter>/type$<letter>/mode$<letter>",
+              "number":["1","2","3","4","5","6","7","8","9","0"],
+              "letter":["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
+              "template":{"global":true}
+          }
+      ]
+    }
+  }
+```
+
+or 
+
+```json
+{
+  "potential_interfaces": {
+    "publications": [
+      { "name": "pub1", "global": true, "type": "double" },
+      { "name": "pub2", "global": true, "type": "double" }
+    ],
+    "inputs": [
+      { "name": "inp2", "global": true, "type": "double" },
+      { "name": "inp1", "global": true, "type": "double" }
+    ],
+    "publication_templates":[
+        {
+            "name":"$<field1>/$<field2>",
+            "field1":["obj1","obj2","obj3"],
+            "field2":[["type1","double"],["type2","int"],["type3","double"]],
+            "template":{"global":true}
+        }
+    ],
+    "input_templates":[
+        {
+            "name":"$<field1>/$<field2>",
+            "field1":["objA","objB","objC"],
+            "field2":[["typeA","double"],["typeB","int"],["typeC","double"]],
+            "template":{"global":true}
+        }
+    ]
+  }
+}
+```
+
+The connector will evaluate all possibilities for the template for possible connections.  The field name in `$<fieldName>` is searched for in the json file.  They may be duplicated, but are treated as independent for evaluation purposes as in the first example.  The first template example defines over 175,000 different possible interfaces.  The type of the interface can be defined as part of the template name, with the particular name as the key.  
