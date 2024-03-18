@@ -461,14 +461,14 @@ TEST(connector_potential_interfaces, input_pub_template_with_units)
     auto& pub1 = vfed.getPublication(0);
     auto& inp1 = vfed.getInput(0);
 
-    EXPECT_EQ(pub1.getUnits(),"kV");
-    EXPECT_EQ(inp1.getUnits(),"V");
+    EXPECT_EQ(pub1.getUnits(), "kV");
+    EXPECT_EQ(inp1.getUnits(), "V");
     const double testValue = 3452.562;
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue*1000.0);
+    EXPECT_EQ(val, testValue * 1000.0);
 
     vfed.finalize();
     fut.get();

@@ -13,9 +13,9 @@
         "name": "$<field1>/$<field2>",
         "field1": ["obj1", "obj2", "obj3"],
         "field2": [
-          ["type1", "double","W"],
+          ["type1", "double", "W"],
           ["type2", "int"],
-          ["type3", "double","kV"]
+          ["type3", "double", "kV"]
         ],
         "template": { "global": true }
       }
@@ -25,9 +25,9 @@
         "name": "$<field1>/$<field2>",
         "field1": ["objA", "objB", "objC"],
         "field2": [
-          ["typeA", "double","kW"],
+          ["typeA", "double", "kW"],
           ["typeB", "int"],
-          ["typeC", "double","V"]
+          ["typeC", "double", "V"]
         ],
         "template": { "global": true }
       }

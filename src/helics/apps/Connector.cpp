@@ -20,12 +20,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <optional>
 #include <regex>
 #include <set>
+#include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include <tuple>
 
 namespace helics::apps {
 
@@ -42,8 +42,9 @@ class TemplateMatcher {
     std::string_view federate;
 
   private:
-    std::vector<std::unordered_map<std::string_view, std::pair<std::string,std::string>>> templatePossibilities;
-    std::vector<std::tuple<std::string, std::string,std::string>> usedTemplates;
+    std::vector<std::unordered_map<std::string_view, std::pair<std::string, std::string>>>
+        templatePossibilities;
+    std::vector<std::tuple<std::string, std::string, std::string>> usedTemplates;
     std::vector<std::string> intermediaries;
     std::vector<std::deque<std::string>> keys;
     std::vector<std::size_t> combinations{0};
@@ -53,7 +54,7 @@ class TemplateMatcher {
     void initialize();
 
     bool loadTemplate(const Json::Value& iTemplate);
-    [[nodiscard]] std::optional<std::tuple<std::string_view, std::string_view,std::string_view>>
+    [[nodiscard]] std::optional<std::tuple<std::string_view, std::string_view, std::string_view>>
         isTemplateMatch(std::string_view testString) const;
     void setAsUsed(std::tuple<std::string_view, std::string_view, std::string_view> match);
     std::size_t possibilitiesCount() const { return combinations.back(); }
@@ -144,23 +145,22 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
     keys.resize(valueNames.size());
     for (index = 0; index < valueNames.size(); ++index) {
         for (const auto& val : iTemplate[valueNames[index]]) {
-            std::pair<std::string,std::string> typeAndUnits;
+            std::pair<std::string, std::string> typeAndUnits;
             std::string_view keyval;
             if (val.isArray()) {
                 keyval = keys[index].emplace_back(val[0].asCString());
-                switch (val.size())
-                {
-                case 1:
-                    break;
-                case 2:
-                    typeAndUnits.first=val[1].asString();
-                    break;
-                case 3:
-                default:
-                    typeAndUnits.first=val[1].asString();
-                    typeAndUnits.second=val[2].asString();
-                    break;
-                }   
+                switch (val.size()) {
+                    case 1:
+                        break;
+                    case 2:
+                        typeAndUnits.first = val[1].asString();
+                        break;
+                    case 3:
+                    default:
+                        typeAndUnits.first = val[1].asString();
+                        typeAndUnits.second = val[2].asString();
+                        break;
+                }
             } else {
                 keyval = keys[index].emplace_back(val.asCString());
             }
@@ -185,7 +185,7 @@ void TemplateMatcher::initialize()
     }
 }
 
-std::optional<std::tuple<std::string_view, std::string_view,std::string_view>>
+std::optional<std::tuple<std::string_view, std::string_view, std::string_view>>
     TemplateMatcher::isTemplateMatch(std::string_view testString) const
 {
     std::vector<std::size_t> intermediateIndices;
@@ -227,12 +227,13 @@ std::optional<std::tuple<std::string_view, std::string_view,std::string_view>>
         }
         ++index;
     }
-    return {std::make_tuple(testString, iType,iUnits)};
+    return {std::make_tuple(testString, iType, iUnits)};
 }
 
-void TemplateMatcher::setAsUsed(std::tuple<std::string_view, std::string_view,std::string_view> match)
+void TemplateMatcher::setAsUsed(
+    std::tuple<std::string_view, std::string_view, std::string_view> match)
 {
-    usedTemplates.emplace_back(std::get<0>(match), std::get<1>(match),std::get<2>(match));
+    usedTemplates.emplace_back(std::get<0>(match), std::get<1>(match), std::get<2>(match));
 }
 
 std::string TemplateMatcher::instantiateTemplate(std::size_t index)
@@ -261,7 +262,7 @@ Json::Value TemplateMatcher::usedInterfaceGeneration()
         if (std::get<0>(used) == prev) {
             continue;
         }
-        prev=std::get<0>(used);
+        prev = std::get<0>(used);
         Json::Value iArray = Json::arrayValue;
         iArray.append(std::get<0>(used));
         iArray.append(std::get<1>(used));
@@ -286,8 +287,7 @@ static void fedConnectionList(ConnectionsList& connections, const Json::Value& f
         }
         if (fed.isMember("connected_publications")) {
             for (const auto& pub : fed["connected_publications"]) {
-                const std::string_view pub1 =
-                    connections.interfaces.emplace_back(pub.asString());
+                const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
                 connections.pubs.insert(pub1);
             }
         }
@@ -301,8 +301,7 @@ static void fedConnectionList(ConnectionsList& connections, const Json::Value& f
         }
         if (fed.isMember("unconnected_publications")) {
             for (const auto& pub : fed["unconnected_publications"]) {
-                const std::string_view pub1 =
-                    connections.interfaces.emplace_back(pub.asString());
+                const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
                 connections.unconnectedPubs.push_back(pub1);
                 connections.pubs.insert(pub1);
             }
@@ -344,8 +343,7 @@ static void fedConnectionList(ConnectionsList& connections, const Json::Value& f
                         if (name.empty()) {
                             continue;
                         }
-                        const std::string_view input1 =
-                            connections.interfaces.emplace_back(name);
+                        const std::string_view input1 = connections.interfaces.emplace_back(name);
                         connections.potentialInputs.emplace(
                             input1, PotentialConnections{federateName, input1, false});
                     } else if (input.isString()) {
@@ -363,8 +361,7 @@ static void fedConnectionList(ConnectionsList& connections, const Json::Value& f
                         if (name.empty()) {
                             continue;
                         }
-                        const std::string_view pub1 =
-                            connections.interfaces.emplace_back(name);
+                        const std::string_view pub1 = connections.interfaces.emplace_back(name);
                         connections.potentialPubs.emplace(
                             pub1, PotentialConnections{federateName, pub1, false});
                     } else if (pub.isString()) {
@@ -385,14 +382,12 @@ static void fedConnectionList(ConnectionsList& connections, const Json::Value& f
                         const std::string_view endpoint1 =
                             connections.interfaces.emplace_back(name);
                         connections.potentialEndpoints.emplace(
-                            endpoint1,
-                            PotentialConnections{federateName, endpoint1, false});
+                            endpoint1, PotentialConnections{federateName, endpoint1, false});
                     } else {
                         const std::string_view endpoint1 =
                             connections.interfaces.emplace_back(endpoint.asCString());
                         connections.potentialEndpoints.emplace(
-                            endpoint1,
-                            PotentialConnections{federateName, endpoint1, false});
+                            endpoint1, PotentialConnections{federateName, endpoint1, false});
                     }
                 }
             }
@@ -402,8 +397,7 @@ static void fedConnectionList(ConnectionsList& connections, const Json::Value& f
                         TemplateMatcher temp;
                         temp.federate = federateName;
                         if (temp.loadTemplate(pubTemplate)) {
-                            connections.potentialPublicationTemplates.push_back(
-                                std::move(temp));
+                            connections.potentialPublicationTemplates.push_back(std::move(temp));
                         }
                     }
                 }
@@ -425,8 +419,7 @@ static void fedConnectionList(ConnectionsList& connections, const Json::Value& f
                         TemplateMatcher temp;
                         temp.federate = federateName;
                         if (temp.loadTemplate(endTemplate)) {
-                            connections.potentialEndpointTemplates.push_back(
-                                std::move(temp));
+                            connections.potentialEndpointTemplates.push_back(std::move(temp));
                         }
                     }
                 }
@@ -446,7 +439,7 @@ static void coreConnectionList(ConnectionsList& connections, const Json::Value& 
     }
     if (core.isMember("federates")) {
         for (const auto& fed : core["federates"]) {
-            fedConnectionList(connections,fed);
+            fedConnectionList(connections, fed);
         }
     }
 }
@@ -1463,9 +1456,12 @@ static int addUsedPotentialInterfaceTemplates(Json::Value& potentialCommand,
             }
             potentialCommand[type].append(ifaceTemplate.usedInterfaceGeneration());
             if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
-                fed->logMessage(
-                    HELICS_LOG_LEVEL_CONNECTIONS,
-                    fmt::format("federate {} request {} {}", possibleFed, type,fileops::generateJsonString(ifaceTemplate.usedInterfaceGeneration())));
+                fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
+                                fmt::format("federate {} request {} {}",
+                                            possibleFed,
+                                            type,
+                                            fileops::generateJsonString(
+                                                ifaceTemplate.usedInterfaceGeneration())));
             }
         }
     }

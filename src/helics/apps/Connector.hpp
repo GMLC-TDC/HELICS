@@ -176,8 +176,9 @@ necessary
         std::vector<TemplateMatcher>& potentialTemplates,
         const std::unordered_multimap<std::string_view, std::string_view>& aliases);
     /** get a list of the possible connections to based on the connections map*/
-    std::vector<Connection> buildPossibleConnectionList(std::string_view startingInterface,
-                                                        const std::vector<std::size_t>& tagList) const;
+    std::vector<Connection>
+        buildPossibleConnectionList(std::string_view startingInterface,
+                                    const std::vector<std::size_t>& tagList) const;
     /** load the regex matchers */
     void generateRegexMatchers();
 

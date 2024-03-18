@@ -327,9 +327,9 @@ or
         "name": "$<field1>/$<field2>",
         "field1": ["objA", "objB", "objC"],
         "field2": [
-          ["typeA", "double","W"],
+          ["typeA", "double", "W"],
           ["typeB", "int"],
-          ["typeC", "double","kV"]
+          ["typeC", "double", "kV"]
         ],
         "template": { "global": true }
       }

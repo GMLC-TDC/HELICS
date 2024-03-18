@@ -127,7 +127,7 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                     bool noUnits{false};
                     if (iType.first == "endpoints") {
                         generator["targeted"] = true;
-                        noUnits=true;
+                        noUnits = true;
                     }
                     for (auto& templateInterfaces : json[templateKey]) {
                         auto templateName = fileops::getName(templateInterfaces);
@@ -146,8 +146,7 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                                 if (!str.empty()) {
                                     interfaceSpec["type"] = interfaceName[1];
                                 }
-                                if (!noUnits)
-                                {
+                                if (!noUnits) {
                                     str = interfaceName[2].asString();
                                     if (!str.empty()) {
                                         interfaceSpec["units"] = interfaceName[2];
