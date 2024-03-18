@@ -211,7 +211,7 @@ void FederateState::reset(const CoreFederateInfo& fedInfo)
     time_granted = startupTime;
     allowed_send_time = startupTime;
 
-    queryCallback = nullptr;
+    queryCallbacks.clear();
     fedCallbacks = nullptr;
     tags.clear();
     // now update with the new properties
