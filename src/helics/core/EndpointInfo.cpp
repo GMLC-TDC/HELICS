@@ -211,7 +211,6 @@ void EndpointInfo::addSource(GlobalHandle source,
 void EndpointInfo::removeTarget(GlobalHandle targetId)
 {
     if (!targetInformation.empty()) {
-        auto tinfo = targetInformation.begin();
         auto removeIterator = std::remove_if(targetInformation.begin(),
                                              targetInformation.end(),
                                              [targetId](const auto& targetInfo) {
@@ -237,7 +236,6 @@ void EndpointInfo::removeTarget(GlobalHandle targetId)
 void EndpointInfo::disconnectFederate(GlobalFederateId fedToDisconnect)
 {
     if (!targetInformation.empty()) {
-        auto tinfo = targetInformation.begin();
         auto removeIterator = std::remove_if(targetInformation.begin(),
                                              targetInformation.end(),
                                              [fedToDisconnect](const auto& targetInfo) {
