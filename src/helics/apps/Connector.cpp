@@ -35,29 +35,30 @@ struct PotentialConnections {
     bool used{false};
 };
 
-class TemplateMatcher
-{
-public:
+class TemplateMatcher {
+  public:
     std::string templateName;
     std::string_view federate;
-private:
-    std::vector<std::unordered_map<std::string_view,std::string>> templatePossibilities;
-    std::vector<std::pair<std::string,std::string>> usedTemplates;
+
+  private:
+    std::vector<std::unordered_map<std::string_view, std::string>> templatePossibilities;
+    std::vector<std::pair<std::string, std::string>> usedTemplates;
     std::vector<std::string> intermediaries;
     std::vector<std::deque<std::string>> keys;
     std::vector<std::size_t> combinations{0};
-public:
-/* methods*/
+
+  public:
+    /* methods*/
     void initialize();
 
-    bool loadTemplate(const Json::Value &info);
-    std::optional<std::pair<std::string_view,std::string_view>> isTemplateMatch(std::string_view testString) const;
-    void setAsUsed(std::pair<std::string_view,std::string_view> match);
-    std::size_t possibilitiesCount() const{return combinations.back();}
+    bool loadTemplate(const Json::Value& info);
+    std::optional<std::pair<std::string_view, std::string_view>>
+        isTemplateMatch(std::string_view testString) const;
+    void setAsUsed(std::pair<std::string_view, std::string_view> match);
+    std::size_t possibilitiesCount() const { return combinations.back(); }
     std::string instantiateTemplate(std::size_t index);
-    bool isUsed() const{return !usedTemplates.empty(); }
+    bool isUsed() const { return !usedTemplates.empty(); }
     Json::Value usedInterfaceGeneration();
-
 };
 /** data class for information from queries*/
 struct ConnectionsList {
@@ -104,45 +105,35 @@ static void loadTags(ConnectionsList& connections, const Json::Value& tags)
 
 bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
 {
-    templateName=fileops::getName(iTemplate);
+    templateName = fileops::getName(iTemplate);
 
-    auto tnameIndex=templateName.find("$<");
-    if (tnameIndex == std::string::npos)
-    {
+    auto tnameIndex = templateName.find("$<");
+    if (tnameIndex == std::string::npos) {
         return false;
     }
-    if (tnameIndex == 0)
-    {
+    if (tnameIndex == 0) {
         intermediaries.push_back("");
-    }
-    else
-    {
-        intermediaries.push_back(templateName.substr(0,tnameIndex));
+    } else {
+        intermediaries.push_back(templateName.substr(0, tnameIndex));
     }
     std::vector<std::string> valueNames;
     int index{0};
-    while (tnameIndex != std::string::npos)
-    {
-        auto close=templateName.find_first_of('>',tnameIndex);
-        std::string tname=templateName.substr(tnameIndex+2,close-tnameIndex-2);
-        if (!iTemplate.isMember(tname))
-        {
+    while (tnameIndex != std::string::npos) {
+        auto close = templateName.find_first_of('>', tnameIndex);
+        std::string tname = templateName.substr(tnameIndex + 2, close - tnameIndex - 2);
+        if (!iTemplate.isMember(tname)) {
             return false;
         }
         valueNames.push_back(tname);
-       
-        tnameIndex=templateName.find("$<",close+1);
-        if (tnameIndex == close + 1)
-        {
+
+        tnameIndex = templateName.find("$<", close + 1);
+        if (tnameIndex == close + 1) {
             return false;
         }
-        if (tnameIndex == std::string::npos)
-        {
-            intermediaries.push_back(templateName.substr(close+1));
-        }
-        else
-        {
-            intermediaries.push_back(templateName.substr(close+1,tnameIndex-close-1));
+        if (tnameIndex == std::string::npos) {
+            intermediaries.push_back(templateName.substr(close + 1));
+        } else {
+            intermediaries.push_back(templateName.substr(close + 1, tnameIndex - close - 1));
         }
 
         ++index;
@@ -150,18 +141,13 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
 
     templatePossibilities.resize(valueNames.size());
     keys.resize(valueNames.size());
-    for (index = 0; index < valueNames.size(); ++index)
-    {
-        for (auto& val : iTemplate[valueNames[index]])
-        {
-            if (val.isArray())
-            {
-                std::string_view keyval=keys[index].emplace_back(val[0].asCString());
+    for (index = 0; index < valueNames.size(); ++index) {
+        for (auto& val : iTemplate[valueNames[index]]) {
+            if (val.isArray()) {
+                std::string_view keyval = keys[index].emplace_back(val[0].asCString());
                 templatePossibilities[index].emplace(keyval, val[1].asString());
-            }
-            else
-            {
-                std::string_view keyval=keys[index].emplace_back(val.asCString());
+            } else {
+                std::string_view keyval = keys[index].emplace_back(val.asCString());
                 templatePossibilities[index].emplace(keyval, "");
             }
         }
@@ -170,118 +156,98 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
     return true;
 }
 
-
 void TemplateMatcher::initialize()
 {
-    combinations.resize(keys.size()+1);
-    std::size_t possibilities=1;
-    for (const auto& field : keys)
-    {
-        possibilities*=field.size();
+    combinations.resize(keys.size() + 1);
+    std::size_t possibilities = 1;
+    for (const auto& field : keys) {
+        possibilities *= field.size();
     }
-    combinations.back()=possibilities;
-    for (std::size_t ii = 0; ii < keys.size(); ++ii)
-    {
-        possibilities/=keys[ii].size();
-        combinations[ii]=possibilities;
+    combinations.back() = possibilities;
+    for (std::size_t ii = 0; ii < keys.size(); ++ii) {
+        possibilities /= keys[ii].size();
+        combinations[ii] = possibilities;
     }
-    
 }
 
-std::optional<std::pair<std::string_view,std::string_view>>  TemplateMatcher::isTemplateMatch(std::string_view testString) const
+std::optional<std::pair<std::string_view, std::string_view>>
+    TemplateMatcher::isTemplateMatch(std::string_view testString) const
 {
     std::vector<std::size_t> intermediateIndices;
     intermediateIndices.reserve(intermediaries.size());
     std::size_t index{0};
-    for (auto& intermedial : intermediaries)
-    {
-        if (intermedial.empty())
-        {
-            if (intermediateIndices.empty())
-            {
+    for (auto& intermedial : intermediaries) {
+        if (intermedial.empty()) {
+            if (intermediateIndices.empty()) {
                 intermediateIndices.push_back(index);
-            }
-            else
-            {
+            } else {
                 intermediateIndices.push_back(std::string::npos);
             }
-            
-        }
-        else
-        {
-            index=testString.find_first_of(intermedial,index);
-            if (index == std::string_view::npos)
-            {
+
+        } else {
+            index = testString.find_first_of(intermedial, index);
+            if (index == std::string_view::npos) {
                 return std::nullopt;
             }
             intermediateIndices.push_back(index);
-            index+=intermedial.size();
+            index += intermedial.size();
         }
     }
-    index=0;
+    index = 0;
     std::string_view iType;
-    while (index < intermediateIndices.size()-1)
-    {
-        auto index1=intermediateIndices[index]+intermediaries[index].size();
-        auto length=intermediateIndices[index+1]-index1;
-        auto tString=testString.substr(index1,length);
-        auto loc=templatePossibilities[index].find(tString);
-        if (loc == templatePossibilities[index].end())
-        {
+    while (index < intermediateIndices.size() - 1) {
+        auto index1 = intermediateIndices[index] + intermediaries[index].size();
+        auto length = intermediateIndices[index + 1] - index1;
+        auto tString = testString.substr(index1, length);
+        auto loc = templatePossibilities[index].find(tString);
+        if (loc == templatePossibilities[index].end()) {
             return std::nullopt;
         }
-        if (!loc->second.empty())
-        {
-            iType=loc->second;
+        if (!loc->second.empty()) {
+            iType = loc->second;
         }
         ++index;
     }
-    return {std::make_pair(testString,iType)};
-
+    return {std::make_pair(testString, iType)};
 }
 
-void TemplateMatcher::setAsUsed(std::pair<std::string_view,std::string_view> match)
+void TemplateMatcher::setAsUsed(std::pair<std::string_view, std::string_view> match)
 {
-    usedTemplates.emplace_back(match.first,match.second);
+    usedTemplates.emplace_back(match.first, match.second);
 }
 
 std::string TemplateMatcher::instantiateTemplate(std::size_t index)
 {
-    if (index >= combinations.back())
-    {
+    if (index >= combinations.back()) {
         return {};
     }
-    std::string rval=intermediaries.front();
-    for (std::size_t ii = 0; ii < keys.size(); ++ii)
-    {
-        std::size_t subIndex=index/combinations[ii];
-        index=index%combinations[ii];
+    std::string rval = intermediaries.front();
+    for (std::size_t ii = 0; ii < keys.size(); ++ii) {
+        std::size_t subIndex = index / combinations[ii];
+        index = index % combinations[ii];
         rval.append(keys[ii][subIndex]);
-        rval.append(intermediaries[ii+1]);
+        rval.append(intermediaries[ii + 1]);
     }
     return rval;
 }
 
 Json::Value TemplateMatcher::usedInterfaceGeneration()
 {
-    Json::Value generator=Json::objectValue;
-    generator["name"]=templateName;
-    generator["interfaces"]=Json::arrayValue;
-    std::sort(usedTemplates.begin(),usedTemplates.end());
+    Json::Value generator = Json::objectValue;
+    generator["name"] = templateName;
+    generator["interfaces"] = Json::arrayValue;
+    std::sort(usedTemplates.begin(), usedTemplates.end());
     std::string_view prev;
-    for (const auto& used : usedTemplates)
-    {
-        if (used.first == prev)
-        {
+    for (const auto& used : usedTemplates) {
+        if (used.first == prev) {
             continue;
         }
-        Json::Value iArray=Json::arrayValue;
+        Json::Value iArray = Json::arrayValue;
         iArray.append(used.first);
         iArray.append(used.second);
         generator["interfaces"].append(iArray);
     }
     return generator;
-
 }
 
 static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
@@ -414,38 +380,37 @@ static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
                             }
                         }
                     }
-                    if (potInterfaces.isMember("publication_templates"))
-                    {
+                    if (potInterfaces.isMember("publication_templates")) {
                         for (const auto& pubTemplate : potInterfaces["publication_templates"]) {
                             if (pubTemplate.isObject()) {
                                 TemplateMatcher temp;
-                                temp.federate=federateName;
+                                temp.federate = federateName;
                                 if (temp.loadTemplate(pubTemplate)) {
-                                    connections.potentialPublicationTemplates.push_back(std::move(temp));
+                                    connections.potentialPublicationTemplates.push_back(
+                                        std::move(temp));
                                 }
                             }
                         }
                     }
-                    if (potInterfaces.isMember("input_templates"))
-                    {
+                    if (potInterfaces.isMember("input_templates")) {
                         for (const auto& inpTemplate : potInterfaces["input_templates"]) {
                             if (inpTemplate.isObject()) {
                                 TemplateMatcher temp;
-                                temp.federate=federateName;
+                                temp.federate = federateName;
                                 if (temp.loadTemplate(inpTemplate)) {
                                     connections.potentialInputTemplates.push_back(std::move(temp));
                                 }
                             }
                         }
                     }
-                    if (potInterfaces.isMember("endpoint_templates"))
-                    {
+                    if (potInterfaces.isMember("endpoint_templates")) {
                         for (const auto& endTemplate : potInterfaces["endpoint_templates"]) {
                             if (endTemplate.isObject()) {
                                 TemplateMatcher temp;
-                                temp.federate=federateName;
+                                temp.federate = federateName;
                                 if (temp.loadTemplate(endTemplate)) {
-                                    connections.potentialEndpointTemplates.push_back(std::move(temp));
+                                    connections.potentialEndpointTemplates.push_back(
+                                        std::move(temp));
                                 }
                             }
                         }
@@ -516,8 +481,6 @@ static ConnectionsList generateConnectionsList(const std::string& connectionData
                    std::hash<std::string>());
     return connections;
 }
-
-
 
 Connector::Connector(std::vector<std::string> args):
     App("connector", std::move(args)), core((fed) ? fed->getCorePointer() : nullptr)
@@ -945,22 +908,18 @@ bool Connector::makePotentialTemplateConnection(
 {
     auto connectionOptions = buildPossibleConnectionList(interface, tagList);
     for (const auto& option : connectionOptions) {
-        for (auto& matcher : potentialTemplates)
-        {
-            auto match=matcher.isTemplateMatch(option.interface2);
-            if (match)
-            {
+        for (auto& matcher : potentialTemplates) {
+            auto match = matcher.isTemplateMatch(option.interface2);
+            if (match) {
                 matcher.setAsUsed(*match);
                 return true;
             }
         }
         auto aliasList = generateAliases(option.interface2, aliases);
         for (const auto& alias : aliasList) {
-            for (auto& matcher : potentialTemplates)
-            {
-                auto match=matcher.isTemplateMatch(alias);
-                if (match)
-                {
+            for (auto& matcher : potentialTemplates) {
+                auto match = matcher.isTemplateMatch(alias);
+                if (match) {
                     matcher.setAsUsed(*match);
                     return true;
                 }
@@ -988,8 +947,7 @@ bool Connector::checkPotentialConnection(
     if (makePotentialConnection(interfaceName, tagList, potentials, aliases)) {
         return true;
     }
-    if (!potentialTemplates.empty())
-    {
+    if (!potentialTemplates.empty()) {
         if (makePotentialTemplateConnection(interfaceName, tagList, potentialTemplates, aliases)) {
             return true;
         }
@@ -1003,8 +961,7 @@ bool Connector::checkPotentialConnection(
             if (makePotentialConnection(alias, tagList, potentials, aliases)) {
                 return true;
             }
-            if (!potentialTemplates.empty())
-            {
+            if (!potentialTemplates.empty()) {
                 if (makePotentialTemplateConnection(alias, tagList, potentialTemplates, aliases)) {
                     return true;
                 }
@@ -1133,7 +1090,7 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
         }
     };
 
-    const auto &tagList = possibleConnections.tagCodes;
+    const auto& tagList = possibleConnections.tagCodes;
     /** unconnected inputs*/
     for (const auto& uInp : possibleConnections.unconnectedInputs) {
         matchCount += makeTargetConnection(
@@ -1169,17 +1126,16 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
     }
 }
 
-
 void Connector::scanPotentialInterfaces(ConnectionsList& possibleConnections)
 {
     /** potential inputs*/
     for (auto& pInp : possibleConnections.potentialInputs) {
         if (checkPotentialConnection(pInp.first,
-            possibleConnections.tagCodes,
-            possibleConnections.pubs,
-            possibleConnections.potentialPubs,
-            possibleConnections.potentialPublicationTemplates,
-            possibleConnections.aliases)) {
+                                     possibleConnections.tagCodes,
+                                     possibleConnections.pubs,
+                                     possibleConnections.potentialPubs,
+                                     possibleConnections.potentialPublicationTemplates,
+                                     possibleConnections.aliases)) {
             pInp.second.used = true;
         }
     }
@@ -1189,11 +1145,11 @@ void Connector::scanPotentialInterfaces(ConnectionsList& possibleConnections)
             continue;
         }
         if (checkPotentialConnection(pPub.first,
-            possibleConnections.tagCodes,
-            possibleConnections.inputs,
-            possibleConnections.potentialInputs,
-            possibleConnections.potentialInputTemplates,
-            possibleConnections.aliases)) {
+                                     possibleConnections.tagCodes,
+                                     possibleConnections.inputs,
+                                     possibleConnections.potentialInputs,
+                                     possibleConnections.potentialInputTemplates,
+                                     possibleConnections.aliases)) {
             pPub.second.used = true;
         }
     }
@@ -1204,72 +1160,62 @@ void Connector::scanPotentialInterfaces(ConnectionsList& possibleConnections)
             continue;
         }
         if (checkPotentialConnection(pEnd.first,
-            possibleConnections.tagCodes,
-            possibleConnections.endpoints,
-            possibleConnections.potentialEndpoints,
-            possibleConnections.potentialEndpointTemplates,
-            possibleConnections.aliases)) {
+                                     possibleConnections.tagCodes,
+                                     possibleConnections.endpoints,
+                                     possibleConnections.potentialEndpoints,
+                                     possibleConnections.potentialEndpointTemplates,
+                                     possibleConnections.aliases)) {
             pEnd.second.used = true;
         }
     }
 }
 
-
 void Connector::scanPotentialInterfaceTemplates(ConnectionsList& possibleConnections)
 {
     /** now run through the potential interface templates as if they were directly listed*/
-    for (auto& inpTemplate : possibleConnections.potentialInputTemplates)
-    {
-        for (std::size_t ii = 0; ii < inpTemplate.possibilitiesCount(); ++ii)
-        {
-            std::string possibility=inpTemplate.instantiateTemplate(ii);
+    for (auto& inpTemplate : possibleConnections.potentialInputTemplates) {
+        for (std::size_t ii = 0; ii < inpTemplate.possibilitiesCount(); ++ii) {
+            std::string possibility = inpTemplate.instantiateTemplate(ii);
             if (checkPotentialConnection(possibility,
-                possibleConnections.tagCodes,
-                possibleConnections.pubs,
-                possibleConnections.potentialPubs,
-                possibleConnections.potentialPublicationTemplates,
-                possibleConnections.aliases)) {
-                auto check=inpTemplate.isTemplateMatch(possibility);
-                if (check)
-                {
+                                         possibleConnections.tagCodes,
+                                         possibleConnections.pubs,
+                                         possibleConnections.potentialPubs,
+                                         possibleConnections.potentialPublicationTemplates,
+                                         possibleConnections.aliases)) {
+                auto check = inpTemplate.isTemplateMatch(possibility);
+                if (check) {
                     inpTemplate.setAsUsed(*check);
                 }
             }
         }
     }
-    for (auto& pubTemplate : possibleConnections.potentialPublicationTemplates)
-    {
-        for (std::size_t ii = 0; ii < pubTemplate.possibilitiesCount(); ++ii)
-        {
-            std::string possibility=pubTemplate.instantiateTemplate(ii);
+    for (auto& pubTemplate : possibleConnections.potentialPublicationTemplates) {
+        for (std::size_t ii = 0; ii < pubTemplate.possibilitiesCount(); ++ii) {
+            std::string possibility = pubTemplate.instantiateTemplate(ii);
             if (checkPotentialConnection(possibility,
-                possibleConnections.tagCodes,
-                possibleConnections.inputs,
-                possibleConnections.potentialInputs,
-                possibleConnections.potentialInputTemplates,
-                possibleConnections.aliases)) {
-                auto check=pubTemplate.isTemplateMatch(possibility);
-                if (check)
-                {
+                                         possibleConnections.tagCodes,
+                                         possibleConnections.inputs,
+                                         possibleConnections.potentialInputs,
+                                         possibleConnections.potentialInputTemplates,
+                                         possibleConnections.aliases)) {
+                auto check = pubTemplate.isTemplateMatch(possibility);
+                if (check) {
                     pubTemplate.setAsUsed(*check);
                 }
             }
         }
     }
-    for (auto& endTemplate : possibleConnections.potentialEndpointTemplates)
-    {
-        for (std::size_t ii = 0; ii < endTemplate.possibilitiesCount(); ++ii)
-        {
-            std::string possibility=endTemplate.instantiateTemplate(ii);
+    for (auto& endTemplate : possibleConnections.potentialEndpointTemplates) {
+        for (std::size_t ii = 0; ii < endTemplate.possibilitiesCount(); ++ii) {
+            std::string possibility = endTemplate.instantiateTemplate(ii);
             if (checkPotentialConnection(possibility,
-                possibleConnections.tagCodes,
-                possibleConnections.endpoints,
-                possibleConnections.potentialEndpoints,
-                possibleConnections.potentialEndpointTemplates,
-                possibleConnections.aliases)) {
-                auto check=endTemplate.isTemplateMatch(possibility);
-                if (check)
-                {
+                                         possibleConnections.tagCodes,
+                                         possibleConnections.endpoints,
+                                         possibleConnections.potentialEndpoints,
+                                         possibleConnections.potentialEndpointTemplates,
+                                         possibleConnections.aliases)) {
+                auto check = endTemplate.isTemplateMatch(possibility);
+                if (check) {
                     endTemplate.setAsUsed(*check);
                 }
             }
@@ -1277,13 +1223,14 @@ void Connector::scanPotentialInterfaceTemplates(ConnectionsList& possibleConnect
     }
 }
 
-
 void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
 {
     /** unconnected inputs*/
     for (const auto& uInp : possibleConnections.unconnectedInputs) {
-        if (makePotentialConnection(
-            uInp, possibleConnections.tagCodes, possibleConnections.potentialPubs, possibleConnections.aliases)) {
+        if (makePotentialConnection(uInp,
+                                    possibleConnections.tagCodes,
+                                    possibleConnections.potentialPubs,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
@@ -1293,9 +1240,9 @@ void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
                     continue;
                 }
                 if (makePotentialConnection(alias,
-                    possibleConnections.tagCodes,
-                    possibleConnections.potentialPubs,
-                    possibleConnections.aliases)) {
+                                            possibleConnections.tagCodes,
+                                            possibleConnections.potentialPubs,
+                                            possibleConnections.aliases)) {
                     break;
                 }
             }
@@ -1304,8 +1251,10 @@ void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
 
     /** unconnected publications*/
     for (const auto& uPub : possibleConnections.unconnectedPubs) {
-        if (makePotentialConnection(
-            uPub, possibleConnections.tagCodes, possibleConnections.potentialInputs, possibleConnections.aliases)) {
+        if (makePotentialConnection(uPub,
+                                    possibleConnections.tagCodes,
+                                    possibleConnections.potentialInputs,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
@@ -1315,9 +1264,9 @@ void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
                     continue;
                 }
                 if (makePotentialConnection(alias,
-                    possibleConnections.tagCodes,
-                    possibleConnections.potentialInputs,
-                    possibleConnections.aliases)) {
+                                            possibleConnections.tagCodes,
+                                            possibleConnections.potentialInputs,
+                                            possibleConnections.aliases)) {
                     break;
                 }
             }
@@ -1327,9 +1276,9 @@ void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
     /** unconnected source endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedSourceEndpoints) {
         if (makePotentialConnection(uEnd,
-            possibleConnections.tagCodes,
-            possibleConnections.potentialEndpoints,
-            possibleConnections.aliases)) {
+                                    possibleConnections.tagCodes,
+                                    possibleConnections.potentialEndpoints,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
@@ -1339,9 +1288,9 @@ void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
                     continue;
                 }
                 if (makePotentialConnection(alias,
-                    possibleConnections.tagCodes,
-                    possibleConnections.potentialEndpoints,
-                    possibleConnections.aliases)) {
+                                            possibleConnections.tagCodes,
+                                            possibleConnections.potentialEndpoints,
+                                            possibleConnections.aliases)) {
                     break;
                 }
             }
@@ -1351,9 +1300,9 @@ void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
     /** unconnected target endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedTargetEndpoints) {
         if (makePotentialConnection(uEnd,
-            possibleConnections.tagCodes,
-            possibleConnections.potentialEndpoints,
-            possibleConnections.aliases)) {
+                                    possibleConnections.tagCodes,
+                                    possibleConnections.potentialEndpoints,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
@@ -1363,9 +1312,9 @@ void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
                     continue;
                 }
                 if (makePotentialConnection(alias,
-                    possibleConnections.tagCodes,
-                    possibleConnections.potentialEndpoints,
-                    possibleConnections.aliases)) {
+                                            possibleConnections.tagCodes,
+                                            possibleConnections.potentialEndpoints,
+                                            possibleConnections.aliases)) {
                     break;
                 }
             }
@@ -1375,7 +1324,6 @@ void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
 
 void Connector::scanUnknownInterfaces(ConnectionsList& possibleConnections)
 {
-
     for (const auto& uInp : possibleConnections.unknownInputs) {
         auto fnd = possibleConnections.potentialInputs.find(uInp);
         if (fnd != possibleConnections.potentialInputs.end()) {
@@ -1428,62 +1376,64 @@ void Connector::scanUnknownInterfaces(ConnectionsList& possibleConnections)
     }
 }
 
-static int addUsedPotentialInterfaceToCommand(Json::Value &potentialCommand,const std::unordered_map<std::string_view, PotentialConnections>& potentials,const std::string &possibleFed,int logLevel, const std::string& type,Federate* fed)
+static int addUsedPotentialInterfaceToCommand(
+    Json::Value& potentialCommand,
+    const std::unordered_map<std::string_view, PotentialConnections>& potentials,
+    const std::string& possibleFed,
+    int logLevel,
+    const std::string& type,
+    Federate* fed)
 {
     int interfaceCount{0};
     std::vector<std::remove_cv_t<std::remove_reference_t<decltype(*potentials.begin())>>>
         enabledInterfaces;
     std::copy_if(potentials.begin(),
-        potentials.end(),
-        std::back_inserter(enabledInterfaces),
-        [possibleFed](auto& pInterface) {
-            return (pInterface.second.federate == possibleFed &&
-                pInterface.second.used == true);
-        });
+                 potentials.end(),
+                 std::back_inserter(enabledInterfaces),
+                 [possibleFed](auto& pInterface) {
+                     return (pInterface.second.federate == possibleFed &&
+                             pInterface.second.used == true);
+                 });
     if (!enabledInterfaces.empty()) {
         potentialCommand[type] = Json::arrayValue;
         for (const auto& iface : enabledInterfaces) {
             potentialCommand[type].append(std::string(iface.first));
             ++interfaceCount;
             if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
-                fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                    fmt::format("federate {} request {} {}",
-                        possibleFed,
-                        type,
-                        iface.first));
+                fed->logMessage(
+                    HELICS_LOG_LEVEL_CONNECTIONS,
+                    fmt::format("federate {} request {} {}", possibleFed, type, iface.first));
             }
         }
     }
     return interfaceCount;
 }
 
-static int addUsedPotentialInterfaceTemplates(Json::Value &potentialCommand, std::vector<TemplateMatcher>& potentials, const std::string& possibleFed, int logLevel, const std::string& type, Federate* fed)
+static int addUsedPotentialInterfaceTemplates(Json::Value& potentialCommand,
+                                              std::vector<TemplateMatcher>& potentials,
+                                              const std::string& possibleFed,
+                                              int logLevel,
+                                              const std::string& type,
+                                              Federate* fed)
 {
     bool hasInterfaceTemplates{false};
-    for (auto& ifaceTemplate : potentials)
-    {
-        if (ifaceTemplate.federate != possibleFed)
-        {
+    for (auto& ifaceTemplate : potentials) {
+        if (ifaceTemplate.federate != possibleFed) {
             continue;
         }
-        if (!ifaceTemplate.isUsed())
-        {
+        if (!ifaceTemplate.isUsed()) {
             continue;
         }
-        hasInterfaceTemplates=true;
+        hasInterfaceTemplates = true;
         break;
     }
-    if (hasInterfaceTemplates)
-    {
+    if (hasInterfaceTemplates) {
         potentialCommand[type] = Json::arrayValue;
-        for (auto& ifaceTemplate : potentials)
-        {
-            if (ifaceTemplate.federate != possibleFed)
-            {
+        for (auto& ifaceTemplate : potentials) {
+            if (ifaceTemplate.federate != possibleFed) {
                 continue;
             }
-            if (!ifaceTemplate.isUsed())
-            {
+            if (!ifaceTemplate.isUsed()) {
                 continue;
             }
             potentialCommand[type].append(ifaceTemplate.usedInterfaceGeneration());
@@ -1502,26 +1452,53 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
     scanUnconnectedInterfaces(possibleConnections);
     /** check for unknown interface connections to potential interfaces*/
     scanUnknownInterfaces(possibleConnections);
-   
-    
 
     int logLevel = fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
     for (auto& possibleFed : possibleConnections.federatesWithPotentialInterfaces) {
         Json::Value establishInterfaces;
         establishInterfaces["command"] = "register_interfaces";
-        addUsedPotentialInterfaceToCommand(establishInterfaces,possibleConnections.potentialInputs,possibleFed,logLevel,"inputs",fed.get());
-        addUsedPotentialInterfaceToCommand(establishInterfaces,possibleConnections.potentialPubs,possibleFed,logLevel,"publications",fed.get());
-        addUsedPotentialInterfaceToCommand(establishInterfaces,possibleConnections.potentialEndpoints,possibleFed,logLevel,"endpoints",fed.get());
-        
-        addUsedPotentialInterfaceTemplates(establishInterfaces,possibleConnections.potentialPublicationTemplates,possibleFed,logLevel,"templated_publications",fed.get());
-        addUsedPotentialInterfaceTemplates(establishInterfaces,possibleConnections.potentialInputTemplates,possibleFed,logLevel,"templated_inputs",fed.get());
-        addUsedPotentialInterfaceTemplates(establishInterfaces,possibleConnections.potentialEndpointTemplates,possibleFed,logLevel,"templated_endpoints",fed.get());
-        std::string commandStr=fileops::generateJsonString(establishInterfaces);
+        addUsedPotentialInterfaceToCommand(establishInterfaces,
+                                           possibleConnections.potentialInputs,
+                                           possibleFed,
+                                           logLevel,
+                                           "inputs",
+                                           fed.get());
+        addUsedPotentialInterfaceToCommand(establishInterfaces,
+                                           possibleConnections.potentialPubs,
+                                           possibleFed,
+                                           logLevel,
+                                           "publications",
+                                           fed.get());
+        addUsedPotentialInterfaceToCommand(establishInterfaces,
+                                           possibleConnections.potentialEndpoints,
+                                           possibleFed,
+                                           logLevel,
+                                           "endpoints",
+                                           fed.get());
+
+        addUsedPotentialInterfaceTemplates(establishInterfaces,
+                                           possibleConnections.potentialPublicationTemplates,
+                                           possibleFed,
+                                           logLevel,
+                                           "templated_publications",
+                                           fed.get());
+        addUsedPotentialInterfaceTemplates(establishInterfaces,
+                                           possibleConnections.potentialInputTemplates,
+                                           possibleFed,
+                                           logLevel,
+                                           "templated_inputs",
+                                           fed.get());
+        addUsedPotentialInterfaceTemplates(establishInterfaces,
+                                           possibleConnections.potentialEndpointTemplates,
+                                           possibleFed,
+                                           logLevel,
+                                           "templated_endpoints",
+                                           fed.get());
+        std::string commandStr = fileops::generateJsonString(establishInterfaces);
         fed->sendCommand(possibleFed, commandStr);
         if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
             fed->logInfoMessage(fmt::format("{} interfaces requested", interfacesRequested));
         }
-       
     }
 }
 

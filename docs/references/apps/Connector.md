@@ -257,21 +257,47 @@ The federate object and the connector also support interface definition template
 
 ```json
 {
-    "potential_interfaces": {
-      
-      "endpoint_templates":[
-          {
-              "name":"obj$<number>/ept$<letter>/type$<letter>/mode$<letter>",
-              "number":["1","2","3","4","5","6","7","8","9","0"],
-              "letter":["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
-              "template":{"global":true}
-          }
-      ]
-    }
+  "potential_interfaces": {
+    "endpoint_templates": [
+      {
+        "name": "obj$<number>/ept$<letter>/type$<letter>/mode$<letter>",
+        "number": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+        "letter": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "I",
+          "J",
+          "K",
+          "L",
+          "M",
+          "N",
+          "O",
+          "P",
+          "Q",
+          "R",
+          "S",
+          "T",
+          "U",
+          "V",
+          "W",
+          "X",
+          "Y",
+          "Z"
+        ],
+        "template": { "global": true }
+      }
+    ]
   }
+}
 ```
 
-or 
+or
 
 ```json
 {
@@ -284,24 +310,32 @@ or
       { "name": "inp2", "global": true, "type": "double" },
       { "name": "inp1", "global": true, "type": "double" }
     ],
-    "publication_templates":[
-        {
-            "name":"$<field1>/$<field2>",
-            "field1":["obj1","obj2","obj3"],
-            "field2":[["type1","double"],["type2","int"],["type3","double"]],
-            "template":{"global":true}
-        }
+    "publication_templates": [
+      {
+        "name": "$<field1>/$<field2>",
+        "field1": ["obj1", "obj2", "obj3"],
+        "field2": [
+          ["type1", "double"],
+          ["type2", "int"],
+          ["type3", "double"]
+        ],
+        "template": { "global": true }
+      }
     ],
-    "input_templates":[
-        {
-            "name":"$<field1>/$<field2>",
-            "field1":["objA","objB","objC"],
-            "field2":[["typeA","double"],["typeB","int"],["typeC","double"]],
-            "template":{"global":true}
-        }
+    "input_templates": [
+      {
+        "name": "$<field1>/$<field2>",
+        "field1": ["objA", "objB", "objC"],
+        "field2": [
+          ["typeA", "double"],
+          ["typeB", "int"],
+          ["typeC", "double"]
+        ],
+        "template": { "global": true }
+      }
     ]
   }
 }
 ```
 
-The connector will evaluate all possibilities for the template for possible connections.  The field name in `$<fieldName>` is searched for in the json file.  They may be duplicated, but are treated as independent for evaluation purposes as in the first example.  The first template example defines over 175,000 different possible interfaces.  The type of the interface can be defined as part of the template name, with the particular name as the key.  
+The connector will evaluate all possibilities for the template for possible connections. The field name in `$<fieldName>` is searched for in the json file. They may be duplicated, but are treated as independent for evaluation purposes as in the first example. The first template example defines over 175,000 different possible interfaces. The type of the interface can be defined as part of the template name, with the particular name as the key.

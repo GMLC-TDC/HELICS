@@ -7,10 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "PotentialInterfacesManager.hpp"
 
+#include "../core/core-exceptions.hpp"
 #include "Federate.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/Core.hpp"
-#include "../core/core-exceptions.hpp"
 
 #include <set>
 
@@ -27,7 +27,7 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
     if (!json.isMember("potential_interfaces")) {
         return;
     }
-    const auto &interfaces = json["potential_interfaces"];
+    const auto& interfaces = json["potential_interfaces"];
     for (auto& itype : interfaceTypes) {
         if (interfaces.isMember(itype)) {
             auto tInterface = interfaces[itype];
@@ -37,22 +37,21 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
                 pMap[name] = ispec;
             }
         }
-        std::string tempString=itype;
+        std::string tempString = itype;
         tempString.pop_back();
-        tempString+="_templates";
+        tempString += "_templates";
         if (interfaces.isMember(tempString)) {
             auto templateInterfaces = interfaces[tempString];
             auto& tMap = potInterfaceTemplates[itype];
-            for (auto& tspec :templateInterfaces) {
+            for (auto& tspec : templateInterfaces) {
                 auto name = fileops::getName(tspec);
-                if (name.find(">$<") != std::string::npos)
-                {
-                    throw(helics::InvalidParameter("template key definitions must not be adjacent, they must have separator characters"));
+                if (name.find(">$<") != std::string::npos) {
+                    throw(helics::InvalidParameter(
+                        "template key definitions must not be adjacent, they must have separator characters"));
                 }
                 tMap[name] = tspec;
             }
         }
-        
     }
 }
 
@@ -79,9 +78,9 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
             }
         }
         for (const auto& iType : potInterfaceTemplates) {
-            std::string templateKey=iType.first;
+            std::string templateKey = iType.first;
             templateKey.pop_back();
-            templateKey+="_templates";
+            templateKey += "_templates";
             interfaces[templateKey] = Json::arrayValue;
             for (auto& ispec : iType.second) {
                 interfaces[templateKey].append(ispec.second);
@@ -129,37 +128,29 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                     if (iType.first == "endpoints") {
                         generator["targeted"] = true;
                     }
-                    for (auto& templateInterfaces : json[templateKey])
-                    {
-                        auto templateName=fileops::getName(templateInterfaces);
+                    for (auto& templateInterfaces : json[templateKey]) {
+                        auto templateName = fileops::getName(templateInterfaces);
 
-                        auto templateLoc=iType.second.find(templateName);
-                        if (templateLoc == iType.second.end())
-                        {
+                        auto templateLoc = iType.second.find(templateName);
+                        if (templateLoc == iType.second.end()) {
                             continue;
                         }
-                        auto& templateGenerator=templateLoc->second;
-                        for (auto& interfaceName :templateInterfaces["interfaces"])
-                        {
-                            Json::Value interfaceSpec=Json::nullValue;
+                        auto& templateGenerator = templateLoc->second;
+                        for (auto& interfaceName : templateInterfaces["interfaces"]) {
+                            Json::Value interfaceSpec = Json::nullValue;
                             interfaceSpec.copy(templateGenerator["template"]);
-                            if (interfaceName.isArray())
-                            {
+                            if (interfaceName.isArray()) {
                                 interfaceSpec["name"] = interfaceName[0];
-                                std::string str=interfaceName[1].asString();
-                                if (!str.empty())
-                                {
-                                    interfaceSpec["type"]=interfaceName[1];
+                                std::string str = interfaceName[1].asString();
+                                if (!str.empty()) {
+                                    interfaceSpec["type"] = interfaceName[1];
                                 }
-                               
-                            }
-                            else
-                            {
+
+                            } else {
                                 interfaceSpec["name"] = interfaceName.asString();
                             }
                             generator[iType.first].append(interfaceSpec);
                         }
-
                     }
                 }
             }

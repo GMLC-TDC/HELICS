@@ -255,8 +255,6 @@ TEST(connector_potential_interfaces, simple_connector_additional_command)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
-
-
 TEST(connector_potential_interfaces, pub_templates)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -266,7 +264,7 @@ TEST(connector_potential_interfaces, pub_templates)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("obj2/type1","inp1", InterfaceDirection::FROM_TO);
+    conn1.addConnection("obj2/type1", "inp1", InterfaceDirection::FROM_TO);
     helics::ValueFederate vfed("c1", fedInfo);
     vfed.registerInterfaces(std::string(testdir) + "simple_interfaces_templates.json");
 
@@ -297,7 +295,7 @@ TEST(connector_potential_interfaces, pub_templates_reverse)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("inp1","obj2/type1", InterfaceDirection::FROM_TO);
+    conn1.addConnection("inp1", "obj2/type1", InterfaceDirection::FROM_TO);
     helics::ValueFederate vfed("c1", fedInfo);
     vfed.registerInterfaces(std::string(testdir) + "simple_interfaces_templates.json");
 
@@ -318,7 +316,6 @@ TEST(connector_potential_interfaces, pub_templates_reverse)
     fut.get();
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
-
 
 TEST(connector_potential_interfaces, pub_template_alias)
 {
@@ -329,10 +326,10 @@ TEST(connector_potential_interfaces, pub_template_alias)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("publicationA","inp1", InterfaceDirection::FROM_TO);
+    conn1.addConnection("publicationA", "inp1", InterfaceDirection::FROM_TO);
     helics::ValueFederate vfed("c1", fedInfo);
     vfed.registerInterfaces(std::string(testdir) + "simple_interfaces_templates.json");
-    vfed.addAlias("obj2/type1","publicationA");
+    vfed.addAlias("obj2/type1", "publicationA");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     vfed.enterExecutingMode();
     EXPECT_EQ(vfed.getPublicationCount(), 1);
@@ -351,8 +348,6 @@ TEST(connector_potential_interfaces, pub_template_alias)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
-
-
 TEST(connector_potential_interfaces, pub_input_template)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -362,7 +357,7 @@ TEST(connector_potential_interfaces, pub_input_template)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("obj2/type1","objA/typeC", InterfaceDirection::FROM_TO);
+    conn1.addConnection("obj2/type1", "objA/typeC", InterfaceDirection::FROM_TO);
     helics::ValueFederate vfed("c1", fedInfo);
     vfed.registerInterfaces(std::string(testdir) + "simple_interfaces_templates2.json");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
@@ -392,7 +387,7 @@ TEST(connector_potential_interfaces, input_pub_template)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("objA/typeC","obj2/type1", InterfaceDirection::FROM_TO);
+    conn1.addConnection("objA/typeC", "obj2/type1", InterfaceDirection::FROM_TO);
     helics::ValueFederate vfed("c1", fedInfo);
     vfed.registerInterfaces(std::string(testdir) + "simple_interfaces_templates2.json");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
@@ -422,12 +417,12 @@ TEST(connector_potential_interfaces, input_pub_template_alias)
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
-    conn1.addConnection("inputA","Publication_key", InterfaceDirection::FROM_TO);
+    conn1.addConnection("inputA", "Publication_key", InterfaceDirection::FROM_TO);
     helics::ValueFederate vfed("c1", fedInfo);
     vfed.registerInterfaces(std::string(testdir) + "simple_interfaces_templates2.json");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
-    vfed.addAlias("obj2/type1","Publication_key");
-    vfed.addAlias("objA/typeC","inputA");
+    vfed.addAlias("obj2/type1", "Publication_key");
+    vfed.addAlias("objA/typeC", "inputA");
     vfed.enterExecutingMode();
     EXPECT_EQ(vfed.getPublicationCount(), 1);
     EXPECT_EQ(vfed.getInputCount(), 1);
@@ -455,18 +450,16 @@ TEST(connector_potential_interfaces, endpoint_template)
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("obj1/eptA", "obj2/eptB", InterfaceDirection::FROM_TO);
-    
+
     helics::MessageFederate mfed("c1", fedInfo);
     mfed.registerInterfaces(std::string(testdir) + "simple_endpoint_template.json");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
     mfed.enterExecutingMode();
 
-    EXPECT_EQ(mfed.getEndpointCount(),2);
-    auto &ept1=mfed.getEndpoint(0);
-    auto &ept2=mfed.getEndpoint(1);
+    EXPECT_EQ(mfed.getEndpointCount(), 2);
+    auto& ept1 = mfed.getEndpoint(0);
+    auto& ept2 = mfed.getEndpoint(1);
 
-    
-    
     constexpr std::string_view testValue = "this is a test string";
     ept1.send(testValue);
     auto retTime = mfed.requestTime(5);
@@ -477,7 +470,6 @@ TEST(connector_potential_interfaces, endpoint_template)
     mfed.finalize();
     fut.get();
 }
-
 
 TEST(connector_potential_interfaces, endpoint_template_alias)
 {
@@ -493,15 +485,13 @@ TEST(connector_potential_interfaces, endpoint_template_alias)
     helics::MessageFederate mfed("c1", fedInfo);
     mfed.registerInterfaces(std::string(testdir) + "simple_endpoint_template.json");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
-    mfed.addAlias("obj1/eptA","ept1");
-    mfed.addAlias("obj2/eptB","ept2");
+    mfed.addAlias("obj1/eptA", "ept1");
+    mfed.addAlias("obj2/eptB", "ept2");
     mfed.enterExecutingMode();
 
-    EXPECT_EQ(mfed.getEndpointCount(),2);
-    auto &ept1=mfed.getEndpoint(0);
-    auto &ept2=mfed.getEndpoint(1);
-
-
+    EXPECT_EQ(mfed.getEndpointCount(), 2);
+    auto& ept1 = mfed.getEndpoint(0);
+    auto& ept2 = mfed.getEndpoint(1);
 
     constexpr std::string_view testValue = "this is a test string";
     ept1.send(testValue);
@@ -513,7 +503,6 @@ TEST(connector_potential_interfaces, endpoint_template_alias)
     mfed.finalize();
     fut.get();
 }
-
 
 TEST(connector_potential_interfaces, big_endpoint_template_alias)
 {
@@ -529,13 +518,13 @@ TEST(connector_potential_interfaces, big_endpoint_template_alias)
     helics::MessageFederate mfed("c1", fedInfo);
     mfed.registerInterfaces(std::string(testdir) + "complex_endpoint_template.json");
     auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
-    mfed.addAlias("obj1/eptA/typeY/modeN","ept1");
-    mfed.addAlias("obj2/eptB/typeQ/modeR","ept2");
+    mfed.addAlias("obj1/eptA/typeY/modeN", "ept1");
+    mfed.addAlias("obj2/eptB/typeQ/modeR", "ept2");
     mfed.enterExecutingMode();
 
-    EXPECT_EQ(mfed.getEndpointCount(),2);
-    auto &ept1=mfed.getEndpoint(0);
-    auto &ept2=mfed.getEndpoint(1);
+    EXPECT_EQ(mfed.getEndpointCount(), 2);
+    auto& ept1 = mfed.getEndpoint(0);
+    auto& ept2 = mfed.getEndpoint(1);
 
     constexpr std::string_view testValue = "this is a test string";
     ept1.send(testValue);
