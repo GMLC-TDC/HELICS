@@ -57,7 +57,7 @@ class TemplateMatcher {
     [[nodiscard]] std::optional<std::tuple<std::string_view, std::string_view, std::string_view>>
         isTemplateMatch(std::string_view testString) const;
     void setAsUsed(std::tuple<std::string_view, std::string_view, std::string_view> match);
-    std::size_t possibilitiesCount() const { return combinations.back(); }
+    [[nodiscard]] std::size_t possibilitiesCount() const { return combinations.back(); }
     std::string instantiateTemplate(std::size_t index);
     [[nodiscard]] bool isUsed() const { return !usedTemplates.empty(); }
     Json::Value usedInterfaceGeneration();
@@ -272,6 +272,103 @@ Json::Value TemplateMatcher::usedInterfaceGeneration()
     return generator;
 }
 
+static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::Value& fed)
+{
+    connections.hasPotentialInterfaces = true;
+    const std::string_view federateName =
+        connections.federatesWithPotentialInterfaces.emplace_back(
+            fed["attributes"]["name"].asCString());
+    const auto& potInterfaces = fed["potential_interfaces"];
+    if (potInterfaces.isMember("inputs")) {
+        for (const auto& input : potInterfaces["inputs"]) {
+            if (input.isObject()) {
+                auto name = fileops::getName(input);
+                if (name.empty()) {
+                    continue;
+                }
+                const std::string_view input1 = connections.interfaces.emplace_back(name);
+                connections.potentialInputs.emplace(
+                    input1, PotentialConnections{federateName, input1, false});
+            } else if (input.isString()) {
+                const std::string_view input1 =
+                    connections.interfaces.emplace_back(input.asCString());
+                connections.potentialInputs.emplace(
+                    input1, PotentialConnections{federateName, input1, false});
+            }
+        }
+    }
+    if (potInterfaces.isMember("publications")) {
+        for (const auto& pub : potInterfaces["publications"]) {
+            if (pub.isObject()) {
+                auto name = fileops::getName(pub);
+                if (name.empty()) {
+                    continue;
+                }
+                const std::string_view pub1 = connections.interfaces.emplace_back(name);
+                connections.potentialPubs.emplace(
+                    pub1, PotentialConnections{federateName, pub1, false});
+            } else if (pub.isString()) {
+                const std::string_view pub1 =
+                    connections.interfaces.emplace_back(pub.asCString());
+                connections.potentialPubs.emplace(
+                    pub1, PotentialConnections{federateName, pub1, false});
+            }
+        }
+    }
+    if (potInterfaces.isMember("endpoints")) {
+        for (const auto& endpoint : potInterfaces["endpoints"]) {
+            if (endpoint.isObject()) {
+                auto name = fileops::getName(endpoint);
+                if (name.empty()) {
+                    continue;
+                }
+                const std::string_view endpoint1 =
+                    connections.interfaces.emplace_back(name);
+                connections.potentialEndpoints.emplace(
+                    endpoint1, PotentialConnections{federateName, endpoint1, false});
+            } else {
+                const std::string_view endpoint1 =
+                    connections.interfaces.emplace_back(endpoint.asCString());
+                connections.potentialEndpoints.emplace(
+                    endpoint1, PotentialConnections{federateName, endpoint1, false});
+            }
+        }
+    }
+    if (potInterfaces.isMember("publication_templates")) {
+        for (const auto& pubTemplate : potInterfaces["publication_templates"]) {
+            if (pubTemplate.isObject()) {
+                TemplateMatcher temp;
+                temp.federate = federateName;
+                if (temp.loadTemplate(pubTemplate)) {
+                    connections.potentialPublicationTemplates.push_back(std::move(temp));
+                }
+            }
+        }
+    }
+    if (potInterfaces.isMember("input_templates")) {
+        for (const auto& inpTemplate : potInterfaces["input_templates"]) {
+            if (inpTemplate.isObject()) {
+                TemplateMatcher temp;
+                temp.federate = federateName;
+                if (temp.loadTemplate(inpTemplate)) {
+                    connections.potentialInputTemplates.push_back(std::move(temp));
+                }
+            }
+        }
+    }
+    if (potInterfaces.isMember("endpoint_templates")) {
+        for (const auto& endTemplate : potInterfaces["endpoint_templates"]) {
+            if (endTemplate.isObject()) {
+                TemplateMatcher temp;
+                temp.federate = federateName;
+                if (temp.loadTemplate(endTemplate)) {
+                    connections.potentialEndpointTemplates.push_back(std::move(temp));
+                }
+            }
+        }
+    }
+}
+
 static void fedConnectionList(ConnectionsList& connections, const Json::Value& fed)
 {
     try {
@@ -331,99 +428,7 @@ static void fedConnectionList(ConnectionsList& connections, const Json::Value& f
             }
         }
         if (fed.isMember("potential_interfaces")) {
-            connections.hasPotentialInterfaces = true;
-            const std::string_view federateName =
-                connections.federatesWithPotentialInterfaces.emplace_back(
-                    fed["attributes"]["name"].asCString());
-            const auto& potInterfaces = fed["potential_interfaces"];
-            if (potInterfaces.isMember("inputs")) {
-                for (const auto& input : potInterfaces["inputs"]) {
-                    if (input.isObject()) {
-                        auto name = fileops::getName(input);
-                        if (name.empty()) {
-                            continue;
-                        }
-                        const std::string_view input1 = connections.interfaces.emplace_back(name);
-                        connections.potentialInputs.emplace(
-                            input1, PotentialConnections{federateName, input1, false});
-                    } else if (input.isString()) {
-                        const std::string_view input1 =
-                            connections.interfaces.emplace_back(input.asCString());
-                        connections.potentialInputs.emplace(
-                            input1, PotentialConnections{federateName, input1, false});
-                    }
-                }
-            }
-            if (potInterfaces.isMember("publications")) {
-                for (const auto& pub : potInterfaces["publications"]) {
-                    if (pub.isObject()) {
-                        auto name = fileops::getName(pub);
-                        if (name.empty()) {
-                            continue;
-                        }
-                        const std::string_view pub1 = connections.interfaces.emplace_back(name);
-                        connections.potentialPubs.emplace(
-                            pub1, PotentialConnections{federateName, pub1, false});
-                    } else if (pub.isString()) {
-                        const std::string_view pub1 =
-                            connections.interfaces.emplace_back(pub.asCString());
-                        connections.potentialPubs.emplace(
-                            pub1, PotentialConnections{federateName, pub1, false});
-                    }
-                }
-            }
-            if (potInterfaces.isMember("endpoints")) {
-                for (const auto& endpoint : potInterfaces["endpoints"]) {
-                    if (endpoint.isObject()) {
-                        auto name = fileops::getName(endpoint);
-                        if (name.empty()) {
-                            continue;
-                        }
-                        const std::string_view endpoint1 =
-                            connections.interfaces.emplace_back(name);
-                        connections.potentialEndpoints.emplace(
-                            endpoint1, PotentialConnections{federateName, endpoint1, false});
-                    } else {
-                        const std::string_view endpoint1 =
-                            connections.interfaces.emplace_back(endpoint.asCString());
-                        connections.potentialEndpoints.emplace(
-                            endpoint1, PotentialConnections{federateName, endpoint1, false});
-                    }
-                }
-            }
-            if (potInterfaces.isMember("publication_templates")) {
-                for (const auto& pubTemplate : potInterfaces["publication_templates"]) {
-                    if (pubTemplate.isObject()) {
-                        TemplateMatcher temp;
-                        temp.federate = federateName;
-                        if (temp.loadTemplate(pubTemplate)) {
-                            connections.potentialPublicationTemplates.push_back(std::move(temp));
-                        }
-                    }
-                }
-            }
-            if (potInterfaces.isMember("input_templates")) {
-                for (const auto& inpTemplate : potInterfaces["input_templates"]) {
-                    if (inpTemplate.isObject()) {
-                        TemplateMatcher temp;
-                        temp.federate = federateName;
-                        if (temp.loadTemplate(inpTemplate)) {
-                            connections.potentialInputTemplates.push_back(std::move(temp));
-                        }
-                    }
-                }
-            }
-            if (potInterfaces.isMember("endpoint_templates")) {
-                for (const auto& endTemplate : potInterfaces["endpoint_templates"]) {
-                    if (endTemplate.isObject()) {
-                        TemplateMatcher temp;
-                        temp.federate = federateName;
-                        if (temp.loadTemplate(endTemplate)) {
-                            connections.potentialEndpointTemplates.push_back(std::move(temp));
-                        }
-                    }
-                }
-            }
+            fedPotentialInterfaceList(connections, fed);
         }
     }
     catch (const Json::Exception& /*ev*/) {
