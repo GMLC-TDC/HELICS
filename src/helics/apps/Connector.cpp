@@ -275,9 +275,8 @@ Json::Value TemplateMatcher::usedInterfaceGeneration()
 static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::Value& fed)
 {
     connections.hasPotentialInterfaces = true;
-    const std::string_view federateName =
-        connections.federatesWithPotentialInterfaces.emplace_back(
-            fed["attributes"]["name"].asCString());
+    const std::string_view federateName = connections.federatesWithPotentialInterfaces.emplace_back(
+        fed["attributes"]["name"].asCString());
     const auto& potInterfaces = fed["potential_interfaces"];
     if (potInterfaces.isMember("inputs")) {
         for (const auto& input : potInterfaces["inputs"]) {
@@ -305,13 +304,12 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::
                     continue;
                 }
                 const std::string_view pub1 = connections.interfaces.emplace_back(name);
-                connections.potentialPubs.emplace(
-                    pub1, PotentialConnections{federateName, pub1, false});
+                connections.potentialPubs.emplace(pub1,
+                                                  PotentialConnections{federateName, pub1, false});
             } else if (pub.isString()) {
-                const std::string_view pub1 =
-                    connections.interfaces.emplace_back(pub.asCString());
-                connections.potentialPubs.emplace(
-                    pub1, PotentialConnections{federateName, pub1, false});
+                const std::string_view pub1 = connections.interfaces.emplace_back(pub.asCString());
+                connections.potentialPubs.emplace(pub1,
+                                                  PotentialConnections{federateName, pub1, false});
             }
         }
     }
@@ -322,8 +320,7 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::
                 if (name.empty()) {
                     continue;
                 }
-                const std::string_view endpoint1 =
-                    connections.interfaces.emplace_back(name);
+                const std::string_view endpoint1 = connections.interfaces.emplace_back(name);
                 connections.potentialEndpoints.emplace(
                     endpoint1, PotentialConnections{federateName, endpoint1, false});
             } else {
