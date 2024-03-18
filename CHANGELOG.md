@@ -9,6 +9,25 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [3.5.1][] - 2024-03-16
+
+Patch release including beta version of reentrant federates and support for "potential_interfaces" section in config files and automatic handling of potential interface generation in the federate class for operation with the connector app.
+
+### Fixed
+
+- Fixed an issue related to disconnection of federates with endpoints while still executing, that could potentially have resulted in an infinite loop
+
+### Changed
+
+- Updated 3rd party libraries including cli11, fmt, spdlog, and asio
+
+### Added
+
+- Automatic handling of potential interface sequence from Federate class
+- Support for potential_interface templates
+- Support for reentrant federates: federates with the same name that can come and go, and support for reconnecting interfaces to the reentrant federate
+- Support for a "helics" section in the configuration json files
+
 ## [3.5.0][] - 2024-02-05
 
 Major release including connector app capability, a refresh of the of the dataBuffer interface, and other bug fixes
