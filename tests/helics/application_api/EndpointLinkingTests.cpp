@@ -612,7 +612,7 @@ TEST_F(mfed_tests, endpoint_linking_dest_alias_rev)
     auto& ept2 = mFed1->registerGlobalTargetedEndpoint("dest_endpoint");
 
     auto& ept1 = mFed1->registerGlobalTargetedEndpoint("source_endpoint");
-    core->addAlias( "dest","dest_endpoint");
+    core->addAlias("dest", "dest_endpoint");
     mFed1->enterExecutingMode();
     ept1.send("test message");
     mFed1->requestNextStep();

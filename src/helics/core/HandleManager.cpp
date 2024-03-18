@@ -427,7 +427,7 @@ void HandleManager::addAlias(std::string_view interfaceName, std::string_view al
     addFilterAlias(*iName, *aliasName);
 
     /** aliases should be reciprocal*/
-    cascade = addAliasName( aliasStableName,interfaceStableName);
+    cascade = addAliasName(aliasStableName, interfaceStableName);
 
     if (cascade) {
         auto& aliasRange = aliases[aliasStableName];
@@ -442,10 +442,10 @@ void HandleManager::addAlias(std::string_view interfaceName, std::string_view al
     }
 
     // add aliases for existing interfaces
-    addPublicationAlias(*aliasName,*iName);
-    addInputAlias(*aliasName,*iName);
-    addEndpointAlias(*aliasName,*iName);
-    addFilterAlias(*aliasName,*iName);
+    addPublicationAlias(*aliasName, *iName);
+    addInputAlias(*aliasName, *iName);
+    addEndpointAlias(*aliasName, *iName);
+    addFilterAlias(*aliasName, *iName);
 }
 
 void HandleManager::addPublicationAlias(std::string_view interfaceName, std::string_view alias)
