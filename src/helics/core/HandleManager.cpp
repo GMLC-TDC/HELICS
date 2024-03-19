@@ -538,21 +538,25 @@ bool HandleManager::addAliasName(std::string_view interfaceName, std::string_vie
     return cascading;
 }
 
-using MapType=std::unordered_map<std::string_view, InterfaceHandle>;
-using AliasT=std::unordered_map<std::string_view, std::vector<std::string_view>> ;
-static void addFields(std::string_view key, std::string_view typeName, InterfaceHandle hid, MapType& searchMap, AliasT aliases)
+using MapType = std::unordered_map<std::string_view, InterfaceHandle>;
+using AliasT = std::unordered_map<std::string_view, std::vector<std::string_view>>;
+static void addFields(std::string_view key,
+                      std::string_view typeName,
+                      InterfaceHandle hid,
+                      MapType& searchMap,
+                      AliasT aliases)
 {
     auto placed = searchMap.try_emplace(key, hid);
     if (!placed.second) {
-        throw std::runtime_error(std::string("duplicate ")+std::string(typeName)+" key found");
+        throw std::runtime_error(std::string("duplicate ") + std::string(typeName) + " key found");
     }
     auto aliasRange = aliases.find(key);
     if (aliasRange != aliases.end()) {
         for (auto& alias : aliasRange->second) {
             placed = searchMap.try_emplace(alias, hid);
             if (!placed.second) {
-                throw std::runtime_error(std::string("duplicate ")+std::string(typeName)+" alias key(" +
-                    std::string(alias) + ") found");
+                throw std::runtime_error(std::string("duplicate ") + std::string(typeName) +
+                                         " alias key(" + std::string(alias) + ") found");
             }
         }
     }
@@ -561,29 +565,27 @@ static void addFields(std::string_view key, std::string_view typeName, Interface
 void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index)
 {
     if (!handle.key.empty()) {
-        
-
         switch (handle.handleType) {
             case InterfaceType::ENDPOINT:
-                addFields(handle.key,"endpoint",InterfaceHandle(index),endpoints,aliases);
+                addFields(handle.key, "endpoint", InterfaceHandle(index), endpoints, aliases);
                 break;
             case InterfaceType::PUBLICATION:
-                addFields(handle.key,"publication",InterfaceHandle(index),publications,aliases);
+                addFields(handle.key, "publication", InterfaceHandle(index), publications, aliases);
                 break;
             case InterfaceType::FILTER:
-                addFields(handle.key,"filter",InterfaceHandle(index),filters,aliases);
+                addFields(handle.key, "filter", InterfaceHandle(index), filters, aliases);
                 break;
             case InterfaceType::INPUT:
-                addFields(handle.key,"input",InterfaceHandle(index),inputs,aliases);
+                addFields(handle.key, "input", InterfaceHandle(index), inputs, aliases);
                 break;
             case InterfaceType::TRANSLATOR:
-                addFields(handle.key,"publication",InterfaceHandle(index),publications,aliases);
-                addFields(handle.key,"endpoint",InterfaceHandle(index),endpoints,aliases);
-                addFields(handle.key,"input",InterfaceHandle(index),inputs,aliases);
+                addFields(handle.key, "publication", InterfaceHandle(index), publications, aliases);
+                addFields(handle.key, "endpoint", InterfaceHandle(index), endpoints, aliases);
+                addFields(handle.key, "input", InterfaceHandle(index), inputs, aliases);
                 break;
             case InterfaceType::SINK:
-                addFields(handle.key,"endpoint",InterfaceHandle(index),endpoints,aliases);
-                addFields(handle.key,"input",InterfaceHandle(index),inputs,aliases);
+                addFields(handle.key, "endpoint", InterfaceHandle(index), endpoints, aliases);
+                addFields(handle.key, "input", InterfaceHandle(index), inputs, aliases);
                 break;
             default:
                 break;
