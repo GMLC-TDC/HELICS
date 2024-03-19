@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 CombinationFederate::CombinationFederate() = default;
-CombinationFederate::CombinationFederate(std::string_view fedName, const FederateInfo& fi):
-    Federate(fedName, fi), ValueFederate(true), MessageFederate(true)
+CombinationFederate::CombinationFederate(std::string_view fedName, const FederateInfo& fedInfo):
+    Federate(fedName, fedInfo), ValueFederate(true), MessageFederate(true)
 {
 }
 CombinationFederate::CombinationFederate(std::string_view fedName,
