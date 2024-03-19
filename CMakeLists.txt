@@ -17,14 +17,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.5.0)
+project(HELICS VERSION 3.5.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2024-02-06")
+set(HELICS_DATE "2024-03-19")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -687,7 +687,7 @@ set(LICENSE_LIST
     "cppzmq"
     "${PROJECT_SOURCE_DIR}/ThirdParty/cppzmq/LICENSE"
     "fmt"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE.rst"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE"
     "units"
     "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
     "JsonCpp"

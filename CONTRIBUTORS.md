@@ -11,7 +11,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Andy Fisher](https://github.com/afisher1)
 - [Jason Fuller](https://github.com/jcfuller1)
 - [Shwetha Niddodi](https://github.com/shwethanidd)
-- [Trevor Hardy](https://energyenvironment.pnnl.gov/staff/staff_info.asp?staff_num=2704)
+- [Trevor Hardy](https://www.pnnl.gov/people/trevor-hardy)
 - [Monish Mukherjee](https://github.com/MuMonish)
 - [Jacob Hansen](https://github.com/Jacobhansens)
 - [Marc Eberlein](https://github.com/eberleim)

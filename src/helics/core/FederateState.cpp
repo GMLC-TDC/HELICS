@@ -154,24 +154,81 @@ void FederateState::setState(FederateStates newState)
     }
 }
 
-void FederateState::reset()
+void FederateState::reset(const CoreFederateInfo& fedInfo)
 {
-    global_id = GlobalFederateId();
-    interfaceInformation.setGlobalId(GlobalFederateId());
-    local_id = LocalFederateId();
     state = FederateStates::CREATED;
     queue.clear();
     delayQueues.clear();
-    // TODO(PT): this probably needs to do a lot more
+    interfaceInformation.reset();
+
+    timeCoord =
+        std::make_unique<TimeCoordinator>([this](const ActionMessage& msg) { routeMessage(msg); });
+
+    only_transmit_on_change = false;
+    realtime = false;
+    observer = false;
+    // reentrant should stay the same
+    mSourceOnly = false;
+    mCallbackBased = false;
+    strict_input_type_checking = false;
+    ignore_unit_mismatch = false;
+    mSlowResponding = false;
+    // allow remote control needs to remain the same
+
+    mLogManager = std::make_unique<LogManager>();
+    maxLogLevel = HELICS_LOG_LEVEL_NO_PRINT;
+    init_transmitted = false;
+
+    wait_for_current_time = false;
+    ignore_time_mismatch_warnings = false;
+    mProfilerActive = false;
+    mLocalProfileCapture = false;
+    errorCode = 0;
+    // leave mParent alone
+    // CommonCore* mParent{nullptr};  //!< pointer to the higher level;
+    errorString.clear();
+    rt_lag = timeZero;
+    rt_lead = timeZero;
+    grantTimeOutPeriod = timeZero;
+    realTimeTimerIndex = -1;
+    grantTimeoutTimeIndex = -1;
+    initRequested = false;
+    requestingMode = false;
+    initIterating = false;
+
+    iterating = false;
+    timeGranted_mode = false;
+    terminate_on_error = false;
+    lastIterationRequest = IterationRequest::NO_ITERATIONS;
+    timeMethod = TimeSynchronizationMethod::DISTRIBUTED;
+    mGrantCount = 0;
+    commandQueue.clear();
+    interfaceFlags = 0;
+
+    events.clear();
+    eventMessages.clear();
+    delayedFederates.clear();
+    time_granted = startupTime;
+    allowed_send_time = startupTime;
+
+    queryCallbacks.clear();
+    fedCallbacks = nullptr;
+    tags.clear();
+    // now update with the new properties
+    for (const auto& prop : fedInfo.timeProps) {
+        setProperty(prop.first, prop.second);
+    }
+    for (const auto& prop : fedInfo.intProps) {
+        setProperty(prop.first, prop.second);
+    }
+    for (const auto& prop : fedInfo.flagProps) {
+        setOptionFlag(prop.first, prop.second);
+    }
+    mLogManager->setTransmitCallback(
+        [this](ActionMessage&& message) { mParent->addActionMessage(std::move(message)); });
+    maxLogLevel = mLogManager->getMaxLevel();
 }
-/** reset the federate to the initializing state*/
-void FederateState::reInit()
-{
-    state = FederateStates::INITIALIZING;
-    queue.clear();
-    delayQueues.clear();
-    // TODO(PT): this needs to reset a bunch of stuff as well as check a few things
-}
+
 FederateStates FederateState::getState() const
 {
     return state.load();
@@ -196,6 +253,7 @@ void FederateState::generateConfig(Json::Value& base) const
     base["only_transmit_on_change"] = only_transmit_on_change;
     base["realtime"] = realtime;
     base["observer"] = observer;
+    base["reentrant"] = reentrant;
     base["source_only"] = mSourceOnly;
     base["strict_input_type_checking"] = strict_input_type_checking;
     base["slow_responding"] = mSlowResponding;
@@ -385,7 +443,7 @@ void FederateState::closeInterface(InterfaceHandle handle, InterfaceType type)
                 rem.setSource(pub->id);
                 rem.actionTime = time_granted;
                 for (const auto& sub : pub->subscribers) {
-                    rem.setDestination(sub.first);
+                    rem.setDestination(sub.id);
                     routeMessage(rem);
                 }
                 pub->subscribers.clear();
@@ -614,7 +672,7 @@ std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
     auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
         for (const auto& sub : pubInfo->subscribers) {
-            subs.emplace_back(sub.first);
+            subs.emplace_back(sub.id);
         }
     }
     return subs;
@@ -1460,9 +1518,10 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     routeMessage(cmd);
                 }
             } else {
+                const Time lastTime = timeCoord->getLastGrant(cmd.source_id);
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case TimeProcessingResult::DELAY_PROCESSING:
-                        addFederateToDelay(GlobalFederateId(cmd.source_id));
+                        addFederateToDelay(cmd.source_id);
                         return MessageProcessingResult::DELAY_MESSAGE;
                     case TimeProcessingResult::NOT_PROCESSED:
                         return MessageProcessingResult::CONTINUE_PROCESSING;
@@ -1472,6 +1531,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 if (state != FederateStates::EXECUTING) {
                     break;
                 }
+
+                interfaceInformation.disconnectFederate(cmd.source_id, lastTime);
                 if (!timeGranted_mode) {
                     auto ret = timeCoord->checkTimeGrant();
                     if (returnableResult(ret)) {
@@ -1652,7 +1713,13 @@ void FederateState::processDataConnectionMessage(ActionMessage& cmd)
                         addDependent(cmd.source_id);
                     }
                 }
+
                 if (getState() > FederateStates::CREATED) {
+                    if (getState() == FederateStates::EXECUTING &&
+                        timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
+                        resetDependency(cmd.source_id);
+                        addDependent(cmd.source_id);
+                    }
                     if (!pubI->data.empty() && pubI->lastPublishTime > Time::minVal()) {
                         ActionMessage pub(CMD_PUB);
                         pub.setSource(pubI->id);
@@ -1680,6 +1747,9 @@ void FederateState::processDataConnectionMessage(ActionMessage& cmd)
                     if (eptI->targetedEndpoint) {
                         if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                             addDependency(cmd.source_id);
+                            if (getState() == FederateStates::EXECUTING) {
+                                minimumReceiveTime = time_granted;
+                            }
                         }
                     }
                 }
@@ -1725,6 +1795,9 @@ void FederateState::processDataMessage(ActionMessage& cmd)
         case CMD_SEND_MESSAGE: {
             auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (epi != nullptr && !epi->sourceOnly) {
+                if (cmd.actionTime < minimumReceiveTime) {
+                    cmd.actionTime = minimumReceiveTime;
+                }
                 // if (!epi->not_interruptible)
                 {
                     timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
@@ -2107,6 +2180,11 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
                 }
             }
             break;
+        case defs::Flags::REENTRANT:
+            if (state == FederateStates::CREATED) {
+                reentrant = value;
+            }
+            break;
         case defs::Flags::CALLBACK_FEDERATE:
             if (state == FederateStates::CREATED) {
                 mCallbackBased = value;
@@ -2121,6 +2199,13 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             timeCoord->setOptionFlag(optionFlag, value);
             break;
         case defs::Options::BUFFER_DATA:
+            break;
+        case defs::Options::RECONNECTABLE:
+            if (value) {
+                interfaceFlags |= make_flags(reconnectable_flag);
+            } else {
+                interfaceFlags &= ~(make_flags(reconnectable_flag));
+            }
             break;
         case defs::Flags::CONNECTIONS_REQUIRED:
             if (value) {
@@ -2173,6 +2258,8 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return realtime;
         case defs::Flags::OBSERVER:
             return observer;
+        case defs::Flags::REENTRANT:
+            return reentrant;
         case defs::Flags::CALLBACK_FEDERATE:
             return mCallbackBased;
         case defs::Flags::SOURCE_ONLY:
@@ -2186,6 +2273,8 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return ((interfaceFlags.load() & make_flags(required_flag)) != 0);
         case defs::Flags::CONNECTIONS_OPTIONAL:
             return ((interfaceFlags.load() & make_flags(optional_flag)) != 0);
+        case defs::Options::RECONNECTABLE:
+            return ((interfaceFlags.load() & make_flags(reconnectable_flag)) != 0);
         case defs::Flags::STRICT_INPUT_TYPE_CHECKING:
             return strict_input_type_checking;
         case defs::Flags::IGNORE_INPUT_UNIT_MISMATCH:
@@ -2268,6 +2357,11 @@ void FederateState::addDependency(GlobalFederateId fedToDependOn)
 void FederateState::addDependent(GlobalFederateId fedThatDependsOnThis)
 {
     timeCoord->addDependent(fedThatDependsOnThis);
+}
+
+void FederateState::resetDependency(GlobalFederateId gid)
+{
+    timeCoord->resetDependency(gid);
 }
 
 int FederateState::checkInterfaces()
@@ -2641,18 +2735,24 @@ std::string FederateState::processQueryActual(std::string_view query) const
             }
             base["tags"] = tagBlock;
         }
-        if (queryCallback) {
-            auto potential = queryCallback("potential_interfaces");
-            if (!potential.empty()) {
-                try {
-                    auto json = fileops::loadJsonStr(potential);
-
-                    if (!json.isMember("error")) {
-                        base["potential_interfaces"] = json;
-                    }
+        if (!queryCallbacks.empty()) {
+            for (const auto& queryCallback : queryCallbacks) {
+                if (!queryCallback) {
+                    continue;
                 }
-                catch (const std::invalid_argument&) {
-                    ;
+                auto potential = queryCallback("potential_interfaces");
+                if (!potential.empty()) {
+                    try {
+                        auto json = fileops::loadJsonStr(potential);
+
+                        if (!json.isMember("error")) {
+                            base["potential_interfaces"] = json;
+                            break;
+                        }
+                    }
+                    catch (const std::invalid_argument&) {
+                        ;
+                    }
                 }
             }
         }
@@ -2712,10 +2812,15 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return fileops::generateJsonString(base);
     }
 
-    if (queryCallback) {
-        auto val = queryCallback(query);
-        if (!val.empty()) {
-            return val;
+    if (!queryCallbacks.empty()) {
+        for (const auto& queryCallback : queryCallbacks) {
+            if (!queryCallback) {
+                continue;
+            }
+            auto val = queryCallback(query);
+            if (!val.empty()) {
+                return val;
+            }
         }
     }
     // check existingTag value for a matching string

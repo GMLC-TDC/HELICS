@@ -16,21 +16,26 @@ A multi-language, cross-platform library that enables different simulators to ea
 
 ## Table of contents
 
+- [Table of contents](#table-of-contents)
 - [Introduction](#introduction)
-  - [Philosophy](#philosophy-of-helics)
+  - [Philosophy of HELICS](#philosophy-of-helics)
 - [Getting Started](#getting-started)
   - [Language Bindings](#language-bindings)
 - [Documentation](#documentation)
-  - [Changelog](#changelog)
-  - [RoadMap](#roadmap)
+  - [Documentation downloads](#documentation-downloads)
+  - [CHANGELOG](#changelog)
+  - [ROADMAP](#roadmap)
   - [Installation](#installation)
   - [Quick links](#quick-links)
+  - [Docker](#docker)
 - [Tools with HELICS support](#tools-with-helics-support)
+  - [HELICS helper Apps](#helics-helper-apps)
 - [Contributing](#contributing)
 - [Build Status](#build-status)
 - [Publications](#publications)
 - [In the News](#in-the-news)
 - [History and Motivation](#history-and-motivation)
+- [Source Repo](#source-repo)
 - [Release](#release)
 
 ## Introduction
@@ -171,6 +176,10 @@ Contributors are welcome, see the [Contributing](CONTRIBUTING.md) guidelines for
 ## Publications
 
 If you use HELICS in your research, please cite:
+
+T. Hardy, B. Palmintier, P. Top, D. Krishnamurthy and J. Fuller, "HELICS: A Co-Simulation Framework for Scalable Multi-Domain Modeling and Analysis," in IEEE Access, doi: 10.1109/ACCESS.2024.3363615, available at [https://ieeexplore.ieee.org/document/10424422](https://ieeexplore.ieee.org/document/10424422)
+
+Older citation
 
 \[1\] B. Palmintier, D. Krishnamurthy, P. Top, S. Smith, J. Daily, and J. Fuller, “Design of the HELICS High-Performance Transmission-Distribution-Communication-Market Co-Simulation Framework,” in _Proc. of the 2017 Workshop on Modeling and Simulation of Cyber-Physical Energy Systems_, Pittsburgh, PA, 2017. [pre-print](https://www.nrel.gov/docs/fy17osti/67928.pdf) | [published](https://ieeexplore.ieee.org/document/8064542/)
 

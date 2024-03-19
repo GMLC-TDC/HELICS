@@ -100,6 +100,8 @@ class EndpointInfo {
     void addSource(GlobalHandle source, std::string_view sourceName, std::string_view sourceType);
     /** remove a target from connection*/
     void removeTarget(GlobalHandle targetId);
+    /** disconnect a federate */
+    void disconnectFederate(GlobalFederateId fedToDisconnect);
     /** get the vector of endpoint targets*/
     const std::vector<std::pair<GlobalHandle, std::string_view>>& getTargets() const
     {

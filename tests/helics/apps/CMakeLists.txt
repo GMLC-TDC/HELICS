@@ -29,6 +29,7 @@ set(helics_apps_test_sources
     ConnectorFileTests.cpp
     Connector2StageTests.cpp
     ConnectorTagTests.cpp
+    ConnectorTestsPotentialInterfaces.cpp
     exeTestHelper.h
 )
 

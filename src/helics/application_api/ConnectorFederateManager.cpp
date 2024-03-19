@@ -18,8 +18,8 @@ ConnectorFederateManager::ConnectorFederateManager(Core* coreObj,
                                                    Federate* ffed,
                                                    LocalFederateId id,
                                                    bool singleThreaded):
-    coreObject(coreObj),
-    filters(!singleThreaded), translators(!singleThreaded), fed(ffed), fedID(id)
+    coreObject(coreObj), filters(!singleThreaded), translators(!singleThreaded), fed(ffed),
+    fedID(id)
 {
 }
 ConnectorFederateManager::~ConnectorFederateManager() = default;
@@ -30,15 +30,15 @@ Filter& ConnectorFederateManager::registerFilter(std::string_view name,
 {
     auto handle = coreObject->registerFilter(name, type_in, type_out);
     if (handle.isValid()) {
-        auto filt = std::make_unique<Filter>(fed, name, handle);
-        Filter& f = *filt;
+        auto filtPtr = std::make_unique<Filter>(fed, name, handle);
+        Filter& filt = *filtPtr;
         auto filts = filters.lock();
         if (name.empty()) {
-            filts->insert(coreObject->getHandleName(filt->getHandle()), std::move(filt));
+            filts->insert(coreObject->getHandleName(filtPtr->getHandle()), std::move(filtPtr));
         } else {
-            filts->insert(name, std::move(filt));
+            filts->insert(name, std::move(filtPtr));
         }
-        return f;
+        return filt;
     }
     throw(RegistrationFailure("Unable to register Filter"));
 }

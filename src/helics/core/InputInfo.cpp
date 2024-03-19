@@ -159,10 +159,19 @@ bool InputInfo::addSource(GlobalHandle newSource,
                           std::string_view stype,
                           std::string_view sunits)
 {
+    int index{0};
     for (const auto& is : input_sources) {
         if (is == newSource) {
+            if (deactivated[index] < Time::maxVal()) {
+                // this is a reconnection
+                deactivated[index] = Time::maxVal();
+                source_info[index].units = sunits;
+                source_info[index].type = sunits;
+                return true;
+            }
             return false;
         }
+        ++index;
     }
     // clear this since it isn't well defined what the units are once a new source is added
     inputUnits.clear();
@@ -175,6 +184,21 @@ bool InputInfo::addSource(GlobalHandle newSource,
     deactivated.push_back(Time::maxVal());
     has_target = true;
     return true;
+}
+
+void InputInfo::disconnectFederate(GlobalFederateId fedToDisconnect, Time minTime)
+{
+    // the inputUnits and type are not determined anymore since the source list has changed
+    inputUnits.clear();
+    inputType.clear();
+    for (size_t ii = 0; ii < input_sources.size(); ++ii) {
+        if (input_sources[ii].fed_id == fedToDisconnect) {
+            if (minTime < deactivated[ii]) {
+                deactivated[ii] = minTime;
+            }
+        }
+        // there could be duplicate sources so we need to do the full loop
+    }
 }
 
 void InputInfo::removeSource(GlobalHandle sourceToRemove, Time minTime)

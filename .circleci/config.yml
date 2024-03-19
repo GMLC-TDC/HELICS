@@ -103,7 +103,7 @@ jobs:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -lc++ -lc++abi -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1  -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -lc++ -lc++abi -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -Wno-reserved-macro-identifier -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1  -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
       LSAN_OPTIONS: "suppressions=/root/project/.circleci/leak_suppression.txt"
       UBSAN_OPTIONS: "print_stacktrace=1 suppressions=/root/project/.circleci/ubsan_suppression.txt"
       ASAN_OPTIONS: "alloc_dealloc_mismatch=0"
@@ -116,7 +116,7 @@ jobs:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=memory -nostdinc++ -nostdlib++ -L/root/develop/libcxx_msan/lib -lc++ -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath,/root/develop/libcxx_msan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=memory -nostdinc++ -nostdlib++ -Wno-reserved-macro-identifier -L/root/develop/libcxx_msan/lib -lc++ -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath,/root/develop/libcxx_msan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
 
     steps:
       - checkout

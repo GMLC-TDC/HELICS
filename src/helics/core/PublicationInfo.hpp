@@ -15,6 +15,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
+struct SubscriberInformation {
+    GlobalHandle id;
+    std::string key;
+    SubscriberInformation() = default;
+    SubscriberInformation(GlobalHandle gid, std::string_view key_): id(gid), key(key_) {}
+};
+
 /** data class containing the information about a publication*/
 class PublicationInfo {
   public:
@@ -22,14 +30,12 @@ class PublicationInfo {
     PublicationInfo(GlobalHandle pid,
                     std::string_view pkey,
                     std::string_view ptype,
-                    std::string_view punits):
-        id(pid),
-        key(pkey), type(ptype), units(punits)
+                    std::string_view punits): id(pid), key(pkey), type(ptype), units(punits)
     {
     }
     const GlobalHandle id;  //!< the identifier for the containing federate
-    std::vector<std::pair<GlobalHandle, std::string>>
-        subscribers;  //!< container for all the subscribers of a publication
+    /// container for all the subscribers of a publication
+    std::vector<SubscriberInformation> subscribers;
     const std::string key;  //!< the key identifier for the publication
     const std::string type;  //!< the type of the publication data
     const std::string units;  //!< the units of the publication data
@@ -53,7 +59,8 @@ class PublicationInfo {
 
     /** remove a subscriber*/
     void removeSubscriber(GlobalHandle subscriberToRemove);
-
+    /** disconnect a federate from the subscriber*/
+    void disconnectFederate(GlobalFederateId fedToDisconnect);
     void setProperty(int32_t option, int32_t value);
     int32_t getProperty(int32_t option) const;
     const std::string& getTargets() const;

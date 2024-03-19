@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/BlockingQueue.hpp"
 #include "helicsTime.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <deque>
@@ -73,6 +74,7 @@ class FederateState {
                                           //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
+    bool reentrant{false};  //!< flag indicating the federate can be reentrant
     bool mSourceOnly{false};  //!< flag indicating the federate is a source_only
     bool mCallbackBased{false};  //!< flag indicating the federate is a callback federate
     /// flag indicating that inputs should have strict type checking
@@ -145,10 +147,11 @@ class FederateState {
     std::vector<GlobalFederateId> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted{startupTime};  //!< the most recent granted time;
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
+    Time minimumReceiveTime{startupTime};  //!< minimum receive time for messages
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
 
     /** a callback for additional queries */
-    std::function<std::string(std::string_view)> queryCallback;
+    std::vector<std::function<std::string(std::string_view)>> queryCallbacks;
     std::shared_ptr<FederateOperator> fedCallbacks;  //!< storage for a callback federate
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
     std::atomic<bool> queueProcessing{false};
@@ -169,9 +172,7 @@ class FederateState {
 
   public:
     /** reset the federate to created state*/
-    void reset();
-    /** reset the federate to the initializing state*/
-    void reInit();
+    void reset(const CoreFederateInfo& fedInfo);
     /** get the name of the federate*/
     const std::string& getIdentifier() const { return name; }
     /** get the current state of the federate*/
@@ -347,6 +348,9 @@ class FederateState {
     void addDependency(GlobalFederateId fedToDependOn);
     /** add a dependent federate*/
     void addDependent(GlobalFederateId fedThatDependsOnThis);
+    /** for dynamic reentrant federates reset the connection*/
+    void resetDependency(GlobalFederateId gid);
+
     /** check the interfaces for any issues*/
     int checkInterfaces();
     /** generate results from a query*/
@@ -477,9 +481,15 @@ class FederateState {
     /** set the query callback function
     @details function must have signature std::string(const std::string &query)
     */
-    void setQueryCallback(std::function<std::string(std::string_view)> queryCallbackFunction)
+    void setQueryCallback(std::function<std::string(std::string_view)> queryCallbackFunction,
+                          int order)
     {
-        queryCallback = std::move(queryCallbackFunction);
+        order = std::clamp(order, 1, 10);
+
+        if (static_cast<int>(queryCallbacks.size()) < order) {
+            queryCallbacks.resize(order);
+        }
+        queryCallbacks[order - 1] = std::move(queryCallbackFunction);
     }
     /** generate the result of a query string
     @param query a query string

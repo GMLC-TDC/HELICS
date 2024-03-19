@@ -24,8 +24,7 @@ TranslatorFederate::TranslatorFederate(GlobalFederateId fedID,
                                        std::string name,
                                        GlobalBrokerId coreID,
                                        Core* /*core*/):
-    mFedID(fedID),
-    mCoreID(coreID), mName(std::move(name)), /*mCore(core),*/
+    mFedID(fedID), mCoreID(coreID), mName(std::move(name)), /*mCore(core),*/
     mCoord([this](const ActionMessage& msg) { routeMessage(msg); })
 {
     mCoord.setSourceId(fedID);
@@ -73,7 +72,7 @@ void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInf
             if (!val.empty()) {
                 if (targets.size() == 1) {
                     ActionMessage sendM(CMD_PUB);
-                    sendM.setDestination(targets.front().first);
+                    sendM.setDestination(targets.front().id);
                     sendM.setSource(trans->id);
                     sendM.actionTime = trans->tranOp->computeNewValueTime(command.actionTime);
                     sendM.payload = std::move(val);
@@ -85,7 +84,7 @@ void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInf
                     sendM.actionTime = trans->tranOp->computeNewValueTime(command.actionTime);
                     sendM.payload = std::move(val);
                     for (const auto& target : targets) {
-                        sendM.setDestination(target.first);
+                        sendM.setDestination(target.id);
                         mSendMessage(sendM);
                     }
                 }

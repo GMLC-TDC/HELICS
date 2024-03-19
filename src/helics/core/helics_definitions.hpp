@@ -28,6 +28,8 @@ namespace defs {
         If the federate goes offline there is no good way to detect it so use with caution
         */
         SLOW_RESPONDING = HELICS_FLAG_SLOW_RESPONDING,
+        /** flag indicating that a federate is observe only*/
+        REENTRANT = HELICS_FLAG_REENTRANT,
         /** flag specifying that a federate encountering an internal error should cause and abort
          * for the entire co-simulation
          */
@@ -158,6 +160,7 @@ namespace defs {
         HANDLE_ONLY_TRANSMIT_ON_CHANGE = HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE,
         HANDLE_ONLY_UPDATE_ON_CHANGE = HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE,
         BUFFER_DATA = HELICS_HANDLE_OPTION_BUFFER_DATA,
+        RECONNECTABLE = HELICS_HANDLE_OPTION_RECONNECTABLE,
         RECEIVE_ONLY = HELICS_HANDLE_OPTION_RECEIVE_ONLY,
         SEND_ONLY = HELICS_HANDLE_OPTION_SOURCE_ONLY,
         IGNORE_INTERRUPTS = HELICS_HANDLE_OPTION_IGNORE_INTERRUPTS,

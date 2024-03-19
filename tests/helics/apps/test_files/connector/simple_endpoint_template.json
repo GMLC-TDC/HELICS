@@ -1,0 +1,12 @@
+{
+  "potential_interfaces": {
+    "endpoint_templates": [
+      {
+        "name": "${field1}/${field2}",
+        "field1": ["obj1", "obj2", "obj3"],
+        "field2": ["eptA", "eptB", "eptC"],
+        "template": { "global": true }
+      }
+    ]
+  }
+}

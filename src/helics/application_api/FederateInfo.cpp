@@ -147,6 +147,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 95> flagStringsTra
     {"interruptible", HELICS_FLAG_INTERRUPTIBLE},
     {"debugging", HELICS_FLAG_DEBUGGING},
     {"profiling", HELICS_FLAG_PROFILING},
+    {"reentrant", HELICS_FLAG_REENTRANT},
     {"local_profiling_capture", HELICS_FLAG_LOCAL_PROFILING_CAPTURE},
     {"profiling_marker", HELICS_FLAG_PROFILING_MARKER},
     {"only_update_on_change", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
@@ -215,6 +216,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 95> flagStringsTra
     {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferdata", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
+    {"reconnectable", HELICS_HANDLE_OPTION_RECONNECTABLE},
     {"connection_required", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
     {"connectionrequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
     {"connectionRequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
@@ -235,6 +237,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 41> optionStringsT
     {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferdata", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
+    {"reconnectable", HELICS_HANDLE_OPTION_RECONNECTABLE},
     {"connectionoptional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
     {"connection_optional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
     {"connectionOptional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
@@ -567,6 +570,10 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         "--json",
         useJsonSerialization,
         "tell the core and federate to use JSON based serialization for all messages, to ensure compatibility");
+    app->add_flag_callback(
+        "--reentrant",
+        [this]() { setFlagOption(HELICS_FLAG_REENTRANT, true); },
+        "specify that the federate can be reentrant (meaning it can stop and be restarted with the same name");
     app->add_option(
            "--profiler",
            profilerFileName,
@@ -801,7 +808,54 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
     catch (const std::invalid_argument& iarg) {
         throw(helics::InvalidParameter(iarg.what()));
     }
+    loadJsonConfig(doc);
+    bool hasHelicsSection = doc.isMember("helics");
+    bool hasHelicsSubSection{false};
+    if (hasHelicsSection) {
+        hasHelicsSubSection = doc["helics"].isMember("helics");
+    }
+    if (runArgParser) {
+        auto app = makeCLIApp();
+        app->allow_extras();
+        try {
+            if (jsonString.find('{') != std::string::npos) {
+                std::istringstream jstring(jsonString);
+                app->parse_from_stream(jstring);
+                if (hasHelicsSection) {
+                    app->get_config_formatter_base()->section("helics");
+                    std::istringstream jstringHelics(jsonString);
+                    app->parse_from_stream(jstringHelics);
+                    if (hasHelicsSubSection) {
+                        app->get_config_formatter_base()->section("helics.helics");
+                        std::istringstream jstringHelicsSub(jsonString);
+                        app->parse_from_stream(jstringHelicsSub);
+                    }
+                }
+            } else {
+                std::ifstream file(jsonString);
+                app->parse_from_stream(file);
+                if (hasHelicsSection) {
+                    file.clear();
+                    file.seekg(0);
+                    app->get_config_formatter_base()->section("helics");
+                    app->parse_from_stream(file);
+                    if (hasHelicsSubSection) {
+                        file.clear();
+                        file.seekg(0);
+                        app->get_config_formatter_base()->section("helics.helics");
+                        app->parse_from_stream(file);
+                    }
+                }
+            }
+        }
+        catch (const CLI::Error& clierror) {
+            throw(InvalidIdentifier(clierror.what()));
+        }
+    }
+}
 
+void FederateInfo::loadJsonConfig(Json::Value& json)
+{
     const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
                                                                           Time arg) {
         setProperty(propStringsTranslations.at(fname), arg);
@@ -811,30 +865,17 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         if (prop.second > 200) {
             continue;
         }
-        fileops::callIfMember(doc, std::string(prop.first), timeCall);
+        fileops::callIfMember(json, std::string(prop.first), timeCall);
     }
 
     processOptions(
-        doc,
+        json,
         [](const std::string& option) { return getFlagIndex(option); },
         [](const std::string& value) { return getOptionValue(value); },
         [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
 
-    if (runArgParser) {
-        auto app = makeCLIApp();
-        app->allow_extras();
-        try {
-            if (jsonString.find('{') != std::string::npos) {
-                std::istringstream jstring(jsonString);
-                app->parse_from_stream(jstring);
-            } else {
-                std::ifstream file(jsonString);
-                app->parse_from_stream(file);
-            }
-        }
-        catch (const CLI::Error& clierror) {
-            throw(InvalidIdentifier(clierror.what()));
-        }
+    if (json.isMember("helics")) {
+        loadJsonConfig(json["helics"]);
     }
 }
 

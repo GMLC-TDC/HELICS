@@ -26,8 +26,7 @@ Probe::Probe(std::string_view appName, const FederateInfo& fedInfo): App(appName
 
 Probe::Probe(std::string_view appName,
              const std::shared_ptr<Core>& core,
-             const FederateInfo& fedInfo):
-    App(appName, core, fedInfo)
+             const FederateInfo& fedInfo): App(appName, core, fedInfo)
 {
 }
 

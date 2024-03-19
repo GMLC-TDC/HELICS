@@ -22,7 +22,6 @@ using logblocktype = gmlc::libguarded::guarded<std::vector<std::pair<int, std::s
 TEST(logging_tests, check_log_message)
 {
     helicsCleanupLibrary();
-    std::cout << "log test starting\n";
     auto fedInfo = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
@@ -34,7 +33,6 @@ TEST(logging_tests, check_log_message)
                                          &err);
 
     auto fed = helicsCreateValueFederate("test1", fedInfo, &err);
-    std::cout << "log test created\n";
     logblocktype mlog;
 
     auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
@@ -52,7 +50,6 @@ TEST(logging_tests, check_log_message)
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    std::cout << "finalized federate\n";
     EXPECT_EQ(err.error_code, 0);
     auto llock = mlog.lock();
     bool found = false;
@@ -61,12 +58,14 @@ TEST(logging_tests, check_log_message)
             found = true;
         }
     }
-    EXPECT_TRUE(found);
-    if (!found) {
+
+    /*if (!found) {
         for (auto& message : *llock) {
             std::cout << "message (" << message.first << ") ::" << message.second << std::endl;
         }
     }
+    */
+    EXPECT_TRUE(found);
     llock.unlock();
     helicsFederateFree(fed);
     helicsFederateInfoFree(fedInfo);
