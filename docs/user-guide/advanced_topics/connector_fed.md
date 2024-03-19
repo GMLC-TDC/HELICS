@@ -12,18 +12,18 @@ The role of the "helics_connector" federate is to evaluate a mapping of the conn
 - Matches can be defined as one-to-one connections or use regular expressions to match many interfaces in one succinct line.
 - Tags can be used to add an extra dimension to the matching process, only allowing federates with certain tags to be have their interfaces be candidates for the matching process.
 - If federates support it, the connector can query a federate about the interfaces it could make and then, based on the results of the matching operation, command said federate to create the necessary interfaces.
-- Potential interfaces can be defined in a json configuration file given to a federate.  This can include interface templates to automatically generate a number of interfaces 
+- Potential interfaces can be defined in a json configuration file given to a federate. This can include interface templates to automatically generate a number of interfaces
 
 ## Callback Complications
 
-The "query-and-command" form of operation is the most complex, largely because it requires the implementation of callback functions. Unless you're using the C API directly, implementing the callback functions takes a little bit of extra effort to get the C-based libraries under the hood working. Since most of the User Guide examples are in Python and most of our users are using Python, we've [documented callbacks in PyHELICS](TODO). Take a look at that page for further details to get a slightly better understanding why C-based callbacks are more complicated in Python.  The better approach as of Version 3.5.1 is to use the `potential interfaces` section, then the callbacks for queries and interface generation are handled automatically by the helics federate.  
+The "query-and-command" form of operation is the most complex, largely because it requires the implementation of callback functions. Unless you're using the C API directly, implementing the callback functions takes a little bit of extra effort to get the C-based libraries under the hood working. Since most of the User Guide examples are in Python and most of our users are using Python, we've [documented callbacks in PyHELICS](TODO). Take a look at that page for further details to get a slightly better understanding why C-based callbacks are more complicated in Python. The better approach as of Version 3.5.1 is to use the `potential interfaces` section, then the callbacks for queries and interface generation are handled automatically by the helics federate.
 
 ## "helics_connector" Interface creation
 
-The order in which "helics*connector" specifed the needed interfaces in the federate is not deterministic. This is especially important when using the APIs that get the interface by index (\_e.g* `helicsFederateGetInputByIndex)`, `helicsFederateGetPublicationByIndex`, `helicsFederateGetEndpointByIndex`, `helicsFederateGetEndpointByIndex`). There is no guarantee that the order the interfaces are added to the federate will be the same from computer to computer. To continue using this API the name should be queried then potentially reordered or use the `ByName` version of the calls.
+The order in which "helics*connector" specified the needed interfaces in the federate is not deterministic. This is especially important when using the APIs that get the interface by index (\_e.g* `helicsFederateGetInputByIndex)`, `helicsFederateGetPublicationByIndex`, `helicsFederateGetEndpointByIndex`, `helicsFederateGetEndpointByIndex`). There is no guarantee that the order the interfaces are added to the federate will be the same from computer to computer. To continue using this API the name should be queried then potentially reordered or use the `ByName` version of the calls.
 
 ## Examples
 
 Three examples have been created to demonstrate the use of the "helics_connector" federate: one uses a direct match-file, one uses a regex match-file and the the last uses a direct match-file while using the query-and-command method of interface creation. Links to the examples are provided below; all produce identical results.
 
-An example utilizing both kinds of iteration will be developed shortly.  Iteration example is available in [here](../examples/advanced_examples/advanced_iteration.md)
+An example utilizing both kinds of iteration will be developed shortly. Iteration example is available in [here](../examples/advanced_examples/advanced_iteration.md)
