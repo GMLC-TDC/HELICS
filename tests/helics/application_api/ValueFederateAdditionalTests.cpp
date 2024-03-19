@@ -1286,7 +1286,7 @@ TEST(valuefederate, duplicate_targets)
 
 class vfedPermutation: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
-TEST_P(vfedPermutation, value_linking_order_permutations)
+TEST_P(vfedPermutation, value_linking_order_permutations_nosan)
 {
     SetupTest<helics::ValueFederate>("test_2", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);

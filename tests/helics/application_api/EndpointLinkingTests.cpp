@@ -624,7 +624,7 @@ TEST_F(mfed_tests, endpoint_linking_dest_alias_rev)
 
 class mfed_permutation_tests: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
-TEST_P(mfed_permutation_tests, endpoint_linking_order_permutations)
+TEST_P(mfed_permutation_tests, endpoint_linking_order_permutations_nosan)
 {
     SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
