@@ -6,7 +6,7 @@ To support this HELICS comes with a connector application called "helics_connect
 
 ## "helics_connector" Federate
 
-The role of the "helics_connector" federate is to evaluate a mapping of the connections between federate interfaces and create the connections between these interfaces. Under the hood, it's using public APIs that allow the sources ("targets") for inputs and endpoints to be defined and destinations ("targets") to be added to publications. (Which is to say, if the stock "helics_connector" federate doesn't work the way you would like, you could actually make your own.) The documentation of the "helics_connector" app can be found on its [dedicated documentation page](https://docs.helics.org/en/latest/references/apps/Connector.html) but I'll summarize the highlights here:
+The role of the "helics_connector" federate is to evaluate a mapping of the connections between federate interfaces and create the connections between these interfaces. Under the hood, it's using public APIs that allow the sources ("targets") for inputs and endpoints to be defined and destinations ("targets") to be added to publications. (Which is to say, if the stock "helics_connector" federate doesn't work the way you would like, you could actually make your own.) The documentation of the "helics_connector" app can be found on its [dedicated documentation page](../../references/apps/Connector.md) but I'll summarize the highlights here:
 
 - Matches are defined in a plain text or JSON structured text file.
 - Matches can be defined as one-to-one connections or use regular expressions to match many interfaces in one succinct line.
