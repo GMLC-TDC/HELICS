@@ -16,7 +16,7 @@ Patch release including beta version of reentrant federates and support for "pot
 ### Fixed
 
 - Fixed an issue related to disconnection of federates with endpoints while still executing, that could potentially have resulted in an infinite loop
-- Fixed an issue with aliases and potentially causing a seg fault or memory condition, now aliases have reciprocity so order in the given alias call doesn't matter.
+- Fixed an issue with aliases potentially causing a seg fault or memory condition, now aliases have reciprocity so order in the given alias call doesn't matter
 
 ### Changed
 
