@@ -76,12 +76,12 @@ class ConnectorFederateManager {
     /** register a Translator
     @details call is only valid in startup mode
     @param name the name of the translator
-    @param type_in the type the translator is expecting on the value interface
-    @param type_out the type the translator for the endpoint
+    @param endpointType is the type of the endpoints
+    @param units is the units associated with the value interface
     */
     Translator& registerTranslator(std::string_view name,
-                                   std::string_view type_in,
-                                   std::string_view type_out);
+                                   std::string_view endpointType,
+                                   std::string_view units);
 
     /** get a registered Translator
     @param name the translator name
