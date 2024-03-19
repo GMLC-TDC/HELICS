@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "PotentialInterfacesManager.hpp"
 
+#include "../core/core-exceptions.hpp"
 #include "Federate.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/Core.hpp"
@@ -26,16 +27,32 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
     if (!json.isMember("potential_interfaces")) {
         return;
     }
-    auto interfaces = json["potential_interfaces"];
-    for (auto& itype : interfaceTypes) {
-        if (!interfaces.isMember(itype)) {
-            continue;
+    const auto& interfaces = json["potential_interfaces"];
+    for (const auto& itype : interfaceTypes) {
+        if (interfaces.isMember(itype)) {
+            auto tInterface = interfaces[itype];
+            auto& pMap = potInterfaces[itype];
+            for (auto& ispec : tInterface) {
+                auto name = fileops::getName(ispec);
+                pMap[name] = ispec;
+            }
         }
-        auto tInterface = interfaces[itype];
-        auto& pMap = potInterfaces[itype];
-        for (auto& ispec : tInterface) {
-            auto name = fileops::getName(ispec);
-            pMap[name] = ispec;
+        std::string tempString = itype;
+        tempString.pop_back();
+        tempString += "_templates";
+        if (interfaces.isMember(tempString)) {
+            auto templateInterfaces = interfaces[tempString];
+            auto& tMap = potInterfaceTemplates[itype];
+            for (auto& tspec : templateInterfaces) {
+                auto name = fileops::getName(tspec);
+                if (name.find("}${") != std::string::npos) {
+                    throw(helics::InvalidParameter(
+                        std::string(
+                            "template key definitions must not be adjacent, they must have separator characters [") +
+                        name + ']'));
+                }
+                tMap[name] = tspec;
+            }
         }
     }
 }
@@ -58,14 +75,22 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
         Json::Value interfaces;
         for (const auto& iType : potInterfaces) {
             interfaces[iType.first] = Json::arrayValue;
-            for (auto& ispec : iType.second) {
+            for (const auto& ispec : iType.second) {
                 interfaces[iType.first].append(ispec.first);
             }
         }
+        for (const auto& iType : potInterfaceTemplates) {
+            std::string templateKey = iType.first;
+            templateKey.pop_back();
+            templateKey += "_templates";
+            interfaces[templateKey] = Json::arrayValue;
+            for (const auto& ispec : iType.second) {
+                interfaces[templateKey].append(ispec.second);
+            }
+        }
         return fileops::generateJsonString(interfaces);
-    } else {
-        return std::string{};
     }
+    return std::string{};
 }
 
 void PotentialInterfacesManager::processCommand(std::pair<std::string, std::string> command)
@@ -97,7 +122,47 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                     }
                 }
             }
-            std::string generatorList = fileops::generateJsonString(generator);
+            for (auto& iType : potInterfaceTemplates) {
+                std::string templateKey{"templated_"};
+                templateKey.append(iType.first);
+                if (json.isMember(templateKey)) {
+                    bool noUnits{false};
+                    if (iType.first == "endpoints") {
+                        generator["targeted"] = true;
+                        noUnits = true;
+                    }
+                    for (auto& templateInterfaces : json[templateKey]) {
+                        auto templateName = fileops::getName(templateInterfaces);
+
+                        auto templateLoc = iType.second.find(templateName);
+                        if (templateLoc == iType.second.end()) {
+                            continue;
+                        }
+                        auto& templateGenerator = templateLoc->second;
+                        for (auto& interfaceName : templateInterfaces["interfaces"]) {
+                            Json::Value interfaceSpec = Json::nullValue;
+                            interfaceSpec.copy(templateGenerator["template"]);
+                            if (interfaceName.isArray()) {
+                                interfaceSpec["name"] = interfaceName[0];
+                                std::string str = interfaceName[1].asString();
+                                if (!str.empty()) {
+                                    interfaceSpec["type"] = interfaceName[1];
+                                }
+                                if (!noUnits) {
+                                    str = interfaceName[2].asString();
+                                    if (!str.empty()) {
+                                        interfaceSpec["units"] = interfaceName[2];
+                                    }
+                                }
+                            } else {
+                                interfaceSpec["name"] = interfaceName.asString();
+                            }
+                            generator[iType.first].append(interfaceSpec);
+                        }
+                    }
+                }
+            }
+            const std::string generatorList = fileops::generateJsonString(generator);
             fedPtr->registerInterfaces(generatorList);
             respondedToCommand.store(true);
             return;

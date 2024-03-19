@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <optional>
 #include <regex>
 #include <set>
+#include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
@@ -35,6 +36,32 @@ struct PotentialConnections {
     bool used{false};
 };
 
+class TemplateMatcher {
+  public:
+    std::string templateName;
+    std::string_view federate;
+
+  private:
+    std::vector<std::unordered_map<std::string_view, std::pair<std::string, std::string>>>
+        templatePossibilities;
+    std::vector<std::tuple<std::string, std::string, std::string>> usedTemplates;
+    std::vector<std::string> intermediaries;
+    std::vector<std::deque<std::string>> keys;
+    std::vector<std::size_t> combinations{0};
+
+  public:
+    /* methods*/
+    void initialize();
+
+    bool loadTemplate(const Json::Value& iTemplate);
+    [[nodiscard]] std::optional<std::tuple<std::string_view, std::string_view, std::string_view>>
+        isTemplateMatch(std::string_view testString) const;
+    void setAsUsed(std::tuple<std::string_view, std::string_view, std::string_view> match);
+    [[nodiscard]] std::size_t possibilitiesCount() const { return combinations.back(); }
+    std::string instantiateTemplate(std::size_t index);
+    [[nodiscard]] bool isUsed() const { return !usedTemplates.empty(); }
+    Json::Value usedInterfaceGeneration();
+};
 /** data class for information from queries*/
 struct ConnectionsList {
     std::unordered_multimap<std::string_view, std::string_view> aliases;
@@ -56,6 +83,9 @@ struct ConnectionsList {
     std::vector<std::string> unknownEndpoints;
     std::vector<std::string> tagStrings;
     std::vector<std::size_t> tagCodes;
+    std::vector<TemplateMatcher> potentialPublicationTemplates;
+    std::vector<TemplateMatcher> potentialInputTemplates;
+    std::vector<TemplateMatcher> potentialEndpointTemplates;
     bool hasPotentialInterfaces{false};
 };
 
@@ -74,143 +104,344 @@ static void loadTags(ConnectionsList& connections, const Json::Value& tags)
         }
     }
 }
-static void coreConnectionList(ConnectionsList& connections, Json::Value& core)
+
+bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
+{
+    templateName = fileops::getName(iTemplate);
+
+    auto tnameIndex = templateName.find("${");
+    if (tnameIndex == std::string::npos) {
+        return false;
+    }
+    if (tnameIndex == 0) {
+        intermediaries.emplace_back("");
+    } else {
+        intermediaries.push_back(templateName.substr(0, tnameIndex));
+    }
+    std::vector<std::string> valueNames;
+    int index{0};
+    while (tnameIndex != std::string::npos) {
+        auto close = templateName.find_first_of('}', tnameIndex);
+        const std::string tname = templateName.substr(tnameIndex + 2, close - tnameIndex - 2);
+        if (!iTemplate.isMember(tname)) {
+            return false;
+        }
+        valueNames.push_back(tname);
+
+        tnameIndex = templateName.find("${", close + 1);
+        if (tnameIndex == close + 1) {
+            return false;
+        }
+        if (tnameIndex == std::string::npos) {
+            intermediaries.push_back(templateName.substr(close + 1));
+        } else {
+            intermediaries.push_back(templateName.substr(close + 1, tnameIndex - close - 1));
+        }
+
+        ++index;
+    }
+
+    templatePossibilities.resize(valueNames.size());
+    keys.resize(valueNames.size());
+    for (index = 0; index < valueNames.size(); ++index) {
+        for (const auto& val : iTemplate[valueNames[index]]) {
+            std::pair<std::string, std::string> typeAndUnits;
+            std::string_view keyval;
+            if (val.isArray()) {
+                keyval = keys[index].emplace_back(val[0].asCString());
+                switch (val.size()) {
+                    case 1:
+                        break;
+                    case 2:
+                        typeAndUnits.first = val[1].asString();
+                        break;
+                    case 3:
+                    default:
+                        typeAndUnits.first = val[1].asString();
+                        typeAndUnits.second = val[2].asString();
+                        break;
+                }
+            } else {
+                keyval = keys[index].emplace_back(val.asCString());
+            }
+            templatePossibilities[index].emplace(keyval, typeAndUnits);
+        }
+    }
+    initialize();
+    return true;
+}
+
+void TemplateMatcher::initialize()
+{
+    combinations.resize(keys.size() + 1);
+    std::size_t possibilities = 1;
+    for (const auto& field : keys) {
+        possibilities *= field.size();
+    }
+    combinations.back() = possibilities;
+    for (std::size_t ii = 0; ii < keys.size(); ++ii) {
+        possibilities /= keys[ii].size();
+        combinations[ii] = possibilities;
+    }
+}
+
+std::optional<std::tuple<std::string_view, std::string_view, std::string_view>>
+    TemplateMatcher::isTemplateMatch(std::string_view testString) const
+{
+    std::vector<std::size_t> intermediateIndices;
+    intermediateIndices.reserve(intermediaries.size());
+    std::size_t index{0};
+    for (const auto& intermedial : intermediaries) {
+        if (intermedial.empty()) {
+            if (intermediateIndices.empty()) {
+                intermediateIndices.push_back(index);
+            } else {
+                intermediateIndices.push_back(std::string::npos);
+            }
+
+        } else {
+            index = testString.find_first_of(intermedial, index);
+            if (index == std::string_view::npos) {
+                return std::nullopt;
+            }
+            intermediateIndices.push_back(index);
+            index += intermedial.size();
+        }
+    }
+    index = 0;
+    std::string_view iType;
+    std::string_view iUnits;
+    while (index < intermediateIndices.size() - 1) {
+        auto index1 = intermediateIndices[index] + intermediaries[index].size();
+        auto length = intermediateIndices[index + 1] - index1;
+        auto tString = testString.substr(index1, length);
+        auto loc = templatePossibilities[index].find(tString);
+        if (loc == templatePossibilities[index].end()) {
+            return std::nullopt;
+        }
+        if (!loc->second.first.empty()) {
+            iType = loc->second.first;
+        }
+        if (!loc->second.second.empty()) {
+            iUnits = loc->second.second;
+        }
+        ++index;
+    }
+    return {std::make_tuple(testString, iType, iUnits)};
+}
+
+void TemplateMatcher::setAsUsed(
+    std::tuple<std::string_view, std::string_view, std::string_view> match)
+{
+    usedTemplates.emplace_back(std::get<0>(match), std::get<1>(match), std::get<2>(match));
+}
+
+std::string TemplateMatcher::instantiateTemplate(std::size_t index)
+{
+    if (index >= combinations.back()) {
+        return {};
+    }
+    std::string rval = intermediaries.front();
+    for (std::size_t ii = 0; ii < keys.size(); ++ii) {
+        const std::size_t subIndex = index / combinations[ii];
+        index = index % combinations[ii];
+        rval.append(keys[ii][subIndex]);
+        rval.append(intermediaries[ii + 1]);
+    }
+    return rval;
+}
+
+Json::Value TemplateMatcher::usedInterfaceGeneration()
+{
+    Json::Value generator = Json::objectValue;
+    generator["name"] = templateName;
+    generator["interfaces"] = Json::arrayValue;
+    std::sort(usedTemplates.begin(), usedTemplates.end());
+    std::string_view prev;
+    for (const auto& used : usedTemplates) {
+        if (std::get<0>(used) == prev) {
+            continue;
+        }
+        prev = std::get<0>(used);
+        Json::Value iArray = Json::arrayValue;
+        iArray.append(std::get<0>(used));
+        iArray.append(std::get<1>(used));
+        iArray.append(std::get<2>(used));
+        generator["interfaces"].append(iArray);
+    }
+    return generator;
+}
+
+static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::Value& fed)
+{
+    connections.hasPotentialInterfaces = true;
+    const std::string_view federateName = connections.federatesWithPotentialInterfaces.emplace_back(
+        fed["attributes"]["name"].asCString());
+    const auto& potInterfaces = fed["potential_interfaces"];
+    if (potInterfaces.isMember("inputs")) {
+        for (const auto& input : potInterfaces["inputs"]) {
+            if (input.isObject()) {
+                auto name = fileops::getName(input);
+                if (name.empty()) {
+                    continue;
+                }
+                const std::string_view input1 = connections.interfaces.emplace_back(name);
+                connections.potentialInputs.emplace(
+                    input1, PotentialConnections{federateName, input1, false});
+            } else if (input.isString()) {
+                const std::string_view input1 =
+                    connections.interfaces.emplace_back(input.asCString());
+                connections.potentialInputs.emplace(
+                    input1, PotentialConnections{federateName, input1, false});
+            }
+        }
+    }
+    if (potInterfaces.isMember("publications")) {
+        for (const auto& pub : potInterfaces["publications"]) {
+            if (pub.isObject()) {
+                auto name = fileops::getName(pub);
+                if (name.empty()) {
+                    continue;
+                }
+                const std::string_view pub1 = connections.interfaces.emplace_back(name);
+                connections.potentialPubs.emplace(pub1,
+                                                  PotentialConnections{federateName, pub1, false});
+            } else if (pub.isString()) {
+                const std::string_view pub1 = connections.interfaces.emplace_back(pub.asCString());
+                connections.potentialPubs.emplace(pub1,
+                                                  PotentialConnections{federateName, pub1, false});
+            }
+        }
+    }
+    if (potInterfaces.isMember("endpoints")) {
+        for (const auto& endpoint : potInterfaces["endpoints"]) {
+            if (endpoint.isObject()) {
+                auto name = fileops::getName(endpoint);
+                if (name.empty()) {
+                    continue;
+                }
+                const std::string_view endpoint1 = connections.interfaces.emplace_back(name);
+                connections.potentialEndpoints.emplace(
+                    endpoint1, PotentialConnections{federateName, endpoint1, false});
+            } else {
+                const std::string_view endpoint1 =
+                    connections.interfaces.emplace_back(endpoint.asCString());
+                connections.potentialEndpoints.emplace(
+                    endpoint1, PotentialConnections{federateName, endpoint1, false});
+            }
+        }
+    }
+    if (potInterfaces.isMember("publication_templates")) {
+        for (const auto& pubTemplate : potInterfaces["publication_templates"]) {
+            if (pubTemplate.isObject()) {
+                TemplateMatcher temp;
+                temp.federate = federateName;
+                if (temp.loadTemplate(pubTemplate)) {
+                    connections.potentialPublicationTemplates.push_back(std::move(temp));
+                }
+            }
+        }
+    }
+    if (potInterfaces.isMember("input_templates")) {
+        for (const auto& inpTemplate : potInterfaces["input_templates"]) {
+            if (inpTemplate.isObject()) {
+                TemplateMatcher temp;
+                temp.federate = federateName;
+                if (temp.loadTemplate(inpTemplate)) {
+                    connections.potentialInputTemplates.push_back(std::move(temp));
+                }
+            }
+        }
+    }
+    if (potInterfaces.isMember("endpoint_templates")) {
+        for (const auto& endTemplate : potInterfaces["endpoint_templates"]) {
+            if (endTemplate.isObject()) {
+                TemplateMatcher temp;
+                temp.federate = federateName;
+                if (temp.loadTemplate(endTemplate)) {
+                    connections.potentialEndpointTemplates.push_back(std::move(temp));
+                }
+            }
+        }
+    }
+}
+
+static void fedConnectionList(ConnectionsList& connections, const Json::Value& fed)
+{
+    try {
+        if (fed.isMember("tags")) {
+            loadTags(connections, fed["tags"]);
+        }
+        if (fed.isMember("connected_inputs")) {
+            for (const auto& input : fed["connected_inputs"]) {
+                const std::string_view input1 =
+                    connections.interfaces.emplace_back(input.asString());
+                connections.inputs.insert(input1);
+            }
+        }
+        if (fed.isMember("connected_publications")) {
+            for (const auto& pub : fed["connected_publications"]) {
+                const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
+                connections.pubs.insert(pub1);
+            }
+        }
+        if (fed.isMember("unconnected_inputs")) {
+            for (const auto& input : fed["unconnected_inputs"]) {
+                const std::string_view input1 =
+                    connections.interfaces.emplace_back(input.asString());
+                connections.unconnectedInputs.push_back(input1);
+                connections.inputs.insert(input1);
+            }
+        }
+        if (fed.isMember("unconnected_publications")) {
+            for (const auto& pub : fed["unconnected_publications"]) {
+                const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
+                connections.unconnectedPubs.push_back(pub1);
+                connections.pubs.insert(pub1);
+            }
+        }
+
+        if (fed.isMember("unconnected_target_endpoints")) {
+            for (const auto& endpoint : fed["unconnected_target_endpoints"]) {
+                const std::string_view end1 =
+                    connections.interfaces.emplace_back(endpoint.asString());
+                connections.unconnectedTargetEndpoints.push_back(end1);
+                connections.endpoints.insert(end1);
+            }
+        }
+        if (fed.isMember("unconnected_source_endpoints")) {
+            for (const auto& endpoint : fed["unconnected_source_endpoints"]) {
+                const std::string_view end1 =
+                    connections.interfaces.emplace_back(endpoint.asString());
+                connections.unconnectedSourceEndpoints.push_back(end1);
+                connections.endpoints.insert(end1);
+            }
+        }
+        if (fed.isMember("connected_endpoints")) {
+            for (const auto& endpoint : fed["connected_endpoints"]) {
+                const std::string_view end1 =
+                    connections.interfaces.emplace_back(endpoint.asString());
+                connections.endpoints.insert(end1);
+            }
+        }
+        if (fed.isMember("potential_interfaces")) {
+            fedPotentialInterfaceList(connections, fed);
+        }
+    }
+    catch (const Json::Exception& /*ev*/) {
+        // TODO(PT): I think this is going to be almost impossible now, but someday might
+        // want to create a response
+        return;
+    }
+}
+static void coreConnectionList(ConnectionsList& connections, const Json::Value& core)
 {
     if (core.isMember("tags")) {
         loadTags(connections, core["tags"]);
     }
     if (core.isMember("federates")) {
         for (const auto& fed : core["federates"]) {
-            try {
-                if (fed.isMember("tags")) {
-                    loadTags(connections, fed["tags"]);
-                }
-                if (fed.isMember("connected_inputs")) {
-                    for (const auto& input : fed["connected_inputs"]) {
-                        const std::string_view input1 =
-                            connections.interfaces.emplace_back(input.asString());
-                        connections.inputs.insert(input1);
-                    }
-                }
-                if (fed.isMember("connected_publications")) {
-                    for (const auto& pub : fed["connected_publications"]) {
-                        const std::string_view pub1 =
-                            connections.interfaces.emplace_back(pub.asString());
-                        connections.pubs.insert(pub1);
-                    }
-                }
-                if (fed.isMember("unconnected_inputs")) {
-                    for (const auto& input : fed["unconnected_inputs"]) {
-                        const std::string_view input1 =
-                            connections.interfaces.emplace_back(input.asString());
-                        connections.unconnectedInputs.push_back(input1);
-                        connections.inputs.insert(input1);
-                    }
-                }
-                if (fed.isMember("unconnected_publications")) {
-                    for (const auto& pub : fed["unconnected_publications"]) {
-                        const std::string_view pub1 =
-                            connections.interfaces.emplace_back(pub.asString());
-                        connections.unconnectedPubs.push_back(pub1);
-                        connections.pubs.insert(pub1);
-                    }
-                }
-
-                if (fed.isMember("unconnected_target_endpoints")) {
-                    for (const auto& endpoint : fed["unconnected_target_endpoints"]) {
-                        const std::string_view end1 =
-                            connections.interfaces.emplace_back(endpoint.asString());
-                        connections.unconnectedTargetEndpoints.push_back(end1);
-                        connections.endpoints.insert(end1);
-                    }
-                }
-                if (fed.isMember("unconnected_source_endpoints")) {
-                    for (const auto& endpoint : fed["unconnected_source_endpoints"]) {
-                        const std::string_view end1 =
-                            connections.interfaces.emplace_back(endpoint.asString());
-                        connections.unconnectedSourceEndpoints.push_back(end1);
-                        connections.endpoints.insert(end1);
-                    }
-                }
-                if (fed.isMember("connected_endpoints")) {
-                    for (const auto& endpoint : fed["connected_endpoints"]) {
-                        const std::string_view end1 =
-                            connections.interfaces.emplace_back(endpoint.asString());
-                        connections.endpoints.insert(end1);
-                    }
-                }
-                if (fed.isMember("potential_interfaces")) {
-                    connections.hasPotentialInterfaces = true;
-                    const std::string_view federateName =
-                        connections.federatesWithPotentialInterfaces.emplace_back(
-                            fed["attributes"]["name"].asCString());
-                    const auto& potInterfaces = fed["potential_interfaces"];
-                    if (potInterfaces.isMember("inputs")) {
-                        for (const auto& input : potInterfaces["inputs"]) {
-                            if (input.isObject()) {
-                                auto name = fileops::getName(input);
-                                if (name.empty()) {
-                                    continue;
-                                }
-                                const std::string_view input1 =
-                                    connections.interfaces.emplace_back(name);
-                                connections.potentialInputs.emplace(
-                                    input1, PotentialConnections{federateName, input1, false});
-                            } else if (input.isString()) {
-                                const std::string_view input1 =
-                                    connections.interfaces.emplace_back(input.asCString());
-                                connections.potentialInputs.emplace(
-                                    input1, PotentialConnections{federateName, input1, false});
-                            }
-                        }
-                    }
-                    if (potInterfaces.isMember("publications")) {
-                        for (const auto& pub : potInterfaces["publications"]) {
-                            if (pub.isObject()) {
-                                auto name = fileops::getName(pub);
-                                if (name.empty()) {
-                                    continue;
-                                }
-                                const std::string_view pub1 =
-                                    connections.interfaces.emplace_back(name);
-                                connections.potentialPubs.emplace(
-                                    pub1, PotentialConnections{federateName, pub1, false});
-                            } else if (pub.isString()) {
-                                const std::string_view pub1 =
-                                    connections.interfaces.emplace_back(pub.asCString());
-                                connections.potentialPubs.emplace(
-                                    pub1, PotentialConnections{federateName, pub1, false});
-                            }
-                        }
-                    }
-                    if (potInterfaces.isMember("endpoints")) {
-                        for (const auto& endpoint : potInterfaces["endpoints"]) {
-                            if (endpoint.isObject()) {
-                                auto name = fileops::getName(endpoint);
-                                if (name.empty()) {
-                                    continue;
-                                }
-                                const std::string_view endpoint1 =
-                                    connections.interfaces.emplace_back(name);
-                                connections.potentialEndpoints.emplace(
-                                    endpoint1,
-                                    PotentialConnections{federateName, endpoint1, false});
-                            } else {
-                                const std::string_view endpoint1 =
-                                    connections.interfaces.emplace_back(endpoint.asCString());
-                                connections.potentialEndpoints.emplace(
-                                    endpoint1,
-                                    PotentialConnections{federateName, endpoint1, false});
-                            }
-                        }
-                    }
-                }
-            }
-            catch (const Json::Exception& /*ev*/) {
-                // TODO(PT): I think this is going to be almost impossible now, but someday might
-                // want to create a response
-                continue;
-            }
+            fedConnectionList(connections, fed);
         }
     }
 }
@@ -262,7 +493,7 @@ static ConnectionsList generateConnectionsList(const std::string& connectionData
     for (auto& core : json["cores"]) {
         coreConnectionList(connections, core);
     }
-    connections.tagStrings.push_back("default");
+    connections.tagStrings.emplace_back("default");
     connections.tagCodes.reserve(connections.tagStrings.size());
     std::transform(connections.tagStrings.begin(),
                    connections.tagStrings.end(),
@@ -384,7 +615,7 @@ Connector::Connector(std::string_view appName, const std::string& configString):
 
 std::size_t Connector::addTag(std::string_view tagName)
 {
-    std::size_t hash = std::hash<std::string_view>()(tagName);
+    const std::size_t hash = std::hash<std::string_view>()(tagName);
     tags.emplace(hash, tagName);
     return hash;
 }
@@ -537,7 +768,7 @@ void Connector::loadJsonFile(const std::string& jsonString,
     auto doc = fileops::loadJson(jsonString);
 
     if (doc.isMember("connector")) {
-        auto connectorConfig = doc["connector"];
+        const auto& connectorConfig = doc["connector"];
         matchTargetEndpoints =
             fileops::getOrDefault(connectorConfig, "match_target_endpoints", matchTargetEndpoints);
         matchMultiple = fileops::getOrDefault(connectorConfig, "match_multiple", matchMultiple);
@@ -689,11 +920,41 @@ bool Connector::makePotentialConnection(
     return false;
 }
 
+bool Connector::makePotentialTemplateConnection(
+    std::string_view interface,
+    const std::vector<std::size_t>& tagList,
+    std::vector<TemplateMatcher>& potentialTemplates,
+    const std::unordered_multimap<std::string_view, std::string_view>& aliases)
+{
+    auto connectionOptions = buildPossibleConnectionList(interface, tagList);
+    for (const auto& option : connectionOptions) {
+        for (auto& matcher : potentialTemplates) {
+            auto match = matcher.isTemplateMatch(option.interface2);
+            if (match) {
+                matcher.setAsUsed(*match);
+                return true;
+            }
+        }
+        auto aliasList = generateAliases(option.interface2, aliases);
+        for (const auto& alias : aliasList) {
+            for (auto& matcher : potentialTemplates) {
+                auto match = matcher.isTemplateMatch(alias);
+                if (match) {
+                    matcher.setAsUsed(*match);
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 bool Connector::checkPotentialConnection(
     std::string_view interfaceName,
     const std::vector<std::size_t>& tagList,
     std::unordered_set<std::string_view>& possibleConnections,
     std::unordered_map<std::string_view, PotentialConnections>& potentials,
+    std::vector<TemplateMatcher>& potentialTemplates,
     const std::unordered_multimap<std::string_view, std::string_view>& aliases)
 {
     static auto nullConnector = [this](std::string_view, std::string_view) {};
@@ -706,6 +967,11 @@ bool Connector::checkPotentialConnection(
     if (makePotentialConnection(interfaceName, tagList, potentials, aliases)) {
         return true;
     }
+    if (!potentialTemplates.empty()) {
+        if (makePotentialTemplateConnection(interfaceName, tagList, potentialTemplates, aliases)) {
+            return true;
+        }
+    }
     if (!aliases.empty()) {
         auto aliasList = generateAliases(interfaceName, aliases);
         for (const auto& alias : aliasList) {
@@ -714,6 +980,11 @@ bool Connector::checkPotentialConnection(
             }
             if (makePotentialConnection(alias, tagList, potentials, aliases)) {
                 return true;
+            }
+            if (!potentialTemplates.empty()) {
+                if (makePotentialTemplateConnection(alias, tagList, potentialTemplates, aliases)) {
+                    return true;
+                }
             }
         }
     }
@@ -803,7 +1074,7 @@ int Connector::makeTargetConnection(
 
 void Connector::makeConnections(ConnectionsList& possibleConnections)
 {
-    int logLevel = fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
+    const int logLevel = fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
     auto inputConnector = [this, logLevel](std::string_view origin, std::string_view source) {
         core.dataLink(source, origin);
         if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
@@ -839,7 +1110,7 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
         }
     };
 
-    auto tagList = possibleConnections.tagCodes;
+    const auto& tagList = possibleConnections.tagCodes;
     /** unconnected inputs*/
     for (const auto& uInp : possibleConnections.unconnectedInputs) {
         matchCount += makeTargetConnection(
@@ -875,16 +1146,15 @@ void Connector::makeConnections(ConnectionsList& possibleConnections)
     }
 }
 
-void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnections)
+void Connector::scanPotentialInterfaces(ConnectionsList& possibleConnections)
 {
-    auto nullConnector = [this](std::string_view, std::string_view) {};
-    auto tagList = possibleConnections.tagCodes;
     /** potential inputs*/
     for (auto& pInp : possibleConnections.potentialInputs) {
         if (checkPotentialConnection(pInp.first,
-                                     tagList,
+                                     possibleConnections.tagCodes,
                                      possibleConnections.pubs,
                                      possibleConnections.potentialPubs,
+                                     possibleConnections.potentialPublicationTemplates,
                                      possibleConnections.aliases)) {
             pInp.second.used = true;
         }
@@ -895,9 +1165,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
             continue;
         }
         if (checkPotentialConnection(pPub.first,
-                                     tagList,
+                                     possibleConnections.tagCodes,
                                      possibleConnections.inputs,
                                      possibleConnections.potentialInputs,
+                                     possibleConnections.potentialInputTemplates,
                                      possibleConnections.aliases)) {
             pPub.second.used = true;
         }
@@ -909,18 +1180,77 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
             continue;
         }
         if (checkPotentialConnection(pEnd.first,
-                                     tagList,
+                                     possibleConnections.tagCodes,
                                      possibleConnections.endpoints,
                                      possibleConnections.potentialEndpoints,
+                                     possibleConnections.potentialEndpointTemplates,
                                      possibleConnections.aliases)) {
             pEnd.second.used = true;
         }
     }
-    /** now try to match unconnected interfaces to some of the potential ones*/
+}
+
+void Connector::scanPotentialInterfaceTemplates(ConnectionsList& possibleConnections)
+{
+    /** now run through the potential interface templates as if they were directly listed*/
+    for (auto& inpTemplate : possibleConnections.potentialInputTemplates) {
+        for (std::size_t ii = 0; ii < inpTemplate.possibilitiesCount(); ++ii) {
+            const std::string possibility = inpTemplate.instantiateTemplate(ii);
+            if (checkPotentialConnection(possibility,
+                                         possibleConnections.tagCodes,
+                                         possibleConnections.pubs,
+                                         possibleConnections.potentialPubs,
+                                         possibleConnections.potentialPublicationTemplates,
+                                         possibleConnections.aliases)) {
+                auto check = inpTemplate.isTemplateMatch(possibility);
+                if (check) {
+                    inpTemplate.setAsUsed(*check);
+                }
+            }
+        }
+    }
+    for (auto& pubTemplate : possibleConnections.potentialPublicationTemplates) {
+        for (std::size_t ii = 0; ii < pubTemplate.possibilitiesCount(); ++ii) {
+            const std::string possibility = pubTemplate.instantiateTemplate(ii);
+            if (checkPotentialConnection(possibility,
+                                         possibleConnections.tagCodes,
+                                         possibleConnections.inputs,
+                                         possibleConnections.potentialInputs,
+                                         possibleConnections.potentialInputTemplates,
+                                         possibleConnections.aliases)) {
+                auto check = pubTemplate.isTemplateMatch(possibility);
+                if (check) {
+                    pubTemplate.setAsUsed(*check);
+                }
+            }
+        }
+    }
+    for (auto& endTemplate : possibleConnections.potentialEndpointTemplates) {
+        for (std::size_t ii = 0; ii < endTemplate.possibilitiesCount(); ++ii) {
+            const std::string possibility = endTemplate.instantiateTemplate(ii);
+            if (checkPotentialConnection(possibility,
+                                         possibleConnections.tagCodes,
+                                         possibleConnections.endpoints,
+                                         possibleConnections.potentialEndpoints,
+                                         possibleConnections.potentialEndpointTemplates,
+                                         possibleConnections.aliases)) {
+                auto check = endTemplate.isTemplateMatch(possibility);
+                if (check) {
+                    endTemplate.setAsUsed(*check);
+                }
+            }
+        }
+    }
+}
+
+void Connector::scanUnconnectedInterfaces(ConnectionsList& possibleConnections)
+{
     /** unconnected inputs*/
     for (const auto& uInp : possibleConnections.unconnectedInputs) {
-        if (makePotentialConnection(
-                uInp, tagList, possibleConnections.potentialPubs, possibleConnections.aliases)) {
+        if (makePotentialConnection(uInp,
+                                    possibleConnections.tagCodes,
+                                    possibleConnections.potentialPubs,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
@@ -930,7 +1260,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
                     continue;
                 }
                 if (makePotentialConnection(alias,
-                                            tagList,
+                                            possibleConnections.tagCodes,
                                             possibleConnections.potentialPubs,
                                             possibleConnections.aliases)) {
                     break;
@@ -941,8 +1271,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
 
     /** unconnected publications*/
     for (const auto& uPub : possibleConnections.unconnectedPubs) {
-        if (makePotentialConnection(
-                uPub, tagList, possibleConnections.potentialInputs, possibleConnections.aliases)) {
+        if (makePotentialConnection(uPub,
+                                    possibleConnections.tagCodes,
+                                    possibleConnections.potentialInputs,
+                                    possibleConnections.aliases)) {
             continue;
         }
         if (!possibleConnections.aliases.empty()) {
@@ -952,7 +1284,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
                     continue;
                 }
                 if (makePotentialConnection(alias,
-                                            tagList,
+                                            possibleConnections.tagCodes,
                                             possibleConnections.potentialInputs,
                                             possibleConnections.aliases)) {
                     break;
@@ -964,7 +1296,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
     /** unconnected source endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedSourceEndpoints) {
         if (makePotentialConnection(uEnd,
-                                    tagList,
+                                    possibleConnections.tagCodes,
                                     possibleConnections.potentialEndpoints,
                                     possibleConnections.aliases)) {
             continue;
@@ -976,7 +1308,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
                     continue;
                 }
                 if (makePotentialConnection(alias,
-                                            tagList,
+                                            possibleConnections.tagCodes,
                                             possibleConnections.potentialEndpoints,
                                             possibleConnections.aliases)) {
                     break;
@@ -988,7 +1320,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
     /** unconnected target endpoints*/
     for (const auto& uEnd : possibleConnections.unconnectedTargetEndpoints) {
         if (makePotentialConnection(uEnd,
-                                    tagList,
+                                    possibleConnections.tagCodes,
                                     possibleConnections.potentialEndpoints,
                                     possibleConnections.aliases)) {
             continue;
@@ -1000,7 +1332,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
                     continue;
                 }
                 if (makePotentialConnection(alias,
-                                            tagList,
+                                            possibleConnections.tagCodes,
                                             possibleConnections.potentialEndpoints,
                                             possibleConnections.aliases)) {
                     break;
@@ -1008,7 +1340,10 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
             }
         }
     }
+}
 
+static void scanUnknownInterfaces(ConnectionsList& possibleConnections)
+{
     for (const auto& uInp : possibleConnections.unknownInputs) {
         auto fnd = possibleConnections.potentialInputs.find(uInp);
         if (fnd != possibleConnections.potentialInputs.end()) {
@@ -1059,79 +1394,135 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
             }
         }
     }
-    int logLevel = fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
+}
+
+static int addUsedPotentialInterfaceToCommand(
+    Json::Value& potentialCommand,
+    const std::unordered_map<std::string_view, PotentialConnections>& potentials,
+    const std::string& possibleFed,
+    int logLevel,
+    const std::string& type,
+    Federate* fed)
+{
+    int interfaceCount{0};
+    std::vector<std::remove_cv_t<std::remove_reference_t<decltype(*potentials.begin())>>>
+        enabledInterfaces;
+    std::copy_if(potentials.begin(),
+                 potentials.end(),
+                 std::back_inserter(enabledInterfaces),
+                 [possibleFed](auto& pInterface) {
+                     return (pInterface.second.federate == possibleFed &&
+                             pInterface.second.used == true);
+                 });
+    if (!enabledInterfaces.empty()) {
+        potentialCommand[type] = Json::arrayValue;
+        for (const auto& iface : enabledInterfaces) {
+            potentialCommand[type].append(std::string(iface.first));
+            ++interfaceCount;
+            if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
+                fed->logMessage(
+                    HELICS_LOG_LEVEL_CONNECTIONS,
+                    fmt::format("federate {} request {} {}", possibleFed, type, iface.first));
+            }
+        }
+    }
+    return interfaceCount;
+}
+
+static int addUsedPotentialInterfaceTemplates(Json::Value& potentialCommand,
+                                              std::vector<TemplateMatcher>& potentials,
+                                              const std::string& possibleFed,
+                                              int logLevel,
+                                              const std::string& type,
+                                              Federate* fed)
+{
+    bool hasInterfaceTemplates{false};
+    for (auto& ifaceTemplate : potentials) {
+        if (ifaceTemplate.federate != possibleFed) {
+            continue;
+        }
+        if (!ifaceTemplate.isUsed()) {
+            continue;
+        }
+        hasInterfaceTemplates = true;
+        break;
+    }
+    if (hasInterfaceTemplates) {
+        potentialCommand[type] = Json::arrayValue;
+        for (auto& ifaceTemplate : potentials) {
+            if (ifaceTemplate.federate != possibleFed) {
+                continue;
+            }
+            if (!ifaceTemplate.isUsed()) {
+                continue;
+            }
+            potentialCommand[type].append(ifaceTemplate.usedInterfaceGeneration());
+            if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
+                fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
+                                fmt::format("federate {} request {} {}",
+                                            possibleFed,
+                                            type,
+                                            fileops::generateJsonString(
+                                                ifaceTemplate.usedInterfaceGeneration())));
+            }
+        }
+    }
+    return 0;
+}
+
+void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnections)
+{
+    scanPotentialInterfaces(possibleConnections);
+    scanPotentialInterfaceTemplates(possibleConnections);
+
+    /** now try to match unconnected interfaces to some of the potential ones*/
+    scanUnconnectedInterfaces(possibleConnections);
+    /** check for unknown interface connections to potential interfaces*/
+    scanUnknownInterfaces(possibleConnections);
+
+    const int logLevel = fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
     for (auto& possibleFed : possibleConnections.federatesWithPotentialInterfaces) {
         Json::Value establishInterfaces;
         establishInterfaces["command"] = "register_interfaces";
-        std::vector<std::remove_reference_t<decltype(*possibleConnections.potentialInputs.begin())>>
-            enabledInputs;
-        std::copy_if(possibleConnections.potentialInputs.begin(),
-                     possibleConnections.potentialInputs.end(),
-                     std::back_inserter(enabledInputs),
-                     [possibleFed](auto& pInterface) {
-                         return (pInterface.second.federate == possibleFed &&
-                                 pInterface.second.used == true);
-                     });
-        if (!enabledInputs.empty()) {
-            establishInterfaces["inputs"] = Json::arrayValue;
-            for (const auto& input : enabledInputs) {
-                establishInterfaces["inputs"].append(std::string(input.first));
-                ++interfacesRequested;
-                if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
-                    fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                                    fmt::format("federate {} request input {}",
-                                                possibleFed,
-                                                input.first));
-                }
-            }
-        }
-        std::vector<std::remove_reference_t<decltype(*possibleConnections.potentialPubs.begin())>>
-            enabledPublications;
-        std::copy_if(possibleConnections.potentialPubs.begin(),
-                     possibleConnections.potentialPubs.end(),
-                     std::back_inserter(enabledPublications),
-                     [possibleFed](auto& pInterface) {
-                         return (pInterface.second.federate == possibleFed &&
-                                 pInterface.second.used == true);
-                     });
-        if (!enabledPublications.empty()) {
-            establishInterfaces["publications"] = Json::arrayValue;
-            for (const auto& pub : enabledPublications) {
-                establishInterfaces["publications"].append(std::string(pub.first));
-                ++interfacesRequested;
-                if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
-                    fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                                    fmt::format("federate {} request publication {}",
-                                                possibleFed,
-                                                pub.first));
-                }
-            }
-        }
+        addUsedPotentialInterfaceToCommand(establishInterfaces,
+                                           possibleConnections.potentialInputs,
+                                           possibleFed,
+                                           logLevel,
+                                           "inputs",
+                                           fed.get());
+        addUsedPotentialInterfaceToCommand(establishInterfaces,
+                                           possibleConnections.potentialPubs,
+                                           possibleFed,
+                                           logLevel,
+                                           "publications",
+                                           fed.get());
+        addUsedPotentialInterfaceToCommand(establishInterfaces,
+                                           possibleConnections.potentialEndpoints,
+                                           possibleFed,
+                                           logLevel,
+                                           "endpoints",
+                                           fed.get());
 
-        std::vector<
-            std::remove_reference_t<decltype(*possibleConnections.potentialEndpoints.begin())>>
-            enabledEndpoints;
-        std::copy_if(possibleConnections.potentialEndpoints.begin(),
-                     possibleConnections.potentialEndpoints.end(),
-                     std::back_inserter(enabledEndpoints),
-                     [possibleFed](auto& pInterface) {
-                         return (pInterface.second.federate == possibleFed &&
-                                 pInterface.second.used == true);
-                     });
-        if (!enabledEndpoints.empty()) {
-            establishInterfaces["endpoints"] = Json::arrayValue;
-            for (const auto& ept : enabledEndpoints) {
-                establishInterfaces["endpoints"].append(std::string(ept.first));
-                ++interfacesRequested;
-                if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
-                    fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                                    fmt::format("federate {} request endpoint {}",
-                                                possibleFed,
-                                                ept.first));
-                }
-            }
-        }
-        fed->sendCommand(possibleFed, fileops::generateJsonString(establishInterfaces));
+        addUsedPotentialInterfaceTemplates(establishInterfaces,
+                                           possibleConnections.potentialPublicationTemplates,
+                                           possibleFed,
+                                           logLevel,
+                                           "templated_publications",
+                                           fed.get());
+        addUsedPotentialInterfaceTemplates(establishInterfaces,
+                                           possibleConnections.potentialInputTemplates,
+                                           possibleFed,
+                                           logLevel,
+                                           "templated_inputs",
+                                           fed.get());
+        addUsedPotentialInterfaceTemplates(establishInterfaces,
+                                           possibleConnections.potentialEndpointTemplates,
+                                           possibleFed,
+                                           logLevel,
+                                           "templated_endpoints",
+                                           fed.get());
+        const std::string commandStr = fileops::generateJsonString(establishInterfaces);
+        fed->sendCommand(possibleFed, commandStr);
         if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
             fed->logInfoMessage(fmt::format("{} interfaces requested", interfacesRequested));
         }
