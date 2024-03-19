@@ -55,7 +55,9 @@ CallbackFederate::CallbackFederate(std::string_view fedName,
     loadOperator();
 }
 
-CallbackFederate::CallbackFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fedInfo):
+CallbackFederate::CallbackFederate(std::string_view fedName,
+                                   CoreApp& core,
+                                   const FederateInfo& fedInfo):
     Federate(fedName, core, fedInfo), CombinationFederate(fedName, core, fedInfo)
 {
     loadOperator();
