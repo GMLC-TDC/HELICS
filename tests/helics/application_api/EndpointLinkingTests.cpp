@@ -212,9 +212,9 @@ TEST_F(mfed_tests, regex_data_sink)
     auto ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
     auto ep3 = mFed3->registerGlobalTargetedEndpoint("ep3");
 
-    auto ds = mFed1->registerDataSink("ds1");
+    auto sink1 = mFed1->registerDataSink("ds1");
 
-    ds.addSourceTarget("REGEX:.*");
+    sink1.addSourceTarget("REGEX:.*");
 
     mFed1->enterExecutingModeAsync();
     mFed3->enterExecutingModeAsync();
@@ -236,22 +236,22 @@ TEST_F(mfed_tests, regex_data_sink)
     gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
-    EXPECT_EQ(ds.pendingMessageCount(), 3);
+    EXPECT_EQ(sink1.pendingMessageCount(), 3);
     EXPECT_FALSE(ep1.hasMessage());
     EXPECT_FALSE(ep2.hasMessage());
     EXPECT_FALSE(ep3.hasMessage());
 
-    auto message = ds.getMessage();
+    auto message = sink1.getMessage();
     if (message) {
         EXPECT_EQ(message->to_string(), "test message1");
     }
 
-    message = ds.getMessage();
+    message = sink1.getMessage();
     if (message) {
         EXPECT_EQ(message->to_string(), "test message2");
     }
 
-    message = ds.getMessage();
+    message = sink1.getMessage();
     if (message) {
         EXPECT_EQ(message->to_string(), "test message3");
     }
