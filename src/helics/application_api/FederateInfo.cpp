@@ -133,7 +133,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 69> propStringsTra
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
 
-static constexpr frozen::unordered_map<std::string_view, int, 95> flagStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 97> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
     {"sourceonly", HELICS_FLAG_SOURCE_ONLY},
     {"sourceOnly", HELICS_FLAG_SOURCE_ONLY},
@@ -233,7 +233,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 95> flagStringsTra
     {"disableremotecontrol", HELICS_FLAG_DISABLE_REMOTE_CONTROL},
     {"disable_remote_control", HELICS_FLAG_DISABLE_REMOTE_CONTROL}};
 
-static constexpr frozen::unordered_map<std::string_view, int, 41> optionStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 42> optionStringsTranslations{
     {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferdata", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
