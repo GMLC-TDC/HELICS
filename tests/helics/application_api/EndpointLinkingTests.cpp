@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <numeric>
 #include <thread>
+#include <algorithm>
 
 /** these test cases test out the message federates
  */
