@@ -212,7 +212,7 @@ class CheckFed {
                                   potEndpoints.end());
     }
     /** get the values array*/
-    const auto& getValues(const std::string& input) const
+    const auto& getValues(std::string_view input) const
     {
         static const std::vector<double> emptyVals;
 
@@ -224,7 +224,7 @@ class CheckFed {
         return emptyVals;
     }
     /** get the values array*/
-    const auto& getMessages(const std::string& endpoint)
+    const auto& getMessages(std::string_view endpoint)
     {
         static const std::vector<std::string> emptyVals;
 
@@ -236,6 +236,25 @@ class CheckFed {
         return emptyVals;
     }
 
+    bool isInput(std::string_view input)
+    {
+        for (int ii = 0; ii < valueNames.size(); ++ii) {
+            if (valueNames[ii] == input) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool isEndpoint(std::string_view endpoint) const
+    {
+        for (int ii = 0; ii < messageNames.size(); ++ii) {
+            if (messageNames[ii] == endpoint) {
+                return true;
+            }
+        }
+        return false;
+    }
     const auto& getValueNames() { return valueNames; }
     const auto& getMessageNames() { return messageNames; }
     bool hasReceivedCommand() const { return receivedCommand; }
@@ -280,6 +299,7 @@ TEST(connector_2stage, simple_connector)
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_EQ(cfed1.getValueNames(), std::vector<std::string>{"inp1"});
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -310,6 +330,7 @@ TEST(connector_2stage, simple_connector_struct)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
@@ -337,6 +358,8 @@ TEST(connector_2stage, simple_endpoint_connector)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
+    EXPECT_TRUE(cfed1.isEndpoint("ept2"));
     EXPECT_FALSE(cfed1.getMessages("ept1").empty());
     EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 2);
@@ -365,6 +388,8 @@ TEST(connector_2stage, simple_endpoint_connector_struct)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
+    EXPECT_TRUE(cfed1.isEndpoint("ept2"));
     EXPECT_FALSE(cfed1.getMessages("ept1").empty());
     EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 2);
@@ -417,6 +442,8 @@ TEST(connector_2stage, simple_endpoint_connector_one_way)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
+    EXPECT_TRUE(cfed1.isEndpoint("ept2"));
     EXPECT_TRUE(cfed1.getMessages("ept1").empty());
     EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -472,6 +499,8 @@ TEST(connector_2stage, simple_endpoint_connector_one_way_reverse)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
+    EXPECT_TRUE(cfed1.isEndpoint("ept2"));
     EXPECT_FALSE(cfed1.getMessages("ept1").empty());
     EXPECT_TRUE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -513,6 +542,7 @@ TEST(connector_2stage, three_fed)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -554,6 +584,7 @@ TEST(connector_2stage, three_fed_endpoint)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 1);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -595,6 +626,7 @@ TEST(connector_2stage, three_fed_endpoint_bi)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 1);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 2);
@@ -636,6 +668,7 @@ TEST(connector_2stage, three_fed_reverse)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -820,6 +853,7 @@ TEST(connector_2stage, three_fed_alias_reverse)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -865,6 +899,7 @@ TEST(connector_2stage, three_fed_potential_alias)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -910,6 +945,7 @@ TEST(connector_2stage, three_fed_potential_alias_reverse)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -957,6 +993,7 @@ TEST(connector_2stage, three_fed_potential_cascade_alias_reverse)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -1001,6 +1038,7 @@ TEST(connector_2stage, three_fed_alias_unmatched_connection)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     // no connections through the connector made
@@ -1098,6 +1136,7 @@ TEST(connector_2stage, three_fed_endpoint_bi_alias)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 1);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 2);
@@ -1145,6 +1184,7 @@ TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 7);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 6);
@@ -1213,6 +1253,8 @@ TEST(connector_2stage, two_sided_broker_connection_alias)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 2);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
+    EXPECT_TRUE(cfed1.isInput("inp2"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_FALSE(cfed1.getValues("inp2").empty());
     EXPECT_TRUE(cfed1.hasReceivedCommand());
@@ -1245,6 +1287,10 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 4);
+    EXPECT_TRUE(cfed1.isEndpoint("e1"));
+    EXPECT_TRUE(cfed1.isEndpoint("e2"));
+    EXPECT_TRUE(cfed1.isEndpoint("e3"));
+    EXPECT_TRUE(cfed1.isEndpoint("e4"));
     EXPECT_TRUE(cfed1.getMessages("e1").empty()) << " endpoint " << cfed1.getMessageNames()[0];
     EXPECT_FALSE(cfed1.getMessages("e2").empty()) << " endpoint " << cfed1.getMessageNames()[1];
     EXPECT_TRUE(cfed1.getMessages("e3").empty()) << " endpoint " << cfed1.getMessageNames()[2];
@@ -1283,6 +1329,10 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 4);
+    EXPECT_TRUE(cfed1.isEndpoint("e1"));
+    EXPECT_TRUE(cfed1.isEndpoint("e2"));
+    EXPECT_TRUE(cfed1.isEndpoint("e3"));
+    EXPECT_TRUE(cfed1.isEndpoint("e4"));
     EXPECT_TRUE(cfed1.getMessages("e1").empty());
     EXPECT_FALSE(cfed1.getMessages("e2").empty());
     EXPECT_TRUE(cfed1.getMessages("e3").empty());
@@ -1328,11 +1378,13 @@ TEST(connector_2stage, multiCheckFed)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_TRUE(cfed1.getValues("inp2").empty());
     EXPECT_TRUE(cfed1.hasReceivedCommand());
 
     ASSERT_EQ(cfed2.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed2.isInput("inpA"));
     EXPECT_FALSE(cfed2.getValues("inpA").empty());
     EXPECT_TRUE(cfed2.getValues("inpB").empty());
     EXPECT_TRUE(cfed2.hasReceivedCommand());
