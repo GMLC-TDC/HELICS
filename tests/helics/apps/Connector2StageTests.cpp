@@ -35,6 +35,7 @@ class CheckFed {
     }
     void initialize()
     {
+        vFed->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
         vFed->setQueryCallback(
             [this](std::string_view query) { return generateQueryResponse(query); });
         vFed->enterInitializingModeIterative();
