@@ -236,6 +236,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
                    "specify that a broker should cause the federation to terminate on an error");
+    hApp->add_flag("--error_on_unmatched",errorOnUnmatchedConnections,"set the broker to terminate the cosimulation if there are unmatched connections");
     mLogManager->addLoggingCLI(hApp);
 
     hApp->add_flag(

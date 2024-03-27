@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static std::string newCoreName(std::string_view baseName)
 {
-    static std::atomic<int> count = 1;
+    static std::atomic<int> count{1};
     int value = ++count;
 
     return std::string(baseName) + std::to_string(value);
@@ -276,14 +276,22 @@ class CheckFed {
     bool receivedCommand{false};
 };
 
-TEST(connector_2stage, simple_connector)
+static helics::FederateInfo generateDefaultFedInfo()
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
-    using helics::apps::InterfaceDirection;
+    
 
     fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.brokerInitString = "--error_on_unmatched";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    return fedInfo;
+}
+
+TEST(connector_2stage, simple_connector)
+{
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
+    using helics::apps::InterfaceDirection;
     helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
 
@@ -308,12 +316,8 @@ TEST(connector_2stage, simple_connector)
 
 TEST(connector_2stage, simple_connector_struct)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
 
@@ -338,12 +342,8 @@ TEST(connector_2stage, simple_connector_struct)
 
 TEST(connector_2stage, simple_endpoint_connector)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::BIDIRECTIONAL);
 
@@ -368,12 +368,8 @@ TEST(connector_2stage, simple_endpoint_connector)
 
 TEST(connector_2stage, simple_endpoint_connector_struct)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::BIDIRECTIONAL);
 
@@ -398,12 +394,8 @@ TEST(connector_2stage, simple_endpoint_connector_struct)
 
 TEST(connector_2stage, evil_federate)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectorevil1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::BIDIRECTIONAL);
 
@@ -422,12 +414,8 @@ TEST(connector_2stage, evil_federate)
 
 TEST(connector_2stage, simple_endpoint_connector_one_way)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::FROM_TO);
 
@@ -452,12 +440,8 @@ TEST(connector_2stage, simple_endpoint_connector_one_way)
 
 TEST(connector_2stage, no_connections)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::FROM_TO);
 
@@ -479,12 +463,8 @@ TEST(connector_2stage, no_connections)
 
 TEST(connector_2stage, simple_endpoint_connector_one_way_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore3", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::TO_FROM);
 
@@ -509,12 +489,9 @@ TEST(connector_2stage, simple_endpoint_connector_one_way_reverse)
 
 TEST(connector_2stage, three_fed)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector2", fedInfo);
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
 
@@ -551,12 +528,9 @@ TEST(connector_2stage, three_fed)
 
 TEST(connector_2stage, three_fed_endpoint)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore5", fedInfo);
     conn1.addConnection("ept1", "oept1", InterfaceDirection::TO_FROM);
 
@@ -593,10 +567,8 @@ TEST(connector_2stage, three_fed_endpoint)
 
 TEST(connector_2stage, three_fed_endpoint_bi)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore6", fedInfo);
@@ -635,10 +607,8 @@ TEST(connector_2stage, three_fed_endpoint_bi)
 
 TEST(connector_2stage, three_fed_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector3", fedInfo);
@@ -677,12 +647,9 @@ TEST(connector_2stage, three_fed_reverse)
 
 TEST(connector_2stage, three_fed_input)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector4", fedInfo);
     conn1.addConnection("inp1", "publication1", InterfaceDirection::FROM_TO);
     conn1.addConnection("publication1", "pub1", InterfaceDirection::FROM_TO);
@@ -724,10 +691,8 @@ TEST(connector_2stage, three_fed_input)
 
 TEST(connector_2stage, three_fed_input_regex)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector4", fedInfo);
@@ -772,10 +737,8 @@ TEST(connector_2stage, three_fed_input_regex)
 
 TEST(connector_2stage, three_fed_input_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector5", fedInfo);
@@ -819,12 +782,9 @@ TEST(connector_2stage, three_fed_input_alias)
 
 TEST(connector_2stage, three_fed_alias_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector6", fedInfo);
     conn1.addConnection("publication1", "inp1", InterfaceDirection::FROM_TO);
 
@@ -862,12 +822,9 @@ TEST(connector_2stage, three_fed_alias_reverse)
 
 TEST(connector_2stage, three_fed_potential_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector7", fedInfo);
     conn1.addConnection("publication1", "input1", InterfaceDirection::FROM_TO);
 
@@ -908,12 +865,9 @@ TEST(connector_2stage, three_fed_potential_alias)
 
 TEST(connector_2stage, three_fed_potential_alias_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector8", fedInfo);
     conn1.addConnection("input1", "publication1", InterfaceDirection::FROM_TO);
 
@@ -954,12 +908,9 @@ TEST(connector_2stage, three_fed_potential_alias_reverse)
 
 TEST(connector_2stage, three_fed_potential_cascade_alias_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector9", fedInfo);
     conn1.addConnection("inputA", "publicationA", InterfaceDirection::FROM_TO);
 
@@ -1002,12 +953,9 @@ TEST(connector_2stage, three_fed_potential_cascade_alias_reverse)
 
 TEST(connector_2stage, three_fed_alias_unmatched_connection)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector10", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1048,12 +996,9 @@ TEST(connector_2stage, three_fed_alias_unmatched_connection)
 
 TEST(connector_2stage, three_fed_unknown_pub_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector11", fedInfo);
     fedInfo.coreInitString = "";
     CheckFed cfed1("c1", fedInfo);
@@ -1099,12 +1044,9 @@ TEST(connector_2stage, three_fed_unknown_pub_alias)
 
 TEST(connector_2stage, three_fed_endpoint_bi_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore7", fedInfo);
     conn1.addConnection("bigEndpoint", "origin", InterfaceDirection::BIDIRECTIONAL);
 
@@ -1145,12 +1087,9 @@ TEST(connector_2stage, three_fed_endpoint_bi_alias)
 
 TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore8", fedInfo);
     conn1.addConnection("bigEndpoint", "origin", InterfaceDirection::BIDIRECTIONAL);
     conn1.addConnection("origin", "secondary", InterfaceDirection::BIDIRECTIONAL);
@@ -1193,12 +1132,9 @@ TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
 
 TEST(connector_2stage, two_sided_broker_connection)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1226,12 +1162,9 @@ TEST(connector_2stage, two_sided_broker_connection)
 
 TEST(connector_2stage, two_sided_broker_connection_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1265,12 +1198,9 @@ TEST(connector_2stage, two_sided_broker_connection_alias)
 
 TEST(connector_2stage, two_sided_broker_connection_endpoints)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1303,12 +1233,8 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
 
 TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1345,12 +1271,9 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
 
 TEST(connector_2stage, multiCheckFed)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo=generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "pubA", InterfaceDirection::FROM_TO);
     conn1.addConnection("inpA", "pub2", InterfaceDirection::FROM_TO);
