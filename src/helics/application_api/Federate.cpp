@@ -2166,7 +2166,7 @@ std::size_t Interface::getSourceTargetCount() const
         return 0;
     }
     try {
-        Json::Value tvalues = fileops::loadJsonStr(targets);
+        const Json::Value tvalues = fileops::loadJsonStr(targets);
         return (tvalues.isArray()) ? tvalues.size() : 1;
     }
     catch (...) {
@@ -2180,7 +2180,7 @@ std::size_t Interface::getDestinationTargetCount() const
         return 0;
     }
     try {
-        Json::Value tvalues = fileops::loadJsonStr(targets);
+        const Json::Value tvalues = fileops::loadJsonStr(targets);
         return (tvalues.isArray()) ? tvalues.size() : 1;
     }
     catch (...) {

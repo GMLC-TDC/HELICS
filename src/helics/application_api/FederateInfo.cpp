@@ -809,7 +809,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         throw(helics::InvalidParameter(iarg.what()));
     }
     loadJsonConfig(doc);
-    bool hasHelicsSection = doc.isMember("helics");
+    const bool hasHelicsSection = doc.isMember("helics");
     bool hasHelicsSubSection{false};
     if (hasHelicsSection) {
         hasHelicsSubSection = doc["helics"].isMember("helics");

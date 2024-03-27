@@ -1005,6 +1005,7 @@ void CoreBroker::sendErrorToImmediateBrokers(int errorCode)
     broadcast(errorCom);
 }
 
+// NOLINTNEXTLINE
 void CoreBroker::processCommand(ActionMessage&& command)
 {
     LOG_TRACE(global_broker_id_local,

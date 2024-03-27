@@ -213,23 +213,23 @@ class CheckFed {
                                   potEndpoints.end());
     }
     /** get the values array*/
-    const auto& getValues(std::string_view input) const
+    [[nodiscard]] const auto& getValues(std::string_view input) const
     {
         static const std::vector<double> emptyVals;
 
-        for (int ii = 0; ii < valueNames.size(); ++ii) {
+        for (std::size_t ii = 0; ii < valueNames.size(); ++ii) {
             if (valueNames[ii] == input) {
                 return values[ii];
             }
         }
         return emptyVals;
     }
-    /** get the values array*/
-    const auto& getMessages(std::string_view endpoint)
+    /** get the messages array*/
+    [[nodiscard]] const auto& getMessages(std::string_view endpoint) const
     {
         static const std::vector<std::string> emptyVals;
 
-        for (int ii = 0; ii < messageNames.size(); ++ii) {
+        for (std::size_t ii = 0; ii < messageNames.size(); ++ii) {
             if (messageNames[ii] == endpoint) {
                 return messages[ii];
             }
@@ -237,9 +237,9 @@ class CheckFed {
         return emptyVals;
     }
 
-    bool isInput(std::string_view input)
+    [[nodiscard]] bool isInput(std::string_view input) const
     {
-        for (int ii = 0; ii < valueNames.size(); ++ii) {
+        for (std::size_t ii = 0; ii < valueNames.size(); ++ii) {
             if (valueNames[ii] == input) {
                 return true;
             }
@@ -247,20 +247,19 @@ class CheckFed {
         return false;
     }
 
-    bool isEndpoint(std::string_view endpoint) const
+    [[nodiscard]] bool isEndpoint(std::string_view endpoint) const
     {
-        for (int ii = 0; ii < messageNames.size(); ++ii) {
+        for (std::size_t ii = 0; ii < messageNames.size(); ++ii) {
             if (messageNames[ii] == endpoint) {
                 return true;
             }
         }
         return false;
     }
-    const auto& getValueNames() { return valueNames; }
-    const auto& getMessageNames() { return messageNames; }
-    bool hasReceivedCommand() const { return receivedCommand; }
+    [[nodiscard]] const auto& getValueNames() const { return valueNames; }
+    [[nodiscard]] const auto& getMessageNames() const { return messageNames; }
+    [[nodiscard]] bool hasReceivedCommand() const { return receivedCommand; }
 
-  public:
     enum class ResponseType { LIST, STRUCTURE, EVIL };
     std::atomic<ResponseType> responseType{ResponseType::LIST};
 

@@ -4649,6 +4649,7 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
         case CMD_INIT_GRANT:
             if (checkActionFlag(cmd, iteration_requested_flag)) {
                 if (initIterations) {
+                    initIterations.store(false);
                     if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
                         loopFederates.apply([&cmd](auto& fed) {
                             if (fed->initIterating.load()) {
@@ -4661,7 +4662,7 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                                checkActionFlag(cmd, dynamic_join_flag)) {
                         routeMessage(cmd);
                     }
-                    initIterations.store(false);
+                    
                 }
             } else {
                 if (transitionBrokerState(
