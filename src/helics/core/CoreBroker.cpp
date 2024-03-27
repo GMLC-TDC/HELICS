@@ -2853,45 +2853,42 @@ void CoreBroker::executeInitializationOperations(bool iterating)
         }
         /** now do a check on the unknownLinks*/
 
-        if (errorOnUnmatchedConnections)
-        {
-            if (unknownHandles.hasUnknowns())
-            {
+        if (errorOnUnmatchedConnections) {
+            if (unknownHandles.hasUnknowns()) {
                 int unmatchedCount{0};
                 ActionMessage eMiss(CMD_ERROR);
                 eMiss.source_id = global_broker_id_local;
                 eMiss.messageID = defs::Errors::CONNECTION_FAILURE;
-                    std::string errorString{"unmatched connections"};
-         
+                std::string errorString{"unmatched connections"};
+
                 unknownHandles.processUnknowns(
-                    [&errorString,&unmatchedCount](const std::string& target,
-                        InterfaceType type,
-                        UnknownHandleManager::TargetInfo /*tinfo*/) {
-                           errorString.append(fmt::format("\nUnable to connect {} to target {}",
-                            interfaceTypeName(type),
-                            target));
-                            ++unmatchedCount;
+                    [&errorString, &unmatchedCount](const std::string& target,
+                                                    InterfaceType type,
+                                                    UnknownHandleManager::TargetInfo /*tinfo*/) {
+                        errorString.append(fmt::format("\nUnable to connect {} to target {}",
+                                                       interfaceTypeName(type),
+                                                       target));
+                        ++unmatchedCount;
                     });
 
-                unknownHandles.processUnknownLinks([this, &errorString,&unmatchedCount](const std::string& origin,
-                    InterfaceType originType,
-                    const std::string& target,
-                    InterfaceType targetType) {
+                unknownHandles.processUnknownLinks(
+                    [this, &errorString, &unmatchedCount](const std::string& origin,
+                                                          InterfaceType originType,
+                                                          const std::string& target,
+                                                          InterfaceType targetType) {
                         const auto* originHandle = handles.getInterfaceHandle(origin, originType);
                         if (originHandle != nullptr) {
-                            const auto* targetHandle = handles.getInterfaceHandle(target, targetType);
-                            if (targetHandle != nullptr)
-                            {
+                            const auto* targetHandle =
+                                handles.getInterfaceHandle(target, targetType);
+                            if (targetHandle != nullptr) {
                                 return;
                             }
                         }
                         ++unmatchedCount;
-                        errorString.append(fmt::format("\nUnable to make link between {} and {}",
-                        origin,
-                        target));
+                        errorString.append(
+                            fmt::format("\nUnable to make link between {} and {}", origin, target));
                     });
-                if (unmatchedCount > 0)
-                {
+                if (unmatchedCount > 0) {
                     LOG_ERROR(parent_broker_id, getIdentifier(), errorString);
                     eMiss.payload = errorString;
                     eMiss.dest_handle = InterfaceHandle{};
@@ -2900,7 +2897,6 @@ void CoreBroker::executeInitializationOperations(bool iterating)
                     addActionMessage(CMD_STOP);
                     return;
                 }
-                
             }
         }
         if (unknownHandles.hasNonOptionalUnknowns()) {

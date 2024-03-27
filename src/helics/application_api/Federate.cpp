@@ -2161,36 +2161,29 @@ const std::string& Interface::getDestinationTargets() const
 
 std::size_t Interface::getSourceTargetCount() const
 {
-    const auto &targets=getSourceTargets();
-    if (targets.empty())
-    {
+    const auto& targets = getSourceTargets();
+    if (targets.empty()) {
         return 0;
     }
-    try
-    {
+    try {
         Json::Value tvalues = fileops::loadJsonStr(targets);
-        return (tvalues.isArray())?tvalues.size():1;
+        return (tvalues.isArray()) ? tvalues.size() : 1;
     }
-    catch (...)
-    {
+    catch (...) {
         return 1;
     }
-
 }
 std::size_t Interface::getDestinationTargetCount() const
 {
-    const auto &targets=getDestinationTargets();
-    if (targets.empty())
-    {
+    const auto& targets = getDestinationTargets();
+    if (targets.empty()) {
         return 0;
     }
-    try
-    {
+    try {
         Json::Value tvalues = fileops::loadJsonStr(targets);
-        return (tvalues.isArray())?tvalues.size():1;
+        return (tvalues.isArray()) ? tvalues.size() : 1;
     }
-    catch (...)
-    {
+    catch (...) {
         return 1;
     }
 }

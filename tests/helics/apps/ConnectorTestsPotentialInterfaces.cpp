@@ -117,8 +117,8 @@ TEST(connector_potential_interfaces, simple_connector_init_iteration)
     auto& pub1 = vfed.getPublication(0);
     auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
-    const auto &targets=pub1.getDestinationTargets();
-    EXPECT_EQ(targets,"inp1");
+    const auto& targets = pub1.getDestinationTargets();
+    EXPECT_EQ(targets, "inp1");
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -347,8 +347,8 @@ TEST(connector_potential_interfaces, pub_template_alias)
     auto& pub1 = vfed.getPublication(0);
     auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
-    const auto &targets=pub1.getDestinationTargets();
-    EXPECT_EQ(targets,"inp1");
+    const auto& targets = pub1.getDestinationTargets();
+    EXPECT_EQ(targets, "inp1");
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -379,7 +379,7 @@ TEST(connector_potential_interfaces, pub_input_template)
     auto& pub1 = vfed.getPublication(0);
     auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
-    EXPECT_EQ(pub1.getDestinationTargetCount(),1);
+    EXPECT_EQ(pub1.getDestinationTargetCount(), 1);
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -582,7 +582,7 @@ TEST(connector_potential_interfaces, big_endpoint_template_alias)
     EXPECT_EQ(retTime, 1.0);
     EXPECT_TRUE(ept2.hasMessage());
     auto message = ept2.getMessage();
-    
+
     mfed.finalize();
     fut.get();
     ASSERT_TRUE(message);
