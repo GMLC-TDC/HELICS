@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/CoreApp.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <future>
 #include <thread>
-#include <algorithm>
 
 static std::string newCoreName(std::string_view baseName)
 {
@@ -240,12 +240,13 @@ class CheckFed {
 
     [[nodiscard]] bool isInput(std::string_view input) const
     {
-        return (std::find(valueNames.begin(),valueNames.end(),input)!=valueNames.end());
+        return (std::find(valueNames.begin(), valueNames.end(), input) != valueNames.end());
     }
 
     [[nodiscard]] bool isEndpoint(std::string_view endpoint) const
     {
-        return (std::find(messageNames.begin(),messageNames.end(),endpoint)!=messageNames.end());
+        return (std::find(messageNames.begin(), messageNames.end(), endpoint) !=
+                messageNames.end());
     }
     [[nodiscard]] const auto& getValueNames() const { return valueNames; }
     [[nodiscard]] const auto& getMessageNames() const { return messageNames; }
