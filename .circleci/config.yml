@@ -78,13 +78,14 @@ jobs:
   helicsgccTSan:
     docker:
       - image: helics/buildenv:gcc13-builder
+    resource_class: large
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON -DCMAKE_CXX_STANDARD=20'
       TSAN_OPTIONS: "second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt history_size=4"
 
     steps:
       - checkout
-      - run: *setup_helics_low_mem
+      - run: *setup_helics
       - run: *run_helics_sanitizer_tests
 
   helicsgccASan:

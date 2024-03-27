@@ -239,8 +239,8 @@ class CheckFed {
 
     [[nodiscard]] bool isInput(std::string_view input) const
     {
-        for (std::size_t ii = 0; ii < valueNames.size(); ++ii) {
-            if (valueNames[ii] == input) {
+        for  (const auto & valueName : valueNames) {
+            if (input == valueName) {
                 return true;
             }
         }
@@ -249,8 +249,8 @@ class CheckFed {
 
     [[nodiscard]] bool isEndpoint(std::string_view endpoint) const
     {
-        for (std::size_t ii = 0; ii < messageNames.size(); ++ii) {
-            if (messageNames[ii] == endpoint) {
+        for  (const auto & messageName : messageNames) {
+            if (endpoint==messageName) {
                 return true;
             }
         }
