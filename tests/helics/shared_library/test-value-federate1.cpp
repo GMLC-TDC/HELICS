@@ -25,7 +25,7 @@ static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& pa
 };
 
 /** test simple creation and destruction*/
-TEST_P(vfedSimpleType, initialize_tests)
+TEST_P(vfedSimpleType, initialize_nosan)
 {
     SetupTest(helicsCreateValueFederate, GetParam(), 1);
     auto vFed1 = GetFederateAt(0);

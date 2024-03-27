@@ -15,13 +15,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/CoreApp.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 
+#include <algorithm>
 #include <atomic>
 #include <future>
 #include <thread>
 
 static std::string newCoreName(std::string_view baseName)
 {
-    static std::atomic<int> count = 1;
+    static std::atomic<int> count{1};
     int value = ++count;
 
     return std::string(baseName) + std::to_string(value);
@@ -35,6 +36,7 @@ class CheckFed {
     }
     void initialize()
     {
+        vFed->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
         vFed->setQueryCallback(
             [this](std::string_view query) { return generateQueryResponse(query); });
         vFed->enterInitializingModeIterative();
@@ -212,23 +214,23 @@ class CheckFed {
                                   potEndpoints.end());
     }
     /** get the values array*/
-    const auto& getValues(const std::string& input) const
+    [[nodiscard]] const auto& getValues(std::string_view input) const
     {
         static const std::vector<double> emptyVals;
 
-        for (int ii = 0; ii < valueNames.size(); ++ii) {
+        for (std::size_t ii = 0; ii < valueNames.size(); ++ii) {
             if (valueNames[ii] == input) {
                 return values[ii];
             }
         }
         return emptyVals;
     }
-    /** get the values array*/
-    const auto& getMessages(const std::string& endpoint)
+    /** get the messages array*/
+    [[nodiscard]] const auto& getMessages(std::string_view endpoint) const
     {
         static const std::vector<std::string> emptyVals;
 
-        for (int ii = 0; ii < messageNames.size(); ++ii) {
+        for (std::size_t ii = 0; ii < messageNames.size(); ++ii) {
             if (messageNames[ii] == endpoint) {
                 return messages[ii];
             }
@@ -236,11 +238,20 @@ class CheckFed {
         return emptyVals;
     }
 
-    const auto& getValueNames() { return valueNames; }
-    const auto& getMessageNames() { return messageNames; }
-    bool hasReceivedCommand() const { return receivedCommand; }
+    [[nodiscard]] bool isInput(std::string_view input) const
+    {
+        return (std::find(valueNames.begin(), valueNames.end(), input) != valueNames.end());
+    }
 
-  public:
+    [[nodiscard]] bool isEndpoint(std::string_view endpoint) const
+    {
+        return (std::find(messageNames.begin(), messageNames.end(), endpoint) !=
+                messageNames.end());
+    }
+    [[nodiscard]] const auto& getValueNames() const { return valueNames; }
+    [[nodiscard]] const auto& getMessageNames() const { return messageNames; }
+    [[nodiscard]] bool hasReceivedCommand() const { return receivedCommand; }
+
     enum class ResponseType { LIST, STRUCTURE, EVIL };
     std::atomic<ResponseType> responseType{ResponseType::LIST};
 
@@ -256,14 +267,21 @@ class CheckFed {
     bool receivedCommand{false};
 };
 
-TEST(connector_2stage, simple_connector)
+static helics::FederateInfo generateDefaultFedInfo()
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
-    using helics::apps::InterfaceDirection;
 
     fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.brokerInitString = "--error_on_unmatched";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    return fedInfo;
+}
+
+TEST(connector_2stage, simple_connector)
+{
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
+    using helics::apps::InterfaceDirection;
     helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
 
@@ -280,6 +298,7 @@ TEST(connector_2stage, simple_connector)
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_EQ(cfed1.getValueNames(), std::vector<std::string>{"inp1"});
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -287,12 +306,8 @@ TEST(connector_2stage, simple_connector)
 
 TEST(connector_2stage, simple_connector_struct)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
 
@@ -310,18 +325,15 @@ TEST(connector_2stage, simple_connector_struct)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
 TEST(connector_2stage, simple_endpoint_connector)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::BIDIRECTIONAL);
 
@@ -337,6 +349,8 @@ TEST(connector_2stage, simple_endpoint_connector)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
+    EXPECT_TRUE(cfed1.isEndpoint("ept2"));
     EXPECT_FALSE(cfed1.getMessages("ept1").empty());
     EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 2);
@@ -344,12 +358,8 @@ TEST(connector_2stage, simple_endpoint_connector)
 
 TEST(connector_2stage, simple_endpoint_connector_struct)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::BIDIRECTIONAL);
 
@@ -365,6 +375,8 @@ TEST(connector_2stage, simple_endpoint_connector_struct)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
+    EXPECT_TRUE(cfed1.isEndpoint("ept2"));
     EXPECT_FALSE(cfed1.getMessages("ept1").empty());
     EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 2);
@@ -372,12 +384,8 @@ TEST(connector_2stage, simple_endpoint_connector_struct)
 
 TEST(connector_2stage, evil_federate)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectorevil1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::BIDIRECTIONAL);
 
@@ -396,12 +404,8 @@ TEST(connector_2stage, evil_federate)
 
 TEST(connector_2stage, simple_endpoint_connector_one_way)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::FROM_TO);
 
@@ -417,6 +421,8 @@ TEST(connector_2stage, simple_endpoint_connector_one_way)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
+    EXPECT_TRUE(cfed1.isEndpoint("ept2"));
     EXPECT_TRUE(cfed1.getMessages("ept1").empty());
     EXPECT_FALSE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -424,12 +430,8 @@ TEST(connector_2stage, simple_endpoint_connector_one_way)
 
 TEST(connector_2stage, no_connections)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore1", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::FROM_TO);
 
@@ -451,12 +453,8 @@ TEST(connector_2stage, no_connections)
 
 TEST(connector_2stage, simple_endpoint_connector_one_way_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore3", fedInfo);
     conn1.addConnection("ept1", "ept2", InterfaceDirection::TO_FROM);
 
@@ -472,6 +470,8 @@ TEST(connector_2stage, simple_endpoint_connector_one_way_reverse)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
+    EXPECT_TRUE(cfed1.isEndpoint("ept2"));
     EXPECT_FALSE(cfed1.getMessages("ept1").empty());
     EXPECT_TRUE(cfed1.getMessages("ept2").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -479,12 +479,9 @@ TEST(connector_2stage, simple_endpoint_connector_one_way_reverse)
 
 TEST(connector_2stage, three_fed)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector2", fedInfo);
     conn1.addConnection("inp1", "pub1", InterfaceDirection::FROM_TO);
 
@@ -513,6 +510,7 @@ TEST(connector_2stage, three_fed)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -520,12 +518,9 @@ TEST(connector_2stage, three_fed)
 
 TEST(connector_2stage, three_fed_endpoint)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore5", fedInfo);
     conn1.addConnection("ept1", "oept1", InterfaceDirection::TO_FROM);
 
@@ -554,6 +549,7 @@ TEST(connector_2stage, three_fed_endpoint)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 1);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -561,10 +557,8 @@ TEST(connector_2stage, three_fed_endpoint)
 
 TEST(connector_2stage, three_fed_endpoint_bi)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore6", fedInfo);
@@ -595,6 +589,7 @@ TEST(connector_2stage, three_fed_endpoint_bi)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 1);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 2);
@@ -602,10 +597,8 @@ TEST(connector_2stage, three_fed_endpoint_bi)
 
 TEST(connector_2stage, three_fed_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector3", fedInfo);
@@ -636,6 +629,7 @@ TEST(connector_2stage, three_fed_reverse)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -643,12 +637,9 @@ TEST(connector_2stage, three_fed_reverse)
 
 TEST(connector_2stage, three_fed_input)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector4", fedInfo);
     conn1.addConnection("inp1", "publication1", InterfaceDirection::FROM_TO);
     conn1.addConnection("publication1", "pub1", InterfaceDirection::FROM_TO);
@@ -690,10 +681,8 @@ TEST(connector_2stage, three_fed_input)
 
 TEST(connector_2stage, three_fed_input_regex)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector4", fedInfo);
@@ -738,10 +727,8 @@ TEST(connector_2stage, three_fed_input_regex)
 
 TEST(connector_2stage, three_fed_input_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector5", fedInfo);
@@ -785,12 +772,9 @@ TEST(connector_2stage, three_fed_input_alias)
 
 TEST(connector_2stage, three_fed_alias_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector6", fedInfo);
     conn1.addConnection("publication1", "inp1", InterfaceDirection::FROM_TO);
 
@@ -820,6 +804,7 @@ TEST(connector_2stage, three_fed_alias_reverse)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -827,12 +812,9 @@ TEST(connector_2stage, three_fed_alias_reverse)
 
 TEST(connector_2stage, three_fed_potential_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector7", fedInfo);
     conn1.addConnection("publication1", "input1", InterfaceDirection::FROM_TO);
 
@@ -865,6 +847,7 @@ TEST(connector_2stage, three_fed_potential_alias)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -872,12 +855,9 @@ TEST(connector_2stage, three_fed_potential_alias)
 
 TEST(connector_2stage, three_fed_potential_alias_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector8", fedInfo);
     conn1.addConnection("input1", "publication1", InterfaceDirection::FROM_TO);
 
@@ -910,6 +890,7 @@ TEST(connector_2stage, three_fed_potential_alias_reverse)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -917,12 +898,9 @@ TEST(connector_2stage, three_fed_potential_alias_reverse)
 
 TEST(connector_2stage, three_fed_potential_cascade_alias_reverse)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector9", fedInfo);
     conn1.addConnection("inputA", "publicationA", InterfaceDirection::FROM_TO);
 
@@ -957,6 +935,7 @@ TEST(connector_2stage, three_fed_potential_cascade_alias_reverse)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -964,12 +943,9 @@ TEST(connector_2stage, three_fed_potential_cascade_alias_reverse)
 
 TEST(connector_2stage, three_fed_alias_unmatched_connection)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector10", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1001,6 +977,7 @@ TEST(connector_2stage, three_fed_alias_unmatched_connection)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_EQ(cfed1.getValues("inp1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     // no connections through the connector made
@@ -1009,12 +986,9 @@ TEST(connector_2stage, three_fed_alias_unmatched_connection)
 
 TEST(connector_2stage, three_fed_unknown_pub_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector11", fedInfo);
     fedInfo.coreInitString = "";
     CheckFed cfed1("c1", fedInfo);
@@ -1060,12 +1034,9 @@ TEST(connector_2stage, three_fed_unknown_pub_alias)
 
 TEST(connector_2stage, three_fed_endpoint_bi_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore7", fedInfo);
     conn1.addConnection("bigEndpoint", "origin", InterfaceDirection::BIDIRECTIONAL);
 
@@ -1098,6 +1069,7 @@ TEST(connector_2stage, three_fed_endpoint_bi_alias)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 1);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 3);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 2);
@@ -1105,12 +1077,9 @@ TEST(connector_2stage, three_fed_endpoint_bi_alias)
 
 TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connectore8", fedInfo);
     conn1.addConnection("bigEndpoint", "origin", InterfaceDirection::BIDIRECTIONAL);
     conn1.addConnection("origin", "secondary", InterfaceDirection::BIDIRECTIONAL);
@@ -1145,6 +1114,7 @@ TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
     fut.get();
     fut2.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 2);
+    EXPECT_TRUE(cfed1.isEndpoint("ept1"));
     EXPECT_EQ(cfed1.getMessages("ept1").size(), 7);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     EXPECT_EQ(conn1.madeConnections(), 6);
@@ -1152,12 +1122,9 @@ TEST(connector_2stage, three_fed_endpoint_dual_bi_alias)
 
 TEST(connector_2stage, two_sided_broker_connection)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1185,12 +1152,9 @@ TEST(connector_2stage, two_sided_broker_connection)
 
 TEST(connector_2stage, two_sided_broker_connection_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1213,6 +1177,8 @@ TEST(connector_2stage, two_sided_broker_connection_alias)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 2);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
+    EXPECT_TRUE(cfed1.isInput("inp2"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_FALSE(cfed1.getValues("inp2").empty());
     EXPECT_TRUE(cfed1.hasReceivedCommand());
@@ -1222,12 +1188,9 @@ TEST(connector_2stage, two_sided_broker_connection_alias)
 
 TEST(connector_2stage, two_sided_broker_connection_endpoints)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1245,6 +1208,10 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 4);
+    EXPECT_TRUE(cfed1.isEndpoint("e1"));
+    EXPECT_TRUE(cfed1.isEndpoint("e2"));
+    EXPECT_TRUE(cfed1.isEndpoint("e3"));
+    EXPECT_TRUE(cfed1.isEndpoint("e4"));
     EXPECT_TRUE(cfed1.getMessages("e1").empty()) << " endpoint " << cfed1.getMessageNames()[0];
     EXPECT_FALSE(cfed1.getMessages("e2").empty()) << " endpoint " << cfed1.getMessageNames()[1];
     EXPECT_TRUE(cfed1.getMessages("e3").empty()) << " endpoint " << cfed1.getMessageNames()[2];
@@ -1256,12 +1223,8 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints)
 
 TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
-    fedInfo.coreInitString = "-f2 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
 
     fedInfo.coreInitString = "";
@@ -1283,6 +1246,10 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getMessageNames().size(), 4);
+    EXPECT_TRUE(cfed1.isEndpoint("e1"));
+    EXPECT_TRUE(cfed1.isEndpoint("e2"));
+    EXPECT_TRUE(cfed1.isEndpoint("e3"));
+    EXPECT_TRUE(cfed1.isEndpoint("e4"));
     EXPECT_TRUE(cfed1.getMessages("e1").empty());
     EXPECT_FALSE(cfed1.getMessages("e2").empty());
     EXPECT_TRUE(cfed1.getMessages("e3").empty());
@@ -1294,12 +1261,9 @@ TEST(connector_2stage, two_sided_broker_connection_endpoints_alias)
 
 TEST(connector_2stage, multiCheckFed)
 {
-    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo = generateDefaultFedInfo();
     using helics::apps::InterfaceDirection;
-
-    fedInfo.coreName = newCoreName("core2stage");
     fedInfo.coreInitString = "-f3 --autobroker";
-    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
     conn1.addConnection("inp1", "pubA", InterfaceDirection::FROM_TO);
     conn1.addConnection("inpA", "pub2", InterfaceDirection::FROM_TO);
@@ -1328,11 +1292,13 @@ TEST(connector_2stage, multiCheckFed)
     cfed1.finalize();
     fut.get();
     ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_TRUE(cfed1.getValues("inp2").empty());
     EXPECT_TRUE(cfed1.hasReceivedCommand());
 
     ASSERT_EQ(cfed2.getValueNames().size(), 1);
+    EXPECT_TRUE(cfed2.isInput("inpA"));
     EXPECT_FALSE(cfed2.getValues("inpA").empty());
     EXPECT_TRUE(cfed2.getValues("inpB").empty());
     EXPECT_TRUE(cfed2.hasReceivedCommand());

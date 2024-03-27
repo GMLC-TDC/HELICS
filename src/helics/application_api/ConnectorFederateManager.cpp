@@ -16,10 +16,10 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 ConnectorFederateManager::ConnectorFederateManager(Core* coreObj,
                                                    Federate* ffed,
-                                                   LocalFederateId id,
+                                                   LocalFederateId fid,
                                                    bool singleThreaded):
     coreObject(coreObj), filters(!singleThreaded), translators(!singleThreaded), fed(ffed),
-    fedID(id)
+    fedID(fid)
 {
 }
 ConnectorFederateManager::~ConnectorFederateManager() = default;
@@ -66,15 +66,15 @@ CloningFilter& ConnectorFederateManager::registerCloningFilter(std::string_view 
 {
     auto handle = coreObject->registerCloningFilter(name, type_in, type_out);
     if (handle.isValid()) {
-        auto filt = std::make_unique<CloningFilter>(fed, name, handle);
-        CloningFilter& f = *filt;
+        auto filtPtr = std::make_unique<CloningFilter>(fed, name, handle);
+        CloningFilter& filt = *filtPtr;
         auto filts = filters.lock();
         if (name.empty()) {
-            filts->insert(coreObject->getHandleName(handle), std::move(filt));
+            filts->insert(coreObject->getHandleName(handle), std::move(filtPtr));
         } else {
-            filts->insert(name, std::move(filt));
+            filts->insert(name, std::move(filtPtr));
         }
-        return f;
+        return filt;
     }
     throw(RegistrationFailure("Unable to register Filter"));
 }

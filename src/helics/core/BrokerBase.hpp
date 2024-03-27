@@ -149,6 +149,8 @@ class BrokerBase {
     bool useJsonSerialization{false};
     bool enable_profiling{false};  //!< indicator that profiling is enabled
     bool allowRemoteControl{true};  //!< if true allows some remote operation
+    /// error if there are unmatched connections on init
+    bool errorOnUnmatchedConnections{false};
     /// time when the error condition started; related to the errorDelay
     decltype(std::chrono::steady_clock::now()) errorTimeStart;
     /// time when the disconnect started

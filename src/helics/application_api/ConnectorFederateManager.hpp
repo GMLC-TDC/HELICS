@@ -27,7 +27,7 @@ class ConnectorFederateManager {
      */
     ConnectorFederateManager(Core* coreObj,
                              Federate* fFed,
-                             LocalFederateId id,
+                             LocalFederateId fid,
                              bool singleThreaded);
     /** destructor */
     ~ConnectorFederateManager();
