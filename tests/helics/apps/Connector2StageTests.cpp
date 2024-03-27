@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <future>
 #include <thread>
+#include <algorithm>
 
 static std::string newCoreName(std::string_view baseName)
 {
@@ -239,22 +240,12 @@ class CheckFed {
 
     [[nodiscard]] bool isInput(std::string_view input) const
     {
-        for (const auto& valueName : valueNames) {
-            if (input == valueName) {
-                return true;
-            }
-        }
-        return false;
+        return (std::find(valueNames.begin(),valueNames.end(),input)!=valueNames.end());
     }
 
     [[nodiscard]] bool isEndpoint(std::string_view endpoint) const
     {
-        for (const auto& messageName : messageNames) {
-            if (endpoint == messageName) {
-                return true;
-            }
-        }
-        return false;
+        return (std::find(messageNames.begin(),messageNames.end(),endpoint)!=messageNames.end());
     }
     [[nodiscard]] const auto& getValueNames() const { return valueNames; }
     [[nodiscard]] const auto& getMessageNames() const { return messageNames; }
