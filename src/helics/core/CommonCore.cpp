@@ -4662,7 +4662,6 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                                checkActionFlag(cmd, dynamic_join_flag)) {
                         routeMessage(cmd);
                     }
-                    
                 }
             } else {
                 if (transitionBrokerState(
