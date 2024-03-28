@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "FederateInfo.hpp"
 
-#include "../common/JsonProcessingFunctions.hpp"
-#include "../common/TomlProcessingFunctions.hpp"
+#include "../common/configFileHelpers.hpp"
 #include "../common/addTargets.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
@@ -735,14 +734,15 @@ void FederateInfo::config_additional(helicsCLI11App* app)
 {
     auto* opt = app->get_option("--config");
     if (opt->count() > 0) {
-        auto configString = opt->as<std::string>();
+        configString = opt->as<std::string>();
         if (CLI::ExistingFile(configString).empty()) {
             if (fileops::hasTomlExtension(configString)) {
                 loadInfoFromToml(configString, false);
-                fileInUse = configString;
+                fileInUse=true;
+
             } else if (fileops::hasJsonExtension(configString)) {
                 loadInfoFromJson(configString, false);
-                fileInUse = configString;
+                fileInUse=true;
             }
         }
     }
@@ -751,21 +751,73 @@ void FederateInfo::config_additional(helicsCLI11App* app)
 FederateInfo loadFederateInfo(const std::string& configString)
 {
     FederateInfo ret;
-    if (fileops::looksLikeCommandLine(configString)) {
+    auto type=fileops::getConfigType(configString);
+    switch (type)
+    {
+    case fileops::ConfigType::JSON_FILE:
+        ret.fileInUse=true;
+        ret.loadInfoFromJson(configString);
+        ret.configString=configString;
+        break;
+    case fileops::ConfigType::JSON_STRING:
+        try
+        {
+            ret.loadInfoFromJson(configString);
+            ret.configString=configString;
+        }
+        catch (const helics::InvalidParameter &)
+        {
+            if (fileops::looksLikeToml(configString))
+            {
+                try
+                {
+                    ret.loadInfoFromToml(configString);
+                    ret.configString=configString;
+                }
+                catch (const helics::InvalidParameter& )
+                {
+                    if (fileops::looksLikeCommandLine(configString))
+                    {
+                        ret.loadInfoFromArgsIgnoreOutput(configString);
+                        break;
+                    }
+                    throw;
+                }
+            }
+            throw;
+        }
+        break;
+    case fileops::ConfigType::TOML_FILE: 
+        ret.fileInUse=true;
+        ret.loadInfoFromToml(configString);
+        ret.configString=configString;
+        break;
+    case fileops::ConfigType::TOML_STRING:
+        try
+        {
+            ret.loadInfoFromToml(configString);
+            ret.configString=configString;
+        }
+        catch (const helics::InvalidParameter &e)
+        {
+              if (fileops::looksLikeCommandLine(configString))
+              {
+                    ret.loadInfoFromArgsIgnoreOutput(configString);
+                    break;
+              }
+              else
+              {
+                  throw;
+              }
+        }
+        break;
+    case fileops::ConfigType::CMD_LINE:
         ret.loadInfoFromArgsIgnoreOutput(configString);
-    } else if (fileops::hasTomlExtension(configString)) {
-        ret.loadInfoFromToml(configString);
-        ret.fileInUse = configString;
-    } else if (fileops::hasJsonExtension(configString)) {
-        ret.loadInfoFromJson(configString);
-        ret.fileInUse = configString;
-    } else if (configString.find_first_of('{') != std::string::npos) {
-        ret.loadInfoFromJson(configString);
-    } else if (configString.find('=') != std::string::npos) {
-        ret.loadInfoFromToml(configString);
-    } else {
+        break;
+    case fileops::ConfigType::NONE:
         ret.defName = configString;
     }
+    
     return ret;
 }
 
@@ -978,9 +1030,9 @@ std::string generateFullCoreInitString(const FederateInfo& fedInfo)
         res += " --broker_key=";
         res.append(fedInfo.key);
     }
-    if (!fedInfo.fileInUse.empty()) {  // we used the file, specify a core section
+    if (fedInfo.fileInUse ) {  // we used the file, specify a core section
         res += " --config_section=core --config-file='";
-        res.append(fedInfo.fileInUse);
+        res.append(fedInfo.configString);
         res.push_back('\'');
     }
     return res;

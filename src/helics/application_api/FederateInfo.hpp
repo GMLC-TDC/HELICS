@@ -23,6 +23,7 @@ class Value;
 
 namespace helics {
 class helicsCLI11App;
+
 /** data class defining federate properties and information
  */
 class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
@@ -55,7 +56,9 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     std::string key;  //!< key for the broker
     std::string localport;  //!< string for defining the local port to use usually a number but
                             //!< other strings are possible
-    std::string fileInUse;  //!< string containing a configuration file that was used
+    
+    std::string configString; //!< storage for config file name or string
+    bool fileInUse{false};
     /** default constructor*/
     FederateInfo();
     /** construct from a type

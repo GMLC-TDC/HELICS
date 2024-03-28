@@ -142,16 +142,29 @@ Endpoint& MessageFederate::registerDataSink(std::string_view sinkName)
 void MessageFederate::registerInterfaces(const std::string& configString)
 {
     registerMessageInterfaces(configString);
-    Federate::registerFilterInterfaces(configString);
+    Federate::registerConnectorInterfaces(configString);
 }
 
 void MessageFederate::registerMessageInterfaces(const std::string& configString)
 {
-    if (fileops::hasTomlExtension(configString)) {
+    auto hint=fileops::getConfigType(configString);
+    switch (hint)
+    {
+    case fileops::ConfigType::JSON_FILE: case fileops::ConfigType::JSON_STRING:
+        try {
+            registerMessageInterfacesJson(configString);
+        }
+        catch (const std::invalid_argument& e) {
+            throw(helics::InvalidParameter(e.what()));
+        }
+        break;
+    case fileops::ConfigType::TOML_FILE: case fileops::ConfigType::TOML_STRING:
         registerMessageInterfacesToml(configString);
-    } else {
-        registerMessageInterfacesJson(configString);
+        break;
+    case fileops::ConfigType::NONE: default:
+        break;
     }
+
 }
 
 // NOLINTNEXTLINE

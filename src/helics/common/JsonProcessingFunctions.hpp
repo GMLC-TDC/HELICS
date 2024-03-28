@@ -19,11 +19,10 @@ them using the jsoncpp library
 #include <string_view>
 
 namespace helics::fileops {
-/** check if a string looks like a command line string*/
-bool looksLikeCommandLine(std::string_view testString);
 /** check if the file has a valid JSON extension*/
 bool hasJsonExtension(std::string_view jsonString);
-
+/** check if the file has a valid JSON extension*/
+bool looksLikeJson(std::string_view jsonString);
 /** load a JSON string or filename that points to a JSON file and return a
 JSON::Value to the root object
 */

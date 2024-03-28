@@ -31,8 +31,10 @@ namespace helics::fileops {
 toml::Value to the root object
 */
 toml::value loadToml(const std::string& tomlString);
-
+/** return true if the string has a toml extension*/
 bool hasTomlExtension(std::string_view tomlString);
+/** return true if the file sort of looks like a toml file*/
+bool looksLikeToml(std::string_view tomlString);
 /** load a TOML object in a string
  * @throws std::invalid_argument if the string parsing failed through toml
  */

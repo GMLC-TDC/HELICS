@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "testFixtures.hpp"
 
 #include <gtest/gtest.h>
+#include <fstream>
+#include <sstream>
 
 class combofed_single_type_tests:
     public ::testing::TestWithParam<const char*>,
@@ -304,6 +306,28 @@ class combofed_file_load_tests:
 TEST_P(combofed_file_load_tests, test_file_load)
 {
     helics::CombinationFederate cFed(std::string(TEST_DIR) + GetParam());
+
+    EXPECT_EQ(cFed.getName(), "comboFed");
+
+    EXPECT_EQ(cFed.getEndpointCount(), 2);
+    auto& id = cFed.getEndpoint("ept1");
+    EXPECT_EQ(id.getExtractionType(), "genmessage");
+
+    EXPECT_EQ(cFed.getInputCount(), 3);
+    EXPECT_EQ(cFed.getPublicationCount(), 2);
+
+    EXPECT_TRUE(!cFed.getPublication(1).getInfo().empty());
+    cFed.getCorePointer()->disconnect();
+    cFed.disconnect();
+}
+
+TEST_P(combofed_file_load_tests, test_string_config)
+{
+    std::ifstream file(std::string(TEST_DIR) + GetParam());
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    helics::CombinationFederate cFed(buffer.str());
 
     EXPECT_EQ(cFed.getName(), "comboFed");
 

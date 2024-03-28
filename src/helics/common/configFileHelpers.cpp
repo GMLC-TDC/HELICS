@@ -9,14 +9,62 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 
-bool looksLikeFile(const std::string& configString)
+namespace helics::fileops
 {
-    if (helics::fileops::hasTomlExtension(configString)) {
-        return true;
+    bool looksLikeCommandLine(std::string_view testString)
+    {
+        if (testString.empty()) {
+            return false;
+        }
+        if (testString.front() == '-') {
+            return true;
+        }
+        if (testString.front() == '\\' || testString.front() == '#' || testString.front() == '{')
+        {
+            return false;
+        }
+        return testString.find(" -") != std::string_view::npos;
     }
-    if ((helics::fileops::hasJsonExtension(configString)) ||
-        (configString.find_first_of('{') != std::string::npos)) {
-        return true;
+
+    bool looksLikeFile(std::string_view configString)
+    {
+        if (helics::fileops::hasTomlExtension(configString)) {
+            return true;
+        }
+        if ((helics::fileops::hasJsonExtension(configString)) ||
+            (configString.find_first_of('{') != std::string_view::npos)) {
+            return true;
+        }
+        return false;
     }
-    return false;
+
+
+    ConfigType getConfigType(std::string_view configString)
+    {
+        if (configString.front() == '-')
+        {
+            return ConfigType::CMD_LINE;
+        }
+        if (fileops::hasJsonExtension(configString))
+        {
+            return ConfigType::JSON_FILE;
+        }
+        if (fileops::hasTomlExtension(configString))
+        {
+            return ConfigType::TOML_FILE;
+        }
+        if (fileops::looksLikeJson(configString))
+        {
+            return ConfigType::JSON_STRING;
+        }
+        if (fileops::looksLikeCommandLine(configString))
+        {
+            return ConfigType::CMD_LINE;
+        }
+        if (fileops::looksLikeToml(configString)) {
+            return ConfigType::TOML_STRING;
+        }
+    return ConfigType::NONE;
+}
+
 }
