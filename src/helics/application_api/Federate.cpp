@@ -230,7 +230,7 @@ void Federate::registerFederate(const FederateInfo& fedInfo)
 
     useJsonSerialization = fedInfo.useJsonSerialization;
     observerMode = fedInfo.observer;
-    configFile = fedInfo.fileInUse;
+    configFile = fedInfo.configString;
     mCurrentTime = coreObject->getCurrentTime(fedID);
     if (!singleThreadFederate) {
         asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
@@ -1209,21 +1209,29 @@ void Federate::disconnectTransition()
 
 void Federate::registerInterfaces(const std::string& configString)
 {
-    // this will be deprecated at some point in the future
     registerConnectorInterfaces(configString);
 }
 
 void Federate::registerConnectorInterfaces(const std::string& configString)
 {
-    if (fileops::hasTomlExtension(configString)) {
-        registerConnectorInterfacesToml(configString);
-    } else {
-        try {
-            registerConnectorInterfacesJson(configString);
-        }
-        catch (const std::invalid_argument& e) {
-            throw(helics::InvalidParameter(e.what()));
-        }
+    auto hint = fileops::getConfigType(configString);
+    switch (hint) {
+        case fileops::ConfigType::JSON_FILE:
+        case fileops::ConfigType::JSON_STRING:
+            try {
+                registerConnectorInterfacesJson(configString);
+            }
+            catch (const std::invalid_argument& e) {
+                throw(helics::InvalidParameter(e.what()));
+            }
+            break;
+        case fileops::ConfigType::TOML_FILE:
+        case fileops::ConfigType::TOML_STRING:
+            registerConnectorInterfacesToml(configString);
+            break;
+        case fileops::ConfigType::NONE:
+        default:
+            break;
     }
 }
 
