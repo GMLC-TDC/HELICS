@@ -82,7 +82,7 @@ helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnit
         if (!units.empty()) {
             defaultUnits = gmlc::utilities::timeUnitsFromString(units);
         }
-        toml::value emptyVal;
+        const toml::value emptyVal;
         auto val = toml::find_or(timeElement, "value", emptyVal);
         if (!val.is_uninitialized()) {
             if (val.is_integer()) {
@@ -119,7 +119,7 @@ std::string tomlAsString(const toml::value& element)
 {
     switch (element.type()) {
         case toml::value_t::string:
-            return element.as_string(std::nothrow_t());
+            return element.as_string(std::nothrow_t()); //NOLINT
         case toml::value_t::floating:
             return std::to_string(element.as_floating(std::nothrow_t()));
         case toml::value_t::integer:

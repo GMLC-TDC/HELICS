@@ -18,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <gtest/gtest.h>
 #include <numeric>
+#include <fstream>
+#include <sstream>
 
 /** these test cases test out the value federates with some additional tests
  */
@@ -604,6 +606,41 @@ TEST_P(valuefed_add_configfile_tests, file_load)
     // test the info from a file
     EXPECT_EQ(vFed.getPublication(0).getInfo(),
               "this is an information string for use by the application");
+
+    EXPECT_EQ(vFed.getInput(2).getName(), "valueFed/ipt2");
+
+    EXPECT_EQ(vFed.query("global_value", "global1"), "this is a global1 value");
+    EXPECT_EQ(vFed.query("global_value", "global2"), "this is another global value");
+
+    auto& pub = vFed.getPublication("pub1");
+    EXPECT_EQ(pub.getUnits(), "m");
+    vFed.disconnect();
+}
+
+TEST_P(valuefed_add_configfile_tests, file_load_as_string)
+{
+
+    std::ifstream file(std::string(TEST_DIR) + GetParam());
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    helics::ValueFederate vFed(buffer.str());
+
+    EXPECT_EQ(vFed.getName(), "valueFed");
+
+    EXPECT_EQ(vFed.getInputCount(), 3);
+    EXPECT_EQ(vFed.getPublicationCount(), 2);
+    auto& inp1 = vFed.getInput("pubshortcut");
+
+    auto key = vFed.getTarget(inp1);
+    EXPECT_EQ(key, "fedName/pub2");
+
+    EXPECT_EQ(inp1.getInfo(), "this is an information string for use by the application");
+    auto pub2name = vFed.getPublication(1).getName();
+    EXPECT_EQ(pub2name, "valueFed/pub2");
+    // test the info from a file
+    EXPECT_EQ(vFed.getPublication(0).getInfo(),
+        "this is an information string for use by the application");
 
     EXPECT_EQ(vFed.getInput(2).getName(), "valueFed/ipt2");
 

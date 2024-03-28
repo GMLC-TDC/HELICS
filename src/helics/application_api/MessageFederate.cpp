@@ -251,7 +251,7 @@ Endpoint& MessageFederate::registerEndpoint(std::string_view eptName,
 void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, bool defaultGlobal)
 {
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
-    bool defaultTargeted = fileops::getOrDefault(json, "targeted", false);
+    const bool defaultTargeted = fileops::getOrDefault(json, "targeted", false);
 
     Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
 
@@ -290,7 +290,7 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
     }
     bool defaultGlobal = false;
     fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
-    bool defaultTargeted = fileops::getOrDefault(doc, "targeted", false);
+    const bool defaultTargeted = fileops::getOrDefault(doc, "targeted", false);
     if (fileops::isMember(doc, "endpoints")) {
         auto& epts = toml::find(doc, "endpoints");
         if (!epts.is_array()) {

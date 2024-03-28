@@ -794,9 +794,8 @@ FederateInfo loadFederateInfo(const std::string& configString)
                 if (fileops::looksLikeCommandLine(configString)) {
                     ret.loadInfoFromArgsIgnoreOutput(configString);
                     break;
-                } else {
-                    throw;
                 }
+                throw;
             }
             break;
         case fileops::ConfigType::CMD_LINE:
@@ -849,7 +848,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         throw(helics::InvalidParameter(iarg.what()));
     }
     loadJsonConfig(doc);
-    bool hasHelicsSection = doc.isMember("helics");
+    const bool hasHelicsSection = doc.isMember("helics");
     bool hasHelicsSubSection{false};
     if (hasHelicsSection) {
         hasHelicsSubSection = doc["helics"].isMember("helics");
