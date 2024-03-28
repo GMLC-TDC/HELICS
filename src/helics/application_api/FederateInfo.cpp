@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "FederateInfo.hpp"
 
-#include "../common/configFileHelpers.hpp"
 #include "../common/addTargets.hpp"
+#include "../common/configFileHelpers.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsCLI11JsonConfig.hpp"
@@ -738,11 +738,11 @@ void FederateInfo::config_additional(helicsCLI11App* app)
         if (CLI::ExistingFile(configString).empty()) {
             if (fileops::hasTomlExtension(configString)) {
                 loadInfoFromToml(configString, false);
-                fileInUse=true;
+                fileInUse = true;
 
             } else if (fileops::hasJsonExtension(configString)) {
                 loadInfoFromJson(configString, false);
-                fileInUse=true;
+                fileInUse = true;
             }
         }
     }
@@ -751,73 +751,61 @@ void FederateInfo::config_additional(helicsCLI11App* app)
 FederateInfo loadFederateInfo(const std::string& configString)
 {
     FederateInfo ret;
-    auto type=fileops::getConfigType(configString);
-    switch (type)
-    {
-    case fileops::ConfigType::JSON_FILE:
-        ret.fileInUse=true;
-        ret.loadInfoFromJson(configString);
-        ret.configString=configString;
-        break;
-    case fileops::ConfigType::JSON_STRING:
-        try
-        {
+    auto type = fileops::getConfigType(configString);
+    switch (type) {
+        case fileops::ConfigType::JSON_FILE:
+            ret.fileInUse = true;
             ret.loadInfoFromJson(configString);
-            ret.configString=configString;
-        }
-        catch (const helics::InvalidParameter &)
-        {
-            if (fileops::looksLikeToml(configString))
-            {
-                try
-                {
-                    ret.loadInfoFromToml(configString);
-                    ret.configString=configString;
-                }
-                catch (const helics::InvalidParameter& )
-                {
-                    if (fileops::looksLikeCommandLine(configString))
-                    {
-                        ret.loadInfoFromArgsIgnoreOutput(configString);
-                        break;
+            ret.configString = configString;
+            break;
+        case fileops::ConfigType::JSON_STRING:
+            try {
+                ret.loadInfoFromJson(configString);
+                ret.configString = configString;
+            }
+            catch (const helics::InvalidParameter&) {
+                if (fileops::looksLikeToml(configString)) {
+                    try {
+                        ret.loadInfoFromToml(configString);
+                        ret.configString = configString;
                     }
+                    catch (const helics::InvalidParameter&) {
+                        if (fileops::looksLikeCommandLine(configString)) {
+                            ret.loadInfoFromArgsIgnoreOutput(configString);
+                            break;
+                        }
+                        throw;
+                    }
+                }
+                throw;
+            }
+            break;
+        case fileops::ConfigType::TOML_FILE:
+            ret.fileInUse = true;
+            ret.loadInfoFromToml(configString);
+            ret.configString = configString;
+            break;
+        case fileops::ConfigType::TOML_STRING:
+            try {
+                ret.loadInfoFromToml(configString);
+                ret.configString = configString;
+            }
+            catch (const helics::InvalidParameter& e) {
+                if (fileops::looksLikeCommandLine(configString)) {
+                    ret.loadInfoFromArgsIgnoreOutput(configString);
+                    break;
+                } else {
                     throw;
                 }
             }
-            throw;
-        }
-        break;
-    case fileops::ConfigType::TOML_FILE: 
-        ret.fileInUse=true;
-        ret.loadInfoFromToml(configString);
-        ret.configString=configString;
-        break;
-    case fileops::ConfigType::TOML_STRING:
-        try
-        {
-            ret.loadInfoFromToml(configString);
-            ret.configString=configString;
-        }
-        catch (const helics::InvalidParameter &e)
-        {
-              if (fileops::looksLikeCommandLine(configString))
-              {
-                    ret.loadInfoFromArgsIgnoreOutput(configString);
-                    break;
-              }
-              else
-              {
-                  throw;
-              }
-        }
-        break;
-    case fileops::ConfigType::CMD_LINE:
-        ret.loadInfoFromArgsIgnoreOutput(configString);
-        break;
-    case fileops::ConfigType::NONE:
-        ret.defName = configString;
+            break;
+        case fileops::ConfigType::CMD_LINE:
+            ret.loadInfoFromArgsIgnoreOutput(configString);
+            break;
+        case fileops::ConfigType::NONE:
+            ret.defName = configString;
     }
-    
+
     return ret;
 }
 
@@ -1030,7 +1018,7 @@ std::string generateFullCoreInitString(const FederateInfo& fedInfo)
         res += " --broker_key=";
         res.append(fedInfo.key);
     }
-    if (fedInfo.fileInUse ) {  // we used the file, specify a core section
+    if (fedInfo.fileInUse) {  // we used the file, specify a core section
         res += " --config_section=core --config-file='";
         res.append(fedInfo.configString);
         res.push_back('\'');

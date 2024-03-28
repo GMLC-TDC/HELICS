@@ -18,36 +18,29 @@ namespace helics::fileops {
 
 bool looksLikeJson(std::string_view jsonString)
 {
-    if (jsonString.empty())
-    {
+    if (jsonString.empty()) {
         return false;
     }
-    if ((jsonString.front() == '{')||(jsonString.front() == '//' && jsonString.back() == '}'))
-    {
+    if ((jsonString.front() == '{') || (jsonString.front() == '//' && jsonString.back() == '}')) {
         return true;
     }
-    if (jsonString.front() == '#' || jsonString.find("\n#") != std::string_view::npos)
-    {
+    if (jsonString.front() == '#' || jsonString.find("\n#") != std::string_view::npos) {
         return false;
     }
-    auto firstColonLoc=jsonString.find_first_of(':');
-    if (firstColonLoc == std::string_view::npos)
-    {
+    auto firstColonLoc = jsonString.find_first_of(':');
+    if (firstColonLoc == std::string_view::npos) {
         return false;
     }
-    auto lastColonLoc=jsonString.find_last_of(':');
-    auto openBracket=jsonString.find_first_of('{');
-    if (openBracket == std::string_view::npos)
-    {
+    auto lastColonLoc = jsonString.find_last_of(':');
+    auto openBracket = jsonString.find_first_of('{');
+    if (openBracket == std::string_view::npos) {
         return false;
     }
-    auto closeBracket=jsonString.find_last_of('}');
-    if (closeBracket == std::string_view::npos)
-    {
+    auto closeBracket = jsonString.find_last_of('}');
+    if (closeBracket == std::string_view::npos) {
         return false;
     }
-    if (openBracket > firstColonLoc || closeBracket < lastColonLoc || openBracket>closeBracket)
-    {
+    if (openBracket > firstColonLoc || closeBracket < lastColonLoc || openBracket > closeBracket) {
         return false;
     }
     return true;

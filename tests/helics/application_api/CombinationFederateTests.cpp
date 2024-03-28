@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 #include "testFixtures.hpp"
 
-#include <gtest/gtest.h>
 #include <fstream>
+#include <gtest/gtest.h>
 #include <sstream>
 
 class combofed_single_type_tests:

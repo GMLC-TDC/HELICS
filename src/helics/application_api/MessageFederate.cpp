@@ -147,24 +147,25 @@ void MessageFederate::registerInterfaces(const std::string& configString)
 
 void MessageFederate::registerMessageInterfaces(const std::string& configString)
 {
-    auto hint=fileops::getConfigType(configString);
-    switch (hint)
-    {
-    case fileops::ConfigType::JSON_FILE: case fileops::ConfigType::JSON_STRING:
-        try {
-            registerMessageInterfacesJson(configString);
-        }
-        catch (const std::invalid_argument& e) {
-            throw(helics::InvalidParameter(e.what()));
-        }
-        break;
-    case fileops::ConfigType::TOML_FILE: case fileops::ConfigType::TOML_STRING:
-        registerMessageInterfacesToml(configString);
-        break;
-    case fileops::ConfigType::NONE: default:
-        break;
+    auto hint = fileops::getConfigType(configString);
+    switch (hint) {
+        case fileops::ConfigType::JSON_FILE:
+        case fileops::ConfigType::JSON_STRING:
+            try {
+                registerMessageInterfacesJson(configString);
+            }
+            catch (const std::invalid_argument& e) {
+                throw(helics::InvalidParameter(e.what()));
+            }
+            break;
+        case fileops::ConfigType::TOML_FILE:
+        case fileops::ConfigType::TOML_STRING:
+            registerMessageInterfacesToml(configString);
+            break;
+        case fileops::ConfigType::NONE:
+        default:
+            break;
     }
-
 }
 
 // NOLINTNEXTLINE

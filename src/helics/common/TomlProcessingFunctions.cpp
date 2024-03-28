@@ -21,18 +21,15 @@ bool hasTomlExtension(std::string_view tomlString)
     return ((ext == "toml") || (ext == "TOML") || (ext == ".ini") || (ext == ".INI"));
 }
 
-
 bool looksLikeToml(std::string_view tomlString)
 {
-    if (tomlString.empty())
-    {
+    if (tomlString.empty()) {
         return false;
     }
-    if (tomlString.find("[[")!=std::string_view::npos)
-    {
+    if (tomlString.find("[[") != std::string_view::npos) {
         return true;
     }
-   
+
     return (tomlString.find_first_of('=') != std::string_view::npos);
 }
 
