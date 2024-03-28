@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "testFixtures.hpp"
 
 #include <algorithm>
+#include <fstream>
 #include <future>
 #include <gtest/gtest.h>
 #include <numeric>
-#include <fstream>
 #include <sstream>
 
 /** these test cases test out the value federates with some additional tests
@@ -619,7 +619,6 @@ TEST_P(valuefed_add_configfile_tests, file_load)
 
 TEST_P(valuefed_add_configfile_tests, file_load_as_string)
 {
-
     std::ifstream file(std::string(TEST_DIR) + GetParam());
     std::stringstream buffer;
     buffer << file.rdbuf();
@@ -640,7 +639,7 @@ TEST_P(valuefed_add_configfile_tests, file_load_as_string)
     EXPECT_EQ(pub2name, "valueFed/pub2");
     // test the info from a file
     EXPECT_EQ(vFed.getPublication(0).getInfo(),
-        "this is an information string for use by the application");
+              "this is an information string for use by the application");
 
     EXPECT_EQ(vFed.getInput(2).getName(), "valueFed/ipt2");
 

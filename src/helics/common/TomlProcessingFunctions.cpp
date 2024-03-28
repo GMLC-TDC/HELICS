@@ -119,7 +119,7 @@ std::string tomlAsString(const toml::value& element)
 {
     switch (element.type()) {
         case toml::value_t::string:
-            return element.as_string(std::nothrow_t()); //NOLINT
+            return element.as_string(std::nothrow_t());  // NOLINT
         case toml::value_t::floating:
             return std::to_string(element.as_floating(std::nothrow_t()));
         case toml::value_t::integer:
