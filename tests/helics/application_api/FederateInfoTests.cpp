@@ -136,6 +136,16 @@ TEST(federateInfo, constructor5)
     EXPECT_EQ(fedInfo.timeProps.size(), 1U);
 }
 
+TEST(federateInfo, constructor5b)
+{
+    helics::FederateInfo fedInfo{
+        "--input_delay 50ms broker --initstring='--loglevel 3 --coretype=zmq' --port=765"};
+    ASSERT_FALSE(fedInfo.brokerInitString.empty());
+    EXPECT_EQ(fedInfo.brokerInitString.front(), ' ');
+    EXPECT_EQ(fedInfo.timeProps.size(), 1U);
+    EXPECT_EQ(fedInfo.brokerPort,765);
+}
+
 TEST(federateInfo, constructor6)
 {
     helics::FederateInfo fedInfo{"--outputdelay=2 --separator=/ --rtlead=100ms --rtlag=50ms"};

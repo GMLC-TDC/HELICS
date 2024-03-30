@@ -581,7 +581,8 @@ TEST_F(valuefed_add_tests_ci_skip, test_move_calls)
 static constexpr const char* config_files[] = {"example_value_fed.json",
                                                "example_value_fed.toml",
                                                "example_value_fed_helics1.json",
-                                               "example_value_fed_helics2.json"};
+                                               "example_value_fed_helics2.json",
+                                               "example_value_fed_helics_broker.json"};
 
 class valuefed_add_configfile_tests:
     public ::testing::TestWithParam<const char*>,

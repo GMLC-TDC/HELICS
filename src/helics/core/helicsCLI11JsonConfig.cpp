@@ -74,7 +74,10 @@ std::vector<CLI::ConfigItem>
         for (auto& fld : fields) {
             auto copy_prefix = prefix;
             if (!name.empty()) {
-                copy_prefix.push_back(name);
+                if (name != mPromoteSection)
+                {
+                    copy_prefix.push_back(name);
+                }
             }
             auto sub_results = fromConfigInternal(j[fld], fld, copy_prefix);
             results.insert(results.end(), sub_results.begin(), sub_results.end());

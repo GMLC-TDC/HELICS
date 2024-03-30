@@ -26,11 +26,12 @@ class HelicsConfigJSON: public CLI::ConfigBase {
     void fallbackToDefault(bool ftd = true) { mFallbackToDefault = ftd; }
     /// throw if the json processing produces errors
     void throwJsonErrors(bool the = true) { mThrowJsonErrors = the; }
-
+    void promoteSection(std::string sectionName){mPromoteSection=std::move(sectionName); }
   private:
     bool mSkipJson{false};
     bool mFallbackToDefault{false};
     bool mThrowJsonErrors{true};
+    std::string mPromoteSection;
     /// Internal parser for the configuration
     std::vector<CLI::ConfigItem>
         fromConfigInternal(Json::Value j,

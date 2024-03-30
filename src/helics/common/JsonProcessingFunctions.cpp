@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/helicsTime.hpp"
 #include "../utilities/timeStringOps.hpp"
+#include "../utilities/string_viewOps.h"
 
 #include <fstream>
 #include <memory>
@@ -16,34 +17,64 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics::fileops {
 
-bool looksLikeJson(std::string_view jsonString)
+    static std::string_view removeSpaceAndComment(std::string_view jsonString)
+    {
+        gmlc::utilities::string_viewOps::trimString(jsonString);
+        while (jsonString.size() > 2)
+        {
+            if (jsonString[0] == '/' && jsonString[1] == '/')
+            {
+                auto nextNewLine=jsonString.find_first_of('\n');
+                if (nextNewLine == std::string_view::npos)
+                {
+                    return std::string_view();
+                }
+                jsonString.remove_prefix(nextNewLine+1);
+                gmlc::utilities::string_viewOps::trimString(jsonString);
+            }
+            else
+            {
+                break;
+            }
+        }
+        gmlc::utilities::string_viewOps::trimString(jsonString);
+        return jsonString;
+    }
+
+bool looksLikeConfigJson(std::string_view jsonString)
 {
-    if (jsonString.empty()) {
+    if (jsonString.find("\n#") != std::string_view::npos) {
         return false;
     }
-    if ((jsonString.front() == '{') || (jsonString.front() == '//' && jsonString.back() == '}')) {
-        return true;
+    jsonString=removeSpaceAndComment(jsonString);
+    if (jsonString.size()<7) {
+        //minimum viable config file is 7 characters {"f":4}
+        return false;
     }
-    if (jsonString.front() == '#' || jsonString.find("\n#") != std::string_view::npos) {
+    
+    if (jsonString.front() != '{'){
+        return false;
+    }
+    auto firstQuote=jsonString.find_first_of("\"'");
+    if (firstQuote == std::string_view::npos)
+    {
         return false;
     }
     auto firstColonLoc = jsonString.find_first_of(':');
     if (firstColonLoc == std::string_view::npos) {
         return false;
     }
-    auto lastColonLoc = jsonString.find_last_of(':');
-    auto openBracket = jsonString.find_first_of('{');
-    if (openBracket == std::string_view::npos) {
-        return false;
-    }
     auto closeBracket = jsonString.find_last_of('}');
     if (closeBracket == std::string_view::npos) {
         return false;
     }
-    if (openBracket > firstColonLoc || closeBracket < lastColonLoc || openBracket > closeBracket) {
-        return false;
+
+    auto afterBracket=removeSpaceAndComment(jsonString.substr(closeBracket+1));
+    if (afterBracket.empty())
+    {
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool hasJsonExtension(std::string_view jsonString)

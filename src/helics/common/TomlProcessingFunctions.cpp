@@ -21,7 +21,7 @@ bool hasTomlExtension(std::string_view tomlString)
     return ((ext == "toml") || (ext == "TOML") || (ext == ".ini") || (ext == ".INI"));
 }
 
-bool looksLikeToml(std::string_view tomlString)
+bool looksLikeConfigToml(std::string_view tomlString)
 {
     if (tomlString.empty()) {
         return false;

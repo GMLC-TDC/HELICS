@@ -21,8 +21,8 @@ them using the jsoncpp library
 namespace helics::fileops {
 /** check if the file has a valid JSON extension*/
 bool hasJsonExtension(std::string_view jsonString);
-/** check if the file has a valid JSON extension*/
-bool looksLikeJson(std::string_view jsonString);
+/** check if the file sort of looks like a possible config file in json format*/
+bool looksLikeConfigJson(std::string_view jsonString);
 /** load a JSON string or filename that points to a JSON file and return a
 JSON::Value to the root object
 */

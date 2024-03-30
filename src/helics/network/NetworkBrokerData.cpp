@@ -24,6 +24,7 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser(std::string
     if (enableConfig) {
         auto* fmtr = addJsonConfig(nbparser.get());
         fmtr->maxLayers(0);
+        fmtr->promoteSection("helics");
     }
     nbparser->option_defaults()->ignore_underscore()->ignore_case();
 

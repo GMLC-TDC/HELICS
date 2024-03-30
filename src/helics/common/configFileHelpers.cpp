@@ -47,13 +47,13 @@ ConfigType getConfigType(std::string_view configString)
     if (fileops::hasTomlExtension(configString)) {
         return ConfigType::TOML_FILE;
     }
-    if (fileops::looksLikeJson(configString)) {
+    if (fileops::looksLikeConfigJson(configString)) {
         return ConfigType::JSON_STRING;
     }
     if (fileops::looksLikeCommandLine(configString)) {
         return ConfigType::CMD_LINE;
     }
-    if (fileops::looksLikeToml(configString)) {
+    if (fileops::looksLikeConfigToml(configString)) {
         return ConfigType::TOML_STRING;
     }
     return ConfigType::NONE;
