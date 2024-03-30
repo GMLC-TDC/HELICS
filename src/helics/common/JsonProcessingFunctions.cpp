@@ -19,21 +19,21 @@ namespace helics::fileops {
 
 static std::string_view removeSpaceAndComment(std::string_view jsonString)
 {
-        gmlc::utilities::string_viewOps::trimString(jsonString);
+    gmlc::utilities::string_viewOps::trimString(jsonString);
     while (jsonString.size() > 2) {
         if (jsonString[0] == '/' && jsonString[1] == '/') {
             auto nextNewLine = jsonString.find_first_of('\n');
             if (nextNewLine == std::string_view::npos) {
-                    return {};
-                }
-            jsonString.remove_prefix(nextNewLine + 1);
-                gmlc::utilities::string_viewOps::trimString(jsonString);
-        } else {
-                break;
+                return {};
             }
+            jsonString.remove_prefix(nextNewLine + 1);
+            gmlc::utilities::string_viewOps::trimString(jsonString);
+        } else {
+            break;
         }
-        gmlc::utilities::string_viewOps::trimString(jsonString);
-        return jsonString;
+    }
+    gmlc::utilities::string_viewOps::trimString(jsonString);
+    return jsonString;
 }
 
 bool looksLikeConfigJson(std::string_view jsonString)
@@ -63,7 +63,7 @@ bool looksLikeConfigJson(std::string_view jsonString)
         return false;
     }
 
-    auto afterBracket=removeSpaceAndComment(jsonString.substr(closeBracket+1));
+    auto afterBracket = removeSpaceAndComment(jsonString.substr(closeBracket + 1));
     return afterBracket.empty();
 }
 
