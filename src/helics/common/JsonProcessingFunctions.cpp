@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "JsonProcessingFunctions.hpp"
 
 #include "../core/helicsTime.hpp"
-#include "../utilities/timeStringOps.hpp"
 #include "../utilities/string_viewOps.h"
+#include "../utilities/timeStringOps.hpp"
 
 #include <fstream>
 #include <memory>
@@ -17,47 +17,41 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics::fileops {
 
-    static std::string_view removeSpaceAndComment(std::string_view jsonString)
-    {
-        gmlc::utilities::string_viewOps::trimString(jsonString);
-        while (jsonString.size() > 2)
-        {
-            if (jsonString[0] == '/' && jsonString[1] == '/')
-            {
-                auto nextNewLine=jsonString.find_first_of('\n');
-                if (nextNewLine == std::string_view::npos)
-                {
-                    return std::string_view();
-                }
-                jsonString.remove_prefix(nextNewLine+1);
-                gmlc::utilities::string_viewOps::trimString(jsonString);
+static std::string_view removeSpaceAndComment(std::string_view jsonString)
+{
+    gmlc::utilities::string_viewOps::trimString(jsonString);
+    while (jsonString.size() > 2) {
+        if (jsonString[0] == '/' && jsonString[1] == '/') {
+            auto nextNewLine = jsonString.find_first_of('\n');
+            if (nextNewLine == std::string_view::npos) {
+                return std::string_view();
             }
-            else
-            {
-                break;
-            }
+            jsonString.remove_prefix(nextNewLine + 1);
+            gmlc::utilities::string_viewOps::trimString(jsonString);
+        } else {
+            break;
         }
-        gmlc::utilities::string_viewOps::trimString(jsonString);
-        return jsonString;
     }
+    gmlc::utilities::string_viewOps::trimString(jsonString);
+    return jsonString;
+}
 
 bool looksLikeConfigJson(std::string_view jsonString)
 {
     if (jsonString.find("\n#") != std::string_view::npos) {
         return false;
     }
-    jsonString=removeSpaceAndComment(jsonString);
-    if (jsonString.size()<7) {
-        //minimum viable config file is 7 characters {"f":4}
+    jsonString = removeSpaceAndComment(jsonString);
+    if (jsonString.size() < 7) {
+        // minimum viable config file is 7 characters {"f":4}
         return false;
     }
-    
-    if (jsonString.front() != '{'){
+
+    if (jsonString.front() != '{') {
         return false;
     }
-    auto firstQuote=jsonString.find_first_of("\"'");
-    if (firstQuote == std::string_view::npos)
-    {
+    auto firstQuote = jsonString.find_first_of("\"'");
+    if (firstQuote == std::string_view::npos) {
         return false;
     }
     auto firstColonLoc = jsonString.find_first_of(':');
@@ -69,9 +63,8 @@ bool looksLikeConfigJson(std::string_view jsonString)
         return false;
     }
 
-    auto afterBracket=removeSpaceAndComment(jsonString.substr(closeBracket+1));
-    if (afterBracket.empty())
-    {
+    auto afterBracket = removeSpaceAndComment(jsonString.substr(closeBracket + 1));
+    if (afterBracket.empty()) {
         return true;
     }
     return false;

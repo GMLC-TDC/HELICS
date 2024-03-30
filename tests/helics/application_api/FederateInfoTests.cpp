@@ -143,7 +143,7 @@ TEST(federateInfo, constructor5b)
     ASSERT_FALSE(fedInfo.brokerInitString.empty());
     EXPECT_EQ(fedInfo.brokerInitString.front(), ' ');
     EXPECT_EQ(fedInfo.timeProps.size(), 1U);
-    EXPECT_EQ(fedInfo.brokerPort,765);
+    EXPECT_EQ(fedInfo.brokerPort, 765);
 }
 
 TEST(federateInfo, constructor6)

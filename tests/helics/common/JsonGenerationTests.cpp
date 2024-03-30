@@ -74,25 +74,24 @@ TEST(looks_like_json, jsonConfig1)
 TEST(looks_like_json, jsonConfig2)
 {
     std::ostringstream res;
-    res<<"// this a comment\n";
-    res<<"   {\n";
-    res<<" \"param1\" : \"value1\" \n";
-    res<<" \"param2\" : \"value3\" //with a comment##\n";
-    res<<"}";
+    res << "// this a comment\n";
+    res << "   {\n";
+    res << " \"param1\" : \"value1\" \n";
+    res << " \"param2\" : \"value3\" //with a comment##\n";
+    res << "}";
 
     EXPECT_TRUE(looksLikeConfigJson(res.str()));
 }
 
-
 TEST(looks_like_json, jsonConfig3)
 {
     std::ostringstream res;
-    res<<"// this a comment\n";
-    res<<"// this a second comment\n";
-    res<<"   {\n";
-    res<<" \"param1\" : \"value1\" \n";
-    res<<" \"param2\" : \"value3\" //with a comment##\n";
-    res<<" }  ";
+    res << "// this a comment\n";
+    res << "// this a second comment\n";
+    res << "   {\n";
+    res << " \"param1\" : \"value1\" \n";
+    res << " \"param2\" : \"value3\" //with a comment##\n";
+    res << " }  ";
 
     EXPECT_TRUE(looksLikeConfigJson(res.str()));
 }
@@ -100,12 +99,12 @@ TEST(looks_like_json, jsonConfig3)
 TEST(looks_like_json, jsonConfig4)
 {
     std::ostringstream res;
-    res<<"// this a comment\n";
-    res<<"// this a second comment\n";
-    res<<"   {\n";
-    res<<" \"param1\" : \"value1\" \n";
-    res<<" \"param2\" : \"value3\" //with a comment##\n";
-    res<<" } //comment after close\n";
+    res << "// this a comment\n";
+    res << "// this a second comment\n";
+    res << "   {\n";
+    res << " \"param1\" : \"value1\" \n";
+    res << " \"param2\" : \"value3\" //with a comment##\n";
+    res << " } //comment after close\n";
 
     EXPECT_TRUE(looksLikeConfigJson(res.str()));
 }
@@ -113,13 +112,13 @@ TEST(looks_like_json, jsonConfig4)
 TEST(looks_like_json, jsonConfig5)
 {
     std::ostringstream res;
-    res<<"// this a comment\n";
-    res<<"// this a second comment\n";
-    res<<"   {\n";
-    res<<" \"param1\" : \"value1\" \n";
-    res<<" \"param2\" : \"value3\" //with a comment##\n";
-    res<<" } //comment after close\n";
-    res<<" } //second comment after close\n";
+    res << "// this a comment\n";
+    res << "// this a second comment\n";
+    res << "   {\n";
+    res << " \"param1\" : \"value1\" \n";
+    res << " \"param2\" : \"value3\" //with a comment##\n";
+    res << " } //comment after close\n";
+    res << " } //second comment after close\n";
 
     EXPECT_TRUE(looksLikeConfigJson(res.str()));
 }
@@ -127,13 +126,13 @@ TEST(looks_like_json, jsonConfig5)
 TEST(looks_like_json, jsonConfig6)
 {
     std::ostringstream res;
-    res<<"      // this a comment\n";
-    res<<"// this a second comment\n";
-    res<<"   {\n";
-    res<<" \"param1\" : \"value1\" \n";
-    res<<" \"param2\" : \"value3\" //with a comment##\n";
-    res<<" } //comment after close\n";
-    res<<" //second comment after close\n\n   \n   ";
+    res << "      // this a comment\n";
+    res << "// this a second comment\n";
+    res << "   {\n";
+    res << " \"param1\" : \"value1\" \n";
+    res << " \"param2\" : \"value3\" //with a comment##\n";
+    res << " } //comment after close\n";
+    res << " //second comment after close\n\n   \n   ";
 
     EXPECT_TRUE(looksLikeConfigJson(res.str()));
 }

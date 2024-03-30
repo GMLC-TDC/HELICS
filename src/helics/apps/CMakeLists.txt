@@ -78,8 +78,13 @@ if(HELICS_BUILD_APP_LIBRARY)
 
     target_link_libraries(helics_apps PUBLIC HELICS::application_api)
     target_link_libraries(
-        helics_apps PRIVATE HELICS::compile_flags_target spdlog::spdlog fmt::fmt helics::zmq HELICS::common
-                            gmlc::networking
+        helics_apps
+        PRIVATE HELICS::compile_flags_target
+                spdlog::spdlog
+                fmt::fmt
+                helics::zmq
+                HELICS::common
+                gmlc::networking
     )
 
     if(BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST

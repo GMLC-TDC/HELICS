@@ -20,7 +20,7 @@
     "input_delay": 0, //the input delay for external data to propagate to federates
     "log_level": "summary", //specify the log level (either a number or string)
     "broker": {
-        "auto":true
+      "auto": true
     }
   },
   //Publications used in the federate

@@ -74,8 +74,7 @@ std::vector<CLI::ConfigItem>
         for (auto& fld : fields) {
             auto copy_prefix = prefix;
             if (!name.empty()) {
-                if (name != mPromoteSection)
-                {
+                if (name != mPromoteSection) {
                     copy_prefix.push_back(name);
                 }
             }

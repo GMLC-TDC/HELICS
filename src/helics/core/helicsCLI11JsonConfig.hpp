@@ -26,7 +26,8 @@ class HelicsConfigJSON: public CLI::ConfigBase {
     void fallbackToDefault(bool ftd = true) { mFallbackToDefault = ftd; }
     /// throw if the json processing produces errors
     void throwJsonErrors(bool the = true) { mThrowJsonErrors = the; }
-    void promoteSection(std::string sectionName){mPromoteSection=std::move(sectionName); }
+    void promoteSection(std::string sectionName) { mPromoteSection = std::move(sectionName); }
+
   private:
     bool mSkipJson{false};
     bool mFallbackToDefault{false};
