@@ -19,21 +19,21 @@ namespace helics::fileops {
 
 static std::string_view removeSpaceAndComment(std::string_view jsonString)
 {
-    gmlc::utilities::string_viewOps::trimString(jsonString);
+        gmlc::utilities::string_viewOps::trimString(jsonString);
     while (jsonString.size() > 2) {
         if (jsonString[0] == '/' && jsonString[1] == '/') {
             auto nextNewLine = jsonString.find_first_of('\n');
             if (nextNewLine == std::string_view::npos) {
-                return std::string_view();
-            }
+                    return {};
+                }
             jsonString.remove_prefix(nextNewLine + 1);
-            gmlc::utilities::string_viewOps::trimString(jsonString);
+                gmlc::utilities::string_viewOps::trimString(jsonString);
         } else {
-            break;
+                break;
+            }
         }
-    }
-    gmlc::utilities::string_viewOps::trimString(jsonString);
-    return jsonString;
+        gmlc::utilities::string_viewOps::trimString(jsonString);
+        return jsonString;
 }
 
 bool looksLikeConfigJson(std::string_view jsonString)
@@ -63,11 +63,8 @@ bool looksLikeConfigJson(std::string_view jsonString)
         return false;
     }
 
-    auto afterBracket = removeSpaceAndComment(jsonString.substr(closeBracket + 1));
-    if (afterBracket.empty()) {
-        return true;
-    }
-    return false;
+    auto afterBracket=removeSpaceAndComment(jsonString.substr(closeBracket+1));
+    return afterBracket.empty();
 }
 
 bool hasJsonExtension(std::string_view jsonString)
@@ -93,8 +90,8 @@ Json::Value loadJson(const std::string& jsonString)
         Json::Value doc;
         const Json::CharReaderBuilder rbuilder;
         std::string errs;
-        const bool ok = Json::parseFromStream(rbuilder, file, &doc, &errs);
-        if (!ok) {
+        const bool success = Json::parseFromStream(rbuilder, file, &doc, &errs);
+        if (!success) {
             throw(std::invalid_argument(errs.c_str()));
         }
         return doc;

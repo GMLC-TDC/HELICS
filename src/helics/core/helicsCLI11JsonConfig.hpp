@@ -35,7 +35,7 @@ class HelicsConfigJSON: public CLI::ConfigBase {
     std::string mPromoteSection;
     /// Internal parser for the configuration
     std::vector<CLI::ConfigItem>
-        fromConfigInternal(Json::Value j,
+        fromConfigInternal(Json::Value json,
                            const std::string& name = {},
                            const std::vector<std::string>& prefix = {}) const;
 };

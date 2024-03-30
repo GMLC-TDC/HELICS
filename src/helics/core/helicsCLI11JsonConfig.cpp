@@ -21,9 +21,11 @@ static Json::Value getSection(Json::Value& base, const std::string& subSection, 
         auto cfg = base[subSection];
         if (cfg.isObject()) {
             return cfg;
-        } else if (cfg.isArray()) {
+        }
+        if (cfg.isArray()) {
             return cfg[configIndex];
-        } else if (cfg.isNull() && subSection.find_first_of('.') != std::string::npos) {
+        }
+        if (cfg.isNull() && subSection.find_first_of('.') != std::string::npos) {
             auto dotloc = subSection.find_first_of('.');
             auto sub1 = base[subSection.substr(0, dotloc)];
             if (!sub1.isNull()) {
@@ -60,17 +62,17 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
 }
 
 std::vector<CLI::ConfigItem>
-    HelicsConfigJSON::fromConfigInternal(Json::Value j,
+    HelicsConfigJSON::fromConfigInternal(Json::Value json,
                                          const std::string& name,
                                          const std::vector<std::string>& prefix) const
 {
     std::vector<CLI::ConfigItem> results;
 
-    if (j.isObject()) {
+    if (json.isObject()) {
         if (prefix.size() > maximumLayers) {
             return results;
         }
-        auto fields = j.getMemberNames();
+        auto fields = json.getMemberNames();
         for (auto& fld : fields) {
             auto copy_prefix = prefix;
             if (!name.empty()) {
@@ -78,7 +80,7 @@ std::vector<CLI::ConfigItem>
                     copy_prefix.push_back(name);
                 }
             }
-            auto sub_results = fromConfigInternal(j[fld], fld, copy_prefix);
+            auto sub_results = fromConfigInternal(json[fld], fld, copy_prefix);
             results.insert(results.end(), sub_results.begin(), sub_results.end());
         }
     } else if (!name.empty()) {
@@ -86,16 +88,16 @@ std::vector<CLI::ConfigItem>
         CLI::ConfigItem& res = results.back();
         res.name = name;
         res.parents = prefix;
-        if (j.isBool()) {
-            res.inputs = {j.asBool() ? "true" : "false"};
-        } else if (j.isNumeric()) {
-            std::stringstream ss;
-            ss << j.asDouble();
-            res.inputs = {ss.str()};
-        } else if (j.isString()) {
-            res.inputs = {j.asString()};
-        } else if (j.isArray()) {
-            for (const auto& obj : j) {
+        if (json.isBool()) {
+            res.inputs = {json.asBool() ? "true" : "false"};
+        } else if (json.isNumeric()) {
+            std::stringstream outstring;
+            outstring << json.asDouble();
+            res.inputs = {outstring.str()};
+        } else if (json.isString()) {
+            res.inputs = {json.asString()};
+        } else if (json.isArray()) {
+            for (const auto& obj : json) {
                 if (obj.isString()) {
                     res.inputs.push_back(obj.asString());
                 } else {
