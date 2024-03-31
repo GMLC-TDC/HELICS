@@ -11,7 +11,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.5.2][] - 2024-04-02
 
-Patch release with fixes for certain compiler builds,  A fix to the test core leading to some sporadic test failures,  and fixing a discrepancy in the handing of config files with the helics_apps
+Patch release with fixes for certain compiler builds, A fix to the test core leading to some sporadic test failures, and fixing a discrepancy in the handing of config files with the helics_apps
 
 ### Fixed
 
