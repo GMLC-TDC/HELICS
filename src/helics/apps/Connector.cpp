@@ -1075,37 +1075,37 @@ int Connector::makeTargetConnection(
 void Connector::makeConnections(ConnectionsList& possibleConnections)
 {
     const int logLevel = fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
-    auto inputConnector = [this, logLevel](std::string_view origin, std::string_view source) {
-        core.dataLink(source, origin);
+    auto inputConnector = [this, logLevel](std::string_view target, std::string_view source) {
+        core.dataLink(source, target);
         if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
             fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                            fmt::format("connecting input {} to publication {}", origin, source));
+                            fmt::format("connecting input {} to publication {}", target, source));
         }
     };
-    auto pubConnector = [this, logLevel](std::string_view origin, std::string_view target) {
-        core.dataLink(origin, target);
+    auto pubConnector = [this, logLevel](std::string_view source, std::string_view target) {
+        core.dataLink(source, target);
         if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
             fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
-                            fmt::format("connecting publication {} to input {}", origin, target));
+                            fmt::format("connecting publication {} to input {}", source, target));
         }
     };
-    auto sourceEndpointConnector = [this, logLevel](std::string_view origin,
+    auto sourceEndpointConnector = [this, logLevel](std::string_view source,
                                                     std::string_view target) {
-        core.linkEndpoints(origin, target);
+        core.linkEndpoints(source, target);
         if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
             fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
                             fmt::format("connecting source endpoint {} to target endpoint {}",
-                                        origin,
+                                        source,
                                         target));
         }
     };
-    auto targetEndpointConnector = [this, logLevel](std::string_view origin,
+    auto targetEndpointConnector = [this, logLevel](std::string_view target,
                                                     std::string_view source) {
-        core.linkEndpoints(source, origin);
+        core.linkEndpoints(source, target);
         if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
             fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
                             fmt::format("connecting target endpoint {} to source endpoint {}",
-                                        origin,
+                                        target,
                                         source));
         }
     };

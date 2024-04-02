@@ -2167,6 +2167,35 @@ const std::string& Interface::getDestinationTargets() const
     return mCore->getDestinationTargets(handle);
 }
 
+std::size_t Interface::getSourceTargetCount() const
+{
+    const auto& targets = getSourceTargets();
+    if (targets.empty()) {
+        return 0;
+    }
+    try {
+        const Json::Value tvalues = fileops::loadJsonStr(targets);
+        return (tvalues.isArray()) ? tvalues.size() : 1;
+    }
+    catch (...) {
+        return 1;
+    }
+}
+std::size_t Interface::getDestinationTargetCount() const
+{
+    const auto& targets = getDestinationTargets();
+    if (targets.empty()) {
+        return 0;
+    }
+    try {
+        const Json::Value tvalues = fileops::loadJsonStr(targets);
+        return (tvalues.isArray()) ? tvalues.size() : 1;
+    }
+    catch (...) {
+        return 1;
+    }
+}
+
 const std::string& Interface::getDisplayName() const
 {
     return (mName.empty() ? getSourceTargets() : mName);
