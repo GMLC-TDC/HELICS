@@ -110,6 +110,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     auto hApp = std::make_shared<helicsCLI11App>("Arguments applying to all Brokers and Cores");
     auto* fmtr = addJsonConfig(hApp.get());
     fmtr->maxLayers(0);
+    fmtr->promoteSection("helics");
     hApp->option_defaults()->ignore_underscore()->ignore_case();
     hApp->add_option("--federates,-f",
                      minFederateCount,

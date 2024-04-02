@@ -142,15 +142,29 @@ Endpoint& MessageFederate::registerDataSink(std::string_view sinkName)
 void MessageFederate::registerInterfaces(const std::string& configString)
 {
     registerMessageInterfaces(configString);
-    Federate::registerFilterInterfaces(configString);
+    Federate::registerConnectorInterfaces(configString);
 }
 
 void MessageFederate::registerMessageInterfaces(const std::string& configString)
 {
-    if (fileops::hasTomlExtension(configString)) {
-        registerMessageInterfacesToml(configString);
-    } else {
-        registerMessageInterfacesJson(configString);
+    auto hint = fileops::getConfigType(configString);
+    switch (hint) {
+        case fileops::ConfigType::JSON_FILE:
+        case fileops::ConfigType::JSON_STRING:
+            try {
+                registerMessageInterfacesJson(configString);
+            }
+            catch (const std::invalid_argument& e) {
+                throw(helics::InvalidParameter(e.what()));
+            }
+            break;
+        case fileops::ConfigType::TOML_FILE:
+        case fileops::ConfigType::TOML_STRING:
+            registerMessageInterfacesToml(configString);
+            break;
+        case fileops::ConfigType::NONE:
+        default:
+            break;
     }
 }
 
@@ -237,7 +251,7 @@ Endpoint& MessageFederate::registerEndpoint(std::string_view eptName,
 void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, bool defaultGlobal)
 {
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
-    bool defaultTargeted = fileops::getOrDefault(json, "targeted", false);
+    const bool defaultTargeted = fileops::getOrDefault(json, "targeted", false);
 
     Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
 
@@ -276,7 +290,7 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
     }
     bool defaultGlobal = false;
     fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
-    bool defaultTargeted = fileops::getOrDefault(doc, "targeted", false);
+    const bool defaultTargeted = fileops::getOrDefault(doc, "targeted", false);
     if (fileops::isMember(doc, "endpoints")) {
         auto& epts = toml::find(doc, "endpoints");
         if (!epts.is_array()) {
