@@ -23,8 +23,8 @@ Patch release with fixes for certain compiler builds, A fix to the test core lea
 
 ### Added
 
-- added an `--error_on_unmatched` flag to the broker for it to error if there are any unmatched requested connectors
-- support for a broker section in config files and subcommand in the command line parsing
+- Added an `--error_on_unmatched` flag to the broker for it to error if there are any unmatched requested connectors
+- Support for a broker section in config files and subcommand in the command line parsing
 
 ## [3.5.1][] - 2024-03-19
 
