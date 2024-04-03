@@ -9,6 +9,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [3.5.2][] - 2024-04-02
+
+Patch release with fixes for certain compiler builds, a fix to the test core leading to some sporadic test failures, and fixing a discrepancy in the handing of config files with the helics_apps.
+
+### Fixed
+
+- Fixed an issue with the test core leading to sporadic failures in the test suite with the connector
+- Fixed compile issues on some versions of clang
+- Fixed some warnings on certain builds using sanitizers
+- Fixed a discrepancy in the handing of config files with the helics_apps library
+- Fixed several clang tidy issues and code cleanup
+
+### Added
+
+- Added an `--error_on_unmatched` flag to the broker for it to error if there are any unmatched requested connectors
+- Support for a broker section in config files and subcommand in the command line parsing
+
 ## [3.5.1][] - 2024-03-19
 
 Patch release including beta version of reentrant federates and support for "potential_interfaces" section in config files and automatic handling of potential interface generation in the federate class for operation with the connector app.
