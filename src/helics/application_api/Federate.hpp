@@ -971,6 +971,10 @@ class HELICS_CXX_EXPORT Interface {
     /** get the destination targets for an interface, either the destinations of data for endpoints
      * or publications, or the destination endpoints for a filter*/
     const std::string& getDestinationTargets() const;
+    /** get the number of source targets*/
+    std::size_t getSourceTargetCount() const;
+    /** get the number of destination targets*/
+    std::size_t getDestinationTargetCount() const;
     /** close the interface*/
     void close();
     /** disconnect the object from the core*/

@@ -19,12 +19,20 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static constexpr std::string_view testdir = TEST_DIR "/connector/";
 
+static std::string newCoreName(std::string_view baseName)
+{
+    static std::atomic<int> count{1};
+    int value = ++count;
+
+    return std::string(baseName) + std::to_string(value);
+}
+
 TEST(connector_potential_interfaces, simple_connector)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_pi1";
+    fedInfo.coreName = newCoreName("ccore_pi");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -56,7 +64,7 @@ TEST(connector_potential_interfaces, simple_connector_async)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_pi_as";
+    fedInfo.coreName = newCoreName("ccore_pi");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -91,7 +99,7 @@ TEST(connector_potential_interfaces, simple_connector_init_iteration)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_pi_it";
+    fedInfo.coreName = newCoreName("ccore_pi");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -109,6 +117,8 @@ TEST(connector_potential_interfaces, simple_connector_init_iteration)
     auto& pub1 = vfed.getPublication(0);
     auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
+    const auto& targets = pub1.getDestinationTargets();
+    EXPECT_EQ(targets, "inp1");
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -125,7 +135,7 @@ TEST(connector_potential_interfaces, simple_connector_init_iteration2)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_pi_it2";
+    fedInfo.coreName = newCoreName("ccore_pi");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -161,7 +171,7 @@ TEST(connector_potential_interfaces, simple_connector2)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_pi2";
+    fedInfo.coreName = newCoreName("ccore_pi");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -193,7 +203,7 @@ TEST(connector_potential_interfaces, endpoint_connector)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_pi3";
+    fedInfo.coreName = newCoreName("ccore_pi");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -224,7 +234,7 @@ TEST(connector_potential_interfaces, simple_connector_additional_command)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_pi4";
+    fedInfo.coreName = newCoreName("ccore_pi");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -260,7 +270,7 @@ TEST(connector_potential_interfaces, pub_templates)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template1";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -291,7 +301,7 @@ TEST(connector_potential_interfaces, pub_templates_reverse)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template2";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -322,7 +332,7 @@ TEST(connector_potential_interfaces, pub_template_alias)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template3";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -337,6 +347,8 @@ TEST(connector_potential_interfaces, pub_template_alias)
     auto& pub1 = vfed.getPublication(0);
     auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
+    const auto& targets = pub1.getDestinationTargets();
+    EXPECT_EQ(targets, "inp1");
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -353,7 +365,7 @@ TEST(connector_potential_interfaces, pub_input_template)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template4";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -367,6 +379,7 @@ TEST(connector_potential_interfaces, pub_input_template)
     auto& pub1 = vfed.getPublication(0);
     auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
+    EXPECT_EQ(pub1.getDestinationTargetCount(), 1);
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -383,7 +396,7 @@ TEST(connector_potential_interfaces, input_pub_template)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template5";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -413,7 +426,7 @@ TEST(connector_potential_interfaces, input_pub_template_alias)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template6";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -445,7 +458,7 @@ TEST(connector_potential_interfaces, input_pub_template_with_units)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template6";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -480,7 +493,7 @@ TEST(connector_potential_interfaces, endpoint_template)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template_ept1";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -501,9 +514,10 @@ TEST(connector_potential_interfaces, endpoint_template)
     EXPECT_EQ(retTime, 1.0);
     EXPECT_TRUE(ept2.hasMessage());
     auto message = ept2.getMessage();
-    EXPECT_EQ(message->to_string(), testValue);
     mfed.finalize();
     fut.get();
+    ASSERT_TRUE(message);
+    EXPECT_EQ(message->to_string(), testValue);
 }
 
 TEST(connector_potential_interfaces, endpoint_template_alias)
@@ -511,7 +525,7 @@ TEST(connector_potential_interfaces, endpoint_template_alias)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template_ept1";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -534,9 +548,10 @@ TEST(connector_potential_interfaces, endpoint_template_alias)
     EXPECT_EQ(retTime, 1.0);
     EXPECT_TRUE(ept2.hasMessage());
     auto message = ept2.getMessage();
-    EXPECT_EQ(message->to_string(), testValue);
     mfed.finalize();
     fut.get();
+    ASSERT_TRUE(message);
+    EXPECT_EQ(message->to_string(), testValue);
 }
 
 TEST(connector_potential_interfaces, big_endpoint_template_alias)
@@ -544,7 +559,7 @@ TEST(connector_potential_interfaces, big_endpoint_template_alias)
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     using helics::apps::InterfaceDirection;
 
-    fedInfo.coreName = "ccore_template_ept1";
+    fedInfo.coreName = newCoreName("ccore_template");
     fedInfo.coreInitString = "-f2 --autobroker";
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::apps::Connector conn1("connector1", fedInfo);
@@ -567,7 +582,9 @@ TEST(connector_potential_interfaces, big_endpoint_template_alias)
     EXPECT_EQ(retTime, 1.0);
     EXPECT_TRUE(ept2.hasMessage());
     auto message = ept2.getMessage();
-    EXPECT_EQ(message->to_string(), testValue);
+
     mfed.finalize();
     fut.get();
+    ASSERT_TRUE(message);
+    EXPECT_EQ(message->to_string(), testValue);
 }
