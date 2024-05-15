@@ -79,21 +79,21 @@ std::string generateStringVector_if(const X& data, Proc generator, validator val
 }
 
 namespace helics {
-void generateInterfaceConfig(Json::Value& iblock,
+void generateInterfaceConfig(nlohmann::json& iblock,
                              const helics::HandleManager& hm,
                              const helics::GlobalFederateId& fed);
 
-Json::Value generateInterfaceConfig(const helics::HandleManager& hm,
+nlohmann::json generateInterfaceConfig(const helics::HandleManager& hm,
                                     const helics::GlobalFederateId& fed);
 
-void addFederateTags(Json::Value& v, const helics::FederateState* fed);
+void addFederateTags(nlohmann::json& v, const helics::FederateState* fed);
 /** generate results from a query related to interfaces*/
 std::string generateInterfaceQueryResults(std::string_view request,
                                           const HandleManager& handles,
                                           const GlobalFederateId fed,
-                                          const std::function<void(Json::Value&)>& addHeaderInfo);
+                                          const std::function<void(nlohmann::json&)>& addHeaderInfo);
 
 std::string generateInterfaceQueryResults(std::string_view request,
                                           const InterfaceInfo& info,
-                                          const std::function<void(Json::Value&)>& addHeaderInfo);
+                                          const std::function<void(nlohmann::json&)>& addHeaderInfo);
 }  // namespace helics

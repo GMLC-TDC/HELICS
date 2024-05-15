@@ -52,7 +52,7 @@ class webTest: public ::testing::Test {
     {
         webs = std::make_shared<helics::apps::WebServer>();
         webs->enableWebSocketServer(true);
-        config["websocket"] = Json::objectValue;
+        config["websocket"] = nlohmann::json::object();
         config["websocket"]["port"] = 26247;
         webs->startServer(&config, webs);
 
@@ -147,7 +147,7 @@ class webTest: public ::testing::Test {
 
     static std::vector<std::shared_ptr<helics::Broker>> brks;
     static std::vector<std::shared_ptr<helics::Core>> cores;
-    static Json::Value config;
+    static nlohmann::json config;
 };
 
 std::shared_ptr<helics::apps::WebServer> webTest::webs;
@@ -157,7 +157,7 @@ std::vector<std::shared_ptr<helics::Core>> webTest::cores;
 beast::flat_buffer webTest::buffer;
 std::unique_ptr<websocket::stream<tcp::socket>> webTest::stream;
 net::io_context webTest::ioc;
-Json::Value webTest::config;
+nlohmann::json webTest::config;
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 constexpr helics::CoreType tCore = helics::CoreType::ZMQ;
@@ -183,80 +183,80 @@ constexpr helics::CoreType tCore = helics::CoreType::TEST;
 
 TEST_F(webTest, test1)
 {
-    Json::Value query;
+    nlohmann::json query;
     query["command"] = "query";
     query["query"] = "brokers";
     auto result = sendText(generateJsonString(query));
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 0U);
 }
 
 TEST_F(webTest, single)
 {
     addBroker(tCore, "--name=brk1");
-    Json::Value query;
+    nlohmann::json query;
     query["command"] = "query";
     query["query"] = "brokers";
     auto result = sendText(generateJsonString(query));
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 1U);
-    EXPECT_STREQ(val["brokers"][0]["name"].asCString(), "brk1");
+    EXPECT_EQ(val["brokers"][0]["name"].get<std::string>(), "brk1");
 }
 
 TEST_F(webTest, pair)
 {
     addBroker(helics::CoreType::TEST, "--name=brk2");
-    Json::Value query;
+    nlohmann::json query;
     query["command"] = "query";
     query["broker"] = "brokers";
     auto result = sendText(generateJsonString(query));
 
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 2U);
-    EXPECT_STREQ(val["brokers"][0]["name"].asCString(), "brk1");
-    EXPECT_STREQ(val["brokers"][1]["name"].asCString(), "brk2");
+    EXPECT_EQ(val["brokers"][0]["name"].get<std::string>(), "brk1");
+    EXPECT_EQ(val["brokers"][1]["name"].get<std::string>(), "brk2");
 }
 
 TEST_F(webTest, single_info)
 {
-    Json::Value query;
+    nlohmann::json query;
     query["command"] = "query";
     query["broker"] = "brk1";
     auto result = sendText(generateJsonString(query));
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 0U);
     EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["federates"].size(), 0U);
-    EXPECT_STREQ(val["attributes"]["name"].asCString(), "brk1");
-    EXPECT_STREQ(val["state"].asCString(), "connected");
+    EXPECT_EQ(val["attributes"]["name"].get<std::string>(), "brk1");
+    EXPECT_EQ(val["state"].get<std::string>(), "connected");
 }
 
 TEST_F(webTest, garbage)
 {
     auto result = sendText("garbage");
     auto val = loadJson(result);
-    EXPECT_NE(val["status"].asInt(), 0);
+    EXPECT_NE(val["status"].get<int>(), 0);
 }
 
 TEST_F(webTest, singleNonJson)
 {
-    Json::Value query;
+    nlohmann::json query;
     query["command"] = "query";
     query["broker"] = "brk1";
     query["query"] = "isconnected";
     auto result = sendText(generateJsonString(query));
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_EQ(val["status"].asInt(), 0);
-    EXPECT_STREQ(val["value"].asCString(), "true");
+    EXPECT_EQ(val["status"].get<int>(), 0);
+    EXPECT_EQ(val["value"].get<std::string>(), "true");
 }
 
 TEST_F(webTest, core)
@@ -264,7 +264,7 @@ TEST_F(webTest, core)
     auto cr = addCore(helics::CoreType::TEST, "--name=cr1 -f2");
     EXPECT_TRUE(cr->connect());
 
-    Json::Value query;
+    nlohmann::json query;
     query["command"] = "query";
     query["broker"] = "brk2";
     auto result = sendText(generateJsonString(query));
@@ -279,12 +279,12 @@ TEST_F(webTest, core)
         val = loadJson(result);
     }
     ASSERT_EQ(val["cores"].size(), 1U);
-    EXPECT_STREQ(val["cores"][0]["attributes"]["name"].asCString(), "cr1");
+    EXPECT_EQ(val["cores"][0]["attributes"]["name"].get<std::string>(), "cr1");
 
     query["target"] = "cr1";
     result = sendText(generateJsonString(query));
     val = loadJson(result);
-    EXPECT_STREQ(val["attributes"]["name"].asCString(), "cr1");
+    EXPECT_EQ(val["attributes"]["name"].get<std::string>(), "cr1");
     query["query"] = "current_state";
 
     auto result2 = sendText(generateJsonString(query));
@@ -293,7 +293,7 @@ TEST_F(webTest, core)
 
 TEST_F(webTest, create)
 {
-    Json::Value create;
+    nlohmann::json create;
     create["command"] = "create";
     create["broker"] = "brk3";
     create["type"] = CORE2;
@@ -301,83 +301,83 @@ TEST_F(webTest, create)
 
     sendText(generateJsonString(create));
 
-    Json::Value query;
+    nlohmann::json query;
     query["command"] = "query";
     query["broker"] = "brokers";
     auto result = sendText(generateJsonString(query));
 
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 3U);
-    EXPECT_STREQ(val["brokers"][2]["name"].asCString(), "brk3");
+    EXPECT_EQ(val["brokers"][2]["name"].get<std::string>(), "brk3");
 
     result = sendText(generateJsonString(create));
     val = loadJson(result);
-    EXPECT_NE(val["status"].asInt(), 0);
+    EXPECT_NE(val["status"].get<int>(), 0);
 
     create["type"] = "NULLCORE";
     create["broker"] = "brk_null";
     result = sendText(generateJsonString(create));
     val = loadJson(result);
-    EXPECT_NE(val["status"].asInt(), 0);
+    EXPECT_NE(val["status"].get<int>(), 0);
     EXPECT_TRUE(result.find("not available") != std::string::npos);
 }
 
 TEST_F(webTest, deleteBroker)
 {
-    Json::Value v1;
+    nlohmann::json v1;
     v1["command"] = "delete";
     v1["broker"] = "brk2";
     sendText(helics::fileops::generateJsonString(v1));
 
-    Json::Value v2;
+    nlohmann::json v2;
     v2["command"] = "query";
     v2["query"] = "brokers";
     auto result = sendText(generateJsonString(v2));
     EXPECT_FALSE(result.empty());
     auto val = helics::fileops::loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 2U);
     v1["broker"] = "brk1";
     sendText(generateJsonString(v1));
     result = sendText(generateJsonString(v2));
     EXPECT_FALSE(result.empty());
     val = helics::fileops::loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 1U);
 }
 
 TEST_F(webTest, createBrokerUUID)
 {
-    Json::Value v4;
+    nlohmann::json v4;
     v4["command"] = "query";
     v4["query"] = "brokers";
 
     auto result = sendText(generateJsonString(v4));
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     auto brksize = val["brokers"].size();
 
-    Json::Value v1;
+    nlohmann::json v1;
     v1["command"] = "create";
     v1["core_type"] = CORE1;
     v1["num_feds"] = 3;
     result = sendText(generateJsonString(v1));
     val = loadJson(result);
-    EXPECT_TRUE(val["broker_uuid"].isString());
-    auto uuid = val["broker_uuid"].asString();
+    EXPECT_TRUE(val["broker_uuid"].is_string());
+    auto uuid = val["broker_uuid"].get<std::string>();
 
-    Json::Value v2;
+    nlohmann::json v2;
     v2["command"] = "get";
     v2["uuid"] = uuid;
 
     result = sendText(generateJsonString(v2));
     val = loadJson(result);
-    EXPECT_TRUE(val["status"].asBool());
+    EXPECT_TRUE(val["status"].get<bool>());
 
-    Json::Value v3;
+    nlohmann::json v3;
     v3["command"] = "delete";
     v3["broker_uuid"] = uuid;
 
@@ -386,30 +386,30 @@ TEST_F(webTest, createBrokerUUID)
     result = sendText(generateJsonString(v4));
     EXPECT_FALSE(result.empty());
     val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), brksize);
 }
 
 TEST_F(webTest, deleteJson)
 {
-    Json::Value v1;
+    nlohmann::json v1;
     v1["command"] = "delete";
     v1["broker"] = "brk3";
     sendText(generateJsonString(v1));
 
-    Json::Value v2;
+    nlohmann::json v2;
     v2["command"] = "query";
     v2["query"] = "brokers";
     auto result = sendText(generateJsonString(v2));
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 0U);
 }
 
 TEST_F(webTest, timeBlock)
 {
-    Json::Value create;
+    nlohmann::json create;
     create["broker"] = "brk_timerws";
     create["command"] = "create";
     create["core_type"] = CORE1;
@@ -420,7 +420,7 @@ TEST_F(webTest, timeBlock)
 
     helics::ValueFederate vFed("fed1", cr);
 
-    Json::Value barrier;
+    nlohmann::json barrier;
     barrier["broker"] = "brk_timerws";
     barrier["command"] = "barrier";
     barrier["time"] = 2;
@@ -446,7 +446,7 @@ TEST_F(webTest, timeBlock)
     EXPECT_EQ(rtime, 6.0);
 
     vFed.finalize();
-    Json::Value v1;
+    nlohmann::json v1;
     v1["command"] = "delete";
     v1["broker"] = "brk_timerws";
     sendText(generateJsonString(v1));

@@ -911,16 +911,16 @@ void FilterFederate::organizeFilterOperations()
     }
 }
 
-void FilterFederate::addFilteredEndpoint(Json::Value& block, GlobalFederateId fed) const
+void FilterFederate::addFilteredEndpoint(nlohmann::json & block, GlobalFederateId fed) const
 {
-    block["endpoints"] = Json::arrayValue;
+    block["endpoints"] = nlohmann::json::array();
     for (const auto& filt : filterCoord) {
         auto* fc = filt.second.get();
         const auto* ep = mHandles->getInterfaceHandle(filt.first, InterfaceType::ENDPOINT);
         if (ep->getFederateId() != fed) {
             continue;
         }
-        Json::Value eptBlock;
+        nlohmann::json eptBlock;
 
         eptBlock["name"] = ep->key;
         eptBlock["id"] = ep->handle.handle.baseValue();
@@ -971,7 +971,7 @@ void FilterFederate::addFilteredEndpoint(Json::Value& block, GlobalFederateId fe
                 eptBlock["cloningdestFilter"] = dcloningFilter;
             }
         }
-        block["endpoints"].append(eptBlock);
+        block["endpoints"].push_back(std::move(eptBlock));
     }
 }
 
@@ -1007,8 +1007,8 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return mCoord.printTimeStatus();
     }
     if (queryStr == "current_state") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -1020,8 +1020,8 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_state") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -1029,8 +1029,8 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_time_debugging") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -1041,12 +1041,12 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "timeconfig") {
-        Json::Value base;
+        nlohmann::json base;
         mCoord.generateConfig(base);
         return fileops::generateJsonString(base);
     }
     if (queryStr == "config") {
-        Json::Value base;
+        nlohmann::json base;
         mCoord.generateConfig(base);
         return fileops::generateJsonString(base);
     }
@@ -1055,15 +1055,15 @@ std::string FilterFederate::query(std::string_view queryStr) const
                                     [](auto& dep) { return std::to_string(dep.baseValue()); });
     }
     if (queryStr == "data_flow_graph") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
         if (filters.size() > 0) {
-            base["filters"] = Json::arrayValue;
+            base["filters"] = nlohmann::json::array();
             for (const auto& filt : filters) {
-                Json::Value filter;
+                nlohmann::json filter;
                 filter["id"] = filt->handle.baseValue();
                 filter["name"] = filt->key;
                 filter["cloning"] = filt->cloning;
@@ -1075,14 +1075,14 @@ std::string FilterFederate::query(std::string_view queryStr) const
                     return std::to_string(dep.fed_id.baseValue()) +
                         "::" + std::to_string(dep.handle.baseValue());
                 });
-                base["filters"].append(std::move(filter));
+                base["filters"].push_back(std::move(filter));
             }
         }
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_time") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -1091,18 +1091,18 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "dependency_graph") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
-        base["dependents"] = Json::arrayValue;
+        base["dependents"] = nlohmann::json::array();
         for (auto& dep : mCoord.getDependents()) {
-            base["dependents"].append(dep.baseValue());
+            base["dependents"].push_back(dep.baseValue());
         }
-        base["dependencies"] = Json::arrayValue;
+        base["dependencies"] = nlohmann::json::array();
         for (auto& dep : mCoord.getDependencies()) {
-            base["dependencies"].append(dep.baseValue());
+            base["dependencies"].push_back(dep.baseValue());
         }
         return fileops::generateJsonString(base);
     }

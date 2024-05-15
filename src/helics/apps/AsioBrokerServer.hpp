@@ -43,7 +43,7 @@ namespace apps {
         AsioBrokerServer() = default;
         explicit AsioBrokerServer(std::string_view server_name): name_(server_name) {}
         /** start the server*/
-        virtual void startServer(const Json::Value* val,
+        virtual void startServer(const nlohmann::json* val,
                                  const std::shared_ptr<TypedBrokerServer>& ptr) override;
         /** stop the server*/
         virtual void stopServer() override;
@@ -77,7 +77,7 @@ namespace apps {
         std::thread mainLoopThread;
         std::mutex threadGuard;
 
-        const Json::Value* config_{nullptr};
+        const nlohmann::json* config_{nullptr};
         const std::string name_;
         bool tcp_enabled_{false};
         bool udp_enabled_{false};
@@ -96,7 +96,7 @@ namespace apps {
         void enableTcpServer(bool /*enabled*/) {}
         void enableUdpServer(bool /*enabled*/) {}
         /** start the server*/
-        virtual void startServer(const Json::Value* /*val*/,
+        virtual void startServer(const nlohmann::json* /*val*/,
                                  const std::shared_ptr<TypedBrokerServer>& /*ptr*/) override
         {
         }

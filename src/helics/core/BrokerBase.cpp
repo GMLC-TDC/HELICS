@@ -546,9 +546,9 @@ std::pair<bool, std::vector<std::string_view>>
     return {true, res};
 }
 
-void BrokerBase::addBaseInformation(Json::Value& base, bool hasParent) const
+void BrokerBase::addBaseInformation(nlohmann::json & base, bool hasParent) const
 {
-    Json::Value object;
+    nlohmann::json object;
     object["name"] = identifier;
     if (uuid_like) {
         object["uuid"] = identifier;

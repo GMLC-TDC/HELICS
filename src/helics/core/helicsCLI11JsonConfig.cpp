@@ -15,44 +15,48 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-static Json::Value getSection(Json::Value& base, const std::string& subSection, int16_t configIndex)
+static nlohmann::json getSection(nlohmann::json& base, const std::string& subSection, int16_t configIndex)
 {
     if (!subSection.empty()) {
         auto cfg = base[subSection];
-        if (cfg.isObject()) {
+        if (cfg.is_object()) {
             return cfg;
         }
-        if (cfg.isArray()) {
+        if (cfg.is_array()) {
             return cfg[configIndex];
         }
-        if (cfg.isNull() && subSection.find_first_of('.') != std::string::npos) {
+        if (cfg.is_null() && subSection.find_first_of('.') != std::string::npos) {
             auto dotloc = subSection.find_first_of('.');
             auto sub1 = base[subSection.substr(0, dotloc)];
-            if (!sub1.isNull()) {
+            if (!sub1.is_null()) {
                 return getSection(sub1, subSection.substr(dotloc + 1), configIndex);
             }
         }
-        return Json::nullValue;
+        return nlohmann::json::object();
     }
     return base;
 }
 
 std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) const
 {
-    Json::CharReaderBuilder rbuilder;
-    rbuilder["collectComments"] = false;
     std::string errs;
     if (!mSkipJson) {
-        Json::Value config;
-        if (Json::parseFromStream(rbuilder, input, &config, &errs)) {
+        nlohmann::json config;
+        try
+        {
+            config=nlohmann::json::parse(input,nullptr,true,true);
             config = getSection(config, section(), configIndex);
-            if (config.isNull()) {
+            if (config.is_null()) {
                 if (mFallbackToDefault) {
                     return ConfigBase::from_config(input);
                 }
                 return {};
             }
             return fromConfigInternal(config);
+        }
+        catch (const nlohmann::json::parse_error& err)
+        {
+            errs=err.what();
         }
         if (mThrowJsonErrors && !errs.empty()) {
             throw(CLI::FileError(errs));
@@ -62,25 +66,24 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
 }
 
 std::vector<CLI::ConfigItem>
-    HelicsConfigJSON::fromConfigInternal(Json::Value json,
+    HelicsConfigJSON::fromConfigInternal(const nlohmann::json &json,
                                          const std::string& name,
                                          const std::vector<std::string>& prefix) const
 {
     std::vector<CLI::ConfigItem> results;
 
-    if (json.isObject()) {
+    if (json.is_object()) {
         if (prefix.size() > maximumLayers) {
             return results;
         }
-        auto fields = json.getMemberNames();
-        for (auto& fld : fields) {
+        for (auto& fld :json.items()) {
             auto copy_prefix = prefix;
             if (!name.empty()) {
                 if (name != mPromoteSection) {
                     copy_prefix.push_back(name);
                 }
             }
-            auto sub_results = fromConfigInternal(json[fld], fld, copy_prefix);
+            auto sub_results = fromConfigInternal(fld.value(), fld.key(), copy_prefix);
             results.insert(results.end(), sub_results.begin(), sub_results.end());
         }
     } else if (!name.empty()) {
@@ -88,18 +91,18 @@ std::vector<CLI::ConfigItem>
         CLI::ConfigItem& res = results.back();
         res.name = name;
         res.parents = prefix;
-        if (json.isBool()) {
-            res.inputs = {json.asBool() ? "true" : "false"};
-        } else if (json.isNumeric()) {
+        if (json.is_boolean()) {
+            res.inputs = {json.get<bool>() ? "true" : "false"};
+        } else if (json.is_number()) {
             std::stringstream outstring;
-            outstring << json.asDouble();
+            outstring << json.get<double>();
             res.inputs = {outstring.str()};
-        } else if (json.isString()) {
-            res.inputs = {json.asString()};
-        } else if (json.isArray()) {
+        } else if (json.is_string()) {
+            res.inputs = {json.get<std::string>()};
+        } else if (json.is_array()) {
             for (const auto& obj : json) {
-                if (obj.isString()) {
-                    res.inputs.push_back(obj.asString());
+                if (obj.is_string()) {
+                    res.inputs.push_back(obj.get<std::string>());
                 } else {
                     break;
                 }

@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <string_view>
 
+
 namespace helics {
 class MessageFederateManager;
 class Endpoint;
@@ -162,7 +163,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     void registerMessageInterfacesJson(const std::string& jsonString);
 
     /** details of the registration process*/
-    void registerMessageInterfacesJsonDetail(Json::Value& json, bool defaultGlobal);
+    void registerMessageInterfacesJsonDetail(const fileops::JsonBuffer&, bool defaultGlobal);
 
     /** register a set Message interfaces using a toml file
   @details call is only valid in startup mode it is a protected call to add an

@@ -727,7 +727,7 @@ TEST(logging, log_buffer_broker4)
     broker.reset();
 
     auto js = helics::fileops::loadJsonStr(str);
-    ASSERT_TRUE(js["logs"].isArray());
+    ASSERT_TRUE(js["logs"].is_array());
     EXPECT_EQ(js["logs"].size(), 7U);
 }
 

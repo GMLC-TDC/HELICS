@@ -250,16 +250,17 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
 {
     auto doc = fileops::loadJson(jsonString);
-    registerValueInterfacesJsonDetail(doc, false);
+    registerValueInterfacesJsonDetail(fileops::JsonBuffer(doc), false);
 }
 
-void ValueFederate::registerValueInterfacesJsonDetail(Json::Value& json, bool defaultGlobal)
+void ValueFederate::registerValueInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuff, bool defaultGlobal)
 {
+    const auto & json=jsonBuff.json();
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 
-    Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
+    const nlohmann::json& iface = (json.contains("interfaces")) ? json["interfaces"] : json;
 
-    if (iface.isMember("publications")) {
+    if (iface.contains("publications")) {
         auto pubs = iface["publications"];
         for (const auto& pub : pubs) {
             auto name = fileops::getName(pub);
@@ -285,7 +286,7 @@ void ValueFederate::registerValueInterfacesJsonDetail(Json::Value& json, bool de
             addTargetVariations(pub, "destination", "targets", addDestTarget);
         }
     }
-    if (iface.isMember("subscriptions")) {
+    if (iface.contains("subscriptions")) {
         auto& subs = iface["subscriptions"];
         for (const auto& sub : subs) {
             bool skipNameTarget{false};
@@ -317,7 +318,7 @@ void ValueFederate::registerValueInterfacesJsonDetail(Json::Value& json, bool de
             addTargetVariations(sub, "source", "targets", addSourceTarget);
         }
     }
-    if (iface.isMember("inputs")) {
+    if (iface.contains("inputs")) {
         auto ipts = iface["inputs"];
         for (const auto& ipt : ipts) {
             auto name = fileops::getName(ipt);
@@ -347,7 +348,7 @@ void ValueFederate::registerValueInterfacesJsonDetail(Json::Value& json, bool de
         }
     }
 
-    if (json.isMember("helics")) {
+    if (json.contains("helics")) {
         registerValueInterfacesJsonDetail(json["helics"], defaultGlobal);
     }
 }
@@ -494,17 +495,17 @@ using dvalue = std::variant<double, std::string>;
 static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
                          const std::string& prefix,
                          char separator,
-                         Json::Value val)
+                         const nlohmann::json &val)
 {
-    for (auto& name : val.getMemberNames()) {
-        auto& field = val[name];
-        if (field.isObject()) {
-            generateData(vpairs, prefix + name + separator, separator, field);
+    for (auto& item : val.items()) {
+        auto& field = item.value();
+        if (field.is_object()) {
+            generateData(vpairs, prefix + item.key() + separator, separator, field);
         } else {
-            if (field.isDouble()) {
-                vpairs.emplace_back(prefix + name, field.asDouble());
+            if (field.is_number()) {
+                vpairs.emplace_back(prefix + item.key(), field.get<double>());
             } else {
-                vpairs.emplace_back(prefix + name, field.asString());
+                vpairs.emplace_back(prefix + item.key(), field.get<std::string>());
             }
         }
     }

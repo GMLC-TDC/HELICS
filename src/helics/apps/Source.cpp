@@ -87,21 +87,21 @@ namespace apps {
     }
 
     static void
-        setGeneratorProperty(SignalGenerator* gen, std::string_view name, const Json::Value& prop)
+        setGeneratorProperty(SignalGenerator* gen, std::string_view name, const nlohmann::json& prop)
     {
-        if (prop.isDouble()) {
-            gen->set(name, prop.asDouble());
+        if (prop.is_number()) {
+            gen->set(name, prop.get<double>());
         } else {
             try {
                 auto time = fileops::loadJsonTime(prop);
                 if (time > Time::minVal()) {
                     gen->set(name, static_cast<double>(time));
                 } else {
-                    gen->setString(name, prop.asString());
+                    gen->setString(name, prop.get<std::string>());
                 }
             }
             catch (const std::invalid_argument&) {
-                gen->setString(name, prop.asString());
+                gen->setString(name, prop.get<std::string>());
             }
         }
     }
@@ -113,9 +113,9 @@ namespace apps {
         // period works
         auto doc = fileops::loadJson(jsonString);
 
-        if (doc.isMember("source")) {
+        if (doc.contains("source")) {
             auto appConfig = doc["source"];
-            if (appConfig.isMember("defaultperiod")) {
+            if (appConfig.contains("defaultperiod")) {
                 defaultPeriod = fileops::loadJsonTime(appConfig["defaultperiod"]);
             }
         }
@@ -134,53 +134,52 @@ namespace apps {
      }
      */
 
-        if (doc.isMember("publications")) {
+        if (doc.contains("publications")) {
             auto pubArray = doc["publications"];
 
             for (const auto& pubElement : pubArray) {
                 auto key = fileops::getName(pubElement);
-                if (pubElement.isMember("start")) {
+                if (pubElement.contains("start")) {
                     setStartTime(key, fileops::loadJsonTime(pubElement["start"]));
                 }
-                if (pubElement.isMember("period")) {
+                if (pubElement.contains("period")) {
                     setPeriod(key, fileops::loadJsonTime(pubElement["period"]));
                 }
-                if (pubElement.isMember("generator")) {
-                    if (pubElement["generator"].isInt()) {
-                        linkPublicationToGenerator(key, pubElement["generator"].asInt());
+                if (pubElement.contains("generator")) {
+                    if (pubElement["generator"].is_number_integer()) {
+                        linkPublicationToGenerator(key, pubElement["generator"].get<int>());
                     } else {
-                        linkPublicationToGenerator(key, pubElement["generator"].asString());
+                        linkPublicationToGenerator(key, pubElement["generator"].get<std::string>());
                     }
                 }
             }
         }
-        if (doc.isMember("generators")) {
+        if (doc.contains("generators")) {
             auto genArray = doc["generators"];
             for (const auto& genElement : genArray) {
                 auto key = fileops::getName(genElement);
                 auto type = genElement["type"];
                 int index = -1;
-                if (!type.isNull()) {
-                    index = addSignalGenerator(key, type.asString());
+                if (!type.is_null()) {
+                    index = addSignalGenerator(key, type.get<std::string>());
                 } else {
                     std::cout << "generator " << key << " does not specify a type\n";
                     continue;
                 }
-                auto mnames = genElement.getMemberNames();
-                for (auto& el : mnames) {
-                    if ((el == "type") || (el == "name") || (el == "key")) {
+                for (auto& el : genElement.items()) {
+                    if ((el.key() == "type") || (el.key() == "name") || (el.key() == "key")) {
                         continue;
                     }
-                    if (el == "properties") {
-                        for (auto& prop : genElement["properties"]) {
-                            if ((prop.isMember("name")) && (prop.isMember("value"))) {
+                    if (el.key() == "properties") {
+                        for (auto& prop : el.value()) {
+                            if ((prop.contains("name")) && (prop.contains("value"))) {
                                 setGeneratorProperty(generators[index].get(),
-                                                     prop["name"].asString(),
+                                                     prop["name"].get<std::string>(),
                                                      prop["value"]);
                             }
                         }
                     } else {
-                        setGeneratorProperty(generators[index].get(), el, genElement[el]);
+                        setGeneratorProperty(generators[index].get(), el.key(), el.value());
                     }
                 }
             }

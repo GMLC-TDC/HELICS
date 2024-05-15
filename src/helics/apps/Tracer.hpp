@@ -53,7 +53,7 @@ namespace apps {
 
         /**constructor taking a file with the required information
     @param name the name of the app may be empty to pull name from the file
-    @param file a file defining the federate information
+    @param configString a file or string defining the federate information
     */
         Tracer(std::string_view name, const std::string& configString);
         /** move construction*/

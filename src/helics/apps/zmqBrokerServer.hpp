@@ -35,7 +35,7 @@ namespace apps {
         zmqBrokerServer() = default;
         explicit zmqBrokerServer(std::string_view server_name): name_(server_name) {}
         /** start the server*/
-        virtual void startServer(const Json::Value* val,
+        virtual void startServer(const nlohmann::json* val,
                                  const std::shared_ptr<TypedBrokerServer>& ptr) override;
         /** stop the server*/
         virtual void stopServer() override;
@@ -60,7 +60,7 @@ namespace apps {
 #endif
         std::thread mainLoopThread;
         std::mutex threadGuard;
-        const Json::Value* config_{nullptr};
+        const nlohmann::json* config_{nullptr};
         const std::string name_;
         bool zmq_enabled_{false};
         bool zmqss_enabled_{false};

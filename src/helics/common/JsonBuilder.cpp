@@ -19,10 +19,10 @@ JsonMapBuilder::JsonMapBuilder() noexcept {}
 
 JsonMapBuilder::~JsonMapBuilder() = default;
 
-Json::Value& JsonMapBuilder::getJValue()
+nlohmann::json & JsonMapBuilder::getJValue()
 {
     if (!jMap) {
-        jMap = std::make_unique<Json::Value>();
+        jMap = std::make_unique<nlohmann::json>();
     }
     return *jMap;
 }
@@ -44,14 +44,14 @@ bool JsonMapBuilder::addComponent(const std::string& info, int index) noexcept
     auto loc = missing_components.find(index);
     if (loc != missing_components.end()) {
         if (info == "#invalid") {
-            (*jMap)[loc->second.first].append(Json::Value{});
+            (*jMap)[loc->second.first].push_back(nlohmann::json::object());
         } else {
             try {
                 auto element = loadJsonStr(info);
-                (*jMap)[loc->second.first].append(element);
+                (*jMap)[loc->second.first].push_back(element);
             }
             catch (const std::invalid_argument&) {
-                (*jMap)[loc->second.first].append(Json::Value{});
+                (*jMap)[loc->second.first].push_back(nlohmann::json::object());
             }
         }
 
@@ -105,8 +105,8 @@ void JsonBuilder::addElement(const std::string& path, const std::string& value)
     size_t ii = 0;
     for (ii = 0; ii < res.size() - 1; ++ii) {
         auto& sub = (*jv)[res[ii]];
-        if (sub.isNull()) {
-            (*jv)[res[ii]] = Json::Value();
+        if (sub.is_null()) {
+            (*jv)[res[ii]] = nlohmann::json::object();
         }
         jv = &(*jv)[res[ii]];
     }
@@ -121,8 +121,8 @@ void JsonBuilder::addElement(const std::string& path, double value)
     size_t ii = 0;
     for (ii = 0; ii < res.size() - 1; ++ii) {
         auto& sub = (*jv)[res[ii]];
-        if (sub.isNull()) {
-            (*jv)[res[ii]] = Json::Value();
+        if (sub.is_null()) {
+            (*jv)[res[ii]] = nlohmann::json::object();
         }
         jv = &(*jv)[res[ii]];
     }
@@ -137,21 +137,21 @@ void JsonBuilder::addElement(const std::string& path, const std::vector<double>&
     size_t ii = 0;
     for (ii = 0; ii < res.size() - 1; ++ii) {
         auto& sub = (*jv)[res[ii]];
-        if (sub.isNull()) {
-            (*jv)[res[ii]] = Json::Value();
+        if (sub.is_null()) {
+            (*jv)[res[ii]] = nlohmann::json();
         }
         jv = &(*jv)[res[ii]];
     }
-    (*jv)[res.back()] = Json::arrayValue;
+    (*jv)[res.back()] = nlohmann::json::array();
     for (const auto& v : value) {
-        (*jv)[res.back()].append(v);
+        (*jv)[res.back()].push_back(v);
     }
 }
 
-Json::Value& JsonBuilder::getJValue()
+nlohmann::json& JsonBuilder::getJValue()
 {
     if (!jMap) {
-        jMap = std::make_unique<Json::Value>();
+        jMap = std::make_unique<nlohmann::json>();
     }
     return *jMap;
 }

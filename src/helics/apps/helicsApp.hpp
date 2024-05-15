@@ -17,10 +17,11 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace CLI {
 class App;
 }  // namespace CLI
-namespace Json {
-class Value;
-}  // namespace Json
 
+namespace helics::fileops
+{
+    class JsonBuffer;
+}
 namespace helics::apps {
 
 class AppTextParser;
@@ -133,7 +134,7 @@ configuration
     void loadConfigOptions(AppTextParser& aparser);
 
   private:
-    void loadConfigOptions(const Json::Value& element);
+    void loadConfigOptions(const fileops::JsonBuffer& element);
     /** generate the command line parser*/
     std::unique_ptr<helicsCLI11App> generateParser();
     /** process the command line arguments */
