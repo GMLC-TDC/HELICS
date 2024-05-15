@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
+#include <json/json.hpp>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -128,9 +129,9 @@ TEST_F(query, federate_map)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(), val["attributes"]["id"].get<int>());
     auto v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][0]["attributes"]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int>(), val["cores"][0]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -150,9 +151,9 @@ TEST_F(query, federate_map2)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["cores"][1]["federates"].size(), 1U);
-    EXPECT_EQ(val["cores"][1]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
+    EXPECT_EQ(val["cores"][1]["attributes"]["parent"].get<int>(), val["attributes"]["id"].get<int>());
     auto v2 = val["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][1]["attributes"]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int>(), val["cores"][1]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -172,14 +173,14 @@ TEST_F(query, federate_map3)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["brokers"].size(), 1U);
-    EXPECT_EQ(val["brokers"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
+    EXPECT_EQ(val["brokers"][0]["attributes"]["parent"].get<int>(), val["attributes"]["id"].get<int>());
     auto brk = val["brokers"][0];
     EXPECT_EQ(brk["cores"].size(), 2U);
     EXPECT_EQ(brk["brokers"].size(), 0U);
     EXPECT_EQ(brk["cores"][1]["federates"].size(), 1U);
-    EXPECT_EQ(brk["cores"][1]["attributes"]["parent"].asInt(), brk["attributes"]["id"].asInt());
+    EXPECT_EQ(brk["cores"][1]["attributes"]["parent"].get<int>(), brk["attributes"]["id"].get<int>());
     auto v2 = brk["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].asInt(), brk["cores"][1]["attributes"]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int>(), brk["cores"][1]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -199,9 +200,9 @@ TEST_F(query, dependency_graph)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(), val["attributes"]["id"].get<int>());
     auto v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][0]["attributes"]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int>(), val["cores"][0]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -246,8 +247,8 @@ TEST_F(query, global_time)
     ASSERT_EQ(val["brokers"][0]["cores"].size(), 2U);
     EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1U);
     EXPECT_EQ(val["brokers"][0]["cores"][1]["federates"].size(), 1U);
-    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["send_time"].asDouble(), 0.0);
-    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["granted_time"].asDouble(), 0.0);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["send_time"].get<double>(), 0.0);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["granted_time"].get<double>(), 0.0);
 
     vFed2->requestTimeAsync(1.0);
     vFed1->requestTime(1.0);
@@ -261,8 +262,8 @@ TEST_F(query, global_time)
     ASSERT_EQ(val["brokers"][0]["cores"].size(), 2U);
     EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1U);
     EXPECT_EQ(val["brokers"][0]["cores"][1]["federates"].size(), 1U);
-    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["send_time"].asDouble(), 1.0);
-    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["granted_time"].asDouble(), 1.0);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["send_time"].get<double>(), 1.0);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["granted_time"].get<double>(), 1.0);
 
     core = nullptr;
     vFed1->finalize();
@@ -290,21 +291,21 @@ TEST_F(query, current_time)
     EXPECT_EQ(std::stod(res), 1.0);
     res = mFed1->query("current_time");
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["granted_time"].asDouble(), 1.0);
-    EXPECT_EQ(val["requested_time"].asDouble(), 1.0);
+    EXPECT_EQ(val["granted_time"].get<double>(), 1.0);
+    EXPECT_EQ(val["requested_time"].get<double>(), 1.0);
 
     mFed1->requestTimeAsync(3.0);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     res = mFed1->query("current_time");
     val = loadJsonStr(res);
-    EXPECT_EQ(val["granted_time"].asDouble(), 1.0);
-    EXPECT_EQ(val["requested_time"].asDouble(), 3.0);
+    EXPECT_EQ(val["granted_time"].get<double>(), 1.0);
+    EXPECT_EQ(val["requested_time"].get<double>(), 3.0);
     mFed2->requestTime(3.0);
     mFed1->requestTimeComplete();
     mFed1->query("broker", "flush");
     res = mFed1->query("broker", "current_time");
     val = loadJsonStr(res);
-    EXPECT_EQ(val["time_next"].asDouble(), 3.0);
+    EXPECT_EQ(val["time_next"].get<double>(), 3.0);
 
     res = mFed1->query("root", "current_time");
     EXPECT_EQ(res, "{}");
@@ -338,7 +339,7 @@ TEST_F(query, version)
     EXPECT_EQ(res, helics::versionString);
     res = mFed1->query("root", "version_all");
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["version"].asString(), helics::versionString);
+    EXPECT_EQ(val["version"].get<std::string>(), helics::versionString);
     mFed1->finalize();
     mFed2->finalize();
 }
@@ -415,7 +416,7 @@ TEST_F(query, current_state)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["federates"].size(), 2U);
     EXPECT_EQ(val["cores"].size(), 2U);
-    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "connected");
+    EXPECT_EQ(val["federates"][0]["state"].get<std::string>(), "connected");
 
     vFed1->localError(-3, "test error");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -426,7 +427,7 @@ TEST_F(query, current_state)
     EXPECT_EQ(val["federates"].size(), 2U);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["brokers"].size(), 0U);
-    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "error");
+    EXPECT_EQ(val["federates"][0]["state"].get<std::string>(), "error");
 
     vFed2->finalize();
 
@@ -436,8 +437,8 @@ TEST_F(query, current_state)
 
     val = loadJsonStr(res);
     EXPECT_EQ(val["federates"].size(), 2U);
-    EXPECT_STREQ(val["federates"][1]["state"].asCString(), "disconnected");
-    EXPECT_STREQ(val["cores"][1]["state"].asCString(), "disconnected");
+    EXPECT_EQ(val["federates"][1]["state"].get<std::string>(), "disconnected");
+    EXPECT_EQ(val["cores"][1]["state"].get<std::string>(), "disconnected");
     core = nullptr;
 
     vFed1->finalize();
@@ -460,7 +461,7 @@ TEST_F(query, global_state)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 1U);
-    EXPECT_STREQ(val["cores"][0]["federates"][0]["state"].asCString(), "executing");
+    EXPECT_EQ(val["cores"][0]["federates"][0]["state"].get<std::string>(), "executing");
 
     vFed1->localError(-3, "test error");
 
@@ -470,10 +471,10 @@ TEST_F(query, global_state)
     val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 1U);
-    if (val["cores"][0]["federates"][0]["attributes"]["name"].asString() == "fed0") {
-        EXPECT_STREQ(val["cores"][0]["federates"][0]["state"].asCString(), "error");
+    if (val["cores"][0]["federates"][0]["attributes"]["name"].get<std::string>() == "fed0") {
+        EXPECT_EQ(val["cores"][0]["federates"][0]["state"].get<std::string>(), "error");
     } else {
-        EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "error");
+        EXPECT_EQ(val["cores"][1]["federates"][0]["state"].get<std::string>(), "error");
     }
 
     vFed2->finalize();
@@ -485,8 +486,8 @@ TEST_F(query, global_state)
     val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["cores"][1]["federates"].size(), 1U);
-    EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "error");
-    EXPECT_STREQ(val["cores"][0]["state"].asCString(), "disconnected");
+    EXPECT_EQ(val["cores"][1]["federates"][0]["state"].get<std::string>(), "error");
+    EXPECT_EQ(val["cores"][0]["state"].get<std::string>(), "disconnected");
     core = nullptr;
 
     vFed1->finalize();
@@ -507,7 +508,7 @@ TEST_F(query, current_state_core)
 
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["federates"].size(), 1U);
-    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "connected");
+    EXPECT_EQ(val["federates"][0]["state"].get<std::string>(), "connected");
 
     vFed1->localError(-3, "test error");
     EXPECT_THROW(vFed1->requestTime(1.0), helics::HelicsException);
@@ -516,7 +517,7 @@ TEST_F(query, current_state_core)
 
     val = loadJsonStr(res);
     EXPECT_EQ(val["federates"].size(), 1U);
-    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "error");
+    EXPECT_EQ(val["federates"][0]["state"].get<std::string>(), "error");
 
     vFed2->finalize();
 
@@ -541,10 +542,10 @@ TEST_F(query, data_flow_graph)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(), val["attributes"]["id"].get<int64_t>());
     auto v2 = val["cores"][0]["federates"][1];
     auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["parent"].asInt(), val["cores"][0]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(), val["cores"][0]["attributes"]["id"].get<int64_t>());
     EXPECT_EQ(v2["publications"].size(), 1U);
     EXPECT_EQ(v1["inputs"].size(), 1U);
     EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
@@ -576,25 +577,25 @@ TEST_F(query, interfaces)
     core = nullptr;
     vFed1->finalize();
     auto val = loadJsonStr(res);
-    EXPECT_STREQ(val["inputs"][0]["name"].asCString(), "ipt1");
-    EXPECT_STREQ(val["publications"][0]["name"].asCString(), "pub1");
-    EXPECT_STREQ(val["endpoints"][0]["name"].asCString(), "ept1");
-    EXPECT_STREQ(val["inputs"][0]["type"].asCString(), "double");
-    EXPECT_STREQ(val["publications"][0]["type"].asCString(), "double");
-    EXPECT_STREQ(val["endpoints"][0]["type"].asCString(), "type1");
+    EXPECT_EQ(val["inputs"][0]["name"].get<std::string>(), "ipt1");
+    EXPECT_EQ(val["publications"][0]["name"].get<std::string>(), "pub1");
+    EXPECT_EQ(val["endpoints"][0]["name"].get<std::string>(), "ept1");
+    EXPECT_EQ(val["inputs"][0]["type"].get<std::string>(), "double");
+    EXPECT_EQ(val["publications"][0]["type"].get<std::string>(), "double");
+    EXPECT_EQ(val["endpoints"][0]["type"].get<std::string>(), "type1");
 
-    EXPECT_STREQ(val["inputs"][0]["units"].asCString(), "kV");
-    EXPECT_STREQ(val["publications"][0]["units"].asCString(), "V");
+    EXPECT_EQ(val["inputs"][0]["units"].get<std::string>(), "kV");
+    EXPECT_EQ(val["publications"][0]["units"].get<std::string>(), "V");
 
-    ASSERT_TRUE(val["inputs"][0]["tags"].isArray());
-    ASSERT_TRUE(val["publications"][0]["tags"].isArray());
-    ASSERT_TRUE(val["endpoints"][0]["tags"].isArray());
-    EXPECT_STREQ(val["publications"][0]["tags"][0]["value"].asCString(), "val1");
-    EXPECT_STREQ(val["inputs"][0]["tags"][0]["value"].asCString(), "val2");
-    EXPECT_STREQ(val["endpoints"][0]["tags"][0]["value"].asCString(), "val3");
-    EXPECT_STREQ(val["publications"][0]["tags"][0]["name"].asCString(), "tag1");
-    EXPECT_STREQ(val["inputs"][0]["tags"][0]["name"].asCString(), "tag2");
-    EXPECT_STREQ(val["endpoints"][0]["tags"][0]["name"].asCString(), "tag3");
+    ASSERT_TRUE(val["inputs"][0]["tags"].is_array());
+    ASSERT_TRUE(val["publications"][0]["tags"].is_array());
+    ASSERT_TRUE(val["endpoints"][0]["tags"].is_array());
+    EXPECT_EQ(val["publications"][0]["tags"][0]["value"].get<std::string>(), "val1");
+    EXPECT_EQ(val["inputs"][0]["tags"][0]["value"].get<std::string>(), "val2");
+    EXPECT_EQ(val["endpoints"][0]["tags"][0]["value"].get<std::string>(), "val3");
+    EXPECT_EQ(val["publications"][0]["tags"][0]["name"].get<std::string>(), "tag1");
+    EXPECT_EQ(val["inputs"][0]["tags"][0]["name"].get<std::string>(), "tag2");
+    EXPECT_EQ(val["endpoints"][0]["tags"][0]["name"].get<std::string>(), "tag3");
     helics::cleanupHelicsLibrary();
 }
 
@@ -619,25 +620,25 @@ TEST_F(query, interfaces_json_serialization)
     core = nullptr;
     vFed1->finalize();
     auto val = loadJsonStr(res);
-    EXPECT_STREQ(val["inputs"][0]["name"].asCString(), "ipt1");
-    EXPECT_STREQ(val["publications"][0]["name"].asCString(), "pub1");
-    EXPECT_STREQ(val["endpoints"][0]["name"].asCString(), "ept1");
-    EXPECT_STREQ(val["inputs"][0]["type"].asCString(), "double");
-    EXPECT_STREQ(val["publications"][0]["type"].asCString(), "double");
-    EXPECT_STREQ(val["endpoints"][0]["type"].asCString(), "type1");
+    EXPECT_EQ(val["inputs"][0]["name"].get<std::string>(), "ipt1");
+    EXPECT_EQ(val["publications"][0]["name"].get<std::string>(), "pub1");
+    EXPECT_EQ(val["endpoints"][0]["name"].get<std::string>(), "ept1");
+    EXPECT_EQ(val["inputs"][0]["type"].get<std::string>(), "double");
+    EXPECT_EQ(val["publications"][0]["type"].get<std::string>(), "double");
+    EXPECT_EQ(val["endpoints"][0]["type"].get<std::string>(), "type1");
 
-    EXPECT_STREQ(val["inputs"][0]["units"].asCString(), "kV");
-    EXPECT_STREQ(val["publications"][0]["units"].asCString(), "V");
+    EXPECT_EQ(val["inputs"][0]["units"].get<std::string>(), "kV");
+    EXPECT_EQ(val["publications"][0]["units"].get<std::string>(), "V");
 
-    ASSERT_TRUE(val["inputs"][0]["tags"].isArray());
-    ASSERT_TRUE(val["publications"][0]["tags"].isArray());
-    ASSERT_TRUE(val["endpoints"][0]["tags"].isArray());
-    EXPECT_STREQ(val["publications"][0]["tags"][0]["value"].asCString(), "val1");
-    EXPECT_STREQ(val["inputs"][0]["tags"][0]["value"].asCString(), "val2");
-    EXPECT_STREQ(val["endpoints"][0]["tags"][0]["value"].asCString(), "val3");
-    EXPECT_STREQ(val["publications"][0]["tags"][0]["name"].asCString(), "tag1");
-    EXPECT_STREQ(val["inputs"][0]["tags"][0]["name"].asCString(), "tag2");
-    EXPECT_STREQ(val["endpoints"][0]["tags"][0]["name"].asCString(), "tag3");
+    ASSERT_TRUE(val["inputs"][0]["tags"].is_array());
+    ASSERT_TRUE(val["publications"][0]["tags"].is_array());
+    ASSERT_TRUE(val["endpoints"][0]["tags"].is_array());
+    EXPECT_EQ(val["publications"][0]["tags"][0]["value"].get<std::string>(), "val1");
+    EXPECT_EQ(val["inputs"][0]["tags"][0]["value"].get<std::string>(), "val2");
+    EXPECT_EQ(val["endpoints"][0]["tags"][0]["value"].get<std::string>(), "val3");
+    EXPECT_EQ(val["publications"][0]["tags"][0]["name"].get<std::string>(), "tag1");
+    EXPECT_EQ(val["inputs"][0]["tags"][0]["name"].get<std::string>(), "tag2");
+    EXPECT_EQ(val["endpoints"][0]["tags"][0]["name"].get<std::string>(), "tag3");
     helics::cleanupHelicsLibrary();
 }
 #endif
@@ -664,8 +665,8 @@ TEST_F(query, federate_tags)
     core = nullptr;
     vFed1->finalize();
     auto val = loadJsonStr(res);
-    EXPECT_STREQ(val["version"].asCString(), "1.4.5");
-    EXPECT_STREQ(val["description"].asCString(), "a federate description");
+    EXPECT_EQ(val["version"].get<std::string>(), "1.4.5");
+    EXPECT_EQ(val["description"].get<std::string>(), "a federate description");
 
     helics::cleanupHelicsLibrary();
 }
@@ -694,8 +695,8 @@ TEST_F(query, core_tags)
     cr.reset();
     vFed1->finalize();
     auto val = loadJsonStr(res);
-    EXPECT_STREQ(val["version"].asCString(), "1.4.6");
-    EXPECT_STREQ(val["description"].asCString(), "a core description");
+    EXPECT_EQ(val["version"].get<std::string>(), "1.4.6");
+    EXPECT_EQ(val["description"].get<std::string>(), "a core description");
 
     helics::cleanupHelicsLibrary();
 }
@@ -717,10 +718,10 @@ TEST_F(query, data_flow_graph_ordered)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(), val["attributes"]["id"].get<int64_t>());
     auto v2 = val["cores"][0]["federates"][1];
     auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][0]["attributes"]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(), val["cores"][0]["attributes"]["id"].get<int64_t>());
     EXPECT_EQ(v2["publications"].size(), 1U);
     EXPECT_EQ(v1["inputs"].size(), 1U);
     EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
@@ -752,13 +753,13 @@ TEST_F(query, data_flow_graph_concurrent)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(), val["attributes"]["id"].get<int64_t>());
     auto v2 = val["cores"][0]["federates"][1];
     auto v1 = val["cores"][0]["federates"][0];
-    if (v1["attributes"]["id"].asInt() > v2["attributes"]["id"].asInt()) {
+    if (v1["attributes"]["id"].get<int64_t>() > v2["attributes"]["id"].get<int64_t>()) {
         std::swap(v1, v2);
     }
-    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][0]["attributes"]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(), val["cores"][0]["attributes"]["id"].get<int64_t>());
     EXPECT_EQ(v2["publications"].size(), 1U);
     EXPECT_EQ(v1["inputs"].size(), 1U);
     EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
@@ -860,9 +861,9 @@ TEST_F(query, update_values)
     auto qres = vFed1->query("updates");
     auto val = loadJsonStr(qres);
 
-    EXPECT_EQ(val["pub1"].asDouble(), 45.7);
-    EXPECT_EQ(val["pub2"].asDouble(), 23.1);
-    EXPECT_EQ(val["pub3"].asDouble(), 19.4);
+    EXPECT_EQ(val["pub1"].get<double>(), 45.7);
+    EXPECT_EQ(val["pub2"].get<double>(), 23.1);
+    EXPECT_EQ(val["pub3"].get<double>(), 19.4);
     vFed1->clearUpdates();
     qres = vFed1->query("updates");
     EXPECT_EQ(qres, "{}");
@@ -872,9 +873,9 @@ TEST_F(query, update_values)
     qres = vFed1->query("updates");
     val = loadJsonStr(qres);
 
-    EXPECT_EQ(val["pub1"].asDouble(), 19.7);
-    EXPECT_TRUE(val["pub2"].isNull());
-    EXPECT_EQ(val["pub3"].asDouble(), 15.1);
+    EXPECT_EQ(val["pub1"].get<double>(), 19.7);
+    EXPECT_TRUE(val["pub2"].is_null());
+    EXPECT_EQ(val["pub3"].get<double>(), 15.1);
     vFed1->finalize();
     helics::cleanupHelicsLibrary();
 }
@@ -900,9 +901,9 @@ TEST_F(query, update_values_local)
     auto qres = vFed1->query("updates");
     auto val = loadJsonStr(qres);
 
-    EXPECT_EQ(val["pub1"].asDouble(), 45.7);
-    EXPECT_EQ(val["fed0"]["pub2"].asDouble(), 23.1);
-    EXPECT_EQ(val["fed0"]["pub3"].asDouble(), 19.4);
+    EXPECT_EQ(val["pub1"].get<double>(), 45.7);
+    EXPECT_EQ(val["fed0"]["pub2"].get<double>(), 23.1);
+    EXPECT_EQ(val["fed0"]["pub3"].get<double>(), 19.4);
     vFed1->clearUpdates();
     qres = vFed1->query("updates");
     EXPECT_EQ(qres, "{}");
@@ -912,9 +913,9 @@ TEST_F(query, update_values_local)
     qres = vFed1->query("updates");
     val = loadJsonStr(qres);
 
-    EXPECT_EQ(val["pub1"].asDouble(), 19.7);
-    EXPECT_TRUE(val["fed0"]["pub2"].isNull());
-    EXPECT_EQ(val["fed0"]["pub3"].asDouble(), 15.1);
+    EXPECT_EQ(val["pub1"].get<double>(), 19.7);
+    EXPECT_TRUE(val["fed0"]["pub2"].is_null());
+    EXPECT_EQ(val["fed0"]["pub3"].get<double>(), 15.1);
     vFed1->finalize();
     helics::cleanupHelicsLibrary();
 }
@@ -940,9 +941,9 @@ TEST_F(query, update_values_all)
     auto qres = vFed1->query("values");
     auto val = loadJsonStr(qres);
 
-    EXPECT_EQ(val["pub1"].asDouble(), 45.7);
-    EXPECT_EQ(val["pub2"].asDouble(), 23.1);
-    EXPECT_EQ(val["pub3"].asDouble(), 19.4);
+    EXPECT_EQ(val["pub1"].get<double>(), 45.7);
+    EXPECT_EQ(val["pub2"].get<double>(), 23.1);
+    EXPECT_EQ(val["pub3"].get<double>(), 19.4);
     vFed1->clearUpdates();
     auto qres2 = vFed1->query("values");
     EXPECT_EQ(qres, qres2);
@@ -952,9 +953,9 @@ TEST_F(query, update_values_all)
     qres = vFed1->query("values");
     val = loadJsonStr(qres);
 
-    EXPECT_EQ(val["pub1"].asDouble(), 19.7);
-    EXPECT_EQ(val["pub2"].asDouble(), 23.1);
-    EXPECT_EQ(val["pub3"].asDouble(), 15.1);
+    EXPECT_EQ(val["pub1"].get<double>(), 19.7);
+    EXPECT_EQ(val["pub2"].get<double>(), 23.1);
+    EXPECT_EQ(val["pub3"].get<double>(), 15.1);
     vFed1->finalize();
     helics::cleanupHelicsLibrary();
 }
@@ -975,8 +976,8 @@ TEST_F(query, global_flush)
     vFed1->finalize();
     helics::cleanupHelicsLibrary();
     auto val = loadJsonStr(qres);
-    ASSERT_TRUE(val["status"].isBool());
-    EXPECT_TRUE(val["status"].asBool());
+    ASSERT_TRUE(val["status"].is_boolean());
+    EXPECT_TRUE(val["status"].get<bool>());
 }
 
 #ifdef HELICS_ENABLE_ZMQ_CORE

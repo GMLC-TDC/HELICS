@@ -295,7 +295,7 @@ std::string ActionMessage::to_string() const
 
 std::string ActionMessage::to_json_string() const
 {
-    Json::Value packet;
+    nlohmann::json packet;
     packet["version"] =
         HELICS_VERSION_MAJOR * 10000 + HELICS_VERSION_MINOR * 100 + HELICS_VERSION_PATCH;
     packet["command"] = static_cast<int>(messageAction);
@@ -313,16 +313,32 @@ std::string ActionMessage::to_json_string() const
         packet["Tdemin"] = Tdemin.getBaseTimeCode();
         packet["Tso"] = Tso.getBaseTimeCode();
     }
-    packet["payload"] = std::string(payload.to_string());
+    packet["payload"] = payload.to_string();
     packet["stringCount"] = static_cast<std::uint32_t>(stringData.size());
     if (!stringData.empty()) {
-        Json::Value sdata = Json::arrayValue;
+        nlohmann::json sdata = nlohmann::json::array();
         for (const auto& str : stringData) {
-            sdata.append(str);
+            sdata.push_back(str);
         }
         packet["strings"] = std::move(sdata);
     }
-    return fileops::generateJsonString(packet);
+    try
+    {
+        return fileops::generateJsonString(packet);
+    }
+    catch (const nlohmann::json::type_error&)
+    {
+        packet["encoding"]="base64";
+        packet["payload"] = gmlc::utilities::base64_encode(payload.data(),payload.size());
+        if (!stringData.empty()) {
+            nlohmann::json sdata = nlohmann::json::array();
+            for (const auto& str : stringData) {
+                sdata.push_back(gmlc::utilities::base64_encode(str.data(),str.size()));
+            }
+            packet["strings"] = std::move(sdata);
+        }
+        return fileops::generateJsonStringNoThrow(packet);
+    }
 }
 
 constexpr auto LEADING_CHAR = '\xF3';
@@ -588,27 +604,39 @@ bool ActionMessage::from_json_string(std::string_view data)
     try {
         auto val = fileops::loadJsonStr(data);
         // auto version = val["version"].asFloat();
-        messageAction = static_cast<action_message_def::action_t>(val["command"].asInt());
-        messageID = val["messageId"].asInt();
-        source_id = GlobalFederateId(val["sourceId"].asInt());
-        dest_id = GlobalFederateId(val["destId"].asInt());
-        source_handle = InterfaceHandle(val["sourceHandle"].asInt());
-        dest_handle = InterfaceHandle(val["destHandle"].asInt());
-        counter = static_cast<uint16_t>(val["counter"].asUInt());
-        flags = static_cast<uint16_t>(val["flags"].asUInt());
-        sequenceID = val["sequenceId"].asUInt();
-        actionTime.setBaseTimeCode(val["actionTime"].asInt64());
+        messageAction = static_cast<action_message_def::action_t>(val["command"].get<int32_t>());
+        messageID = val["messageId"].get<int32_t>();
+        source_id = GlobalFederateId(val["sourceId"].get<int32_t>());
+        dest_id = GlobalFederateId(val["destId"].get<int32_t>());
+        source_handle = InterfaceHandle(val["sourceHandle"].get<int32_t>());
+        dest_handle = InterfaceHandle(val["destHandle"].get<int32_t>());
+        counter =val["counter"].get<uint16_t>();
+        flags = val["flags"].get<uint16_t>();
+        sequenceID = val["sequenceId"].get<uint32_t>();
+        actionTime.setBaseTimeCode(val["actionTime"].get<int64_t>());
         if (messageAction == CMD_TIME_REQUEST) {
-            Te.setBaseTimeCode(val["Te"].asInt64());
-            Tdemin.setBaseTimeCode(val["Tdemin"].asInt64());
-            Tso.setBaseTimeCode(val["Tso"].asInt64());
+            Te.setBaseTimeCode(val["Te"].get<int64_t>());
+            Tdemin.setBaseTimeCode(val["Tdemin"].get<int64_t>());
+            Tso.setBaseTimeCode(val["Tso"].get<int64_t>());
         }
-
-        payload = val["payload"].asString();
-        auto stringCount = val["stringCount"].asUInt();
+        payload = val["payload"].get<std::string>();
+        auto stringCount = val["stringCount"].get<int>();
         stringData.resize(stringCount);
-        for (Json::ArrayIndex ii = 0; ii < stringCount; ++ii) {
-            setString(ii, val["strings"][ii].asString());
+        for (int ii = 0; ii < stringCount; ++ii) {
+            setString(ii, val["strings"][ii].get<std::string>());
+        }
+        bool base64_encoding{false};
+        if (val.contains("encoding") && val["encoding"].is_string())
+        {
+            base64_encoding=val["encoding"].get<std::string>()=="base64";
+        }
+        if (base64_encoding)
+        {
+            payload=gmlc::utilities::base64_decode_to_string(payload.to_string());
+            for (auto& stringd : stringData)
+            {
+                stringd=gmlc::utilities::base64_decode_to_string(stringd);
+            }
         }
     }
     catch (...) {

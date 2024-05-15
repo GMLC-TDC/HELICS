@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
 
-#include "json/forwards.h"
+#include "json/json_fwd.hpp"
 #include <atomic>
 #include <functional>
 #include <string>
@@ -128,7 +128,7 @@ class BaseTimeCoordinator {
     /** generate a string with the current time status*/
     virtual std::string printTimeStatus() const = 0;
     /** generate debugging time information*/
-    virtual void generateDebuggingTimeInfo(Json::Value& base) const;
+    virtual void generateDebuggingTimeInfo(nlohmann::json& base) const;
 
     /** check if there are any active Time dependencies*/
     bool hasActiveTimeDependencies() const;
@@ -140,7 +140,7 @@ class BaseTimeCoordinator {
 
     /** grant timeout check
     @return a json Object with debugging info if empty nothing is logged*/
-    Json::Value grantTimeoutCheck(const ActionMessage& cmd);
+    nlohmann::json grantTimeoutCheck(const ActionMessage& cmd);
     /** get the current next time*/
     virtual Time getNextTime() const = 0;
 };

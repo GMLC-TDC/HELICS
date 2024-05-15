@@ -22,13 +22,10 @@ and some common methods used cores and brokers
 #include <thread>
 #include <utility>
 #include <vector>
+#include <json/json_fwd.hpp>
 
 namespace spdlog {
 class logger;
-}
-/** forward declare Json::Value*/
-namespace Json {
-class Value;
 }
 
 namespace helics {
@@ -288,7 +285,7 @@ class BrokerBase {
     /** process some common commands that can be processed by the broker base */
     std::pair<bool, std::vector<std::string_view>> processBaseCommands(ActionMessage& command);
     /** add some base information to a json structure */
-    void addBaseInformation(Json::Value& base, bool hasParent) const;
+    void addBaseInformation(nlohmann::json& base, bool hasParent) const;
 
   public:
     /** generate a callback function for the logging purposes*/

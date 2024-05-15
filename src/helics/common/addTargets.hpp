@@ -45,25 +45,25 @@ bool addTargets(const toml::value& section, std::string targetName, Callable cal
 }
 
 template<typename Callable>
-bool addTargets(const Json::Value& section, std::string targetName, Callable callback)
+bool addTargets(const nlohmann::json & section, std::string targetName, Callable callback)
 {
     bool found{false};
     // There should probably be a static_assert here but there isn't a nice type trait to check that
-    if (section.isMember(targetName)) {
+    if (section.contains(targetName)) {
         auto targets = section[targetName];
-        if (targets.isArray()) {
+        if (targets.is_array()) {
             for (const auto& target : targets) {
-                callback(target.asString());
+                callback(target.get<std::string>());
             }
         } else {
-            callback(targets.asString());
+            callback(targets.get<std::string>());
         }
         found = true;
     }
     if (targetName.back() == 's') {
         targetName.pop_back();
-        if (section.isMember(targetName)) {
-            callback(section[targetName].asString());
+        if (section.contains(targetName)) {
+            callback(section[targetName].get<std::string>());
             found = true;
         }
     }
@@ -91,12 +91,12 @@ void processOptions(const toml::value& section,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction);
 
-void processOptions(const Json::Value& section,
+void processOptions(const nlohmann::json & section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction);
 
-void loadTags(const Json::Value& section,
+void loadTags(const nlohmann::json & section,
               const std::function<void(std::string_view, std::string_view)>& tagAction);
 
 void loadTags(const toml::value& section,

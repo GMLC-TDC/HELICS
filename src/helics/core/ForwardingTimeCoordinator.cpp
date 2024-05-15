@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <fmt/format.h>
 #include <iostream>
-#include <json/json.h>
+#include <json/json.hpp>
 #include <set>
 #include <string>
 #include <vector>
@@ -101,14 +101,14 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
     return (updateUpStream || updateDownStream);
 }
 
-void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
+void ForwardingTimeCoordinator::generateDebuggingTimeInfo(nlohmann::json& base) const
 {
     base["type"] = "forwarding";
-    Json::Value upBlock;
+    nlohmann::json upBlock;
     generateJsonOutputTimeData(upBlock, upstream);
 
     base["upstream"] = upBlock;
-    Json::Value downBlock;
+    nlohmann::json downBlock;
     generateJsonOutputTimeData(downBlock, downstream);
     base["downstream"] = downBlock;
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);

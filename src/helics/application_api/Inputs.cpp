@@ -281,9 +281,9 @@ static defV vectorizeOperation(const std::vector<defV>& vals)
             if (vals.empty()) {
                 return std::string{};
             }
-            Json::Value svect = Json::arrayValue;
+            nlohmann::json svect = nlohmann::json::array();
             for (const auto& val : vals) {
-                svect.append(std::get<std::string>(val));
+                svect.push_back(std::get<std::string>(val));
             }
 
             return fileops::generateJsonString(svect);
@@ -728,7 +728,7 @@ void Input::loadSourceInformation()
         if (injectionType == DataType::HELICS_MULTI) {
             auto jvalue = fileops::loadJsonStr(iType);
             for (auto& res : jvalue) {
-                sourceTypes.emplace_back(getTypeFromString(res.asCString()), nullptr);
+                sourceTypes.emplace_back(getTypeFromString(res.get<std::string>()), nullptr);
             }
         } else {
             auto iValue = fileops::loadJsonStr(iUnits);
@@ -740,7 +740,7 @@ void Input::loadSourceInformation()
                 auto iValue = fileops::loadJsonStr(iUnits);
                 int ii{0};
                 for (auto& res : iValue) {
-                    auto str = res.asString();
+                    auto str = res.get<std::string>();
                     if (!str.empty()) {
                         auto U =
                             std::make_shared<units::precise_unit>(units::unit_from_string(str));

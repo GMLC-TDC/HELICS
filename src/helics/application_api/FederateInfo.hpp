@@ -17,13 +17,12 @@ namespace CLI {
 class App;
 }
 
-namespace Json {
-class Value;
-}
-
 namespace helics {
 class helicsCLI11App;
 
+namespace fileops {
+    class JsonBuffer;
+}
 /** data class defining federate properties and information
  */
 class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
@@ -130,7 +129,7 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     /** do some additional configuration from config files */
     void config_additional(CLI::App* app);
     /** method for loading info from json*/
-    void loadJsonConfig(Json::Value& json);
+    void loadJsonConfig(const fileops::JsonBuffer& json);
 };
 
 /** generate a FederateInfo object from a config file or string (JSON, TOML)
