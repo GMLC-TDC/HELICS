@@ -16,13 +16,13 @@ and some common methods used cores and brokers
 #include "gmlc/containers/BlockingPriorityQueue.hpp"
 
 #include <atomic>
+#include <json/json_fwd.hpp>
 #include <limits>
 #include <memory>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
-#include <json/json_fwd.hpp>
 
 namespace spdlog {
 class logger;

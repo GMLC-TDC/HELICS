@@ -91,12 +91,13 @@ struct ConnectionsList {
 
 static void loadTags(ConnectionsList& connections, const nlohmann::json& tags)
 {
-    for (const auto &val:tags.items()) {
+    for (const auto& val : tags.items()) {
         if (val.key() == "tags") {
-            auto tagVect = gmlc::utilities::stringOps::splitlineQuotes(val.value().get<std::string>());
+            auto tagVect =
+                gmlc::utilities::stringOps::splitlineQuotes(val.value().get<std::string>());
             connections.tagStrings.insert(connections.tagStrings.end(),
-                tagVect.begin(),
-                tagVect.end());
+                                          tagVect.begin(),
+                                          tagVect.end());
         } else {
             if (!val.value().is_string() || isTrueString(val.value().get<std::string>())) {
                 connections.tagStrings.emplace_back(val.key());
@@ -307,7 +308,8 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const nlohma
                 connections.potentialPubs.emplace(pub1,
                                                   PotentialConnections{federateName, pub1, false});
             } else if (pub.is_string()) {
-                const std::string_view pub1 = connections.interfaces.emplace_back(pub.get<std::string>());
+                const std::string_view pub1 =
+                    connections.interfaces.emplace_back(pub.get<std::string>());
                 connections.potentialPubs.emplace(pub1,
                                                   PotentialConnections{federateName, pub1, false});
             }
@@ -381,7 +383,8 @@ static void fedConnectionList(ConnectionsList& connections, const nlohmann::json
         }
         if (fed.contains("connected_publications")) {
             for (const auto& pub : fed["connected_publications"]) {
-                const std::string_view pub1 = connections.interfaces.emplace_back(pub.get<std::string>());
+                const std::string_view pub1 =
+                    connections.interfaces.emplace_back(pub.get<std::string>());
                 connections.pubs.insert(pub1);
             }
         }
@@ -395,7 +398,8 @@ static void fedConnectionList(ConnectionsList& connections, const nlohmann::json
         }
         if (fed.contains("unconnected_publications")) {
             for (const auto& pub : fed["unconnected_publications"]) {
-                const std::string_view pub1 = connections.interfaces.emplace_back(pub.get<std::string>());
+                const std::string_view pub1 =
+                    connections.interfaces.emplace_back(pub.get<std::string>());
                 connections.unconnectedPubs.push_back(pub1);
                 connections.pubs.insert(pub1);
             }
@@ -428,7 +432,7 @@ static void fedConnectionList(ConnectionsList& connections, const nlohmann::json
             fedPotentialInterfaceList(connections, fed);
         }
     }
-    catch (const nlohmann::json::exception & /*ev*/) {
+    catch (const nlohmann::json::exception& /*ev*/) {
         // TODO(PT): I think this is going to be almost impossible now, but someday might
         // want to create a response
         return;

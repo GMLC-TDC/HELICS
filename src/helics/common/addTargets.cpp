@@ -41,13 +41,13 @@ void processOptions(const toml::value& section,
     }
 }
 
-void processOptions(const nlohmann::json & section,
+void processOptions(const nlohmann::json& section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction)
 {
     auto stop = section.end();
-    for (const auto& [key, value]: section.items()) {
+    for (const auto& [key, value] : section.items()) {
         if (value.is_array() || value.is_object()) {
             continue;
         }
@@ -79,7 +79,7 @@ static std::pair<std::string, std::string> getTagPair(const TV& tv)
     return std::make_pair(std::string{}, std::string{});
 }
 
-void loadTags(const nlohmann::json & section,
+void loadTags(const nlohmann::json& section,
               const std::function<void(std::string_view, std::string_view)>& tagAction)
 {
     if (section.contains("tags")) {
@@ -98,8 +98,9 @@ void loadTags(const nlohmann::json & section,
             } else if (tv.is_object()) {
                 for (auto& item : tv.items()) {
                     tagAction(item.key(),
-                              (item.value().is_string()) ? item.value().get<std::string>():
-                                                      fileops::generateJsonString(item.value()));
+                              (item.value().is_string()) ?
+                                  item.value().get<std::string>() :
+                                  fileops::generateJsonString(item.value()));
                 }
             }
         }

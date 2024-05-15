@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "gmlc/libguarded/shared_guarded.hpp"
-#include "json/json_fwd.hpp"
 
+#include "json/json_fwd.hpp"
 #include <atomic>
 #include <deque>
 #include <functional>
@@ -40,6 +40,6 @@ class LogBuffer {
 };
 
 /** helper function to write a log buffer to a json object*/
-void bufferToJson(const LogBuffer& buffer, nlohmann::json &base);
+void bufferToJson(const LogBuffer& buffer, nlohmann::json& base);
 
 }  // namespace helics

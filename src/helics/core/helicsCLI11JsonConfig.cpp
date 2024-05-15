@@ -15,7 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-static nlohmann::json getSection(nlohmann::json& base, const std::string& subSection, int16_t configIndex)
+static nlohmann::json
+    getSection(nlohmann::json& base, const std::string& subSection, int16_t configIndex)
 {
     if (!subSection.empty()) {
         auto cfg = base[subSection];
@@ -42,9 +43,8 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
     std::string errs;
     if (!mSkipJson) {
         nlohmann::json config;
-        try
-        {
-            config=nlohmann::json::parse(input,nullptr,true,true);
+        try {
+            config = nlohmann::json::parse(input, nullptr, true, true);
             config = getSection(config, section(), configIndex);
             if (config.is_null()) {
                 if (mFallbackToDefault) {
@@ -54,9 +54,8 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
             }
             return fromConfigInternal(config);
         }
-        catch (const nlohmann::json::parse_error& err)
-        {
-            errs=err.what();
+        catch (const nlohmann::json::parse_error& err) {
+            errs = err.what();
         }
         if (mThrowJsonErrors && !errs.empty()) {
             throw(CLI::FileError(errs));
@@ -66,7 +65,7 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
 }
 
 std::vector<CLI::ConfigItem>
-    HelicsConfigJSON::fromConfigInternal(const nlohmann::json &json,
+    HelicsConfigJSON::fromConfigInternal(const nlohmann::json& json,
                                          const std::string& name,
                                          const std::vector<std::string>& prefix) const
 {
@@ -76,7 +75,7 @@ std::vector<CLI::ConfigItem>
         if (prefix.size() > maximumLayers) {
             return results;
         }
-        for (auto& fld :json.items()) {
+        for (auto& fld : json.items()) {
             auto copy_prefix = prefix;
             if (!name.empty()) {
                 if (name != mPromoteSection) {

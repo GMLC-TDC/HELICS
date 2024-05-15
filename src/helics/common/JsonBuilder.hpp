@@ -5,13 +5,12 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
+#include <json/json_fwd.hpp>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <json/json_fwd.hpp>
 
 namespace helics::fileops {
 
@@ -77,6 +76,5 @@ class JsonBuilder {
     /** reset the builder*/
     void reset();
 };
-
 
 }  // namespace helics::fileops

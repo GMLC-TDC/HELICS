@@ -84,16 +84,18 @@ void generateInterfaceConfig(nlohmann::json& iblock,
                              const helics::GlobalFederateId& fed);
 
 nlohmann::json generateInterfaceConfig(const helics::HandleManager& hm,
-                                    const helics::GlobalFederateId& fed);
+                                       const helics::GlobalFederateId& fed);
 
 void addFederateTags(nlohmann::json& v, const helics::FederateState* fed);
 /** generate results from a query related to interfaces*/
-std::string generateInterfaceQueryResults(std::string_view request,
-                                          const HandleManager& handles,
-                                          const GlobalFederateId fed,
-                                          const std::function<void(nlohmann::json&)>& addHeaderInfo);
+std::string
+    generateInterfaceQueryResults(std::string_view request,
+                                  const HandleManager& handles,
+                                  const GlobalFederateId fed,
+                                  const std::function<void(nlohmann::json&)>& addHeaderInfo);
 
-std::string generateInterfaceQueryResults(std::string_view request,
-                                          const InterfaceInfo& info,
-                                          const std::function<void(nlohmann::json&)>& addHeaderInfo);
+std::string
+    generateInterfaceQueryResults(std::string_view request,
+                                  const InterfaceInfo& info,
+                                  const std::function<void(nlohmann::json&)>& addHeaderInfo);
 }  // namespace helics

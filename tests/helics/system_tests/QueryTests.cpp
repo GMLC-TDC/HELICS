@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
-#include <json/json.hpp>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include <json/json.hpp>
 #include <thread>
 
 struct query: public FederateTestFixture, public ::testing::Test {};
@@ -129,9 +129,11 @@ TEST_F(query, federate_map)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(), val["attributes"]["id"].get<int>());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(),
+              val["attributes"]["id"].get<int>());
     auto v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(), val["cores"][0]["attributes"]["id"].get<int>());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+              val["cores"][0]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -151,9 +153,11 @@ TEST_F(query, federate_map2)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["cores"][1]["federates"].size(), 1U);
-    EXPECT_EQ(val["cores"][1]["attributes"]["parent"].get<int>(), val["attributes"]["id"].get<int>());
+    EXPECT_EQ(val["cores"][1]["attributes"]["parent"].get<int>(),
+              val["attributes"]["id"].get<int>());
     auto v2 = val["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(), val["cores"][1]["attributes"]["id"].get<int>());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+              val["cores"][1]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -173,14 +177,17 @@ TEST_F(query, federate_map3)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["brokers"].size(), 1U);
-    EXPECT_EQ(val["brokers"][0]["attributes"]["parent"].get<int>(), val["attributes"]["id"].get<int>());
+    EXPECT_EQ(val["brokers"][0]["attributes"]["parent"].get<int>(),
+              val["attributes"]["id"].get<int>());
     auto brk = val["brokers"][0];
     EXPECT_EQ(brk["cores"].size(), 2U);
     EXPECT_EQ(brk["brokers"].size(), 0U);
     EXPECT_EQ(brk["cores"][1]["federates"].size(), 1U);
-    EXPECT_EQ(brk["cores"][1]["attributes"]["parent"].get<int>(), brk["attributes"]["id"].get<int>());
+    EXPECT_EQ(brk["cores"][1]["attributes"]["parent"].get<int>(),
+              brk["attributes"]["id"].get<int>());
     auto v2 = brk["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(), brk["cores"][1]["attributes"]["id"].get<int>());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+              brk["cores"][1]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -200,9 +207,11 @@ TEST_F(query, dependency_graph)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(), val["attributes"]["id"].get<int>());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(),
+              val["attributes"]["id"].get<int>());
     auto v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(), val["cores"][0]["attributes"]["id"].get<int>());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+              val["cores"][0]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -542,10 +551,12 @@ TEST_F(query, data_flow_graph)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(), val["attributes"]["id"].get<int64_t>());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
+              val["attributes"]["id"].get<int64_t>());
     auto v2 = val["cores"][0]["federates"][1];
     auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(), val["cores"][0]["attributes"]["id"].get<int64_t>());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+              val["cores"][0]["attributes"]["id"].get<int64_t>());
     EXPECT_EQ(v2["publications"].size(), 1U);
     EXPECT_EQ(v1["inputs"].size(), 1U);
     EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
@@ -718,10 +729,12 @@ TEST_F(query, data_flow_graph_ordered)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(), val["attributes"]["id"].get<int64_t>());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
+              val["attributes"]["id"].get<int64_t>());
     auto v2 = val["cores"][0]["federates"][1];
     auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(), val["cores"][0]["attributes"]["id"].get<int64_t>());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+              val["cores"][0]["attributes"]["id"].get<int64_t>());
     EXPECT_EQ(v2["publications"].size(), 1U);
     EXPECT_EQ(v1["inputs"].size(), 1U);
     EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
@@ -753,13 +766,15 @@ TEST_F(query, data_flow_graph_concurrent)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(), val["attributes"]["id"].get<int64_t>());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
+              val["attributes"]["id"].get<int64_t>());
     auto v2 = val["cores"][0]["federates"][1];
     auto v1 = val["cores"][0]["federates"][0];
     if (v1["attributes"]["id"].get<int64_t>() > v2["attributes"]["id"].get<int64_t>()) {
         std::swap(v1, v2);
     }
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(), val["cores"][0]["attributes"]["id"].get<int64_t>());
+    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+              val["cores"][0]["attributes"]["id"].get<int64_t>());
     EXPECT_EQ(v2["publications"].size(), 1U);
     EXPECT_EQ(v1["inputs"].size(), 1U);
     EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");

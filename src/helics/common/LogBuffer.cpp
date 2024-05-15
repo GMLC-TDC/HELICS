@@ -58,7 +58,7 @@ void LogBuffer::process(
     }
 }
 
-void bufferToJson(const LogBuffer& buffer, nlohmann::json & base)
+void bufferToJson(const LogBuffer& buffer, nlohmann::json& base)
 {
     base["logs"] = nlohmann::json::array();
     buffer.process([&base](int level, std::string_view header, std::string_view message) {

@@ -546,8 +546,8 @@ defV readJsonValue(const data_view& data)
                 result = json["value"].get<double>();
                 break;
             case DataType::HELICS_COMPLEX:
-                result =
-                    std::complex<double>(json["value"][0].get<double>(), json["value"][1].get<double>());
+                result = std::complex<double>(json["value"][0].get<double>(),
+                                              json["value"][1].get<double>());
                 break;
             case DataType::HELICS_BOOL:
                 result = static_cast<std::int64_t>(json["value"].get<bool>());

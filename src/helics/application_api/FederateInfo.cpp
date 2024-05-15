@@ -7,12 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "FederateInfo.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/addTargets.hpp"
 #include "../common/configFileHelpers.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsCLI11JsonConfig.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
 #include "../core/helicsVersion.hpp"
 #include "frozen/string.h"
 #include "frozen/unordered_map.h"
@@ -920,7 +920,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
 
 void FederateInfo::loadJsonConfig(const fileops::JsonBuffer& jsonBuf)
 {
-    const auto &json=jsonBuf.json();
+    const auto& json = jsonBuf.json();
     const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
                                                                           Time arg) {
         setProperty(propStringsTranslations.at(fname), arg);

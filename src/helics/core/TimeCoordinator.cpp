@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
-#include <json/json.hpp>
 #include <algorithm>
 #include <fmt/format.h>
 #include <iostream>
+#include <json/json.hpp>
 #include <set>
 #include <string>
 #include <utility>

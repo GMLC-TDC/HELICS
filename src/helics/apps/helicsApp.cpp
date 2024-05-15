@@ -290,9 +290,9 @@ void App::loadJsonFileConfiguration(const std::string& appName,
     }
 }
 
-void App::loadConfigOptions(const fileops::JsonBuffer & elementBuff)
+void App::loadConfigOptions(const fileops::JsonBuffer& elementBuff)
 {
-    const auto &element=elementBuff.json();
+    const auto& element = elementBuff.json();
     if (element.contains("stop")) {
         stopTime = fileops::loadJsonTime(element["stop"]);
     }

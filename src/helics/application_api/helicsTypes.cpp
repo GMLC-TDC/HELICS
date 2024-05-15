@@ -410,11 +410,11 @@ NamedPoint helicsGetNamedPoint(std::string_view val)
     try {
         auto jv = fileops::loadJsonStr(val);
         switch (jv.type()) {
-        case nlohmann::json::value_t::number_float:
+            case nlohmann::json::value_t::number_float:
                 p.value = jv.get<double>();
                 p.name = "value";
                 break;
-        case nlohmann::json::value_t::string:
+            case nlohmann::json::value_t::string:
                 p.name = jv.get<std::string>();
                 break;
             case nlohmann::json::value_t::array:

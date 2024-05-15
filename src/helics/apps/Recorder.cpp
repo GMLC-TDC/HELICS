@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/Filters.hpp"
 #include "../application_api/queryFunctions.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/JsonGeneration.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/base64.h"
@@ -326,8 +326,7 @@ void Recorder::writeTextFile(const std::string& filename)
         }
         if (isBinaryData(mess->data)) {
             if (isEscapableData(mess->data)) {
-                outFile << "\t"
-                        << generateJsonQuotedString(std::string(mess->data.to_string()))
+                outFile << "\t" << generateJsonQuotedString(std::string(mess->data.to_string()))
                         << "\n";
             } else {
                 outFile << "\t\"" << encode(mess->data.to_string()) << "\"\n";

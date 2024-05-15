@@ -911,7 +911,7 @@ void FilterFederate::organizeFilterOperations()
     }
 }
 
-void FilterFederate::addFilteredEndpoint(nlohmann::json & block, GlobalFederateId fed) const
+void FilterFederate::addFilteredEndpoint(nlohmann::json& block, GlobalFederateId fed) const
 {
     block["endpoints"] = nlohmann::json::array();
     for (const auto& filt : filterCoord) {

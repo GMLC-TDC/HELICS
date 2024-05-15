@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "json/json.hpp"
-
 #include <fmt/format.h>
 #include <string>
 

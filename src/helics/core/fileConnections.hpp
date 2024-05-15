@@ -244,7 +244,8 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
     if (doc.contains("filters")) {
         for (const auto& filt : doc["filters"]) {
             if (filt.is_array()) {
-                brk->addSourceFilterToEndpoint(filt[0].get<std::string>(), filt[1].get<std::string>());
+                brk->addSourceFilterToEndpoint(filt[0].get<std::string>(),
+                                               filt[1].get<std::string>());
             } else {
                 std::string fname = fileops::getOrDefault(filt, "filter", std::string_view());
                 if (!fname.empty()) {

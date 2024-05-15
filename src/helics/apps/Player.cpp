@@ -361,8 +361,9 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
             Time ptime;
             int iterationIndex = 0;
             if (pointElement.contains("time")) {
-                const auto &telement=pointElement["time"];
-                auto str = telement.is_number()? std::to_string(telement.get<double>()):telement.get<std::string>();
+                const auto& telement = pointElement["time"];
+                auto str = telement.is_number() ? std::to_string(telement.get<double>()) :
+                                                  telement.get<std::string>();
                 auto cloc = str.find_last_of(':');
                 if (cloc == std::string::npos) {
                     ptime = fileops::loadJsonTime(str, units);

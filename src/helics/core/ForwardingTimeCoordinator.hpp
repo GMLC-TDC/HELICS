@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
 
-#include <json/json_fwd.hpp>
 #include <atomic>
 #include <functional>
+#include <json/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
