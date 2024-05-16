@@ -476,7 +476,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
     data += sizeof(Time::baseType);
 
     if (messageAction == CMD_TIME_REQUEST) {
-        tsize += static_cast<int>(3 * sizeof(Time::baseType));
+        tsize += 3 * sizeof(Time::baseType);
         if (buffer_size < tsize) {
             messageAction = CMD_INVALID;
             return (0);

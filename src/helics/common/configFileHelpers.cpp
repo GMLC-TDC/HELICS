@@ -38,6 +38,10 @@ bool looksLikeFile(std::string_view configString)
 
 ConfigType getConfigType(std::string_view configString)
 {
+    if (configString.empty())
+    {
+        return ConfigType::NONE;
+    }
     if (configString.front() == '-') {
         return ConfigType::CMD_LINE;
     }
