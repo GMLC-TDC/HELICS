@@ -38,8 +38,7 @@ bool looksLikeFile(std::string_view configString)
 
 ConfigType getConfigType(std::string_view configString)
 {
-    if (configString.empty())
-    {
+    if (configString.empty()) {
         return ConfigType::NONE;
     }
     if (configString.front() == '-') {
