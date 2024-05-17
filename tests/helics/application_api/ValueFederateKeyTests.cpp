@@ -426,6 +426,23 @@ TEST_P(valuefed_all_type_tests, dual_transfer_inputs)
     EXPECT_TRUE(res);
 }
 
+TEST_F(valuefed, dual_transfer_inputs_odd_name)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    // register the publications
+    std::string oddName(45,201);
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>(oddName);
+
+    auto& inpid = vFed2->registerInput<std::string>("inp1");
+
+    vFed2->addTarget(inpid, oddName);
+    bool res = dualTransfer(vFed1, vFed2, pub1, inpid);
+    EXPECT_TRUE(res);
+}
+
 TEST_P(valuefed_all_type_tests, dual_transfer_pubtarget)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 2);

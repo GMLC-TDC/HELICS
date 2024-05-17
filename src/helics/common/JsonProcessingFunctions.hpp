@@ -65,10 +65,7 @@ helics::Time loadJsonTime(const nlohmann::json& timeElement,
 std::string getName(const nlohmann::json& element);
 
 /** generate a Json String*/
-std::string generateJsonString(const nlohmann::json& block);
-
-/** generate a JSON string skipping utf encoding errors*/
-std::string generateJsonStringNoThrow(const nlohmann::json& block) noexcept;
+std::string generateJsonString(const nlohmann::json& block, bool hexConvert=true);
 
 inline std::string JsonAsString(const nlohmann::json& element)
 {
