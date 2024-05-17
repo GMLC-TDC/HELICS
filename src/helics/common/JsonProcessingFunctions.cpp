@@ -145,7 +145,11 @@ std::string getName(const nlohmann::json& element)
 
 std::string generateJsonString(const nlohmann::json& block, bool hexConvert)
 {
-    return block.dump(3, ' ', true,hexConvert?nlohmann::json::error_handler_t::hex:nlohmann::json::error_handler_t::strict);
+    return block.dump(3,
+                      ' ',
+                      true,
+                      hexConvert ? nlohmann::json::error_handler_t::hex :
+                                   nlohmann::json::error_handler_t::strict);
 }
 
 }  // namespace helics::fileops
