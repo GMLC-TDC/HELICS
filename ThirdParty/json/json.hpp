@@ -18053,7 +18053,8 @@ enum class error_handler_t
 {
     strict,  ///< throw a type_error exception in case of invalid UTF-8
     replace, ///< replace invalid UTF-8 sequences with U+FFFD
-    ignore   ///< ignore invalid UTF-8 sequences
+    ignore,   ///< ignore invalid UTF-8 sequences
+    hex ///< replace invalid UTF-8 sequencies with equivalent hex codes
 };
 
 template<typename BasicJsonType>
@@ -18575,7 +18576,46 @@ class serializer
                             state = UTF8_ACCEPT;
                             break;
                         }
+                        case error_handler_t::hex:
+                        {
+                            // in case we saw this character the first time, we
+                            // would like to read it again, because the byte
+                            // may be OK for itself, but just not OK for the
+                            // previous sequence
+                            if (undumped_chars > 0)
+                            {
+                                --i;
+                            }
 
+                            // reset length buffer to the last accepted index;
+                            // thus removing/ignoring the invalid characters
+                            bytes = bytes_after_last_accept;
+
+                            auto hexBytes=hex_bytes(byte | 0);
+                            string_buffer[bytes++] = '\\';
+                            string_buffer[bytes++] = '\\';
+                            string_buffer[bytes++] = 'X';
+                            string_buffer[bytes++] = hexBytes[0];
+                            string_buffer[bytes++] = hexBytes[1];
+
+                                // write buffer and reset index; there must be 13 bytes
+                                // left, as this is the maximal number of bytes to be
+                                // written ("\uxxxx\uxxxx\0") for one code point
+                                if (string_buffer.size() - bytes < 13)
+                                {
+                                    o->write_characters(string_buffer.data(), bytes);
+                                    bytes = 0;
+                                }
+
+                            bytes_after_last_accept = bytes;
+                         
+
+                            undumped_chars = 0;
+
+                            // continue processing the string
+                            state = UTF8_ACCEPT;
+                            break;
+                        }
                         default:            // LCOV_EXCL_LINE
                             JSON_ASSERT(false); // NOLINT(cert-dcl03-c,hicpp-static-assert,misc-static-assert) LCOV_EXCL_LINE
                     }
@@ -18615,6 +18655,7 @@ class serializer
                 }
 
                 case error_handler_t::ignore:
+                case error_handler_t::hex:
                 {
                     // write all accepted bytes
                     o->write_characters(string_buffer.data(), bytes_after_last_accept);

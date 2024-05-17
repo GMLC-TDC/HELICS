@@ -324,7 +324,7 @@ std::string ActionMessage::to_json_string() const
     }
     try
     {
-        return fileops::generateJsonString(packet);
+        return fileops::generateJsonString(packet,false);
     }
     catch (const nlohmann::json::type_error&)
     {
@@ -337,7 +337,7 @@ std::string ActionMessage::to_json_string() const
             }
             packet["strings"] = std::move(sdata);
         }
-        return fileops::generateJsonStringNoThrow(packet);
+        return fileops::generateJsonString(packet);
     }
 }
 

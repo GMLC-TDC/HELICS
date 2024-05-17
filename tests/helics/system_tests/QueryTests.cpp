@@ -558,6 +558,41 @@ TEST_F(query, data_flow_graph)
     helics::cleanupHelicsLibrary();
 }
 
+TEST_F(query, data_flow_graph_non_utf8)
+{
+    //The main point of this test is to make sure the json doesn't blow up when a non utf-8 string is used somewhere
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    std::string oddName(47,209);
+    vFed1->registerGlobalInput<double>(oddName);
+    std::string oddName2(23,199);
+    auto& p1 = vFed2->registerGlobalPublication<double>(oddName2);
+    p1.addTarget(oddName);
+    vFed1->enterInitializingModeAsync();
+    vFed2->enterInitializingMode();
+    vFed1->enterInitializingModeComplete();
+    auto core = vFed1->getCorePointer();
+    auto res = core->query("root", "data_flow_graph", HELICS_SEQUENCING_MODE_FAST);
+    auto val = loadJsonStr(res);
+    EXPECT_EQ(val["cores"].size(), 1U);
+    EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
+        val["attributes"]["id"].get<int64_t>());
+    auto v2 = val["cores"][0]["federates"][1];
+    auto v1 = val["cores"][0]["federates"][0];
+    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+        val["cores"][0]["attributes"]["id"].get<int64_t>());
+    EXPECT_EQ(v2["publications"].size(), 1U);
+    EXPECT_EQ(v1["inputs"].size(), 1U);
+    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    core = nullptr;
+    vFed1->finalize();
+    vFed2->finalize();
+    helics::cleanupHelicsLibrary();
+}
+
 TEST_F(query, interfaces)
 {
     SetupTest<helics::CombinationFederate>("test", 1);

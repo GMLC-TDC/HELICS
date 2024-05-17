@@ -145,14 +145,9 @@ std::string getName(const nlohmann::json& element)
         ((element.contains("name")) ? element["name"].get<std::string>() : std::string());
 }
 
-std::string generateJsonString(const nlohmann::json& block)
+std::string generateJsonString(const nlohmann::json& block, bool hexConvert)
 {
-    return block.dump(3,' ',true);
-}
-
-std::string generateJsonStringNoThrow(const nlohmann::json& block) noexcept
-{
-    return block.dump(3,' ',true,nlohmann::json::error_handler_t::replace);
+    return block.dump(3, ' ', true,hexConvert?nlohmann::json::error_handler_t::hex:nlohmann::json::error_handler_t::strict);
 }
 
 }  // namespace helics::fileops
