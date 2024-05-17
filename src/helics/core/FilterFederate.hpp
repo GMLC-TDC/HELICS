@@ -120,7 +120,7 @@ class FilterFederate {
      * delivered to a federate*/
     bool destinationProcessMessage(ActionMessage& command, const BasicHandleInfo* handle);
 
-    void addFilteredEndpoint(Json::Value& block, GlobalFederateId fed) const;
+    void addFilteredEndpoint(nlohmann::json& block, GlobalFederateId fed) const;
 
     void setHandleManager(HandleManager* handles) { mHandles = handles; }
 

@@ -541,42 +541,42 @@ defV readJsonValue(const data_view& data)
     defV result;
     try {
         auto json = fileops::loadJsonStr(data.string_view());
-        switch (getTypeFromString(json["type"].asCString())) {
+        switch (getTypeFromString(json["type"].get<std::string>())) {
             case DataType::HELICS_DOUBLE:
-                result = json["value"].asDouble();
+                result = json["value"].get<double>();
                 break;
             case DataType::HELICS_COMPLEX:
-                result =
-                    std::complex<double>(json["value"][0].asDouble(), json["value"][1].asDouble());
+                result = std::complex<double>(json["value"][0].get<double>(),
+                                              json["value"][1].get<double>());
                 break;
             case DataType::HELICS_BOOL:
-                result = static_cast<std::int64_t>(json["value"].asBool());
+                result = static_cast<std::int64_t>(json["value"].get<bool>());
                 break;
             case DataType::HELICS_VECTOR: {
                 std::vector<double> res;
                 for (const auto& v : json["value"]) {
-                    res.push_back(v.asDouble());
+                    res.push_back(v.get<double>());
                 }
                 result = std::move(res);
             } break;
             case DataType::HELICS_COMPLEX_VECTOR: {
                 std::vector<std::complex<double>> res;
                 auto ca = json["value"];
-                for (Json::ArrayIndex ii = 0; ii < ca.size() - 1; ii += 2) {
-                    res.emplace_back(ca[ii].asDouble(), ca[ii + 1].asDouble());
+                for (std::size_t ii = 0; ii < ca.size() - 1; ii += 2) {
+                    res.emplace_back(ca[ii].get<double>(), ca[ii + 1].get<double>());
                 }
                 result = std::move(res);
             } break;
             case DataType::HELICS_INT:
             case DataType::HELICS_TIME:
-                result = json["value"].asInt64();
+                result = json["value"].get<int64_t>();
                 break;
             case DataType::HELICS_STRING:
             case DataType::HELICS_CHAR:
-                result = json["value"].asString();
+                result = json["value"].get<std::string>();
                 break;
             case DataType::HELICS_NAMED_POINT:
-                result = NamedPoint(json["name"].asCString(), json["value"].asDouble());
+                result = NamedPoint(json["name"].get<std::string>(), json["value"].get<double>());
                 break;
             case DataType::HELICS_MULTI:
             default:

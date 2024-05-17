@@ -2621,7 +2621,7 @@ void CommonCore::setQueryCallback(LocalFederateId federateID,
 
 std::string CommonCore::filteredEndpointQuery(const FederateState* fed) const
 {
-    Json::Value base;
+    nlohmann::json base;
     if (fed != nullptr) {
         base["name"] = fed->getIdentifier();
         base["id"] = fed->global_id.load().baseValue();
@@ -2631,7 +2631,7 @@ std::string CommonCore::filteredEndpointQuery(const FederateState* fed) const
     } else {
         base["name"] = getIdentifier();
         base["id"] = global_broker_id_local.baseValue();
-        base["endpoints"] = Json::arrayValue;
+        base["endpoints"] = nlohmann::json::array();
     }
     return fileops::generateJsonString(base);
 }
@@ -2668,7 +2668,7 @@ std::string CommonCore::federateQuery(const FederateState* fed,
     auto resultString = generateInterfaceQueryResults(queryStr,
                                                       loopHandles,
                                                       fed->global_id,
-                                                      [](Json::Value& /*unused*/) {});
+                                                      [](nlohmann::json& /*unused*/) {});
     if (!resultString.empty()) {
         return resultString;
     }
@@ -2743,20 +2743,20 @@ std::string CommonCore::quickCoreQueries(std::string_view queryStr) const
 }
 
 void CommonCore::loadBasicJsonInfo(
-    Json::Value& base,
-    const std::function<void(Json::Value& fedval, const FedInfo& fed)>& fedLoader) const
+    nlohmann::json& base,
+    const std::function<void(nlohmann::json& fedval, const FedInfo& fed)>& fedLoader) const
 {
     addBaseInformation(base, true);
     if (fedLoader) {
-        base["federates"] = Json::arrayValue;
+        base["federates"] = nlohmann::json::array();
         for (const auto& fed : loopFederates) {
-            Json::Value fedval;
-            fedval["attributes"] = Json::objectValue;
+            nlohmann::json fedval;
+            fedval["attributes"] = nlohmann::json::object();
             fedval["attributes"]["id"] = fed.fed->global_id.load().baseValue();
             fedval["attributes"]["name"] = fed.fed->getIdentifier();
             fedval["attributes"]["parent"] = global_broker_id_local.baseValue();
             fedLoader(fedval, fed);
-            base["federates"].append(std::move(fedval));
+            base["federates"].push_back(std::move(fedval));
         }
     }
 }
@@ -2772,7 +2772,7 @@ void CommonCore::initializeMapBuilder(std::string_view request,
     std::get<2>(mapBuilders[index]) = reuse;
     auto& builder = std::get<0>(mapBuilders[index]);
     builder.reset();
-    Json::Value& base = builder.getJValue();
+    nlohmann::json& base = builder.getJValue();
     addBaseInformation(base, true);
     ActionMessage queryReq(force_ordering ? CMD_QUERY_ORDERED : CMD_QUERY);
     if (index == GLOBAL_FLUSH) {
@@ -2782,7 +2782,7 @@ void CommonCore::initializeMapBuilder(std::string_view request,
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
     if (loopFederates.size() > 0 || filterFed != nullptr || translatorFed != nullptr) {
-        base["federates"] = Json::arrayValue;
+        base["federates"] = nlohmann::json::array();
         for (const auto& fed : loopFederates) {
             const int brkindex =
                 builder.generatePlaceHolder("federates", fed->global_id.load().baseValue());
@@ -2825,13 +2825,13 @@ void CommonCore::initializeMapBuilder(std::string_view request,
             break;
         case DEPENDENCY_GRAPH: {
             if (hasTimeDependency) {
-                base["dependents"] = Json::arrayValue;
+                base["dependents"] = nlohmann::json::array();
                 for (const auto& dep : timeCoord->getDependents()) {
-                    base["dependents"].append(dep.baseValue());
+                    base["dependents"].push_back(dep.baseValue());
                 }
-                base["dependencies"] = Json::arrayValue;
+                base["dependencies"] = nlohmann::json::array();
                 for (const auto& dep : timeCoord->getDependencies()) {
-                    base["dependencies"].append(dep.baseValue());
+                    base["dependencies"].push_back(dep.baseValue());
                 }
             }
         } break;
@@ -2841,13 +2841,13 @@ void CommonCore::initializeMapBuilder(std::string_view request,
         case GLOBAL_TIME_DEBUGGING:
             base["state"] = brokerStateName(getBrokerState());
             if (timeCoord && !timeCoord->empty()) {
-                base["time"] = Json::Value();
+                base["time"] = nlohmann::json();
                 timeCoord->generateDebuggingTimeInfo(base["time"]);
             }
             break;
         case UNCONNECTED_INTERFACES:
             if (!tags.empty()) {
-                Json::Value tagBlock = Json::objectValue;
+                nlohmann::json tagBlock = nlohmann::json::object();
                 for (const auto& tag : tags) {
                     tagBlock[tag.first] = tag.second;
                 }
@@ -2878,7 +2878,7 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
 
 std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering) const
 {
-    auto addHeader = [this](Json::Value& base) { loadBasicJsonInfo(base, nullptr); };
+    auto addHeader = [this](nlohmann::json& base) { loadBasicJsonInfo(base, nullptr); };
 
     auto res = quickCoreQueries(queryStr);
     if (!res.empty()) {
@@ -2889,7 +2889,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
                                     [](const auto& fed) { return fed->getIdentifier(); });
     }
     if (queryStr == "tags") {
-        Json::Value tagBlock = Json::objectValue;
+        nlohmann::json tagBlock = nlohmann::json::object();
         for (const auto& tag : tags) {
             tagBlock[tag.first] = tag.second;
         }
@@ -2900,7 +2900,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
         queriedTag.remove_prefix(4);
         for (const auto& tag : tags) {
             if (queriedTag == tag.first) {
-                return Json::valueToQuotedString(tag.second.c_str());
+                return generateJsonQuotedString(tag.second);
             }
         }
         return "\"\"";
@@ -2923,13 +2923,13 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
         return (allInitReady()) ? "true" : "false";
     }
     if (queryStr == "logs") {
-        Json::Value base;
+        nlohmann::json base;
         loadBasicJsonInfo(base, nullptr);
         bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
     if (queryStr == "address") {
-        return Json::valueToQuotedString(getAddress().c_str());
+        return generateJsonQuotedString(getAddress());
     }
     if (queryStr == "counter") {
         return fmt::format("{}", generateMapObjectCounter());
@@ -2944,14 +2944,14 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
         return timeCoord->printTimeStatus();
     }
     if (queryStr == "version_all") {
-        Json::Value base;
-        loadBasicJsonInfo(base, [](Json::Value& /*val*/, const FedInfo& /*fed*/) {});
+        nlohmann::json base;
+        loadBasicJsonInfo(base, [](nlohmann::json& /*val*/, const FedInfo& /*fed*/) {});
         base["version"] = versionString;
         return fileops::generateJsonString(base);
     }
     if (queryStr == "current_state") {
-        Json::Value base;
-        loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
+        nlohmann::json base;
+        loadBasicJsonInfo(base, [](nlohmann::json& val, const FedInfo& fed) {
             val["state"] = stateString(fed.state);
         });
         base["state"] = brokerStateName(getBrokerState());
@@ -2959,8 +2959,8 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
         return fileops::generateJsonString(base);
     }
     if (queryStr == "interfaces") {
-        Json::Value base;
-        loadBasicJsonInfo(base, [this](Json::Value& val, const FedInfo& fed) {
+        nlohmann::json base;
+        loadBasicJsonInfo(base, [this](nlohmann::json& val, const FedInfo& fed) {
             generateInterfaceConfig(val, loopHandles, fed->global_id);
         });
         return fileops::generateJsonString(base);
@@ -2993,21 +2993,21 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
         return "#wait";
     }
     if (queryStr == "dependencies") {
-        Json::Value base;
+        nlohmann::json base;
         loadBasicJsonInfo(base, nullptr);
-        base["dependents"] = Json::arrayValue;
+        base["dependents"] = nlohmann::json::array();
         for (const auto& dep : timeCoord->getDependents()) {
-            base["dependents"].append(dep.baseValue());
+            base["dependents"].push_back(dep.baseValue());
         }
-        base["dependencies"] = Json::arrayValue;
+        base["dependencies"] = nlohmann::json::array();
         for (const auto& dep : timeCoord->getDependencies()) {
-            base["dependencies"].append(dep.baseValue());
+            base["dependencies"].push_back(dep.baseValue());
         }
         return fileops::generateJsonString(base);
     }
     if (queryStr == "federate_map") {
-        Json::Value base;
-        loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
+        nlohmann::json base;
+        loadBasicJsonInfo(base, [](nlohmann::json& val, const FedInfo& fed) {
             if (fed.fed->try_lock()) {
                 addFederateTags(val, fed.fed);
                 fed.fed->unlock();
@@ -3017,7 +3017,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
         });
         // add core tags if needed
         if (!tags.empty()) {
-            Json::Value tagBlock = Json::objectValue;
+            nlohmann::json tagBlock = nlohmann::json::object();
             for (const auto& tag : tags) {
                 tagBlock[tag.first] = tag.second;
             }
@@ -3028,7 +3028,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
     // check tag value for a matching string
     for (const auto& tag : tags) {
         if (tag.first == queryStr) {
-            return Json::valueToQuotedString(tag.second.c_str());
+            return generateJsonQuotedString(tag.second);
         }
     }
     // if nothing found generate an error response
@@ -3046,7 +3046,7 @@ std::string CommonCore::query(std::string_view target,
                 return res;
             }
             if (queryStr == "logs") {
-                Json::Value base;
+                nlohmann::json base;
                 loadBasicJsonInfo(base, nullptr);
                 bufferToJson(mLogManager->getLogBuffer(), base);
                 return fileops::generateJsonString(base);
@@ -4765,12 +4765,12 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     LOG_ERROR(global_broker_id_local, getIdentifier(), "timeout disconnect");
                 }
                 if (timeCoord && !timeCoord->empty()) {
-                    Json::Value base;
+                    nlohmann::json base;
                     addBaseInformation(base, true);
                     base["state"] = brokerStateName(getBrokerState());
-                    base["time"] = Json::Value();
+                    base["time"] = nlohmann::json();
                     timeCoord->generateDebuggingTimeInfo(base["time"]);
-                    base["federates"] = Json::arrayValue;
+                    base["federates"] = nlohmann::json::array();
                     for (const auto& fed : loopFederates) {
                         const std::string ret =
                             federateQuery(fed.fed, "global_time_debugging", false);
@@ -4782,18 +4782,18 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                             }
                         } else {
                             auto element = fileops::loadJsonStr(ret);
-                            base["federates"].append(element);
+                            base["federates"].push_back(element);
                         }
                     }
                     if (filterFed != nullptr) {
                         auto str = filterFed->query("global_time_debugging");
                         auto element = fileops::loadJsonStr(str);
-                        base["federates"].append(element);
+                        base["federates"].push_back(element);
                     }
                     if (translatorFed != nullptr) {
                         auto str = translatorFed->query("global_time_debugging");
                         auto element = fileops::loadJsonStr(str);
-                        base["federates"].append(element);
+                        base["federates"].push_back(element);
                     }
                     auto debugString = fileops::generateJsonString(base);
                     debugString.insert(0, "TIME DEBUGGING::");
@@ -5164,7 +5164,7 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
         manageTimeBlocks(cmd);
     } else if (cmd.action() == CMD_GRANT_TIMEOUT_CHECK) {
         auto json = timeCoord->grantTimeoutCheck(cmd);
-        if (!json.isNull()) {
+        if (!json.is_null()) {
             auto debugString = fileops::generateJsonString(json);
             debugString.insert(0, "TIME DEBUGGING::");
             LOG_WARNING(global_broker_id_local, getIdentifier(), debugString);

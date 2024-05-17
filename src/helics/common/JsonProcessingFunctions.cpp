@@ -73,7 +73,7 @@ bool hasJsonExtension(std::string_view jsonString)
     return ((ext == "json") || (ext == "JSON") || (ext == ".jsn") || (ext == ".JSN"));
 }
 
-Json::Value loadJson(const std::string& jsonString)
+nlohmann::json loadJson(const std::string& jsonString)
 {
     if (jsonString.size() > 128) {
         try {
@@ -87,78 +87,69 @@ Json::Value loadJson(const std::string& jsonString)
     std::ifstream file(jsonString);
 
     if (file.is_open()) {
-        Json::Value doc;
-        const Json::CharReaderBuilder rbuilder;
-        std::string errs;
-        const bool success = Json::parseFromStream(rbuilder, file, &doc, &errs);
-        if (!success) {
-            throw(std::invalid_argument(errs.c_str()));
+        try {
+            return nlohmann::json::parse(file, nullptr, true, true);
         }
-        return doc;
+        catch (const nlohmann::json::parse_error& errs) {
+            throw(std::invalid_argument(errs.what()));
+        }
     }
     return loadJsonStr(jsonString);
 }
 
-Json::Value loadJsonStr(std::string_view jsonString)
+nlohmann::json loadJsonStr(std::string_view jsonString)
 {
-    Json::Value doc;
-    const Json::CharReaderBuilder rbuilder;
-    std::string errs;
-    auto reader = std::unique_ptr<Json::CharReader>(rbuilder.newCharReader());
-    const bool parseOk =
-        reader->parse(jsonString.data(), jsonString.data() + jsonString.size(), &doc, &errs);
-    if (!parseOk) {
-        throw(std::invalid_argument(errs.c_str()));
+    try {
+        return nlohmann::json::parse(jsonString.begin(), jsonString.end(), nullptr, true, true);
     }
-    return doc;
+    catch (const nlohmann::json::parse_error& errs) {
+        throw(std::invalid_argument(errs.what()));
+    }
 }
 
 /** read a time from a JSON value element*/
-helics::Time loadJsonTime(const Json::Value& timeElement, time_units defaultUnits)
+helics::Time loadJsonTime(const nlohmann::json& timeElement, time_units defaultUnits)
 {
-    if (timeElement.isObject()) {
-        if (timeElement.isMember("unit")) {
-            defaultUnits = gmlc::utilities::timeUnitsFromString(timeElement["unit"].asString());
+    if (timeElement.is_object()) {
+        if (timeElement.contains("unit")) {
+            defaultUnits =
+                gmlc::utilities::timeUnitsFromString(timeElement["unit"].get<std::string>());
         }
-        if (timeElement.isMember("units")) {
-            defaultUnits = gmlc::utilities::timeUnitsFromString(timeElement["units"].asString());
+        if (timeElement.contains("units")) {
+            defaultUnits =
+                gmlc::utilities::timeUnitsFromString(timeElement["units"].get<std::string>());
         }
-        if (timeElement.isMember("value")) {
-            if (timeElement["value"].isInt64()) {
-                return {timeElement["value"].asInt64(), defaultUnits};
+        if (timeElement.contains("value")) {
+            if (timeElement["value"].is_number_integer()) {
+                return {timeElement["value"].get<int64_t>(), defaultUnits};
             }
-            return {timeElement["value"].asDouble() * toSecondMultiplier(defaultUnits)};
+            return {timeElement["value"].get<double>() * toSecondMultiplier(defaultUnits)};
         }
         return helics::Time::minVal();
     }
-    if (timeElement.isInt64()) {
-        return {timeElement.asInt64(), defaultUnits};
+    if (timeElement.is_number_integer() || timeElement.is_number_unsigned()) {
+        return {timeElement.get<std::int64_t>(), defaultUnits};
     }
-    if (timeElement.isDouble()) {
-        return {timeElement.asDouble() * toSecondMultiplier(defaultUnits)};
+    if (timeElement.is_number_float()) {
+        return {timeElement.get<double>() * toSecondMultiplier(defaultUnits)};
     }
-    return gmlc::utilities::loadTimeFromString<helics::Time>(timeElement.asString());
+    return gmlc::utilities::loadTimeFromString<helics::Time>(timeElement.get<std::string>());
 }
 
-std::string getName(const Json::Value& element)
+std::string getName(const nlohmann::json& element)
 {
-    return (element.isMember("key")) ?
-        element["key"].asString() :
-        ((element.isMember("name")) ? element["name"].asString() : std::string());
+    return (element.contains("key")) ?
+        element["key"].get<std::string>() :
+        ((element.contains("name")) ? element["name"].get<std::string>() : std::string());
 }
 
-std::string generateJsonString(const Json::Value& block)
+std::string generateJsonString(const nlohmann::json& block, bool hexConvert)
 {
-    Json::StreamWriterBuilder builder;
-    builder["emitUTF8"] = true;
-    builder["commentStyle"] = "None";
-    builder["indentation"] = "   ";  // or whatever you like
-    builder["precision"] = 17;
-    auto writer = std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter());
-    std::stringstream sstr;
-    writer->write(block, &sstr);
-    auto ret = sstr.str();
-    return ret;
+    return block.dump(3,
+                      ' ',
+                      true,
+                      hexConvert ? nlohmann::json::error_handler_t::hex :
+                                   nlohmann::json::error_handler_t::strict);
 }
 
 }  // namespace helics::fileops

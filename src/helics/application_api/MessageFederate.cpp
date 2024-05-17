@@ -248,14 +248,16 @@ Endpoint& MessageFederate::registerEndpoint(std::string_view eptName,
     return registerEndpoint(eptName, type);
 }
 
-void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, bool defaultGlobal)
+void MessageFederate::registerMessageInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuff,
+                                                          bool defaultGlobal)
 {
+    const auto& json = jsonBuff.json();
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
     const bool defaultTargeted = fileops::getOrDefault(json, "targeted", false);
 
-    Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
+    const nlohmann::json& iface = (json.contains("interfaces")) ? json["interfaces"] : json;
 
-    if (iface.isMember("endpoints")) {
+    if (iface.contains("endpoints")) {
         for (const auto& ept : iface["endpoints"]) {
             auto eptName = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
@@ -266,7 +268,7 @@ void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, boo
             loadOptions(this, ept, epObj);
         }
     }
-    if (iface.isMember("datasinks")) {
+    if (iface.contains("datasinks")) {
         for (const auto& ept : iface["datasinks"]) {
             auto eptName = fileops::getName(ept);
             Endpoint& epObj = registerDataSink(eptName);
@@ -274,7 +276,7 @@ void MessageFederate::registerMessageInterfacesJsonDetail(Json::Value& json, boo
             loadOptions(this, ept, epObj);
         }
     }
-    if (json.isMember("helics")) {
+    if (json.contains("helics")) {
         registerMessageInterfacesJsonDetail(json["helics"], defaultGlobal);
     }
 }

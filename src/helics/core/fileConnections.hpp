@@ -164,7 +164,7 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
 {
     static_assert(std::is_base_of<Broker, brkX>::value || std::is_base_of<Core, brkX>::value,
                   "input must be Core or Broker");
-    Json::Value doc;
+    nlohmann::json doc;
     try {
         doc = loadJson(file);
     }
@@ -172,10 +172,10 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
         throw(helics::InvalidParameter(ia.what()));
     }
 
-    if (doc.isMember("connections")) {
+    if (doc.contains("connections")) {
         for (const auto& conn : doc["connections"]) {
-            if (conn.isArray() && conn.size() >= 2) {
-                brk->dataLink(conn[0].asString(), conn[1].asString());
+            if (conn.is_array() && conn.size() >= 2) {
+                brk->dataLink(conn[0].get<std::string>(), conn[1].get<std::string>());
             } else {
                 std::string pub = fileops::getOrDefault(conn, "publication", std::string_view());
                 if (!pub.empty()) {
@@ -207,10 +207,10 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
             }
         }
     }
-    if (doc.isMember("links")) {
+    if (doc.contains("links")) {
         for (const auto& conn : doc["links"]) {
-            if (conn.isArray() && conn.size() >= 2) {
-                brk->linkEndpoints(conn[0].asString(), conn[1].asString());
+            if (conn.is_array() && conn.size() >= 2) {
+                brk->linkEndpoints(conn[0].get<std::string>(), conn[1].get<std::string>());
             } else {
                 std::string pub = fileops::getOrDefault(conn, "publication", std::string_view());
                 if (!pub.empty()) {
@@ -241,10 +241,11 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
             }
         }
     }
-    if (doc.isMember("filters")) {
+    if (doc.contains("filters")) {
         for (const auto& filt : doc["filters"]) {
-            if (filt.isArray()) {
-                brk->addSourceFilterToEndpoint(filt[0].asString(), filt[1].asString());
+            if (filt.is_array()) {
+                brk->addSourceFilterToEndpoint(filt[0].get<std::string>(),
+                                               filt[1].get<std::string>());
             } else {
                 std::string fname = fileops::getOrDefault(filt, "filter", std::string_view());
                 if (!fname.empty()) {
@@ -263,28 +264,26 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
             }
         }
     }
-    if (doc.isMember("globals")) {
-        if (doc["globals"].isArray()) {
-            for (auto& val : doc["globals"]) {
-                brk->setGlobal(val[0].asString(), val[1].asString());
+    if (doc.contains("globals")) {
+        if (doc["globals"].is_array()) {
+            for (const auto& val : doc["globals"]) {
+                brk->setGlobal(val[0].get<std::string>(), val[1].get<std::string>());
             }
         } else {
-            auto members = doc["globals"].getMemberNames();
-            for (auto& val : members) {
-                brk->setGlobal(val, doc["globals"][val].asString());
+            for (const auto& member : doc["globals"].items()) {
+                brk->setGlobal(member.key(), member.value().get<std::string>());
             }
         }
     }
 
-    if (doc.isMember("aliases")) {
-        if (doc["aliases"].isArray()) {
-            for (auto& val : doc["aliases"]) {
-                brk->addAlias(val[0].asString(), val[1].asString());
+    if (doc.contains("aliases")) {
+        if (doc["aliases"].is_array()) {
+            for (const auto& val : doc["aliases"]) {
+                brk->addAlias(val[0].get<std::string>(), val[1].get<std::string>());
             }
         } else {
-            auto members = doc["aliases"].getMemberNames();
-            for (auto& val : members) {
-                brk->addAlias(val, doc["aliases"][val].asString());
+            for (const auto& member : doc["aliases"].items()) {
+                brk->addAlias(member.key(), member.value().get<std::string>());
             }
         }
     }

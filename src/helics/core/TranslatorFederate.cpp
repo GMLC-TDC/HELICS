@@ -372,8 +372,8 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
         return mCoord.printTimeStatus();
     }
     if (queryStr == "current_state") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -385,8 +385,8 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_state") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -394,8 +394,8 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_time_debugging") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -404,12 +404,12 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "timeconfig") {
-        Json::Value base;
+        nlohmann::json base;
         mCoord.generateConfig(base);
         return fileops::generateJsonString(base);
     }
     if (queryStr == "config") {
-        Json::Value base;
+        nlohmann::json base;
         mCoord.generateConfig(base);
         return fileops::generateJsonString(base);
     }
@@ -418,15 +418,15 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
                                     [](auto& dep) { return std::to_string(dep.baseValue()); });
     }
     if (queryStr == "data_flow_graph") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
         if (translators.size() > 0) {
-            base["translators"] = Json::arrayValue;
+            base["translators"] = nlohmann::json::array();
             for (const auto& trans : translators) {
-                Json::Value tran;
+                nlohmann::json tran;
                 tran["id"] = trans->id.handle.baseValue();
                 tran["name"] = trans->key;
 
@@ -434,14 +434,14 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
                 tran["destination_endpoints"] = trans->getEndpointInfo()->getDestinationTargets();
                 tran["source_publications"] = trans->getPubInfo()->getTargets();
                 tran["destination_inputs"] = trans->getInputInfo()->getTargets();
-                base["translators"].append(std::move(tran));
+                base["translators"].push_back(std::move(tran));
             }
         }
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_time") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -450,18 +450,18 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "dependency_graph") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
-        base["dependents"] = Json::arrayValue;
+        base["dependents"] = nlohmann::json::array();
         for (auto& dep : mCoord.getDependents()) {
-            base["dependents"].append(dep.baseValue());
+            base["dependents"].push_back(dep.baseValue());
         }
-        base["dependencies"] = Json::arrayValue;
+        base["dependencies"] = nlohmann::json::array();
         for (auto& dep : mCoord.getDependencies()) {
-            base["dependencies"].append(dep.baseValue());
+            base["dependencies"].push_back(dep.baseValue());
         }
         return fileops::generateJsonString(base);
     }

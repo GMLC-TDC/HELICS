@@ -866,7 +866,7 @@ received
     void registerConnectorInterfacesToml(const std::string& tomlString);
     /** check if a filter type and operation is valid
      */
-    void registerConnectorInterfacesJsonDetail(Json::Value& json);
+    void registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& json);
     bool
         checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation) const;
 };

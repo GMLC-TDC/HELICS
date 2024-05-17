@@ -194,7 +194,7 @@ namespace helics::core {
 
 std::string systemInfo()
 {
-    Json::Value base;
+    nlohmann::json base;
     base["version"]["string"] = helics::versionString;
     base["version"]["major"] = helics::versionMajor;
     base["version"]["minor"] = helics::versionMinor;
@@ -202,11 +202,11 @@ std::string systemInfo()
     base["version"]["build"] = helics::versionBuild;
     base["buildflags"] = helics::buildFlags;
     base["compiler"] = helics::compiler;
-    base["cores"] = Json::arrayValue;
+    base["cores"] = nlohmann::json::array();
 
     auto ctypesA = CoreFactory::getAvailableCoreTypes();
     for (const auto& ctype : ctypesA) {
-        base["cores"].append(ctype);
+        base["cores"].push_back(ctype);
     }
     auto cpumodel = getCPUModel();
     if (!cpumodel.empty()) {

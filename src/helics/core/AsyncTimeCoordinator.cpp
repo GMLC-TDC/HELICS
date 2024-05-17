@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
-#include "json/json.h"
+#include "json/json.hpp"
 #include <algorithm>
 #include <fmt/format.h>
 #include <iostream>
@@ -29,7 +29,7 @@ bool AsyncTimeCoordinator::updateTimeFactors()
     return false;
 }
 
-void AsyncTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
+void AsyncTimeCoordinator::generateDebuggingTimeInfo(nlohmann::json& base) const
 {
     base["type"] = "global";
     base["nextEvent"] = static_cast<double>(nextEvent);

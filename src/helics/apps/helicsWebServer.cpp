@@ -144,13 +144,12 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
     }
     if (!body.empty()) {
         if (body.front() == '{') {
-            Json::Value val = helics::fileops::loadJsonStr(body);
-            auto mnames = val.getMemberNames();
-            for (auto& vb : mnames) {
-                if (val[vb].isString()) {
-                    results.second[vb] = val[vb].asString();
+            nlohmann::json val = helics::fileops::loadJsonStr(body);
+            for (auto& vb : val.items()) {
+                if (vb.value().is_string()) {
+                    results.second[vb.key()] = vb.value().get<std::string>();
                 } else {
-                    results.second[vb] = helics::fileops::generateJsonString(val[vb]);
+                    results.second[vb.key()] = helics::fileops::generateJsonString(vb.value());
                 }
             }
         } else {
@@ -203,17 +202,17 @@ void partitionTarget(std::string_view target,
 std::string getBrokerList()
 {
     auto brks = helics::BrokerFactory::getAllBrokers();
-    Json::Value base;
-    base["brokers"] = Json::arrayValue;
+    nlohmann::json base;
+    base["brokers"] = nlohmann::json::array();
     for (auto& brk : brks) {
-        Json::Value brokerBlock;
+        nlohmann::json brokerBlock;
 
         brokerBlock["name"] = brk->getIdentifier();
         brokerBlock["address"] = brk->getAddress();
         brokerBlock["isConnected"] = brk->isConnected();
         brokerBlock["isOpen"] = brk->isOpenToNewFederates();
         brokerBlock["isRoot"] = brk->isRoot();
-        base["brokers"].append(brokerBlock);
+        base["brokers"].push_back(brokerBlock);
     }
     return helics::fileops::generateJsonString(base);
 }
@@ -391,7 +390,7 @@ std::pair<RequestReturnVal, std::string>
                 return {RequestReturnVal::BAD_REQUEST, "unable to create broker"};
                 // return send(bad_request("unable to create broker"));
             }
-            Json::Value retJson;
+            nlohmann::json retJson;
             retJson["broker"] = brokerName;
             if (useUuid) {
                 retJson["broker_uuid"] = brokerName;
@@ -587,7 +586,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                                                      shared_from_this()));
             return;
         }
-        Json::Value response;
+        nlohmann::json response;
         switch (res.first) {
             case RequestReturnVal::BAD_REQUEST:
                 response["status"] = static_cast<int>(http::status::bad_request);
@@ -942,7 +941,7 @@ class Listener: public std::enable_shared_from_this<Listener> {
 
 //------------------------------------------------------------------------------
 
-static const Json::Value null;
+static const nlohmann::json null;
 
 namespace helics::apps {
 
@@ -1002,7 +1001,8 @@ void WebServer::processArgs(std::string_view args)
     }
 }
 
-void WebServer::startServer(const Json::Value* val, const std::shared_ptr<TypedBrokerServer>& ptr)
+void WebServer::startServer(const nlohmann::json* val,
+                            const std::shared_ptr<TypedBrokerServer>& ptr)
 {
     logMessage("starting broker web server");
     config = (val != nullptr) ? val : &null;
@@ -1041,7 +1041,7 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
 {
     if (mHttpEnabled) {
         auto httpInterfaceNetwork = mInterfaceNetwork;
-        if (config->isMember("http")) {
+        if (config->contains("http")) {
             auto V = (*config)["http"];
             helics::fileops::replaceIfMember(V, "interface", mHttpAddress);
             helics::fileops::replaceIfMember(V, "port", mHttpPort);
@@ -1078,7 +1078,7 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
 
     if (mWebsocketEnabled) {
         auto websocketInterfaceNetwork = mInterfaceNetwork;
-        if (config->isMember("websocket")) {
+        if (config->contains("websocket")) {
             auto V = (*config)["websocket"];
             helics::fileops::replaceIfMember(V, "interface", mWebsocketAddress);
             helics::fileops::replaceIfMember(V, "port", mWebsocketPort);

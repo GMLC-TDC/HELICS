@@ -15,13 +15,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 #include <vector>
 
-namespace Json {
-class Value;
-}
-
 namespace helics {
 class ActionMessage;
 class helicsCLI11App;
+
+namespace fileops {
+    class JsonStorage;
+}
 
 using portData = std::vector<std::tuple<int, bool, std::shared_ptr<Broker>>>;
 
@@ -74,7 +74,7 @@ communication methods*/
         std::vector<std::shared_ptr<TypedBrokerServer>> servers;
         std::string configFile_;
         std::string server_name_;
-        std::unique_ptr<Json::Value> config_;
+        std::unique_ptr<fileops::JsonStorage> config_;
         std::string mHttpArgs;
         std::string mWebSocketArgs;
         std::string mZmqArgs;
