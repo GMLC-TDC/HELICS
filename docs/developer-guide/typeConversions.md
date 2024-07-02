@@ -105,6 +105,7 @@ There are defined conversions from all known available types to all others.
 - BOOL -> (val!=0)?"1":"0"
 
 [^1]: conversion to double is lossless only if the value actually fits in a double mantissa value.
+
 [^2]: for a named point conversion, if the value doesn't fit in double the string translation is placed in the string field and a NaN value in the value segment to ensure no data loss.
 
 ### Conversion from String
@@ -155,7 +156,9 @@ Similar to getDoubleFromString in conversion of vectors. It will convert most re
 - BOOL -> (vectorNorm(val)!=0)?"1":"0"
 
 [^3]: vectorNorm is the sqrt of the inner product of the vector.
+
 [^4]: vectorString is comma-separated string of the numerical values enclosed in `[]`, for example `[45.7,22.7,17.8]`. This is a JSON compatible string format.
+
 [^5]: if the vector is a single element the NAMED_POINT translation is equivalent to a double translation.
 
 ### Conversion from Complex Vector
