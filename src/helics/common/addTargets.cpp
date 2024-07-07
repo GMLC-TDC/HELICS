@@ -10,12 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "JsonProcessingFunctions.hpp"
 #include "TomlProcessingFunctions.hpp"
 
+#include <cstdint>
+#include <functional>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
-#include <functional>
-#include <string_view>
-#include <cstdint>
 
 namespace helics {
 
@@ -75,7 +75,8 @@ static std::pair<std::string, std::string> getTagPair(const TV& tagValue)
     const std::string name = fileops::getName(tagValue);
     if (name.empty()) {
     } else {
-        const std::string val = fileops::getOrDefault(tagValue, std::string("value"), std::string_view{});
+        const std::string val =
+            fileops::getOrDefault(tagValue, std::string("value"), std::string_view{});
         return std::make_pair(name, val);
     }
 
@@ -112,8 +113,9 @@ void loadTags(const Json::Value& section,
                 auto names = tagValue.getMemberNames();
                 for (auto& name : names) {
                     tagAction(name,
-                              (tagValue[name].isString()) ? tagValue[name].asString() :
-                                                      fileops::generateJsonString(tagValue[name]));
+                              (tagValue[name].isString()) ?
+                                  tagValue[name].asString() :
+                                  fileops::generateJsonString(tagValue[name]));
                 }
             }
         } else if (tagValue.isString()) {
