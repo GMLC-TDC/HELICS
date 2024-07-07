@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <string_view>
 
 namespace helics::apps {
 
