@@ -29,7 +29,7 @@ void processOptions(const toml::value& section,
         if (telement.second.is_array() || telement.second.is_table()) {
             continue;
         }
-        int32_t index = optionConversion(telement.first);
+        const int32_t index = optionConversion(telement.first);
         if (index >= 0) {
             int32_t val = -1;
             if (telement.second.is_boolean()) {
@@ -91,9 +91,9 @@ void loadTags(const Json::Value& section,
         if (tagValue.isArray()) {
             for (auto& tagPair : tagValue) {
                 if (tagPair.isObject()) {
-                    auto pv = getTagPair(tagPair);
-                    if (!pv.first.empty()) {
-                        tagAction(pv.first, pv.second);
+                    auto pairValues = getTagPair(tagPair);
+                    if (!pairValues.first.empty()) {
+                        tagAction(pairValues.first, pairValues.second);
                     }
                 } else if (tagPair.isArray()) {
                     if (tagPair.size() > 1) {
@@ -131,9 +131,9 @@ void loadTags(const toml::value& section,
         auto tagValue = section.at("tags");
         if (tagValue.is_array()) {
             for (std::size_t ii = 0; ii < tagValue.size(); ++ii) {
-                auto pv = getTagPair(tagValue[ii]);
-                if (!pv.first.empty()) {
-                    tagAction(pv.first, pv.second);
+                auto tagPair = getTagPair(tagValue[ii]);
+                if (!tagPair.first.empty()) {
+                    tagAction(tagPair.first, tagPair.second);
                 }
             }
         } else {
