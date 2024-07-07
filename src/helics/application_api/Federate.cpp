@@ -132,7 +132,7 @@ Federate::~Federate()
         // LCOV_EXCL_START
         catch (...)  // do not allow a throw inside the destructor
         {
-            //finalize may throw but we can't allow that
+            // finalize may throw but we can't allow that
             ;
         }
         // LCOV_EXCL_STOP
