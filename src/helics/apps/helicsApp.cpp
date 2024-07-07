@@ -181,7 +181,7 @@ std::vector<int> AppTextParser::preParseFile(const std::vector<char>& klines)
         }
 
         ++counts[0];
-        for (int ii = 0; ii < klines.size(); ++ii) {
+        for (std::size_t ii = 0; ii < klines.size(); ++ii) {
             if (str[fc] == klines[ii]) {
                 ++counts[ii + 1];
             }

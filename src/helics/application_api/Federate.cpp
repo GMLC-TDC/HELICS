@@ -1542,7 +1542,7 @@ void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
         registerConnectorInterfacesJsonDetail(json["helics"]);
     }
 
-    if (json.isMember("potential_interfaces")) {
+    if (json.isMember("potential_interfaces") || json.isMember("potential_interface_templates")) {
         if (!potManager) {
             potManager = std::make_unique<PotentialInterfacesManager>(coreObject.get(), this);
         }

@@ -1259,6 +1259,11 @@ TEST(valuefederate, file_and_config)
     Fed2->enterExecutingModeAsync();
     Fed1->enterExecutingModeComplete();
 
+    //check some tags
+    EXPECT_EQ(Fed1->getTag("tag1"),"1");
+    EXPECT_EQ(Fed1->getTag("tag2"),"1");
+    EXPECT_EQ(Fed1->getTag("tag3"),"1");
+
     EXPECT_TRUE(Fed2->getFlagOption(HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE));
     pub1.publish(std::complex<double>(1, 2));
 

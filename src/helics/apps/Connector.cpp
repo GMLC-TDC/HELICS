@@ -119,13 +119,23 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
         intermediaries.push_back(templateName.substr(0, tnameIndex));
     }
     std::vector<std::string> valueNames;
-    int index{0};
+    std::size_t index{0};
     while (tnameIndex != std::string::npos) {
         auto close = templateName.find_first_of('}', tnameIndex);
         const std::string tname = templateName.substr(tnameIndex + 2, close - tnameIndex - 2);
-        if (!iTemplate.isMember(tname)) {
-            return false;
+        if (iTemplate.isMember("fields"))
+        {
+            if (!iTemplate["fields"].isMember(tname)) {
+                return false;
+            }
         }
+        else
+        {
+            if (!iTemplate.isMember(tname)) {
+                return false;
+            }
+        }
+        
         valueNames.push_back(tname);
 
         tnameIndex = templateName.find("${", close + 1);
@@ -143,13 +153,15 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
 
     templatePossibilities.resize(valueNames.size());
     keys.resize(valueNames.size());
+    const Json::Value &fieldRoot=(iTemplate.isMember("fields"))?iTemplate["fields"]:iTemplate;
+
     for (index = 0; index < valueNames.size(); ++index) {
-        for (const auto& val : iTemplate[valueNames[index]]) {
-            std::pair<std::string, std::string> typeAndUnits;
-            std::string_view keyval;
-            if (val.isArray()) {
-                keyval = keys[index].emplace_back(val[0].asCString());
-                switch (val.size()) {
+            for (const auto& val : fieldRoot[valueNames[index]]) {
+                std::pair<std::string, std::string> typeAndUnits;
+                std::string_view keyval;
+                if (val.isArray()) {
+                    keyval = keys[index].emplace_back(val[0].asCString());
+                    switch (val.size()) {
                     case 1:
                         break;
                     case 2:
@@ -160,13 +172,15 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
                         typeAndUnits.first = val[1].asString();
                         typeAndUnits.second = val[2].asString();
                         break;
+                    }
                 }
-            } else {
-                keyval = keys[index].emplace_back(val.asCString());
+                else {
+                    keyval = keys[index].emplace_back(val.asCString());
+                }
+                templatePossibilities[index].emplace(keyval, typeAndUnits);
             }
-            templatePossibilities[index].emplace(keyval, typeAndUnits);
         }
-    }
+    
     initialize();
     return true;
 }
@@ -594,15 +608,15 @@ Connector::Connector(std::string_view appName, const FederateInfo& fedInfo):
 }
 
 Connector::Connector(std::string_view appName,
-                     const std::shared_ptr<Core>& core,
+                     const std::shared_ptr<Core>& coreObj,
                      const FederateInfo& fedInfo):
-    App(appName, core, fedInfo), core((fed) ? fed->getCorePointer() : nullptr)
+    App(appName, coreObj, fedInfo), core((fed) ? fed->getCorePointer() : nullptr)
 {
     initialSetup();
 }
 
-Connector::Connector(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
-    App(appName, core, fedInfo), core((fed) ? fed->getCorePointer() : nullptr)
+Connector::Connector(std::string_view appName, CoreApp& coreObj, const FederateInfo& fedInfo):
+    App(appName, coreObj, fedInfo), core((fed) ? fed->getCorePointer() : nullptr)
 {
     initialSetup();
 }
@@ -645,7 +659,7 @@ bool Connector::addConnectionVector(const std::vector<std::string>& connection)
         newTags.push_back(connection[2]);
     }
 
-    for (int ii = 3; ii < connection.size(); ++ii) {
+    for (std::size_t ii = 3; ii < connection.size(); ++ii) {
         newTags.push_back(connection[ii]);
     }
     addConnection(connection[0], connection[1], direction, newTags);
@@ -664,7 +678,7 @@ void Connector::addConnection(std::string_view interface1,
     }
     auto iview1 = addInterface(interface1);
     auto iview2 = addInterface(interface2);
-    Connection conn{iview1, iview2, direction, std::move(svtags)};
+    Connection conn{iview1, iview2, direction, std::move(svtags),nullptr};
     if (iview1.compare(0, 6, "REGEX:") == 0) {
         switch (direction) {
             case InterfaceDirection::TO_FROM:

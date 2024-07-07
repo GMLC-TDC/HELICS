@@ -86,23 +86,47 @@ void loadTags(const Json::Value& section,
         auto tv = section["tags"];
         if (tv.isArray()) {
             for (auto& tp : tv) {
-                auto pv = getTagPair(tp);
-                if (!pv.first.empty()) {
-                    tagAction(pv.first, pv.second);
+                if (tp.isObject())
+                {
+                    auto pv = getTagPair(tp);
+                    if (!pv.first.empty()) {
+                        tagAction(pv.first, pv.second);
+                    }
                 }
+                else if (tp.isArray())
+                {
+                    if (tp.size() > 1)
+                    {
+                        tagAction(tp[0].asString(), tp[1].asString());
+                    }
+                    else
+                    {
+                        tagAction(tp[0].asString(), "1");
+                    }
+                }
+                else if (tp.isString())
+                {
+                    tagAction(tp.asString(), "1");
+                }
+
             }
-        } else {
+        }
+        else if (tv.isObject()){
             auto pv = getTagPair(tv);
             if (!pv.first.empty()) {
                 tagAction(pv.first, pv.second);
-            } else if (tv.isObject()) {
+            }
+            else if (tv.isObject()) {
                 auto names = tv.getMemberNames();
                 for (auto& name : names) {
                     tagAction(name,
-                              (tv[name].isString()) ? tv[name].asString() :
-                                                      fileops::generateJsonString(tv[name]));
+                        (tv[name].isString()) ? tv[name].asString() :
+                        fileops::generateJsonString(tv[name]));
                 }
             }
+        }
+        else if (tv.isString()) {
+            tagAction("tags",tv.asString());
         }
     }
 }

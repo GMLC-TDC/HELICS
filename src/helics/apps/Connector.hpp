@@ -57,18 +57,18 @@ class HELICS_CXX_EXPORT Connector: public App {
     explicit Connector(std::string_view name, const FederateInfo& fedInfo);
     /**constructor taking a federate information structure and using the given core
 @param name the name of the federate (can be empty to use defaults from fedInfo)
-@param core a pointer to core object which the federate can join
+@param coreObj a pointer to core object which the federate can join
 @param fedInfo  a federate information structure
 */
     Connector(std::string_view name,
-              const std::shared_ptr<Core>& core,
+              const std::shared_ptr<Core>& coreObj,
               const FederateInfo& fedInfo);
     /**constructor taking a federate information structure and using the given core
 @param name the name of the federate (can be empty to use defaults from fedInfo)
-@param core a coreApp object that can be joined
+@param coreObj a coreApp object that can be joined
 @param fedInfo  a federate information structure
 */
-    Connector(std::string_view name, CoreApp& core, const FederateInfo& fedInfo);
+    Connector(std::string_view name, CoreApp& coreObj, const FederateInfo& fedInfo);
     /**constructor taking a file with the required information
 @param appName the name of the app
 @param configString JSON, TOML or text file or JSON string defining the federate information and
