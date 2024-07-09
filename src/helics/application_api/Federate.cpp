@@ -132,6 +132,8 @@ Federate::~Federate()
         // LCOV_EXCL_START
         catch (...)  // do not allow a throw inside the destructor
         {
+            // finalize may throw but we can't allow that
+            ;
         }
         // LCOV_EXCL_STOP
     }
@@ -1542,7 +1544,7 @@ void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
         registerConnectorInterfacesJsonDetail(json["helics"]);
     }
 
-    if (json.isMember("potential_interfaces")) {
+    if (json.isMember("potential_interfaces") || json.isMember("potential_interface_templates")) {
         if (!potManager) {
             potManager = std::make_unique<PotentialInterfacesManager>(coreObject.get(), this);
         }
@@ -2060,9 +2062,9 @@ void Federate::logMessage(int level, std::string_view message) const
     if (coreObject) {
         coreObject->logMessage(fedID, level, message);
     } else if (level <= HELICS_LOG_LEVEL_WARNING) {
-        std::cerr << message << std::endl;
+        std::cerr << message << '\n';
     } else {
-        std::cout << message << std::endl;
+        std::cout << message << '\n';
     }
 }
 

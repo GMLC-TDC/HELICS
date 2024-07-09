@@ -391,6 +391,37 @@ TEST(connector_potential_interfaces, pub_input_template)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
+TEST(connector_potential_interfaces, pub_input_template3)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = newCoreName("ccore_template");
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+    conn1.addConnection("obj2/type1", "objA/typeC", InterfaceDirection::FROM_TO);
+    helics::ValueFederate vfed("c1", fedInfo);
+    vfed.registerInterfaces(std::string(testdir) + "simple_interfaces_templates3.json");
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    vfed.enterExecutingMode();
+    EXPECT_EQ(vfed.getPublicationCount(), 1);
+    EXPECT_EQ(vfed.getInputCount(), 1);
+    auto& pub1 = vfed.getPublication(0);
+    auto& inp1 = vfed.getInput(0);
+    const double testValue = 3452.562;
+    EXPECT_EQ(pub1.getDestinationTargetCount(), 1);
+    pub1.publish(testValue);
+    auto retTime = vfed.requestTime(5);
+    EXPECT_EQ(retTime, 1.0);
+    auto val = inp1.getDouble();
+    EXPECT_EQ(val, testValue);
+
+    vfed.finalize();
+    fut.get();
+    EXPECT_EQ(conn1.madeConnections(), 1);
+}
+
 TEST(connector_potential_interfaces, input_pub_template)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
