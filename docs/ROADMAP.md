@@ -27,5 +27,4 @@ This document contains tentative plans for changes and improvements of note in u
 - Some sort of rollback operations
 - Remote procedure call type of federate
 - Plugin architecture for user defined cores
-- Separate octave interface
 - Enable mesh networking in HELICS

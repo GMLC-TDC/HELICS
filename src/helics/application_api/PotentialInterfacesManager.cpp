@@ -24,34 +24,55 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
 {
     static const std::set<std::string> interfaceTypes{
         "publications", "inputs", "endpoints", "filters", "translators", "datasinks"};
-    if (!json.isMember("potential_interfaces")) {
-        return;
-    }
-    const auto& interfaces = json["potential_interfaces"];
-    for (const auto& itype : interfaceTypes) {
-        if (interfaces.isMember(itype)) {
-            auto tInterface = interfaces[itype];
-            auto& pMap = potInterfaces[itype];
-            for (auto& ispec : tInterface) {
-                auto name = fileops::getName(ispec);
-                pMap[name] = ispec;
+    if (json.isMember("potential_interfaces")) {
+        const auto& interfaces = json["potential_interfaces"];
+        for (const auto& itype : interfaceTypes) {
+            if (interfaces.isMember(itype)) {
+                auto tInterface = interfaces[itype];
+                auto& pMap = potInterfaces[itype];
+                for (auto& ispec : tInterface) {
+                    auto name = fileops::getName(ispec);
+                    pMap[name] = ispec;
+                }
+            }
+            std::string tempString = itype;
+            tempString.pop_back();
+            tempString += "_templates";
+            if (interfaces.isMember(tempString)) {
+                auto templateInterfaces = interfaces[tempString];
+                auto& tMap = potInterfaceTemplates[itype];
+                for (auto& tspec : templateInterfaces) {
+                    auto name = fileops::getName(tspec);
+                    if (name.find("}${") != std::string::npos) {
+                        throw(helics::InvalidParameter(
+                            std::string(
+                                "template key definitions must not be adjacent, they must have separator characters [") +
+                            name + ']'));
+                    }
+                    tMap[name] = tspec;
+                }
             }
         }
-        std::string tempString = itype;
-        tempString.pop_back();
-        tempString += "_templates";
-        if (interfaces.isMember(tempString)) {
-            auto templateInterfaces = interfaces[tempString];
-            auto& tMap = potInterfaceTemplates[itype];
-            for (auto& tspec : templateInterfaces) {
-                auto name = fileops::getName(tspec);
-                if (name.find("}${") != std::string::npos) {
-                    throw(helics::InvalidParameter(
-                        std::string(
-                            "template key definitions must not be adjacent, they must have separator characters [") +
-                        name + ']'));
+    }
+    if (json.isMember("potential_interface_templates")) {
+        const auto& interfaces = json["potential_interface_templates"];
+        for (const auto& itype : interfaceTypes) {
+            std::string tempString = itype;
+            tempString.pop_back();
+            tempString += "_templates";
+            if (interfaces.isMember(tempString)) {
+                auto templateInterfaces = interfaces[tempString];
+                auto& tMap = potInterfaceTemplates[itype];
+                for (auto& tspec : templateInterfaces) {
+                    auto name = fileops::getName(tspec);
+                    if (name.find("}${") != std::string::npos) {
+                        throw(helics::InvalidParameter(
+                            std::string(
+                                "template key definitions must not be adjacent, they must have separator characters [") +
+                            name + ']'));
+                    }
+                    tMap[name] = tspec;
                 }
-                tMap[name] = tspec;
             }
         }
     }

@@ -114,7 +114,7 @@ class CloningFilter: public Filter {
     /** construct from underlying filter object*/
     explicit CloningFilter(HelicsFilter hfilt) HELICS_NOTHROW: Filter(hfilt) {}
     /** default constructor*/
-    CloningFilter() HELICS_NOTHROW{};
+    CloningFilter() HELICS_NOTHROW {};
     /** copy constructor*/
     CloningFilter(const CloningFilter& filter): Filter(filter) {}
     /** copy assignment*/
