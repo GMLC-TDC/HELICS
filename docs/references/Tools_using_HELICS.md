@@ -58,7 +58,6 @@ Check the corresponding links for more information.
 - [GasModels.jl](https://github.com/lanl-ansi/GasModels.jl).
 - [SAInt](https://encoord.com/SAInt.html) is a commercial tool that includes detailed support for natural gas simulation and planning in addition to other energy systems. See additional information, including a gas-grid use case, under Electric Transmission System Simulation above.
 
-
 ## Optimization packages
 
 - [GAMS](https://www.gams.com/).
