@@ -326,7 +326,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     return issues;
 }
 
-void InterfaceInfo::getUnconnectedInterfaces(nlohmann::json & base) const
+void InterfaceInfo::getUnconnectedInterfaces(nlohmann::json& base) const
 {
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {

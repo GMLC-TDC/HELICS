@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
-
 #include "nlohmann/json_fwd.hpp"
+
 #include <atomic>
 #include <functional>
 #include <string>

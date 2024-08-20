@@ -18,9 +18,8 @@ namespace CLI {
 class App;
 }  // namespace CLI
 
-namespace helics::fileops
-{
-    class JsonBuffer;
+namespace helics::fileops {
+class JsonBuffer;
 }
 namespace helics::apps {
 

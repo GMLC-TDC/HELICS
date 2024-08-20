@@ -18,11 +18,11 @@ and some common methods used cores and brokers
 #include <atomic>
 #include <limits>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
-#include <nlohmann/json_fwd.hpp>
 
 namespace spdlog {
 class logger;

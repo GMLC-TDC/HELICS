@@ -40,6 +40,6 @@ class LogBuffer {
 };
 
 /** helper function to write a log buffer to a json object*/
-void bufferToJson(const LogBuffer& buffer, nlohmann::json &base);
+void bufferToJson(const LogBuffer& buffer, nlohmann::json& base);
 
 }  // namespace helics

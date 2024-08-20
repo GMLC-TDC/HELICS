@@ -45,7 +45,7 @@ bool addTargets(const toml::value& section, std::string targetName, Callable cal
 }
 
 template<typename Callable>
-bool addTargets(const nlohmann::json & section, std::string targetName, Callable callback)
+bool addTargets(const nlohmann::json& section, std::string targetName, Callable callback)
 {
     bool found{false};
     // There should probably be a static_assert here but there isn't a nice type trait to check that
@@ -91,12 +91,12 @@ void processOptions(const toml::value& section,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction);
 
-void processOptions(const nlohmann::json & section,
+void processOptions(const nlohmann::json& section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction);
 
-void loadTags(const nlohmann::json & section,
+void loadTags(const nlohmann::json& section,
               const std::function<void(std::string_view, std::string_view)>& tagAction);
 
 void loadTags(const toml::value& section,

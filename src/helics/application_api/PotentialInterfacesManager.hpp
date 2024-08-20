@@ -9,13 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <deque>
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <nlohmann/json_fwd.hpp>
-
 
 namespace helics {
 class Core;

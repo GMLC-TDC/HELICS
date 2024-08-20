@@ -7,11 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "queryHelpers.hpp"
 
-#include <nlohmann/json.hpp>
 #include "../common/JsonProcessingFunctions.hpp"
 #include "FederateState.hpp"
 #include "HandleManager.hpp"
 #include "InterfaceInfo.hpp"
+
+#include <nlohmann/json.hpp>
 
 namespace helics {
 
@@ -44,7 +45,8 @@ void addFederateTags(nlohmann::json& v, const FederateState* fed)
     }
 }
 
-static void storeEndpoint(const BasicHandleInfo& handle, nlohmann::json & block, bool includeID = false)
+static void
+    storeEndpoint(const BasicHandleInfo& handle, nlohmann::json& block, bool includeID = false)
 {
     nlohmann::json ept = nlohmann::json::object();
     ept["name"] = handle.key;
@@ -128,7 +130,8 @@ static void
     block["translators"].push_back(trans);
 }
 
-static void storeFilter(const BasicHandleInfo& handle, nlohmann::json& block, bool includeID = false)
+static void
+    storeFilter(const BasicHandleInfo& handle, nlohmann::json& block, bool includeID = false)
 {
     nlohmann::json filt = nlohmann::json::object();
     filt["name"] = handle.key;
@@ -143,7 +146,7 @@ static void storeFilter(const BasicHandleInfo& handle, nlohmann::json& block, bo
 }
 
 nlohmann::json generateInterfaceConfig(const helics::HandleManager& hm,
-                                    const helics::GlobalFederateId& fed)
+                                       const helics::GlobalFederateId& fed)
 {
     nlohmann::json iblock;
     generateInterfaceConfig(iblock, hm, fed);
@@ -209,7 +212,7 @@ void generateInterfaceConfig(nlohmann::json& iblock,
 std::string generateInterfaceQueryResults(std::string_view request,
                                           const HandleManager& handles,
                                           const GlobalFederateId fed,
-                                          const std::function<void(nlohmann::json &)>& addHeaderInfo)
+                                          const std::function<void(nlohmann::json&)>& addHeaderInfo)
 {
     if (request == "inputs") {
         return generateStringVector_if(

@@ -46,13 +46,13 @@ void processOptions(const toml::value& section,
     }
 }
 
-void processOptions(const nlohmann::json & section,
+void processOptions(const nlohmann::json& section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction)
 {
     auto stop = section.end();
-    for (const auto& [key, value]: section.items()) {
+    for (const auto& [key, value] : section.items()) {
         if (value.is_array() || value.is_object()) {
             continue;
         }
@@ -85,7 +85,7 @@ static std::pair<std::string, std::string> getTagPair(const TV& tagValue)
     return std::make_pair(std::string{}, std::string{});
 }
 
-void loadTags(const nlohmann::json & section,
+void loadTags(const nlohmann::json& section,
               const std::function<void(std::string_view, std::string_view)>& tagAction)
 {
     if (section.contains("tags")) {
@@ -100,7 +100,7 @@ void loadTags(const nlohmann::json & section,
                         tagAction(JsonAsString(tagPair[0]), JsonAsString(tagPair[1]));
                     } else {
                         tagAction(JsonAsString(tagPair[0]), "1");
-            }
+                    }
                 } else if (tagPair.is_string()) {
                     tagAction(tagPair.get<std::string>(), "1");
                 }

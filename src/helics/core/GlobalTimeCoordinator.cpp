@@ -162,7 +162,7 @@ TimeProcessingResult GlobalTimeCoordinator::processTimeMessage(const ActionMessa
     return res;
 }
 
-void GlobalTimeCoordinator::generateDebuggingTimeInfo(nlohmann::json & base) const
+void GlobalTimeCoordinator::generateDebuggingTimeInfo(nlohmann::json& base) const
 {
     base["type"] = "global";
     base["nextEvent"] = static_cast<double>(nextEvent);

@@ -7,11 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <nlohmann/json_fwd.hpp>
 
 namespace helics::fileops {
 
@@ -77,6 +76,5 @@ class JsonBuilder {
     /** reset the builder*/
     void reset();
 };
-
 
 }  // namespace helics::fileops

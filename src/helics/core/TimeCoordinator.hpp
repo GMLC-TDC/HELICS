@@ -10,9 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include "BaseTimeCoordinator.hpp"
 
-#include <nlohmann/json_fwd.hpp>
 #include <atomic>
 #include <functional>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -234,7 +234,7 @@ class TimeCoordinator: public BaseTimeCoordinator {
     void generateConfig(nlohmann::json& base) const;
 
     /** generate debugging time information*/
-    virtual void generateDebuggingTimeInfo(nlohmann::json & base) const override;
+    virtual void generateDebuggingTimeInfo(nlohmann::json& base) const override;
 
     /** get a count of the active dependencies*/
     std::pair<GlobalFederateId, Time> getMinGrantedDependency() const;

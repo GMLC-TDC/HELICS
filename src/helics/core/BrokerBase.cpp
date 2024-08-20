@@ -546,7 +546,7 @@ std::pair<bool, std::vector<std::string_view>>
     return {true, res};
 }
 
-void BrokerBase::addBaseInformation(nlohmann::json & base, bool hasParent) const
+void BrokerBase::addBaseInformation(nlohmann::json& base, bool hasParent) const
 {
     nlohmann::json object;
     object["name"] = identifier;

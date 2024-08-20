@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <string_view>
 
-
 namespace helics {
 class MessageFederateManager;
 class Endpoint;

@@ -433,7 +433,7 @@ TEST_F(valuefed, dual_transfer_inputs_odd_name)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     // register the publications
-    std::string oddName(45,201);
+    std::string oddName(45, 201);
     auto& pub1 = vFed1->registerGlobalPublication<std::string>(oddName);
 
     auto& inpid = vFed2->registerInput<std::string>("inp1");

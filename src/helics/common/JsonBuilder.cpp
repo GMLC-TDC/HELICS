@@ -19,7 +19,7 @@ JsonMapBuilder::JsonMapBuilder() noexcept {}
 
 JsonMapBuilder::~JsonMapBuilder() = default;
 
-nlohmann::json & JsonMapBuilder::getJValue()
+nlohmann::json& JsonMapBuilder::getJValue()
 {
     if (!jMap) {
         jMap = std::make_unique<nlohmann::json>();

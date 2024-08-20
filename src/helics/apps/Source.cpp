@@ -86,8 +86,9 @@ namespace apps {
         }
     }
 
-    static void
-        setGeneratorProperty(SignalGenerator* gen, std::string_view name, const nlohmann::json& prop)
+    static void setGeneratorProperty(SignalGenerator* gen,
+                                     std::string_view name,
+                                     const nlohmann::json& prop)
     {
         if (prop.is_number()) {
             gen->set(name, prop.get<double>());

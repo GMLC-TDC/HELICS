@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "basic_CoreTypes.hpp"
-
 #include "nlohmann/json_fwd.hpp"
+
 #include <string>
 #include <utility>
 #include <vector>

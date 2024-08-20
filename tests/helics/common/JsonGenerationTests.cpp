@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/common/JsonGeneration.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "nlohmann/json.hpp"
+
 #include <gtest/gtest.h>
 
 using namespace helics;

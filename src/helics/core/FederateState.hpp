@@ -168,7 +168,7 @@ class FederateState {
     /** add a federate to the delayed list*/
     void addFederateToDelay(GlobalFederateId gid);
     /** generate a component of json config string*/
-    void generateConfig(nlohmann::json & base) const;
+    void generateConfig(nlohmann::json& base) const;
 
   public:
     /** reset the federate to created state*/

@@ -9,11 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsCLI11.hpp"
 
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <nlohmann/json_fwd.hpp>
 
 namespace helics {
 /// Define a JSON parser for the config files for CLI11
@@ -36,7 +35,7 @@ class HelicsConfigJSON: public CLI::ConfigBase {
     std::string mPromoteSection;
     /// Internal parser for the configuration
     std::vector<CLI::ConfigItem>
-        fromConfigInternal(const nlohmann::json &json,
+        fromConfigInternal(const nlohmann::json& json,
                            const std::string& name = {},
                            const std::vector<std::string>& prefix = {}) const;
 };

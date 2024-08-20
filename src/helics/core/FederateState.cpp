@@ -29,10 +29,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <utility>
-#include <sstream>
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "MessageTimer.hpp"
@@ -249,7 +249,7 @@ bool FederateState::checkAndSetValue(InterfaceHandle pub_id, const char* data, u
     return res;
 }
 
-void FederateState::generateConfig(nlohmann::json & base) const
+void FederateState::generateConfig(nlohmann::json& base) const
 {
     base["only_transmit_on_change"] = only_transmit_on_change;
     base["realtime"] = realtime;

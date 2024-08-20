@@ -1001,7 +1001,8 @@ void WebServer::processArgs(std::string_view args)
     }
 }
 
-void WebServer::startServer(const nlohmann::json* val, const std::shared_ptr<TypedBrokerServer>& ptr)
+void WebServer::startServer(const nlohmann::json* val,
+                            const std::shared_ptr<TypedBrokerServer>& ptr)
 {
     logMessage("starting broker web server");
     config = (val != nullptr) ? val : &null;

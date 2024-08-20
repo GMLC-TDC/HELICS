@@ -15,8 +15,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 #include <vector>
 
-
-
 namespace helics {
 class ActionMessage;
 class helicsCLI11App;

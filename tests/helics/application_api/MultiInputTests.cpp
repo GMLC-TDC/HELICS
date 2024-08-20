@@ -470,7 +470,7 @@ TEST_F(multiInput, vectorize_string)
     pub1.publish("test1");
     vFed1->requestNextStep();
     auto val = in1.getValue<std::string>();
-    EXPECT_NE(val.find("\"test1\""),std::string::npos);
+    EXPECT_NE(val.find("\"test1\""), std::string::npos);
     pub3.publish("test3");
     pub2.publish("test2");
 

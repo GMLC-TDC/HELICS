@@ -1391,7 +1391,8 @@ static void
                 if (prop["value"].is_number()) {
                     iface.set(prop["name"].get<std::string>(), prop["value"].get<double>());
                 } else {
-                    iface.setString(prop["name"].get<std::string>(), prop["value"].get<std::string>());
+                    iface.setString(prop["name"].get<std::string>(),
+                                    prop["value"].get<std::string>());
                 }
             }
         } else {
@@ -1406,7 +1407,8 @@ static void
                 if (props["value"].is_number()) {
                     iface.set(props["name"].get<std::string>(), props["value"].get<double>());
                 } else {
-                    iface.setString(props["name"].get<std::string>(), props["value"].get<std::string>());
+                    iface.setString(props["name"].get<std::string>(),
+                                    props["value"].get<std::string>());
                 }
             }
         }
@@ -1419,10 +1421,10 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
     registerConnectorInterfacesJsonDetail(fileops::JsonBuffer(doc));
 }
 
-void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer &jsonBuffer)
+void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuffer)
 {
     using fileops::getOrDefault;
-    auto &json=jsonBuffer.json();
+    auto& json = jsonBuffer.json();
     bool defaultGlobal = false;
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 

@@ -16,7 +16,7 @@ namespace helics {
 inline std::string generateJsonQuotedString(const std::string& string)
 {
     nlohmann::json V = string;
-    return V.dump(-1,' ',true,nlohmann::json::error_handler_t::hex);
+    return V.dump(-1, ' ', true, nlohmann::json::error_handler_t::hex);
 }
 
 enum class JsonErrorCodes : std::int32_t {

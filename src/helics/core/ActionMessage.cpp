@@ -322,18 +322,16 @@ std::string ActionMessage::to_json_string() const
         }
         packet["strings"] = std::move(sdata);
     }
-    try
-    {
-        return fileops::generateJsonString(packet,false);
+    try {
+        return fileops::generateJsonString(packet, false);
     }
-    catch (const nlohmann::json::type_error&)
-    {
-        packet["encoding"]="base64";
-        packet["payload"] = gmlc::utilities::base64_encode(payload.data(),payload.size());
+    catch (const nlohmann::json::type_error&) {
+        packet["encoding"] = "base64";
+        packet["payload"] = gmlc::utilities::base64_encode(payload.data(), payload.size());
         if (!stringData.empty()) {
             nlohmann::json sdata = nlohmann::json::array();
             for (const auto& str : stringData) {
-                sdata.push_back(gmlc::utilities::base64_encode(str.data(),str.size()));
+                sdata.push_back(gmlc::utilities::base64_encode(str.data(), str.size()));
             }
             packet["strings"] = std::move(sdata);
         }
@@ -610,7 +608,7 @@ bool ActionMessage::from_json_string(std::string_view data)
         dest_id = GlobalFederateId(val["destId"].get<int32_t>());
         source_handle = InterfaceHandle(val["sourceHandle"].get<int32_t>());
         dest_handle = InterfaceHandle(val["destHandle"].get<int32_t>());
-        counter =val["counter"].get<uint16_t>();
+        counter = val["counter"].get<uint16_t>();
         flags = val["flags"].get<uint16_t>();
         sequenceID = val["sequenceId"].get<uint32_t>();
         actionTime.setBaseTimeCode(val["actionTime"].get<int64_t>());
@@ -626,16 +624,13 @@ bool ActionMessage::from_json_string(std::string_view data)
             setString(ii, val["strings"][ii].get<std::string>());
         }
         bool base64_encoding{false};
-        if (val.contains("encoding") && val["encoding"].is_string())
-        {
-            base64_encoding=val["encoding"].get<std::string>()=="base64";
+        if (val.contains("encoding") && val["encoding"].is_string()) {
+            base64_encoding = val["encoding"].get<std::string>() == "base64";
         }
-        if (base64_encoding)
-        {
-            payload=gmlc::utilities::base64_decode_to_string(payload.to_string());
-            for (auto& stringd : stringData)
-            {
-                stringd=gmlc::utilities::base64_decode_to_string(stringd);
+        if (base64_encoding) {
+            payload = gmlc::utilities::base64_decode_to_string(payload.to_string());
+            for (auto& stringd : stringData) {
+                stringd = gmlc::utilities::base64_decode_to_string(stringd);
             }
         }
     }

@@ -13,36 +13,36 @@ them using the jsoncpp library
 
 #include "../core/helicsTime.hpp"
 
-#include <nlohmann/json.hpp>
 #include <functional>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <string_view>
 
 namespace helics::fileops {
 
-    /** class to make it easier to contain certain things and remove need for including the actual json library in the public headers*/
-    class JsonBuffer {
-    public:
-        JsonBuffer(const nlohmann::json& jref):reference(jref) {
-        }
+/** class to make it easier to contain certain things and remove need for including the actual json
+ * library in the public headers*/
+class JsonBuffer {
+  public:
+    JsonBuffer(const nlohmann::json& jref): reference(jref) {}
 
-        const nlohmann::json& json() const { return reference; }
-    private:
-        const nlohmann::json &reference;
+    const nlohmann::json& json() const { return reference; }
 
-    };
+  private:
+    const nlohmann::json& reference;
+};
 
-    /** class to make it easier to contain certain things and remove need for including the actual json library in the public headers*/
-    class JsonStorage {
-    public:
-        JsonStorage(const nlohmann::json& jref):jStorage(jref) {
-        }
-        nlohmann::json &json() { return jStorage; }
-        const nlohmann::json& json() const { return jStorage; }
-    private:
-        nlohmann::json jStorage;
+/** class to make it easier to contain certain things and remove need for including the actual json
+ * library in the public headers*/
+class JsonStorage {
+  public:
+    JsonStorage(const nlohmann::json& jref): jStorage(jref) {}
+    nlohmann::json& json() { return jStorage; }
+    const nlohmann::json& json() const { return jStorage; }
 
-    };
+  private:
+    nlohmann::json jStorage;
+};
 
 /** check if the file has a valid JSON extension*/
 bool hasJsonExtension(std::string_view jsonString);
@@ -65,7 +65,7 @@ helics::Time loadJsonTime(const nlohmann::json& timeElement,
 std::string getName(const nlohmann::json& element);
 
 /** generate a Json String*/
-std::string generateJsonString(const nlohmann::json& block, bool hexConvert=true);
+std::string generateJsonString(const nlohmann::json& block, bool hexConvert = true);
 
 inline std::string JsonAsString(const nlohmann::json& element)
 {
@@ -145,7 +145,8 @@ inline void
     }
 }
 
-inline void replaceIfMember(const nlohmann::json& element, const std::string& key, std::string& sval)
+inline void
+    replaceIfMember(const nlohmann::json& element, const std::string& key, std::string& sval)
 {
     if (element.contains(key)) {
         sval = element[key].get<std::string>();

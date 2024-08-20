@@ -248,9 +248,10 @@ Endpoint& MessageFederate::registerEndpoint(std::string_view eptName,
     return registerEndpoint(eptName, type);
 }
 
-void MessageFederate::registerMessageInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuff, bool defaultGlobal)
+void MessageFederate::registerMessageInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuff,
+                                                          bool defaultGlobal)
 {
-    const auto &json=jsonBuff.json();
+    const auto& json = jsonBuff.json();
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
     const bool defaultTargeted = fileops::getOrDefault(json, "targeted", false);
 

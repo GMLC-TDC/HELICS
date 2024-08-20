@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BaseTimeCoordinator.hpp"
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
-
 #include "nlohmann/json_fwd.hpp"
+
 #include <atomic>
 #include <functional>
 #include <string>
@@ -60,7 +60,7 @@ class AsyncTimeCoordinator: public BaseTimeCoordinator {
     /** generate a string with the current time status*/
     virtual std::string printTimeStatus() const override;
     /** generate debugging time information*/
-    virtual void generateDebuggingTimeInfo(nlohmann::json & base) const override;
+    virtual void generateDebuggingTimeInfo(nlohmann::json& base) const override;
 
     /** get the current next time*/
     virtual Time getNextTime() const override { return currentMinTime; }

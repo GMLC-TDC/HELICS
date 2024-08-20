@@ -87,12 +87,10 @@ nlohmann::json loadJson(const std::string& jsonString)
     std::ifstream file(jsonString);
 
     if (file.is_open()) {
-        try
-        {
-            return nlohmann::json::parse(file,nullptr, true, true);
+        try {
+            return nlohmann::json::parse(file, nullptr, true, true);
         }
-        catch (const nlohmann::json::parse_error& errs)
-        {
+        catch (const nlohmann::json::parse_error& errs) {
             throw(std::invalid_argument(errs.what()));
         }
     }
@@ -101,12 +99,10 @@ nlohmann::json loadJson(const std::string& jsonString)
 
 nlohmann::json loadJsonStr(std::string_view jsonString)
 {
-    try
-    {
-        return nlohmann::json::parse(jsonString.begin(),jsonString.end(),nullptr, true, true);
+    try {
+        return nlohmann::json::parse(jsonString.begin(), jsonString.end(), nullptr, true, true);
     }
-    catch (const nlohmann::json::parse_error& errs)
-    {
+    catch (const nlohmann::json::parse_error& errs) {
         throw(std::invalid_argument(errs.what()));
     }
 }
@@ -116,10 +112,12 @@ helics::Time loadJsonTime(const nlohmann::json& timeElement, time_units defaultU
 {
     if (timeElement.is_object()) {
         if (timeElement.contains("unit")) {
-            defaultUnits = gmlc::utilities::timeUnitsFromString(timeElement["unit"].get<std::string>());
+            defaultUnits =
+                gmlc::utilities::timeUnitsFromString(timeElement["unit"].get<std::string>());
         }
         if (timeElement.contains("units")) {
-            defaultUnits = gmlc::utilities::timeUnitsFromString(timeElement["units"].get<std::string>());
+            defaultUnits =
+                gmlc::utilities::timeUnitsFromString(timeElement["units"].get<std::string>());
         }
         if (timeElement.contains("value")) {
             if (timeElement["value"].is_number_integer()) {
@@ -129,7 +127,7 @@ helics::Time loadJsonTime(const nlohmann::json& timeElement, time_units defaultU
         }
         return helics::Time::minVal();
     }
-    if (timeElement.is_number_integer()||timeElement.is_number_unsigned()) {
+    if (timeElement.is_number_integer() || timeElement.is_number_unsigned()) {
         return {timeElement.get<std::int64_t>(), defaultUnits};
     }
     if (timeElement.is_number_float()) {
@@ -147,7 +145,11 @@ std::string getName(const nlohmann::json& element)
 
 std::string generateJsonString(const nlohmann::json& block, bool hexConvert)
 {
-    return block.dump(3, ' ', true,hexConvert?nlohmann::json::error_handler_t::hex:nlohmann::json::error_handler_t::strict);
+    return block.dump(3,
+                      ' ',
+                      true,
+                      hexConvert ? nlohmann::json::error_handler_t::hex :
+                                   nlohmann::json::error_handler_t::strict);
 }
 
 }  // namespace helics::fileops

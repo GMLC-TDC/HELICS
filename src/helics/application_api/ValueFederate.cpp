@@ -253,9 +253,10 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
     registerValueInterfacesJsonDetail(fileops::JsonBuffer(doc), false);
 }
 
-void ValueFederate::registerValueInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuff, bool defaultGlobal)
+void ValueFederate::registerValueInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuff,
+                                                      bool defaultGlobal)
 {
-    const auto & json=jsonBuff.json();
+    const auto& json = jsonBuff.json();
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 
     const nlohmann::json& iface = (json.contains("interfaces")) ? json["interfaces"] : json;
@@ -495,7 +496,7 @@ using dvalue = std::variant<double, std::string>;
 static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
                          const std::string& prefix,
                          char separator,
-                         const nlohmann::json &val)
+                         const nlohmann::json& val)
 {
     for (auto& item : val.items()) {
         auto& field = item.value();
