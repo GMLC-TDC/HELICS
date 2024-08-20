@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <fmt/format.h>
 #include <iostream>
-#include <json/json.hpp>
+#include <nlohmann/json.hpp>
 #include <set>
 #include <string>
 #include <vector>

@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PublicationInfo.hpp"
 #include "gmlc/containers/DualMappedPointerVector.hpp"
 
-#include "json/json_fwd.hpp"
+#include "nlohmann/json_fwd.hpp"
 #include <atomic>
 #include <string>
 #include <utility>

@@ -124,12 +124,12 @@ bool TemplateMatcher::loadTemplate(const nlohmann::json& iTemplate)
     while (tnameIndex != std::string::npos) {
         auto close = templateName.find_first_of('}', tnameIndex);
         const std::string tname = templateName.substr(tnameIndex + 2, close - tnameIndex - 2);
-        if (iTemplate.isMember("fields")) {
-            if (!iTemplate["fields"].isMember(tname)) {
+        if (iTemplate.contains("fields")) {
+            if (!iTemplate["fields"].contains(tname)) {
                 return false;
             }
         } else {
-            if (!iTemplate.isMember(tname)) {
+            if (!iTemplate.contains(tname)) {
             return false;
         }
         }
@@ -151,7 +151,7 @@ bool TemplateMatcher::loadTemplate(const nlohmann::json& iTemplate)
 
     templatePossibilities.resize(valueNames.size());
     keys.resize(valueNames.size());
-    const Json::Value& fieldRoot = (iTemplate.isMember("fields")) ? iTemplate["fields"] : iTemplate;
+    const nlohmann::json& fieldRoot = (iTemplate.contains("fields")) ? iTemplate["fields"] : iTemplate;
 
     for (index = 0; index < valueNames.size(); ++index) {
         for (const auto& val : fieldRoot[valueNames[index]]) {

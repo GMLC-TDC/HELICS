@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include "BaseTimeCoordinator.hpp"
 
-#include <json/json_fwd.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <atomic>
 #include <functional>
 #include <string>

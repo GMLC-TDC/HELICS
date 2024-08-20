@@ -22,7 +22,7 @@ and some common methods used cores and brokers
 #include <thread>
 #include <utility>
 #include <vector>
-#include <json/json_fwd.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace spdlog {
 class logger;

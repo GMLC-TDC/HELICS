@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <json/json_fwd.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 
 namespace helics {

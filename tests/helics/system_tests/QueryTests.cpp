@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
-#include <json/json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

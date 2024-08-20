@@ -13,7 +13,7 @@ them using the jsoncpp library
 
 #include "../core/helicsTime.hpp"
 
-#include <json/json.hpp>
+#include <nlohmann/json.hpp>
 #include <functional>
 #include <string>
 #include <string_view>

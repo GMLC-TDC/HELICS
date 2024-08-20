@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "gmlc/libguarded/shared_guarded.hpp"
-#include "json/json_fwd.hpp"
+#include "nlohmann/json_fwd.hpp"
 
 #include <atomic>
 #include <deque>

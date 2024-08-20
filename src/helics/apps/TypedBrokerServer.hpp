@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/ActionMessage.hpp"
 
-#include <json/json_fwd.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <memory>
 #include <string>
 #include <tuple>

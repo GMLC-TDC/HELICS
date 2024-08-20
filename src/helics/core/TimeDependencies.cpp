@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include "flagOperations.hpp"
 
-#include "json/json.hpp"
+#include "nlohmann/json.hpp"
 #include <algorithm>
 #include <cassert>
 #include <string>

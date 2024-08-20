@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "queryHelpers.hpp"
 
-#include <json/json.hpp>
+#include <nlohmann/json.hpp>
 #include "../common/JsonProcessingFunctions.hpp"
 #include "FederateState.hpp"
 #include "HandleManager.hpp"

@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "LogBuffer.hpp"
 
-#include "json/json.hpp"
+#include "nlohmann/json.hpp"
 #include <utility>
 
 namespace helics {

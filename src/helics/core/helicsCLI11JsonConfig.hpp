@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-#include <json/json_fwd.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace helics {
 /// Define a JSON parser for the config files for CLI11

@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
+using fileops::JsonAsString;
+
 void processOptions(const toml::value& section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,
@@ -93,32 +95,27 @@ void loadTags(const nlohmann::json & section,
                 auto pairValues = getTagPair(tagPair);
                 if (!pairValues.first.empty()) {
                     tagAction(pairValues.first, pairValues.second);
-                }
-                } else if (tagPair.isArray()) {
+                } else if (tagPair.is_array()) {
                     if (tagPair.size() > 1) {
-                        tagAction(tagPair[0].asString(), tagPair[1].asString());
+                        tagAction(JsonAsString(tagPair[0]), JsonAsString(tagPair[1]));
                     } else {
-                        tagAction(tagPair[0].asString(), "1");
+                        tagAction(JsonAsString(tagPair[0]), "1");
             }
-                } else if (tagPair.isString()) {
-                    tagAction(tagPair.asString(), "1");
+                } else if (tagPair.is_string()) {
+                    tagAction(tagPair.get<std::string>(), "1");
                 }
             }
-        } else if (tagValue.isObject()) {
+        } else if (tagValue.is_object()) {
             auto tagPair = getTagPair(tagValue);
             if (!tagPair.first.empty()) {
                 tagAction(tagPair.first, tagPair.second);
-            } else if (tagValue.isObject()) {
-                auto names = tagValue.getMemberNames();
-                for (auto& name : names) {
-                    tagAction(name,
-                              (tagValue[name].isString()) ?
-                                  tagValue[name].asString() :
-                                  fileops::generateJsonString(tagValue[name]));
+            } else if (tagValue.is_object()) {
+                for (auto& item : tagValue.items()) {
+                    tagAction(item.key(), JsonAsString(item.value()));
                 }
             }
-        } else if (tagValue.isString()) {
-            tagAction("tags", tagValue.asString());
+        } else if (tagValue.is_string()) {
+            tagAction("tags", tagValue.get<std::string>());
         }
     }
 }
