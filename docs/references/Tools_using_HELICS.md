@@ -21,8 +21,9 @@ Check the corresponding links for more information.
 - [MATPOWER](http://www.pserc.cornell.edu/matpower/), an open-source Matlab based power flow and optimal power flow tool. HELICS support under development.
 - [InterPSS](http://www.interpss.org/), a Java-based power systems simulator. HELICS support under development. [Use case instructions can be found here](https://gmlc-tdc.github.io/HELICS-Use-Cases/PNNL-TD-Dynamic-Load/index.html).
 - [PSLF](https://github.com/GMLC-TDC/PSLF-wrapper) has some level of support using the experimental python interface.
-- [PSS/E](https://new.siemens.com/global/en/products/energy/services/transmission-distribution-smart-grid/consulting-and-planning/pss-software/pss-e.html)
+- [PSS/E](https://new.siemens.com/global/en/products/energy/services/transmission-distribution-smart-grid/consulting-and-planning/pss-software/pss-e.html) through the [PyPSSE python wrapper](https://github.com/NREL/PyPSSE) (Note: pip install as [NREL-pypsse](https://pypi.org/project/NREL-pypsse/))
 - [PowerWorld](https://www.powerworld.com/) Simulator is an interactive power system simulation package designed to simulate high voltage power system operation on a time frame ranging from several minutes to several days.
+- [SAInt](https://encoord.com/SAInt.html) is a commercial tool that provides planning and analysis across multiple energy systems including electric system production cost, power flow, and dynamics in addition to natural gas, district heat, and other networks. A HELICS use case is described [here](https://www.encoord.com/resources/case-studies/helics) with source code in this [repository](https://github.com/NREL/SAInt_HELICS_interface).
 - [PyPower](https://pypi.org/project/PYPOWER/) does not have a standard HELICS integration but it has been used on various projects. PYPOWER is a power flow and Optimal Power Flow (OPF) solver. It is a port of MATPOWER to the Python programming language. Current features include:
   - DC and AC (Newton’s method & Fast Decoupled) power flow and
   - DC and AC optimal power flow (OPF)
@@ -55,6 +56,7 @@ Check the corresponding links for more information.
 
 - [NGFAST](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.172.1169).
 - [GasModels.jl](https://github.com/lanl-ansi/GasModels.jl).
+- [SAInt](https://encoord.com/SAInt.html) is a commercial tool that includes detailed support for natural gas simulation and planning in addition to other energy systems. See additional information, including a gas-grid use case, under Electric Transmission System Simulation above.
 
 ## Optimization packages
 
