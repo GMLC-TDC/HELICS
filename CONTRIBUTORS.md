@@ -67,7 +67,7 @@ The header only bindings for the ZeroMQ library are used to interact with the Ze
 
 ### [Json](https://github.com/nlohmann/json)
 
-Json is used for parsing json files. The single file header and forward declarations is included in this repo [LICENSE](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT).
+JSON for Modern C++ is used for parsing json files. The single file header and forward declarations is included in this repo [LICENSE](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT).
 
 ### [CLI11](https://github.com/CLIUtils/CLI11)
 
