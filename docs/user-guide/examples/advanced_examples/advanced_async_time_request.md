@@ -22,7 +22,7 @@ The example can be found in the [HELICS Examples repopsitory.](https://github.co
 
 To run the example: 
 ```shell
-$ helics run --path=advanced_asyunc_runner.json
+$ helics run --path=advanced_async_runner.json
 ```
 
 And the results should look like this:
