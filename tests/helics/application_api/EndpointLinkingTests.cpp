@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "testFixtures_shared.hpp"
 #endif
 
+#include <algorithm>
 #include <future>
 #include <iostream>
 #include <numeric>
@@ -64,19 +65,19 @@ TEST_F(mfed_tests, regex1)
     EXPECT_TRUE(ep2.hasMessage());
     EXPECT_TRUE(ep3.hasMessage());
 
-    auto m = ep1.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message");
+    auto message = ep1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message");
     }
 
-    m = ep2.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message");
+    message = ep2.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message");
     }
 
-    m = ep3.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message");
+    message = ep3.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message");
     }
 
     mFed1->finalizeAsync();
@@ -121,19 +122,19 @@ TEST_F(mfed_tests, regex2)
     EXPECT_TRUE(ep2.hasMessage());
     EXPECT_TRUE(ep3.hasMessage());
 
-    auto m = ep1.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message");
+    auto message = ep1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message");
     }
 
-    m = ep2.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message");
+    message = ep2.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message");
     }
 
-    m = ep3.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message");
+    message = ep3.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message");
     }
 
     mFed1->finalizeAsync();
@@ -179,19 +180,19 @@ TEST_F(mfed_tests, regex3)
     EXPECT_FALSE(ep2.hasMessage());
     EXPECT_FALSE(ep3.hasMessage());
 
-    auto m = ep1.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message1");
+    auto message = ep1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message1");
     }
 
-    m = ep1.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message2");
+    message = ep1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message2");
     }
 
-    m = ep3.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message3");
+    message = ep3.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message3");
     }
 
     mFed1->finalizeAsync();
@@ -212,9 +213,9 @@ TEST_F(mfed_tests, regex_data_sink)
     auto ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
     auto ep3 = mFed3->registerGlobalTargetedEndpoint("ep3");
 
-    auto ds = mFed1->registerDataSink("ds1");
+    auto sink1 = mFed1->registerDataSink("ds1");
 
-    ds.addSourceTarget("REGEX:.*");
+    sink1.addSourceTarget("REGEX:.*");
 
     mFed1->enterExecutingModeAsync();
     mFed3->enterExecutingModeAsync();
@@ -236,24 +237,24 @@ TEST_F(mfed_tests, regex_data_sink)
     gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
-    EXPECT_EQ(ds.pendingMessageCount(), 3);
+    EXPECT_EQ(sink1.pendingMessageCount(), 3);
     EXPECT_FALSE(ep1.hasMessage());
     EXPECT_FALSE(ep2.hasMessage());
     EXPECT_FALSE(ep3.hasMessage());
 
-    auto m = ds.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message1");
+    auto message = sink1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message1");
     }
 
-    m = ds.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message2");
+    message = sink1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message2");
     }
 
-    m = ds.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message3");
+    message = sink1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message3");
     }
 
     mFed1->finalizeAsync();
@@ -299,19 +300,19 @@ TEST_F(mfed_tests, regex_combo1)
     EXPECT_TRUE(ep2.hasMessage());
     EXPECT_TRUE(ep3.hasMessage());
 
-    auto m = ep1.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message");
+    auto message = ep1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message");
     }
 
-    m = ep2.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message");
+    message = ep2.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message");
     }
 
-    m = ep3.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message");
+    message = ep3.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message");
     }
 
     mFed1->finalizeAsync();
@@ -405,19 +406,19 @@ TEST_F(mfed_tests, regex_combo3)
     EXPECT_FALSE(ep2.hasMessage());
     EXPECT_FALSE(ep3.hasMessage());
 
-    auto m = ep1.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message1");
+    auto message = ep1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message1");
     }
 
-    m = ep1.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message2");
+    message = ep1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message2");
     }
 
-    m = ep3.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message3");
+    message = ep3.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message3");
     }
 
     mFed1->finalizeAsync();
@@ -438,9 +439,9 @@ TEST_F(mfed_tests, regex_combo_data_sink)
     auto ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
     auto ep3 = mFed3->registerGlobalTargetedEndpoint("ep3");
 
-    auto ds = mFed1->registerDataSink("ds1");
+    auto sink1 = mFed1->registerDataSink("ds1");
 
-    ds.addSourceTarget("REGEX:.*");
+    sink1.addSourceTarget("REGEX:.*");
 
     mFed1->enterExecutingModeAsync();
     mFed3->enterExecutingModeAsync();
@@ -462,24 +463,24 @@ TEST_F(mfed_tests, regex_combo_data_sink)
     gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
-    EXPECT_EQ(ds.pendingMessageCount(), 3);
+    EXPECT_EQ(sink1.pendingMessageCount(), 3);
     EXPECT_FALSE(ep1.hasMessage());
     EXPECT_FALSE(ep2.hasMessage());
     EXPECT_FALSE(ep3.hasMessage());
 
-    auto m = ds.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message1");
+    auto message = sink1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message1");
     }
 
-    m = ds.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message2");
+    message = sink1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message2");
     }
 
-    m = ds.getMessage();
-    if (m) {
-        EXPECT_EQ(m->to_string(), "test message3");
+    message = sink1.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "test message3");
     }
 
     mFed1->finalizeAsync();
@@ -502,8 +503,8 @@ TEST_F(mfed_tests, endpoint_linking)
     ept1.send("test message");
     mFed1->requestNextStep();
     EXPECT_TRUE(ept2.hasMessage());
-    auto m = ept2.getMessage();
-    EXPECT_EQ(m->to_string(), "test message");
+    auto message = ept2.getMessage();
+    EXPECT_EQ(message->to_string(), "test message");
     mFed1->finalize();
 }
 
@@ -520,8 +521,8 @@ TEST_F(mfed_tests, endpoint_linking_dest_unknown)
     ept1.send("test message");
     mFed1->requestNextStep();
     EXPECT_TRUE(ept2.hasMessage());
-    auto m = ept2.getMessage();
-    EXPECT_EQ(m->to_string(), "test message");
+    auto message = ept2.getMessage();
+    EXPECT_EQ(message->to_string(), "test message");
     mFed1->finalize();
 }
 
@@ -538,8 +539,8 @@ TEST_F(mfed_tests, endpoint_linking_source_unknown)
     ept1.send("test message");
     mFed1->requestNextStep();
     EXPECT_TRUE(ept2.hasMessage());
-    auto m = ept2.getMessage();
-    EXPECT_EQ(m->to_string(), "test message");
+    auto message = ept2.getMessage();
+    EXPECT_EQ(message->to_string(), "test message");
     mFed1->finalize();
 }
 
@@ -557,8 +558,8 @@ TEST_F(mfed_tests, endpoint_linking_both_unknown)
     ept1.send("test message");
     mFed1->requestNextStep();
     EXPECT_TRUE(ept2.hasMessage());
-    auto m = ept2.getMessage();
-    EXPECT_EQ(m->to_string(), "test message");
+    auto message = ept2.getMessage();
+    EXPECT_EQ(message->to_string(), "test message");
     mFed1->finalize();
 }
 
@@ -577,8 +578,8 @@ TEST_F(mfed_tests, endpoint_linking_source_alias)
     ept1.send("test message");
     mFed1->requestNextStep();
     EXPECT_TRUE(ept2.hasMessage());
-    auto m = ept2.getMessage();
-    EXPECT_EQ(m->to_string(), "test message");
+    auto message = ept2.getMessage();
+    EXPECT_EQ(message->to_string(), "test message");
     mFed1->finalize();
 }
 
@@ -597,14 +598,34 @@ TEST_F(mfed_tests, endpoint_linking_dest_alias)
     ept1.send("test message");
     mFed1->requestNextStep();
     EXPECT_TRUE(ept2.hasMessage());
-    auto m = ept2.getMessage();
-    EXPECT_EQ(m->to_string(), "test message");
+    auto message = ept2.getMessage();
+    EXPECT_EQ(message->to_string(), "test message");
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, endpoint_linking_dest_alias_rev)
+{
+    SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    helics::CoreApp core(mFed1->getCorePointer());
+
+    core->linkEndpoints("source_endpoint", "dest");
+    auto& ept2 = mFed1->registerGlobalTargetedEndpoint("dest_endpoint");
+
+    auto& ept1 = mFed1->registerGlobalTargetedEndpoint("source_endpoint");
+    core->addAlias("dest", "dest_endpoint");
+    mFed1->enterExecutingMode();
+    ept1.send("test message");
+    mFed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    auto message = ept2.getMessage();
+    EXPECT_EQ(message->to_string(), "test message");
     mFed1->finalize();
 }
 
 class mfed_permutation_tests: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
-TEST_P(mfed_permutation_tests, endpoint_linking_order_permutations)
+TEST_P(mfed_permutation_tests, endpoint_linking_order_permutations_nosan)
 {
     SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
@@ -633,8 +654,8 @@ TEST_P(mfed_permutation_tests, endpoint_linking_order_permutations)
     ept1.send("test message");
     mFed1->requestNextStep();
     EXPECT_TRUE(ept2.hasMessage());
-    auto m = ept2.getMessage();
-    EXPECT_EQ(m->to_string(), "test message");
+    auto message = ept2.getMessage();
+    EXPECT_EQ(message->to_string(), "test message");
     mFed1->finalize();
 }
 

@@ -15,7 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 #include "testFixtures.hpp"
 
+#include <fstream>
 #include <gtest/gtest.h>
+#include <sstream>
 
 class combofed_single_type_tests:
     public ::testing::TestWithParam<const char*>,
@@ -52,27 +54,27 @@ TEST_P(combofed_single_type_tests, publication_registration)
     SetupTest<helics::CombinationFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
-    auto& pubid = vFed1->registerPublication<std::string>("pub1");
-    auto& pubid2 = vFed1->registerGlobalPublication<int>("pub2");
+    auto& pub1 = vFed1->registerPublication<std::string>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<int>("pub2");
 
-    auto& pubid3 = vFed1->registerPublication("pub3", "double", "V");
+    auto& pub3 = vFed1->registerPublication("pub3", "double", "V");
     vFed1->enterExecutingMode();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
-    auto& sv = pubid.getName();
-    auto& sv2 = pubid2.getName();
-    EXPECT_EQ(sv, "fed0/pub1");
-    EXPECT_EQ(sv2, "pub2");
-    auto& pub3name = pubid3.getName();
+    auto& pubName = pub1.getName();
+    auto& pubName2 = pub2.getName();
+    EXPECT_EQ(pubName, "fed0/pub1");
+    EXPECT_EQ(pubName2, "pub2");
+    auto& pub3name = pub3.getName();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
-    EXPECT_EQ(pubid3.getExtractionType(), "double");
-    EXPECT_EQ(pubid3.getUnits(), "V");
+    EXPECT_EQ(pub3.getExtractionType(), "double");
+    EXPECT_EQ(pub3.getUnits(), "V");
 
-    EXPECT_TRUE(vFed1->getPublication("pub1").getHandle() == pubid.getHandle());
-    EXPECT_TRUE(vFed1->getPublication("pub2").getHandle() == pubid2.getHandle());
-    EXPECT_TRUE(vFed1->getPublication("fed0/pub1").getHandle() == pubid.getHandle());
+    EXPECT_TRUE(vFed1->getPublication("pub1").getHandle() == pub1.getHandle());
+    EXPECT_TRUE(vFed1->getPublication("pub2").getHandle() == pub2.getHandle());
+    EXPECT_TRUE(vFed1->getPublication("fed0/pub1").getHandle() == pub1.getHandle());
     vFed1->disconnect();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -84,33 +86,33 @@ TEST_P(combofed_single_type_tests, single_transfer)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto& subid = vFed1->registerSubscription("pub1");
+    auto& inp1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    pub1.publish("string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string resultString1 = inp1.getString();
     // make sure the string is what we expect
-    EXPECT_EQ(s, "string1");
+    EXPECT_EQ(resultString1, "string1");
     // publish a second string
-    pubid.publish("string2");
+    pub1.publish("string2");
     // make sure the value is still what we expect
-    s = subid.getString();
+    resultString1 = inp1.getString();
 
-    EXPECT_EQ(s, "string1");
+    EXPECT_EQ(resultString1, "string1");
     // advance time
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    s = subid.getString();
+    resultString1 = inp1.getString();
 
-    EXPECT_EQ(s, "string2");
+    EXPECT_EQ(resultString1, "string2");
     vFed1->disconnect();
 }
 
@@ -119,24 +121,24 @@ TEST_P(combofed_single_type_tests, endpoint_registration)
     SetupTest<helics::CombinationFederate>(GetParam(), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
-    auto& epid = mFed1->registerEndpoint("ep1");
-    auto& epid2 = mFed1->registerGlobalEndpoint("ep2", "random");
+    auto& ept1 = mFed1->registerEndpoint("ep1");
+    auto& ept2 = mFed1->registerGlobalEndpoint("ep2", "random");
 
     mFed1->enterExecutingMode();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
-    auto& sv = epid.getName();
-    auto& sv2 = epid2.getName();
-    EXPECT_EQ(sv, "fed0/ep1");
-    EXPECT_EQ(sv2, "ep2");
+    auto& eptName1 = ept1.getName();
+    auto& eptName2 = ept2.getName();
+    EXPECT_EQ(eptName1, "fed0/ep1");
+    EXPECT_EQ(eptName2, "ep2");
 
-    EXPECT_EQ(epid.getExtractionType(), "");
-    EXPECT_EQ(epid2.getInjectionType(), "random");
+    EXPECT_EQ(ept1.getExtractionType(), "");
+    EXPECT_EQ(ept2.getInjectionType(), "random");
 
-    EXPECT_TRUE(mFed1->getEndpoint("ep1").getHandle() == epid.getHandle());
-    EXPECT_TRUE(mFed1->getEndpoint("fed0/ep1").getHandle() == epid.getHandle());
-    EXPECT_TRUE(mFed1->getEndpoint("ep2").getHandle() == epid2.getHandle());
+    EXPECT_TRUE(mFed1->getEndpoint("ep1").getHandle() == ept1.getHandle());
+    EXPECT_TRUE(mFed1->getEndpoint("fed0/ep1").getHandle() == ept1.getHandle());
+    EXPECT_TRUE(mFed1->getEndpoint("ep2").getHandle() == ept2.getHandle());
     mFed1->disconnect();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -180,15 +182,15 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     res = mFed2->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = mFed1->getMessage(epid);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = mFed1->getMessage(epid);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[245], data2[245]);
+    EXPECT_EQ(message1->data[245], data2[245]);
 
-    auto M2 = mFed2->getMessage(epid2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = mFed2->getMessage(epid2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[245], data[245]);
+    EXPECT_EQ(message2->data[245], data[245]);
     mFed1->disconnect();
     mFed2->disconnect();
 
@@ -237,16 +239,16 @@ TEST_P(combofed_type_tests, multimode_transfer)
     EXPECT_EQ(gtime, 1.0);
     EXPECT_EQ(cFed1->requestTimeComplete(), 1.0);
 
-    std::string s = subid.getString();
+    std::string resultString1 = subid.getString();
     // get the value
     // make sure the string is what we expect
-    EXPECT_EQ(s, "string1");
+    EXPECT_EQ(resultString1, "string1");
     // publish a second string
     pubid.publish("string2");
     // make sure the value is still what we expect
-    s = subid.getString();
+    resultString1 = subid.getString();
 
-    EXPECT_EQ(s, "string1");
+    EXPECT_EQ(resultString1, "string1");
 
     auto res = cFed1->hasMessage();
     EXPECT_TRUE(res);
@@ -255,15 +257,15 @@ TEST_P(combofed_type_tests, multimode_transfer)
     res = cFed2->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = cFed1->getMessage(epid);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = cFed1->getMessage(epid);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[245], data2[245]);
+    EXPECT_EQ(message1->data[245], data2[245]);
 
-    auto M2 = cFed2->getMessage(epid2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = cFed2->getMessage(epid2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[245], data[245]);
+    EXPECT_EQ(message2->data[245], data[245]);
 
     cFed1->requestTimeAsync(1.0);
 
@@ -273,9 +275,9 @@ TEST_P(combofed_type_tests, multimode_transfer)
     EXPECT_EQ(cFed1->requestTimeComplete(), 2.0);
     // make sure the value was updated
 
-    const auto& ns = subid.getString();
+    const auto& resultString2 = subid.getString();
 
-    EXPECT_EQ(ns, "string2");
+    EXPECT_EQ(resultString2, "string2");
 
     cFed1->disconnect();
     cFed2->disconnect();
@@ -308,8 +310,30 @@ TEST_P(combofed_file_load_tests, test_file_load)
     EXPECT_EQ(cFed.getName(), "comboFed");
 
     EXPECT_EQ(cFed.getEndpointCount(), 2);
-    auto& id = cFed.getEndpoint("ept1");
-    EXPECT_EQ(id.getExtractionType(), "genmessage");
+    auto& ept1 = cFed.getEndpoint("ept1");
+    EXPECT_EQ(ept1.getExtractionType(), "genmessage");
+
+    EXPECT_EQ(cFed.getInputCount(), 3);
+    EXPECT_EQ(cFed.getPublicationCount(), 2);
+
+    EXPECT_TRUE(!cFed.getPublication(1).getInfo().empty());
+    cFed.getCorePointer()->disconnect();
+    cFed.disconnect();
+}
+
+TEST_P(combofed_file_load_tests, test_string_config)
+{
+    std::ifstream file(std::string(TEST_DIR) + GetParam());
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    helics::CombinationFederate cFed(buffer.str());
+
+    EXPECT_EQ(cFed.getName(), "comboFed");
+
+    EXPECT_EQ(cFed.getEndpointCount(), 2);
+    auto& ept1 = cFed.getEndpoint("ept1");
+    EXPECT_EQ(ept1.getExtractionType(), "genmessage");
 
     EXPECT_EQ(cFed.getInputCount(), 3);
     EXPECT_EQ(cFed.getPublicationCount(), 2);
@@ -325,10 +349,10 @@ INSTANTIATE_TEST_SUITE_P(combofed_tests,
 
 TEST(comboFederate, constructor2)
 {
-    auto cr = helics::CoreFactory::create(helics::CoreType::TEST, "--name=mf --autobroker");
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
-    helics::CombinationFederate mf1("fed1", cr, fi);
+    auto core = helics::CoreFactory::create(helics::CoreType::TEST, "--name=mf --autobroker");
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
+    helics::CombinationFederate mf1("fed1", core, fedInfo);
 
     mf1.registerGlobalFilter("filt1");
     mf1.registerGlobalFilter("filt2");
@@ -336,22 +360,22 @@ TEST(comboFederate, constructor2)
     EXPECT_NO_THROW(mf1.enterExecutingMode());
     mf1.disconnect();
 
-    cr.reset();
+    core.reset();
 }
 
 TEST(comboFederate, constructor3)
 {
-    helics::CoreApp cr(helics::CoreType::TEST, "--name=mf2 --autobroker");
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
-    helics::CombinationFederate mf1("fed1", cr, fi);
+    helics::CoreApp core(helics::CoreType::TEST, "--name=mf2 --autobroker");
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
+    helics::CombinationFederate mf1("fed1", core, fedInfo);
 
     mf1.registerGlobalFilter("filt1");
     mf1.registerGlobalFilter("filt2");
 
     EXPECT_NO_THROW(mf1.enterExecutingMode());
     mf1.disconnect();
-    EXPECT_TRUE(cr.waitForDisconnect(std::chrono::milliseconds(500)));
+    EXPECT_TRUE(core.waitForDisconnect(std::chrono::milliseconds(500)));
 }
 
 TEST_F(combofed, regex_link_anon_inp)

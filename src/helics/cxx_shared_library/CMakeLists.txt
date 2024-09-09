@@ -22,6 +22,7 @@ set(helics_shared_sources
     ../application_api/FilterOperations.cpp
     ../application_api/TranslatorOperations.cpp
     ../application_api/ConnectorFederateManager.cpp
+    ../application_api/PotentialInterfacesManager.cpp
     ../application_api/Endpoints.cpp
     ../application_api/helicsTypes.cpp
     ../application_api/queryFunctions.cpp

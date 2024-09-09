@@ -21,9 +21,7 @@ namespace helics {
 Input::Input(ValueFederate* valueFed,
              InterfaceHandle id,
              std::string_view actName,
-             std::string_view unitsOut):
-    Interface(valueFed, id, actName),
-    fed(valueFed)
+             std::string_view unitsOut): Interface(valueFed, id, actName), fed(valueFed)
 {
     if (!unitsOut.empty()) {
         outputUnits =
@@ -800,12 +798,16 @@ void integerExtractAndConvert(defV& store,
 
 data_view Input::checkAndGetFedUpdate()
 {
-    return (fed->isUpdated(*this) || allowDirectFederateUpdate()) ? (fed->getBytes(*this)) :
-                                                                    data_view{};
+    return ((fed != nullptr) && (fed->isUpdated(*this) || allowDirectFederateUpdate())) ?
+        (fed->getBytes(*this)) :
+        data_view{};
 }
 
 void Input::forceCoreDataUpdate()
 {
+    if (fed == nullptr) {
+        return;
+    }
     auto dv = fed->getBytes(*this);
     if (!dv.empty()) {
         valueExtract(dv, injectionType, lastValue);

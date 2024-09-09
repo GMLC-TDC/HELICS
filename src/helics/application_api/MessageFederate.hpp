@@ -161,11 +161,20 @@ class HELICS_CXX_EXPORT MessageFederate:
  */
     void registerMessageInterfacesJson(const std::string& jsonString);
 
+    /** details of the registration process*/
+    void registerMessageInterfacesJsonDetail(Json::Value& json, bool defaultGlobal);
+
     /** register a set Message interfaces using a toml file
   @details call is only valid in startup mode it is a protected call to add an
   @param tomlString  the location of the TOML to load to generate the interfaces
   */
     void registerMessageInterfacesToml(const std::string& tomlString);
+
+    /** register an endpoint with the particular properties*/
+    Endpoint& registerEndpoint(std::string_view eptName,
+                               std::string_view type,
+                               bool global,
+                               bool targeted);
 
   public:
     /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint

@@ -36,6 +36,7 @@ class CoreApp;
 class AsyncFedCallInfo;
 class MessageOperator;
 class ConnectorFederateManager;
+class PotentialInterfacesManager;
 class Filter;
 class Translator;
 class CloningFilter;
@@ -89,6 +90,8 @@ class HELICS_CXX_EXPORT Federate {
     bool retriggerTimeRequest{false};
     /*** specify that the federate will only be used on a single thread*/
     bool singleThreadFederate{false};
+    /*** specify that the federate has potential interfaces*/
+    bool hasPotentialInterfaces{false};
 
   private:
     LocalFederateId fedID;  //!< the federate ID of the object for use in the core
@@ -101,6 +104,9 @@ class HELICS_CXX_EXPORT Federate {
     /// pointer to a class defining the async call information
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>> asyncCallInfo;
     std::unique_ptr<ConnectorFederateManager> cManager;  //!< class for managing filter operations
+    /// class for managing potential interfaces
+    std::unique_ptr<PotentialInterfacesManager> potManager;
+    std::atomic<int> potInterfacesSequence{0};
     std::string mName;  //!< the name of the federate
     std::function<void(Time, Time, bool)> timeRequestEntryCallback;
     std::function<void(Time, bool)> timeUpdateCallback;
@@ -844,6 +850,8 @@ received
 
     /** function to deal with any operations that occur on a mode switch*/
     void updateFederateMode(Modes newMode);
+    /** run the actions necessary for starting up with potential interfaces*/
+    void potentialInterfacesStartupSequence();
     /** function to deal with any operations that need to occur on a time update*/
     void updateSimulationTime(Time newTime, Time oldTime, bool iterating);
     /** register connector(filters,translators) interfaces defined in  file or string
@@ -858,6 +866,7 @@ received
     void registerConnectorInterfacesToml(const std::string& tomlString);
     /** check if a filter type and operation is valid
      */
+    void registerConnectorInterfacesJsonDetail(Json::Value& json);
     bool
         checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation) const;
 };
@@ -962,6 +971,10 @@ class HELICS_CXX_EXPORT Interface {
     /** get the destination targets for an interface, either the destinations of data for endpoints
      * or publications, or the destination endpoints for a filter*/
     const std::string& getDestinationTargets() const;
+    /** get the number of source targets*/
+    std::size_t getSourceTargetCount() const;
+    /** get the number of destination targets*/
+    std::size_t getDestinationTargetCount() const;
     /** close the interface*/
     void close();
     /** disconnect the object from the core*/

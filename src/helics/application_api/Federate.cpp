@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ConnectorFederateManager.hpp"
 #include "CoreApp.hpp"
 #include "Filters.hpp"
+#include "PotentialInterfacesManager.hpp"
 #include "Translator.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
@@ -28,6 +29,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/format.h>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <utility>
 
 namespace helics {
@@ -62,9 +64,7 @@ Federate::Federate(std::string_view fedname, CoreApp& core, const FederateInfo& 
 
 Federate::Federate(std::string_view fedName,
                    const std::shared_ptr<Core>& core,
-                   const FederateInfo& fedInfo):
-    coreObject(core),
-    mName(fedName)
+                   const FederateInfo& fedInfo): coreObject(core), mName(fedName)
 {
     if (mName.empty()) {
         mName = fedInfo.defName;
@@ -132,6 +132,8 @@ Federate::~Federate()
         // LCOV_EXCL_START
         catch (...)  // do not allow a throw inside the destructor
         {
+            // finalize may throw but we can't allow that
+            ;
         }
         // LCOV_EXCL_STOP
     }
@@ -230,7 +232,7 @@ void Federate::registerFederate(const FederateInfo& fedInfo)
 
     useJsonSerialization = fedInfo.useJsonSerialization;
     observerMode = fedInfo.observer;
-    configFile = fedInfo.fileInUse;
+    configFile = fedInfo.configString;
     mCurrentTime = coreObject->getCurrentTime(fedID);
     if (!singleThreadFederate) {
         asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
@@ -250,6 +252,10 @@ void Federate::enterInitializingMode()
     switch (cmode) {
         case Modes::STARTUP:
             try {
+                if (hasPotentialInterfaces) {
+                    potentialInterfacesStartupSequence();
+                }
+
                 if (coreObject->enterInitializingMode(fedID)) {
                     enteringInitializingMode(IterationResult::NEXT_STEP);
                 }
@@ -292,6 +298,9 @@ void Federate::enterInitializingModeAsync()
         auto asyncInfo = asyncCallInfo->lock();
         if (currentMode.compare_exchange_strong(cmode, Modes::PENDING_INIT)) {
             asyncInfo->initFuture = std::async(std::launch::async, [this]() {
+                if (hasPotentialInterfaces) {
+                    potentialInterfacesStartupSequence();
+                }
                 return coreObject->enterInitializingMode(fedID);
             });
         }
@@ -366,7 +375,38 @@ void Federate::enterInitializingModeIterative()
     switch (cmode) {
         case Modes::STARTUP:
             try {
-                coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
+                if (hasPotentialInterfaces && potManager) {
+                    switch (potInterfacesSequence.load()) {
+                        case 0:
+                            potManager->initialize();
+                            coreObject->enterInitializingMode(
+                                fedID, helics::IterationRequest::FORCE_ITERATION);
+                            potInterfacesSequence.store(2);
+                            break;
+                        case 2: {
+                            // respond to query
+                            coreObject->enterInitializingMode(
+                                fedID, helics::IterationRequest::FORCE_ITERATION);
+                            // now check for commands
+                            auto cmd = coreObject->getCommand(fedID);
+                            if (cmd.first.empty()) {
+                                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                                cmd = coreObject->getCommand(fedID);
+                            }
+                            while (!cmd.first.empty()) {
+                                potManager->processCommand(std::move(cmd));
+                                cmd = coreObject->getCommand(fedID);
+                            }
+                            potInterfacesSequence.store(3);
+                        } break;
+                        default:
+                            coreObject->enterInitializingMode(
+                                fedID, helics::IterationRequest::FORCE_ITERATION);
+                            break;
+                    }
+                } else {
+                    coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
+                }
             }
             catch (const HelicsException&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -1047,6 +1087,39 @@ iteration_time Federate::requestTimeIterativeComplete()
         "cannot call requestTimeIterativeComplete without first calling requestTimeIterativeAsync function"));
 }
 
+void Federate::potentialInterfacesStartupSequence()
+{
+    if (potManager) {
+        switch (potInterfacesSequence.load()) {
+            case 0:
+                potManager->initialize();
+                potInterfacesSequence.store(1);
+                [[fallthrough]];
+            case 1:
+                coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+                potInterfacesSequence.store(2);
+                [[fallthrough]];
+            case 2: {
+                // respond to query
+                coreObject->enterInitializingMode(fedID, helics::IterationRequest::FORCE_ITERATION);
+                // now check for commands
+                auto cmd = coreObject->getCommand(fedID);
+                if (cmd.first.empty()) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                    cmd = coreObject->getCommand(fedID);
+                }
+                while (!cmd.first.empty()) {
+                    potManager->processCommand(std::move(cmd));
+                    cmd = coreObject->getCommand(fedID);
+                }
+                potInterfacesSequence.store(3);
+            } break;
+            default:
+                break;
+        }
+    }
+}
+
 void Federate::updateFederateMode(Modes newMode)
 {
     const Modes oldMode = currentMode.load();
@@ -1138,21 +1211,29 @@ void Federate::disconnectTransition()
 
 void Federate::registerInterfaces(const std::string& configString)
 {
-    // this will be deprecated at some point in the future
     registerConnectorInterfaces(configString);
 }
 
 void Federate::registerConnectorInterfaces(const std::string& configString)
 {
-    if (fileops::hasTomlExtension(configString)) {
-        registerConnectorInterfacesToml(configString);
-    } else {
-        try {
-            registerConnectorInterfacesJson(configString);
-        }
-        catch (const std::invalid_argument& e) {
-            throw(helics::InvalidParameter(e.what()));
-        }
+    auto hint = fileops::getConfigType(configString);
+    switch (hint) {
+        case fileops::ConfigType::JSON_FILE:
+        case fileops::ConfigType::JSON_STRING:
+            try {
+                registerConnectorInterfacesJson(configString);
+            }
+            catch (const std::invalid_argument& e) {
+                throw(helics::InvalidParameter(e.what()));
+            }
+            break;
+        case fileops::ConfigType::TOML_FILE:
+        case fileops::ConfigType::TOML_STRING:
+            registerConnectorInterfacesToml(configString);
+            break;
+        case fileops::ConfigType::NONE:
+        default:
+            break;
     }
 }
 
@@ -1296,7 +1377,7 @@ static void
     static constexpr std::string_view errorMessage =
         R"(interface properties require "name" and "value" fields)";
     if (json.isMember("properties")) {
-        auto& props = json["properties"];
+        const auto& props = json["properties"];
         if (props.isArray()) {
             for (const auto& prop : props) {
                 if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
@@ -1335,14 +1416,20 @@ static void
 
 void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 {
-    using fileops::getOrDefault;
     auto doc = fileops::loadJson(jsonString);
+    registerConnectorInterfacesJsonDetail(doc);
+}
 
+void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
+{
+    using fileops::getOrDefault;
     bool defaultGlobal = false;
-    fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
+    fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 
-    if (doc.isMember("filters")) {
-        for (const auto& filt : doc["filters"]) {
+    Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
+
+    if (iface.isMember("filters")) {
+        for (const auto& filt : iface["filters"]) {
             const std::string key = getOrDefault(filt, "name", emptyStr);
             const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
@@ -1378,8 +1465,8 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             loadPropertiesJson(this, filter, filt, strictConfigChecking);
         }
     }
-    if (doc.isMember("translators")) {
-        for (const auto& trans : doc["translators"]) {
+    if (iface.isMember("translators")) {
+        for (const auto& trans : iface["translators"]) {
             const std::string key = getOrDefault(trans, "name", emptyStr);
 
             std::string ttype = getOrDefault(trans, "type", std::string("custom"));
@@ -1443,16 +1530,27 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             loadPropertiesJson(this, translator, trans, strictConfigChecking);
         }
     }
-    arrayPairProcess(doc, "globals", [this](std::string_view key, std::string_view val) {
+    arrayPairProcess(json, "globals", [this](std::string_view key, std::string_view val) {
         setGlobal(key, val);
     });
-    arrayPairProcess(doc, "aliases", [this](std::string_view key, std::string_view val) {
+    arrayPairProcess(json, "aliases", [this](std::string_view key, std::string_view val) {
         addAlias(key, val);
     });
 
-    loadTags(doc, [this](std::string_view tagname, std::string_view tagvalue) {
+    loadTags(json, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
     });
+    if (json.isMember("helics")) {
+        registerConnectorInterfacesJsonDetail(json["helics"]);
+    }
+
+    if (json.isMember("potential_interfaces") || json.isMember("potential_interface_templates")) {
+        if (!potManager) {
+            potManager = std::make_unique<PotentialInterfacesManager>(coreObject.get(), this);
+        }
+        potManager->loadPotentialInterfaces(json);
+        hasPotentialInterfaces = true;
+    }
 }
 
 static void arrayPairProcess(toml::value doc,
@@ -1482,14 +1580,14 @@ static void
     static constexpr std::string_view errorMessage =
         R"(interface properties require "name" and "value" fields)";
     if (fileops::isMember(data, "properties")) {
-        auto& props = toml::find(data, "properties");
+        const auto& props = toml::find(data, "properties");
         if (props.is_array()) {
-            auto& propArray = props.as_array();
+            const auto& propArray = props.as_array();
             for (const auto& prop : propArray) {
                 std::string propname;
                 propname = toml::find_or(prop, "name", propname);
                 const toml::value uVal;
-                auto& propval = toml::find_or(prop, "value", uVal);
+                const auto& propval = toml::find_or(prop, "value", uVal);
 
                 if ((propname.empty()) || (propval.is_uninitialized())) {
                     if (strict) {
@@ -1509,7 +1607,7 @@ static void
         } else {
             std::string propname;
             propname = toml::find_or(props, "name", propname);
-            toml::value uVal;
+            const toml::value uVal;
             auto propval = toml::find_or(props, "value", uVal);
 
             if ((propname.empty()) || (propval.is_uninitialized())) {
@@ -1785,7 +1883,7 @@ std::string Federate::queryComplete(QueryId queryIndex)  // NOLINT
 
 void Federate::setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction)
 {
-    coreObject->setQueryCallback(fedID, queryFunction);
+    coreObject->setQueryCallback(fedID, queryFunction, 1);
 }
 
 bool Federate::isQueryCompleted(QueryId queryIndex) const  // NOLINT
@@ -1820,11 +1918,21 @@ void Federate::sendCommand(std::string_view target,
 
 std::pair<std::string, std::string> Federate::getCommand()
 {
+    if (hasPotentialInterfaces) {
+        if (potManager->hasExtraCommands()) {
+            return potManager->getCommand();
+        }
+    }
     return coreObject->getCommand(fedID);
 }
 
 std::pair<std::string, std::string> Federate::waitCommand()
 {
+    if (hasPotentialInterfaces) {
+        if (potManager->hasExtraCommands()) {
+            return potManager->getCommand();
+        }
+    }
     return coreObject->waitCommand(fedID);
 }
 
@@ -1954,9 +2062,9 @@ void Federate::logMessage(int level, std::string_view message) const
     if (coreObject) {
         coreObject->logMessage(fedID, level, message);
     } else if (level <= HELICS_LOG_LEVEL_WARNING) {
-        std::cerr << message << std::endl;
+        std::cerr << message << '\n';
     } else {
-        std::cout << message << std::endl;
+        std::cout << message << '\n';
     }
 }
 
@@ -2059,6 +2167,35 @@ const std::string& Interface::getSourceTargets() const
 const std::string& Interface::getDestinationTargets() const
 {
     return mCore->getDestinationTargets(handle);
+}
+
+std::size_t Interface::getSourceTargetCount() const
+{
+    const auto& targets = getSourceTargets();
+    if (targets.empty()) {
+        return 0;
+    }
+    try {
+        const Json::Value tvalues = fileops::loadJsonStr(targets);
+        return (tvalues.isArray()) ? tvalues.size() : 1;
+    }
+    catch (...) {
+        return 1;
+    }
+}
+std::size_t Interface::getDestinationTargetCount() const
+{
+    const auto& targets = getDestinationTargets();
+    if (targets.empty()) {
+        return 0;
+    }
+    try {
+        const Json::Value tvalues = fileops::loadJsonStr(targets);
+        return (tvalues.isArray()) ? tvalues.size() : 1;
+    }
+    catch (...) {
+        return 1;
+    }
 }
 
 const std::string& Interface::getDisplayName() const

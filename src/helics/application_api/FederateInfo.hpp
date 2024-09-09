@@ -17,8 +17,13 @@ namespace CLI {
 class App;
 }
 
+namespace Json {
+class Value;
+}
+
 namespace helics {
 class helicsCLI11App;
+
 /** data class defining federate properties and information
  */
 class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
@@ -51,7 +56,9 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     std::string key;  //!< key for the broker
     std::string localport;  //!< string for defining the local port to use usually a number but
                             //!< other strings are possible
-    std::string fileInUse;  //!< string containing a configuration file that was used
+
+    std::string configString;  //!< storage for config file name or string
+    bool fileInUse{false};
     /** default constructor*/
     FederateInfo();
     /** construct from a type
@@ -121,7 +128,9 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();
     /** do some additional configuration from config files */
-    void config_additional(helicsCLI11App* app);
+    void config_additional(CLI::App* app);
+    /** method for loading info from json*/
+    void loadJsonConfig(Json::Value& json);
 };
 
 /** generate a FederateInfo object from a config file or string (JSON, TOML)

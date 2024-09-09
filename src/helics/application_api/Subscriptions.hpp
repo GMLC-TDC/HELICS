@@ -49,8 +49,7 @@ class VectorSubscription {
                        int count,
                        const X& defValue,
                        std::string_view units = std::string_view{}):
-        fed(valueFed),
-        m_key(key), m_units(units)
+        fed(valueFed), m_key(key), m_units(units)
     {
         ids.reserve(count);
         vals.resize(count, defValue);
@@ -181,8 +180,7 @@ class VectorSubscription2d {
                          int count_y,
                          const X& defValue,
                          std::string_view units = std::string_view()):
-        fed(std::addressof(*valueFed)),
-        m_key(key), m_units(units)
+        fed(std::addressof(*valueFed)), m_key(key), m_units(units)
     {
         static_assert(
             std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value,

@@ -35,8 +35,7 @@ class FilterInfo {
                std::string_view type_in_,
                std::string_view type_out_,
                bool destFilter_):
-        core_id(core_id_),
-        handle(handle_), key(key_), inputType(type_in_), outputType(type_out_),
+        core_id(core_id_), handle(handle_), key(key_), inputType(type_in_), outputType(type_out_),
         dest_filter(destFilter_)
     {
     }

@@ -759,6 +759,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1SINGLE_1THR
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1REENTRANT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsFederateFlags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsFederateFlags)HELICS_FLAG_REENTRANT;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1IGNORE_1TIME_1MISMATCH_1WARNINGS_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsFederateFlags result;
@@ -1738,6 +1750,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1HANDLE_1OPTION_1B
   (void)jenv;
   (void)jcls;
   result = (HelicsHandleOptions)HELICS_HANDLE_OPTION_BUFFER_DATA;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1HANDLE_1OPTION_1RECONNECTABLE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsHandleOptions result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsHandleOptions)HELICS_HANDLE_OPTION_RECONNECTABLE;
   jresult = (jint)result; 
   return jresult;
 }

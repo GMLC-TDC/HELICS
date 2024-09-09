@@ -76,6 +76,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "terminate_on_error": false,
   "source_only": false,
   "observer": false,
+  "dynamic":false,
   "only_update_on_change": false,
   "only_transmit_on_change": false,
   "broker_key": "",
@@ -391,6 +392,20 @@ _API:_ `helicsFederateInfoSetFlagOption`
 _Property's enumerated name:_ `HELICS_FLAG_OBSERVER` [0]
 
 Used to indicate to the federation that this federate produces no data and only has inputs/subscriptions. Specifying this when appropriate allows HELICS to more efficiently grant times to the federation.
+
+---
+
+### `reentrant` [false]
+
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+| [C](api-reference/C_API.md#federateinfo)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
+
+_Property's enumerated name:_ `HELICS_FLAG_REENTRANT` [38]
+
+Used to indicate to the broker that this federate may disconnect and reconnect at a later time using the same federate name. Without setting this flag, the federate would have to rejoin under a different name and would be considered a new federate by the federation. This flag only has an effect if the "dynamic" flag is also set on the broker.
 
 ---
 
@@ -908,6 +923,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL` [402]
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL` [402]
 
 When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.

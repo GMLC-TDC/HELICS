@@ -5,7 +5,7 @@ branches:
     - main
     - develop
 
-version: 3.5.0.{build}
+version: 3.5.3.{build}
 
 image: Visual Studio 2019
 
@@ -26,11 +26,13 @@ install:
   - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,git,make,gcc-core,gcc-g++,libboost-devel,libzmq-devel'
   - '%CYG_ROOT%\bin\cygcheck -dc'
   - cd %APPVEYOR_BUILD_FOLDER%
+  - git config --global --add safe.directory %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
 
 before_build:
   - mkdir build
   - cd build
+  - git config --global --add safe.directory /cygdrive/c/projects/helics
   - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_SWIG=OFF -DHELICS_BUILD_TESTS=OFF -DHELICS_DISABLE_ASIO=ON -DHELICS_ENABLE_IPC_CORE=OFF"'
   - cd ..
 

@@ -42,22 +42,23 @@ CallbackFederate::CallbackFederate() {}
 // NOTE: the CallbackFederate must call the federate constructor do to the virtual inheritance in
 // CombinationFederate
 
-CallbackFederate::CallbackFederate(std::string_view fedName, const FederateInfo& fi):
-    Federate(fedName, fi), CombinationFederate(fedName, fi)
+CallbackFederate::CallbackFederate(std::string_view fedName, const FederateInfo& fedInfo):
+    Federate(fedName, fedInfo), CombinationFederate(fedName, fedInfo)
 {
     loadOperator();
 }
 CallbackFederate::CallbackFederate(std::string_view fedName,
                                    const std::shared_ptr<Core>& core,
-                                   const FederateInfo& fi):
-    Federate(fedName, core, fi),
-    CombinationFederate(fedName, core, fi)
+                                   const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo), CombinationFederate(fedName, core, fedInfo)
 {
     loadOperator();
 }
 
-CallbackFederate::CallbackFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi):
-    Federate(fedName, core, fi), CombinationFederate(fedName, core, fi)
+CallbackFederate::CallbackFederate(std::string_view fedName,
+                                   CoreApp& core,
+                                   const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo), CombinationFederate(fedName, core, fedInfo)
 {
     loadOperator();
 }
@@ -133,7 +134,7 @@ void CallbackFederate::setFlagOption(int32_t property, bool val)
         mEventTriggered = val;
         // this does need to fallthrough
     }
-    Federate::setFlagOption(property, val);
+    CombinationFederate::setFlagOption(property, val);
 }
 
 void CallbackFederate::finalizeCallback()

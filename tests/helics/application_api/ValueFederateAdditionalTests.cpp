@@ -15,9 +15,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "testFixtures.hpp"
 
 #include <algorithm>
+#include <fstream>
 #include <future>
 #include <gtest/gtest.h>
 #include <numeric>
+#include <sstream>
 
 /** these test cases test out the value federates with some additional tests
  */
@@ -576,7 +578,11 @@ TEST_F(valuefed_add_tests_ci_skip, test_move_calls)
     EXPECT_NE(vFed.getName(), "test1");  // NOLINT
 }
 
-static constexpr const char* config_files[] = {"example_value_fed.json", "example_value_fed.toml"};
+static constexpr const char* config_files[] = {"example_value_fed.json",
+                                               "example_value_fed.toml",
+                                               "example_value_fed_helics1.json",
+                                               "example_value_fed_helics2.json",
+                                               "example_value_fed_helics_broker.json"};
 
 class valuefed_add_configfile_tests:
     public ::testing::TestWithParam<const char*>,
@@ -585,6 +591,40 @@ class valuefed_add_configfile_tests:
 TEST_P(valuefed_add_configfile_tests, file_load)
 {
     helics::ValueFederate vFed(std::string(TEST_DIR) + GetParam());
+
+    EXPECT_EQ(vFed.getName(), "valueFed");
+
+    EXPECT_EQ(vFed.getInputCount(), 3);
+    EXPECT_EQ(vFed.getPublicationCount(), 2);
+    auto& inp1 = vFed.getInput("pubshortcut");
+
+    auto key = vFed.getTarget(inp1);
+    EXPECT_EQ(key, "fedName/pub2");
+
+    EXPECT_EQ(inp1.getInfo(), "this is an information string for use by the application");
+    auto pub2name = vFed.getPublication(1).getName();
+    EXPECT_EQ(pub2name, "valueFed/pub2");
+    // test the info from a file
+    EXPECT_EQ(vFed.getPublication(0).getInfo(),
+              "this is an information string for use by the application");
+
+    EXPECT_EQ(vFed.getInput(2).getName(), "valueFed/ipt2");
+
+    EXPECT_EQ(vFed.query("global_value", "global1"), "this is a global1 value");
+    EXPECT_EQ(vFed.query("global_value", "global2"), "this is another global value");
+
+    auto& pub = vFed.getPublication("pub1");
+    EXPECT_EQ(pub.getUnits(), "m");
+    vFed.disconnect();
+}
+
+TEST_P(valuefed_add_configfile_tests, file_load_as_string)
+{
+    std::ifstream file(std::string(TEST_DIR) + GetParam());
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    helics::ValueFederate vFed(buffer.str());
 
     EXPECT_EQ(vFed.getName(), "valueFed");
 
@@ -1219,6 +1259,11 @@ TEST(valuefederate, file_and_config)
     Fed2->enterExecutingModeAsync();
     Fed1->enterExecutingModeComplete();
 
+    // check some tags
+    EXPECT_EQ(Fed1->getTag("tag1"), "1");
+    EXPECT_EQ(Fed1->getTag("tag2"), "1");
+    EXPECT_EQ(Fed1->getTag("tag3"), "1");
+
     EXPECT_TRUE(Fed2->getFlagOption(HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE));
     pub1.publish(std::complex<double>(1, 2));
 
@@ -1283,7 +1328,7 @@ TEST(valuefederate, duplicate_targets)
 
 class vfedPermutation: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
-TEST_P(vfedPermutation, value_linking_order_permutations)
+TEST_P(vfedPermutation, value_linking_order_permutations_nosan)
 {
     SetupTest<helics::ValueFederate>("test_2", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);

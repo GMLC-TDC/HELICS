@@ -363,6 +363,12 @@ bool TimeDependencies::addDependency(GlobalFederateId gid)
         if (dep->fedID == gid) {
             auto rval = dep->dependency;
             dep->dependency = true;
+            if (dep->next == Time::maxVal()) {
+                dep->next = negEpsilon;
+                dep->lastGrant = timeZero;
+                dep->mTimeState = TimeState::initialized;
+                return true;
+            }
             // the dependency is already present
             return !rval;
         }
@@ -418,6 +424,18 @@ void TimeDependencies::removeDependent(GlobalFederateId gid)
             dep->dependent = false;
             if (!dep->dependency) {
                 dependencies.erase(dep);
+            }
+        }
+    }
+}
+
+void TimeDependencies::resetDependency(GlobalFederateId gid)
+{
+    auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
+    if (dep != dependencies.end()) {
+        if (dep->fedID == gid) {
+            if (dep->mTimeState == TimeState::time_granted && dep->lastGrant >= cBigTime) {
+                *dep = DependencyInfo(dep->fedID);
             }
         }
     }

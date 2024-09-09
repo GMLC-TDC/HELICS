@@ -39,6 +39,7 @@ set(private_application_api_headers
     FilterOperations.hpp
     ConnectorFederateManager.hpp
     TranslatorOperations.hpp
+    PotentialInterfacesManager.hpp
 )
 
 set(application_api_sources
@@ -55,6 +56,7 @@ set(application_api_sources
     Filters.cpp
     FilterOperations.cpp
     ConnectorFederateManager.cpp
+    PotentialInterfacesManager.cpp
     Translator.cpp
     TranslatorOperations.cpp
     Endpoints.cpp

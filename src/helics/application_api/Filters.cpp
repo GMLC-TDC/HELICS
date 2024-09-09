@@ -162,8 +162,7 @@ CloningFilter::CloningFilter(Federate* ffed, std::string_view filtName, Interfac
 
 CloningFilter::CloningFilter(InterfaceVisibility locality,
                              Federate* ffed,
-                             std::string_view filtName):
-    Filter(ffed, filtName, InterfaceHandle())
+                             std::string_view filtName): Filter(ffed, filtName, InterfaceHandle())
 {
     if (ffed != nullptr) {
         if (locality == InterfaceVisibility::GLOBAL) {

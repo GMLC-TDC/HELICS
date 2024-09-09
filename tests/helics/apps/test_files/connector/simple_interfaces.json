@@ -1,0 +1,6 @@
+{
+  "potential_interfaces": {
+    "publications": [{ "name": "pub1", "global": true, "type": "double" }],
+    "inputs": [{ "name": "inp1", "global": true, "type": "double" }]
+  }
+}
