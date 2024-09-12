@@ -1449,14 +1449,15 @@ This filter will randomly drop a message, the drop probability is specified, and
 
 #### `clone`
 
-This filter will copy a message and send it to the original destination plus a new one.
+The clone filter takes any message sent from endpoints listed in the `source_targets` object and sends a copy to endpoints in the `destination_target` object. Note that both of these can be strings for a single endpoint or lists for multiple endpoints.
 
 ```json
    "operation": "clone",
-    "properties": {
-        "name": "add delivery",
-        "value": "endpoint name",
-    },
+   "source_targets":[
+     "source_endpoint_1_name",
+     "source_endpoint_2_name" 
+   ],
+   "destination_targets": "ep_that_receives_cloned_messages"
 ```
 
 ## Translator Options
