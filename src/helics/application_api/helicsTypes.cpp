@@ -18,6 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <fmt/format.h>
+#if FMT_VERSION >= 110000
+#    include <fmt/ranges.h>
+#endif
 #include <functional>
 #include <numeric>
 #include <regex>
