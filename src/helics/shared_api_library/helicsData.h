@@ -70,6 +70,7 @@ HELICS_EXPORT int32_t helicsDataBufferFillFromString(HelicsDataBuffer data, cons
 /** convert a raw string (may contain nulls) to serialized bytesin a buffer
 * @param data the HelicsDataBuffer to fill
 * @param str the value to serialize into the dataBuffer
+@param stringSize the size of the string value to serialize into the dataBuffer
 @return the buffer size after filling
 */
 HELICS_EXPORT int32_t helicsDataBufferFillFromRawString(HelicsDataBuffer data, const char* str, int stringSize);
