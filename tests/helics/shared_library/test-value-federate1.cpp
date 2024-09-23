@@ -1248,3 +1248,114 @@ TEST_F(vfedSingle, buffer_tests)
 
     CE(helicsFederateFinalize(vFed, &err));
 }
+
+TEST_F(vfedSingle, update_tests)
+{
+    HelicsTime gtime;
+    HelicsBool val1 = 0;
+    SetupTest(helicsCreateValueFederate, "test", 1, 1.0);
+    auto vFed = GetFederateAt(0);
+    // register the publications
+    auto pubid = helicsFederateRegisterGlobalPublication(
+        vFed, "pub1", HELICS_DATA_TYPE_BOOLEAN, "", nullptr);
+    auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "", nullptr);
+
+    CE(helicsFederateEnterExecutingMode(vFed, &err));
+
+    // publish string1 at time=0.0;
+    CE(helicsPublicationPublishBoolean(pubid, HELICS_TRUE, &err));
+
+    CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
+    EXPECT_EQ(gtime, 1.0);
+
+    EXPECT_EQ(helicsInputIsUpdated(subid), HELICS_TRUE);
+    // get the value
+    CE(val1 = helicsInputGetBoolean(subid, &err));
+    // make sure the string is what we expect
+    EXPECT_EQ(val1, HELICS_TRUE);
+    // make sure the value reads as not updated now
+    EXPECT_NE(helicsInputIsUpdated(subid), HELICS_TRUE);
+    // publish a second value
+    CE(helicsPublicationPublishBoolean(pubid, HELICS_FALSE, &err));
+
+    // make sure the value is still what we expect
+    CE(val1 = helicsInputGetBoolean(subid, &err));
+    EXPECT_EQ(val1, HELICS_TRUE);
+
+    // make sure the value reads as not updated now
+    EXPECT_NE(helicsInputIsUpdated(subid), HELICS_TRUE);
+
+    // advance time
+    CE(gtime = helicsFederateRequestTime(vFed, 2.0, &err));
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 2.0);
+    EXPECT_EQ(helicsInputIsUpdated(subid), HELICS_TRUE);
+    CE(val1 = helicsInputGetBoolean(subid, &err));
+    EXPECT_EQ(val1, HELICS_FALSE);
+    EXPECT_NE(helicsInputIsUpdated(subid), HELICS_TRUE);
+
+    // advance time
+    CE(gtime = helicsFederateRequestTime(vFed, 3.0, &err));
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 3.0);
+    EXPECT_NE(helicsInputIsUpdated(subid), HELICS_TRUE);
+
+    CE(helicsFederateFinalize(vFed, &err));
+}
+
+TEST_F(vfedSingle, update_tests_string)
+{
+    HelicsTime gtime;
+    const char* test1 = "string_test1";
+    const char* test2 = "test_string2";
+    char val1[60];
+    SetupTest(helicsCreateValueFederate, "test", 1, 1.0);
+    auto vFed = GetFederateAt(0);
+    // register the publications
+    auto pubid =
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_STRING, "", nullptr);
+    auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "", nullptr);
+
+    CE(helicsFederateEnterExecutingMode(vFed, &err));
+
+    // publish string1 at time=0.0;
+    CE(helicsPublicationPublishString(pubid, test1, &err));
+
+    CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
+    EXPECT_EQ(gtime, 1.0);
+
+    EXPECT_EQ(helicsInputIsUpdated(subid), HELICS_TRUE);
+    int len = 0;
+    // get the value
+    CE(helicsInputGetString(subid, val1, 60, &len, &err));
+    // make sure the string is what we expect
+    EXPECT_STREQ(val1, test1);
+    // make sure the value reads as not updated now
+    EXPECT_NE(helicsInputIsUpdated(subid), HELICS_TRUE);
+    // publish a second value
+    CE(helicsPublicationPublishString(pubid, test2, &err));
+
+    // make sure the value is still what we expect
+    CE(helicsInputGetString(subid, val1, 60, &len, &err));
+    EXPECT_STREQ(val1, test1);
+
+    // make sure the value reads as not updated now
+    EXPECT_NE(helicsInputIsUpdated(subid), HELICS_TRUE);
+
+    // advance time
+    CE(gtime = helicsFederateRequestTime(vFed, 2.0, &err));
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 2.0);
+    EXPECT_EQ(helicsInputIsUpdated(subid), HELICS_TRUE);
+    CE(helicsInputGetString(subid, val1, 60, &len, &err));
+    EXPECT_STREQ(val1, test2);
+    EXPECT_NE(helicsInputIsUpdated(subid), HELICS_TRUE);
+
+    // advance time
+    CE(gtime = helicsFederateRequestTime(vFed, 3.0, &err));
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 3.0);
+    EXPECT_NE(helicsInputIsUpdated(subid), HELICS_TRUE);
+
+    CE(helicsFederateFinalize(vFed, &err));
+}

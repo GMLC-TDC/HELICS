@@ -544,10 +544,10 @@ TEST_F(TranslatorFixture, translator_to_message)
 
     auto json = helics::fileops::loadJsonStr(message->data.to_string());
 
-    ASSERT_TRUE(json.isMember("value"));
-    ASSERT_TRUE(json.isMember("type"));
-    EXPECT_DOUBLE_EQ(json["value"].asDouble(), 20.7);
-    EXPECT_STREQ(json["type"].asCString(), "double");
+    ASSERT_TRUE(json.contains("value"));
+    ASSERT_TRUE(json.contains("type"));
+    EXPECT_DOUBLE_EQ(json["value"].get<double>(), 20.7);
+    EXPECT_EQ(json["type"].get<std::string>(), "double");
     FullDisconnect();
 }
 
@@ -589,10 +589,10 @@ TEST_F(TranslatorFixture, translator_to_message_2fed)
 
     auto json = helics::fileops::loadJsonStr(message->data.to_string());
 
-    ASSERT_TRUE(json.isMember("value"));
-    ASSERT_TRUE(json.isMember("type"));
-    EXPECT_DOUBLE_EQ(json["value"].asDouble(), 20.7);
-    EXPECT_STREQ(json["type"].asCString(), "double");
+    ASSERT_TRUE(json.contains("value"));
+    ASSERT_TRUE(json.contains("type"));
+    EXPECT_DOUBLE_EQ(json["value"].get<double>(), 20.7);
+    EXPECT_EQ(json["type"].get<std::string>(), "double");
     FullDisconnect();
 }
 
@@ -627,10 +627,10 @@ TEST_F(TranslatorFixture, translator_to_message_target_from_translator)
 
     auto json = helics::fileops::loadJsonStr(message->data.to_string());
 
-    ASSERT_TRUE(json.isMember("value"));
-    ASSERT_TRUE(json.isMember("type"));
-    EXPECT_DOUBLE_EQ(json["value"].asDouble(), 20.7);
-    EXPECT_STREQ(json["type"].asCString(), "double");
+    ASSERT_TRUE(json.contains("value"));
+    ASSERT_TRUE(json.contains("type"));
+    EXPECT_DOUBLE_EQ(json["value"].get<double>(), 20.7);
+    EXPECT_EQ(json["type"].get<std::string>(), "double");
     FullDisconnect();
 }
 
@@ -753,10 +753,10 @@ TEST_F(TranslatorFixture, translator_to_multimessage)
 
     auto json = helics::fileops::loadJsonStr(message->data.to_string());
 
-    ASSERT_TRUE(json.isMember("value"));
-    ASSERT_TRUE(json.isMember("type"));
-    EXPECT_DOUBLE_EQ(json["value"].asDouble(), 20.7);
-    EXPECT_STREQ(json["type"].asCString(), "double");
+    ASSERT_TRUE(json.contains("value"));
+    ASSERT_TRUE(json.contains("type"));
+    EXPECT_DOUBLE_EQ(json["value"].get<double>(), 20.7);
+    EXPECT_EQ(json["type"].get<std::string>(), "double");
 
     EXPECT_TRUE(endpoint2.hasMessage());
     auto message2 = endpoint2.getMessage();
@@ -766,10 +766,10 @@ TEST_F(TranslatorFixture, translator_to_multimessage)
 
     auto json2 = helics::fileops::loadJsonStr(message2->data.to_string());
 
-    ASSERT_TRUE(json2.isMember("value"));
-    ASSERT_TRUE(json2.isMember("type"));
-    EXPECT_DOUBLE_EQ(json2["value"].asDouble(), 20.7);
-    EXPECT_STREQ(json2["type"].asCString(), "double");
+    ASSERT_TRUE(json2.contains("value"));
+    ASSERT_TRUE(json2.contains("type"));
+    EXPECT_DOUBLE_EQ(json2["value"].get<double>(), 20.7);
+    EXPECT_EQ(json2["type"].get<std::string>(), "double");
     FullDisconnect();
 }
 

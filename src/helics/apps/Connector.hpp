@@ -24,7 +24,7 @@ struct Connection {
     std::string_view interface2;
     InterfaceDirection direction;
     std::vector<std::size_t> tags;
-    std::shared_ptr<std::string> stringBuffer;
+    std::shared_ptr<std::string> stringBuffer{nullptr};
 };
 
 struct ConnectionsList;

@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/common/JsonGeneration.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
+#include "nlohmann/json.hpp"
 
 #include <gtest/gtest.h>
 
@@ -26,10 +27,10 @@ static constexpr const char* test_strings[] = {"test1",
 TEST_P(jsonStringGen_tests, convert_tests)
 {
     auto str = generateJsonQuotedString(GetParam());
-    Json::Value value;
+    nlohmann::json value;
     EXPECT_NO_THROW(value = loadJsonStr(str));
-    EXPECT_TRUE(value.isString());
-    EXPECT_STREQ(value.asCString(), GetParam());
+    EXPECT_TRUE(value.is_string());
+    EXPECT_EQ(value.get<std::string>(), GetParam());
 }
 
 INSTANTIATE_TEST_SUITE_P(jsonString_tests, jsonStringGen_tests, ::testing::ValuesIn(test_strings));
@@ -39,14 +40,14 @@ TEST(error_generation, egen1)
     std::string message = "this is a message";
     int code{505};
     auto estring = generateJsonErrorResponse(static_cast<JsonErrorCodes>(code), message);
-    Json::Value value;
+    nlohmann::json value;
     EXPECT_NO_THROW(value = loadJsonStr(estring));
-    EXPECT_TRUE(value.isObject());
+    EXPECT_TRUE(value.is_object());
 
-    EXPECT_TRUE(value["error"].isObject());
-    EXPECT_TRUE(value["error"]["code"].isInt());
-    EXPECT_EQ(value["error"]["code"].asInt(), code);
-    EXPECT_STREQ(value["error"]["message"].asCString(), message.c_str());
+    EXPECT_TRUE(value["error"].is_object());
+    EXPECT_TRUE(value["error"]["code"].is_number_integer());
+    EXPECT_EQ(value["error"]["code"].get<int>(), code);
+    EXPECT_EQ(value["error"]["message"].get<std::string>(), message);
 }
 
 TEST(error_generation, egen2)
@@ -54,14 +55,14 @@ TEST(error_generation, egen2)
     std::string message = "this is a \"quoted\" message";
     int code{-216};
     auto estring = generateJsonErrorResponse(static_cast<JsonErrorCodes>(code), message);
-    Json::Value value;
+    nlohmann::json value;
     EXPECT_NO_THROW(value = loadJsonStr(estring));
-    EXPECT_TRUE(value.isObject());
+    EXPECT_TRUE(value.is_object());
 
-    EXPECT_TRUE(value["error"].isObject());
-    EXPECT_TRUE(value["error"]["code"].isInt());
-    EXPECT_EQ(value["error"]["code"].asInt(), code);
-    EXPECT_EQ(value["error"]["message"].asString(), message);
+    EXPECT_TRUE(value["error"].is_object());
+    EXPECT_TRUE(value["error"]["code"].is_number_integer());
+    EXPECT_EQ(value["error"]["code"].get<int>(), code);
+    EXPECT_EQ(value["error"]["message"].get<std::string>(), message);
 }
 
 TEST(looks_like_json, jsonConfig1)

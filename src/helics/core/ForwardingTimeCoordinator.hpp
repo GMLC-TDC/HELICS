@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
 
-#include "json/forwards.h"
 #include <atomic>
 #include <functional>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -58,7 +58,7 @@ class ForwardingTimeCoordinator: public BaseTimeCoordinator {
     /** generate a string with the current time status*/
     virtual std::string printTimeStatus() const override;
     /** generate debugging time information*/
-    virtual void generateDebuggingTimeInfo(Json::Value& base) const override;
+    virtual void generateDebuggingTimeInfo(nlohmann::json& base) const override;
 
     /** get the current next time*/
     virtual Time getNextTime() const override { return downstream.next; }

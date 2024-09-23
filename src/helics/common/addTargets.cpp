@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
+using fileops::JsonAsString;
+
 void processOptions(const toml::value& section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,
@@ -44,25 +46,25 @@ void processOptions(const toml::value& section,
     }
 }
 
-void processOptions(const Json::Value& section,
+void processOptions(const nlohmann::json& section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction)
 {
     auto stop = section.end();
-    for (auto sIterator = section.begin(); sIterator != stop; ++sIterator) {
-        if (sIterator->isArray() || sIterator->isObject()) {
+    for (const auto& [key, value] : section.items()) {
+        if (value.is_array() || value.is_object()) {
             continue;
         }
-        const int32_t index = optionConversion(sIterator.name());
+        int32_t index = optionConversion(key);
         if (index >= 0) {
             int32_t val = -1;
-            if (sIterator->isBool()) {
-                val = sIterator->asBool() ? 1 : 0;
-            } else if (sIterator->isInt64()) {
-                val = sIterator->asInt64();
+            if (value.is_boolean()) {
+                val = value.get<bool>() ? 1 : 0;
+            } else if (value.is_number_integer()) {
+                val = value.get<int32_t>();
             } else {
-                val = valueConversion(sIterator->asString());
+                val = valueConversion(value.get<std::string>());
             }
             optionAction(index, val);
         }
@@ -83,43 +85,37 @@ static std::pair<std::string, std::string> getTagPair(const TV& tagValue)
     return std::make_pair(std::string{}, std::string{});
 }
 
-void loadTags(const Json::Value& section,
+void loadTags(const nlohmann::json& section,
               const std::function<void(std::string_view, std::string_view)>& tagAction)
 {
-    if (section.isMember("tags")) {
+    if (section.contains("tags")) {
         auto tagValue = section["tags"];
-        if (tagValue.isArray()) {
+        if (tagValue.is_array()) {
             for (auto& tagPair : tagValue) {
-                if (tagPair.isObject()) {
-                    auto pairValues = getTagPair(tagPair);
-                    if (!pairValues.first.empty()) {
-                        tagAction(pairValues.first, pairValues.second);
-                    }
-                } else if (tagPair.isArray()) {
+                auto pairValues = getTagPair(tagPair);
+                if (!pairValues.first.empty()) {
+                    tagAction(pairValues.first, pairValues.second);
+                } else if (tagPair.is_array()) {
                     if (tagPair.size() > 1) {
-                        tagAction(tagPair[0].asString(), tagPair[1].asString());
+                        tagAction(JsonAsString(tagPair[0]), JsonAsString(tagPair[1]));
                     } else {
-                        tagAction(tagPair[0].asString(), "1");
+                        tagAction(JsonAsString(tagPair[0]), "1");
                     }
-                } else if (tagPair.isString()) {
-                    tagAction(tagPair.asString(), "1");
+                } else if (tagPair.is_string()) {
+                    tagAction(tagPair.get<std::string>(), "1");
                 }
             }
-        } else if (tagValue.isObject()) {
+        } else if (tagValue.is_object()) {
             auto tagPair = getTagPair(tagValue);
             if (!tagPair.first.empty()) {
                 tagAction(tagPair.first, tagPair.second);
-            } else if (tagValue.isObject()) {
-                auto names = tagValue.getMemberNames();
-                for (auto& name : names) {
-                    tagAction(name,
-                              (tagValue[name].isString()) ?
-                                  tagValue[name].asString() :
-                                  fileops::generateJsonString(tagValue[name]));
+            } else if (tagValue.is_object()) {
+                for (auto& item : tagValue.items()) {
+                    tagAction(item.key(), JsonAsString(item.value()));
                 }
             }
-        } else if (tagValue.isString()) {
-            tagAction("tags", tagValue.asString());
+        } else if (tagValue.is_string()) {
+            tagAction("tags", tagValue.get<std::string>());
         }
     }
 }

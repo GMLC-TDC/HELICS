@@ -381,11 +381,11 @@ std::string helicsNamedPointString(const NamedPoint& point)
 }
 std::string helicsNamedPointString(std::string_view pointName, double val)
 {
-    Json::Value NP;
+    nlohmann::json NP;
     NP["value"] = val;
     if (pointName.empty()) {
     } else {
-        NP["name"] = Json::Value(pointName.data(), pointName.data() + pointName.size());
+        NP["name"] = pointName;
     }
     return fileops::generateJsonString(NP);
 }
@@ -410,21 +410,21 @@ NamedPoint helicsGetNamedPoint(std::string_view val)
     try {
         auto jv = fileops::loadJsonStr(val);
         switch (jv.type()) {
-            case Json::ValueType::realValue:
-                p.value = jv.asDouble();
+            case nlohmann::json::value_t::number_float:
+                p.value = jv.get<double>();
                 p.name = "value";
                 break;
-            case Json::ValueType::stringValue:
-                p.name = jv.asString();
+            case nlohmann::json::value_t::string:
+                p.name = jv.get<std::string>();
                 break;
-            case Json::ValueType::arrayValue:
+            case nlohmann::json::value_t::array:
                 break;
-            case Json::ValueType::intValue:
-            case Json::ValueType::uintValue:
-                p.value = static_cast<double>(jv.asInt());
+            case nlohmann::json::value_t::number_integer:
+            case nlohmann::json::value_t::number_unsigned:
+                p.value = static_cast<double>(jv.get<int>());
                 p.name = "value";
                 break;
-            case Json::ValueType::objectValue:
+            case nlohmann::json::value_t::object:
                 fileops::replaceIfMember(jv, "value", p.value);
                 fileops::replaceIfMember(jv, "name", p.name);
                 break;
@@ -603,31 +603,31 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
             auto JV = fileops::loadJsonStr(val);
             int cnt{0};
             switch (JV.type()) {
-                case Json::ValueType::realValue:
-                case Json::ValueType::intValue:
-                case Json::ValueType::uintValue:
+                case nlohmann::json::value_t::number_float:
+                case nlohmann::json::value_t::number_integer:
+                case nlohmann::json::value_t::number_unsigned:
                     data.resize(0);
-                    data.emplace_back(JV.asDouble(), 0.0);
+                    data.emplace_back(JV.get<double>(), 0.0);
                     break;
-                case Json::ValueType::arrayValue:
+                case nlohmann::json::value_t::array:
                     for (auto& av : JV) {
-                        if (av.isNumeric()) {
+                        if (av.is_number()) {
                             if (cnt == 0) {
-                                data.emplace_back(av.asDouble(), 0.0);
+                                data.emplace_back(av.get<double>(), 0.0);
                                 cnt = 1;
                             } else {
-                                data.back() += std::complex<double>{0.0, av.asDouble()};
+                                data.back() += std::complex<double>{0.0, av.get<double>()};
                                 cnt = 0;
                             }
-                        } else if (av.isArray()) {
+                        } else if (av.is_array()) {
                             cnt = 0;
                             if (av.size() >= 2) {
-                                if (av[0].isNumeric()) {
-                                    data.emplace_back(av[0].asDouble(), av[1].asDouble());
+                                if (av[0].is_number()) {
+                                    data.emplace_back(av[0].get<double>(), av[1].get<double>());
                                 }
                             } else if (av.size() == 1) {
-                                if (av[0].isNumeric()) {
-                                    data.emplace_back(av[0].asDouble(), 0.0);
+                                if (av[0].is_number()) {
+                                    data.emplace_back(av[0].get<double>(), 0.0);
                                 }
                             } else {
                                 data.push_back(invalidValue<std::complex<double>>());
@@ -755,7 +755,7 @@ SmallBuffer typeConvert(DataType type, double val)
         case DataType::HELICS_VECTOR:
             return ValueConverter<double>::convert(&val, 1);
         case DataType::HELICS_JSON: {
-            Json::Value json;
+            nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_DOUBLE);
             json["value"] = val;
             return fileops::generateJsonString(json);
@@ -799,7 +799,7 @@ SmallBuffer typeConvert(DataType type, int64_t val)
             return ValueConverter<double>::convert(&doubleVal, 1);
         }
         case DataType::HELICS_JSON: {
-            Json::Value json;
+            nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_INT);
             json["value"] = val;
             return fileops::generateJsonString(json);
@@ -837,7 +837,7 @@ SmallBuffer typeConvert(DataType type, std::string_view val)
         case DataType::HELICS_VECTOR:
             return ValueConverter<std::vector<double>>::convert(helicsGetVector(val));
         case DataType::HELICS_JSON: {
-            Json::Value json;
+            nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_STRING);
             json["value"] = std::string(val);
             return fileops::generateJsonString(json);
@@ -891,11 +891,11 @@ SmallBuffer typeConvert(DataType type, const double* vals, size_t size)
         default:
             return ValueConverter<double>::convert(vals, size);
         case DataType::HELICS_JSON: {
-            Json::Value jv;
+            nlohmann::json jv;
             jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
-            Json::Value vv = Json::arrayValue;
+            nlohmann::json vv = nlohmann::json::array();
             for (size_t ii = 0; ii < size; ++ii) {
-                vv.append(vals[ii]);
+                vv.push_back(vals[ii]);
             }
             jv["value"] = std::move(vv);
             return fileops::generateJsonString(jv);
@@ -950,11 +950,11 @@ SmallBuffer typeConvertComplex(DataType type, const double* vals, size_t size)
         default:
             return ValueConverter<double>::convert(vals, size);
         case DataType::HELICS_JSON: {
-            Json::Value jv;
+            nlohmann::json jv;
             jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
-            Json::Value vv = Json::arrayValue;
+            nlohmann::json vv = nlohmann::json::array();
             for (size_t ii = 0; ii < size; ++ii) {
-                vv.append(vals[ii]);
+                vv.push_back(vals[ii]);
             }
             jv["value"] = std::move(vv);
             return fileops::generateJsonString(jv);
@@ -1001,12 +1001,12 @@ SmallBuffer typeConvert(DataType type, const std::vector<std::complex<double>>& 
             return ValueConverter<std::vector<double>>::convert(DV);
         }
         case DataType::HELICS_JSON: {
-            Json::Value jv;
+            nlohmann::json jv;
             jv["type"] = typeNameStringRef(DataType::HELICS_COMPLEX_VECTOR);
-            Json::Value vv = Json::arrayValue;
+            nlohmann::json vv = nlohmann::json::array();
             for (const auto& v : val) {
-                vv.append(v.real());
-                vv.append(v.imag());
+                vv.push_back(v.real());
+                vv.push_back(v.imag());
             }
             jv["value"] = std::move(vv);
             return fileops::generateJsonString(jv);
@@ -1044,11 +1044,11 @@ SmallBuffer typeConvert(DataType type, const std::complex<double>& val)
             return ValueConverter<std::vector<double>>::convert(V);
         }
         case DataType::HELICS_JSON: {
-            Json::Value json;
+            nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_COMPLEX);
-            Json::Value vv = Json::arrayValue;
-            vv.append(val.real());
-            vv.append(val.imag());
+            nlohmann::json vv = nlohmann::json::array();
+            vv.push_back(val.real());
+            vv.push_back(val.imag());
             json["value"] = std::move(vv);
             return fileops::generateJsonString(json);
         }
@@ -1090,7 +1090,7 @@ SmallBuffer typeConvert(DataType type, const NamedPoint& val)
         case DataType::HELICS_VECTOR:
             return ValueConverter<double>::convert(&(val.value), 1);
         case DataType::HELICS_JSON: {
-            Json::Value json;
+            nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_NAMED_POINT);
             json["name"] = val.name;
             json["value"] = val.value;
@@ -1131,7 +1131,7 @@ SmallBuffer typeConvert(DataType type, std::string_view str, double val)
         case DataType::HELICS_VECTOR:
             return ValueConverter<double>::convert(&(val), 1);
         case DataType::HELICS_JSON: {
-            Json::Value json;
+            nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_NAMED_POINT);
             json["name"] = std::string(str);
             json["value"] = val;
@@ -1169,7 +1169,7 @@ SmallBuffer typeConvert(DataType type, bool val)
             return ValueConverter<double>::convert(&v2, 1);
         }
         case DataType::HELICS_JSON: {
-            Json::Value json;
+            nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_BOOL);
             json["value"] = val;
             return fileops::generateJsonString(json);
@@ -1206,7 +1206,7 @@ SmallBuffer typeConvert(DataType type, char val)
             return ValueConverter<double>::convert(&v2, 1);
         }
         case DataType::HELICS_JSON: {
-            Json::Value json;
+            nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_INT);
             json["value"] = val;
             return fileops::generateJsonString(json);
@@ -1252,7 +1252,7 @@ SmallBuffer typeConvert(DataType type, Time val)
             return ValueConverter<std::vector<double>>::convert(vec);
         }
         case DataType::HELICS_JSON: {
-            Json::Value json;
+            nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_TIME);
             json["value"] = val.getBaseTimeCode();
             return fileops::generateJsonString(json);

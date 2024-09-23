@@ -45,7 +45,7 @@ class RestApiConnection {
     boost::beast::flat_buffer buffer;
 
     std::string hostName{"localHost"};
-    Json::Value config;
+    nlohmann::json config;
     bool connected{false};
 };
 }  // namespace helics::apps

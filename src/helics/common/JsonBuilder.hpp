@@ -7,19 +7,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <utility>
 #include <vector>
 
-namespace Json {
-class Value;
-}  // namespace Json
-
 namespace helics::fileops {
+
 /** class handling the construction in pieces of a JSON map*/
 class JsonMapBuilder {
   private:
-    std::unique_ptr<Json::Value> jMap;
+    std::unique_ptr<nlohmann::json> jMap;
     std::map<int, std::pair<std::string, int32_t>> missing_components;
     int counterCode{0};  // a code for the user to include for various purposes
   public:
@@ -28,7 +26,7 @@ class JsonMapBuilder {
     JsonMapBuilder(JsonMapBuilder&& map) noexcept = default;
     JsonMapBuilder& operator=(JsonMapBuilder&& map) = default;
     /** get the underlying json object*/
-    Json::Value& getJValue();
+    nlohmann::json& getJValue();
     /** check if the map has completed*/
     bool isCompleted() const;
     // check whether a map is currently completed or under construction
@@ -60,13 +58,13 @@ class JsonMapBuilder {
 /** class to help with the generation of JSON*/
 class JsonBuilder {
   private:
-    std::unique_ptr<Json::Value> jMap;
+    std::unique_ptr<nlohmann::json> jMap;
 
   public:
     JsonBuilder() noexcept;
     ~JsonBuilder();
     /** get the underlying json object*/
-    Json::Value& getJValue();
+    nlohmann::json& getJValue();
     /** add a string element on a specific path*/
     void addElement(const std::string& path, const std::string& value);
     /** add a double element on a specific path*/
@@ -78,4 +76,5 @@ class JsonBuilder {
     /** reset the builder*/
     void reset();
 };
+
 }  // namespace helics::fileops

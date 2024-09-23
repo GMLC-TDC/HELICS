@@ -197,7 +197,7 @@ TEST(type_conversion, namedpoint_conversion)
         checkTypeConversion1(vp,
                              std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
     EXPECT_TRUE(checkTypeConversion1(vp, true));
-    Json::Value v1;
+    nlohmann::json v1;
     v1["name"] = "point";
     v1["value"] = val;
     EXPECT_TRUE(checkTypeConversion1(vp, helics::fileops::generateJsonString(v1)));

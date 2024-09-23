@@ -23,7 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "cppzmq/zmq.hpp"
 #endif
 
-static const Json::Value null;
+static const nlohmann::json null;
 
 namespace helics::apps {
 
@@ -46,7 +46,7 @@ void zmqBrokerServer::processArgs(std::string_view args)
     }
 }
 
-void zmqBrokerServer::startServer(const Json::Value* val,
+void zmqBrokerServer::startServer(const nlohmann::json* val,
                                   const std::shared_ptr<TypedBrokerServer>& /*ptr*/)
 {
     config_ = (val != nullptr) ? val : &null;
@@ -76,13 +76,13 @@ void zmqBrokerServer::stopServer()
                                  ((zmq_enabled_) ? getDefaultPort(HELICS_CORE_TYPE_ZMQ) + 1 :
                                                    getDefaultPort(HELICS_CORE_TYPE_ZMQ_SS));
     if (zmq_enabled_) {
-        if (config_->isMember("zmq")) {
+        if (config_->contains("zmq")) {
             auto V = (*config_)["zmq"];
             fileops::replaceIfMember(V, "interface", mZmqInterface);
             fileops::replaceIfMember(V, "port", port);
         }
     } else {
-        if (config_->isMember("zmqss")) {
+        if (config_->contains("zmqss")) {
             auto V = (*config_)["zmqss"];
             fileops::replaceIfMember(V, "interface", mZmqInterface);
             fileops::replaceIfMember(V, "port", port);
@@ -116,7 +116,7 @@ std::pair<std::unique_ptr<zmq::socket_t>, int> zmqBrokerServer::loadZMQsocket(zm
                                                           getDefaultPort(HELICS_CORE_TYPE_ZMQ) + 1};
     std::string ext_interface = "tcp://*";
     std::chrono::milliseconds timeout(20000);
-    if (config_->isMember("zmq")) {
+    if (config_->contains("zmq")) {
         auto V = (*config_)["zmq"];
         fileops::replaceIfMember(V, "interface", ext_interface);
         fileops::replaceIfMember(V, "port", retval.second);
@@ -139,7 +139,7 @@ std::pair<std::unique_ptr<zmq::socket_t>, int> zmqBrokerServer::loadZMQSSsocket(
                                                           getDefaultPort(HELICS_CORE_TYPE_ZMQ_SS)};
     std::string ext_interface = "tcp://*";
     std::chrono::milliseconds timeout(20000);
-    if (config_->isMember("zmqss")) {
+    if (config_->contains("zmqss")) {
         auto V = (*config_)["zmqss"];
         fileops::replaceIfMember(V, "interface", ext_interface);
         fileops::replaceIfMember(V, "port", retval.second);

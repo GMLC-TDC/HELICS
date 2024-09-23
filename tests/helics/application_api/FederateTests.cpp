@@ -367,8 +367,8 @@ TEST(federate, index_groups)
 
     auto qres = fed1->query("root", "federate_map");
     auto val = helics::fileops::loadJsonStr(qres);
-    EXPECT_GT(val["cores"][0]["federates"][0]["attributes"]["id"].asInt64(),
-              val["cores"][0]["federates"][1]["attributes"]["id"].asInt64());
+    EXPECT_GT(val["cores"][0]["federates"][0]["attributes"]["id"].get<int64_t>(),
+              val["cores"][0]["federates"][1]["attributes"]["id"].get<int64_t>());
     fed1->finalize();
     fed2->finalize();
 }

@@ -470,7 +470,7 @@ TEST_F(multiInput, vectorize_string)
     pub1.publish("test1");
     vFed1->requestNextStep();
     auto val = in1.getValue<std::string>();
-    EXPECT_EQ(val, "[ \"test1\" ]");
+    EXPECT_NE(val.find("\"test1\""), std::string::npos);
     pub3.publish("test3");
     pub2.publish("test2");
 
@@ -479,9 +479,9 @@ TEST_F(multiInput, vectorize_string)
     auto jv = fileops::loadJsonStr(val);
 
     EXPECT_EQ(jv.size(), 3U);
-    EXPECT_STREQ(jv[0].asCString(), "test1");
-    EXPECT_STREQ(jv[1].asCString(), "test2");
-    EXPECT_STREQ(jv[2].asCString(), "test3");
+    EXPECT_EQ(jv[0].get<std::string>(), "test1");
+    EXPECT_EQ(jv[1].get<std::string>(), "test2");
+    EXPECT_EQ(jv[2].get<std::string>(), "test3");
 
     vFed1->finalize();
 }

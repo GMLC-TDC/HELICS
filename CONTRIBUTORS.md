@@ -65,9 +65,9 @@ Asio is used for TCP and UDP communication, as well as resolving IP addresses. T
 
 The header only bindings for the ZeroMQ library are used to interact with the ZeroMQ library. The header files are modified to include some string operations and are included in the HELICS source. cppzmq is licensed under the [MIT](https://github.com/zeromq/cppzmq/blob/master/LICENSE) license.
 
-### [JsonCpp](https://github.com/open-source-parsers/jsoncpp)
+### [JSON for Modern C++](https://github.com/nlohmann/json)
 
-JsonCpp is used for parsing json files. It is included as a submodule JsonCpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE).
+JSON for Modern C++ is used for parsing json files. The single file header and forward declarations is included in this repo [LICENSE](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT).
 
 ### [CLI11](https://github.com/CLIUtils/CLI11)
 

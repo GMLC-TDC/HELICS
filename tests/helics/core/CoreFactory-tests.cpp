@@ -170,13 +170,13 @@ TEST(core, systemInfo)
     auto eVers = helics::core::systemInfo();
 
     auto json = helics::fileops::loadJsonStr(eVers);
-    EXPECT_FALSE(json.isNull());
+    EXPECT_FALSE(json.is_null());
 
-    EXPECT_FALSE(json["version"].isNull());
+    EXPECT_FALSE(json["version"].is_null());
 
-    ASSERT_FALSE(json["cores"].isNull());
+    ASSERT_FALSE(json["cores"].is_null());
     for (const auto& coretype : json["cores"]) {
-        auto cname = coretype.asString();
+        auto cname = coretype.get<std::string>();
         EXPECT_TRUE(helics::core::isCoreTypeAvailable(helics::core::coreTypeFromString(cname)));
     }
 }
