@@ -294,11 +294,11 @@ void UdpComms::queue_tx_function()
                         if (brkprt.first != "?") {
                             brokerTargetAddress = brkprt.first;
                         }
-                        query = udp::resolver::query(udpnet(interfaceNetwork),
+                        udp::resolver::query localQuery(udpnet(interfaceNetwork),
                                                      brokerTargetAddress,
                                                      std::to_string(brokerPort));
                         // Setup the control socket for comms with the receiver
-                        broker_endpoint = *resolver.resolve(query);
+                        broker_endpoint = *resolver.resolve(localQuery);
                         continue;
                     } else if (m.messageID == DELAY_CONNECTION) {
                         std::this_thread::sleep_for(std::chrono::seconds(2));
