@@ -576,9 +576,9 @@ TEST_F(query, data_flow_graph_non_utf8)
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
-    std::string oddName(47, 209);
+    std::string oddName(47, static_cast<unsigned char>(209));
     vFed1->registerGlobalInput<double>(oddName);
-    std::string oddName2(23, 199);
+    std::string oddName2(23, static_cast<unsigned char>(199));
     auto& p1 = vFed2->registerGlobalPublication<double>(oddName2);
     p1.addTarget(oddName);
     vFed1->enterInitializingModeAsync();
