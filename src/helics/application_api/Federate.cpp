@@ -1327,11 +1327,11 @@ static void arrayPairProcess(nlohmann::json doc,
 {
     if (doc.contains(key)) {
         if (doc[key].is_array()) {
-            for (auto& val : doc[key]) {
+            for (const auto& val : doc[key]) {
                 pairOp(val[0].get<std::string>(), val[1].get<std::string>());
             }
         } else {
-            for (auto& val : doc[key].items()) {
+            for (const auto& val : doc[key].items()) {
                 pairOp(val.key(), val.value().get<std::string>());
             }
         }
@@ -1425,7 +1425,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuffer)
 {
     using fileops::getOrDefault;
-    auto& json = jsonBuffer.json();
+    const auto& json = jsonBuffer.json();
     bool defaultGlobal = false;
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 

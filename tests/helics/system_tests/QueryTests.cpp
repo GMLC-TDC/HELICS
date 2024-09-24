@@ -25,6 +25,7 @@ struct query: public FederateTestFixture, public ::testing::Test {};
 
 using gmlc::utilities::stringOps::removeQuotes;
 class query_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
+
 /** test simple creation and destruction*/
 TEST_P(query_type, publication_queries)
 {
@@ -829,18 +830,18 @@ TEST_F(query, updates_indices)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerGlobalPublication<double>("pub2");
-    auto& p3 = vFed1->registerGlobalPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("pub2");
     vFed1->registerSubscription("pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updated_input_indices");
@@ -848,8 +849,8 @@ TEST_F(query, updates_indices)
     vFed1->clearUpdates();
     qres = vFed1->query("updated_input_indices");
     EXPECT_EQ(qres, "[]");
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updated_input_indices");
     EXPECT_EQ(qres, "[0,2]");
@@ -861,18 +862,18 @@ TEST_F(query, updates_names)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerGlobalPublication<double>("pub2");
-    auto& p3 = vFed1->registerGlobalPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("pub2");
     vFed1->registerSubscription("pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updated_input_names");
@@ -881,8 +882,8 @@ TEST_F(query, updates_names)
     vFed1->clearUpdates();
     qres = vFed1->query("updated_input_names");
     EXPECT_EQ(qres, "[]");
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updated_input_names");
     res = helics::vectorizeQueryResult(qres);
@@ -895,18 +896,18 @@ TEST_F(query, update_values)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerGlobalPublication<double>("pub2");
-    auto& p3 = vFed1->registerGlobalPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("pub2");
     vFed1->registerSubscription("pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updates");
@@ -918,8 +919,8 @@ TEST_F(query, update_values)
     vFed1->clearUpdates();
     qres = vFed1->query("updates");
     EXPECT_EQ(qres, "{}");
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updates");
     val = loadJsonStr(qres);
@@ -935,18 +936,18 @@ TEST_F(query, update_values_local)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerPublication<double>("pub2");
-    auto& p3 = vFed1->registerPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerPublication<double>("pub2");
+    auto& pub3 = vFed1->registerPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("fed0/pub2");
     vFed1->registerSubscription("fed0/pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updates");
@@ -958,8 +959,8 @@ TEST_F(query, update_values_local)
     vFed1->clearUpdates();
     qres = vFed1->query("updates");
     EXPECT_EQ(qres, "{}");
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updates");
     val = loadJsonStr(qres);
@@ -975,18 +976,18 @@ TEST_F(query, update_values_all)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerGlobalPublication<double>("pub2");
-    auto& p3 = vFed1->registerGlobalPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("pub2");
     vFed1->registerSubscription("pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("values");
@@ -998,8 +999,8 @@ TEST_F(query, update_values_all)
     vFed1->clearUpdates();
     auto qres2 = vFed1->query("values");
     EXPECT_EQ(qres, qres2);
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("values");
     val = loadJsonStr(qres);
@@ -1015,12 +1016,12 @@ TEST_F(query, global_flush)
 {
     SetupTest<helics::ValueFederate>("test_4", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
 
     vFed1->registerSubscription("pub1");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
+    pub1.publish(45.7);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("root", "global_flush");
@@ -1055,6 +1056,15 @@ TEST_F(query, query_subscriptions)
     helics::cleanupHelicsLibrary();
 }
 
+/// @brief  helper to test if a json loads properly
+/// @param jsonString 
+/// @return 
+bool testLoadJson(const std::string& jsonString)
+{
+    auto val=nlohmann::json::parse(jsonString.begin(), jsonString.end(), nullptr, false, true);
+    return (!val.is_discarded());
+}
+
 TEST_F(query, queries_query)
 {
     SetupTest<helics::CombinationFederate>("zmq2", 2);
@@ -1066,9 +1076,9 @@ TEST_F(query, queries_query)
 
     vFed2->registerSubscription("pub1");
     vFed2->registerSubscription("pub2");
-    auto& f1 = vFed2->registerFilter("f1");
-    f1.addSourceTarget("pub3");
-    f1.addDestinationTarget("pub3");
+    auto& filt1 = vFed2->registerFilter("f1");
+    filt1.addSourceTarget("pub3");
+    filt1.addDestinationTarget("pub3");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -1086,12 +1096,7 @@ TEST_F(query, queries_query)
         }
         auto qres = vFed1->query(qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error";
-        try {
-            auto v = loadJsonStr(qres);
-        }
-        catch (...) {
-            EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
-        }
+        EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qstr;
     }
 
     res = vFed1->query("core", "queries");
@@ -1104,12 +1109,7 @@ TEST_F(query, queries_query)
         }
         auto qres = vFed1->query("core", qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in core";
-        try {
-            auto v = loadJsonStr(qres);
-        }
-        catch (...) {
-            EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
-        }
+        EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qstr;
     }
 
     res = vFed1->query("root", "queries");
@@ -1122,12 +1122,7 @@ TEST_F(query, queries_query)
         }
         auto qres = vFed1->query("root", qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in root";
-        try {
-            auto v = loadJsonStr(qres);
-        }
-        catch (...) {
-            EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
-        }
+        EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qstr;
     }
 
     vFed1->finalize();
@@ -1159,8 +1154,8 @@ TEST_F(query, concurrent_callback)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     vFed1->registerGlobalInput<double>("ipt1");
-    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
-    p1.addTarget("ipt1");
+    auto& pub1 = vFed2->registerGlobalPublication<double>("pub1");
+    pub1.addTarget("ipt1");
 
     vFed1->setQueryCallback([](std::string_view queryStr) {
         return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
@@ -1198,11 +1193,11 @@ TEST_F(query, queries_disconnected)
     vFed2->finalize();
     vFed1->requestTime(3.0);
     res = vFed1->query(vFed2->getName(), "state");
-    int ii{0};
+    int sleepCount{0};
     while (res.find("disconnected") == std::string::npos) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         res = vFed1->query(vFed2->getName(), "state");
-        if (++ii > 10) {
+        if (++sleepCount > 10) {
             break;
         }
     }
@@ -1226,42 +1221,18 @@ TEST_F(query, queries_disconnected_global)
     vFed1->enterExecutingModeComplete();
     vFed3->enterExecutingModeComplete();
 
-    auto res = brokers[0]->query("root", "global_time");
-    try {
-        auto v = loadJsonStr(res);
-        (void)(v);
-    }
-    catch (...) {
-        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
-    }
+    auto qres = brokers[0]->query("root", "global_time");
+    EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qres;
     vFed2->finalize();
     vFed1->requestTime(3.0);
-    res = brokers[0]->query("root", "global_time");
-    try {
-        auto v = loadJsonStr(res);
-        (void)(v);
-    }
-    catch (...) {
-        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
-    }
+    qres = brokers[0]->query("root", "global_time");
+    EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qres;
     vFed2->finalize();
-    res = brokers[0]->query("root", "global_time");
-    try {
-        auto v = loadJsonStr(res);
-        (void)(v);
-    }
-    catch (...) {
-        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
-    }
+    qres = brokers[0]->query("root", "global_time");
+    EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qres;
     vFed3->finalize();
-    res = brokers[0]->query("root", "global_time");
-    try {
-        auto v = loadJsonStr(res);
-        (void)(v);
-    }
-    catch (...) {
-        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
-    }
+    qres = brokers[0]->query("root", "global_time");
+    EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qres;
 }
 
 TEST_F(query, queries_timeout_ci_skip)
