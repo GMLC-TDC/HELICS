@@ -329,8 +329,8 @@ void UdpComms::queue_tx_function()
     if (localTargetAddress.empty() || localTargetAddress == "*" ||
         localTargetAddress == "udp://*") {
         const udp::resolver::query queryLocal(udpnet(interfaceNetwork),
-                                        "127.0.0.1",
-                                        std::to_string(PortNumber));
+                                              "127.0.0.1",
+                                              std::to_string(PortNumber));
         auto result = resolver.resolve(queryLocal);
         rxEndpoint = *result;
     } else {
