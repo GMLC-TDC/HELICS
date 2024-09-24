@@ -1057,11 +1057,11 @@ TEST_F(query, query_subscriptions)
 }
 
 /// @brief  helper to test if a json loads properly
-/// @param jsonString 
-/// @return 
+/// @param jsonString
+/// @return
 bool testLoadJson(const std::string& jsonString)
 {
-    auto val=nlohmann::json::parse(jsonString.begin(), jsonString.end(), nullptr, false, true);
+    auto val = nlohmann::json::parse(jsonString.begin(), jsonString.end(), nullptr, false, true);
     return (!val.is_discarded());
 }
 
@@ -1096,7 +1096,7 @@ TEST_F(query, queries_query)
         }
         auto qres = vFed1->query(qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error";
-        EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qstr;
+        EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qstr;
     }
 
     res = vFed1->query("core", "queries");
@@ -1109,7 +1109,7 @@ TEST_F(query, queries_query)
         }
         auto qres = vFed1->query("core", qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in core";
-        EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qstr;
+        EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qstr;
     }
 
     res = vFed1->query("root", "queries");
@@ -1122,7 +1122,7 @@ TEST_F(query, queries_query)
         }
         auto qres = vFed1->query("root", qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in root";
-        EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qstr;
+        EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qstr;
     }
 
     vFed1->finalize();
@@ -1222,17 +1222,17 @@ TEST_F(query, queries_disconnected_global)
     vFed3->enterExecutingModeComplete();
 
     auto qres = brokers[0]->query("root", "global_time");
-    EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qres;
+    EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qres;
     vFed2->finalize();
     vFed1->requestTime(3.0);
     qres = brokers[0]->query("root", "global_time");
-    EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qres;
+    EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qres;
     vFed2->finalize();
     qres = brokers[0]->query("root", "global_time");
-    EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qres;
+    EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qres;
     vFed3->finalize();
     qres = brokers[0]->query("root", "global_time");
-    EXPECT_TRUE(testLoadJson(qres))<< "Unable to load JSON string " << qres;
+    EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qres;
 }
 
 TEST_F(query, queries_timeout_ci_skip)

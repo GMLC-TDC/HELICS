@@ -190,8 +190,8 @@ void UdpComms::queue_tx_function()
         }
         try {
             const udp::resolver::query query(udpnet(interfaceNetwork),
-                                       brokerTargetAddress,
-                                       std::to_string(brokerPort));
+                                             brokerTargetAddress,
+                                             std::to_string(brokerPort));
             // Setup the control socket for comms with the receiver
             broker_endpoint = *resolver.resolve(query);
             int retries{0};
@@ -294,8 +294,8 @@ void UdpComms::queue_tx_function()
                             brokerTargetAddress = brkprt.first;
                         }
                         const udp::resolver::query localQuery(udpnet(interfaceNetwork),
-                                                        brokerTargetAddress,
-                                                        std::to_string(brokerPort));
+                                                              brokerTargetAddress,
+                                                              std::to_string(brokerPort));
                         // Setup the control socket for comms with the receiver
                         broker_endpoint = *resolver.resolve(localQuery);
                         continue;
@@ -313,7 +313,7 @@ void UdpComms::queue_tx_function()
             }
         }
         catch (std::exception& err) {
-            logError(fmt::format("error connecting to broker {}",err.what()));
+            logError(fmt::format("error connecting to broker {}", err.what()));
             PortNumber = -1;
             promisePort.set_value(-1);
             setTxStatus(ConnectionStatus::ERRORED);
@@ -335,11 +335,11 @@ void UdpComms::queue_tx_function()
         rxEndpoint = *result;
     } else {
         const udp::resolver::query queryLocal(udpnet(interfaceNetwork),
-                                        localTargetAddress,
-                                        std::to_string(PortNumber));
+                                              localTargetAddress,
+                                              std::to_string(PortNumber));
         auto result = resolver.resolve(queryLocal, error);
         if (error) {
-            logError(fmt::format("Unable to resolve: {}",localTargetAddress));
+            logError(fmt::format("Unable to resolve: {}", localTargetAddress));
             setTxStatus(ConnectionStatus::ERRORED);
             return;
         }
@@ -365,16 +365,14 @@ void UdpComms::queue_tx_function()
                             std::tie(interface, port) =
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
                             const udp::resolver::query queryNew(udpnet(interfaceNetwork),
-                                                          interface,
-                                                          port);
+                                                                interface,
+                                                                port);
 
                             routes.emplace(route_id{cmd.getExtraData()},
                                            *resolver.resolve(queryNew));
                         }
                         catch (const std::exception& err) {
-                            logError(
-                                fmt::format("unable to resolve new route: {}",
-                                    err.what()));
+                            logError(fmt::format("unable to resolve new route: {}", err.what()));
                         }
                         processed = true;
                     } break;
@@ -494,15 +492,15 @@ void UdpComms::closeReceiver()
                     // try connecting with the receiver socket
                     udp::resolver resolver(serv->getBaseContext());
                     const udp::resolver::query queryLocal(udpnet(interfaceNetwork),
-                                                    "127.0.0.1",
-                                                    std::to_string(PortNumber));
+                                                          "127.0.0.1",
+                                                          std::to_string(PortNumber));
                     rxEndpoint = *resolver.resolve(queryLocal);
                 } else {
                     // try connecting with the receiver socket
                     udp::resolver resolver(serv->getBaseContext());
                     const udp::resolver::query queryLocal(udpnet(interfaceNetwork),
-                                                    localTargetAddress,
-                                                    std::to_string(PortNumber));
+                                                          localTargetAddress,
+                                                          std::to_string(PortNumber));
                     rxEndpoint = *resolver.resolve(queryLocal);
                 }
 
@@ -516,7 +514,7 @@ void UdpComms::closeReceiver()
                 }
             }
         }
-        //NOLINTNEXTLINE
+        // NOLINTNEXTLINE
         catch (...) {
             // ignore error here since we are already disconnecting
         }
