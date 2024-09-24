@@ -115,10 +115,14 @@ double vectorNorm(const double* vec, std::size_t size)
 
 double vectorNorm(const std::vector<std::complex<double>>& vec)
 {
-    return std::sqrt(std::inner_product(
-        vec.begin(), vec.end(), vec.begin(), 0.0, std::plus<>(), [](const auto& avec, const auto& bvec) {
-            return (avec * std::conj(bvec)).real();
-        }));
+    return std::sqrt(std::inner_product(vec.begin(),
+                                        vec.end(),
+                                        vec.begin(),
+                                        0.0,
+                                        std::plus<>(),
+                                        [](const auto& avec, const auto& bvec) {
+                                            return (avec * std::conj(bvec)).real();
+                                        }));
 }
 
 std::string helicsComplexString(double real, double imag)
@@ -449,7 +453,7 @@ static int readSize(std::string_view val)
             auto size = numConv<int>(val.substr(1, firstBracket - 1));
             return size;
         }
-        //NOLINTNEXTLINE
+        // NOLINTNEXTLINE
         catch (const std::invalid_argument&) {
             // go to the alternative path if this fails
         }
@@ -504,8 +508,9 @@ double getDoubleFromString(std::string_view val)
     }
     if (val.front() == 'c') {
         auto complexVal = helicsGetComplexVector(val);
-        return (complexVal.size() != 1) ? vectorNorm(complexVal) :
-                                  ((complexVal[0].imag() == 0.0) ? complexVal[0].real() : std::abs(complexVal[0]));
+        return (complexVal.size() != 1) ?
+            vectorNorm(complexVal) :
+            ((complexVal[0].imag() == 0.0) ? complexVal[0].real() : std::abs(complexVal[0]));
     }
     auto cval = helicsGetComplex(val);
     return (cval.imag() == 0.0) ? cval.real() : std::abs(cval);
@@ -541,7 +546,8 @@ void helicsGetVector(std::string_view val, std::vector<double>& data)
         auto firstBracket = val.find_first_of('[');
         for (decltype(size) ii = 0; ii < size; ++ii) {
             auto nextChar = val.find_first_of(",;]", firstBracket + 1);
-            auto vectorVal = helicsGetComplex(val.substr(firstBracket + 1, nextChar - firstBracket - 1));
+            auto vectorVal =
+                helicsGetComplex(val.substr(firstBracket + 1, nextChar - firstBracket - 1));
             data.push_back(vectorVal.real());
             data.push_back(vectorVal.imag());
             firstBracket = nextChar;
