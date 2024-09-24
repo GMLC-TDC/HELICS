@@ -545,8 +545,8 @@ TEST_F(valuefed, dual_transfer_coreApp_link)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    helics::CoreApp cr(vFed1->getCorePointer());
-    cr.dataLink("pub1", "inp1");
+    helics::CoreApp core(vFed1->getCorePointer());
+    core.dataLink("pub1", "inp1");
     // register the publications
     auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 

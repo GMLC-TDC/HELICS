@@ -572,72 +572,72 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
         return;
     }
     if (val.front() == 'v') {
-        auto sz = readSize(val);
-        data.reserve(sz / 2);
+        auto size = readSize(val);
+        data.reserve(size / 2);
         data.resize(0);
-        auto fb = val.find_first_of('[');
-        for (decltype(sz) ii = 0; ii < sz - 1; ii += 2) {
-            auto nc = val.find_first_of(",;]", fb + 1);
-            auto nc2 = val.find_first_of(",;]", nc + 1);
+        auto firstBracket = val.find_first_of('[');
+        for (decltype(size) ii = 0; ii < size - 1; ii += 2) {
+            auto nextChar = val.find_first_of(",;]", firstBracket + 1);
+            auto secondChar = val.find_first_of(",;]", nextChar + 1);
             try {
-                auto vstr1 = val.substr(fb + 1, nc - fb - 1);
+                auto vstr1 = val.substr(firstBracket + 1, nextChar - firstBracket - 1);
                 string_viewOps::trimString(vstr1);
-                auto vstr2 = val.substr(nc + 1, nc2 - nc - 1);
+                auto vstr2 = val.substr(nextChar + 1, secondChar - nextChar - 1);
                 string_viewOps::trimString(vstr2);
-                auto V1 = numConv<double>(vstr1);
-                auto V2 = numConv<double>(vstr2);
-                data.emplace_back(V1, V2);
+                auto val1 = numConv<double>(vstr1);
+                auto val2 = numConv<double>(vstr2);
+                data.emplace_back(val1, val2);
             }
             catch (const std::invalid_argument&) {
                 data.push_back(invalidValue<std::complex<double>>());
             }
-            fb = nc;
+            firstBracket = nextChar;
         }
     } else if (val.front() == 'c') {
-        auto sz = readSize(val);
-        data.reserve(sz);
+        auto size = readSize(val);
+        data.reserve(size);
         data.resize(0);
-        auto fb = val.find_first_of('[');
-        for (decltype(sz) ii = 0; ii < sz; ++ii) {
-            auto nc = val.find_first_of(",;]", fb + 1);
-            auto V = helicsGetComplex(val.substr(fb + 1, nc - fb - 1));
-            data.push_back(V);
-            fb = nc;
+        auto firstBracket = val.find_first_of('[');
+        for (decltype(size) ii = 0; ii < size; ++ii) {
+            auto nextChar = val.find_first_of(",;]", firstBracket + 1);
+            auto cval = helicsGetComplex(val.substr(firstBracket + 1, nextChar - firstBracket - 1));
+            data.push_back(cval);
+            firstBracket = nextChar;
         }
     } else {
         if (val.find_first_of("ji") != std::string_view::npos) {
-            auto V = helicsGetComplex(val);
+            auto cval = helicsGetComplex(val);
             data.resize(0);
-            data.push_back(V);
+            data.push_back(cval);
         } else {
-            auto JV = fileops::loadJsonStr(val);
+            auto json = fileops::loadJsonStr(val);
             int cnt{0};
-            switch (JV.type()) {
+            switch (json.type()) {
                 case nlohmann::json::value_t::number_float:
                 case nlohmann::json::value_t::number_integer:
                 case nlohmann::json::value_t::number_unsigned:
                     data.resize(0);
-                    data.emplace_back(JV.get<double>(), 0.0);
+                    data.emplace_back(json.get<double>(), 0.0);
                     break;
                 case nlohmann::json::value_t::array:
-                    for (auto& av : JV) {
-                        if (av.is_number()) {
+                    for (auto& aval : json) {
+                        if (aval.is_number()) {
                             if (cnt == 0) {
-                                data.emplace_back(av.get<double>(), 0.0);
+                                data.emplace_back(aval.get<double>(), 0.0);
                                 cnt = 1;
                             } else {
-                                data.back() += std::complex<double>{0.0, av.get<double>()};
+                                data.back() += std::complex<double>{0.0, aval.get<double>()};
                                 cnt = 0;
                             }
-                        } else if (av.is_array()) {
+                        } else if (aval.is_array()) {
                             cnt = 0;
-                            if (av.size() >= 2) {
-                                if (av[0].is_number()) {
-                                    data.emplace_back(av[0].get<double>(), av[1].get<double>());
+                            if (aval.size() >= 2) {
+                                if (aval[0].is_number()) {
+                                    data.emplace_back(aval[0].get<double>(), aval[1].get<double>());
                                 }
-                            } else if (av.size() == 1) {
-                                if (av[0].is_number()) {
-                                    data.emplace_back(av[0].get<double>(), 0.0);
+                            } else if (aval.size() == 1) {
+                                if (aval[0].is_number()) {
+                                    data.emplace_back(aval[0].get<double>(), 0.0);
                                 }
                             } else {
                                 data.push_back(invalidValue<std::complex<double>>());
@@ -759,8 +759,8 @@ SmallBuffer typeConvert(DataType type, double val)
         case DataType::HELICS_NAMED_POINT:
             return ValueConverter<NamedPoint>::convert(NamedPoint{"value", val});
         case DataType::HELICS_COMPLEX_VECTOR: {
-            const std::complex<double> v2(val, 0.0);
-            return ValueConverter<std::complex<double>>::convert(&v2, 1);
+            const std::complex<double> cvec(val, 0.0);
+            return ValueConverter<std::complex<double>>::convert(&cvec, 1);
         }
         case DataType::HELICS_VECTOR:
             return ValueConverter<double>::convert(&val, 1);
@@ -890,25 +890,25 @@ SmallBuffer typeConvert(DataType type, const double* vals, size_t size)
             return ValueConverter<NamedPoint>::convert(
                 NamedPoint{helicsVectorString(vals, size), std::nan("0")});
         case DataType::HELICS_COMPLEX_VECTOR: {
-            std::vector<std::complex<double>> CD;
-            CD.reserve(size);
+            std::vector<std::complex<double>> cvec;
+            cvec.reserve(size);
             for (size_t ii = 0; ii < size; ++ii) {
-                CD.emplace_back(vals[ii], 0.0);
+                cvec.emplace_back(vals[ii], 0.0);
             }
-            return ValueConverter<std::vector<std::complex<double>>>::convert(CD);
+            return ValueConverter<std::vector<std::complex<double>>>::convert(cvec);
         } break;
         case DataType::HELICS_VECTOR:
         default:
             return ValueConverter<double>::convert(vals, size);
         case DataType::HELICS_JSON: {
-            nlohmann::json jv;
-            jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
-            nlohmann::json vv = nlohmann::json::array();
+            nlohmann::json json;
+            json["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
+            nlohmann::json jsonArray = nlohmann::json::array();
             for (size_t ii = 0; ii < size; ++ii) {
-                vv.push_back(vals[ii]);
+                jsonArray.push_back(vals[ii]);
             }
-            jv["value"] = std::move(vv);
-            return fileops::generateJsonString(jv);
+            json["value"] = std::move(jsonArray);
+            return fileops::generateJsonString(json);
         }
     }
 }
@@ -960,14 +960,14 @@ SmallBuffer typeConvertComplex(DataType type, const double* vals, size_t size)
         default:
             return ValueConverter<double>::convert(vals, size);
         case DataType::HELICS_JSON: {
-            nlohmann::json jv;
-            jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
-            nlohmann::json vv = nlohmann::json::array();
+            nlohmann::json json;
+            json["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
+            nlohmann::json jsonArray = nlohmann::json::array();
             for (size_t ii = 0; ii < size; ++ii) {
-                vv.push_back(vals[ii]);
+                jsonArray.push_back(vals[ii]);
             }
-            jv["value"] = std::move(vv);
-            return fileops::generateJsonString(jv);
+            json["value"] = std::move(jsonArray);
+            return fileops::generateJsonString(json);
         }
     }
 }
@@ -1002,24 +1002,24 @@ SmallBuffer typeConvert(DataType type, const std::vector<std::complex<double>>& 
         default:
             return ValueConverter<std::vector<std::complex<double>>>::convert(val);
         case DataType::HELICS_VECTOR: {
-            std::vector<double> DV;
-            DV.reserve(val.size() * 2);
+            std::vector<double> vectorVal;
+            vectorVal.reserve(val.size() * 2);
             for (const auto& vali : val) {
-                DV.push_back(vali.real());
-                DV.push_back(vali.imag());
+                vectorVal.push_back(vali.real());
+                vectorVal.push_back(vali.imag());
             }
-            return ValueConverter<std::vector<double>>::convert(DV);
+            return ValueConverter<std::vector<double>>::convert(vectorVal);
         }
         case DataType::HELICS_JSON: {
-            nlohmann::json jv;
-            jv["type"] = typeNameStringRef(DataType::HELICS_COMPLEX_VECTOR);
-            nlohmann::json vv = nlohmann::json::array();
-            for (const auto& v : val) {
-                vv.push_back(v.real());
-                vv.push_back(v.imag());
+            nlohmann::json json;
+            json["type"] = typeNameStringRef(DataType::HELICS_COMPLEX_VECTOR);
+            nlohmann::json jsonArray = nlohmann::json::array();
+            for (const auto& element : val) {
+                jsonArray.push_back(element.real());
+                jsonArray.push_back(element.imag());
             }
-            jv["value"] = std::move(vv);
-            return fileops::generateJsonString(jv);
+            json["value"] = std::move(jsonArray);
+            return fileops::generateJsonString(json);
         }
     }
 }
@@ -1050,16 +1050,16 @@ SmallBuffer typeConvert(DataType type, const std::complex<double>& val)
         case DataType::HELICS_COMPLEX_VECTOR:
             return ValueConverter<std::complex<double>>::convert(&val, 1);
         case DataType::HELICS_VECTOR: {
-            const std::vector<double> V{val.real(), val.imag()};
-            return ValueConverter<std::vector<double>>::convert(V);
+            const std::vector<double> vectorVal{val.real(), val.imag()};
+            return ValueConverter<std::vector<double>>::convert(vectorVal);
         }
         case DataType::HELICS_JSON: {
             nlohmann::json json;
             json["type"] = typeNameStringRef(DataType::HELICS_COMPLEX);
-            nlohmann::json vv = nlohmann::json::array();
-            vv.push_back(val.real());
-            vv.push_back(val.imag());
-            json["value"] = std::move(vv);
+            nlohmann::json jsonArray = nlohmann::json::array();
+            jsonArray.push_back(val.real());
+            jsonArray.push_back(val.imag());
+            json["value"] = std::move(jsonArray);
             return fileops::generateJsonString(json);
         }
     }
@@ -1094,8 +1094,8 @@ SmallBuffer typeConvert(DataType type, const NamedPoint& val)
             return ValueConverter<std::string_view>::convert(
                 (std::isnan(val.value)) ? val.name : helicsNamedPointString(val));
         case DataType::HELICS_COMPLEX_VECTOR: {
-            const std::complex<double> v2(val.value, 0.0);
-            return ValueConverter<std::complex<double>>::convert(&v2, 1);
+            const std::complex<double> cval(val.value, 0.0);
+            return ValueConverter<std::complex<double>>::convert(&cval, 1);
         }
         case DataType::HELICS_VECTOR:
             return ValueConverter<double>::convert(&(val.value), 1);
@@ -1135,8 +1135,8 @@ SmallBuffer typeConvert(DataType type, std::string_view str, double val)
         case DataType::HELICS_CHAR:
             return ValueConverter<std::string_view>::convert(helicsNamedPointString(str, val));
         case DataType::HELICS_COMPLEX_VECTOR: {
-            const std::complex<double> v2(val, 0.0);
-            return ValueConverter<std::complex<double>>::convert(&v2, 1);
+            const std::complex<double> cval(val, 0.0);
+            return ValueConverter<std::complex<double>>::convert(&cval, 1);
         }
         case DataType::HELICS_VECTOR:
             return ValueConverter<double>::convert(&(val), 1);
@@ -1167,12 +1167,12 @@ SmallBuffer typeConvert(DataType type, bool val)
         default:
             return ValueConverter<std::string_view>::convert(val ? "1" : "0");
         case DataType::HELICS_NAMED_POINT: {
-            const NamedPoint np{"value", val ? 1.0 : 0.0};
-            return ValueConverter<NamedPoint>::convert(np);
+            const NamedPoint namePoint{"value", val ? 1.0 : 0.0};
+            return ValueConverter<NamedPoint>::convert(namePoint);
         }
         case DataType::HELICS_COMPLEX_VECTOR: {
-            const std::complex<double> v2(val ? 1.0 : 0.0, 0.0);
-            return ValueConverter<std::complex<double>>::convert(&v2, 1);
+            const std::complex<double> cval(val ? 1.0 : 0.0, 0.0);
+            return ValueConverter<std::complex<double>>::convert(&cval, 1);
         }
         case DataType::HELICS_VECTOR: {
             auto v2 = val ? 1.0 : 0.0;
@@ -1204,16 +1204,16 @@ SmallBuffer typeConvert(DataType type, char val)
         default:
             return ValueConverter<std::string_view>::convert(std::string_view(&val, 1));
         case DataType::HELICS_NAMED_POINT: {
-            const NamedPoint np{"value", static_cast<double>(val)};
-            return ValueConverter<NamedPoint>::convert(np);
+            const NamedPoint namePoint{"value", static_cast<double>(val)};
+            return ValueConverter<NamedPoint>::convert(namePoint);
         }
         case DataType::HELICS_COMPLEX_VECTOR: {
             const std::complex<double> cvec(static_cast<double>(val), 0.0);
             return ValueConverter<std::complex<double>>::convert(&cvec, 1);
         }
         case DataType::HELICS_VECTOR: {
-            const auto v2 = static_cast<double>(val);
-            return ValueConverter<double>::convert(&v2, 1);
+            const auto doubleVal = static_cast<double>(val);
+            return ValueConverter<double>::convert(&doubleVal, 1);
         }
         case DataType::HELICS_JSON: {
             nlohmann::json json;
@@ -1253,9 +1253,9 @@ SmallBuffer typeConvert(DataType type, Time val)
                     NamedPoint{"value", static_cast<double>(val)});
             }
         case DataType::HELICS_COMPLEX_VECTOR: {
-            std::vector<std::complex<double>> cv;
-            cv.emplace_back(static_cast<double>(val), 0.0);
-            return ValueConverter<std::vector<std::complex<double>>>::convert(cv);
+            std::vector<std::complex<double>> cval;
+            cval.emplace_back(static_cast<double>(val), 0.0);
+            return ValueConverter<std::vector<std::complex<double>>>::convert(cval);
         }
         case DataType::HELICS_VECTOR: {
             const std::vector<double> vec{static_cast<double>(val)};

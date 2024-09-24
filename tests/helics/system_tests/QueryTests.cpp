@@ -132,8 +132,8 @@ TEST_F(query, federate_map)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(),
               val["attributes"]["id"].get<int>());
-    auto& v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+    auto& fed2 = val["cores"][0]["federates"][1];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int>(),
               val["cores"][0]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
@@ -156,8 +156,8 @@ TEST_F(query, federate_map2)
     EXPECT_EQ(val["cores"][1]["federates"].size(), 1U);
     EXPECT_EQ(val["cores"][1]["attributes"]["parent"].get<int>(),
               val["attributes"]["id"].get<int>());
-    auto& v2 = val["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+    auto& fed1 = val["cores"][1]["federates"][0];
+    EXPECT_EQ(fed1["attributes"]["parent"].get<int>(),
               val["cores"][1]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
@@ -186,8 +186,8 @@ TEST_F(query, federate_map3)
     EXPECT_EQ(brk["cores"][1]["federates"].size(), 1U);
     EXPECT_EQ(brk["cores"][1]["attributes"]["parent"].get<int>(),
               brk["attributes"]["id"].get<int>());
-    auto& v2 = brk["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+    auto& fed1 = brk["cores"][1]["federates"][0];
+    EXPECT_EQ(fed1["attributes"]["parent"].get<int>(),
               brk["cores"][1]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
@@ -210,8 +210,8 @@ TEST_F(query, dependency_graph)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(),
               val["attributes"]["id"].get<int>());
-    auto v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+    auto fed2 = val["cores"][0]["federates"][1];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int>(),
               val["cores"][0]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
@@ -542,8 +542,8 @@ TEST_F(query, data_flow_graph)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     vFed1->registerGlobalInput<double>("ipt1");
-    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
-    p1.addTarget("ipt1");
+    auto& pub1 = vFed2->registerGlobalPublication<double>("pub1");
+    pub1.addTarget("ipt1");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -554,16 +554,16 @@ TEST_F(query, data_flow_graph)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
               val["attributes"]["id"].get<int64_t>());
-    auto v2 = val["cores"][0]["federates"][1];
-    auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+    auto fed2 = val["cores"][0]["federates"][1];
+    auto fed1 = val["cores"][0]["federates"][0];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int64_t>(),
               val["cores"][0]["attributes"]["id"].get<int64_t>());
-    EXPECT_EQ(v2["publications"].size(), 1U);
-    EXPECT_EQ(v1["inputs"].size(), 1U);
-    EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
-    EXPECT_EQ(v2["publications"][0]["key"], "pub1");
-    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
-    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    EXPECT_EQ(fed2["publications"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"][0]["key"], "ipt1");
+    EXPECT_EQ(fed2["publications"][0]["key"], "pub1");
+    EXPECT_EQ(fed1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(fed2["publications"][0]["targets"].size(), 1U);
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -580,8 +580,8 @@ TEST_F(query, data_flow_graph_non_utf8)
     std::string oddName(47, static_cast<unsigned char>(209));
     vFed1->registerGlobalInput<double>(oddName);
     std::string oddName2(23, static_cast<unsigned char>(199));
-    auto& p1 = vFed2->registerGlobalPublication<double>(oddName2);
-    p1.addTarget(oddName);
+    auto& pub1 = vFed2->registerGlobalPublication<double>(oddName2);
+    pub1.addTarget(oddName);
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -592,14 +592,14 @@ TEST_F(query, data_flow_graph_non_utf8)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
               val["attributes"]["id"].get<int64_t>());
-    auto v2 = val["cores"][0]["federates"][1];
-    auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+    auto fed2 = val["cores"][0]["federates"][1];
+    auto fed1 = val["cores"][0]["federates"][0];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int64_t>(),
               val["cores"][0]["attributes"]["id"].get<int64_t>());
-    EXPECT_EQ(v2["publications"].size(), 1U);
-    EXPECT_EQ(v1["inputs"].size(), 1U);
-    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
-    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    EXPECT_EQ(fed2["publications"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(fed2["publications"][0]["targets"].size(), 1U);
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -611,14 +611,14 @@ TEST_F(query, interfaces)
     SetupTest<helics::CombinationFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
 
-    auto& i1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1", "V");
-    auto& e1 = vFed1->registerGlobalEndpoint("ept1", "type1");
-    p1.addTarget("ipt1");
-    p1.setTag("tag1", "val1");
+    auto& ipt1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1", "V");
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1", "type1");
+    pub1.addTarget("ipt1");
+    pub1.setTag("tag1", "val1");
 
-    i1.setTag("tag2", "val2");
-    e1.setTag("tag3", "val3");
+    ipt1.setTag("tag2", "val2");
+    ept1.setTag("tag3", "val3");
     vFed1->enterInitializingMode();
     auto core = vFed1->getCorePointer();
     auto res = core->query("fed0", "interfaces", HELICS_SEQUENCING_MODE_FAST);
@@ -654,14 +654,14 @@ TEST_F(query, interfaces_json_serialization)
     SetupTest<helics::CombinationFederate>("zmq4", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
 
-    auto& i1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1", "V");
-    auto& e1 = vFed1->registerGlobalEndpoint("ept1", "type1");
-    p1.addTarget("ipt1");
-    p1.setTag("tag1", "val1");
+    auto& ipt1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1", "V");
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1", "type1");
+    pub1.addTarget("ipt1");
+    pub1.setTag("tag1", "val1");
 
-    i1.setTag("tag2", "val2");
-    e1.setTag("tag3", "val3");
+    ipt1.setTag("tag2", "val2");
+    ept1.setTag("tag3", "val3");
     vFed1->enterInitializingMode();
     auto core = vFed1->getCorePointer();
     auto res = core->query("fed0", "interfaces", HELICS_SEQUENCING_MODE_FAST);
@@ -724,15 +724,15 @@ TEST_F(query, core_tags)
     SetupTest<helics::CombinationFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
     ASSERT_TRUE(vFed1);
-    auto cr = helics::CoreApp(vFed1->getCorePointer());
-    cr.setTag("description", "a core description");
-    cr.setTag("version", "1.4.6");
+    auto core = helics::CoreApp(vFed1->getCorePointer());
+    core.setTag("description", "a core description");
+    core.setTag("version", "1.4.6");
 
-    EXPECT_EQ(cr.getTag("version"), "1.4.6");
-    EXPECT_EQ(cr.getTag("description"), "a core description");
+    EXPECT_EQ(core.getTag("version"), "1.4.6");
+    EXPECT_EQ(core.getTag("description"), "a core description");
 
     // test an unknown tag
-    EXPECT_TRUE(cr.getTag("nonatag").empty());
+    EXPECT_TRUE(core.getTag("nonatag").empty());
 
     vFed1->enterInitializingMode();
 
@@ -740,7 +740,7 @@ TEST_F(query, core_tags)
 
     auto desc = vFed1->query("core", "description");
     EXPECT_EQ(desc, "\"a core description\"");
-    cr.reset();
+    core.reset();
     vFed1->finalize();
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["version"].get<std::string>(), "1.4.6");
@@ -756,8 +756,8 @@ TEST_F(query, data_flow_graph_ordered)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     vFed1->registerGlobalInput<double>("ipt1");
-    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
-    p1.addTarget("ipt1");
+    auto& pub1 = vFed2->registerGlobalPublication<double>("pub1");
+    pub1.addTarget("ipt1");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -768,16 +768,16 @@ TEST_F(query, data_flow_graph_ordered)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
               val["attributes"]["id"].get<int64_t>());
-    auto& v2 = val["cores"][0]["federates"][1];
-    auto& v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+    auto& fed2 = val["cores"][0]["federates"][1];
+    auto& fed1 = val["cores"][0]["federates"][0];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int64_t>(),
               val["cores"][0]["attributes"]["id"].get<int64_t>());
-    EXPECT_EQ(v2["publications"].size(), 1U);
-    EXPECT_EQ(v1["inputs"].size(), 1U);
-    EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
-    EXPECT_EQ(v2["publications"][0]["key"], "pub1");
-    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
-    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    EXPECT_EQ(fed2["publications"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"][0]["key"], "ipt1");
+    EXPECT_EQ(fed2["publications"][0]["key"], "pub1");
+    EXPECT_EQ(fed1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(fed2["publications"][0]["targets"].size(), 1U);
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -791,8 +791,8 @@ TEST_F(query, data_flow_graph_concurrent)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     vFed1->registerGlobalInput<double>("ipt1");
-    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
-    p1.addTarget("ipt1");
+    auto& pub1 = vFed2->registerGlobalPublication<double>("pub1");
+    pub1.addTarget("ipt1");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -805,19 +805,19 @@ TEST_F(query, data_flow_graph_concurrent)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
               val["attributes"]["id"].get<int64_t>());
-    auto& v2 = val["cores"][0]["federates"][1];
-    auto& v1 = val["cores"][0]["federates"][0];
-    if (v1["attributes"]["id"].get<int64_t>() > v2["attributes"]["id"].get<int64_t>()) {
-        std::swap(v1, v2);
+    auto& fed2 = val["cores"][0]["federates"][1];
+    auto& fed1 = val["cores"][0]["federates"][0];
+    if (fed1["attributes"]["id"].get<int64_t>() > fed2["attributes"]["id"].get<int64_t>()) {
+        std::swap(fed1, fed2);
     }
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int64_t>(),
               val["cores"][0]["attributes"]["id"].get<int64_t>());
-    EXPECT_EQ(v2["publications"].size(), 1U);
-    EXPECT_EQ(v1["inputs"].size(), 1U);
-    EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
-    EXPECT_EQ(v2["publications"][0]["key"], "pub1");
-    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
-    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    EXPECT_EQ(fed2["publications"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"][0]["key"], "ipt1");
+    EXPECT_EQ(fed2["publications"][0]["key"], "pub1");
+    EXPECT_EQ(fed1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(fed2["publications"][0]["targets"].size(), 1U);
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
     core = nullptr;

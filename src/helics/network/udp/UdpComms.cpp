@@ -137,21 +137,21 @@ void UdpComms::queue_rx_function()
             return;
         }
         if (len == 5) {
-            std::string str(data.data(), len);
+            const std::string_view str(data.data(), len);
             if (str == "close") {
                 break;
             }
         }
-        ActionMessage M(reinterpret_cast<std::byte*>(data.data()), len);
-        if (!isValidCommand(M)) {
+        ActionMessage cmd(reinterpret_cast<std::byte*>(data.data()), len);
+        if (!isValidCommand(cmd)) {
             logWarning("invalid command received udp");
             continue;
         }
-        if (isProtocolCommand(M)) {
-            if (M.messageID == CLOSE_RECEIVER) {
+        if (isProtocolCommand(cmd)) {
+            if (cmd.messageID == CLOSE_RECEIVER) {
                 break;
             }
-            auto reply = generateReplyToIncomingMessage(M);
+            auto reply = generateReplyToIncomingMessage(cmd);
             if (reply.messageID == DISCONNECT) {
                 break;
             }
@@ -159,7 +159,7 @@ void UdpComms::queue_rx_function()
                 socket.send_to(asio::buffer(reply.to_string()), remote_endp, 0, ignored_error);
             }
         } else {
-            ActionCallback(std::move(M));
+            ActionCallback(std::move(cmd));
         }
     }
     disconnecting = true;
@@ -328,7 +328,7 @@ void UdpComms::queue_tx_function()
     udp::endpoint rxEndpoint;
     if (localTargetAddress.empty() || localTargetAddress == "*" ||
         localTargetAddress == "udp://*") {
-        udp::resolver::query queryLocal(udpnet(interfaceNetwork),
+        const udp::resolver::query queryLocal(udpnet(interfaceNetwork),
                                         "127.0.0.1",
                                         std::to_string(PortNumber));
         auto result = resolver.resolve(queryLocal);
@@ -359,7 +359,7 @@ void UdpComms::queue_tx_function()
                 switch (cmd.messageID) {
                     case NEW_ROUTE: {
                         try {
-                            std::string newroute(cmd.payload.to_string());
+                            const std::string newroute(cmd.payload.to_string());
                             std::string interface;
                             std::string port;
                             std::tie(interface, port) =
@@ -393,6 +393,8 @@ void UdpComms::queue_tx_function()
                     case DISCONNECT:
                         continueProcessing = false;
                         processed = true;
+                        break;
+                    default:
                         break;
                 }
             }
