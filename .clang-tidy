@@ -29,6 +29,7 @@ Checks: "
   -misc-non-private-member-variables-in-classes,
   -misc-no-recursion,
   -misc-use-anonymous-namespace,
+  -misc-include-cleaner,
   cert-*,
   -cert-err58-cpp,
   portability-*,

@@ -116,8 +116,8 @@ double vectorNorm(const double* vec, std::size_t size)
 double vectorNorm(const std::vector<std::complex<double>>& vec)
 {
     return std::sqrt(std::inner_product(
-        vec.begin(), vec.end(), vec.begin(), 0.0, std::plus<>(), [](const auto& a, const auto& b) {
-            return (a * std::conj(b)).real();
+        vec.begin(), vec.end(), vec.begin(), 0.0, std::plus<>(), [](const auto& avec, const auto& bvec) {
+            return (avec * std::conj(bvec)).real();
         }));
 }
 
@@ -310,9 +310,9 @@ std::complex<double> helicsGetComplex(std::string_view val)
             return {real, imag};
         }
         if (val.find_first_of(',', sep + 1) != std::string_view::npos) {
-            auto V = helicsGetVector(val);
-            if (V.size() >= 2) {
-                return {V[0], V[1]};
+            auto vectorVal = helicsGetVector(val);
+            if (vectorVal.size() >= 2) {
+                return {vectorVal[0], vectorVal[1]};
             }
             return invalidValue<std::complex<double>>();
         }
@@ -321,17 +321,17 @@ std::complex<double> helicsGetComplex(std::string_view val)
         imag = numConv<double>(val.substr(sep + 1));
         return {real, imag};
     }
-    std::smatch m;
+    std::smatch match;
 
     auto temp = std::string(val);
-    std::regex_search(temp, m, creg);
+    std::regex_search(temp, match, creg);
     try {
-        if (m.size() == 9) {
-            real = numConv<double>(m[1]);
+        if (match.size() == 9) {
+            real = numConv<double>(match[1]);
 
-            imag = numConv<double>(m[6]);
+            imag = numConv<double>(match[6]);
 
-            if (*m[5].first == '-') {
+            if (*match[5].first == '-') {
                 imag = -imag;
             }
         } else {
@@ -384,81 +384,82 @@ std::string helicsNamedPointString(const NamedPoint& point)
 }
 std::string helicsNamedPointString(std::string_view pointName, double val)
 {
-    nlohmann::json NP;
-    NP["value"] = val;
+    nlohmann::json namePoint;
+    namePoint["value"] = val;
     if (pointName.empty()) {
     } else {
-        NP["name"] = pointName;
+        namePoint["name"] = pointName;
     }
-    return fileops::generateJsonString(NP);
+    return fileops::generateJsonString(namePoint);
 }
 
 std::vector<double> helicsGetVector(std::string_view val)
 {
-    std::vector<double> V;
-    helicsGetVector(val, V);
-    return V;
+    std::vector<double> vectorVal;
+    helicsGetVector(val, vectorVal);
+    return vectorVal;
 }
 
 std::vector<std::complex<double>> helicsGetComplexVector(std::string_view val)
 {
-    std::vector<std::complex<double>> V;
-    helicsGetComplexVector(val, V);
-    return V;
+    std::vector<std::complex<double>> vectorVal;
+    helicsGetComplexVector(val, vectorVal);
+    return vectorVal;
 }
 
 NamedPoint helicsGetNamedPoint(std::string_view val)
 {
-    NamedPoint p;
+    NamedPoint namePoint;
     try {
-        auto jv = fileops::loadJsonStr(val);
-        switch (jv.type()) {
+        auto json = fileops::loadJsonStr(val);
+        switch (json.type()) {
             case nlohmann::json::value_t::number_float:
-                p.value = jv.get<double>();
-                p.name = "value";
+                namePoint.value = json.get<double>();
+                namePoint.name = "value";
                 break;
             case nlohmann::json::value_t::string:
-                p.name = jv.get<std::string>();
+                namePoint.name = json.get<std::string>();
                 break;
             case nlohmann::json::value_t::array:
                 break;
             case nlohmann::json::value_t::number_integer:
             case nlohmann::json::value_t::number_unsigned:
-                p.value = static_cast<double>(jv.get<int>());
-                p.name = "value";
+                namePoint.value = static_cast<double>(json.get<int>());
+                namePoint.name = "value";
                 break;
             case nlohmann::json::value_t::object:
-                fileops::replaceIfMember(jv, "value", p.value);
-                fileops::replaceIfMember(jv, "name", p.name);
+                fileops::replaceIfMember(json, "value", namePoint.value);
+                fileops::replaceIfMember(json, "name", namePoint.name);
                 break;
             default:
                 break;
         }
     }
     catch (...) {
-        p.name = val;
+        namePoint.name = val;
     }
-    return p;
+    return namePoint;
 }
 
 static int readSize(std::string_view val)
 {
-    auto fb = val.find_first_of('[');
-    if (fb > 1) {
+    auto firstBracket = val.find_first_of('[');
+    if (firstBracket > 1) {
         try {
-            auto size = numConv<int>(val.substr(1, fb - 1));
+            auto size = numConv<int>(val.substr(1, firstBracket - 1));
             return size;
         }
+        //NOLINTNEXTLINE
         catch (const std::invalid_argument&) {
             // go to the alternative path if this fails
         }
     }
-    if (val.find_first_not_of(" ]", fb + 1) == std::string_view::npos) {
+    if (val.find_first_not_of(" ]", firstBracket + 1) == std::string_view::npos) {
         return 0;
     }
-    auto res = std::count_if(val.begin() + fb,
+    auto res = std::count_if(val.begin() + firstBracket,
                              val.end(),
-                             [](auto c) { return (c == ',') || (c == ';'); }) +
+                             [](auto nextChar) { return (nextChar == ',') || (nextChar == ';'); }) +
         1;
     return static_cast<int>(res);
 }
@@ -469,14 +470,14 @@ std::complex<double> getComplexFromString(std::string_view val)
         return invalidValue<std::complex<double>>();
     }
     if ((val.front() == 'v') || (val.front() == 'c') || val.front() == '[') {
-        auto V = helicsGetVector(val);
-        if (V.empty()) {
+        auto vectorVal = helicsGetVector(val);
+        if (vectorVal.empty()) {
             return invalidValue<std::complex<double>>();
         }
-        if (V.size() == 1) {
-            return {V[0], 0.0};
+        if (vectorVal.size() == 1) {
+            return {vectorVal[0], 0.0};
         }
-        return {V[0], V[1]};
+        return {vectorVal[0], vectorVal[1]};
     }
     return helicsGetComplex(val);
 }
@@ -498,13 +499,13 @@ double getDoubleFromString(std::string_view val)
         return invalidValue<double>();
     }
     if (val.front() == 'v' || val.front() == '[') {
-        auto V = helicsGetVector(val);
-        return (V.size() != 1) ? vectorNorm(V) : V[0];
+        auto vectorVal = helicsGetVector(val);
+        return (vectorVal.size() != 1) ? vectorNorm(vectorVal) : vectorVal[0];
     }
     if (val.front() == 'c') {
-        auto cv = helicsGetComplexVector(val);
-        return (cv.size() != 1) ? vectorNorm(cv) :
-                                  ((cv[0].imag() == 0.0) ? cv[0].real() : std::abs(cv[0]));
+        auto complexVal = helicsGetComplexVector(val);
+        return (complexVal.size() != 1) ? vectorNorm(complexVal) :
+                                  ((complexVal[0].imag() == 0.0) ? complexVal[0].real() : std::abs(complexVal[0]));
     }
     auto cval = helicsGetComplex(val);
     return (cval.imag() == 0.0) ? cval.real() : std::abs(cval);
@@ -517,43 +518,43 @@ void helicsGetVector(std::string_view val, std::vector<double>& data)
         return;
     }
     if (val.front() == 'v' || val.front() == '[') {
-        auto sz = readSize(val);
-        if (sz > 0) {
-            data.reserve(sz);
+        auto size = readSize(val);
+        if (size > 0) {
+            data.reserve(size);
         }
         data.resize(0);
-        auto fb = val.find_first_of('[');
-        for (decltype(sz) ii = 0; ii < sz; ++ii) {
-            auto nc = val.find_first_of(";,]", fb + 1);
+        auto firstBracket = val.find_first_of('[');
+        for (decltype(size) ii = 0; ii < size; ++ii) {
+            auto nextChar = val.find_first_of(";,]", firstBracket + 1);
 
-            auto vstr = val.substr(fb + 1, nc - fb - 1);
+            auto vstr = val.substr(firstBracket + 1, nextChar - firstBracket - 1);
             string_viewOps::trimString(vstr);
-            auto V = numeric_conversion<double>(vstr, invalidValue<double>());
-            data.push_back(V);
+            auto vectorVal = numeric_conversion<double>(vstr, invalidValue<double>());
+            data.push_back(vectorVal);
 
-            fb = nc;
+            firstBracket = nextChar;
         }
     } else if (val.front() == 'c') {
-        auto sz = readSize(val);
-        data.reserve(static_cast<std::size_t>(sz) * 2);
+        auto size = readSize(val);
+        data.reserve(static_cast<std::size_t>(size) * 2);
         data.resize(0);
-        auto fb = val.find_first_of('[');
-        for (decltype(sz) ii = 0; ii < sz; ++ii) {
-            auto nc = val.find_first_of(",;]", fb + 1);
-            auto V = helicsGetComplex(val.substr(fb + 1, nc - fb - 1));
-            data.push_back(V.real());
-            data.push_back(V.imag());
-            fb = nc;
+        auto firstBracket = val.find_first_of('[');
+        for (decltype(size) ii = 0; ii < size; ++ii) {
+            auto nextChar = val.find_first_of(",;]", firstBracket + 1);
+            auto vectorVal = helicsGetComplex(val.substr(firstBracket + 1, nextChar - firstBracket - 1));
+            data.push_back(vectorVal.real());
+            data.push_back(vectorVal.imag());
+            firstBracket = nextChar;
         }
     } else {
-        auto V = helicsGetComplex(val);
-        if (V.imag() == 0) {
+        auto cval = helicsGetComplex(val);
+        if (cval.imag() == 0) {
             data.resize(1);
-            data[0] = V.real();
+            data[0] = cval.real();
         } else {
             data.resize(2);
-            data[0] = V.real();
-            data[1] = V.imag();
+            data[0] = cval.real();
+            data[1] = cval.imag();
         }
     }
 }

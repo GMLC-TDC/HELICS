@@ -20,15 +20,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ConnectorFederateManager.hpp"
 #include "CoreApp.hpp"
 #include "Filters.hpp"
+#include "FederateInfo.hpp"
 #include "PotentialInterfacesManager.hpp"
 #include "Translator.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
 
-#include <cassert>
 #include <fmt/format.h>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 
