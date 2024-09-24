@@ -1047,9 +1047,9 @@ TEST_P(valuefed_single_type, transfer_close)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto &pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto &sub1 = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -1091,9 +1091,9 @@ TEST_P(valuefed_single_type, transfer_remove_target)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto &pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto &sub1 = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;

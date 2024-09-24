@@ -1610,7 +1610,7 @@ static void
             std::string propname;
             propname = toml::find_or(props, "name", propname);
             const toml::value uVal;
-            const auto &propval = toml::find_or(props, "value", uVal);
+            const auto& propval = toml::find_or(props, "value", uVal);
 
             if ((propname.empty()) || (propval.is_uninitialized())) {
                 if (strict) {

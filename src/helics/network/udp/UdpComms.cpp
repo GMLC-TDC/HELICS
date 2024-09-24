@@ -295,8 +295,8 @@ void UdpComms::queue_tx_function()
                             brokerTargetAddress = brkprt.first;
                         }
                         udp::resolver::query localQuery(udpnet(interfaceNetwork),
-                                                     brokerTargetAddress,
-                                                     std::to_string(brokerPort));
+                                                        brokerTargetAddress,
+                                                        std::to_string(brokerPort));
                         // Setup the control socket for comms with the receiver
                         broker_endpoint = *resolver.resolve(localQuery);
                         continue;
