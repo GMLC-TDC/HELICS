@@ -44,7 +44,7 @@ TEST_P(query_type, publication_queries)
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
 
-    auto core = vFed1->getCorePointer();
+    std::shared_ptr<helics::Core> core = vFed1->getCorePointer();
     auto res = core->query("fed0", "publications", HELICS_SEQUENCING_MODE_FAST);
     EXPECT_EQ(res, R"(["pub1","fed0/pub2"])");
     auto rvec = helics::vectorizeQueryResult(res);
@@ -767,8 +767,8 @@ TEST_F(query, data_flow_graph_ordered)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
               val["attributes"]["id"].get<int64_t>());
-    auto v2 = val["cores"][0]["federates"][1];
-    auto v1 = val["cores"][0]["federates"][0];
+    auto &v2 = val["cores"][0]["federates"][1];
+    auto &v1 = val["cores"][0]["federates"][0];
     EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
               val["cores"][0]["attributes"]["id"].get<int64_t>());
     EXPECT_EQ(v2["publications"].size(), 1U);

@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <functional>
 #include <numeric>
 #include <regex>
