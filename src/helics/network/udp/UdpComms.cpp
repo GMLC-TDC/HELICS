@@ -166,7 +166,7 @@ void UdpComms::queue_rx_function()
     setRxStatus(ConnectionStatus::TERMINATED);
 }
 
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 void UdpComms::queue_tx_function()
 {
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
