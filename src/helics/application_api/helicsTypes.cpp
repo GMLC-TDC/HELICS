@@ -801,8 +801,8 @@ SmallBuffer typeConvert(DataType type, int64_t val)
             }
 
         case DataType::HELICS_COMPLEX_VECTOR: {
-            const std::complex<double> v2(static_cast<double>(val), 0.0);
-            return ValueConverter<std::complex<double>>::convert(&v2, 1);
+            const std::complex<double> cvec(static_cast<double>(val), 0.0);
+            return ValueConverter<std::complex<double>>::convert(&cvec, 1);
         }
         case DataType::HELICS_VECTOR: {
             const auto doubleVal = static_cast<double>(val);
@@ -938,23 +938,23 @@ SmallBuffer typeConvertComplex(DataType type, const double* vals, size_t size)
                                                                                                "0");
         case DataType::HELICS_STRING:
         case DataType::HELICS_CHAR: {
-            std::vector<std::complex<double>> CD;
-            CD.reserve(size);
+            std::vector<std::complex<double>> cvec;
+            cvec.reserve(size);
             for (size_t ii = 0; ii < size; ++ii) {
-                CD.emplace_back(vals[2 * ii], vals[2 * ii + 1]);
+                cvec.emplace_back(vals[2 * ii], vals[2 * ii + 1]);
             }
-            return ValueConverter<std::string_view>::convert(helicsComplexVectorString(CD));
+            return ValueConverter<std::string_view>::convert(helicsComplexVectorString(cvec));
         }
         case DataType::HELICS_NAMED_POINT:
             return ValueConverter<NamedPoint>::convert(
                 NamedPoint{helicsVectorString(vals, size), std::nan("0")});
         case DataType::HELICS_COMPLEX_VECTOR: {
-            std::vector<std::complex<double>> CD;
-            CD.reserve(size);
+            std::vector<std::complex<double>> cvec;
+            cvec.reserve(size);
             for (size_t ii = 0; ii < size; ++ii) {
-                CD.emplace_back(vals[2 * ii], vals[2 * ii + 1]);
+                cvec.emplace_back(vals[2 * ii], vals[2 * ii + 1]);
             }
-            return ValueConverter<std::vector<std::complex<double>>>::convert(CD);
+            return ValueConverter<std::vector<std::complex<double>>>::convert(cvec);
         } break;
         case DataType::HELICS_VECTOR:
         default:
@@ -1175,8 +1175,8 @@ SmallBuffer typeConvert(DataType type, bool val)
             return ValueConverter<std::complex<double>>::convert(&cval, 1);
         }
         case DataType::HELICS_VECTOR: {
-            auto v2 = val ? 1.0 : 0.0;
-            return ValueConverter<double>::convert(&v2, 1);
+            auto vec = val ? 1.0 : 0.0;
+            return ValueConverter<double>::convert(&vec, 1);
         }
         case DataType::HELICS_JSON: {
             nlohmann::json json;

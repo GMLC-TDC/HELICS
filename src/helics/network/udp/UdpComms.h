@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <set>
 
-namespace helics {
-namespace udp {
+namespace helics::udp {
     /** implementation for the communication interface that uses ZMQ messages to communicate*/
     class UdpComms final: public NetworkCommsInterface {
       public:
@@ -30,6 +29,7 @@ namespace udp {
         virtual void queue_tx_function() override;  //!< the loop for transmitting data
         virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
 
+
         // promise and future for communicating port number from tx_thread to rx_thread
         std::promise<int> promisePort;
         std::future<int> futurePort;
@@ -38,4 +38,3 @@ namespace udp {
     };
 
 }  // namespace udp
-}  // namespace helics
