@@ -25,6 +25,7 @@ struct query: public FederateTestFixture, public ::testing::Test {};
 
 using gmlc::utilities::stringOps::removeQuotes;
 class query_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
+
 /** test simple creation and destruction*/
 TEST_P(query_type, publication_queries)
 {
@@ -44,7 +45,7 @@ TEST_P(query_type, publication_queries)
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
 
-    auto core = vFed1->getCorePointer();
+    std::shared_ptr<helics::Core> core = vFed1->getCorePointer();
     auto res = core->query("fed0", "publications", HELICS_SEQUENCING_MODE_FAST);
     EXPECT_EQ(res, R"(["pub1","fed0/pub2"])");
     auto rvec = helics::vectorizeQueryResult(res);
@@ -131,8 +132,8 @@ TEST_F(query, federate_map)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(),
               val["attributes"]["id"].get<int>());
-    auto v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+    auto& fed2 = val["cores"][0]["federates"][1];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int>(),
               val["cores"][0]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
@@ -155,8 +156,8 @@ TEST_F(query, federate_map2)
     EXPECT_EQ(val["cores"][1]["federates"].size(), 1U);
     EXPECT_EQ(val["cores"][1]["attributes"]["parent"].get<int>(),
               val["attributes"]["id"].get<int>());
-    auto v2 = val["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+    auto& fed1 = val["cores"][1]["federates"][0];
+    EXPECT_EQ(fed1["attributes"]["parent"].get<int>(),
               val["cores"][1]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
@@ -179,14 +180,14 @@ TEST_F(query, federate_map3)
     EXPECT_EQ(val["brokers"].size(), 1U);
     EXPECT_EQ(val["brokers"][0]["attributes"]["parent"].get<int>(),
               val["attributes"]["id"].get<int>());
-    auto brk = val["brokers"][0];
+    auto& brk = val["brokers"][0];
     EXPECT_EQ(brk["cores"].size(), 2U);
     EXPECT_EQ(brk["brokers"].size(), 0U);
     EXPECT_EQ(brk["cores"][1]["federates"].size(), 1U);
     EXPECT_EQ(brk["cores"][1]["attributes"]["parent"].get<int>(),
               brk["attributes"]["id"].get<int>());
-    auto v2 = brk["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+    auto& fed1 = brk["cores"][1]["federates"][0];
+    EXPECT_EQ(fed1["attributes"]["parent"].get<int>(),
               brk["cores"][1]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
@@ -209,8 +210,8 @@ TEST_F(query, dependency_graph)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int>(),
               val["attributes"]["id"].get<int>());
-    auto v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int>(),
+    auto fed2 = val["cores"][0]["federates"][1];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int>(),
               val["cores"][0]["attributes"]["id"].get<int>());
     core = nullptr;
     vFed1->finalize();
@@ -541,8 +542,8 @@ TEST_F(query, data_flow_graph)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     vFed1->registerGlobalInput<double>("ipt1");
-    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
-    p1.addTarget("ipt1");
+    auto& pub1 = vFed2->registerGlobalPublication<double>("pub1");
+    pub1.addTarget("ipt1");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -553,16 +554,16 @@ TEST_F(query, data_flow_graph)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
               val["attributes"]["id"].get<int64_t>());
-    auto v2 = val["cores"][0]["federates"][1];
-    auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+    auto fed2 = val["cores"][0]["federates"][1];
+    auto fed1 = val["cores"][0]["federates"][0];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int64_t>(),
               val["cores"][0]["attributes"]["id"].get<int64_t>());
-    EXPECT_EQ(v2["publications"].size(), 1U);
-    EXPECT_EQ(v1["inputs"].size(), 1U);
-    EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
-    EXPECT_EQ(v2["publications"][0]["key"], "pub1");
-    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
-    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    EXPECT_EQ(fed2["publications"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"][0]["key"], "ipt1");
+    EXPECT_EQ(fed2["publications"][0]["key"], "pub1");
+    EXPECT_EQ(fed1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(fed2["publications"][0]["targets"].size(), 1U);
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -576,11 +577,11 @@ TEST_F(query, data_flow_graph_non_utf8)
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
-    std::string oddName(47, 209);
+    std::string oddName(47, static_cast<unsigned char>(209));
     vFed1->registerGlobalInput<double>(oddName);
-    std::string oddName2(23, 199);
-    auto& p1 = vFed2->registerGlobalPublication<double>(oddName2);
-    p1.addTarget(oddName);
+    std::string oddName2(23, static_cast<unsigned char>(199));
+    auto& pub1 = vFed2->registerGlobalPublication<double>(oddName2);
+    pub1.addTarget(oddName);
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -591,14 +592,14 @@ TEST_F(query, data_flow_graph_non_utf8)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
               val["attributes"]["id"].get<int64_t>());
-    auto v2 = val["cores"][0]["federates"][1];
-    auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+    auto fed2 = val["cores"][0]["federates"][1];
+    auto fed1 = val["cores"][0]["federates"][0];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int64_t>(),
               val["cores"][0]["attributes"]["id"].get<int64_t>());
-    EXPECT_EQ(v2["publications"].size(), 1U);
-    EXPECT_EQ(v1["inputs"].size(), 1U);
-    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
-    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    EXPECT_EQ(fed2["publications"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(fed2["publications"][0]["targets"].size(), 1U);
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -610,14 +611,14 @@ TEST_F(query, interfaces)
     SetupTest<helics::CombinationFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
 
-    auto& i1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1", "V");
-    auto& e1 = vFed1->registerGlobalEndpoint("ept1", "type1");
-    p1.addTarget("ipt1");
-    p1.setTag("tag1", "val1");
+    auto& ipt1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1", "V");
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1", "type1");
+    pub1.addTarget("ipt1");
+    pub1.setTag("tag1", "val1");
 
-    i1.setTag("tag2", "val2");
-    e1.setTag("tag3", "val3");
+    ipt1.setTag("tag2", "val2");
+    ept1.setTag("tag3", "val3");
     vFed1->enterInitializingMode();
     auto core = vFed1->getCorePointer();
     auto res = core->query("fed0", "interfaces", HELICS_SEQUENCING_MODE_FAST);
@@ -653,14 +654,14 @@ TEST_F(query, interfaces_json_serialization)
     SetupTest<helics::CombinationFederate>("zmq4", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
 
-    auto& i1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1", "V");
-    auto& e1 = vFed1->registerGlobalEndpoint("ept1", "type1");
-    p1.addTarget("ipt1");
-    p1.setTag("tag1", "val1");
+    auto& ipt1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1", "V");
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1", "type1");
+    pub1.addTarget("ipt1");
+    pub1.setTag("tag1", "val1");
 
-    i1.setTag("tag2", "val2");
-    e1.setTag("tag3", "val3");
+    ipt1.setTag("tag2", "val2");
+    ept1.setTag("tag3", "val3");
     vFed1->enterInitializingMode();
     auto core = vFed1->getCorePointer();
     auto res = core->query("fed0", "interfaces", HELICS_SEQUENCING_MODE_FAST);
@@ -723,15 +724,15 @@ TEST_F(query, core_tags)
     SetupTest<helics::CombinationFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
     ASSERT_TRUE(vFed1);
-    auto cr = helics::CoreApp(vFed1->getCorePointer());
-    cr.setTag("description", "a core description");
-    cr.setTag("version", "1.4.6");
+    auto core = helics::CoreApp(vFed1->getCorePointer());
+    core.setTag("description", "a core description");
+    core.setTag("version", "1.4.6");
 
-    EXPECT_EQ(cr.getTag("version"), "1.4.6");
-    EXPECT_EQ(cr.getTag("description"), "a core description");
+    EXPECT_EQ(core.getTag("version"), "1.4.6");
+    EXPECT_EQ(core.getTag("description"), "a core description");
 
     // test an unknown tag
-    EXPECT_TRUE(cr.getTag("nonatag").empty());
+    EXPECT_TRUE(core.getTag("nonatag").empty());
 
     vFed1->enterInitializingMode();
 
@@ -739,7 +740,7 @@ TEST_F(query, core_tags)
 
     auto desc = vFed1->query("core", "description");
     EXPECT_EQ(desc, "\"a core description\"");
-    cr.reset();
+    core.reset();
     vFed1->finalize();
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["version"].get<std::string>(), "1.4.6");
@@ -755,8 +756,8 @@ TEST_F(query, data_flow_graph_ordered)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     vFed1->registerGlobalInput<double>("ipt1");
-    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
-    p1.addTarget("ipt1");
+    auto& pub1 = vFed2->registerGlobalPublication<double>("pub1");
+    pub1.addTarget("ipt1");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -767,16 +768,16 @@ TEST_F(query, data_flow_graph_ordered)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
               val["attributes"]["id"].get<int64_t>());
-    auto v2 = val["cores"][0]["federates"][1];
-    auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+    auto& fed2 = val["cores"][0]["federates"][1];
+    auto& fed1 = val["cores"][0]["federates"][0];
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int64_t>(),
               val["cores"][0]["attributes"]["id"].get<int64_t>());
-    EXPECT_EQ(v2["publications"].size(), 1U);
-    EXPECT_EQ(v1["inputs"].size(), 1U);
-    EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
-    EXPECT_EQ(v2["publications"][0]["key"], "pub1");
-    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
-    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    EXPECT_EQ(fed2["publications"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"][0]["key"], "ipt1");
+    EXPECT_EQ(fed2["publications"][0]["key"], "pub1");
+    EXPECT_EQ(fed1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(fed2["publications"][0]["targets"].size(), 1U);
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -790,8 +791,8 @@ TEST_F(query, data_flow_graph_concurrent)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     vFed1->registerGlobalInput<double>("ipt1");
-    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
-    p1.addTarget("ipt1");
+    auto& pub1 = vFed2->registerGlobalPublication<double>("pub1");
+    pub1.addTarget("ipt1");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -804,19 +805,19 @@ TEST_F(query, data_flow_graph_concurrent)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["attributes"]["parent"].get<int64_t>(),
               val["attributes"]["id"].get<int64_t>());
-    auto v2 = val["cores"][0]["federates"][1];
-    auto v1 = val["cores"][0]["federates"][0];
-    if (v1["attributes"]["id"].get<int64_t>() > v2["attributes"]["id"].get<int64_t>()) {
-        std::swap(v1, v2);
+    auto& fed2 = val["cores"][0]["federates"][1];
+    auto& fed1 = val["cores"][0]["federates"][0];
+    if (fed1["attributes"]["id"].get<int64_t>() > fed2["attributes"]["id"].get<int64_t>()) {
+        std::swap(fed1, fed2);
     }
-    EXPECT_EQ(v2["attributes"]["parent"].get<int64_t>(),
+    EXPECT_EQ(fed2["attributes"]["parent"].get<int64_t>(),
               val["cores"][0]["attributes"]["id"].get<int64_t>());
-    EXPECT_EQ(v2["publications"].size(), 1U);
-    EXPECT_EQ(v1["inputs"].size(), 1U);
-    EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
-    EXPECT_EQ(v2["publications"][0]["key"], "pub1");
-    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
-    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    EXPECT_EQ(fed2["publications"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"].size(), 1U);
+    EXPECT_EQ(fed1["inputs"][0]["key"], "ipt1");
+    EXPECT_EQ(fed2["publications"][0]["key"], "pub1");
+    EXPECT_EQ(fed1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(fed2["publications"][0]["targets"].size(), 1U);
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
     core = nullptr;
@@ -829,18 +830,18 @@ TEST_F(query, updates_indices)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerGlobalPublication<double>("pub2");
-    auto& p3 = vFed1->registerGlobalPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("pub2");
     vFed1->registerSubscription("pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updated_input_indices");
@@ -848,8 +849,8 @@ TEST_F(query, updates_indices)
     vFed1->clearUpdates();
     qres = vFed1->query("updated_input_indices");
     EXPECT_EQ(qres, "[]");
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updated_input_indices");
     EXPECT_EQ(qres, "[0,2]");
@@ -861,18 +862,18 @@ TEST_F(query, updates_names)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerGlobalPublication<double>("pub2");
-    auto& p3 = vFed1->registerGlobalPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("pub2");
     vFed1->registerSubscription("pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updated_input_names");
@@ -881,8 +882,8 @@ TEST_F(query, updates_names)
     vFed1->clearUpdates();
     qres = vFed1->query("updated_input_names");
     EXPECT_EQ(qres, "[]");
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updated_input_names");
     res = helics::vectorizeQueryResult(qres);
@@ -895,18 +896,18 @@ TEST_F(query, update_values)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerGlobalPublication<double>("pub2");
-    auto& p3 = vFed1->registerGlobalPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("pub2");
     vFed1->registerSubscription("pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updates");
@@ -918,8 +919,8 @@ TEST_F(query, update_values)
     vFed1->clearUpdates();
     qres = vFed1->query("updates");
     EXPECT_EQ(qres, "{}");
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updates");
     val = loadJsonStr(qres);
@@ -935,18 +936,18 @@ TEST_F(query, update_values_local)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerPublication<double>("pub2");
-    auto& p3 = vFed1->registerPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerPublication<double>("pub2");
+    auto& pub3 = vFed1->registerPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("fed0/pub2");
     vFed1->registerSubscription("fed0/pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updates");
@@ -958,8 +959,8 @@ TEST_F(query, update_values_local)
     vFed1->clearUpdates();
     qres = vFed1->query("updates");
     EXPECT_EQ(qres, "{}");
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updates");
     val = loadJsonStr(qres);
@@ -975,18 +976,18 @@ TEST_F(query, update_values_all)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed1->registerGlobalPublication<double>("pub2");
-    auto& p3 = vFed1->registerGlobalPublication<double>("pub3");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
     vFed1->registerSubscription("pub1");
     vFed1->registerSubscription("pub2");
     vFed1->registerSubscription("pub3");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
-    p2.publish(23.1);
-    p3.publish(19.4);
+    pub1.publish(45.7);
+    pub2.publish(23.1);
+    pub3.publish(19.4);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("values");
@@ -998,8 +999,8 @@ TEST_F(query, update_values_all)
     vFed1->clearUpdates();
     auto qres2 = vFed1->query("values");
     EXPECT_EQ(qres, qres2);
-    p1.publish(19.7);
-    p3.publish(15.1);
+    pub1.publish(19.7);
+    pub3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("values");
     val = loadJsonStr(qres);
@@ -1015,12 +1016,12 @@ TEST_F(query, global_flush)
 {
     SetupTest<helics::ValueFederate>("test_4", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
 
     vFed1->registerSubscription("pub1");
 
     vFed1->enterExecutingMode();
-    p1.publish(45.7);
+    pub1.publish(45.7);
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("root", "global_flush");
@@ -1055,6 +1056,15 @@ TEST_F(query, query_subscriptions)
     helics::cleanupHelicsLibrary();
 }
 
+/// @brief  helper to test if a json loads properly
+/// @param jsonString
+/// @return
+bool testLoadJson(const std::string& jsonString)
+{
+    auto val = nlohmann::json::parse(jsonString.begin(), jsonString.end(), nullptr, false, true);
+    return (!val.is_discarded());
+}
+
 TEST_F(query, queries_query)
 {
     SetupTest<helics::CombinationFederate>("zmq2", 2);
@@ -1066,9 +1076,9 @@ TEST_F(query, queries_query)
 
     vFed2->registerSubscription("pub1");
     vFed2->registerSubscription("pub2");
-    auto& f1 = vFed2->registerFilter("f1");
-    f1.addSourceTarget("pub3");
-    f1.addDestinationTarget("pub3");
+    auto& filt1 = vFed2->registerFilter("f1");
+    filt1.addSourceTarget("pub3");
+    filt1.addDestinationTarget("pub3");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -1086,12 +1096,7 @@ TEST_F(query, queries_query)
         }
         auto qres = vFed1->query(qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error";
-        try {
-            auto v = loadJsonStr(qres);
-        }
-        catch (...) {
-            EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
-        }
+        EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qstr;
     }
 
     res = vFed1->query("core", "queries");
@@ -1104,12 +1109,7 @@ TEST_F(query, queries_query)
         }
         auto qres = vFed1->query("core", qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in core";
-        try {
-            auto v = loadJsonStr(qres);
-        }
-        catch (...) {
-            EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
-        }
+        EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qstr;
     }
 
     res = vFed1->query("root", "queries");
@@ -1122,12 +1122,7 @@ TEST_F(query, queries_query)
         }
         auto qres = vFed1->query("root", qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in root";
-        try {
-            auto v = loadJsonStr(qres);
-        }
-        catch (...) {
-            EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
-        }
+        EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qstr;
     }
 
     vFed1->finalize();
@@ -1159,8 +1154,8 @@ TEST_F(query, concurrent_callback)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     vFed1->registerGlobalInput<double>("ipt1");
-    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
-    p1.addTarget("ipt1");
+    auto& pub1 = vFed2->registerGlobalPublication<double>("pub1");
+    pub1.addTarget("ipt1");
 
     vFed1->setQueryCallback([](std::string_view queryStr) {
         return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
@@ -1198,11 +1193,11 @@ TEST_F(query, queries_disconnected)
     vFed2->finalize();
     vFed1->requestTime(3.0);
     res = vFed1->query(vFed2->getName(), "state");
-    int ii{0};
+    int sleepCount{0};
     while (res.find("disconnected") == std::string::npos) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         res = vFed1->query(vFed2->getName(), "state");
-        if (++ii > 10) {
+        if (++sleepCount > 10) {
             break;
         }
     }
@@ -1226,42 +1221,18 @@ TEST_F(query, queries_disconnected_global)
     vFed1->enterExecutingModeComplete();
     vFed3->enterExecutingModeComplete();
 
-    auto res = brokers[0]->query("root", "global_time");
-    try {
-        auto v = loadJsonStr(res);
-        (void)(v);
-    }
-    catch (...) {
-        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
-    }
+    auto qres = brokers[0]->query("root", "global_time");
+    EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qres;
     vFed2->finalize();
     vFed1->requestTime(3.0);
-    res = brokers[0]->query("root", "global_time");
-    try {
-        auto v = loadJsonStr(res);
-        (void)(v);
-    }
-    catch (...) {
-        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
-    }
+    qres = brokers[0]->query("root", "global_time");
+    EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qres;
     vFed2->finalize();
-    res = brokers[0]->query("root", "global_time");
-    try {
-        auto v = loadJsonStr(res);
-        (void)(v);
-    }
-    catch (...) {
-        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
-    }
+    qres = brokers[0]->query("root", "global_time");
+    EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qres;
     vFed3->finalize();
-    res = brokers[0]->query("root", "global_time");
-    try {
-        auto v = loadJsonStr(res);
-        (void)(v);
-    }
-    catch (...) {
-        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
-    }
+    qres = brokers[0]->query("root", "global_time");
+    EXPECT_TRUE(testLoadJson(qres)) << "Unable to load JSON string " << qres;
 }
 
 TEST_F(query, queries_timeout_ci_skip)

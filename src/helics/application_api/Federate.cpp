@@ -19,16 +19,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "AsyncFedCallInfo.hpp"
 #include "ConnectorFederateManager.hpp"
 #include "CoreApp.hpp"
+#include "FederateInfo.hpp"
 #include "Filters.hpp"
 #include "PotentialInterfacesManager.hpp"
 #include "Translator.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
 
-#include <cassert>
 #include <fmt/format.h>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 
@@ -1326,11 +1327,11 @@ static void arrayPairProcess(nlohmann::json doc,
 {
     if (doc.contains(key)) {
         if (doc[key].is_array()) {
-            for (auto& val : doc[key]) {
+            for (const auto& val : doc[key]) {
                 pairOp(val[0].get<std::string>(), val[1].get<std::string>());
             }
         } else {
-            for (auto& val : doc[key].items()) {
+            for (const auto& val : doc[key].items()) {
                 pairOp(val.key(), val.value().get<std::string>());
             }
         }
@@ -1424,7 +1425,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuffer)
 {
     using fileops::getOrDefault;
-    auto& json = jsonBuffer.json();
+    const auto& json = jsonBuffer.json();
     bool defaultGlobal = false;
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 
@@ -1610,7 +1611,7 @@ static void
             std::string propname;
             propname = toml::find_or(props, "name", propname);
             const toml::value uVal;
-            auto propval = toml::find_or(props, "value", uVal);
+            const auto& propval = toml::find_or(props, "value", uVal);
 
             if ((propname.empty()) || (propval.is_uninitialized())) {
                 if (strict) {

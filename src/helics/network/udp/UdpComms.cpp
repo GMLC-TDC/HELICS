@@ -137,21 +137,21 @@ void UdpComms::queue_rx_function()
             return;
         }
         if (len == 5) {
-            std::string str(data.data(), len);
+            const std::string_view str(data.data(), len);
             if (str == "close") {
                 break;
             }
         }
-        ActionMessage M(reinterpret_cast<std::byte*>(data.data()), len);
-        if (!isValidCommand(M)) {
+        ActionMessage cmd(reinterpret_cast<std::byte*>(data.data()), len);
+        if (!isValidCommand(cmd)) {
             logWarning("invalid command received udp");
             continue;
         }
-        if (isProtocolCommand(M)) {
-            if (M.messageID == CLOSE_RECEIVER) {
+        if (isProtocolCommand(cmd)) {
+            if (cmd.messageID == CLOSE_RECEIVER) {
                 break;
             }
-            auto reply = generateReplyToIncomingMessage(M);
+            auto reply = generateReplyToIncomingMessage(cmd);
             if (reply.messageID == DISCONNECT) {
                 break;
             }
@@ -159,16 +159,16 @@ void UdpComms::queue_rx_function()
                 socket.send_to(asio::buffer(reply.to_string()), remote_endp, 0, ignored_error);
             }
         } else {
-            ActionCallback(std::move(M));
+            ActionCallback(std::move(cmd));
         }
     }
     disconnecting = true;
     setRxStatus(ConnectionStatus::TERMINATED);
 }
 
+// NOLINTNEXTLINE
 void UdpComms::queue_tx_function()
 {
-    std::vector<char> buffer;
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
     udp::resolver resolver(ioctx->getBaseContext());
     bool closingRx = false;
@@ -190,9 +190,9 @@ void UdpComms::queue_tx_function()
             brokerPort = getDefaultBrokerPort();
         }
         try {
-            udp::resolver::query query(udpnet(interfaceNetwork),
-                                       brokerTargetAddress,
-                                       std::to_string(brokerPort));
+            const udp::resolver::query query(udpnet(interfaceNetwork),
+                                             brokerTargetAddress,
+                                             std::to_string(brokerPort));
             // Setup the control socket for comms with the receiver
             broker_endpoint = *resolver.resolve(query);
             int retries{0};
@@ -212,10 +212,10 @@ void UdpComms::queue_tx_function()
                     setTxStatus(ConnectionStatus::TERMINATED);
                     return;
                 }
-                ActionMessage m(CMD_PROTOCOL_PRIORITY);
-                m.messageID = (PortNumber <= 0) ? REQUEST_PORTS : CONNECTION_REQUEST;
-                m.setStringData(brokerName, brokerInitString);
-                transmitSocket.send_to(asio::buffer(m.to_string()), broker_endpoint, 0, error);
+                ActionMessage cmd(CMD_PROTOCOL_PRIORITY);
+                cmd.messageID = (PortNumber <= 0) ? REQUEST_PORTS : CONNECTION_REQUEST;
+                cmd.setStringData(brokerName, brokerInitString);
+                transmitSocket.send_to(asio::buffer(cmd.to_string()), broker_endpoint, 0, error);
                 if (error) {
                     logError(fmt::format("error in initial send to broker {}", error.message()));
                     if (PortNumber.load() <= 0) {
@@ -228,7 +228,7 @@ void UdpComms::queue_tx_function()
                 }
 
                 bool timeout{false};
-                std::vector<char> rx(128);
+                std::vector<char> receiveData(128);
                 udp::endpoint brk;
 
                 while ((transmitSocket.available() == 0) && (!timeout)) {
@@ -258,7 +258,7 @@ void UdpComms::queue_tx_function()
                     }
                     continue;
                 }
-                auto len = transmitSocket.receive_from(asio::buffer(rx), brk, 0, error);
+                auto len = transmitSocket.receive_from(asio::buffer(receiveData), brk, 0, error);
                 if (error) {
                     if (errorCount++ == 0) {
                         logError(
@@ -276,33 +276,33 @@ void UdpComms::queue_tx_function()
                     std::this_thread::sleep_for(std::chrono::milliseconds(200));
                     continue;
                 }
-                m = ActionMessage(reinterpret_cast<std::byte*>(rx.data()), len);
-                if (isProtocolCommand(m)) {
-                    if (m.messageID == PORT_DEFINITIONS) {
-                        loadPortDefinitions(m);
+                cmd = ActionMessage(reinterpret_cast<std::byte*>(receiveData.data()), len);
+                if (isProtocolCommand(cmd)) {
+                    if (cmd.messageID == PORT_DEFINITIONS) {
+                        loadPortDefinitions(cmd);
                         promisePort.set_value(PortNumber);
                         connectionEstablished = true;
-                    } else if (m.messageID == CONNECTION_ACK) {
+                    } else if (cmd.messageID == CONNECTION_ACK) {
                         if (PortNumber.load() > 0) {
                             connectionEstablished = true;
                             continue;
                         }
-                    } else if (m.messageID == NEW_BROKER_INFORMATION) {
+                    } else if (cmd.messageID == NEW_BROKER_INFORMATION) {
                         logMessage("got new broker information");
-                        auto brkprt = gmlc::networking::extractInterfaceAndPort(m.getString(0));
+                        auto brkprt = gmlc::networking::extractInterfaceAndPort(cmd.getString(0));
                         brokerPort = brkprt.second;
                         if (brkprt.first != "?") {
                             brokerTargetAddress = brkprt.first;
                         }
-                        query = udp::resolver::query(udpnet(interfaceNetwork),
-                                                     brokerTargetAddress,
-                                                     std::to_string(brokerPort));
+                        const udp::resolver::query localQuery(udpnet(interfaceNetwork),
+                                                              brokerTargetAddress,
+                                                              std::to_string(brokerPort));
                         // Setup the control socket for comms with the receiver
-                        broker_endpoint = *resolver.resolve(query);
+                        broker_endpoint = *resolver.resolve(localQuery);
                         continue;
-                    } else if (m.messageID == DELAY_CONNECTION) {
+                    } else if (cmd.messageID == DELAY_CONNECTION) {
                         std::this_thread::sleep_for(std::chrono::seconds(2));
-                    } else if (m.messageID == DISCONNECT) {
+                    } else if (cmd.messageID == DISCONNECT) {
                         if (PortNumber <= 0) {
                             PortNumber = -1;
                             promisePort.set_value(-1);
@@ -313,8 +313,8 @@ void UdpComms::queue_tx_function()
                 }
             }
         }
-        catch (std::exception& e) {
-            logError(std::string("error connecting to broker ") + e.what());
+        catch (std::exception& err) {
+            logError(fmt::format("error connecting to broker {}", err.what()));
             PortNumber = -1;
             promisePort.set_value(-1);
             setTxStatus(ConnectionStatus::ERRORED);
@@ -329,18 +329,18 @@ void UdpComms::queue_tx_function()
     udp::endpoint rxEndpoint;
     if (localTargetAddress.empty() || localTargetAddress == "*" ||
         localTargetAddress == "udp://*") {
-        udp::resolver::query queryLocal(udpnet(interfaceNetwork),
-                                        "127.0.0.1",
-                                        std::to_string(PortNumber));
+        const udp::resolver::query queryLocal(udpnet(interfaceNetwork),
+                                              "127.0.0.1",
+                                              std::to_string(PortNumber));
         auto result = resolver.resolve(queryLocal);
         rxEndpoint = *result;
     } else {
-        udp::resolver::query queryLocal(udpnet(interfaceNetwork),
-                                        localTargetAddress,
-                                        std::to_string(PortNumber));
+        const udp::resolver::query queryLocal(udpnet(interfaceNetwork),
+                                              localTargetAddress,
+                                              std::to_string(PortNumber));
         auto result = resolver.resolve(queryLocal, error);
         if (error) {
-            logError(std::string("Unable to resolve:") + localTargetAddress);
+            logError(fmt::format("Unable to resolve: {}", localTargetAddress));
             setTxStatus(ConnectionStatus::ERRORED);
             return;
         }
@@ -360,20 +360,20 @@ void UdpComms::queue_tx_function()
                 switch (cmd.messageID) {
                     case NEW_ROUTE: {
                         try {
-                            std::string newroute(cmd.payload.to_string());
+                            const std::string newroute(cmd.payload.to_string());
                             std::string interface;
                             std::string port;
                             std::tie(interface, port) =
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
-                            udp::resolver::query queryNew(udpnet(interfaceNetwork),
-                                                          interface,
-                                                          port);
+                            const udp::resolver::query queryNew(udpnet(interfaceNetwork),
+                                                                interface,
+                                                                port);
 
                             routes.emplace(route_id{cmd.getExtraData()},
                                            *resolver.resolve(queryNew));
                         }
-                        catch (std::exception&) {
-                            // TODO(someone): do something???
+                        catch (const std::exception& err) {
+                            logError(fmt::format("unable to resolve new route: {}", err.what()));
                         }
                         processed = true;
                     } break;
@@ -394,6 +394,8 @@ void UdpComms::queue_tx_function()
                     case DISCONNECT:
                         continueProcessing = false;
                         processed = true;
+                        break;
+                    default:
                         break;
                 }
             }
@@ -492,16 +494,16 @@ void UdpComms::closeReceiver()
                     localTargetAddress == "udp://*") {
                     // try connecting with the receiver socket
                     udp::resolver resolver(serv->getBaseContext());
-                    udp::resolver::query queryLocal(udpnet(interfaceNetwork),
-                                                    "127.0.0.1",
-                                                    std::to_string(PortNumber));
+                    const udp::resolver::query queryLocal(udpnet(interfaceNetwork),
+                                                          "127.0.0.1",
+                                                          std::to_string(PortNumber));
                     rxEndpoint = *resolver.resolve(queryLocal);
                 } else {
                     // try connecting with the receiver socket
                     udp::resolver resolver(serv->getBaseContext());
-                    udp::resolver::query queryLocal(udpnet(interfaceNetwork),
-                                                    localTargetAddress,
-                                                    std::to_string(PortNumber));
+                    const udp::resolver::query queryLocal(udpnet(interfaceNetwork),
+                                                          localTargetAddress,
+                                                          std::to_string(PortNumber));
                     rxEndpoint = *resolver.resolve(queryLocal);
                 }
 
@@ -515,6 +517,7 @@ void UdpComms::closeReceiver()
                 }
             }
         }
+        // NOLINTNEXTLINE
         catch (...) {
             // ignore error here since we are already disconnecting
         }
