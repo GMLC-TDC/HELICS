@@ -14,6 +14,8 @@ mark_as_advanced(BOOST_INSTALL_PATH)
 if(WIN32 AND NOT UNIX_LIKE)
 
     set(boost_versions
+        boost_1_86_0
+        boost_1_85_0
         boost_1_84_0
         boost_1_83_0
         boost_1_82_0
@@ -26,12 +28,6 @@ if(WIN32 AND NOT UNIX_LIKE)
         boost_1_75_0
         boost_1_74_0
         boost_1_73_0
-        boost_1_72_0
-        boost_1_71_0
-        boost_1_70_0
-        boost_1_69_0
-        boost_1_68_0
-        boost_1_67_0
     )
 
     set(poss_prefixes
@@ -91,12 +87,12 @@ if(NOT BOOST_REQUIRED_LIBRARIES)
 endif()
 
 # Minimum version of Boost required for building a project
-set(BOOST_MINIMUM_VERSION 1.67)
+set(BOOST_MINIMUM_VERSION 1.73)
 
 if(BOOST_REQUIRED_LIBRARIES)
-    find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED)
+    find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED CONFIG)
 else()
-    find_package(Boost ${BOOST_MINIMUM_VERSION})
+    find_package(Boost ${BOOST_MINIMUM_VERSION} CONFIG)
 endif()
 # Minimum version of Boost required for building test suite
 set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})

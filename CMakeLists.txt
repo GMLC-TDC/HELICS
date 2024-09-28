@@ -7,7 +7,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.11...3.28)
+cmake_minimum_required(VERSION 3.22...3.30)
+cmake_policy(SET CMP0167 OLD)
+cmake_policy(SET CMP0169 OLD)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -17,14 +19,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.5.3)
+project(HELICS VERSION 3.6.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2024-07-08")
+set(HELICS_DATE "2024-10-08")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -82,7 +84,6 @@ include(CMakeDependentOption)
 include(copy_key_files)
 include(CTest)
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.12)
     option(
         HELICS_ENABLE_PYTHON_BUILD_SCRIPTS
         "HELICS build systems can use python to automatically generate some files.  This is not required but may be useful if you are a developer and frequently modifying some files"
@@ -93,7 +94,6 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.12)
     if(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
         find_package(Python COMPONENTS Interpreter)
     endif()
-endif()
 
 # allow BOOST library inclusion to be turned off completely; this option will disable the IPC core
 option(HELICS_DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")

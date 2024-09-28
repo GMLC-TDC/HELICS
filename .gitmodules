@@ -31,3 +31,6 @@
 	path = ThirdParty/networking
 	url = ../../GMLC-TDC/networking.git
 	branch = main
+[submodule "ThirdParty/libzmq"]
+	path = ThirdParty/libzmq
+	url = https://github.com/zeromq/libzmq.git
