@@ -435,11 +435,11 @@ TEST_F(multiInput, vectorize_string)
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    auto& pub1 = vFed1->registerGlobalPublication("pub1", "string");
-    auto& pub2 = vFed1->registerGlobalPublication("pub2", "string");
-    auto& pub3 = vFed1->registerGlobalPublication("pub3", "string");
+    auto pub1 = vFed1->registerGlobalPublication("pub1", "string");
+    auto pub2 = vFed1->registerGlobalPublication("pub2", "string");
+    auto pub3 = vFed1->registerGlobalPublication("pub3", "string");
 
-    auto& inp1 = vFed1->registerInput("", "string");
+    auto inp1 = vFed1->registerInput("", "string");
     inp1.addTarget("pub1");
     inp1.addTarget("pub2");
     inp1.addTarget("pub3");
@@ -471,9 +471,9 @@ TEST_F(multiInput, vectorizeComplex)
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    auto& pub1 = vFed1->registerGlobalPublication("pub1", "complex_vector");
-    auto& pub2 = vFed1->registerGlobalPublication("pub2", "complex_vector");
-    auto& pub3 = vFed1->registerGlobalPublication("pub3", "complex_vector");
+    auto pub1 = vFed1->registerGlobalPublication("pub1", "complex_vector");
+    auto pub2 = vFed1->registerGlobalPublication("pub2", "complex_vector");
+    auto pub3 = vFed1->registerGlobalPublication("pub3", "complex_vector");
 
     auto in1 = vFed1->registerInput("", "complex_vector");
     in1.addTarget("pub1");

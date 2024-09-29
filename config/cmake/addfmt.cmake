@@ -35,7 +35,12 @@ if(NOT TARGET fmt::fmt)
             set(FMT_OS ON CACHE INTERNAL "")
         endif()
         # add the vendored FMT header only library
-        add_subdirectory(ThirdParty/fmtlib)
+
+        if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+        add_subdirectory(ThirdParty/fmtlib EXCLUDE_FROM_ALL SYSTEM)
+        else()
+        add_subdirectory(ThirdParty/fmtlib EXCLUDE_FROM_ALL)
+        endif()
 
         set_target_properties(fmt PROPERTIES FOLDER Extern)
 
