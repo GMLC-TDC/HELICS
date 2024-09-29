@@ -982,7 +982,7 @@ TEST_F(valuefed, time_update_callback_single_thread)
     int validCount{0};
     vFed1->setInputNotificationCallback([&](const helics::Input& input, helics::Time callTime) {
         lastTime = callTime;
-        lastId =input.getHandle();
+        lastId = input.getHandle();
     });
     vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
         if (newTime > lastTime && !iterating) {
