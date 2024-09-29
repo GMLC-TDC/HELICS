@@ -119,10 +119,10 @@ set(BOOST_MINIMUM_VERSION 1.73)
 set(Boost_DEBUG ON)
 if(BOOST_REQUIRED_LIBRARIES)
     find_package(
-        Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED CONFIG
+        Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED
     )
 else()
-    find_package(Boost ${BOOST_MINIMUM_VERSION} CONFIG)
+    find_package(Boost ${BOOST_MINIMUM_VERSION})
 endif()
 # Minimum version of Boost required for building test suite
 set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})

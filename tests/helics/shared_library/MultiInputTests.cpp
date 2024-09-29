@@ -435,27 +435,27 @@ TEST_F(multiInput, vectorize_string)
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    auto pub1 = vFed1->registerGlobalPublication("pub1", "string");
-    auto pub2 = vFed1->registerGlobalPublication("pub2", "string");
-    auto pub3 = vFed1->registerGlobalPublication("pub3", "string");
+    auto& pub1 = vFed1->registerGlobalPublication("pub1", "string");
+    auto& pub2 = vFed1->registerGlobalPublication("pub2", "string");
+    auto& pub3 = vFed1->registerGlobalPublication("pub3", "string");
 
-    auto in1 = vFed1->registerInput("", "string");
-    in1.addTarget("pub1");
-    in1.addTarget("pub2");
-    in1.addTarget("pub3");
-    in1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,
+    auto& inp1 = vFed1->registerInput("", "string");
+    inp1.addTarget("pub1");
+    inp1.addTarget("pub2");
+    inp1.addTarget("pub3");
+    inp1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,
                   HELICS_MULTI_INPUT_VECTORIZE_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish("test1");
     vFed1->requestNextStep();
-    auto val = in1.getString();
+    auto val = inp1.getString();
     EXPECT_NE(val.find("\"test1\""), std::string::npos);
     pub3.publish("test3");
     pub2.publish("test2");
 
     vFed1->requestNextStep();
-    val = in1.getString();
+    val = inp1.getString();
     auto aloc1 = val.find("test1");
     auto aloc2 = val.find("test2");
     auto aloc3 = val.find("test3");
@@ -471,9 +471,9 @@ TEST_F(multiInput, vectorizeComplex)
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    auto pub1 = vFed1->registerGlobalPublication("pub1", "complex_vector");
-    auto pub2 = vFed1->registerGlobalPublication("pub2", "complex_vector");
-    auto pub3 = vFed1->registerGlobalPublication("pub3", "complex_vector");
+    auto& pub1 = vFed1->registerGlobalPublication("pub1", "complex_vector");
+    auto& pub2 = vFed1->registerGlobalPublication("pub2", "complex_vector");
+    auto& pub3 = vFed1->registerGlobalPublication("pub3", "complex_vector");
 
     auto in1 = vFed1->registerInput("", "complex_vector");
     in1.addTarget("pub1");
