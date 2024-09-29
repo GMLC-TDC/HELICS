@@ -281,6 +281,17 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/spdlog/CMakeLists.txt")
         submod_update(ThirdParty/spdlog)
     endif()
+    if (HELICS_BUILD_TESTS)
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/CMakeLists.txt")
+        submod_update(ThirdParty/googletest)
+    endif()
+    endif()
+
+    if (HELICS_BUILD_TESTS)
+        if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/benchmark/CMakeLists.txt")
+            submod_update(ThirdParty/benchmark)
+        endif()
+    endif()
 
     check_submodule_status()
 

@@ -22,10 +22,6 @@ set(HAVE_STD_REGEX ON CACHE INTERNAL "")
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "")
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/CMakeLists.txt")
-    submod_update(ThirdParty/googletest)
-endif()
-
 add_subdirectory(
     ${CMAKE_SOURCE_DIR}/ThirdParty/googletest ${CMAKE_BINARY_DIR}/ThirdParty/googletest
     EXCLUDE_FROM_ALL

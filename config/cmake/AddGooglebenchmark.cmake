@@ -18,10 +18,6 @@ set(HAVE_STD_REGEX ON CACHE INTERNAL "")
 set(HAVE_POSIX_REGEX OFF CACHE INTERNAL "")
 set(HAVE_GNU_POSIX_REGEX OFF CACHE INTERNAL "")
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/benchmark/CMakeLists.txt")
-    submod_update(ThirdParty/benchmark)
-endif()
-
 add_subdirectory(
     ${CMAKE_SOURCE_DIR}/ThirdParty/benchmark ${CMAKE_BINARY_DIR}/ThirdParty/benchmarks
     EXCLUDE_FROM_ALL
