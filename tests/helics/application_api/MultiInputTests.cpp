@@ -141,7 +141,7 @@ TEST_F(multiInput, priority)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, max)
+TEST_F(multiInput, max_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -179,7 +179,7 @@ TEST_F(multiInput, max)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, min)
+TEST_F(multiInput, min_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -217,7 +217,7 @@ TEST_F(multiInput, min)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, and)
+TEST_F(multiInput, and_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -255,7 +255,7 @@ TEST_F(multiInput, and)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, or)
+TEST_F(multiInput, or_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -301,7 +301,7 @@ TEST_F(multiInput, or)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, sum)
+TEST_F(multiInput, sum_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -339,7 +339,7 @@ TEST_F(multiInput, sum)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, average)
+TEST_F(multiInput, average_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -377,7 +377,7 @@ TEST_F(multiInput, average)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, diff)
+TEST_F(multiInput, diff_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -411,7 +411,7 @@ TEST_F(multiInput, diff)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, vectorize)
+TEST_F(multiInput, vectorize_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);

@@ -8,8 +8,6 @@
 # ~~~
 
 cmake_minimum_required(VERSION 3.22...3.30)
-cmake_policy(SET CMP0167 OLD)
-cmake_policy(SET CMP0169 OLD)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -690,17 +688,17 @@ set(LICENSE_LIST
 )
 
 if(HELICS_BUILD_TESTS)
-    list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest-src/LICENSE")
+    list(APPEND LICENSE_LIST "Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE")
 endif()
 
 if(HELICS_BUILD_BENCHMARKS)
     list(APPEND LICENSE_LIST "Google Benchmark"
-         "${PROJECT_BINARY_DIR}/_deps/gbenchmark-src/LICENSE"
+         "${PROJECT_SOURCE_DIR}/ThirdParty/benchmark/LICENSE"
     )
 endif()
 
 if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
-    list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/LICENSE")
+    list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_SOURCE_DIR}/ThirdParty/libzmq/LICENSE")
 endif()
 
 if(NOT HELICS_DISABLE_ASIO)
@@ -786,16 +784,6 @@ cmake_dependent_option(
 
 if(HELICS_ENABLE_PACKAGE_BUILD)
 
-    if(CMAKE_VERSION VERSION_LESS 3.13)
-        if(HELICS_ZMQ_SUBPROJECT OR HELICS_ZMQ_FORCE_SUBPROJECT)
-            if(ENABLE_ZMQ_CORE)
-                message(
-                    FATAL_ERROR
-                        "CMAKE 3.13 or higher is required to package a subproject of ZeroMQ with HELICS"
-                )
-            endif()
-        endif()
-    endif()
     # cmake-format: off
     set(CPACK_PACKAGE_NAME "Helics")
     set(CPACK_PACKAGE_VENDOR "GMLC")
@@ -880,6 +868,8 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         "Helics Recorder"
         "helics_player"
         "Helics Player"
+        "helics_connector"
+        "Helics Connector"
     )
 
     if(INSTALL_SYSTEM_LIBRARIES)

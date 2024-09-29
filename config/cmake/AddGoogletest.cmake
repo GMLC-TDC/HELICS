@@ -8,35 +8,11 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #
-# Downloads GTest and provides a helper macro to add tests. Add make check, as well, which gives
+# Add make check, as well, which gives
 # output on failed tests without having to set an environment variable.
 #
 
-set(gtest_version v1.14.0)
 
-string(TOLOWER "googletest" gtName)
-
-include(FetchContent)
-mark_as_advanced(FETCHCONTENT_BASE_DIR)
-mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
-mark_as_advanced(FETCHCONTENT_QUIET)
-mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
-
-fetchcontent_declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG ${gtest_version}
-    GIT_SHALLOW 1
-    UPDATE_COMMAND ""
-)
-
-fetchcontent_getproperties(googletest)
-
-if(NOT ${gtName}_POPULATED)
-    # Fetch the content using previously declared details
-    fetchcontent_populate(googletest)
-
-endif()
 hide_variable(FETCHCONTENT_SOURCE_DIR_GOOGLETEST)
 hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_GOOGLETEST)
 
@@ -46,9 +22,8 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 set(HAVE_STD_REGEX ON CACHE INTERNAL "")
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "")
-add_subdirectory(${${gtName}_SOURCE_DIR} ${${gtName}_BINARY_DIR} EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_SOURCE_DIR}/ThirdParty/googletest ${CMAKE_BINARY_DIR}/ThirdParty/googletest EXCLUDE_FROM_ALL)
 
-message(STATUS "loading google-test directory ${${gtName}_SOURCE_DIR}")
 if(NOT MSVC)
     # target_Compile_options(gtest PRIVATE "-Wno-undef") target_Compile_options(gmock PRIVATE
     # "-Wno-undef") target_Compile_options(gtest_main PRIVATE "-Wno-undef")
