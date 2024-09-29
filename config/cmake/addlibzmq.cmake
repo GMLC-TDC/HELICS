@@ -62,6 +62,10 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     )
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/libzmq/CMakeLists.txt")
+    submod_update(ThirdParty/libzmq)
+endif()
+
 add_subdirectory(${PROJECT_SOURCE_DIR}/ThirdParty/libzmq EXCLUDE_FROM_ALL)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

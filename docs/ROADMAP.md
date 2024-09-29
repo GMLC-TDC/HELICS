@@ -4,8 +4,7 @@ This document contains tentative plans for changes and improvements of note in u
 
 ## \[3.6\] ~ Summer 2024
 
-- Single thread cores
-- Update IPC core
+
 - Some of the other features listed below
 - This release will likely update HELICS to use C++20 and update minimum Compilers, CMake, boost, and other dependencies.
   - GCC 11
@@ -20,6 +19,8 @@ This document contains tentative plans for changes and improvements of note in u
 - Separate Java Interface
 - Observer App
 - Tag based subscriptions
+- Single thread cores
+- Update IPC core
 
 ## Further in the future
 
