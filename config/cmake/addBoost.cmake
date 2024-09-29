@@ -13,7 +13,7 @@ mark_as_advanced(BOOST_INSTALL_PATH)
 
 if(WIN32 AND NOT UNIX_LIKE)
 
-    if (MSVC_VERSION GREATER_EQUAL 1930)
+    if(MSVC_VERSION GREATER_EQUAL 1930)
         set(BOOST_MSVC_LIB_PATH lib64-msvc-14.3)
     else()
         set(BOOST_MSVC_LIB_PATH lib64-msvc-14.2)
@@ -70,12 +70,24 @@ if(WIN32 AND NOT UNIX_LIKE)
         PATHS ${BOOST_INSTALL_PATH} ${boost_paths}
     )
     if(BOOST_TEST_PATH)
-        if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
+        if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
             find_path(
                 BOOST_CMAKE_PATH
                 NAMES BoostConfig.cmake
                 PATHS ${BOOST_TEST_PATH}/${BOOST_MSVC_LIB_PATH}/cmake
-                PATH_SUFFIXES Boost-1.86.0 Boost-1.85.0 Boost-1.84.0 Boost-1.83.0 Boost-1.82.0 Boost-1.81.0 Boost-1.80.0 Boost-1.79.0 Boost-1.78.0 Boost-1.77.0 Boost-1.76.0 Boost-1.75.0
+                PATH_SUFFIXES
+                    Boost-1.86.0
+                    Boost-1.85.0
+                    Boost-1.84.0
+                    Boost-1.83.0
+                    Boost-1.82.0
+                    Boost-1.81.0
+                    Boost-1.80.0
+                    Boost-1.79.0
+                    Boost-1.78.0
+                    Boost-1.77.0
+                    Boost-1.76.0
+                    Boost-1.75.0
             )
             set(BOOST_ROOT ${BOOST_CMAKE_PATH})
         else()
@@ -84,7 +96,7 @@ if(WIN32 AND NOT UNIX_LIKE)
     endif(BOOST_TEST_PATH)
 else()
     # Minimum version of Boost required for building a project
-    
+
     if(NOT BOOST_ROOT)
         if(BOOST_INSTALL_PATH)
             set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
@@ -106,7 +118,9 @@ set(BOOST_MINIMUM_VERSION 1.73)
 
 set(Boost_DEBUG ON)
 if(BOOST_REQUIRED_LIBRARIES)
-    find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED CONFIG)
+    find_package(
+        Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED CONFIG
+    )
 else()
     find_package(Boost ${BOOST_MINIMUM_VERSION} CONFIG)
 endif()

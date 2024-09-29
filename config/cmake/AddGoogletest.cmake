@@ -8,10 +8,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #
-# Add make check, as well, which gives
-# output on failed tests without having to set an environment variable.
+# Add make check, as well, which gives output on failed tests without having to set an environment
+# variable.
 #
-
 
 hide_variable(FETCHCONTENT_SOURCE_DIR_GOOGLETEST)
 hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_GOOGLETEST)
@@ -22,7 +21,10 @@ set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 set(HAVE_STD_REGEX ON CACHE INTERNAL "")
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "")
-add_subdirectory(${CMAKE_SOURCE_DIR}/ThirdParty/googletest ${CMAKE_BINARY_DIR}/ThirdParty/googletest EXCLUDE_FROM_ALL)
+add_subdirectory(
+    ${CMAKE_SOURCE_DIR}/ThirdParty/googletest ${CMAKE_BINARY_DIR}/ThirdParty/googletest
+    EXCLUDE_FROM_ALL
+)
 
 if(NOT MSVC)
     # target_Compile_options(gtest PRIVATE "-Wno-undef") target_Compile_options(gmock PRIVATE

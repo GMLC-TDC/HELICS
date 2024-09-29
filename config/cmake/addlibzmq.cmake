@@ -111,14 +111,14 @@ if(${PROJECT_NAME}_BUILD_CXX_SHARED_LIB OR NOT ${PROJECT_NAME}_DISABLE_C_SHARED_
 
     if(NOT ${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY AND NOT ${PROJECT_NAME}_SKIP_ZMQ_INSTALL)
         set_target_properties(${zmq_target_output} PROPERTIES PUBLIC_HEADER "")
-            install(
-                TARGETS ${zmq_target_output}
-                RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                FRAMEWORK DESTINATION "Library/Frameworks"
-            )
-       
+        install(
+            TARGETS ${zmq_target_output}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            FRAMEWORK DESTINATION "Library/Frameworks"
+        )
+
         if(MSVC AND NOT EMBEDDED_DEBUG_INFO AND NOT ${PROJECT_NAME}_BINARY_ONLY_INSTALL)
             install(
                 FILES $<TARGET_PDB_FILE:${zmq_target_output}>

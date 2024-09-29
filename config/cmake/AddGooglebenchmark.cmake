@@ -7,7 +7,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE INTERNAL "")
 set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "Suppressing benchmark's tests")
 set(BENCHMARK_ENABLE_INSTALL OFF CACHE INTERNAL "")
@@ -18,7 +17,10 @@ set(BENCHMARK_INSTALL_DOCS OFF CACHE INTERNAL "")
 set(HAVE_STD_REGEX ON CACHE INTERNAL "")
 set(HAVE_POSIX_REGEX OFF CACHE INTERNAL "")
 set(HAVE_GNU_POSIX_REGEX OFF CACHE INTERNAL "")
-add_subdirectory(${CMAKE_SOURCE_DIR}/ThirdParty/benchmark ${CMAKE_BINARY_DIR}/ThirdParty/benchmarks EXCLUDE_FROM_ALL)
+add_subdirectory(
+    ${CMAKE_SOURCE_DIR}/ThirdParty/benchmark ${CMAKE_BINARY_DIR}/ThirdParty/benchmarks
+    EXCLUDE_FROM_ALL
+)
 
 # Target must already exist
 macro(add_benchmark_with_main TESTNAME)

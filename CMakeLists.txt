@@ -82,16 +82,16 @@ include(CMakeDependentOption)
 include(copy_key_files)
 include(CTest)
 
-    option(
-        HELICS_ENABLE_PYTHON_BUILD_SCRIPTS
-        "HELICS build systems can use python to automatically generate some files.  This is not required but may be useful if you are a developer and frequently modifying some files"
-        OFF
-    )
-    mark_as_advanced(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
+option(
+    HELICS_ENABLE_PYTHON_BUILD_SCRIPTS
+    "HELICS build systems can use python to automatically generate some files.  This is not required but may be useful if you are a developer and frequently modifying some files"
+    OFF
+)
+mark_as_advanced(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
 
-    if(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
-        find_package(Python COMPONENTS Interpreter)
-    endif()
+if(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
+    find_package(Python COMPONENTS Interpreter)
+endif()
 
 # allow BOOST library inclusion to be turned off completely; this option will disable the IPC core
 option(HELICS_DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")
