@@ -51,7 +51,6 @@ void processOptions(const nlohmann::json& section,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction)
 {
-    auto stop = section.end();
     for (const auto& [key, value] : section.items()) {
         if (value.is_array() || value.is_object()) {
             continue;
