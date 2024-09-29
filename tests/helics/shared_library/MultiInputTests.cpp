@@ -444,7 +444,7 @@ TEST_F(multiInput, vectorize_string)
     inp1.addTarget("pub2");
     inp1.addTarget("pub3");
     inp1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,
-                  HELICS_MULTI_INPUT_VECTORIZE_OPERATION);
+                   HELICS_MULTI_INPUT_VECTORIZE_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish("test1");
