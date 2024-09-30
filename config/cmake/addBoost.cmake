@@ -132,14 +132,14 @@ else()
 endif()
 
 if(NOT Boost_FOUND)
-message(STATUS "in boost not found")
+    message(STATUS "in boost not found")
     find_path(
         Boost_INCLUDE_DIR
         NAMES boost/version.hpp boost/config.hpp
         HINTS ${Boost_ROOT} ${BOOST_ROOT}
         NO_DEFAULT_PATH
     )
-    message(STATUS "boost Inlude dir = ${BOOST_INCLUDE_DIR}")
+    message(STATUS "boost Include dir = ${BOOST_INCLUDE_DIR}")
     if(Boost_INCLUDE_DIR)
         add_library(Boost::headers INTERFACE IMPORTED)
         set_target_properties(
