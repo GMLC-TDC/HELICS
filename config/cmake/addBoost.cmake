@@ -133,10 +133,8 @@ endif()
 
 if(NOT Boost_FOUND)
     message(STATUS "in boost not found looking in ${Boost_ROOT} and ${BOOST_ROOT}")
-    find_path(
-        Boost_INCLUDE_DIR
-        NAMES boost/version.hpp boost/config.hpp
-        PATHS ${Boost_ROOT} ${BOOST_ROOT}
+    find_path(Boost_INCLUDE_DIR NAMES boost/version.hpp boost/config.hpp PATHS ${Boost_ROOT}
+                                                                               ${BOOST_ROOT}
     )
     message(STATUS "boost Include dir = ${BOOST_INCLUDE_DIR}")
     if(Boost_INCLUDE_DIR)
