@@ -299,7 +299,7 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
     else()
         list(APPEND IGNORE_MODULES benchmark)
     endif()
-    
+
     check_submodule_status(IGNORE_MODULES)
 
 endif() # NOT HELICS_DISABLE_GIT_OPERATIONS
