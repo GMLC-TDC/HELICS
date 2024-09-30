@@ -14,9 +14,17 @@ mark_as_advanced(BOOST_INSTALL_PATH)
 if(WIN32 AND NOT UNIX_LIKE)
 
     if(MSVC_VERSION GREATER_EQUAL 1930)
-        set(BOOST_MSVC_LIB_PATH lib64-msvc-14.3)
+        if (CMAKE_SIZE_OF_VOID_P EQUAL 4)
+            set(BOOST_MSVC_LIB_PATH lib32-msvc-14.3)
+        else()
+            set(BOOST_MSVC_LIB_PATH lib64-msvc-14.3)
+        endif()
     else()
-        set(BOOST_MSVC_LIB_PATH lib64-msvc-14.2)
+    if (CMAKE_SIZE_OF_VOID_P EQUAL 4)
+    set(BOOST_MSVC_LIB_PATH lib32-msvc-14.2)
+else()
+    set(BOOST_MSVC_LIB_PATH lib64-msvc-14.2)
+endif()
     endif()
     set(boost_versions
         boost_1_86_0
@@ -89,7 +97,7 @@ if(WIN32 AND NOT UNIX_LIKE)
                     Boost-1.76.0
                     Boost-1.75.0
             )
-            set(Boost_ROOT ${BOOST_TEST_PATH})
+            set(Boost_ROOT ${BOOST_CMAKE_PATH})
         else()
             set(Boost_ROOT ${BOOST_TEST_PATH})
         endif()
@@ -118,137 +126,46 @@ set(BOOST_MINIMUM_VERSION 1.73)
 
 set(Boost_DEBUG ON)
 if(BOOST_REQUIRED_LIBRARIES)
-    find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED)
+    find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES})
 else()
     find_package(Boost ${BOOST_MINIMUM_VERSION})
 endif()
+
+if (NOT Boost_FOUND)
+    find_path(Boost_INCLUDE_DIR
+        NAMES boost/version.hpp boost/config.hpp
+        HINTS ${Boost_ROOT} ${BOOST_ROOT}
+        NO_DEFAULT_PATH
+    )
+    if (Boost_INCLUDE_DIR)
+        add_library(Boost::headers INTERFACE IMPORTED)
+        if(Boost_INCLUDE_DIRS)
+            set_target_properties(Boost::headers PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}")
+        endif()
+        add_library(Boost::boost INTERFACE IMPORTED)
+        set_target_properties(Boost::boost
+            PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)
+
+        set(version_file ${Boost_INCLUDE_DIR}/boost/version.hpp)
+        if(EXISTS "${version_file}")
+            file(STRINGS "${version_file}" contents REGEX "#define BOOST_(LIB_)?VERSION ")
+            if(contents MATCHES "#define BOOST_VERSION ([0-9]+)")
+                set(Boost_VERSION_MACRO "${CMAKE_MATCH_1}")
+            endif()
+            if(contents MATCHES "#define BOOST_LIB_VERSION \"([0-9_]+)\"")
+               set(Boost_LIB_VERSION "${CMAKE_MATCH_1}")
+            endif()
+            math(EXPR Boost_VERSION_MAJOR "${Boost_VERSION_MACRO} / 100000")
+            math(EXPR Boost_VERSION_MINOR "${Boost_VERSION_MACRO} / 100 % 1000")
+            math(EXPR Boost_VERSION_PATCH "${Boost_VERSION_MACRO} % 100")
+        endif()
+        set(Boost_FOUND ON)
+
+    endif ()
+endif()
+if (NOT Boost_FOUND)
+    message(ERROR "Unable to find BOOST")
+endif()
 # Minimum version of Boost required for building test suite
 set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})
-
-# message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR} |")
-
-# message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS} |")
-
-# message(STATUS "Using Boost libraries : ${Boost_LIBRARIES} |")
-set(modifier,"")
-foreach(loop_var ${Boost_LIBRARIES})
-    if(loop_var STREQUAL "debug")
-        list(INSERT modifier 0 ${loop_var})
-    elseif(loop_var STREQUAL "optimized")
-        list(INSERT modifier 0 ${loop_var})
-    else()
-        # message("Boost_LIBRARIES ${loop_var}")
-        if(loop_var MATCHES "unit_test")
-            list(APPEND Boost_LIBRARIES_test ${modifier} ${loop_var})
-        else()
-            list(APPEND Boost_LIBRARIES_core ${modifier} ${loop_var})
-        endif()
-        if("${modifier}" STREQUAL "debug")
-            if(loop_var MATCHES "unit_test")
-                list(APPEND Boost_LIBRARIES_test_debug ${loop_var})
-            else()
-                list(APPEND Boost_LIBRARIES_core_debug ${loop_var})
-            endif()
-        else()
-            if(loop_var MATCHES "unit_test")
-                list(APPEND Boost_LIBRARIES_test_release ${loop_var})
-            else()
-                list(APPEND Boost_LIBRARIES_core_release ${loop_var})
-            endif()
-        endif()
-        list(LENGTH modifier modifier_size)
-        if(modifier_size GREATER 0)
-            list(REMOVE_AT modifier -1)
-        endif()
-    endif()
-endforeach(loop_var)
-
-#
-# Add boost targets to use
-#
-
-if(${Boost_USE_STATIC_LIBS})
-    if(NOT TARGET Boostlibs::core)
-        add_library(Boostlibs::core STATIC IMPORTED)
-    endif()
-    if(NOT TARGET Boostlibs::test)
-        add_library(Boostlibs::test STATIC IMPORTED)
-    endif()
-else()
-    if(NOT TARGET Boostlibs::core)
-        add_library(Boostlibs::core UNKNOWN IMPORTED)
-    endif()
-    if(NOT TARGET Boostlibs::test)
-        add_library(Boostlibs::test UNKNOWN IMPORTED)
-    endif()
-    # if(MINGW) set_property(TARGET Boostlibs::core PROPERTY INTERFACE_COMPILE_DEFINTIONS
-    # BOOST_USE_WINDOWS_H) endif()
-endif()
-
-list(LENGTH Boost_LIBRARIES_core_debug core_debug_size)
-list(LENGTH Boost_LIBRARIES_core_release core_release_size)
-
-math(EXPR rng "${core_release_size} - 1")
-
-if(core_debug_size EQUAL 0)
-    list(GET Boost_LIBRARIES_core_release 0 first_lib)
-    set_target_properties(Boostlibs::core PROPERTIES IMPORTED_LOCATION ${first_lib})
-
-    foreach(item RANGE 1 ${rng})
-        list(GET Boost_LIBRARIES_core_release ${item} next_lib)
-        string(RANDOM LENGTH 7 rand_name)
-        if(Boost_USE_STATIC_LIBS)
-            add_library(Boostlibs::${rand_name} STATIC IMPORTED)
-        else()
-            add_library(Boostlibs::${rand_name} UNKNOWN IMPORTED)
-        endif()
-        set_target_properties(Boostlibs::${rand_name} PROPERTIES IMPORTED_LOCATION ${next_lib})
-        list(APPEND boost_core_deps Boostlibs::${rand_name})
-    endforeach()
-else()
-    list(GET Boost_LIBRARIES_core_release 0 first_lib_r)
-    list(GET Boost_LIBRARIES_core_debug 0 first_lib_d)
-    set_target_properties(
-        Boostlibs::core PROPERTIES IMPORTED_LOCATION_DEBUG ${first_lib_d} IMPORTED_LOCATION_RELEASE
-                                                                          ${first_lib_r}
-    )
-
-    foreach(item RANGE 1 ${rng})
-        list(GET Boost_LIBRARIES_core_release ${item} next_lib_r)
-        list(GET Boost_LIBRARIES_core_debug ${item} next_lib_d)
-        string(RANDOM LENGTH 7 rand_name)
-        if(Boost_USE_STATIC_LIBS)
-            add_library(Boostlibs::${rand_name} STATIC IMPORTED)
-        else()
-            add_library(Boostlibs::${rand_name} UNKNOWN IMPORTED)
-        endif()
-        set_target_properties(
-            Boostlibs::${rand_name} PROPERTIES IMPORTED_LOCATION_DEBUG ${next_lib_d}
-                                               IMPORTED_LOCATION_RELEASE ${next_lib_r}
-        )
-        list(APPEND boost_core_deps Boostlibs::${rand_name})
-    endforeach()
-endif()
-
-if(Boost_INCLUDE_DIR)
-    set_target_properties(
-        Boostlibs::core Boostlibs::test PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
-                                                   ${Boost_INCLUDE_DIR}
-    )
-endif()
-if(BOOST_REQUIRED_LIBRARIES)
-    set_target_properties(Boostlibs::core PROPERTIES INTERFACE_LINK_LIBRARIES "${boost_core_deps}")
-
-    if(Boost_LIBRARIES_test_debug)
-        set_target_properties(
-            Boostlibs::test PROPERTIES IMPORTED_LOCATION_DEBUG "${Boost_LIBRARIES_test_debug}"
-                                       IMPORTED_LOCATION_RELEASE "${Boost_LIBRARIES_test_release}"
-        )
-    else()
-        set_target_properties(
-            Boostlibs::test PROPERTIES IMPORTED_LOCATION "${Boost_LIBRARIES_test_release}"
-        )
-    endif()
-endif()
-# message(STATUS "Using Boost core debug libraries : ${Boost_LIBRARIES_core_debug}") message(STATUS
-# "Using Boost core release libraries : ${Boost_LIBRARIES_core_release}")
