@@ -14,17 +14,17 @@ mark_as_advanced(BOOST_INSTALL_PATH)
 if(WIN32 AND NOT UNIX_LIKE)
 
     if(MSVC_VERSION GREATER_EQUAL 1930)
-        if (CMAKE_SIZE_OF_VOID_P EQUAL 4)
+        if(CMAKE_SIZE_OF_VOID_P EQUAL 4)
             set(BOOST_MSVC_LIB_PATH lib32-msvc-14.3)
         else()
             set(BOOST_MSVC_LIB_PATH lib64-msvc-14.3)
         endif()
     else()
-    if (CMAKE_SIZE_OF_VOID_P EQUAL 4)
-    set(BOOST_MSVC_LIB_PATH lib32-msvc-14.2)
-else()
-    set(BOOST_MSVC_LIB_PATH lib64-msvc-14.2)
-endif()
+        if(CMAKE_SIZE_OF_VOID_P EQUAL 4)
+            set(BOOST_MSVC_LIB_PATH lib32-msvc-14.2)
+        else()
+            set(BOOST_MSVC_LIB_PATH lib64-msvc-14.2)
+        endif()
     endif()
     set(boost_versions
         boost_1_86_0
@@ -131,21 +131,22 @@ else()
     find_package(Boost ${BOOST_MINIMUM_VERSION})
 endif()
 
-if (NOT Boost_FOUND)
-    find_path(Boost_INCLUDE_DIR
+if(NOT Boost_FOUND)
+    find_path(
+        Boost_INCLUDE_DIR
         NAMES boost/version.hpp boost/config.hpp
         HINTS ${Boost_ROOT} ${BOOST_ROOT}
         NO_DEFAULT_PATH
     )
-    if (Boost_INCLUDE_DIR)
+    if(Boost_INCLUDE_DIR)
         add_library(Boost::headers INTERFACE IMPORTED)
         if(Boost_INCLUDE_DIRS)
-            set_target_properties(Boost::headers PROPERTIES
-                INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}")
+            set_target_properties(
+                Boost::headers PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}"
+            )
         endif()
         add_library(Boost::boost INTERFACE IMPORTED)
-        set_target_properties(Boost::boost
-            PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)
+        set_target_properties(Boost::boost PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)
 
         set(version_file ${Boost_INCLUDE_DIR}/boost/version.hpp)
         if(EXISTS "${version_file}")
@@ -154,7 +155,7 @@ if (NOT Boost_FOUND)
                 set(Boost_VERSION_MACRO "${CMAKE_MATCH_1}")
             endif()
             if(contents MATCHES "#define BOOST_LIB_VERSION \"([0-9_]+)\"")
-               set(Boost_LIB_VERSION "${CMAKE_MATCH_1}")
+                set(Boost_LIB_VERSION "${CMAKE_MATCH_1}")
             endif()
             math(EXPR Boost_VERSION_MAJOR "${Boost_VERSION_MACRO} / 100000")
             math(EXPR Boost_VERSION_MINOR "${Boost_VERSION_MACRO} / 100 % 1000")
@@ -162,9 +163,9 @@ if (NOT Boost_FOUND)
         endif()
         set(Boost_FOUND ON)
 
-    endif ()
+    endif()
 endif()
-if (NOT Boost_FOUND)
+if(NOT Boost_FOUND)
     message(ERROR "Unable to find BOOST")
 endif()
 # Minimum version of Boost required for building test suite
