@@ -138,7 +138,7 @@ jobs:
 
   helicsInstall1:
     docker:
-      - image: helics/buildenv:builder
+      - image: helics/buildenv:ubuntu24.04-default-builder
     environment:
       CMAKE_FLAGS: "-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_BENCHMARKS=ON -DHELICS_INSTALL_PACKAGE_TESTS=ON"
     steps:
@@ -148,7 +148,7 @@ jobs:
 
   helicsNoZmq:
     docker:
-      - image: helics/buildenv:gcc10-builder
+      - image: helics/buildenv:gcc13-builder
     environment:
       CMAKE_FLAGS: "-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17"
     steps:
@@ -167,7 +167,7 @@ jobs:
 
   helicsInstall2:
     docker:
-      - image: helics/buildenv:builder
+      - image: helics/buildenv:ubuntu24.04-default-builder
     environment:
       CMAKE_FLAGS: "-DHELICS_BUILD_TESTS=ON -DHELICS_INSTALL_PACKAGE_TESTS=ON"
     steps:
@@ -206,7 +206,7 @@ jobs:
 
   benchmarkjob:
     docker:
-      - image: helics/buildenv:builder
+      - image: helics/buildenv:ubuntu24.04-default-builder
     environment:
       CMAKE_FLAGS: "-DHELICS_BUILD_BENCHMARKS=ON -DBM_RESULT_DIR=/tmp/bm_results/ -DHELICS_DISABLE_C_SHARED_LIB=ON"
     steps:

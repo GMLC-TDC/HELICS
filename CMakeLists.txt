@@ -17,6 +17,7 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
+message(STATUS "Generating with CMAKE version ${CMAKE_VERSION}")
 project(HELICS VERSION 3.6.0)
 
 # -----------------------------------------------------------------------------
