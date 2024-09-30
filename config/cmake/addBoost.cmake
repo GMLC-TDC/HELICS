@@ -132,19 +132,19 @@ else()
 endif()
 
 if(NOT Boost_FOUND)
+message(STATUS "in boost not found")
     find_path(
         Boost_INCLUDE_DIR
         NAMES boost/version.hpp boost/config.hpp
         HINTS ${Boost_ROOT} ${BOOST_ROOT}
         NO_DEFAULT_PATH
     )
+    message(STATUS "boost Inlude dir = ${BOOST_INCLUDE_DIR}")
     if(Boost_INCLUDE_DIR)
         add_library(Boost::headers INTERFACE IMPORTED)
-        if(Boost_INCLUDE_DIRS)
-            set_target_properties(
-                Boost::headers PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}"
-            )
-        endif()
+        set_target_properties(
+            Boost::headers PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}"
+        )
         add_library(Boost::boost INTERFACE IMPORTED)
         set_target_properties(Boost::boost PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)
 
@@ -160,13 +160,16 @@ if(NOT Boost_FOUND)
             math(EXPR Boost_VERSION_MAJOR "${Boost_VERSION_MACRO} / 100000")
             math(EXPR Boost_VERSION_MINOR "${Boost_VERSION_MACRO} / 100 % 1000")
             math(EXPR Boost_VERSION_PATCH "${Boost_VERSION_MACRO} % 100")
+
+            message(STATUS "Boost VERSION ${Boost_VERSION_MACRO}")
         endif()
         set(Boost_FOUND ON)
+        message(STATUS "Setting boost found to true")
 
     endif()
 endif()
 if(NOT Boost_FOUND)
-    message(ERROR "Unable to find BOOST")
+    message(FATAL " Unable to find BOOST library")
 endif()
 # Minimum version of Boost required for building test suite
 set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})
