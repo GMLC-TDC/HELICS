@@ -132,12 +132,11 @@ else()
 endif()
 
 if(NOT Boost_FOUND)
-    message(STATUS "in boost not found")
+    message(STATUS "in boost not found looking in ${Boost_ROOT} and ${BOOST_ROOT}")
     find_path(
         Boost_INCLUDE_DIR
         NAMES boost/version.hpp boost/config.hpp
-        HINTS ${Boost_ROOT} ${BOOST_ROOT}
-        NO_DEFAULT_PATH
+        PATHS ${Boost_ROOT} ${BOOST_ROOT}
     )
     message(STATUS "boost Include dir = ${BOOST_INCLUDE_DIR}")
     if(Boost_INCLUDE_DIR)
@@ -169,7 +168,7 @@ if(NOT Boost_FOUND)
     endif()
 endif()
 if(NOT Boost_FOUND)
-    message(FATAL " Unable to find BOOST library")
+    message(FATAL_ERROR " Unable to find BOOST library")
 endif()
 # Minimum version of Boost required for building test suite
 set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})
