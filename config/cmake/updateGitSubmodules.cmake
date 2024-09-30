@@ -62,7 +62,7 @@ macro(submod_update target)
     endif()
 endmacro()
 
-function(check_submodule_status)
+function(check_submodule_status ignore_list)
     if(${PROJECT_NAME}_ENABLE_SUBMODULE_UPDATE)
         execute_process(
             COMMAND ${GIT_EXECUTABLE} submodule status
@@ -91,11 +91,28 @@ function(check_submodule_status)
             )
         endif()
         if(NOT "${SUBMODULE_STATUS}" STREQUAL "")
-            message(
-                WARNING
-                    "Submodules are not up to date. Update submodules by running `git submodule update --init` before building HELICS."
-                    "\nOut of date submodules:\n ${SUBMODULE_STATUS}"
-            )
+            set(MISSING_SUBMODULES "")
+            set(TEST_STRING,SUBMODULE_STATUS)
+            STRING(REGEX REPLACE "\n" ";" TEST_STRING "${TEST_STRING}")
+            foreach(item IN LISTS TEST_STRING)
+                set(IGNORE_MATCHED OFF)
+                foreach(ignore_item IN LISTS ignore_list)
+                    if (item MATCHES ignore_item)
+                        set(IGNORE_MATCHED ON)
+                        break()
+                    endif()
+                endforeach()
+                if (NOT IGNORE_MATCH)
+                    list(APPEND MISSING_SUBMODULES item)
+                endif()
+            endforeach()
+            if (MISSING_SUBMODULES)
+                message(
+                    WARNING
+                        "Submodules are not up to date. Update submodules by running `git submodule update --init` before building HELICS."
+                        "\nOut of date submodules:\n ${SUBMODULE_STATUS}"
+                )
+            endif()
         endif()
     endif()
 endfunction()

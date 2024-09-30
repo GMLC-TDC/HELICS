@@ -282,19 +282,25 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/spdlog/CMakeLists.txt")
         submod_update(ThirdParty/spdlog)
     endif()
+
+    set(IGNORE_MODULES libzmq)
     if(HELICS_BUILD_TESTS)
         if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/CMakeLists.txt")
             submod_update(ThirdParty/googletest)
         endif()
+    else()
+        list(APPEND IGNORE_MODULES googletest)
     endif()
 
-    if(HELICS_BUILD_TESTS)
+    if(HELICS_BUILD_BENCHMARKS)
         if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/benchmark/CMakeLists.txt")
             submod_update(ThirdParty/benchmark)
         endif()
+    else()
+        list(APPEND IGNORE_MODULES benchmark)
     endif()
-
-    check_submodule_status()
+    
+    check_submodule_status(IGNORE_MODULES)
 
 endif() # NOT HELICS_DISABLE_GIT_OPERATIONS
 include(GNUInstallDirs)
