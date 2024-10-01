@@ -102,7 +102,7 @@ if(WIN32 AND NOT UNIX_LIKE)
             set(Boost_ROOT ${BOOST_TEST_PATH})
         endif()
     endif(BOOST_TEST_PATH)
-else()
+endif()
     # Minimum version of Boost required for building a project
 
     if(NOT Boost_ROOT)
@@ -113,8 +113,10 @@ else()
         else()
             set(Boost_ROOT "$ENV{BOOST_ROOT}")
         endif()
+    elseif($ENV{BOOST_ROOT})
+        set(BOOST_ROOT "$ENV{BOOST_ROOT}")
     endif()
-endif()
+
 
 hide_variable(BOOST_TEST_PATH)
 
