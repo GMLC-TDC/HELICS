@@ -106,6 +106,7 @@ endif()
     # Minimum version of Boost required for building a project
 
     if(NOT Boost_ROOT)
+        message(STATUS "Boost root not found ${Boost_ROOT}")
         if(BOOST_INSTALL_PATH)
             set(Boost_ROOT "${BOOST_INSTALL_PATH}")
         elseif($ENV{BOOST_INSTALL_PATH})
@@ -113,8 +114,12 @@ endif()
         else()
             set(Boost_ROOT "$ENV{BOOST_ROOT}")
         endif()
-    elseif($ENV{BOOST_ROOT})
+    endif()
+    
+    if($ENV{BOOST_ROOT})
         set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+        message(STATUS "setting BOOST_ROOT ${BOOST_ROOT}")
+        
     endif()
 
 
@@ -135,8 +140,10 @@ endif()
 
 if(NOT Boost_FOUND)
     message(STATUS "in boost not found looking in ${Boost_ROOT} and ${BOOST_ROOT}")
-    find_path(Boost_INCLUDE_DIR NAMES boost/version.hpp boost/config.hpp PATHS ${Boost_ROOT}
-                                                                               ${BOOST_ROOT}
+    find_path(
+        Boost_INCLUDE_DIR
+        NAMES boost/version.hpp boost/config.hpp
+        PATHS ${BOOST_ROOT} ${Boost_ROOT} 
     )
     message(STATUS "boost Include dir = ${BOOST_INCLUDE_DIR}")
     if(Boost_INCLUDE_DIR)
