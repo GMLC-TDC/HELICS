@@ -37,7 +37,7 @@ before_build:
   - mkdir build
   - cd build
   - git config --global --add safe.directory /cygdrive/c/projects/helics
-  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_SWIG=OFF -DHELICS_BUILD_TESTS=OFF -DHELICS_DISABLE_ASIO=ON -DHELICS_ENABLE_IPC_CORE=OFF"'
+  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -DHELICS_ENABLE_SWIG=OFF -DHELICS_DISABLE_GIT_OPERATIONS=ON -DHELICS_BUILD_TESTS=OFF -DHELICS_DISABLE_ASIO=ON -DHELICS_ENABLE_IPC_CORE=OFF"'
   - cd ..
 
 # Build and test, actually.
