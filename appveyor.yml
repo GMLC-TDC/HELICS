@@ -23,6 +23,7 @@ cache:
 # Install needed build dependencies
 #
 install:
+  - (New-Object Net.WebClient).DownloadFile('https://cygwin.com/setup-x86_64.exe', 'C:\cygwin64\setup-x86_64.exe')
   - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,git,make,gcc-core,gcc-g++,libboost-devel,libzmq-devel'
   - '%CYG_ROOT%\bin\cygcheck -dc'
   - cd %APPVEYOR_BUILD_FOLDER%
