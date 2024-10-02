@@ -13,7 +13,7 @@ if(NOT CMAKE_CXX_STANDARD)
     if(${PROJECT_NAME}_CXX_STANDARD)
         set(CMAKE_CXX_STANDARD ${PROJECT_NAME}_CXX_STANDARD)
     else()
-        set(CMAKE_CXX_STANDARD 17)
+        set(CMAKE_CXX_STANDARD 20)
     endif()
 endif()
 
