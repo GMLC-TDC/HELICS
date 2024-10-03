@@ -17,8 +17,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
-static constexpr std::string_view testdir = TEST_DIR "/connector/";
-
 TEST(connector_tags, no_match_tag)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);

@@ -66,7 +66,13 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/libzmq/CMakeLists.txt")
     submod_update(ThirdParty/libzmq)
 endif()
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/ThirdParty/libzmq EXCLUDE_FROM_ALL)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/ThirdParty/libzmq EXCLUDE_FROM_ALL SYSTEM)
+else()
+    add_subdirectory(${PROJECT_SOURCE_DIR}/ThirdParty/libzmq EXCLUDE_FROM_ALL)
+endif()
+        
+
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS ${OLDCMAKE_CXX_FLAGS})
