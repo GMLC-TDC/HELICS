@@ -143,8 +143,8 @@ if(NOT Boost_FOUND)
     )
     message(STATUS "boost Include dir = ${Boost_INCLUDE_DIR}")
     if(Boost_INCLUDE_DIR)
-       
-		set(version_file ${Boost_INCLUDE_DIR}/boost/version.hpp)
+
+        set(version_file ${Boost_INCLUDE_DIR}/boost/version.hpp)
         if(EXISTS "${version_file}")
             file(STRINGS "${version_file}" contents REGEX "#define BOOST_(LIB_)?VERSION ")
             if(contents MATCHES "#define BOOST_VERSION ([0-9]+)")
@@ -167,10 +167,8 @@ if(NOT Boost_FOUND)
             add_library(Boost::boost INTERFACE IMPORTED)
             set_target_properties(Boost::boost PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)
 
-            
-
-        set(Boost_FOUND ON)
-        message(STATUS "Setting boost found to true")
+            set(Boost_FOUND ON)
+            message(STATUS "Setting boost found to true")
         endif()
 
     endif()
