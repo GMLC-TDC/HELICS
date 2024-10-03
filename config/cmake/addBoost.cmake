@@ -131,9 +131,9 @@ endif()
 set(BOOST_MINIMUM_VERSION 1.73)
 
 if(BOOST_REQUIRED_LIBRARIES)
-    find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES})
+    find_package(Boost ${BOOST_MINIMUM_VERSION} QUIET COMPONENTS ${BOOST_REQUIRED_LIBRARIES})
 else()
-    find_package(Boost ${BOOST_MINIMUM_VERSION})
+    find_package(Boost ${BOOST_MINIMUM_VERSION} QUIET)
 endif()
 
 if(NOT Boost_FOUND)
@@ -141,10 +141,10 @@ if(NOT Boost_FOUND)
     find_path(Boost_INCLUDE_DIR NAMES boost/version.hpp boost/config.hpp PATHS ${BOOST_ROOT}
                                                                                ${Boost_ROOT}
     )
-
-    message(STATUS "boost Include dir = ${BOOST_INCLUDE_DIR}")
+    message(STATUS "boost Include dir = ${Boost_INCLUDE_DIR}")
     if(Boost_INCLUDE_DIR)
-
+       
+		set(version_file ${Boost_INCLUDE_DIR}/boost/version.hpp)
         if(EXISTS "${version_file}")
             file(STRINGS "${version_file}" contents REGEX "#define BOOST_(LIB_)?VERSION ")
             if(contents MATCHES "#define BOOST_VERSION ([0-9]+)")
@@ -167,10 +167,10 @@ if(NOT Boost_FOUND)
             add_library(Boost::boost INTERFACE IMPORTED)
             set_target_properties(Boost::boost PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)
 
-            set(version_file ${Boost_INCLUDE_DIR}/boost/version.hpp)
+            
 
-            set(Boost_FOUND ON)
-            message(STATUS "Setting boost found to true")
+        set(Boost_FOUND ON)
+        message(STATUS "Setting boost found to true")
         endif()
 
     endif()
