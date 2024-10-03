@@ -297,7 +297,7 @@ TEST(connector_2stage, simple_connector)
     cfed1.finalize();
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     fut.get();
-    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1U);
     EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_EQ(cfed1.getValueNames(), std::vector<std::string>{"inp1"});
@@ -674,8 +674,8 @@ TEST(connector_2stage, three_fed_input)
     vFed2.disconnect();
     fut.get();
     fut2.get();
-    EXPECT_GE(data.size(), 1);
-    EXPECT_EQ(conn1.madeConnections(), 1);
+    EXPECT_GE(data.size(), 1U);
+    EXPECT_EQ(conn1.madeConnections(), 1U);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
 }
 
