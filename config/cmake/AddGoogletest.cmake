@@ -22,21 +22,17 @@ set(HAVE_STD_REGEX ON CACHE INTERNAL "")
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "")
 
-
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
-            add_subdirectory(
-    ${CMAKE_SOURCE_DIR}/ThirdParty/googletest ${CMAKE_BINARY_DIR}/ThirdParty/googletest
-    EXCLUDE_FROM_ALL SYSTEM
-)
-        else()
-            add_subdirectory(
-    ${CMAKE_SOURCE_DIR}/ThirdParty/googletest ${CMAKE_BINARY_DIR}/ThirdParty/googletest
-    EXCLUDE_FROM_ALL
-)
-        endif()
-
-
-
+    add_subdirectory(
+        ${CMAKE_SOURCE_DIR}/ThirdParty/googletest ${CMAKE_BINARY_DIR}/ThirdParty/googletest
+        EXCLUDE_FROM_ALL SYSTEM
+    )
+else()
+    add_subdirectory(
+        ${CMAKE_SOURCE_DIR}/ThirdParty/googletest ${CMAKE_BINARY_DIR}/ThirdParty/googletest
+        EXCLUDE_FROM_ALL
+    )
+endif()
 
 if(NOT MSVC)
     # target_Compile_options(gtest PRIVATE "-Wno-undef") target_Compile_options(gmock PRIVATE
