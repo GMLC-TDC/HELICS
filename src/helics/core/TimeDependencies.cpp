@@ -840,7 +840,9 @@ const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependenci
                                               ConnectionType ignoreType,
                                               GlobalFederateId ignore)
 {
-    static const DependencyInfo maxDep{Time::maxVal(), TimeState::initialized, static_cast<std::uint8_t>(50U)};
+    static const DependencyInfo maxDep{Time::maxVal(),
+                                       TimeState::initialized,
+                                       static_cast<std::uint8_t>(50U)};
 
     const DependencyInfo* minDep = &maxDep;
 
