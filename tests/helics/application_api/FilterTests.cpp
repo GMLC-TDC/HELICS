@@ -2399,6 +2399,132 @@ TEST_P(filter_single_type_test, filter_core_termination)
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
+// test for filter configuration of different flavors
+TEST_F(filter, filter_config_test1)
+{
+    auto fed1 = std::make_shared<helics::MessageFederate>(std::string(TEST_DIR) +
+        "filter_test1.json");
+
+    EXPECT_NO_THROW(fed1->enterExecutingMode());
+
+    EXPECT_EQ(fed1->getFilterCount(), 1U);
+   
+    EXPECT_EQ(fed1->getEndpointCount(), 3U);
+    auto& ept1 =fed1->getEndpoint(0);
+    auto& ept2 =fed1->getEndpoint(1);
+
+    ept1.send("1");
+    fed1->requestNextStep();
+    EXPECT_FALSE(ept2.hasMessage());
+    auto time=fed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    
+    fed1->finalize();
+
+    FullDisconnect();
+}
+
+
+// test for filter configuration of different flavors
+TEST_F(filter, filter_config_test2)
+{
+    auto fed1 = std::make_shared<helics::MessageFederate>(std::string(TEST_DIR) +
+        "filter_test2.json");
+
+    EXPECT_NO_THROW(fed1->enterExecutingMode());
+
+    EXPECT_EQ(fed1->getFilterCount(), 1U);
+
+    EXPECT_EQ(fed1->getEndpointCount(), 3U);
+    auto& ept1 =fed1->getEndpoint(0);
+    auto& ept2 =fed1->getEndpoint(1);
+
+    ept1.send("1");
+    fed1->requestNextStep();
+    EXPECT_FALSE(ept2.hasMessage());
+    auto time=fed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+
+    fed1->finalize();
+
+    FullDisconnect();
+}
+
+// test for filter configuration of different flavors
+TEST_F(filter, filter_config_test3)
+{
+    auto fed1 = std::make_shared<helics::MessageFederate>(std::string(TEST_DIR) +
+        "filter_test3.json");
+
+    EXPECT_NO_THROW(fed1->enterExecutingMode());
+
+    EXPECT_EQ(fed1->getFilterCount(), 1U);
+
+    EXPECT_EQ(fed1->getEndpointCount(), 3U);
+    auto& ept1 =fed1->getEndpoint(0);
+    auto& ept2 =fed1->getEndpoint(1);
+    auto& ept3 =fed1->getEndpoint(2);
+
+    ept1.send("1");
+    fed1->requestNextStep();
+    EXPECT_FALSE(ept2.hasMessage());
+    EXPECT_TRUE(ept3.hasMessage());
+
+    fed1->finalize();
+
+    FullDisconnect();
+}
+
+// test for filter configuration of different flavors
+TEST_F(filter, filter_config_test4)
+{
+    auto fed1 = std::make_shared<helics::MessageFederate>(std::string(TEST_DIR) +
+        "filter_test4.json");
+
+    EXPECT_NO_THROW(fed1->enterExecutingMode());
+
+    EXPECT_EQ(fed1->getFilterCount(), 1U);
+
+    EXPECT_EQ(fed1->getEndpointCount(), 3U);
+    auto& ept1 =fed1->getEndpoint(0);
+    auto& ept2 =fed1->getEndpoint(1);
+    auto& ept3 =fed1->getEndpoint(2);
+
+    ept1.send("1");
+    fed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    EXPECT_TRUE(ept3.hasMessage());
+
+    fed1->finalize();
+
+    FullDisconnect();
+}
+
+// test for filter configuration of different flavors
+TEST_F(filter, filter_config_test5)
+{
+    auto fed1 = std::make_shared<helics::MessageFederate>(std::string(TEST_DIR) +
+        "filter_test5.json");
+
+    EXPECT_NO_THROW(fed1->enterExecutingMode());
+
+    EXPECT_EQ(fed1->getFilterCount(), 1U);
+
+    EXPECT_EQ(fed1->getEndpointCount(), 3U);
+    auto& ept1 =fed1->getEndpoint(0);
+    auto& ept2 =fed1->getEndpoint(1);
+    auto& ept3 =fed1->getEndpoint(2);
+
+    ept1.send("1");
+    fed1->requestNextStep();
+    EXPECT_TRUE(ept2.hasMessage());
+    EXPECT_TRUE(ept3.hasMessage());
+
+    fed1->finalize();
+
+    FullDisconnect();
+}
+
 INSTANTIATE_TEST_SUITE_P(filter,
                          filter_single_type_test,
                          ::testing::ValuesIn(CoreTypes_simple),

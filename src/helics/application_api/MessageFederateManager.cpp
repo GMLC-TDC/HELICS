@@ -113,11 +113,12 @@ bool MessageFederateManager::hasMessage() const
 
 bool MessageFederateManager::hasMessage(const Endpoint& ept)
 {
+    bool result{ false };
     if (ept.dataReference != nullptr) {
-        auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
-        return (!eptDat->messages.empty());
+        auto* eptDat = static_cast<EndpointData*>(ept.dataReference);
+        result= (!eptDat->messages.empty());
     }
-    return false;
+    return result;
 }
 
 /**
@@ -126,7 +127,7 @@ bool MessageFederateManager::hasMessage(const Endpoint& ept)
 uint64_t MessageFederateManager::pendingMessageCount(const Endpoint& ept)
 {
     if (ept.dataReference != nullptr) {
-        auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
+        auto* eptDat = static_cast<EndpointData*>(ept.dataReference);
         return eptDat->messages.size();
     }
     return 0;
