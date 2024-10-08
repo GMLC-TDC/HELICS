@@ -1253,24 +1253,23 @@ static Translator& generateTranslator(Federate* fed,
     return trans;
 }
 static Filter& registerFilter(Federate* fed,
-    bool global,
-    bool cloning,
-    std::string_view name,
-    std::string_view inputType,
-    std::string_view outputType)
+                              bool global,
+                              bool cloning,
+                              std::string_view name,
+                              std::string_view inputType,
+                              std::string_view outputType)
 {
     const bool useTypes = !((inputType.empty()) && (outputType.empty()));
     if (useTypes) {
         if (cloning) {
             return (global) ? fed->registerGlobalCloningFilter(name, inputType, outputType) :
-                fed->registerCloningFilter(name, inputType, outputType);
+                              fed->registerCloningFilter(name, inputType, outputType);
         }
         return (global) ? fed->registerGlobalFilter(name, inputType, outputType) :
-            fed->registerFilter(name, inputType, outputType);
+                          fed->registerFilter(name, inputType, outputType);
     }
     if (cloning) {
-        return
-            (global) ? fed->registerGlobalCloningFilter(name) : fed->registerCloningFilter(name);
+        return (global) ? fed->registerGlobalCloningFilter(name) : fed->registerCloningFilter(name);
     }
     return (global) ? fed->registerGlobalFilter(name) : fed->registerFilter(name);
 }
@@ -1283,7 +1282,7 @@ static Filter& generateFilter(Federate* fed,
                               std::string_view inputType,
                               std::string_view outputType)
 {
-    auto &filt=registerFilter(fed,global,cloning, name, inputType,outputType);
+    auto& filt = registerFilter(fed, global, cloning, name, inputType, outputType);
     if (operation != FilterTypes::CUSTOM) {
         filt.setFilterType(static_cast<std::int32_t>(operation));
     }
@@ -1444,7 +1443,10 @@ void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& 
             const bool cloningFlag = getOrDefault(filt, "cloning", false);
             const bool useTypes = !((inputType.empty()) && (outputType.empty()));
             const bool global = fileops::getOrDefault(filt, "global", defaultGlobal);
-            const std::string operation = getOrDefault(filt, "operation", (cloningFlag)?std::string("clone"):std::string("custom"));
+            const std::string operation =
+                getOrDefault(filt,
+                             "operation",
+                             (cloningFlag) ? std::string("clone") : std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
             if (!checkValidFilterType(useTypes, opType, operation)) {
