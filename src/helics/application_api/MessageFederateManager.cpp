@@ -113,10 +113,10 @@ bool MessageFederateManager::hasMessage() const
 
 bool MessageFederateManager::hasMessage(const Endpoint& ept)
 {
-    bool result{ false };
+    bool result{false};
     if (ept.dataReference != nullptr) {
         auto* eptDat = static_cast<EndpointData*>(ept.dataReference);
-        result= (!eptDat->messages.empty());
+        result = (!eptDat->messages.empty());
     }
     return result;
 }
