@@ -957,8 +957,8 @@ TEST_F(filter, reroute_cascade)
     for (int ii = 0; ii < 8; ++ii) {
         auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
         auto& filt1 = helics::make_filter(helics::FilterTypes::REROUTE,
-                                       filt.get(),
-                                       std::string("rrfilt") + std::to_string(ii));
+                                          filt.get(),
+                                          std::string("rrfilt") + std::to_string(ii));
         filt1.addDestinationTarget(std::string("rec") + std::to_string(ii + 1));
         filt1.setString("newdestination", std::string("rec") + std::to_string(ii + 2));
         filters.push_back(filt1);
@@ -1825,7 +1825,7 @@ TEST_F(filter, reroute_separate2_5message_b_nocov)
     for (auto& count : mcount) {
         totalMessageCount += count;
         EXPECT_TRUE(count == 5 || count == 0) << "incorrect # of messages in interval [" << index
-                                        << "], (" << count << ") messages instead of 5 ";
+                                              << "], (" << count << ") messages instead of 5 ";
         ++index;
     }
     EXPECT_EQ(totalMessageCount, 50);
