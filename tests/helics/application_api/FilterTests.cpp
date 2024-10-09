@@ -414,12 +414,12 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
 }
 
 static bool twoStageFilterTest(std::shared_ptr<helics::MessageFederate>& mFed,
-                                  std::shared_ptr<helics::MessageFederate>& fFed1,
-                                  std::shared_ptr<helics::MessageFederate>& fFed2,
-                                  helics::Endpoint& ept1,
-                                  helics::Endpoint& ept2,
-                                  helics::Filter& filt1,
-                                  helics::Filter& filt2)
+                               std::shared_ptr<helics::MessageFederate>& fFed1,
+                               std::shared_ptr<helics::MessageFederate>& fFed2,
+                               helics::Endpoint& ept1,
+                               helics::Endpoint& ept2,
+                               helics::Filter& filt1,
+                               helics::Filter& filt2)
 {
     bool correct = true;
 

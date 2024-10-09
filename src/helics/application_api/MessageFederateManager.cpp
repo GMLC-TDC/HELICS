@@ -144,7 +144,7 @@ uint64_t MessageFederateManager::pendingMessageCount() const
     /*
     uint64_t size{ 0 };
     for (const auto& mq : eptDat) {
-        size = size+mq.messages.size();
+        size = size + mq.messages.size();
     }
     return size;
     */
