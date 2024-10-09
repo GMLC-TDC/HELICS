@@ -121,14 +121,16 @@ TEST_P(filter_single_type_test, message_filter_function)
     auto res = mFed->hasMessage();
     EXPECT_TRUE(!res);
     if (res) {
-        auto m3 = mFed->getMessage(ept2);
+        auto message3 = mFed->getMessage(ept2);
+        (void)(message3);
     }
     mFed->requestTimeAsync(2.0);
     fFed->requestTime(2.0);
     mFed->requestTimeComplete();
     EXPECT_TRUE(!mFed->hasMessage(ept2));
     if (mFed->hasMessage(ept2)) {
-        auto m3 = mFed->getMessage(ept2);
+        auto message3 = mFed->getMessage(ept2);
+        (void)(message3);
     }
     fFed->requestTimeAsync(3.0);
     auto retTime = mFed->requestTime(3.0);
@@ -411,7 +413,7 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
     EXPECT_TRUE(!mCore->isConnected());
 }
 
-static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed,
+static bool twoStageFilterTest(std::shared_ptr<helics::MessageFederate>& mFed,
                                   std::shared_ptr<helics::MessageFederate>& fFed1,
                                   std::shared_ptr<helics::MessageFederate>& fFed2,
                                   helics::Endpoint& ept1,
@@ -526,7 +528,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage)
     filt2.addSourceTarget("port1");
     EXPECT_TRUE(filt2.getHandle().isValid());
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -555,7 +557,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_targe
 
     EXPECT_TRUE(filt2.getHandle().isValid());
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -586,7 +588,7 @@ TEST_F(filter, message_filter_function_two_stage_endpoint_target_alias)
 
     EXPECT_TRUE(filt2.getHandle().isValid());
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -616,7 +618,7 @@ TEST_F(filter, message_filter_function_two_stage_endpoint_target_alias_regex)
 
     EXPECT_TRUE(filt2.getHandle().isValid());
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -646,7 +648,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_targe
 
     EXPECT_TRUE(filt2.getHandle().isValid());
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -676,7 +678,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
 
     EXPECT_TRUE(filt2.getHandle().isValid());
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -707,7 +709,7 @@ TEST_F(filter, message_filter_function_two_stage_brokerApp_filter_link)
 
     EXPECT_TRUE(filt2.getHandle().isValid());
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 #ifdef HELICS_ENABLE_ZMQ_CORE
@@ -803,7 +805,7 @@ TEST_F(filter, many_filters)
         auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
         auto& filt1 = filt->registerFilter("filt1");
         auto dataOp = std::make_shared<helics::MessageDataOperator>();
-        dataOp->setDataFunction([ii](helics::SmallBuffer& db) { db.push_back('a' + ii); });
+        dataOp->setDataFunction([ii](helics::SmallBuffer& buffer) { buffer.push_back('a' + ii); });
         filt1.setOperator(dataOp);
         filt1.addSourceTarget("send");
         filterFeds.push_back(std::move(filt));
@@ -826,8 +828,8 @@ TEST_F(filter, many_filters)
             requestTime = rec->requestTimeAdvance(1.0);
             if (ept2.hasMessage()) {
                 ++cntb;
-                auto m = ept2.getMessage();
-                EXPECT_EQ(m->data.size(), 17U + 18U);
+                auto message = ept2.getMessage();
+                EXPECT_EQ(message->data.size(), 17U + 18U);
             }
         }
         rec->finalize();
@@ -873,9 +875,9 @@ TEST_F(filter, many_filters_multi)
     for (int ii = 0; ii < 8; ++ii) {
         auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
         auto& filt1 = filt->registerFilter("filt1");
-        auto op = std::make_shared<helics::MessageDataOperator>();
-        op->setDataFunction([ii](helics::SmallBuffer& db) { db.push_back('a' + ii); });
-        filt1.setOperator(op);
+        auto dataOp = std::make_shared<helics::MessageDataOperator>();
+        dataOp->setDataFunction([ii](helics::SmallBuffer& buffer) { buffer.push_back('a' + ii); });
+        filt1.setOperator(dataOp);
         filt1.addSourceTarget("send");
         filterFeds.push_back(std::move(filt));
     }
@@ -900,8 +902,8 @@ TEST_F(filter, many_filters_multi)
             requestTime = rec->requestTimeAdvance(1.0);
             while (ept2.hasMessage()) {
                 ++cntb;
-                auto m = ept2.getMessage();
-                EXPECT_EQ(m->data.size(), 18U + 8U);
+                auto message = ept2.getMessage();
+                EXPECT_EQ(message->data.size(), 18U + 8U);
             }
         }
         rec->finalize();
@@ -985,8 +987,8 @@ TEST_F(filter, reroute_cascade)
             requestTime = rec->requestTimeAdvance(1.0);
             while (rec9.hasMessage()) {
                 ++cntb;
-                auto m = rec9.getMessage();
-                EXPECT_EQ(m->data.size(), 18U);
+                auto message = rec9.getMessage();
+                EXPECT_EQ(message->data.size(), 18U);
             }
         }
         rec->finalize();
@@ -1318,13 +1320,13 @@ TEST_F(filter, reroute_separate_dest_target)
     auto thread2 = std::thread(act2);
     int cnt{0};
     filt->enterExecutingMode();
-    std::vector<helics::Time> tm;
-    tm.reserve(12);
+    std::vector<helics::Time> timeVector;
+    timeVector.reserve(12);
     helics::Time requestTime = helics::timeZero;
     while (requestTime < 20.0) {
         requestTime = filt->requestTime(21.0);
         ++cnt;
-        tm.emplace_back(requestTime);
+        timeVector.emplace_back(requestTime);
     }
     thread1.join();
     thread2.join();
@@ -1356,10 +1358,10 @@ TEST_F(filter, separate_slow_filter_ci_skip)
     auto& filt1 = helics::make_filter(helics::FilterTypes::CUSTOM, filt.get(), "rrfilt");
 
     auto customOp = std::make_shared<helics::CustomMessageOperator>();
-    auto mop = [](std::unique_ptr<helics::Message> m) {
+    auto mop = [](std::unique_ptr<helics::Message> message) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        m->data.append("bb");
-        return m;
+        message->data.append("bb");
+        return message;
     };
 
     customOp->setMessageFunction(mop);
@@ -1423,10 +1425,10 @@ TEST_F(filter, separate_slow_dest_filter_ci_skip)
     auto& filt1 = helics::make_filter(helics::FilterTypes::CUSTOM, filt.get(), "rrfilt");
 
     auto customOp = std::make_shared<helics::CustomMessageOperator>();
-    auto mop = [](std::unique_ptr<helics::Message> m) {
+    auto mop = [](std::unique_ptr<helics::Message> message) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        m->data.append("bb");
-        return m;
+        message->data.append("bb");
+        return message;
     };
 
     customOp->setMessageFunction(mop);
@@ -1549,7 +1551,8 @@ TEST_F(filter, reroute_separate2_5message_nocov)
             requestTime = filt->requestTime(helics::Time::maxVal());
             mcount.push_back(0);
             while (reroute1.hasMessage()) {
-                auto m = reroute1.getMessage();
+                auto message = reroute1.getMessage();
+                (void)message;
                 ++mcount[cnt];
             }
             ++cnt;
@@ -1557,16 +1560,16 @@ TEST_F(filter, reroute_separate2_5message_nocov)
     };
 
     auto thread1 = std::thread(act1);
-    auto t2 = std::thread(act2);
-    auto t3 = std::thread(act3);
+    auto thread2 = std::thread(act2);
+    auto thread3 = std::thread(act3);
 
     thread1.join();
-    t2.join();
+    thread2.join();
 
     // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     // auto res = broker->query("root", "global_time_debugging");
-    t3.join();
+    thread3.join();
     filt->finalize();
     EXPECT_EQ(rec1.pendingMessageCount(), 0U);
     EXPECT_EQ(rec2.pendingMessageCount(), 0U);
@@ -1668,7 +1671,8 @@ TEST_F(filter, reroute_separate2_5000message_ci_skip_nocov)
             requestTime = filt->requestTime(helics::Time::maxVal());
             mcount.push_back(0);
             while (reroute1.hasMessage()) {
-                auto m = reroute1.getMessage();
+                auto message = reroute1.getMessage();
+                (void)message;
                 ++mcount[cnt];
             }
             ++cnt;
@@ -1860,7 +1864,7 @@ TEST_F(filter, message_filter_function_two_stage_coreApp_filter_link)
 
     EXPECT_TRUE(filt2.getHandle().isValid());
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -1883,7 +1887,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
     auto& ept1 = mFed->registerGlobalEndpoint("port1");
     auto& ept2 = mFed->registerGlobalEndpoint("port2");
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -1907,7 +1911,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     broker->addSourceFilterToEndpoint("filter1", "port1");
     broker->addDestinationFilterToEndpoint("filter2", "port2");
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -1932,7 +1936,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
     auto& filt1 = fFed->registerGlobalFilter("filter1");
     auto& filt2 = fFed2->registerGlobalFilter("filter2");
 
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, ept1, ept2, filt1, filt2);
     EXPECT_TRUE(res);
 }
 
@@ -2135,12 +2139,12 @@ TEST_P(filter_single_type_test, message_filter_function2_rem_target)
 
     ASSERT_TRUE(mFed->hasMessage(ept2));
 
-    auto m2 = mFed->getMessage(ept2);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_source, "port1");
-    EXPECT_EQ(m2->dest, "port2");
-    EXPECT_EQ(m2->data.size(), data.size());
-    EXPECT_EQ(m2->time, 2.5);
+    auto message2 = mFed->getMessage(ept2);
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->original_source, "port1");
+    EXPECT_EQ(message2->dest, "port2");
+    EXPECT_EQ(message2->data.size(), data.size());
+    EXPECT_EQ(message2->time, 2.5);
 
     EXPECT_TRUE(!mFed->hasMessage(ept1));
     mFed->requestTime(4.0);

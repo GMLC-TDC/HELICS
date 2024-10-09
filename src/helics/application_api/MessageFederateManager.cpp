@@ -140,9 +140,9 @@ prefer to just use getMessage until it returns an invalid Message.
 uint64_t MessageFederateManager::pendingMessageCount() const
 {
     auto eptDat = eptData.lock_shared();
-    uint64_t size = 0;
+    uint64_t size{ 0 };
     for (const auto& mq : eptDat) {
-        size += mq.messages.size();
+        size = size+mq.messages.size();
     }
     return size;
 }
