@@ -140,11 +140,14 @@ prefer to just use getMessage until it returns an invalid Message.
 uint64_t MessageFederateManager::pendingMessageCount() const
 {
     auto eptDat = eptData.lock_shared();
+    return std::accumulate(eptDat.begin(),eptDat.end(),0,[](uint64_t count,const auto &ept){return count+static_cast<uint64_t>(ept.messages.size());});
+    /*
     uint64_t size{ 0 };
     for (const auto& mq : eptDat) {
         size = size+mq.messages.size();
     }
     return size;
+    */
 }
 
 std::unique_ptr<Message> MessageFederateManager::getMessage(const Endpoint& ept)

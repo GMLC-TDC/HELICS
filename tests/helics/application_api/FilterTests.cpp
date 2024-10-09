@@ -1453,22 +1453,22 @@ TEST_F(filter, separate_slow_dest_filter_ci_skip)
             ++cntb;
             while (rec->hasMessage()) {
                 ++mcnt;
-                auto m = rec->getMessage();
-                EXPECT_EQ(m->data.to_string().back(), 'b');
+                auto message = rec->getMessage();
+                EXPECT_EQ(message->data.to_string().back(), 'b');
             }
         }
         rec->finalize();
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
     filt->enterExecutingMode();
     helics::Time requestTime = helics::timeZero;
     while (requestTime < 20.0) {
         requestTime = filt->requestTime(21.0);
     }
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
     EXPECT_EQ(mcnt, 10);
     EXPECT_EQ(cntb, 10);
     filt->finalize();

@@ -295,6 +295,9 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     auto cnt = mFed2->pendingMessageCount(epid2);
     EXPECT_EQ(cnt, 4);
 
+    cnt = mFed2->pendingMessageCount();
+    EXPECT_EQ(cnt, 4);
+
     auto M1 = mFed2->getMessage(epid2);
     ASSERT_TRUE(M1);
     ASSERT_EQ(M1->data.size(), data1.size());
