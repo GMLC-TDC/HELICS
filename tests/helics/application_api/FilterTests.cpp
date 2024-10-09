@@ -1581,7 +1581,7 @@ TEST_F(filter, reroute_separate2_5message_nocov)
     for (auto& count : mcount) {
         totalMessageCount += count;
         EXPECT_TRUE(count == 5 || count == 0) << "incorrect # of messages in interval [" << index
-                                        << "], (" << count << ") messages instead of 5 ";
+                                              << "], (" << count << ") messages instead of 5 ";
         ++index;
     }
     EXPECT_EQ(totalMessageCount, 50);
@@ -1700,7 +1700,7 @@ TEST_F(filter, reroute_separate2_5000message_ci_skip_nocov)
     for (auto& count : mcount) {
         totalMessageCount += count;
         EXPECT_TRUE(count == 500 || count == 0) << "incorrect # of messages in interval [" << index
-                                          << "], (" << count << ") messages instead of 50 ";
+                                                << "], (" << count << ") messages instead of 50 ";
         ++index;
     }
     EXPECT_EQ(totalMessageCount, 5000);
