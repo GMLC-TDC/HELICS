@@ -135,12 +135,12 @@ TEST_P(filter_single_type_test, message_filter_function)
     EXPECT_EQ(retTime, 3.0);
     ASSERT_TRUE(mFed->hasMessage(ept2));
 
-    auto m2 = mFed->getMessage(ept2);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_source, "port1");
-    EXPECT_EQ(m2->dest, "port2");
-    EXPECT_EQ(m2->data.size(), data.size());
-    EXPECT_EQ(m2->time, 2.5);
+    auto message2 = mFed->getMessage(ept2);
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->original_source, "port1");
+    EXPECT_EQ(message2->dest, "port2");
+    EXPECT_EQ(message2->data.size(), data.size());
+    EXPECT_EQ(message2->time, 2.5);
 
     mFed->requestTime(3.0);
     fFed->requestTimeComplete();
@@ -196,12 +196,12 @@ TEST_P(filter_single_type_test, message_filter_object)
 
     ASSERT_TRUE(mFed->hasMessage(ept2));
 
-    auto m2 = mFed->getMessage(ept2);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_source, "port1");
-    EXPECT_EQ(m2->dest, "port2");
-    EXPECT_EQ(m2->data.size(), data.size());
-    EXPECT_EQ(m2->time, 2.5);
+    auto message2 = mFed->getMessage(ept2);
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->original_source, "port1");
+    EXPECT_EQ(message2->dest, "port2");
+    EXPECT_EQ(message2->data.size(), data.size());
+    EXPECT_EQ(message2->time, 2.5);
 
     mFed->requestTime(3.0);
     fFed->requestTimeComplete();
@@ -247,7 +247,7 @@ TEST_P(filter_single_type_test, message_dest_filter_function)
 
     auto res = mFed->hasMessage();
     if (res) {
-        auto m = mFed->getMessage();
+        auto message = mFed->getMessage();
         EXPECT_TRUE(!res);
     }
 
@@ -259,12 +259,12 @@ TEST_P(filter_single_type_test, message_dest_filter_function)
 
     ASSERT_TRUE(mFed->hasMessage(ept2));
 
-    auto m2 = mFed->getMessage(ept2);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_source, "port1");
-    EXPECT_EQ(m2->dest, "port2");
-    EXPECT_EQ(m2->data.size(), data.size());
-    EXPECT_EQ(m2->time, 2.5);
+    auto message2 = mFed->getMessage(ept2);
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->original_source, "port1");
+    EXPECT_EQ(message2->dest, "port2");
+    EXPECT_EQ(message2->data.size(), data.size());
+    EXPECT_EQ(message2->time, 2.5);
 
     mFed->requestTime(3.0);
     fFed->requestTimeComplete();
@@ -281,9 +281,9 @@ simulation
 
 TEST_P(filter_single_type_test, message_source_filter_function)
 {
-    auto p = GetParam();
-    auto broker = AddBroker(p, 2);
-    AddFederates<helics::MessageFederate>(p, 2, broker, 0.5, "message");
+    auto typeParam = GetParam();
+    auto broker = AddBroker(typeParam, 2);
+    AddFederates<helics::MessageFederate>(typeParam, 2, broker, 0.5, "message");
 
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
@@ -330,7 +330,7 @@ TEST_P(filter_single_type_test, message_source_filter_function)
     EXPECT_TRUE(retTime == 2.5);
     ASSERT_TRUE(mFed2->hasMessage(ept2));
 
-    auto m2 = mFed2->getMessage(ept2);
+    auto message2 = mFed2->getMessage(ept2);
 
     mFed2->requestTime(3.0);
     mFed1->requestTimeComplete();
@@ -391,12 +391,12 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
 
     ASSERT_TRUE(mFed->hasMessage(ept2));
 
-    auto m2 = mFed->getMessage(ept2);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_source, "port1");
-    EXPECT_EQ(m2->dest, "port2");
-    EXPECT_EQ(m2->data.size(), data.size());
-    EXPECT_EQ(m2->time, 2.5);
+    auto message2 = mFed->getMessage(ept2);
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->original_source, "port1");
+    EXPECT_EQ(message2->dest, "port2");
+    EXPECT_EQ(message2->data.size(), data.size());
+    EXPECT_EQ(message2->time, 2.5);
 
     mFed->requestTime(3.0);
     fFed->requestTimeComplete();
@@ -465,16 +465,16 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
         correct = false;
     }
     if (mFed->hasMessage(ept2)) {
-        auto m2 = mFed->getMessage(ept2);
+        auto message2 = mFed->getMessage(ept2);
         const auto& ept1Name = ept1.getName();
         if (ept1Name.size() > 1) {
-            EXPECT_EQ(m2->source, ept1.getName());
-            EXPECT_EQ(m2->original_source, ept1.getName());
+            EXPECT_EQ(message2->source, ept1.getName());
+            EXPECT_EQ(message2->original_source, ept1.getName());
         }
 
-        EXPECT_EQ(m2->dest, p2Name);
-        EXPECT_EQ(m2->data.size(), data.size());
-        EXPECT_EQ(m2->time, 2.5);
+        EXPECT_EQ(message2->dest, p2Name);
+        EXPECT_EQ(message2->data.size(), data.size());
+        EXPECT_EQ(message2->time, 2.5);
     }
 
     fFed1->requestTimeComplete();
@@ -731,7 +731,7 @@ TEST_F(filter, reroute_separate)
     auto& ept1 = send->registerGlobalEndpoint("send");
     auto& ept2 = rec->registerGlobalEndpoint("rec");
     ept1.setDefaultDestination("rec");
-    auto& p3 = filt->registerGlobalEndpoint("reroute");
+    auto& reroute1 = filt->registerGlobalEndpoint("reroute");
 
     auto& filt1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
@@ -760,8 +760,8 @@ TEST_F(filter, reroute_separate)
         rec->finalize();
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
     int cnt{0};
     filt->enterExecutingMode();
     helics::Time requestTime = helics::timeZero;
@@ -774,10 +774,10 @@ TEST_F(filter, reroute_separate)
         }
         ++cnt;
     }
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
     EXPECT_EQ(ept2.pendingMessageCount(), 0U);
-    EXPECT_EQ(p3.pendingMessageCount(), 10U);
+    EXPECT_EQ(reroute1.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 11);
     EXPECT_EQ(cntb, 0);
     filt->finalize();
@@ -802,9 +802,9 @@ TEST_F(filter, many_filters)
     for (int ii = 0; ii < 18; ++ii) {
         auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
         auto& filt1 = filt->registerFilter("filt1");
-        auto op = std::make_shared<helics::MessageDataOperator>();
-        op->setDataFunction([ii](helics::SmallBuffer& db) { db.push_back('a' + ii); });
-        filt1.setOperator(op);
+        auto dataOp = std::make_shared<helics::MessageDataOperator>();
+        dataOp->setDataFunction([ii](helics::SmallBuffer& db) { db.push_back('a' + ii); });
+        filt1.setOperator(dataOp);
         filt1.addSourceTarget("send");
         filterFeds.push_back(std::move(filt));
     }
@@ -833,8 +833,8 @@ TEST_F(filter, many_filters)
         rec->finalize();
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
 
     for (auto& ffed : filterFeds) {
         ffed->enterExecutingModeAsync();
@@ -844,8 +844,8 @@ TEST_F(filter, many_filters)
         ffed->requestTimeAsync(50);
     }
 
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
     EXPECT_EQ(ept2.pendingMessageCount(), 0U);
 
     EXPECT_EQ(cntb, 10);
@@ -907,8 +907,8 @@ TEST_F(filter, many_filters_multi)
         rec->finalize();
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
 
     for (auto& ffed : filterFeds) {
         ffed->enterExecutingModeAsync();
@@ -918,8 +918,8 @@ TEST_F(filter, many_filters_multi)
         ffed->requestTimeAsync(50);
     }
 
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
     EXPECT_EQ(ept2.pendingMessageCount(), 0U);
 
     EXPECT_EQ(cntb, 40);
@@ -940,17 +940,17 @@ TEST_F(filter, reroute_cascade)
     auto send = GetFederateAs<helics::MessageFederate>(0);
     auto rec = GetFederateAs<helics::MessageFederate>(1);
 
-    auto& s1 = send->registerGlobalEndpoint("send");
-    auto& r1 = rec->registerGlobalEndpoint("rec1");
-    auto& r2 = rec->registerGlobalEndpoint("rec2");
-    auto& r3 = rec->registerGlobalEndpoint("rec3");
-    auto& r4 = rec->registerGlobalEndpoint("rec4");
-    auto& r5 = rec->registerGlobalEndpoint("rec5");
-    auto& r6 = rec->registerGlobalEndpoint("rec6");
-    auto& r7 = rec->registerGlobalEndpoint("rec7");
-    auto& r8 = rec->registerGlobalEndpoint("rec8");
-    auto& r9 = rec->registerGlobalEndpoint("rec9");
-    s1.setDefaultDestination("rec1");
+    auto& send1 = send->registerGlobalEndpoint("send");
+    auto& rec1 = rec->registerGlobalEndpoint("rec1");
+    auto& rec2 = rec->registerGlobalEndpoint("rec2");
+    auto& rec3 = rec->registerGlobalEndpoint("rec3");
+    auto& rec4 = rec->registerGlobalEndpoint("rec4");
+    auto& rec5 = rec->registerGlobalEndpoint("rec5");
+    auto& rec6 = rec->registerGlobalEndpoint("rec6");
+    auto& rec7 = rec->registerGlobalEndpoint("rec7");
+    auto& rec8 = rec->registerGlobalEndpoint("rec8");
+    auto& rec9 = rec->registerGlobalEndpoint("rec9");
+    send1.setDefaultDestination("rec1");
 
     std::vector<std::shared_ptr<helics::MessageFederate>> filterFeds;
     std::vector<helics::Filter> filters;
@@ -965,35 +965,35 @@ TEST_F(filter, reroute_cascade)
         filterFeds.push_back(std::move(filt));
     }
 
-    auto act1 = [&s1, &send]() {
+    auto act1 = [&send1, &send]() {
         send->enterExecutingMode();
         helics::Time requestTime = helics::timeZero;
         while (requestTime < 10.0) {
-            s1.send("this is a message1");
-            s1.send("this is a message2");
-            s1.send("this is a message3");
-            s1.send("this is a message4");
+            send1.send("this is a message1");
+            send1.send("this is a message2");
+            send1.send("this is a message3");
+            send1.send("this is a message4");
             requestTime = send->requestTimeAdvance(1.0);
         }
         send->finalize();
     };
     int cntb{0};
-    auto act2 = [&rec, &cntb, &r9]() {
+    auto act2 = [&rec, &cntb, &rec9]() {
         rec->enterExecutingMode();
         helics::Time requestTime = helics::timeZero;
         while (requestTime < 10.0) {
             requestTime = rec->requestTimeAdvance(1.0);
-            while (r9.hasMessage()) {
+            while (rec9.hasMessage()) {
                 ++cntb;
-                auto m = r9.getMessage();
+                auto m = rec9.getMessage();
                 EXPECT_EQ(m->data.size(), 18U);
             }
         }
         rec->finalize();
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
 
     for (auto& ffed : filterFeds) {
         ffed->enterExecutingModeAsync();
@@ -1003,16 +1003,16 @@ TEST_F(filter, reroute_cascade)
         ffed->requestTimeAsync(50);
     }
 
-    t1.join();
-    t2.join();
-    EXPECT_EQ(r1.pendingMessageCount(), 0U);
-    EXPECT_EQ(r2.pendingMessageCount(), 0U);
-    EXPECT_EQ(r3.pendingMessageCount(), 0U);
-    EXPECT_EQ(r4.pendingMessageCount(), 0U);
-    EXPECT_EQ(r5.pendingMessageCount(), 0U);
-    EXPECT_EQ(r6.pendingMessageCount(), 0U);
-    EXPECT_EQ(r7.pendingMessageCount(), 0U);
-    EXPECT_EQ(r8.pendingMessageCount(), 0U);
+    thread1.join();
+    thread2.join();
+    EXPECT_EQ(rec1.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec2.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec3.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec4.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec5.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec6.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec7.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec8.pendingMessageCount(), 0U);
 
     EXPECT_EQ(cntb, 40);
     for (auto& ffed : filterFeds) {
@@ -1023,7 +1023,7 @@ TEST_F(filter, reroute_cascade)
 
 class RecFilterCheck {
   private:
-    std::thread id;
+    std::thread thread;
     std::shared_ptr<helics::MessageFederate> mFed;
     int mIndex{0};
 
@@ -1052,9 +1052,9 @@ class RecFilterCheck {
             }
             mFed->finalize();
         };
-        id = std::thread(act1);
+        thread = std::thread(act1);
     }
-    void join() { id.join(); }
+    void join() { thread.join(); }
 };
 
 /** this test case fails as of yet with no good path to resolving it yet*/
@@ -1102,7 +1102,7 @@ TEST_F(filter, reroute_cascade_2_ci_skip)
         }
         send->finalize();
     };
-    auto t1 = std::thread(acts);
+    auto thread1 = std::thread(acts);
 
     for (auto& rfed : recFeds) {
         rfed.run();
@@ -1118,7 +1118,7 @@ TEST_F(filter, reroute_cascade_2_ci_skip)
     helics::Time requestTime = helics::timeZero;
     helics::Time ptr = helics::timeZero;
 
-    t1.join();
+    thread1.join();
 
     for (auto& rfed : recFeds) {
         rfed.join();
@@ -1156,7 +1156,7 @@ TEST_F(filter, reroute_separate2)
     auto& ept1 = send->registerGlobalEndpoint("send");
     auto& ept2 = rec->registerGlobalEndpoint("rec");
     ept1.setDefaultDestination("rec");
-    auto& ept3 = filt->registerGlobalEndpoint("reroute");
+    auto& reroute1 = filt->registerGlobalEndpoint("reroute");
 
     auto& filt1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
@@ -1192,20 +1192,20 @@ TEST_F(filter, reroute_separate2)
         }
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
-    auto t3 = std::thread(act3);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
+    auto thread3 = std::thread(act3);
 
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
 
     // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     // auto res = broker->query("root", "global_time_debugging");
-    t3.join();
+    thread3.join();
     filt->finalize();
     EXPECT_EQ(ept2.pendingMessageCount(), 0U);
-    EXPECT_EQ(ept3.pendingMessageCount(), 10U);
+    EXPECT_EQ(reroute1.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 11);
     // auto res2 = broker->query("root", "global_time_debugging");
     broker->waitForDisconnect();
@@ -1226,7 +1226,7 @@ TEST_F(filter, reroute_separate3)
     auto& ept1 = send->registerGlobalEndpoint("send");
     auto& ept2 = rec->registerGlobalEndpoint("rec");
     ept1.setDefaultDestination("rec");
-    auto& p3 = filt->registerGlobalEndpoint("reroute");
+    auto& reroute1 = filt->registerGlobalEndpoint("reroute");
 
     auto& filt1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
@@ -1252,8 +1252,8 @@ TEST_F(filter, reroute_separate3)
         rec->finalize();
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
     int cnt{0};
     filt->enterExecutingMode();
     helics::Time requestTime = helics::timeZero;
@@ -1261,10 +1261,10 @@ TEST_F(filter, reroute_separate3)
         requestTime = filt->requestTime(helics::Time::maxVal());
         ++cnt;
     }
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
     EXPECT_EQ(ept2.pendingMessageCount(), 0U);
-    EXPECT_EQ(p3.pendingMessageCount(), 10U);
+    EXPECT_EQ(reroute1.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 11);
     filt->finalize();
 }
@@ -1285,7 +1285,7 @@ TEST_F(filter, reroute_separate_dest_target)
     auto& ept1 = send->registerGlobalEndpoint("send");
     auto& ept2 = rec->registerGlobalEndpoint("rec");
     ept1.setDefaultDestination("rec");
-    auto& p3 = filt->registerGlobalEndpoint("reroute");
+    auto& reroute1 = filt->registerGlobalEndpoint("reroute");
 
     auto& filt1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
@@ -1314,8 +1314,8 @@ TEST_F(filter, reroute_separate_dest_target)
         rec->finalize();
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
     int cnt{0};
     filt->enterExecutingMode();
     std::vector<helics::Time> tm;
@@ -1326,10 +1326,10 @@ TEST_F(filter, reroute_separate_dest_target)
         ++cnt;
         tm.emplace_back(requestTime);
     }
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
     EXPECT_EQ(ept2.pendingMessageCount(), 0U);
-    EXPECT_EQ(p3.pendingMessageCount(), 10U);
+    EXPECT_EQ(reroute1.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 10);
     if (cnt == 11) {
         EXPECT_EQ(cnt, 10);
@@ -1355,15 +1355,15 @@ TEST_F(filter, separate_slow_filter_ci_skip)
 
     auto& filt1 = helics::make_filter(helics::FilterTypes::CUSTOM, filt.get(), "rrfilt");
 
-    auto op = std::make_shared<helics::CustomMessageOperator>();
+    auto customOp = std::make_shared<helics::CustomMessageOperator>();
     auto mop = [](std::unique_ptr<helics::Message> m) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         m->data.append("bb");
         return m;
     };
 
-    op->setMessageFunction(mop);
-    filt1.setOperator(op);
+    customOp->setMessageFunction(mop);
+    filt1.setOperator(customOp);
     filt1.addSourceTarget("send");
     auto act1 = [&ept1, &send]() {
         send->enterExecutingMode();
@@ -1384,22 +1384,22 @@ TEST_F(filter, separate_slow_filter_ci_skip)
             ++cntb;
             while (rec->hasMessage()) {
                 ++mcnt;
-                auto m = rec->getMessage();
-                EXPECT_EQ(m->data.to_string().back(), 'b');
+                auto message = rec->getMessage();
+                EXPECT_EQ(message->data.to_string().back(), 'b');
             }
         }
         rec->finalize();
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
     filt->enterExecutingMode();
     helics::Time requestTime = helics::timeZero;
     while (requestTime < 20.0) {
         requestTime = filt->requestTime(21.0);
     }
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
     EXPECT_EQ(mcnt, 10);
     EXPECT_EQ(cntb, 10);
     filt->finalize();
@@ -1422,15 +1422,15 @@ TEST_F(filter, separate_slow_dest_filter_ci_skip)
 
     auto& filt1 = helics::make_filter(helics::FilterTypes::CUSTOM, filt.get(), "rrfilt");
 
-    auto op = std::make_shared<helics::CustomMessageOperator>();
+    auto customOp = std::make_shared<helics::CustomMessageOperator>();
     auto mop = [](std::unique_ptr<helics::Message> m) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         m->data.append("bb");
         return m;
     };
 
-    op->setMessageFunction(mop);
-    filt1.setOperator(op);
+    customOp->setMessageFunction(mop);
+    filt1.setOperator(customOp);
     filt1.addDestinationTarget("rec");
     auto act1 = [&ept1, &send]() {
         send->enterExecutingMode();
@@ -1484,25 +1484,25 @@ TEST_F(filter, reroute_separate2_5message_nocov)
     auto rec = GetFederateAs<helics::MessageFederate>(1);
     auto filt = GetFederateAs<helics::MessageFederate>(2);
 
-    auto& s1 = send->registerGlobalEndpoint("send1");
-    auto& s2 = send->registerGlobalEndpoint("send2");
-    auto& s3 = send->registerGlobalEndpoint("send3");
-    auto& s4 = send->registerGlobalEndpoint("send4");
-    auto& s5 = send->registerGlobalEndpoint("send5");
+    auto& send1 = send->registerGlobalEndpoint("send1");
+    auto& send2 = send->registerGlobalEndpoint("send2");
+    auto& send3 = send->registerGlobalEndpoint("send3");
+    auto& send4 = send->registerGlobalEndpoint("send4");
+    auto& send5 = send->registerGlobalEndpoint("send5");
 
-    auto& r1 = rec->registerGlobalEndpoint("rec1");
-    auto& r2 = rec->registerGlobalEndpoint("rec2");
-    auto& r3 = rec->registerGlobalEndpoint("rec3");
-    auto& r4 = rec->registerGlobalEndpoint("rec4");
-    auto& r5 = rec->registerGlobalEndpoint("rec5");
+    auto& rec1 = rec->registerGlobalEndpoint("rec1");
+    auto& rec2 = rec->registerGlobalEndpoint("rec2");
+    auto& rec3 = rec->registerGlobalEndpoint("rec3");
+    auto& rec4 = rec->registerGlobalEndpoint("rec4");
+    auto& rec5 = rec->registerGlobalEndpoint("rec5");
 
-    s1.setDefaultDestination("rec1");
-    s2.setDefaultDestination("rec2");
-    s3.setDefaultDestination("rec3");
-    s4.setDefaultDestination("rec4");
-    s5.setDefaultDestination("rec5");
+    send1.setDefaultDestination("rec1");
+    send2.setDefaultDestination("rec2");
+    send3.setDefaultDestination("rec3");
+    send4.setDefaultDestination("rec4");
+    send5.setDefaultDestination("rec5");
 
-    auto& p3 = filt->registerGlobalEndpoint("reroute");
+    auto& reroute1 = filt->registerGlobalEndpoint("reroute");
 
     auto& filt1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
@@ -1518,13 +1518,13 @@ TEST_F(filter, reroute_separate2_5message_nocov)
         send->enterExecutingMode();
         helics::Time requestTime = helics::timeZero;
         while (requestTime < 10.0) {
-            s1.send("this is a message1");
+            send1.send("this is a message1");
 
-            s2.send("this is a message2");
+            send2.send("this is a message2");
             // std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            s3.send("this is a message3");
-            s4.send("this is a message4");
-            s5.send("this is a message5");
+            send3.send("this is a message3");
+            send4.send("this is a message4");
+            send5.send("this is a message5");
             // std::this_thread::sleep_for(std::chrono::milliseconds(200));
             requestTime = send->requestTimeAdvance(1.0);
         }
@@ -1548,19 +1548,19 @@ TEST_F(filter, reroute_separate2_5message_nocov)
         while (requestTime < 20.0) {
             requestTime = filt->requestTime(helics::Time::maxVal());
             mcount.push_back(0);
-            while (p3.hasMessage()) {
-                auto m = p3.getMessage();
+            while (reroute1.hasMessage()) {
+                auto m = reroute1.getMessage();
                 ++mcount[cnt];
             }
             ++cnt;
         }
     };
 
-    auto t1 = std::thread(act1);
+    auto thread1 = std::thread(act1);
     auto t2 = std::thread(act2);
     auto t3 = std::thread(act3);
 
-    t1.join();
+    thread1.join();
     t2.join();
 
     // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -1568,20 +1568,20 @@ TEST_F(filter, reroute_separate2_5message_nocov)
     // auto res = broker->query("root", "global_time_debugging");
     t3.join();
     filt->finalize();
-    EXPECT_EQ(r1.pendingMessageCount(), 0U);
-    EXPECT_EQ(r2.pendingMessageCount(), 0U);
-    EXPECT_EQ(r3.pendingMessageCount(), 0U);
-    EXPECT_EQ(r4.pendingMessageCount(), 0U);
-    EXPECT_EQ(r5.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec1.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec2.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec3.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec4.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec5.pendingMessageCount(), 0U);
 
-    EXPECT_EQ(p3.pendingMessageCount(), 0U);
+    EXPECT_EQ(reroute1.pendingMessageCount(), 0U);
     EXPECT_EQ(cnt, 11);
     int totalMessageCount{0};
     int index = 0;
-    for (auto& mc : mcount) {
-        totalMessageCount += mc;
-        EXPECT_TRUE(mc == 5 || mc == 0) << "incorrect # of messages in interval [" << index
-                                        << "], (" << mc << ") messages instead of 5 ";
+    for (auto& count : mcount) {
+        totalMessageCount += count;
+        EXPECT_TRUE(count == 5 || count == 0) << "incorrect # of messages in interval [" << index
+                                        << "], (" << count << ") messages instead of 5 ";
         ++index;
     }
     EXPECT_EQ(totalMessageCount, 50);
@@ -1601,25 +1601,25 @@ TEST_F(filter, reroute_separate2_5000message_ci_skip_nocov)
     auto rec = GetFederateAs<helics::MessageFederate>(1);
     auto filt = GetFederateAs<helics::MessageFederate>(2);
 
-    auto& s1 = send->registerGlobalEndpoint("send1");
-    auto& s2 = send->registerGlobalEndpoint("send2");
-    auto& s3 = send->registerGlobalEndpoint("send3");
-    auto& s4 = send->registerGlobalEndpoint("send4");
-    auto& s5 = send->registerGlobalEndpoint("send5");
+    auto& send1 = send->registerGlobalEndpoint("send1");
+    auto& send2 = send->registerGlobalEndpoint("send2");
+    auto& send3 = send->registerGlobalEndpoint("send3");
+    auto& send4 = send->registerGlobalEndpoint("send4");
+    auto& send5 = send->registerGlobalEndpoint("send5");
 
-    auto& r1 = rec->registerGlobalEndpoint("rec1");
-    auto& r2 = rec->registerGlobalEndpoint("rec2");
-    auto& r3 = rec->registerGlobalEndpoint("rec3");
-    auto& r4 = rec->registerGlobalEndpoint("rec4");
-    auto& r5 = rec->registerGlobalEndpoint("rec5");
+    auto& rec1 = rec->registerGlobalEndpoint("rec1");
+    auto& rec2 = rec->registerGlobalEndpoint("rec2");
+    auto& rec3 = rec->registerGlobalEndpoint("rec3");
+    auto& rec4 = rec->registerGlobalEndpoint("rec4");
+    auto& rec5 = rec->registerGlobalEndpoint("rec5");
 
-    s1.setDefaultDestination("rec1");
-    s2.setDefaultDestination("rec2");
-    s3.setDefaultDestination("rec3");
-    s4.setDefaultDestination("rec4");
-    s5.setDefaultDestination("rec5");
+    send1.setDefaultDestination("rec1");
+    send2.setDefaultDestination("rec2");
+    send3.setDefaultDestination("rec3");
+    send4.setDefaultDestination("rec4");
+    send5.setDefaultDestination("rec5");
 
-    auto& p3 = filt->registerGlobalEndpoint("reroute");
+    auto& reroute1 = filt->registerGlobalEndpoint("reroute");
 
     auto& filt1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
@@ -1636,13 +1636,13 @@ TEST_F(filter, reroute_separate2_5000message_ci_skip_nocov)
         helics::Time requestTime = helics::timeZero;
         while (requestTime < 10.0) {
             for (int kk = 0; kk < 100; ++kk) {
-                s1.send("this is a message1");
+                send1.send("this is a message1");
 
-                s2.send("this is a message2");
+                send2.send("this is a message2");
                 // std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                s3.send("this is a message3");
-                s4.send("this is a message4");
-                s5.send("this is a message5");
+                send3.send("this is a message3");
+                send4.send("this is a message4");
+                send5.send("this is a message5");
             }
             // std::this_thread::sleep_for(std::chrono::milliseconds(200));
             requestTime = send->requestTimeAdvance(1.0);
@@ -1667,40 +1667,40 @@ TEST_F(filter, reroute_separate2_5000message_ci_skip_nocov)
         while (requestTime < 20.0) {
             requestTime = filt->requestTime(helics::Time::maxVal());
             mcount.push_back(0);
-            while (p3.hasMessage()) {
-                auto m = p3.getMessage();
+            while (reroute1.hasMessage()) {
+                auto m = reroute1.getMessage();
                 ++mcount[cnt];
             }
             ++cnt;
         }
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
-    auto t3 = std::thread(act3);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
+    auto thread3 = std::thread(act3);
 
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
 
     // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     // auto res = broker->query("root", "global_time_debugging");
-    t3.join();
+    thread3.join();
     filt->finalize();
-    EXPECT_EQ(r1.pendingMessageCount(), 0U);
-    EXPECT_EQ(r2.pendingMessageCount(), 0U);
-    EXPECT_EQ(r3.pendingMessageCount(), 0U);
-    EXPECT_EQ(r4.pendingMessageCount(), 0U);
-    EXPECT_EQ(r5.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec1.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec2.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec3.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec4.pendingMessageCount(), 0U);
+    EXPECT_EQ(rec5.pendingMessageCount(), 0U);
 
-    EXPECT_EQ(p3.pendingMessageCount(), 0U);
+    EXPECT_EQ(reroute1.pendingMessageCount(), 0U);
     EXPECT_EQ(cnt, 11);
     int totalMessageCount{0};
     int index = 0;
-    for (auto& mc : mcount) {
-        totalMessageCount += mc;
-        EXPECT_TRUE(mc == 500 || mc == 0) << "incorrect # of messages in interval [" << index
-                                          << "], (" << mc << ") messages instead of 50 ";
+    for (auto& count : mcount) {
+        totalMessageCount += count;
+        EXPECT_TRUE(count == 500 || count == 0) << "incorrect # of messages in interval [" << index
+                                          << "], (" << count << ") messages instead of 50 ";
         ++index;
     }
     EXPECT_EQ(totalMessageCount, 5000);
@@ -1848,9 +1848,9 @@ TEST_F(filter, message_filter_function_two_stage_coreApp_filter_link)
     auto& ept2 = mFed->registerGlobalEndpoint("port2");
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
-    helics::CoreApp cr(mFed->getCorePointer());
-    cr.addSourceFilterToEndpoint("filter1", "port1");
-    cr.addDestinationFilterToEndpoint("filter2", "port2");
+    helics::CoreApp cApp(mFed->getCorePointer());
+    cApp.addSourceFilterToEndpoint("filter1", "port1");
+    cApp.addDestinationFilterToEndpoint("filter2", "port2");
 
     auto& filt1 = fFed->registerGlobalFilter("filter1");
 
@@ -1999,12 +1999,12 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_object)
     }
     ASSERT_TRUE(mFed->hasMessage(ept2));
 
-    auto m2 = mFed->getMessage(ept2);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_source, "port1");
-    EXPECT_EQ(m2->dest, "port2");
-    EXPECT_EQ(m2->data.size(), data.size());
-    EXPECT_EQ(m2->time, 2.5);
+    auto message2 = mFed->getMessage(ept2);
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->original_source, "port1");
+    EXPECT_EQ(message2->dest, "port2");
+    EXPECT_EQ(message2->data.size(), data.size());
+    EXPECT_EQ(message2->time, 2.5);
 
     fFed->requestTimeComplete();
     fFed2->requestTimeComplete();
@@ -2072,12 +2072,12 @@ TEST_P(filter_single_type_test, message_filter_function2)
 
     ASSERT_TRUE(mFed->hasMessage(ept2));
 
-    auto m2 = mFed->getMessage(ept2);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_source, "port1");
-    EXPECT_EQ(m2->dest, "port2");
-    EXPECT_EQ(m2->data.size(), data.size());
-    EXPECT_EQ(m2->time, 2.5);
+    auto message2 = mFed->getMessage(ept2);
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->original_source, "port1");
+    EXPECT_EQ(message2->dest, "port2");
+    EXPECT_EQ(message2->data.size(), data.size());
+    EXPECT_EQ(message2->time, 2.5);
 
     EXPECT_TRUE(!mFed->hasMessage(ept1));
     mFed->requestTime(4.0);
@@ -2177,7 +2177,7 @@ TEST_F(filter_test, message_clone_test)
 
     auto& ept1 = sFed->registerGlobalEndpoint("src");
     auto& ept2 = dFed->registerGlobalEndpoint("dest");
-    auto& p3 = dcFed->registerGlobalEndpoint("cm");
+    auto& ept3 = dcFed->registerGlobalEndpoint("cm");
 
     helics::CloningFilter cFilt(dcFed.get());
     cFilt.addSourceTarget("src");
@@ -2203,11 +2203,11 @@ TEST_F(filter_test, message_clone_test)
     EXPECT_TRUE(res);
 
     if (res) {
-        auto m2 = dFed->getMessage(ept2);
-        EXPECT_EQ(m2->source, "src");
-        EXPECT_EQ(m2->original_source, "src");
-        EXPECT_EQ(m2->dest, "dest");
-        EXPECT_EQ(m2->data.size(), data.size());
+        auto message2 = dFed->getMessage(ept2);
+        EXPECT_EQ(message2->source, "src");
+        EXPECT_EQ(message2->original_source, "src");
+        EXPECT_EQ(message2->dest, "dest");
+        EXPECT_EQ(message2->data.size(), data.size());
     }
 
     // now check the message clone
@@ -2215,12 +2215,12 @@ TEST_F(filter_test, message_clone_test)
     EXPECT_TRUE(res);
 
     if (res) {
-        auto m2 = dcFed->getMessage(p3);
-        EXPECT_EQ(m2->source, "src");
-        EXPECT_EQ(m2->original_source, "src");
-        EXPECT_EQ(m2->dest, "cm");
-        EXPECT_EQ(m2->original_dest, "dest");
-        EXPECT_EQ(m2->data.size(), data.size());
+        auto message2 = dcFed->getMessage(ept3);
+        EXPECT_EQ(message2->source, "src");
+        EXPECT_EQ(message2->original_source, "src");
+        EXPECT_EQ(message2->dest, "cm");
+        EXPECT_EQ(message2->original_dest, "dest");
+        EXPECT_EQ(message2->data.size(), data.size());
     }
 
     sFed->finalizeAsync();
@@ -2246,8 +2246,8 @@ TEST_F(filter_test, message_multi_clone_test)
 
     auto& ept1 = sFed->registerGlobalEndpoint("src");
     auto& ept2 = sFed2->registerGlobalEndpoint("src2");
-    auto& p3 = dFed->registerGlobalEndpoint("dest");
-    auto& p4 = dcFed->registerGlobalEndpoint("cm");
+    auto& destEpt = dFed->registerGlobalEndpoint("dest");
+    auto& cmEpt = dcFed->registerGlobalEndpoint("cm");
 
     helics::CloningFilter cFilt(dcFed.get());
     cFilt.addSourceTarget("src");
@@ -2275,52 +2275,52 @@ TEST_F(filter_test, message_multi_clone_test)
     sFed2->requestTimeComplete();
     dcFed->requestTimeComplete();
 
-    auto mcnt = dFed->pendingMessageCount(p3);
+    auto mcnt = dFed->pendingMessageCount(destEpt);
     EXPECT_EQ(mcnt, 2);
     auto res = dFed->hasMessage();
     EXPECT_TRUE(res);
 
     if (res) {
-        auto m2 = dFed->getMessage(p3);
-        EXPECT_EQ(m2->source, "src");
-        EXPECT_EQ(m2->original_source, "src");
-        EXPECT_EQ(m2->dest, "dest");
-        EXPECT_EQ(m2->data.size(), data.size());
+        auto message2 = dFed->getMessage(destEpt);
+        EXPECT_EQ(message2->source, "src");
+        EXPECT_EQ(message2->original_source, "src");
+        EXPECT_EQ(message2->dest, "dest");
+        EXPECT_EQ(message2->data.size(), data.size());
         res = dFed->hasMessage();
         EXPECT_TRUE(res);
 
         if (res) {
-            m2 = dFed->getMessage(p3);
-            EXPECT_EQ(m2->source, "src2");
-            EXPECT_EQ(m2->original_source, "src2");
-            EXPECT_EQ(m2->dest, "dest");
-            EXPECT_EQ(m2->data.size(), data2.size());
+            message2 = dFed->getMessage(destEpt);
+            EXPECT_EQ(message2->source, "src2");
+            EXPECT_EQ(message2->original_source, "src2");
+            EXPECT_EQ(message2->dest, "dest");
+            EXPECT_EQ(message2->data.size(), data2.size());
         }
     }
 
     // now check the message clone
-    mcnt = dcFed->pendingMessageCount(p4);
+    mcnt = dcFed->pendingMessageCount(cmEpt);
     EXPECT_EQ(mcnt, 2);
     res = dcFed->hasMessage();
     EXPECT_TRUE(res);
 
     if (res) {
-        auto m2 = dcFed->getMessage(p4);
-        EXPECT_EQ(m2->source, "src");
-        EXPECT_EQ(m2->original_source, "src");
-        EXPECT_EQ(m2->dest, "cm");
-        EXPECT_EQ(m2->original_dest, "dest");
-        EXPECT_EQ(m2->data.size(), data.size());
+        auto message2 = dcFed->getMessage(cmEpt);
+        EXPECT_EQ(message2->source, "src");
+        EXPECT_EQ(message2->original_source, "src");
+        EXPECT_EQ(message2->dest, "cm");
+        EXPECT_EQ(message2->original_dest, "dest");
+        EXPECT_EQ(message2->data.size(), data.size());
         res = dcFed->hasMessage();
         EXPECT_TRUE(res);
 
         if (res) {
-            m2 = dcFed->getMessage(p4);
-            EXPECT_EQ(m2->source, "src2");
-            EXPECT_EQ(m2->original_source, "src2");
-            EXPECT_EQ(m2->dest, "cm");
-            EXPECT_EQ(m2->original_dest, "dest");
-            EXPECT_EQ(m2->data.size(), data2.size());
+            message2 = dcFed->getMessage(cmEpt);
+            EXPECT_EQ(message2->source, "src2");
+            EXPECT_EQ(message2->original_source, "src2");
+            EXPECT_EQ(message2->dest, "cm");
+            EXPECT_EQ(message2->original_dest, "dest");
+            EXPECT_EQ(message2->data.size(), data2.size());
         }
     }
 
@@ -2349,12 +2349,12 @@ TEST_P(filter_single_type_test, filter_core_termination)
     auto& ept1 = mFed->registerGlobalEndpoint("port1");
     auto& ept2 = mFed->registerGlobalEndpoint("port2");
 
-    auto c2 = fFed->getCorePointer();
-    auto filt1 = c2->registerFilter("filter1", std::string(), std::string());
-    c2->addSourceTarget(filt1, "port1");
+    auto coreP = fFed->getCorePointer();
+    auto filt1 = coreP->registerFilter("filter1", std::string(), std::string());
+    coreP->addSourceTarget(filt1, "port1");
     auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
     timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 2.5; });
-    c2->setFilterOperator(filt1, timeOperator);
+    coreP->setFilterOperator(filt1, timeOperator);
 
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
@@ -2373,17 +2373,17 @@ TEST_P(filter_single_type_test, filter_core_termination)
 
     mFed->requestTime(2.0);
     ASSERT_TRUE(!mFed->hasMessage(ept2));
-    EXPECT_TRUE(c2->isConnected());
+    EXPECT_TRUE(coreP->isConnected());
     mFed->requestTime(3.0);
     ept1.sendTo(data, "port2");
     ASSERT_TRUE(mFed->hasMessage(ept2));
 
-    auto m2 = mFed->getMessage(ept2);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_source, "port1");
-    EXPECT_EQ(m2->dest, "port2");
-    EXPECT_EQ(m2->data.size(), data.size());
-    EXPECT_EQ(m2->time, 2.5);
+    auto message2 = mFed->getMessage(ept2);
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->original_source, "port1");
+    EXPECT_EQ(message2->dest, "port2");
+    EXPECT_EQ(message2->data.size(), data.size());
+    EXPECT_EQ(message2->time, 2.5);
 
     auto requestTime = mFed->requestTime(4.0);
     EXPECT_TRUE(!mFed->hasMessage(ept2));
@@ -2392,10 +2392,10 @@ TEST_P(filter_single_type_test, filter_core_termination)
     mFed->finalize();
     fFed->finalizeComplete();
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    if (c2->isConnected()) {
+    if (coreP->isConnected()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(400));
     }
-    EXPECT_TRUE(!c2->isConnected());
+    EXPECT_TRUE(!coreP->isConnected());
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
@@ -2416,7 +2416,7 @@ TEST_F(filter, filter_config_test1)
     ept1.send("1");
     fed1->requestNextStep();
     EXPECT_FALSE(ept2.hasMessage());
-    auto time = fed1->requestNextStep();
+    fed1->requestNextStep();
     EXPECT_TRUE(ept2.hasMessage());
 
     fed1->finalize();
@@ -2441,7 +2441,7 @@ TEST_F(filter, filter_config_test2)
     ept1.send("1");
     fed1->requestNextStep();
     EXPECT_FALSE(ept2.hasMessage());
-    auto time = fed1->requestNextStep();
+    fed1->requestNextStep();
     EXPECT_TRUE(ept2.hasMessage());
 
     fed1->finalize();
