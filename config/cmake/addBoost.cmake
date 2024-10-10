@@ -96,6 +96,8 @@ if(WIN32 AND NOT UNIX_LIKE)
                     Boost-1.77.0
                     Boost-1.76.0
                     Boost-1.75.0
+                    Boost-1.74.0
+                    Boost-1.73.0
             )
             set(Boost_ROOT ${BOOST_CMAKE_PATH})
         else()
@@ -116,10 +118,9 @@ if(NOT Boost_ROOT)
     endif()
 endif()
 
-if($ENV{BOOST_ROOT})
-    set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+if(NOT BOOST_ROOT)
+    set(BOOST_ROOT ${Boost_ROOT})
     message(STATUS "setting BOOST_ROOT ${BOOST_ROOT}")
-
 endif()
 
 hide_variable(BOOST_TEST_PATH)
