@@ -214,6 +214,12 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
     addTargetVariations(data, "destination", "endpoints", [&ept](std::string_view endpoint) {
         ept.addDestinationEndpoint(endpoint);
     });
+    addTargetVariations(data, "source", "targets", [&ept](std::string_view endpoint) {
+        ept.addSourceEndpoint(endpoint);
+    });
+    addTargetVariations(data, "destination", "targets", [&ept](std::string_view endpoint) {
+        ept.addDestinationEndpoint(endpoint);
+    });
     addTargets(data, "destFilters", [&ept](std::string_view filt) {
         ept.addDestinationFilter(filt);
     });

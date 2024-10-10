@@ -1252,12 +1252,10 @@ static Translator& generateTranslator(Federate* fed,
     }
     return trans;
 }
-
-static Filter& generateFilter(Federate* fed,
+static Filter& registerFilter(Federate* fed,
                               bool global,
                               bool cloning,
                               std::string_view name,
-                              FilterTypes operation,
                               std::string_view inputType,
                               std::string_view outputType)
 {
@@ -1271,14 +1269,20 @@ static Filter& generateFilter(Federate* fed,
                           fed->registerFilter(name, inputType, outputType);
     }
     if (cloning) {
-        Filter& filt =
-            (global) ? fed->registerGlobalCloningFilter(name) : fed->registerCloningFilter(name);
-        if (operation != FilterTypes::CUSTOM) {
-            filt.setFilterType(static_cast<std::int32_t>(operation));
-        }
-        return filt;
+        return (global) ? fed->registerGlobalCloningFilter(name) : fed->registerCloningFilter(name);
     }
-    Filter& filt = (global) ? fed->registerCloningFilter(name) : fed->registerFilter(name);
+    return (global) ? fed->registerGlobalFilter(name) : fed->registerFilter(name);
+}
+
+static Filter& generateFilter(Federate* fed,
+                              bool global,
+                              bool cloning,
+                              std::string_view name,
+                              FilterTypes operation,
+                              std::string_view inputType,
+                              std::string_view outputType)
+{
+    auto& filt = registerFilter(fed, global, cloning, name, inputType, outputType);
     if (operation != FilterTypes::CUSTOM) {
         filt.setFilterType(static_cast<std::int32_t>(operation));
     }
@@ -1436,17 +1440,20 @@ void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& 
             const std::string key = getOrDefault(filt, "name", emptyStr);
             const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
-            const bool cloningflag = getOrDefault(filt, "cloning", false);
+            const bool cloningFlag = getOrDefault(filt, "cloning", false);
             const bool useTypes = !((inputType.empty()) && (outputType.empty()));
             const bool global = fileops::getOrDefault(filt, "global", defaultGlobal);
-            const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
+            const std::string operation =
+                getOrDefault(filt,
+                             "operation",
+                             (cloningFlag) ? std::string("clone") : std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
             if (!checkValidFilterType(useTypes, opType, operation)) {
                 continue;
             }
             auto& filter =
-                generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
+                generateFilter(this, global, cloningFlag, key, opType, inputType, outputType);
             loadOptions(this, filt, filter);
 
             addTargetVariations(filt, "source", "endpoints", [&filter](const std::string& target) {
@@ -1459,7 +1466,7 @@ void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& 
                                     filter.addDestinationTarget(target);
                                 });
 
-            if (cloningflag) {
+            if (cloningFlag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
                 });

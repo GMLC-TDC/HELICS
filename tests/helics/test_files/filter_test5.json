@@ -1,0 +1,28 @@
+{
+  "name": "filt_test1",
+  "coretype": "test",
+  "coreinitstring": "--autobroker",
+  "defaultglobal": true,
+  "period": 1.0,
+
+  "endpoints": [
+    {
+      "name": "ept1",
+      "destinationtargets": "ept2"
+    },
+    {
+      "name": "ept2"
+    },
+    {
+      "name": "ept3"
+    }
+  ],
+  "filters": [
+    {
+      "destinationtargets": "ept2",
+      "cloning": true,
+      "operation": "cloning",
+      "delivery": "ept3"
+    }
+  ]
+}

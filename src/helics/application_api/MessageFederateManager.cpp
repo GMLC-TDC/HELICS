@@ -17,9 +17,9 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 MessageFederateManager::MessageFederateManager(Core* coreOb,
                                                MessageFederate* fed,
-                                               LocalFederateId id,
+                                               LocalFederateId fedid,
                                                bool singleThreaded):
-    mLocalEndpoints(!singleThreaded), coreObject(coreOb), mFed(fed), fedID(id),
+    mLocalEndpoints(!singleThreaded), coreObject(coreOb), mFed(fed), fedID(fedid),
     eptData(!singleThreaded), messageOrder(!singleThreaded)
 {
 }
@@ -113,11 +113,12 @@ bool MessageFederateManager::hasMessage() const
 
 bool MessageFederateManager::hasMessage(const Endpoint& ept)
 {
+    bool result{false};
     if (ept.dataReference != nullptr) {
-        auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
-        return (!eptDat->messages.empty());
+        auto* eptDat = static_cast<EndpointData*>(ept.dataReference);
+        result = (!eptDat->messages.empty());
     }
-    return false;
+    return result;
 }
 
 /**
@@ -126,7 +127,7 @@ bool MessageFederateManager::hasMessage(const Endpoint& ept)
 uint64_t MessageFederateManager::pendingMessageCount(const Endpoint& ept)
 {
     if (ept.dataReference != nullptr) {
-        auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
+        auto* eptDat = static_cast<EndpointData*>(ept.dataReference);
         return eptDat->messages.size();
     }
     return 0;
@@ -139,20 +140,25 @@ prefer to just use getMessage until it returns an invalid Message.
 uint64_t MessageFederateManager::pendingMessageCount() const
 {
     auto eptDat = eptData.lock_shared();
-    uint64_t sz = 0;
+    return std::accumulate(eptDat.begin(), eptDat.end(), 0, [](uint64_t count, const auto& ept) {
+        return count + static_cast<uint64_t>(ept.messages.size());
+    });
+    /*
+    uint64_t size{ 0 };
     for (const auto& mq : eptDat) {
-        sz += mq.messages.size();
+        size = size + mq.messages.size();
     }
-    return sz;
+    return size;
+    */
 }
 
 std::unique_ptr<Message> MessageFederateManager::getMessage(const Endpoint& ept)
 {
     if (ept.dataReference != nullptr) {
         auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
-        auto mv = eptDat->messages.pop();
-        if (mv) {
-            return std::move(*mv);
+        auto message = eptDat->messages.pop();
+        if (message) {
+            return std::move(*message);
         }
     }
     return nullptr;
@@ -164,9 +170,9 @@ std::unique_ptr<Message> MessageFederateManager::getMessage()
     auto eptDat = eptData.lock();
     for (auto& edat : eptDat) {
         if (!edat.messages.empty()) {
-            auto ms = edat.messages.pop();
-            if (ms) {
-                return std::move(*ms);
+            auto message = edat.messages.pop();
+            if (message) {
+                return std::move(*message);
             }
         }
     }
