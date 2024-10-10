@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cmake_minimum_required(VERSION 3.11...3.24)
+cmake_minimum_required(VERSION 3.22...3.30)
 project(helicsJAVA)
 
 get_directory_property(hasParent PARENT_DIRECTORY)
@@ -84,12 +84,8 @@ include_directories(${HELICS_SWIG_INCLUDE_DIRS})
 # ##################################################################################################
 # UseSWIG feature support
 # ##################################################################################################
-# This can be removed in HELICS 3 if the minimum CMake version is >= 3.12
-if(NOT CMAKE_VERSION VERSION_LESS 3.12)
-    set(USE_MODERNIZED_SWIG ON)
-else()
-    set(USE_MODERNIZED_SWIG OFF)
-endif()
+
+set(USE_MODERNIZED_SWIG ON)
 
 # ##################################################################################################
 # Run SWIG only (no build)

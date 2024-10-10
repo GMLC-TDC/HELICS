@@ -37,7 +37,6 @@
 #    include:
 #      - refs/heads/main
 #      - refs/heads/develop
-#      - refs/heads/helics2
 #      - 'refs/pull/**'
 #      - 'refs/tags/**'
 #
@@ -80,6 +79,5 @@ trigger:
     include:
       - refs/heads/main
       - refs/heads/develop
-      - refs/heads/helics2
       - "refs/pull/**"
       - "refs/tags/**"

@@ -5,9 +5,9 @@ branches:
     - main
     - develop
 
-version: 3.5.3.{build}
+version: 3.6.0.{build}
 
-image: Visual Studio 2019
+image: Visual Studio 2022
 
 environment:
   global:
@@ -18,6 +18,10 @@ environment:
 
 cache:
   - '%CYG_CACHE%'
+
+init:
+  ps: |
+    (New-Object Net.WebClient).DownloadFile('https://cygwin.com/setup-x86_64.exe', 'C:\cygwin64\setup-x86_64.exe')
 
 #
 # Install needed build dependencies
@@ -33,7 +37,7 @@ before_build:
   - mkdir build
   - cd build
   - git config --global --add safe.directory /cygdrive/c/projects/helics
-  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_SWIG=OFF -DHELICS_BUILD_TESTS=OFF -DHELICS_DISABLE_ASIO=ON -DHELICS_ENABLE_IPC_CORE=OFF"'
+  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -DCMAKE_BUILD_TYPE=Release -DHELICS_SKIP_WINNT_DEFINITION=ON -DCMAKE_CXX_STANDARD=17 -DHELICS_ENABLE_SWIG=OFF -DHELICS_DISABLE_GIT_OPERATIONS=ON -DHELICS_BUILD_TESTS=OFF -DHELICS_DISABLE_ASIO=ON -DHELICS_ENABLE_IPC_CORE=OFF"'
   - cd ..
 
 # Build and test, actually.

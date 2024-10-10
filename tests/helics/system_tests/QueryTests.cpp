@@ -1057,8 +1057,8 @@ TEST_F(query, query_subscriptions)
 }
 
 /// @brief  helper to test if a json loads properly
-/// @param jsonString
-/// @return
+/// @param jsonString the string containing json data
+/// @return true if the string loaded as json properly
 bool testLoadJson(const std::string& jsonString)
 {
     auto val = nlohmann::json::parse(jsonString.begin(), jsonString.end(), nullptr, false, true);

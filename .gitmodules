@@ -31,3 +31,12 @@
 	path = ThirdParty/networking
 	url = ../../GMLC-TDC/networking.git
 	branch = main
+[submodule "ThirdParty/libzmq"]
+	path = ThirdParty/libzmq
+	url = https://github.com/zeromq/libzmq.git
+[submodule "ThirdParty/googletest"]
+	path = ThirdParty/googletest
+	url = https://github.com/google/googletest.git
+[submodule "ThirdParty/benchmark"]
+	path = ThirdParty/benchmark
+	url = https://github.com/google/benchmark.git

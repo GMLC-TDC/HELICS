@@ -11,7 +11,7 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(hasParent)
     add_subdirectory(helics)
 else()
-    cmake_minimum_required(VERSION 3.10...3.25)
+    cmake_minimum_required(VERSION 3.22...3.30)
 
     set(HELICS_BUILD_TESTS OFF CACHE INTERNAL "")
     set(HELICS_BUILD_JAVA_INTERFACE OFF CACHE INTERNAL "")

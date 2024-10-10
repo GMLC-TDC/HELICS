@@ -857,9 +857,9 @@ TEST_F(valuefed, all_callback)
     helics::SmallBuffer buffer(547, ';');
     helics::InterfaceHandle lastId;
     helics::Time lastTime;
-    vFed1->setInputNotificationCallback([&](const helics::Input& sub1, helics::Time callTime) {
+    vFed1->setInputNotificationCallback([&](const helics::Input& input, helics::Time callTime) {
         lastTime = callTime;
-        lastId = sub1.getHandle();
+        lastId = input.getHandle();
     });
     vFed1->enterExecutingMode();
     vFed1->publishBytes(pub3, buffer);
@@ -921,9 +921,9 @@ TEST_F(valuefed, time_update_callback)
     helics::InterfaceHandle lastId;
     helics::Time lastTime{helics::Time::minVal()};
     int validCount{0};
-    vFed1->setInputNotificationCallback([&](const helics::Input& sub1, helics::Time callTime) {
+    vFed1->setInputNotificationCallback([&](const helics::Input& input, helics::Time callTime) {
         lastTime = callTime;
-        lastId = sub1.getHandle();
+        lastId = input.getHandle();
     });
     vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
         if (newTime > lastTime && !iterating) {
@@ -980,9 +980,9 @@ TEST_F(valuefed, time_update_callback_single_thread)
     helics::InterfaceHandle lastId;
     helics::Time lastTime{helics::Time::minVal()};
     int validCount{0};
-    vFed1->setInputNotificationCallback([&](const helics::Input& sub1, helics::Time callTime) {
+    vFed1->setInputNotificationCallback([&](const helics::Input& input, helics::Time callTime) {
         lastTime = callTime;
-        lastId = sub1.getHandle();
+        lastId = input.getHandle();
     });
     vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
         if (newTime > lastTime && !iterating) {

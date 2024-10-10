@@ -51,12 +51,11 @@ void processOptions(const nlohmann::json& section,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction)
 {
-    auto stop = section.end();
     for (const auto& [key, value] : section.items()) {
         if (value.is_array() || value.is_object()) {
             continue;
         }
-        int32_t index = optionConversion(key);
+        const int32_t index = optionConversion(key);
         if (index >= 0) {
             int32_t val = -1;
             if (value.is_boolean()) {
@@ -110,7 +109,7 @@ void loadTags(const nlohmann::json& section,
             if (!tagPair.first.empty()) {
                 tagAction(tagPair.first, tagPair.second);
             } else if (tagValue.is_object()) {
-                for (auto& item : tagValue.items()) {
+                for (const auto& item : tagValue.items()) {
                     tagAction(item.key(), JsonAsString(item.value()));
                 }
             }
