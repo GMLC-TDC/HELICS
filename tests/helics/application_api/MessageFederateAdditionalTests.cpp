@@ -509,9 +509,9 @@ TEST_P(mfed_file_config_files, test_file_load)
     EXPECT_EQ(mFed.getName(), "messageFed");
 
     EXPECT_EQ(mFed.getEndpointCount(), 2);
-    auto id = mFed.getEndpoint("ept1");
-    EXPECT_EQ(id.getExtractionType(), "genmessage");
-    EXPECT_EQ(id.getInfo(), "this is an information string for use by the application");
+    auto& ept1 = mFed.getEndpoint("ept1");
+    EXPECT_EQ(ept1.getExtractionType(), "genmessage");
+    EXPECT_EQ(ept1.getInfo(), "this is an information string for use by the application");
 
     EXPECT_EQ(mFed.query("global_value", "global1"), "this is a global1 value");
     EXPECT_EQ(mFed.query("global_value", "global2"), "this is another global value");
