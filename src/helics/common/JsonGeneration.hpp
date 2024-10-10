@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "json/json.h"
-#include "json/writer.h"
+#include "nlohmann/json.hpp"
+
 #include <fmt/format.h>
 #include <string>
 
@@ -15,8 +15,8 @@ namespace helics {
 
 inline std::string generateJsonQuotedString(const std::string& string)
 {
-    Json::String V = Json::valueToQuotedString(string.c_str());
-    return V.c_str();
+    nlohmann::json V = string;
+    return V.dump(-1, ' ', true, nlohmann::json::error_handler_t::hex);
 }
 
 enum class JsonErrorCodes : std::int32_t {

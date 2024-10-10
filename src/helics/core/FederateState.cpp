@@ -29,6 +29,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <utility>
@@ -248,7 +249,7 @@ bool FederateState::checkAndSetValue(InterfaceHandle pub_id, const char* data, u
     return res;
 }
 
-void FederateState::generateConfig(Json::Value& base) const
+void FederateState::generateConfig(nlohmann::json& base) const
 {
     base["only_transmit_on_change"] = only_transmit_on_change;
     base["realtime"] = realtime;
@@ -2630,8 +2631,8 @@ std::pair<std::string, std::string> FederateState::waitCommand()
 
 std::string FederateState::processQueryActual(std::string_view query) const
 {
-    auto addHeader = [this](Json::Value& base) {
-        Json::Value att = Json::objectValue;
+    auto addHeader = [this](nlohmann::json& base) {
+        nlohmann::json att = nlohmann::json::object();
         att["name"] = getIdentifier();
         att["id"] = global_id.load().baseValue();
         att["parent"] = mParent->getGlobalId().baseValue();
@@ -2671,7 +2672,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return timeCoord->printTimeStatus();
     }
     if (query == "current_state") {
-        Json::Value base;
+        nlohmann::json base;
         addHeader(base);
         base["state"] = fedStateString(state.load());
         base["publications"] = publicationCount();
@@ -2681,26 +2682,26 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return fileops::generateJsonString(base);
     }
     if (query == "barriers") {
-        Json::Value base;
+        nlohmann::json base;
         addHeader(base);
 
-        base["barriers"] = Json::arrayValue;
+        base["barriers"] = nlohmann::json::array();
         for (const auto& barrier : timeCoord->getBarriers()) {
-            Json::Value br1 = Json::objectValue;
+            nlohmann::json br1 = nlohmann::json::object();
             br1["id"] = barrier.second;
             br1["time"] = static_cast<double>(barrier.first);
-            base["barriers"].append(std::move(br1));
+            base["barriers"].push_back(std::move(br1));
         }
         return fileops::generateJsonString(base);
     }
     if (query == "global_state") {
-        Json::Value base;
+        nlohmann::json base;
         addHeader(base);
         base["state"] = fedStateString(state.load());
         return fileops::generateJsonString(base);
     }
     if (query == "global_time_debugging") {
-        Json::Value base;
+        nlohmann::json base;
         addHeader(base);
         base["federate_state"] = fedStateString(state.load());
         base["granted_mode"] = timeGranted_mode;
@@ -2710,13 +2711,13 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return fileops::generateJsonString(base);
     }
     if (query == "timeconfig") {
-        Json::Value base;
+        nlohmann::json base;
         timeCoord->generateConfig(base);
         generateConfig(base);
         return fileops::generateJsonString(base);
     }
     if (query == "config") {
-        Json::Value base;
+        nlohmann::json base;
         timeCoord->generateConfig(base);
         generateConfig(base);
         interfaceInformation.generateInferfaceConfig(base);
@@ -2724,12 +2725,12 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return fileops::generateJsonString(base);
     }
     if (query == "unconnected_interfaces") {
-        Json::Value base;
+        nlohmann::json base;
         addHeader(base);
         interfaceInformation.getUnconnectedInterfaces(base);
 
         if (!tags.empty()) {
-            Json::Value tagBlock = Json::objectValue;
+            nlohmann::json tagBlock = nlohmann::json::object();
             for (const auto& tag : tags) {
                 tagBlock[tag.first] = tag.second;
             }
@@ -2745,7 +2746,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
                     try {
                         auto json = fileops::loadJsonStr(potential);
 
-                        if (!json.isMember("error")) {
+                        if (!json.contains("error")) {
                             base["potential_interfaces"] = json;
                             break;
                         }
@@ -2759,7 +2760,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return fileops::generateJsonString(base);
     }
     if (query == "tags") {
-        Json::Value tagBlock = Json::objectValue;
+        nlohmann::json tagBlock = nlohmann::json::object();
         for (const auto& tag : tags) {
             tagBlock[tag.first] = tag.second;
         }
@@ -2770,7 +2771,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         keyTag.remove_prefix(4);
         for (const auto& tag : tags) {
             if (keyTag == tag.first) {
-                return Json::valueToQuotedString(tag.second.c_str());
+                return generateJsonQuotedString(tag.second);
             }
         }
         return "\"\"";
@@ -2780,34 +2781,34 @@ std::string FederateState::processQueryActual(std::string_view query) const
                                     [](auto& dep) { return std::to_string(dep.baseValue()); });
     }
     if (query == "logs") {
-        Json::Value base;
+        nlohmann::json base;
         addHeader(base);
         bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
     if (query == "data_flow_graph") {
-        Json::Value base;
+        nlohmann::json base;
         addHeader(base);
         interfaceInformation.generateDataFlowGraph(base);
         return fileops::generateJsonString(base);
     }
     if (query == "global_time" || query == "global_status") {
-        Json::Value base;
+        nlohmann::json base;
         addHeader(base);
         base["granted_time"] = static_cast<double>(timeCoord->getGrantedTime());
         base["send_time"] = static_cast<double>(timeCoord->allowedSendTime());
         return fileops::generateJsonString(base);
     }
     if (query == "dependency_graph") {
-        Json::Value base;
+        nlohmann::json base;
         addHeader(base);
-        base["dependents"] = Json::arrayValue;
+        base["dependents"] = nlohmann::json::array();
         for (auto& dep : timeCoord->getDependents()) {
-            base["dependents"].append(dep.baseValue());
+            base["dependents"].push_back(dep.baseValue());
         }
-        base["dependencies"] = Json::arrayValue;
+        base["dependencies"] = nlohmann::json::array();
         for (auto& dep : timeCoord->getDependencies()) {
-            base["dependencies"].append(dep.baseValue());
+            base["dependencies"].push_back(dep.baseValue());
         }
         return fileops::generateJsonString(base);
     }
@@ -2826,7 +2827,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
     // check existingTag value for a matching string
     for (const auto& tag : tags) {
         if (tag.first == query) {
-            return Json::valueToQuotedString(tag.second.c_str());
+            return generateJsonQuotedString(tag.second);
         }
     }
     return generateJsonErrorResponse(JsonErrorCodes::BAD_REQUEST, "unrecognized Federate query");

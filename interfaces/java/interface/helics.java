@@ -169,6 +169,8 @@ public class helics implements helicsConstants {
   /**
    *  convert a raw string (may contain nulls) to serialized bytesin a buffer<br>
    * @param data the HelicsDataBuffer to fill<br>
+   * @param str the value to serialize into the dataBuffer<br>
+   * @param stringSize the size of the string value to serialize into the dataBuffer<br>
    * @return the buffer size after filling
    */
   public static SWIGTYPE_p_int32_t helicsDataBufferFillFromRawString(SWIGTYPE_p_void data, String str, int stringSize) {
@@ -208,6 +210,8 @@ public class helics implements helicsConstants {
   /**
    *  convert a complex pair to serialized bytesin a buffer<br>
    * @param data the HelicsDataBuffer to fill<br>
+   * @param real the real part of the imaginary number to serialize into the dataBuffer<br>
+   * @param imag the imaginary part of the imaginary number to serialize into the dataBuffer<br>
    * @return the buffer size after filling
    */
   public static SWIGTYPE_p_int32_t helicsDataBufferFillFromComplex(SWIGTYPE_p_void data, double real, double imag) {

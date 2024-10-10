@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/ActionMessage.hpp"
 
-#include <json/forwards.h>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -25,7 +25,7 @@ namespace apps {
       public:
         virtual ~TypedBrokerServer() = default;
         /** start the server, the server may require a shared pointer to keep the data alive */
-        virtual void startServer(const Json::Value* val,
+        virtual void startServer(const nlohmann::json* val,
                                  const std::shared_ptr<TypedBrokerServer>& ptr) = 0;
         /** stop the server*/
         virtual void stopServer() = 0;

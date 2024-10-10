@@ -7,7 +7,7 @@ task:
     pkg install -y cmake libzmq4 ninja git
   build_script: |
     mkdir build && cd build
-    cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
+    cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DCMAKE_CXX_STANDARD=17 ..
     cmake --build .
   test_script: |
     cd build

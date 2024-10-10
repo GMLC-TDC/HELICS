@@ -129,7 +129,7 @@ TEST_F(multiInput, priority)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, max)
+TEST_F(multiInput, max_operation)
 {
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
@@ -166,7 +166,7 @@ TEST_F(multiInput, max)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, min)
+TEST_F(multiInput, min_operation)
 {
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
@@ -203,7 +203,7 @@ TEST_F(multiInput, min)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, and)
+TEST_F(multiInput, and_operation)
 {
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
@@ -240,7 +240,7 @@ TEST_F(multiInput, and)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, or)
+TEST_F(multiInput, or_operation)
 {
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
@@ -285,7 +285,7 @@ TEST_F(multiInput, or)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, sum)
+TEST_F(multiInput, sum_operation)
 {
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
@@ -322,7 +322,7 @@ TEST_F(multiInput, sum)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, average)
+TEST_F(multiInput, average_operation)
 {
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
@@ -359,7 +359,7 @@ TEST_F(multiInput, average)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, diff)
+TEST_F(multiInput, diff_operation)
 {
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
@@ -392,7 +392,7 @@ TEST_F(multiInput, diff)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, vectorize)
+TEST_F(multiInput, vectorize_operation)
 {
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
@@ -439,23 +439,23 @@ TEST_F(multiInput, vectorize_string)
     auto pub2 = vFed1->registerGlobalPublication("pub2", "string");
     auto pub3 = vFed1->registerGlobalPublication("pub3", "string");
 
-    auto in1 = vFed1->registerInput("", "string");
-    in1.addTarget("pub1");
-    in1.addTarget("pub2");
-    in1.addTarget("pub3");
-    in1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,
-                  HELICS_MULTI_INPUT_VECTORIZE_OPERATION);
+    auto inp1 = vFed1->registerInput("", "string");
+    inp1.addTarget("pub1");
+    inp1.addTarget("pub2");
+    inp1.addTarget("pub3");
+    inp1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,
+                   HELICS_MULTI_INPUT_VECTORIZE_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish("test1");
     vFed1->requestNextStep();
-    auto val = in1.getString();
-    EXPECT_EQ(val, "[ \"test1\" ]");
+    auto val = inp1.getString();
+    EXPECT_NE(val.find("\"test1\""), std::string::npos);
     pub3.publish("test3");
     pub2.publish("test2");
 
     vFed1->requestNextStep();
-    val = in1.getString();
+    val = inp1.getString();
     auto aloc1 = val.find("test1");
     auto aloc2 = val.find("test2");
     auto aloc3 = val.find("test3");

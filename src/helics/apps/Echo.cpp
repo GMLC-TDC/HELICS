@@ -144,10 +144,10 @@ namespace apps {
 
         auto doc = fileops::loadJson(jsonFile);
 
-        if (doc.isMember("echo")) {
+        if (doc.contains("echo")) {
             auto echoConfig = doc["echo"];
 
-            if (echoConfig.isMember("delay")) {
+            if (echoConfig.contains("delay")) {
                 std::lock_guard<std::mutex> lock(delayTimeLock);
                 delayTime = fileops::loadJsonTime(echoConfig["delay"]);
             }

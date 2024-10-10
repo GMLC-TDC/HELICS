@@ -20,14 +20,14 @@ PotentialInterfacesManager::PotentialInterfacesManager(Core* core, Federate* fed
 {
 }
 
-void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
+void PotentialInterfacesManager::loadPotentialInterfaces(const nlohmann::json& json)
 {
     static const std::set<std::string> interfaceTypes{
         "publications", "inputs", "endpoints", "filters", "translators", "datasinks"};
-    if (json.isMember("potential_interfaces")) {
+    if (json.contains("potential_interfaces")) {
         const auto& interfaces = json["potential_interfaces"];
         for (const auto& itype : interfaceTypes) {
-            if (interfaces.isMember(itype)) {
+            if (interfaces.contains(itype)) {
                 auto tInterface = interfaces[itype];
                 auto& pMap = potInterfaces[itype];
                 for (auto& ispec : tInterface) {
@@ -38,7 +38,7 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
             std::string tempString = itype;
             tempString.pop_back();
             tempString += "_templates";
-            if (interfaces.isMember(tempString)) {
+            if (interfaces.contains(tempString)) {
                 auto templateInterfaces = interfaces[tempString];
                 auto& tMap = potInterfaceTemplates[itype];
                 for (auto& tspec : templateInterfaces) {
@@ -54,13 +54,13 @@ void PotentialInterfacesManager::loadPotentialInterfaces(Json::Value& json)
             }
         }
     }
-    if (json.isMember("potential_interface_templates")) {
+    if (json.contains("potential_interface_templates")) {
         const auto& interfaces = json["potential_interface_templates"];
         for (const auto& itype : interfaceTypes) {
             std::string tempString = itype;
             tempString.pop_back();
             tempString += "_templates";
-            if (interfaces.isMember(tempString)) {
+            if (interfaces.contains(tempString)) {
                 auto templateInterfaces = interfaces[tempString];
                 auto& tMap = potInterfaceTemplates[itype];
                 for (auto& tspec : templateInterfaces) {
@@ -93,20 +93,20 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
             // we have already generated interfaces so no need to respond to the query
             return std::string{};
         }
-        Json::Value interfaces;
+        nlohmann::json interfaces;
         for (const auto& iType : potInterfaces) {
-            interfaces[iType.first] = Json::arrayValue;
+            interfaces[iType.first] = nlohmann::json::array();
             for (const auto& ispec : iType.second) {
-                interfaces[iType.first].append(ispec.first);
+                interfaces[iType.first].push_back(ispec.first);
             }
         }
         for (const auto& iType : potInterfaceTemplates) {
             std::string templateKey = iType.first;
             templateKey.pop_back();
             templateKey += "_templates";
-            interfaces[templateKey] = Json::arrayValue;
+            interfaces[templateKey] = nlohmann::json::array();
             for (const auto& ispec : iType.second) {
-                interfaces[templateKey].append(ispec.second);
+                interfaces[templateKey].push_back(ispec.second);
             }
         }
         return fileops::generateJsonString(interfaces);
@@ -116,7 +116,7 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
 
 void PotentialInterfacesManager::processCommand(std::pair<std::string, std::string> command)
 {
-    Json::Value json;
+    nlohmann::json json;
     try {
         json = fileops::loadJsonStr(command.first);
     }
@@ -124,21 +124,21 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
         extraCommands.push_back(std::move(command));
         return;
     }
-    if (json.isMember("command")) {
+    if (json.contains("command")) {
         if (json["command"] == "register_interfaces") {
-            Json::Value generator;
+            nlohmann::json generator;
             for (auto& iType : potInterfaces) {
-                if (json.isMember(iType.first)) {
+                if (json.contains(iType.first)) {
                     if (iType.first == "endpoints") {
                         generator["targeted"] = true;
                     }
-                    generator[iType.first] = Json::arrayValue;
+                    generator[iType.first] = nlohmann::json::array();
                     iMap& pInterfaces = iType.second;
                     for (const auto& iface : json[iType.first]) {
-                        const std::string name = iface.asString();
+                        const std::string name = iface.get<std::string>();
                         auto iLoc = pInterfaces.find(name);
                         if (iLoc != pInterfaces.end()) {
-                            generator[iType.first].append(iLoc->second);
+                            generator[iType.first].push_back(iLoc->second);
                         }
                     }
                 }
@@ -146,7 +146,7 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
             for (auto& iType : potInterfaceTemplates) {
                 std::string templateKey{"templated_"};
                 templateKey.append(iType.first);
-                if (json.isMember(templateKey)) {
+                if (json.contains(templateKey)) {
                     bool noUnits{false};
                     if (iType.first == "endpoints") {
                         generator["targeted"] = true;
@@ -161,24 +161,23 @@ void PotentialInterfacesManager::processCommand(std::pair<std::string, std::stri
                         }
                         auto& templateGenerator = templateLoc->second;
                         for (auto& interfaceName : templateInterfaces["interfaces"]) {
-                            Json::Value interfaceSpec = Json::nullValue;
-                            interfaceSpec.copy(templateGenerator["template"]);
-                            if (interfaceName.isArray()) {
+                            nlohmann::json interfaceSpec = templateGenerator["template"];
+                            if (interfaceName.is_array()) {
                                 interfaceSpec["name"] = interfaceName[0];
-                                std::string str = interfaceName[1].asString();
+                                std::string str = interfaceName[1].get<std::string>();
                                 if (!str.empty()) {
                                     interfaceSpec["type"] = interfaceName[1];
                                 }
                                 if (!noUnits) {
-                                    str = interfaceName[2].asString();
+                                    str = interfaceName[2].get<std::string>();
                                     if (!str.empty()) {
                                         interfaceSpec["units"] = interfaceName[2];
                                     }
                                 }
                             } else {
-                                interfaceSpec["name"] = interfaceName.asString();
+                                interfaceSpec["name"] = interfaceName.get<std::string>();
                             }
-                            generator[iType.first].append(interfaceSpec);
+                            generator[iType.first].push_back(interfaceSpec);
                         }
                     }
                 }

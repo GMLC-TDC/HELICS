@@ -54,14 +54,14 @@ class TemplateMatcher {
     /* methods*/
     void initialize();
 
-    bool loadTemplate(const Json::Value& iTemplate);
+    bool loadTemplate(const nlohmann::json& iTemplate);
     [[nodiscard]] std::optional<std::tuple<std::string_view, std::string_view, std::string_view>>
         isTemplateMatch(std::string_view testString) const;
     void setAsUsed(std::tuple<std::string_view, std::string_view, std::string_view> match);
     [[nodiscard]] std::size_t possibilitiesCount() const { return combinations.back(); }
     std::string instantiateTemplate(std::size_t index);
     [[nodiscard]] bool isUsed() const { return !usedTemplates.empty(); }
-    Json::Value usedInterfaceGeneration();
+    nlohmann::json usedInterfaceGeneration();
 };
 /** data class for information from queries*/
 struct ConnectionsList {
@@ -90,23 +90,24 @@ struct ConnectionsList {
     bool hasPotentialInterfaces{false};
 };
 
-static void loadTags(ConnectionsList& connections, const Json::Value& tags)
+static void loadTags(ConnectionsList& connections, const nlohmann::json& tags)
 {
-    for (Json::Value::const_iterator itr = tags.begin(); itr != tags.end(); ++itr) {
-        if (itr.key().asString() == "tags") {
-            auto tagVect = gmlc::utilities::stringOps::splitlineQuotes(itr->asString());
+    for (const auto& val : tags.items()) {
+        if (val.key() == "tags") {
+            auto tagVect =
+                gmlc::utilities::stringOps::splitlineQuotes(val.value().get<std::string>());
             connections.tagStrings.insert(connections.tagStrings.end(),
                                           tagVect.begin(),
                                           tagVect.end());
         } else {
-            if (!itr->isString() || isTrueString(itr->asCString())) {
-                connections.tagStrings.emplace_back(itr.key().asString());
+            if (!val.value().is_string() || isTrueString(val.value().get<std::string>())) {
+                connections.tagStrings.emplace_back(val.key());
             }
         }
     }
 }
 
-bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
+bool TemplateMatcher::loadTemplate(const nlohmann::json& iTemplate)
 {
     templateName = fileops::getName(iTemplate);
 
@@ -124,12 +125,12 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
     while (tnameIndex != std::string::npos) {
         auto close = templateName.find_first_of('}', tnameIndex);
         const std::string tname = templateName.substr(tnameIndex + 2, close - tnameIndex - 2);
-        if (iTemplate.isMember("fields")) {
-            if (!iTemplate["fields"].isMember(tname)) {
+        if (iTemplate.contains("fields")) {
+            if (!iTemplate["fields"].contains(tname)) {
                 return false;
             }
         } else {
-            if (!iTemplate.isMember(tname)) {
+            if (!iTemplate.contains(tname)) {
                 return false;
             }
         }
@@ -151,28 +152,29 @@ bool TemplateMatcher::loadTemplate(const Json::Value& iTemplate)
 
     templatePossibilities.resize(valueNames.size());
     keys.resize(valueNames.size());
-    const Json::Value& fieldRoot = (iTemplate.isMember("fields")) ? iTemplate["fields"] : iTemplate;
+    const nlohmann::json& fieldRoot =
+        (iTemplate.contains("fields")) ? iTemplate["fields"] : iTemplate;
 
     for (index = 0; index < valueNames.size(); ++index) {
         for (const auto& val : fieldRoot[valueNames[index]]) {
             std::pair<std::string, std::string> typeAndUnits;
             std::string_view keyval;
-            if (val.isArray()) {
-                keyval = keys[index].emplace_back(val[0].asCString());
+            if (val.is_array()) {
+                keyval = keys[index].emplace_back(val[0].get<std::string>());
                 switch (val.size()) {
                     case 1:
                         break;
                     case 2:
-                        typeAndUnits.first = val[1].asString();
+                        typeAndUnits.first = val[1].get<std::string>();
                         break;
                     case 3:
                     default:
-                        typeAndUnits.first = val[1].asString();
-                        typeAndUnits.second = val[2].asString();
+                        typeAndUnits.first = val[1].get<std::string>();
+                        typeAndUnits.second = val[2].get<std::string>();
                         break;
                 }
             } else {
-                keyval = keys[index].emplace_back(val.asCString());
+                keyval = keys[index].emplace_back(val.get<std::string>());
             }
             templatePossibilities[index].emplace(keyval, typeAndUnits);
         }
@@ -262,11 +264,11 @@ std::string TemplateMatcher::instantiateTemplate(std::size_t index)
     return rval;
 }
 
-Json::Value TemplateMatcher::usedInterfaceGeneration()
+nlohmann::json TemplateMatcher::usedInterfaceGeneration()
 {
-    Json::Value generator = Json::objectValue;
+    nlohmann::json generator = nlohmann::json::object();
     generator["name"] = templateName;
-    generator["interfaces"] = Json::arrayValue;
+    generator["interfaces"] = nlohmann::json::array();
     std::sort(usedTemplates.begin(), usedTemplates.end());
     std::string_view prev;
     for (const auto& used : usedTemplates) {
@@ -274,24 +276,24 @@ Json::Value TemplateMatcher::usedInterfaceGeneration()
             continue;
         }
         prev = std::get<0>(used);
-        Json::Value iArray = Json::arrayValue;
-        iArray.append(std::get<0>(used));
-        iArray.append(std::get<1>(used));
-        iArray.append(std::get<2>(used));
-        generator["interfaces"].append(iArray);
+        nlohmann::json iArray = nlohmann::json::array();
+        iArray.push_back(std::get<0>(used));
+        iArray.push_back(std::get<1>(used));
+        iArray.push_back(std::get<2>(used));
+        generator["interfaces"].push_back(iArray);
     }
     return generator;
 }
 
-static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::Value& fed)
+static void fedPotentialInterfaceList(ConnectionsList& connections, const nlohmann::json& fed)
 {
     connections.hasPotentialInterfaces = true;
     const std::string_view federateName = connections.federatesWithPotentialInterfaces.emplace_back(
-        fed["attributes"]["name"].asCString());
+        fed["attributes"]["name"].get<std::string>());
     const auto& potInterfaces = fed["potential_interfaces"];
-    if (potInterfaces.isMember("inputs")) {
+    if (potInterfaces.contains("inputs")) {
         for (const auto& input : potInterfaces["inputs"]) {
-            if (input.isObject()) {
+            if (input.is_object()) {
                 auto name = fileops::getName(input);
                 if (name.empty()) {
                     continue;
@@ -299,17 +301,17 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::
                 const std::string_view input1 = connections.interfaces.emplace_back(name);
                 connections.potentialInputs.emplace(
                     input1, PotentialConnections{federateName, input1, false});
-            } else if (input.isString()) {
+            } else if (input.is_string()) {
                 const std::string_view input1 =
-                    connections.interfaces.emplace_back(input.asCString());
+                    connections.interfaces.emplace_back(input.get<std::string>());
                 connections.potentialInputs.emplace(
                     input1, PotentialConnections{federateName, input1, false});
             }
         }
     }
-    if (potInterfaces.isMember("publications")) {
+    if (potInterfaces.contains("publications")) {
         for (const auto& pub : potInterfaces["publications"]) {
-            if (pub.isObject()) {
+            if (pub.is_object()) {
                 auto name = fileops::getName(pub);
                 if (name.empty()) {
                     continue;
@@ -317,16 +319,17 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::
                 const std::string_view pub1 = connections.interfaces.emplace_back(name);
                 connections.potentialPubs.emplace(pub1,
                                                   PotentialConnections{federateName, pub1, false});
-            } else if (pub.isString()) {
-                const std::string_view pub1 = connections.interfaces.emplace_back(pub.asCString());
+            } else if (pub.is_string()) {
+                const std::string_view pub1 =
+                    connections.interfaces.emplace_back(pub.get<std::string>());
                 connections.potentialPubs.emplace(pub1,
                                                   PotentialConnections{federateName, pub1, false});
             }
         }
     }
-    if (potInterfaces.isMember("endpoints")) {
+    if (potInterfaces.contains("endpoints")) {
         for (const auto& endpoint : potInterfaces["endpoints"]) {
-            if (endpoint.isObject()) {
+            if (endpoint.is_object()) {
                 auto name = fileops::getName(endpoint);
                 if (name.empty()) {
                     continue;
@@ -336,15 +339,15 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::
                     endpoint1, PotentialConnections{federateName, endpoint1, false});
             } else {
                 const std::string_view endpoint1 =
-                    connections.interfaces.emplace_back(endpoint.asCString());
+                    connections.interfaces.emplace_back(endpoint.get<std::string>());
                 connections.potentialEndpoints.emplace(
                     endpoint1, PotentialConnections{federateName, endpoint1, false});
             }
         }
     }
-    if (potInterfaces.isMember("publication_templates")) {
+    if (potInterfaces.contains("publication_templates")) {
         for (const auto& pubTemplate : potInterfaces["publication_templates"]) {
-            if (pubTemplate.isObject()) {
+            if (pubTemplate.is_object()) {
                 TemplateMatcher temp;
                 temp.federate = federateName;
                 if (temp.loadTemplate(pubTemplate)) {
@@ -353,9 +356,9 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::
             }
         }
     }
-    if (potInterfaces.isMember("input_templates")) {
+    if (potInterfaces.contains("input_templates")) {
         for (const auto& inpTemplate : potInterfaces["input_templates"]) {
-            if (inpTemplate.isObject()) {
+            if (inpTemplate.is_object()) {
                 TemplateMatcher temp;
                 temp.federate = federateName;
                 if (temp.loadTemplate(inpTemplate)) {
@@ -364,9 +367,9 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::
             }
         }
     }
-    if (potInterfaces.isMember("endpoint_templates")) {
+    if (potInterfaces.contains("endpoint_templates")) {
         for (const auto& endTemplate : potInterfaces["endpoint_templates"]) {
-            if (endTemplate.isObject()) {
+            if (endTemplate.is_object()) {
                 TemplateMatcher temp;
                 temp.federate = federateName;
                 if (temp.loadTemplate(endTemplate)) {
@@ -377,87 +380,89 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const Json::
     }
 }
 
-static void fedConnectionList(ConnectionsList& connections, const Json::Value& fed)
+static void fedConnectionList(ConnectionsList& connections, const nlohmann::json& fed)
 {
     try {
-        if (fed.isMember("tags")) {
+        if (fed.contains("tags")) {
             loadTags(connections, fed["tags"]);
         }
-        if (fed.isMember("connected_inputs")) {
+        if (fed.contains("connected_inputs")) {
             for (const auto& input : fed["connected_inputs"]) {
                 const std::string_view input1 =
-                    connections.interfaces.emplace_back(input.asString());
+                    connections.interfaces.emplace_back(input.get<std::string>());
                 connections.inputs.insert(input1);
             }
         }
-        if (fed.isMember("connected_publications")) {
+        if (fed.contains("connected_publications")) {
             for (const auto& pub : fed["connected_publications"]) {
-                const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
+                const std::string_view pub1 =
+                    connections.interfaces.emplace_back(pub.get<std::string>());
                 connections.pubs.insert(pub1);
             }
         }
-        if (fed.isMember("unconnected_inputs")) {
+        if (fed.contains("unconnected_inputs")) {
             for (const auto& input : fed["unconnected_inputs"]) {
                 const std::string_view input1 =
-                    connections.interfaces.emplace_back(input.asString());
+                    connections.interfaces.emplace_back(input.get<std::string>());
                 connections.unconnectedInputs.push_back(input1);
                 connections.inputs.insert(input1);
             }
         }
-        if (fed.isMember("unconnected_publications")) {
+        if (fed.contains("unconnected_publications")) {
             for (const auto& pub : fed["unconnected_publications"]) {
-                const std::string_view pub1 = connections.interfaces.emplace_back(pub.asString());
+                const std::string_view pub1 =
+                    connections.interfaces.emplace_back(pub.get<std::string>());
                 connections.unconnectedPubs.push_back(pub1);
                 connections.pubs.insert(pub1);
             }
         }
 
-        if (fed.isMember("unconnected_target_endpoints")) {
+        if (fed.contains("unconnected_target_endpoints")) {
             for (const auto& endpoint : fed["unconnected_target_endpoints"]) {
                 const std::string_view end1 =
-                    connections.interfaces.emplace_back(endpoint.asString());
+                    connections.interfaces.emplace_back(endpoint.get<std::string>());
                 connections.unconnectedTargetEndpoints.push_back(end1);
                 connections.endpoints.insert(end1);
             }
         }
-        if (fed.isMember("unconnected_source_endpoints")) {
+        if (fed.contains("unconnected_source_endpoints")) {
             for (const auto& endpoint : fed["unconnected_source_endpoints"]) {
                 const std::string_view end1 =
-                    connections.interfaces.emplace_back(endpoint.asString());
+                    connections.interfaces.emplace_back(endpoint.get<std::string>());
                 connections.unconnectedSourceEndpoints.push_back(end1);
                 connections.endpoints.insert(end1);
             }
         }
-        if (fed.isMember("connected_endpoints")) {
+        if (fed.contains("connected_endpoints")) {
             for (const auto& endpoint : fed["connected_endpoints"]) {
                 const std::string_view end1 =
-                    connections.interfaces.emplace_back(endpoint.asString());
+                    connections.interfaces.emplace_back(endpoint.get<std::string>());
                 connections.endpoints.insert(end1);
             }
         }
-        if (fed.isMember("potential_interfaces")) {
+        if (fed.contains("potential_interfaces")) {
             fedPotentialInterfaceList(connections, fed);
         }
     }
-    catch (const Json::Exception& /*ev*/) {
+    catch (const nlohmann::json::exception& /*ev*/) {
         // TODO(PT): I think this is going to be almost impossible now, but someday might
         // want to create a response
         return;
     }
 }
-static void coreConnectionList(ConnectionsList& connections, const Json::Value& core)
+static void coreConnectionList(ConnectionsList& connections, const nlohmann::json& core)
 {
-    if (core.isMember("tags")) {
+    if (core.contains("tags")) {
         loadTags(connections, core["tags"]);
     }
-    if (core.isMember("federates")) {
+    if (core.contains("federates")) {
         for (const auto& fed : core["federates"]) {
             fedConnectionList(connections, fed);
         }
     }
 }
 
-static void brokerConnectionList(ConnectionsList& connections, Json::Value& broker)
+static void brokerConnectionList(ConnectionsList& connections, nlohmann::json& broker)
 {
     for (auto& subBroker : broker["brokers"]) {
         brokerConnectionList(connections, subBroker);
@@ -471,31 +476,31 @@ static ConnectionsList generateConnectionsList(const std::string& connectionData
 {
     ConnectionsList connections;
     auto json = fileops::loadJsonStr(connectionData);
-    if (json.isMember("aliases")) {
+    if (json.contains("aliases")) {
         for (auto& alias : json["aliases"]) {
             const std::string_view alias1 =
-                connections.interfaces.emplace_back(alias[0].asString());
+                connections.interfaces.emplace_back(alias[0].get<std::string>());
             const std::string_view alias2 =
-                connections.interfaces.emplace_back(alias[1].asString());
+                connections.interfaces.emplace_back(alias[1].get<std::string>());
             connections.aliases.emplace(alias1, alias2);
         }
     }
-    if (json.isMember("tags")) {
+    if (json.contains("tags")) {
         loadTags(connections, json["tags"]);
     }
-    if (json.isMember("unknown_inputs")) {
+    if (json.contains("unknown_inputs")) {
         for (const auto& input : json["unknown_inputs"]) {
-            connections.unknownInputs.push_back(input.asString());
+            connections.unknownInputs.push_back(input.get<std::string>());
         }
     }
-    if (json.isMember("unknown_publications")) {
+    if (json.contains("unknown_publications")) {
         for (const auto& pub : json["unknown_publications"]) {
-            connections.unknownPubs.push_back(pub.asString());
+            connections.unknownPubs.push_back(pub.get<std::string>());
         }
     }
-    if (json.isMember("unknown_endpoints")) {
+    if (json.contains("unknown_endpoints")) {
         for (const auto& ept : json["unknown_endpoints"]) {
-            connections.unknownEndpoints.push_back(ept.asString());
+            connections.unknownEndpoints.push_back(ept.get<std::string>());
         }
     }
     for (auto& broker : json["brokers"]) {
@@ -778,7 +783,7 @@ void Connector::loadJsonFile(const std::string& jsonString,
 
     auto doc = fileops::loadJson(jsonString);
 
-    if (doc.isMember("connector")) {
+    if (doc.contains("connector")) {
         const auto& connectorConfig = doc["connector"];
         matchTargetEndpoints =
             fileops::getOrDefault(connectorConfig, "match_target_endpoints", matchTargetEndpoints);
@@ -787,12 +792,12 @@ void Connector::loadJsonFile(const std::string& jsonString,
             fileops::getOrDefault(connectorConfig, "always_check_regex", alwaysCheckRegex);
     }
     auto connectionArray = doc["connections"];
-    if (connectionArray.isArray()) {
+    if (connectionArray.is_array()) {
         connections.reserve(connections.size() + connectionArray.size());
         for (const auto& connectionElement : connectionArray) {
             std::vector<std::string> connectionObject;
             for (const auto& subElement : connectionElement) {
-                connectionObject.push_back(subElement.asString());
+                connectionObject.push_back(subElement.get<std::string>());
             }
             addConnectionVector(connectionObject);
         }
@@ -968,7 +973,7 @@ bool Connector::checkPotentialConnection(
     std::vector<TemplateMatcher>& potentialTemplates,
     const std::unordered_multimap<std::string_view, std::string_view>& aliases)
 {
-    static auto nullConnector = [this](std::string_view, std::string_view) {};
+    static auto nullConnector = [](std::string_view, std::string_view) {};
     /** potential inputs*/
     auto matched =
         makeTargetConnection(interfaceName, tagList, possibleConnections, aliases, nullConnector);
@@ -1408,7 +1413,7 @@ static void scanUnknownInterfaces(ConnectionsList& possibleConnections)
 }
 
 static int addUsedPotentialInterfaceToCommand(
-    Json::Value& potentialCommand,
+    nlohmann::json& potentialCommand,
     const std::unordered_map<std::string_view, PotentialConnections>& potentials,
     const std::string& possibleFed,
     int logLevel,
@@ -1426,9 +1431,9 @@ static int addUsedPotentialInterfaceToCommand(
                              pInterface.second.used == true);
                  });
     if (!enabledInterfaces.empty()) {
-        potentialCommand[type] = Json::arrayValue;
+        potentialCommand[type] = nlohmann::json::array();
         for (const auto& iface : enabledInterfaces) {
-            potentialCommand[type].append(std::string(iface.first));
+            potentialCommand[type].push_back(std::string(iface.first));
             ++interfaceCount;
             if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
                 fed->logMessage(
@@ -1440,7 +1445,7 @@ static int addUsedPotentialInterfaceToCommand(
     return interfaceCount;
 }
 
-static int addUsedPotentialInterfaceTemplates(Json::Value& potentialCommand,
+static int addUsedPotentialInterfaceTemplates(nlohmann::json& potentialCommand,
                                               std::vector<TemplateMatcher>& potentials,
                                               const std::string& possibleFed,
                                               int logLevel,
@@ -1459,7 +1464,7 @@ static int addUsedPotentialInterfaceTemplates(Json::Value& potentialCommand,
         break;
     }
     if (hasInterfaceTemplates) {
-        potentialCommand[type] = Json::arrayValue;
+        potentialCommand[type] = nlohmann::json::array();
         for (auto& ifaceTemplate : potentials) {
             if (ifaceTemplate.federate != possibleFed) {
                 continue;
@@ -1467,7 +1472,7 @@ static int addUsedPotentialInterfaceTemplates(Json::Value& potentialCommand,
             if (!ifaceTemplate.isUsed()) {
                 continue;
             }
-            potentialCommand[type].append(ifaceTemplate.usedInterfaceGeneration());
+            potentialCommand[type].push_back(ifaceTemplate.usedInterfaceGeneration());
             if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
                 fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS,
                                 fmt::format("federate {} request {} {}",
@@ -1493,7 +1498,7 @@ void Connector::establishPotentialInterfaces(ConnectionsList& possibleConnection
 
     const int logLevel = fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL);
     for (auto& possibleFed : possibleConnections.federatesWithPotentialInterfaces) {
-        Json::Value establishInterfaces;
+        nlohmann::json establishInterfaces;
         establishInterfaces["command"] = "register_interfaces";
         addUsedPotentialInterfaceToCommand(establishInterfaces,
                                            possibleConnections.potentialInputs,

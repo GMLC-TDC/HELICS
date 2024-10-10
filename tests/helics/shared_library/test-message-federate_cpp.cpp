@@ -369,7 +369,7 @@ TEST(dataBuffer, buffer)
     const char* str2 = "this is another string, that is fairly long that I want to put in a buffer";
     buf1.fill(str1);
     // +1 is to account for newline stringSize is the size required to hold the string
-    EXPECT_EQ(buf1.stringSize(), str1.size() + 1);
+    EXPECT_EQ(buf1.stringSize(), static_cast<int>(str1.size() + 1));
     EXPECT_EQ(buf1.toString(), str1);
     buf1.fill(str2);
     EXPECT_EQ(buf1.toString(), str2);

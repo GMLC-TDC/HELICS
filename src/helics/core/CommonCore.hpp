@@ -22,7 +22,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include "helicsTime.hpp"
 
-#include "json/forwards.h"
 #include <any>
 #include <array>
 #include <atomic>
@@ -435,8 +434,8 @@ class CommonCore: public Core, public BrokerBase {
     uint16_t getNextAirlockIndex();
     /** load the basic core info into a JSON object*/
     void loadBasicJsonInfo(
-        Json::Value& base,
-        const std::function<void(Json::Value& fedval, const FedInfo& fed)>& fedLoader) const;
+        nlohmann::json& base,
+        const std::function<void(nlohmann::json& fedval, const FedInfo& fed)>& fedLoader) const;
     /** generate a mapbuilder for the federates
     @param request the query to build the map for
     @param index the key of the request

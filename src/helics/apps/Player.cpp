@@ -346,22 +346,24 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
 
     auto doc = fileops::loadJson(jsonString);
 
-    if (doc.isMember("player")) {
+    if (doc.contains("player")) {
         auto& playerConfig = doc["player"];
-        if (playerConfig.isMember("time_units")) {
-            if (playerConfig["time_units"].asString() == "ns") {
+        if (playerConfig.contains("time_units")) {
+            if (playerConfig["time_units"].get<std::string>() == "ns") {
                 timeMultiplier = 1e-9;
             }
         }
     }
     auto& pointArray = doc["points"];
-    if (pointArray.isArray()) {
+    if (pointArray.is_array()) {
         points.reserve(points.size() + pointArray.size());
         for (const auto& pointElement : pointArray) {
             Time ptime;
             int iterationIndex = 0;
-            if (pointElement.isMember("time")) {
-                auto str = pointElement["time"].asString();
+            if (pointElement.contains("time")) {
+                const auto& telement = pointElement["time"];
+                auto str = telement.is_number() ? std::to_string(telement.get<double>()) :
+                                                  telement.get<std::string>();
                 auto cloc = str.find_last_of(':');
                 if (cloc == std::string::npos) {
                     ptime = fileops::loadJsonTime(str, units);
@@ -374,8 +376,8 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
                         iterationIndex = 0;
                     }
                 }
-            } else if (pointElement.isMember("t")) {
-                auto str = pointElement["t"].asString();
+            } else if (pointElement.contains("t")) {
+                auto str = pointElement["t"].get<std::string>();
                 auto cloc = str.find_last_of(':');
                 if (cloc == std::string::npos) {
                     ptime = fileops::loadJsonTime(str, units);
@@ -393,35 +395,35 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
                 continue;
             }
             defV val;
-            if (pointElement.isMember("value")) {
+            if (pointElement.contains("value")) {
                 auto& M = pointElement["value"];
-                if (M.isInt64()) {
-                    val = M.asInt64();
-                } else if (M.isDouble()) {
-                    val = M.asDouble();
+                if (M.is_number_integer()) {
+                    val = M.get<int64_t>();
+                } else if (M.is_number()) {
+                    val = M.get<double>();
                 } else {
-                    val = M.asString();
+                    val = M.get<std::string>();
                 }
-            } else if (pointElement.isMember("v")) {
+            } else if (pointElement.contains("v")) {
                 auto& M = pointElement["v"];
-                if (M.isInt64()) {
-                    val = M.asInt64();
-                } else if (M.isDouble()) {
-                    val = M.asDouble();
+                if (M.is_number_integer()) {
+                    val = M.get<int64_t>();
+                } else if (M.is_number()) {
+                    val = M.get<double>();
                 } else {
-                    val = M.asString();
+                    val = M.get<std::string>();
                 }
             }
             std::string type;
-            if (pointElement.isMember("type")) {
-                type = pointElement["type"].asString();
+            if (pointElement.contains("type")) {
+                type = pointElement["type"].get<std::string>();
             }
-            if (pointElement.isMember("iteration")) {
-                iterationIndex = pointElement["iteration"].asInt();
+            if (pointElement.contains("iteration")) {
+                iterationIndex = pointElement["iteration"].get<int>();
             }
             std::string key;
-            if (pointElement.isMember("key")) {
-                key = pointElement["key"].asString();
+            if (pointElement.contains("key")) {
+                key = pointElement["key"].get<std::string>();
             } else {
                 std::cout << "key not specified\n";
                 continue;
@@ -438,35 +440,35 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
     }
 
     auto& messageArray = doc["messages"];
-    if (messageArray.isArray()) {
+    if (messageArray.is_array()) {
         messages.reserve(messages.size() + messageArray.size());
         for (const auto& messageElement : messageArray) {
             Time ptime;
-            if (messageElement.isMember("time")) {
+            if (messageElement.contains("time")) {
                 ptime = fileops::loadJsonTime(messageElement["time"], units);
-            } else if (messageElement.isMember("t")) {
+            } else if (messageElement.contains("t")) {
                 ptime = fileops::loadJsonTime(messageElement["t"], units);
             } else {
                 std::cout << "time not specified\n";
                 continue;
             }
             std::string src;
-            if (messageElement.isMember("src")) {
-                src = messageElement["src"].asString();
+            if (messageElement.contains("src")) {
+                src = messageElement["src"].get<std::string>();
             }
-            if (messageElement.isMember("source")) {
-                src = messageElement["source"].asString();
+            if (messageElement.contains("source")) {
+                src = messageElement["source"].get<std::string>();
             }
             std::string dest;
-            if (messageElement.isMember("dest")) {
-                dest = messageElement["dest"].asString();
+            if (messageElement.contains("dest")) {
+                dest = messageElement["dest"].get<std::string>();
             }
-            if (messageElement.isMember("destination")) {
-                dest = messageElement["destination"].asString();
+            if (messageElement.contains("destination")) {
+                dest = messageElement["destination"].get<std::string>();
             }
             Time sendTime = ptime;
             std::string type;
-            if (messageElement.isMember("sendtime")) {
+            if (messageElement.contains("sendtime")) {
                 ptime = fileops::loadJsonTime(messageElement["sendtime"], units);
             }
 
@@ -475,10 +477,10 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
             messages.back().mess.source = src;
             messages.back().mess.dest = dest;
             messages.back().mess.time = ptime;
-            if (messageElement.isMember("data")) {
-                auto str = messageElement["data"].asString();
-                if (messageElement.isMember("encoding")) {
-                    if (messageElement["encoding"].asString() == "base64") {
+            if (messageElement.contains("data")) {
+                auto str = messageElement["data"].get<std::string>();
+                if (messageElement.contains("encoding")) {
+                    if (messageElement["encoding"].get<std::string>() == "base64") {
                         auto offset = hasB64Wrapper(str);
                         if (offset == 0) {
                             messages.back().mess.data =
@@ -488,10 +490,10 @@ void Player::loadJsonFile(const std::string& jsonString, bool enableFederateInte
                     }
                 }
                 messages.back().mess.data = decode(std::move(str));
-            } else if (messageElement.isMember("message")) {
-                auto str = messageElement["message"].asString();
-                if (messageElement.isMember("encoding")) {
-                    if (messageElement["encoding"].asString() == "base64") {
+            } else if (messageElement.contains("message")) {
+                auto str = messageElement["message"].get<std::string>();
+                if (messageElement.contains("encoding")) {
+                    if (messageElement["encoding"].get<std::string>() == "base64") {
                         auto offset = hasB64Wrapper(str);
                         if (offset == 0)  // directly encoded no wrapper
                         {
@@ -789,7 +791,7 @@ static std::string decode(std::string&& stringToDecode)
         try {
             return helics::fileops::JsonAsString(helics::fileops::loadJsonStr(stringToDecode));
         }
-        catch (const Json::Exception&) {
+        catch (const nlohmann::json::exception&) {
             return gmlc::utilities::stringOps::removeQuotes(stringToDecode);
         }
     }
