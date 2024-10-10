@@ -20,7 +20,8 @@ The results of this example are identical to those of the Advanced Default examp
 
 The example can be found in the [HELICS Examples repopsitory.](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_async_time_request)
 
-To run the example: 
+To run the example:
+
 ```shell
 $ helics run --path=advanced_async_runner.json
 ```

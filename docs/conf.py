@@ -50,7 +50,6 @@ if os.environ.get("READTHEDOCS", "") == "True":
     html_context["READTHEDOCS"] = True
 
 
-
 def download_helics_images():
     print("Downloading doc images from GMLC-TDC/helics_doc_resources")
     with tempfile.TemporaryDirectory() as tmpdirname:

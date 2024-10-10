@@ -4,8 +4,8 @@
 
 T. Hardy, B. Palmintier, P. Top, D. Krishnamurthy and J. Fuller, "HELICS: A Co-Simulation Framework for Scalable Multi-Domain Modeling and Analysis," in IEEE Access, doi: 10.1109/ACCESS.2024.3363615, available at [https://ieeexplore.ieee.org/document/10424422](https://ieeexplore.ieee.org/document/10424422)
 
-
 ## Co-Simulation Architecture and Theory with HELICS
+
 B. Palmintier, D. Krishnamurthy, P. Top, S. Smith, J. Daily and J. Fuller, "Design of the HELICS high-performance transmission-distribution-communication-market co-simulation framework", Proc. Workshop Model. Simul. Cyber-Physical Energy Syst. (MSCPES), pp. 1-6, Apr. 2017, available at: [https://ieeexplore.ieee.org/document/8064542/](https://ieeexplore.ieee.org/document/8064542/).
 
 Juan Gilberto Rueda Vasquez. COMPARISON BETWEEN TWO CO-SIMULATION FRAMEWORKS, MOSAIK AND HELICS. Rel. Lorenzo Bottaccioli, Edoardo Patti, Claudia De Vizia. Politecnico di Torino, Corso di laurea magistrale in Ict For Smart Societies (Ict Per La Società Del Futuro), 2022, available at [https://webthesis.biblio.polito.it/25624/](https://webthesis.biblio.polito.it/25624/)
@@ -16,9 +16,8 @@ Barbierato, L., Rando Mazzarino, P., Montarolo, M. et al. A comparison study of 
 
 A. Latif, B. Palmintier, F. Nejabatkhah and P. Jacques, "Multi-federate co-convergence with HELICS," 2024 IEEE Power & Energy Society Innovative Smart Grid Technologies Conference (ISGT), Washington, DC, USA, 2024, pp. 1-5, doi: 10.1109/ISGT59692.2024.10454238, available at [https://ieeexplore.ieee.org/document/10454238](https://ieeexplore.ieee.org/document/10454238)
 
-
-
 ## HELICS Application papers
+
 The following are a list of some of the published work using HELICS. If you have published work using HELICS you would like to see on this list, email support@helics.org with the citation and we'll review it.
 
 J. R. Theisen, A. Bose, M. Mukherjee, D. Burgess, K. Wilhelm and M. Diedesch, "Community-Based Transactive Coordination Mechanism for Enabling Grid-Edge Systems," 2024 IEEE Texas Power and Energy Conference (TPEC), College Station, TX, USA, 2024, pp. 1-6, doi: 10.1109/TPEC60005.2024.10472237, available at [https://ieeexplore.ieee.org/document/10472237](https://ieeexplore.ieee.org/document/10472237).
@@ -77,4 +76,3 @@ Dylan Cutler, Ted Kwasnik, Sivasathya Balamurugan, Tarek Elgindy, Siddharth Swam
 J. Zhang et al., "Development of HELICS-based High-Performance Cyber-Physical Co-simulation Framework for Distributed Energy Resources Applications," 2020 IEEE International Conference on Communications, Control, and Computing Technologies for Smart Grids (SmartGridComm), Tempe, AZ, USA, 2020, pp. 1-5, doi: 10.1109/SmartGridComm47815.2020.9302977, available at [https://ieeexplore.ieee.org/abstract/document/9302977](https://ieeexplore.ieee.org/abstract/document/9302977).
 
 Bhattarai B.P., L.D. Marinovici, M. Touhiduzzaman, F.K. Tuffner, K.P. Schneider, J. Xie, and P. Thekkumparambath Mana, et al. "Studying impacts of communication system performance on dynamic stability of networked microgrid". IET Smart Grid 3, no. 5:667 - 676, 2020, doi:10.1049/iet-stg.2019.0303, available at [https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/iet-stg.2019.0303](https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/iet-stg.2019.0303).
-

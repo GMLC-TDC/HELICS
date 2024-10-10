@@ -928,7 +928,6 @@ _Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL` [402]
 
 When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.
 
-
 ---
 
 ### `default_global` [false]
@@ -940,7 +939,6 @@ _API:_ (no API interface)
 Set to `true` to force all handles to act as globals; see "global" below for further details.
 
 ---
-
 
 ## Subscription, Input, and/or Publication Options
 
@@ -1291,7 +1289,7 @@ _API:_ `helicsFilterAddSourceTarget`
 | [Python](https://python.helics.org/api/capi-py/#helicsFilterAddSourceTarget)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddSourceTarget-Tuple{HELICS.Filter,%20String})
 
-Defines the endpoint sending messages that the filter should act on. All messages coming from the specified endpoint will run through the filter first before being sent on to their specified destiation.
+Defines the endpoint sending messages that the filter should act on. All messages coming from the specified endpoint will run through the filter first before being sent on to their specified destination.
 
 ---
 
@@ -1445,6 +1443,7 @@ This filter will randomly drop a message, the drop probability is specified, and
 ```
 
 #### `clone`
+
 Unlike other filters, cloning is not considered an "operation" and is enabled by setting the "clone" flag. (Prior to version 3.6, it was required to also define the filter "operation" to "clone".)
 
 The clone filter takes any message sent from endpoints listed in the `source_targets` object and sends a copy to endpoints in the `delivery` object. Note that both of these can be strings for a single endpoint or lists for multiple endpoints. In the example below, all messages originating from the endpoints named "source_endpoint_1_name" and "source_endpoint_2_name" will be copied and sent on to the endpoint named "ep_that_receives_cloned_messages".
@@ -1453,7 +1452,7 @@ The clone filter takes any message sent from endpoints listed in the `source_tar
    "clone": true,
    "source_targets":[
      "source_endpoint_1_name",
-     "source_endpoint_2_name" 
+     "source_endpoint_2_name"
    ],
    "delivery": "ep_that_receives_cloned_messages"
 ```
