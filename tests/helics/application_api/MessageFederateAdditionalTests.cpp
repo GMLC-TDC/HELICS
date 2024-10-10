@@ -914,7 +914,7 @@ TEST_F(mfed_tests, missing_endpoint)
     try {
         mFed1->requestTime(3.0);
     }
-    catch (const helics::HelicsException &) {
+    catch (const helics::HelicsException&) {
         ;
     }
     logs = mlog.lock();
