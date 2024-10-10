@@ -1246,14 +1246,11 @@ The `info` field is entirely ignored by HELICS and is used as a mechanism to pas
 ## Filter Options
 
 Filters are registered with the core or through the application API.
-There are also Filter object that hide some of the API calls in a slightly nicer interface. Generally a filter will define a target endpoint as either a source filter or destination filter. Source filters can be chained, as in there can be more than one of them. At present there can only be a single non-cloning destination filter attached to an endpoint.
+There are also Filter object that hide some of the API calls in a slightly nicer interface. Generally a filter will be associated with a specific endpoint as either a source filter or destination filter. Source filters can be chained, as in there can be more than one of them. At present there can only be a single non-cloning destination filter attached to an endpoint.
 
-Non-cloning filters can modify the message in some ways, cloning filters just copy the message and may send it to multiple destinations.
+Non-cloning filters can modify the message in some ways, cloning filters just copy the message and may send it to multiple destinations. Cloning not considered the "operation" of the filter and can be specified in parallel to another filter operation.
 
-On creation, filters have a target endpoint and an optional name.
-Custom filters may have input and output types associated with them.
-This is used for chaining and automatic ordering of filters.
-Filters do not have to be defined on the same core as the endpoint, and in fact can be anywhere in the federation, any messages will be automatically routed appropriately.
+On creation, filters have a target endpoint and an optional name. Custom filters may have input and output types associated with them; this is used for chaining and automatic ordering of filters. Filters do not have to be defined on the same core as the source or destination endpoint on which they act; they can be defined anywhere in the federation and all appropriate messages will be automatically routed through them appropriately.
 
 _API:_
 
@@ -1294,7 +1291,7 @@ _API:_ `helicsFilterAddSourceTarget`
 | [Python](https://python.helics.org/api/capi-py/#helicsFilterAddSourceTarget)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddSourceTarget-Tuple{HELICS.Filter,%20String})
 
-Acts on previously registered filter and associated with a specific endpoint of the federate.
+Defines the endpoint sending messages that the filter should act on. All messages coming from the specified endpoint will run through the filter first before being sent on to their specified destiation.
 
 ---
 
@@ -1308,7 +1305,7 @@ _API:_ `helicsFilterAddDestinationTarget`
 | [Python](https://python.helics.org/api/capi-py/#helicsFilterAddDestinationTarget)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddDestinationTarget-Tuple{HELICS.Filter,%20String})
 
-Acts on previously registered filter and associated with a specific endpoint of the federate.
+Defines the endpoint receiving messages that the filter should act on. All messages going to the specified endpoint will run through the filter first.
 
 ---
 
@@ -1448,16 +1445,17 @@ This filter will randomly drop a message, the drop probability is specified, and
 ```
 
 #### `clone`
+Unlike other filters, cloning is not considered an "operation" and is enabled by setting the "clone" flag. (Prior to version 3.6, it was required to also define the filter "operation" to "clone".)
 
-The clone filter takes any message sent from endpoints listed in the `source_targets` object and sends a copy to endpoints in the `destination_target` object. Note that both of these can be strings for a single endpoint or lists for multiple endpoints.
+The clone filter takes any message sent from endpoints listed in the `source_targets` object and sends a copy to endpoints in the `delivery` object. Note that both of these can be strings for a single endpoint or lists for multiple endpoints. In the example below, all messages originating from the endpoints named "source_endpoint_1_name" and "source_endpoint_2_name" will be copied and sent on to the endpoint named "ep_that_receives_cloned_messages".
 
 ```json
-   "operation": "clone",
+   "clone": true,
    "source_targets":[
      "source_endpoint_1_name",
      "source_endpoint_2_name" 
    ],
-   "destination_targets": "ep_that_receives_cloned_messages"
+   "delivery": "ep_that_receives_cloned_messages"
 ```
 
 ## Translator Options
