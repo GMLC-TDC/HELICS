@@ -63,8 +63,8 @@ TEST_P(filter_single_type_test, message_filter_registration)
     auto& filt2 = fFed->registerFilter("filter2");
     filt2.addDestinationTarget("port2");
     EXPECT_TRUE(filt2.getHandle().isValid());
-    auto& eept1 = fFed->registerEndpoint("fout");
-    EXPECT_TRUE(eept1.getHandle().isValid());
+    auto& ept1 = fFed->registerEndpoint("fout");
+    EXPECT_TRUE(ept1.getHandle().isValid());
 
     mFed->finalizeAsync();
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
