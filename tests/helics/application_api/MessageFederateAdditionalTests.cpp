@@ -149,11 +149,11 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
 
     EXPECT_TRUE(rxend == epid2.getHandle());
     EXPECT_EQ(timeRx, helics::Time(1.0));
-    auto M = mFed1->getMessage(epid2);
-    ASSERT_TRUE(M);
-    ASSERT_EQ(M->data.size(), data.size());
+    auto message = mFed1->getMessage(epid2);
+    ASSERT_TRUE(message);
+    ASSERT_EQ(message->data.size(), data.size());
 
-    EXPECT_EQ(M->data[245], data[245]);
+    EXPECT_EQ(message->data[245], data[245]);
     mFed1->finalize();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -196,11 +196,11 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
 
     EXPECT_TRUE(rxend == ep2.getHandle());
     EXPECT_EQ(timeRx, helics::Time(1.0));
-    auto M = ep2.getMessage();
-    ASSERT_TRUE(M);
-    ASSERT_EQ(M->data.size(), data.size());
+    auto message = ep2.getMessage();
+    ASSERT_TRUE(message);
+    ASSERT_EQ(message->data.size(), data.size());
 
-    EXPECT_EQ(M->data[245], data[245]);
+    EXPECT_EQ(message->data[245], data[245]);
     mFed1->finalize();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -239,11 +239,11 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     EXPECT_TRUE(!res);
     EXPECT_TRUE(rxend == ep2.getHandle());
     EXPECT_EQ(timeRx, helics::Time(1.0));
-    auto M = ep2.getMessage();
-    ASSERT_TRUE(M);
-    ASSERT_EQ(M->data.size(), data.size());
+    auto message = ep2.getMessage();
+    ASSERT_TRUE(message);
+    ASSERT_EQ(message->data.size(), data.size());
 
-    EXPECT_EQ(M->data[245], data[245]);
+    EXPECT_EQ(message->data[245], data[245]);
     mFed1->finalize();
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
@@ -534,8 +534,8 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
     EXPECT_EQ(mFed.getName(), "filterFed");
 
     EXPECT_EQ(mFed.getEndpointCount(), 3);
-    auto id = mFed.getEndpoint("ept1");
-    EXPECT_EQ(id.getExtractionType(), "genmessage");
+    auto& ept1 = mFed.getEndpoint("ept1");
+    EXPECT_EQ(ept1.getExtractionType(), "genmessage");
 
     EXPECT_EQ(mFed.getFilterCount(), 3);
 
@@ -546,10 +546,10 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
 
     EXPECT_EQ(mFed.getFilter(0).getInfo(),
               "this is an information string for use by the application");
-    auto cr = mFed.getCorePointer();
+    auto core = mFed.getCorePointer();
     mFed.disconnect();
-    cr->disconnect();
-    cr.reset();
+    core->disconnect();
+    core.reset();
 }
 
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
@@ -571,15 +571,15 @@ TEST_F(mfed_tests, send_message1)
 
     mFed1->requestNextStep();
 
-    auto m1 = ep2.getMessage();
-    EXPECT_EQ(m1->data.size(), 26U);
+    auto message = ep2.getMessage();
+    EXPECT_EQ(message->data.size(), 26U);
 
     ep1.sendToAt(message1.c_str(), 31, "ep2", 1.7);
 
     auto res = mFed1->requestTime(2.0);
     EXPECT_EQ(res, 1.7);
-    m1 = ep2.getMessage();
-    EXPECT_EQ(m1->data.size(), 31U);
+    message = ep2.getMessage();
+    EXPECT_EQ(message->data.size(), 31U);
 
     mFed1->finalize();
 }
@@ -602,10 +602,10 @@ TEST(messageFederate, constructor1)
     auto ept1 = mf2.registerEndpoint();
     EXPECT_FALSE(mf2.hasMessage(ept1));
     EXPECT_EQ(mf2.pendingMessageCount(ept1), 0);
-    auto m1 = mf2.getMessage(ept1);
-    EXPECT_FALSE(m1);
+    auto message = mf2.getMessage(ept1);
+    EXPECT_FALSE(message);
 
-    EXPECT_THROW(ept1.send(std::move(m1)), helics::InvalidFunctionCall);
+    EXPECT_THROW(ept1.send(std::move(message)), helics::InvalidFunctionCall);
 
     mf2.enterExecutingMode();
     mf2.finalize();
@@ -615,10 +615,10 @@ TEST(messageFederate, constructor1)
 
 TEST(messageFederate, constructor2)
 {
-    auto cr = helics::CoreFactory::create(helics::CoreType::TEST, "--name=cb --autobroker");
+    auto core = helics::CoreFactory::create(helics::CoreType::TEST, "--name=cb --autobroker");
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
-    helics::MessageFederate mf1("fed1", cr, fedInfo);
+    helics::MessageFederate mf1("fed1", core, fedInfo);
 
     mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
 
@@ -628,7 +628,7 @@ TEST(messageFederate, constructor2)
     EXPECT_NO_THROW(mf1.enterExecutingMode());
     mf1.finalize();
 
-    cr.reset();
+    core.reset();
 }
 
 TEST(messageFederate, constructor3)
@@ -915,6 +915,7 @@ TEST_F(mfed_tests, missing_endpoint)
         mFed1->requestTime(3.0);
     }
     catch (const helics::HelicsException &) {
+        ;
     }
     logs = mlog.lock();
     EXPECT_EQ(logs->size(), 2U);
