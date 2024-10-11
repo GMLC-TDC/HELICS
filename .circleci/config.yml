@@ -7,7 +7,7 @@ aliases:
       mkdir -p build
       cd build
       eval cmake .. ${CMAKE_FLAGS}
-      make -j 4
+      make -j 5
 
   - &setup_helics_low_mem
     name: setup_helics
