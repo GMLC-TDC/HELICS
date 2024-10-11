@@ -48,7 +48,6 @@ aliases:
       make RUN_KEY_BENCHMARKS
 
 jobs:
-
   helicsgccTSan:
     docker:
       - image: helics/buildenv:gcc14-builder

@@ -150,11 +150,10 @@ class FederateState {
     Time minimumReceiveTime{startupTime};  //!< minimum receive time for messages
 
 #if __cplusplus >= 201703L
-    mutable std::atomic_flag processing {};  //!< the federate is processing
+    mutable std::atomic_flag processing{};  //!< the federate is processing
 #else
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
 #endif
-    
 
     /** a callback for additional queries */
     std::vector<std::function<std::string(std::string_view)>> queryCallbacks;
