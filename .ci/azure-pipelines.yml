@@ -64,11 +64,11 @@ jobs:
       matrix:
         XCode-latest:
           test_config: "ci"
-          vmImage: "macOS-13"
+          vmImage: "macOS-14"
         XCode-oldest:
           test_config: "ci"
-          vmImage: "macOS-12"
-          xcode_path: "/Applications/Xcode_13.2.1.app"
+          vmImage: "macOS-13"
+          xcode_path: "/Applications/Xcode_14.1.app"
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 60
