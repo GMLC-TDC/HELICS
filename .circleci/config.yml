@@ -7,7 +7,7 @@ aliases:
       mkdir -p build
       cd build
       eval cmake .. ${CMAKE_FLAGS}
-      make -j 5
+      make -j 4
 
   - &setup_helics_low_mem
     name: setup_helics
@@ -151,6 +151,7 @@ jobs:
   gcc14:
     docker:
       - image: helics/buildenv:gcc14-builder
+    resource_class: large
     environment:
       CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DCMAKE_CXX_FLAGS="-pedantic-errors" -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
     steps:
