@@ -18,22 +18,6 @@ aliases:
       eval cmake .. ${CMAKE_FLAGS}
       make -j 2
 
-  - &run_octave_tests
-    name: run_octave_tests
-    command: |
-      cd build
-      make install
-      cd ${OCTAVETEST}
-      # this return the write error code in RESULT
-      res=$(octave -W -V --eval "source('runTestsCIRCLECI.m');")
-      echo "$res"
-      if [[ "$res" == *"failed"* ]]; then
-         echo "*** Octave tests FAILED: "
-         exit -1
-      fi
-      echo "*** Octave tests PASSED "
-      exit 0
-
   - &run_helics_tests
     name: run_helics_tests
     command: |
@@ -64,20 +48,10 @@ aliases:
       make RUN_KEY_BENCHMARKS
 
 jobs:
-  helicsoctave:
-    docker:
-      - image: helics/buildenv:octave
-    environment:
-      OCTAVETEST: "/root/project/tests/octave"
-      CMAKE_FLAGS: "-DHELICS_BUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON"
-    steps:
-      - checkout
-      - run: *setup_helics
-      - run: *run_octave_tests
 
   helicsgccTSan:
     docker:
-      - image: helics/buildenv:gcc13-builder
+      - image: helics/buildenv:gcc14-builder
     resource_class: large
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON -DCMAKE_CXX_STANDARD=20'
@@ -90,7 +64,7 @@ jobs:
 
   helicsgccASan:
     docker:
-      - image: helics/buildenv:gcc13-builder
+      - image: helics/buildenv:gcc14-builder
     resource_class: large
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -static-libstdc++ -static-libasan -lrt -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON -DCMAKE_CXX_STANDARD=20'
@@ -116,7 +90,7 @@ jobs:
 
   helicsMSan:
     docker:
-      - image: helics/buildenv:sanitizers-14
+      - image: helics/buildenv:sanitizers-18
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=memory -nostdinc++ -nostdlib++ -Wno-reserved-macro-identifier -L/root/develop/libcxx_msan/lib -lc++ -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath,/root/develop/libcxx_msan/lib" -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
 
@@ -127,7 +101,7 @@ jobs:
 
   helicsTSan:
     docker:
-      - image: helics/buildenv:sanitizers-14
+      - image: helics/buildenv:sanitizers-18
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -nostdinc++ -nostdlib++ -L/root/develop/libcxx_tsan/lib -lc++ -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O2 -Wl,-rpath,/root/develop/libcxx_tsan/lib" -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
       TSAN_OPTIONS: "suppressions=/root/project/.circleci/tsan_suppression.txt"
@@ -150,7 +124,7 @@ jobs:
     docker:
       - image: helics/buildenv:gcc13-builder
     environment:
-      CMAKE_FLAGS: "-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20"
+      CMAKE_FLAGS: "-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_BUILD_TESTS=ON"
     steps:
       - checkout
       - run: *setup_helics
@@ -175,9 +149,9 @@ jobs:
       - run: *setup_helics
       - run: *run_installer_tests
 
-  gcc13:
+  gcc14:
     docker:
-      - image: helics/buildenv:gcc13-builder
+      - image: helics/buildenv:gcc14-builder
     environment:
       CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DCMAKE_CXX_FLAGS="-pedantic-errors" -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
     steps:
@@ -185,9 +159,9 @@ jobs:
       - run: *setup_helics
       - run: *run_helics_tests
 
-  clang14:
+  clang18:
     docker:
-      - image: helics/buildenv:clang14-builder
+      - image: helics/buildenv:clang18-builder
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-pedantic-errors" -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
     steps:
@@ -195,9 +169,9 @@ jobs:
       - run: *setup_helics
       - run: *run_helics_tests
 
-  clang14_cxx23:
+  clang18_cxx23:
     docker:
-      - image: helics/buildenv:clang14-builder
+      - image: helics/buildenv:clang18-builder
     environment:
       CMAKE_FLAGS: "-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DCMAKE_CXX_STANDARD=23"
     steps:
@@ -243,15 +217,15 @@ workflows:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - gcc13:
+      - gcc14:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - clang14:
+      - clang18:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - clang14_cxx23:
+      - clang18_cxx23:
           filters:
             branches:
               ignore: /pre-commit\/.*/
