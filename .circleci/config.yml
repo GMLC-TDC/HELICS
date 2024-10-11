@@ -263,11 +263,6 @@ workflows:
             branches:
               only:
                 - dailies_tests
-      - helicsoctave:
-          filters:
-            branches:
-              only:
-                - dailies_tests
       - helicsNoZmq:
           filters:
             branches:
@@ -284,7 +279,6 @@ workflows:
     jobs:
       - helicsTumbleweed
       - helicsNoZmq
-      - helicsoctave
       - helicsTSan
       - helicsASan
       - helicsgccASan
