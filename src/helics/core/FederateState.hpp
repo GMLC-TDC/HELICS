@@ -149,7 +149,7 @@ class FederateState {
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
     Time minimumReceiveTime{startupTime};  //!< minimum receive time for messages
 
-#if __has_cpp_attribute(__cpp_lib_atomic_value_initialization)
+#if __cplusplus >= 201703L
     mutable std::atomic_flag processing {};  //!< the federate is processing
 #else
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
