@@ -30,18 +30,33 @@ class HELICS_CXX_EXPORT BrokerApp {
     /** construct from command line arguments in a vector
     @param args the command line arguments to pass in a reverse vector
     */
-    explicit BrokerApp(std::vector<std::string> args);
+    explicit BrokerApp(std::vector<std::string> &&args);
     /** construct from command line arguments in a vector
      @param ctype the type of broker to create
      @param args the command line arguments to pass in a reverse vector
     */
-    BrokerApp(CoreType ctype, std::vector<std::string> args);
+    BrokerApp(CoreType ctype, std::vector<std::string> &&args);
     /** construct from command line arguments in a vector
      @param ctype the type of broker to create
      @param broker_name the name of the broker
      @param args the command line arguments to pass in a reverse vector
     */
-    BrokerApp(CoreType ctype, const std::string& broker_name, std::vector<std::string> args);
+    BrokerApp(CoreType ctype, const std::string& broker_name, std::vector<std::string> &&args);
+    /** construct from command line arguments in a vector
+    @param args the command line arguments to pass in a reverse vector
+    */
+    explicit BrokerApp(std::vector<std::string> &args);
+    /** construct from command line arguments in a vector
+    @param ctype the type of broker to create
+    @param args the command line arguments to pass in a reverse vector
+    */
+    BrokerApp(CoreType ctype, std::vector<std::string> &args);
+    /** construct from command line arguments in a vector
+    @param ctype the type of broker to create
+    @param broker_name the name of the broker
+    @param args the command line arguments to pass in a reverse vector
+    */
+    BrokerApp(CoreType ctype, const std::string& broker_name, std::vector<std::string> &args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
