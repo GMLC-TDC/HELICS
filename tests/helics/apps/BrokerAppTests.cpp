@@ -170,8 +170,7 @@ TEST(BrokerAppTests, constructorZMQNoConnect)
 {
     std::vector<std::string> input{"10.7.5.5", "--local_interface"};
     /// test for connection error with zmq to connect with higher level broker
-    EXPECT_THROW(helics::BrokerApp(helics::CoreType::ZMQ,
-                                   "brk13",input),
+    EXPECT_THROW(helics::BrokerApp(helics::CoreType::ZMQ, "brk13", input),
                  helics::ConnectionFailure);
 }
 #endif

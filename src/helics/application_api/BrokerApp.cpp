@@ -18,8 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-BrokerApp::BrokerApp(CoreType ctype, const std::string& broker_name, std::vector<std::string> &&args):
-    name(broker_name)
+BrokerApp::BrokerApp(CoreType ctype,
+                     const std::string& broker_name,
+                     std::vector<std::string>&& args): name(broker_name)
 {
     auto app = generateParser(ctype == CoreType::MULTI);
     app->setDefaultCoreType(ctype);
@@ -29,18 +30,19 @@ BrokerApp::BrokerApp(CoreType ctype, const std::string& broker_name, std::vector
     }
 }
 
-BrokerApp::BrokerApp(CoreType ctype, std::vector<std::string> &&args):
+BrokerApp::BrokerApp(CoreType ctype, std::vector<std::string>&& args):
     BrokerApp(ctype, std::string{}, std::move(args))
 {
 }
 
-BrokerApp::BrokerApp(std::vector<std::string> &&args):
+BrokerApp::BrokerApp(std::vector<std::string>&& args):
     BrokerApp(CoreType::DEFAULT, std::string{}, std::move(args))
 {
 }
 
-BrokerApp::BrokerApp(CoreType ctype, const std::string& broker_name, std::vector<std::string> &args):
-    name(broker_name)
+BrokerApp::BrokerApp(CoreType ctype,
+                     const std::string& broker_name,
+                     std::vector<std::string>& args): name(broker_name)
 {
     auto app = generateParser(ctype == CoreType::MULTI);
     app->setDefaultCoreType(ctype);
@@ -50,12 +52,12 @@ BrokerApp::BrokerApp(CoreType ctype, const std::string& broker_name, std::vector
     }
 }
 
-BrokerApp::BrokerApp(CoreType ctype, std::vector<std::string> &args):
+BrokerApp::BrokerApp(CoreType ctype, std::vector<std::string>& args):
     BrokerApp(ctype, std::string{}, args)
 {
 }
 
-BrokerApp::BrokerApp(std::vector<std::string> &args):
+BrokerApp::BrokerApp(std::vector<std::string>& args):
     BrokerApp(CoreType::DEFAULT, std::string{}, args)
 {
 }
