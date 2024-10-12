@@ -223,12 +223,12 @@ TEST(BrokerAppTests, file_logging_p2)
     app.waitForDisconnect();
     app.reset();
     helics::cleanupHelicsLibrary();
-    std::error_code ec;
-    bool res = std::filesystem::remove(lfilename, ec);
+    std::error_code errorType;
+    bool res = std::filesystem::remove(lfilename, errorType);
     int tries = 0;
     while (!res) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        res = std::filesystem::remove(lfilename, ec);
+        res = std::filesystem::remove(lfilename, errorType);
         ++tries;
         if (tries > 15) {
             break;
