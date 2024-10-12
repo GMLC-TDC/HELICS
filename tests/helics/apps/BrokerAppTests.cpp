@@ -159,17 +159,23 @@ TEST(BrokerAppTests, constructor11)
     EXPECT_FALSE(App.isConnected());
 }
 
+
 TEST(BrokerAppTests, constructor12)
 {
     EXPECT_THROW(helics::BrokerApp(helics::CoreType::NULLCORE, "brk12", std::vector<std::string>{}),
-                 helics::HelicsException);
+        helics::HelicsException);
+}
+
 #ifdef HELICS_ENABLE_ZMQ_CORE
+TEST(BrokerAppTests, constructorZMQNoConnect)
+{
+    /// test for connection error with zmq to connect with higher level broker
     EXPECT_THROW(helics::BrokerApp(helics::CoreType::ZMQ,
-                                   "brk12",
+                                   "brk13",
                                    std::vector<std::string>{"10.7.5.5", "--local_interface"}),
                  helics::ConnectionFailure);
-#endif
 }
+#endif
 
 TEST(BrokerAppTests, null)
 {
