@@ -159,11 +159,10 @@ TEST(BrokerAppTests, constructor11)
     EXPECT_FALSE(App.isConnected());
 }
 
-
 TEST(BrokerAppTests, constructor12)
 {
     EXPECT_THROW(helics::BrokerApp(helics::CoreType::NULLCORE, "brk12", std::vector<std::string>{}),
-        helics::HelicsException);
+                 helics::HelicsException);
 }
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
