@@ -19,7 +19,7 @@ The "query-and-command" form of operation is the most complex, largely because i
 
 ## "helics_connector" Interface creation
 
-The order in which "helics_connector" creates the interfaces in the federate is not deterministic. This is especially important when using the APIs that get the interface by index (_e.g_ `helicsFederateGetInputByIndex)`, `helicsFederateGetPublicationByIndex`, `helicsFederateGetEndpointByIndex`, `helicsFederateGetEndpointByIndex`). There is no guarantee that the order the interfaces are added to the federate will be the same from computer to computer. To continue using this API
+The order in which "helics*connector" creates the interfaces in the federate is not deterministic. This is especially important when using the APIs that get the interface by index (\_e.g* `helicsFederateGetInputByIndex)`, `helicsFederateGetPublicationByIndex`, `helicsFederateGetEndpointByIndex`, `helicsFederateGetEndpointByIndex`). There is no guarantee that the order the interfaces are added to the federate will be the same from computer to computer. To continue using this API
 
 ## Examples
 
