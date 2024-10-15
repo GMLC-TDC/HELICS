@@ -12,7 +12,7 @@ There is also a similar set of APIs when working with the iterative time request
 
 ## Example Explanation
 
-The advanced default example has been very slightly modified to demonstrate the use of `helicsFederateRequestTimeAsync()` and `helicsFederateRequestTimeComplete()`. In this case, Battery.py has been edited to always make the async time request and then immediately call a frivalous function that, once a simulated day, delays the time request by one wall-clock second and sends a message indicating to the logs. (Obviously, in a real-world application the work down in this function would not be frivalous.) Running this example and looking at the logs shows this message, indicating the function is being run after the async time request but before completing the time requeest.
+The advanced default example has been very slightly modified to demonstrate the use of `helicsFederateRequestTimeAsync()` and `helicsFederateRequestTimeComplete()`. In this case, Battery.py has been edited to always make the async time request and then immediately call a frivolous function that, once a simulated day, delays the time request by one wall-clock second and sends a message to the logs. (Obviously, in a real-world application the work done in this function would not be frivolous.) Running this example and looking at the logs shows this message, indicating the function is being run after the async time request but before completing the time request.
 
 The results of this example are identical to those of the Advanced Default example as there is no impact on the simulated results, just the wall-clock time it takes to run the simulation.
 
