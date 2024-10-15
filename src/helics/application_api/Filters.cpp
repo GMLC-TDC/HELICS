@@ -13,8 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <map>
 #include <memory>
-#include <utility>
 #include <string>
+#include <utility>
 
 namespace helics {
 static const std::map<std::string_view, FilterTypes> filterTypes{

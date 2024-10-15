@@ -10,9 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helics_definitions.hpp"
 
 #include <iostream>
-#include <thread>
-#include <string>
 #include <memory>
+#include <string>
+#include <thread>
 
 // NOLINTNEXTLINE
 int main(int argc, char* argv[])

@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 
 #include <cassert>
-#include <string>
 #include <memory>
+#include <string>
 #include <utility>
 
 namespace helics {

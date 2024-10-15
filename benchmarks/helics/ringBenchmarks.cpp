@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <gmlc/concurrency/Barrier.hpp>
 #include <iostream>
-#include <thread>
 #include <string>
+#include <thread>
 #include <vector>
 
 using helics::CoreType;

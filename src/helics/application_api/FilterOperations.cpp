@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <random>
 #include <regex>
-#include <thread>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace helics {

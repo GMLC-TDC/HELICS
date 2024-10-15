@@ -8,9 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/CombinationFederate.hpp"
 
 #include <iostream>
-#include <thread>
-#include <string>
 #include <memory>
+#include <string>
+#include <thread>
 
 int main(int argc, char* argv[])  // NOLINT
 {
