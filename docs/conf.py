@@ -44,6 +44,7 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 # be required by Oct 7, 2024
 # See https://about.readthedocs.com/blog/2024/07/addons-by-default/
 # Define the canonical URL if you are using a custom domain on Read the Docs
+html_context = {}
 html_baseurl = "docs.helics.org"
 # Tell Jinja2 templates the build is running on Read the Docs
 if os.environ.get("READTHEDOCS", "") == "True":
