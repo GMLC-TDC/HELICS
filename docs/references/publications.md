@@ -22,8 +22,6 @@ The following are a list of some of the published work using HELICS. If you have
 
 J. R. Theisen, A. Bose, M. Mukherjee, D. Burgess, K. Wilhelm and M. Diedesch, "Community-Based Transactive Coordination Mechanism for Enabling Grid-Edge Systems," 2024 IEEE Texas Power and Energy Conference (TPEC), College Station, TX, USA, 2024, pp. 1-6, doi: 10.1109/TPEC60005.2024.10472237, available at [https://ieeexplore.ieee.org/document/10472237](https://ieeexplore.ieee.org/document/10472237).
 
-J. R. Theisen, A. Bose, M. Mukherjee, D. Burgess, K. Wilhelm and M. Diedesch, "Community-Based Transactive Coordination Mechanism for Enabling Grid-Edge Systems," 2024 IEEE Texas Power and Energy Conference (TPEC), College Station, TX, USA, 2024, pp. 1-6, doi: 10.1109/TPEC60005.2024.10472237 available at [https://ieeexplore.ieee.org/document/10472237](https://ieeexplore.ieee.org/document/10472237).
-
 A. K. Bharati, V. Ajjarapu, W. Du and Y. Liu, "Role of Distributed Inverter-Based-Resources in Bulk Grid Primary Frequency Response Through HELICS Based SMTD Co-Simulation," in IEEE Systems Journal, vol. 17, no. 1, pp. 1071-1082, March 2023, doi: 10.1109/JSYST.2022.3218117 available at [https://ieeexplore.ieee.org/document/9966492](https://ieeexplore.ieee.org/document/9966492).
 
 Y. Liu, R. Huang, W. Du, A. Singhal and Z. Huang, "Highly-Scalable Transmission and Distribution Dynamic Co-Simulation With 10,000+ Grid-Following and Grid-Forming Inverters," in IEEE Transactions on Power Delivery, vol. 39, no. 1, pp. 578-590, Feb. 2024, doi: 10.1109/TPWRD.2023.3302303, available at [https://ieeexplore.ieee.org/abstract/document/10210125](https://ieeexplore.ieee.org/abstract/document/10210125).
