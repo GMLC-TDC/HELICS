@@ -1246,7 +1246,7 @@ The `info` field is entirely ignored by HELICS and is used as a mechanism to pas
 Filters are registered with the core or through the application API.
 There are also Filter object that hide some of the API calls in a slightly nicer interface. Generally a filter will be associated with a specific endpoint as either a source filter or destination filter. Source filters can be chained, as in there can be more than one of them. At present there can only be a single non-cloning destination filter attached to an endpoint.
 
-Non-cloning filters can modify the message in some ways, cloning filters just copy the message and may send it to multiple destinations. Cloning not considered the "operation" of the filter and can be specified in parallel to another filter operation.
+Non-cloning filters can modify the message in some ways, cloning filters just copy the message and may send it to multiple destinations. Cloning is not considered the "operation" of the filter and can be specified in parallel to another filter operation.
 
 On creation, filters have a target endpoint and an optional name. Custom filters may have input and output types associated with them; this is used for chaining and automatic ordering of filters. Filters do not have to be defined on the same core as the source or destination endpoint on which they act; they can be defined anywhere in the federation and all appropriate messages will be automatically routed through them appropriately.
 
