@@ -15,6 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Publications.hpp"
 
 #include <utility>
+#include <string>
+#include <vector>
+#include <map>
+
 namespace helics {
 ValueFederateManager::ValueFederateManager(Core* coreOb,
                                            ValueFederate* vfed,

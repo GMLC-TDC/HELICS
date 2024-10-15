@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 #include <utility>
+#include <string>
 
 namespace helics {
 static const std::map<std::string_view, TranslatorTypes> translatorTypes{

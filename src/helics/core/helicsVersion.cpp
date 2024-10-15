@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 
 #include <thread>
+#include <string>
 
 #if defined(_WIN32) || defined(WIN32)
 #    include <intrin.h>

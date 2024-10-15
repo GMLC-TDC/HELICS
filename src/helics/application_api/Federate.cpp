@@ -32,6 +32,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string_view>
 #include <thread>
 #include <utility>
+#include <memory>
 
 namespace helics {
 // a key link that does very little yet, but forces linking to a particular file

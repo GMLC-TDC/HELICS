@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <string>
 #include <thread>
+#include <iostream>
+#include <memory>
 
 namespace boostipc = boost::interprocess;
 

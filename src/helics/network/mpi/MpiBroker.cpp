@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <mpi.h>
 #include <string>
+#include <iostream>
 
 namespace helics {
 namespace mpi {

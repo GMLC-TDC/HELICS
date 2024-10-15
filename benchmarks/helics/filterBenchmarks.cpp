@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gmlc/concurrency/Barrier.hpp>
 #include <iostream>
 #include <thread>
+#include <string>
+#include <vector>
 
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 

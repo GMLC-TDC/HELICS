@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "spdlog/spdlog.h"
 
 #include <utility>
+#include <string>
+#include <memory>
 
 namespace helics::apps {
 

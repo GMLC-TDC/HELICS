@@ -24,6 +24,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/format.h>
 #include <tuple>
 #include <utility>
+#include <string>
+#include <vector>
+#include <memory>
+#include <iostream>
 
 // NOLINTNEXTLINE
 DECLARE_TRIPLINE()

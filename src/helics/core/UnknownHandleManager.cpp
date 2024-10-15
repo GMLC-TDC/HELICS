@@ -9,6 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 
 #include <algorithm>
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include <utility>
 
 namespace helics {
 /** add a missingPublication*/

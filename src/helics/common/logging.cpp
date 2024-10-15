@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <map>
 #include <unordered_map>
+#include <string>
 
 namespace helics {
 extern const std::unordered_map<std::string, int> gLogLevelMap{

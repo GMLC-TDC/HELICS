@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <thread>
 #include <vector>
+#include <utility>
 
 using helics::CoreType;
 

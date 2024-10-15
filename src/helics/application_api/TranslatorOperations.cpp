@@ -12,6 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../utilities/timeStringOps.hpp"
 #include "HelicsPrimaryTypes.hpp"
 
+#include <memory>
+#include <map>
+#include <utility>
+
 namespace helics {
 
 SmallBuffer JsonTranslatorOperator::convertToValue(std::unique_ptr<Message> message)

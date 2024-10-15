@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <spdlog/logger.h>
+#include <vector>
+#include <string>
 
 static const std::vector<std::string> helpArgs{"-?"};
 int main(int argc, char* argv[])

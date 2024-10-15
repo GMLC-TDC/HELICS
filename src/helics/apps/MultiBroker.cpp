@@ -18,6 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <mutex>
 #include <thread>
+#include <utility>
+#include <memory>
+#include <string>
 
 #ifdef HELICS_ENABLE_TCP_CORE
 #    include "../network/tcp/TcpCommsSS.h"

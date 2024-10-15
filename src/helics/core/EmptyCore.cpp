@@ -11,6 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsVersion.hpp"
 
 #include <iostream>
+#include <string>
+#include <vector>
+#include <utility>
+#include <memory>
 
 namespace helics {
 

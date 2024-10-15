@@ -14,6 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <nlohmann/json.hpp>
 
+#include <string>
+
 namespace helics {
 
 static void addTags(nlohmann::json& v, const BasicHandleInfo& bhi)

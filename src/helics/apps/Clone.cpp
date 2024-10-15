@@ -29,6 +29,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <utility>
 #include <vector>
+#include <tuple>
+#include <memory>
 
 /** encode the string in base64 if needed otherwise just return the string*/
 static std::string encode(std::string_view str2encode)

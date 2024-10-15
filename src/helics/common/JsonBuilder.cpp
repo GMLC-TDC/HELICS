@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 
 #include <utility>
+#include <string>
+#include <vector>
+#include <memory>
 
 namespace helics::fileops {
 using stringVector = gmlc::utilities::stringVector;

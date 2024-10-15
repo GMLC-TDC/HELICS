@@ -16,6 +16,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "zmqBrokerServer.hpp"
 
 #include <utility>
+#include <string>
+#include <memory>
+#include <iostream>
+
 #ifdef HELICS_ENABLE_WEBSERVER
 #    include "helicsWebServer.hpp"
 #endif
