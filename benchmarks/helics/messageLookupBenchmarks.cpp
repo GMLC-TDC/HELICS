@@ -18,11 +18,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <gmlc/concurrency/Barrier.hpp>
 #include <iostream>
-#include <random>
-#include <thread>
-#include <string>
-#include <vector>
 #include <memory>
+#include <random>
+#include <string>
+#include <thread>
+#include <vector>
 
 /** class implementing the hub for an echo test*/
 class messageGenerator {

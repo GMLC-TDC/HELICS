@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/frozen_map.h"
 
 #include <complex>
-#include <vector>
-#include <utility>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace helics::detail {
 
