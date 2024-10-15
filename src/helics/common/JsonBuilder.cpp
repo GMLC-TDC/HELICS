@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "JsonProcessingFunctions.hpp"
 #include "gmlc/utilities/stringOps.h"
 
-#include <utility>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics::fileops {
 using stringVector = gmlc::utilities::stringVector;

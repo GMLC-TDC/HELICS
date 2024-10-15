@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "InterfaceInfo.hpp"
 
 #include <nlohmann/json.hpp>
-
 #include <string>
 
 namespace helics {

@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 #include "zmqBrokerServer.hpp"
 
-#include <utility>
-#include <string>
-#include <memory>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
 
 #ifdef HELICS_ENABLE_WEBSERVER
 #    include "helicsWebServer.hpp"

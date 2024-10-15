@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <chrono>
 #include <iostream>
-#include <thread>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 
 /** function to run the online terminal program*/
 void terminalFunction(std::vector<std::string> args);

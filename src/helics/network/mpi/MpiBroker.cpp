@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/helicsCLI11.hpp"
 #include "MpiComms.h"
 
+#include <iostream>
 #include <memory>
 #include <mpi.h>
 #include <string>
-#include <iostream>
 
 namespace helics {
 namespace mpi {
