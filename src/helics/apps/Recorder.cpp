@@ -22,16 +22,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <regex>
 #include <set>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
-#include <tuple>
-#include <memory>
 
 /** encode the string in base64 if needed otherwise just return the string*/
 static std::string encode(std::string_view str2encode)

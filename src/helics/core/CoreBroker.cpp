@@ -27,12 +27,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/format.h>
 #include <iostream>
 #include <limits>
+#include <map>
+#include <memory>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
-#include <memory>
-#include <map>
 
 namespace helics {
 

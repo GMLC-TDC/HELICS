@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../utilities/timeStringOps.hpp"
 #include "HelicsPrimaryTypes.hpp"
 
-#include <memory>
 #include <map>
+#include <memory>
 #include <utility>
 
 namespace helics {

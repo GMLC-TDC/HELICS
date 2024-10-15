@@ -19,12 +19,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cassert>
 #include <fmt/format.h>
+#include <iostream>
+#include <memory>
+#include <string>
 #include <tuple>
 #include <utility>
-#include <string>
 #include <vector>
-#include <memory>
-#include <iostream>
 
 namespace helics::BrokerFactory {
 

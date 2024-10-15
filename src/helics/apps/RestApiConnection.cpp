@@ -20,9 +20,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <sstream>
 #include <streambuf>
+#include <string>
 #include <thread>
 #include <vector>
-#include <string>
 
 // NOLINTNEXTLINE
 namespace beast = boost::beast;  // from <boost/beast.hpp>

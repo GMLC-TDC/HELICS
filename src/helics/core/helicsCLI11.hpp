@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreTypes.hpp"
 #include "helicsTime.hpp"
 
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>
 
 #if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
 #    include "../application_api/timeOperations.hpp"

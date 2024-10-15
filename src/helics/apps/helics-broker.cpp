@@ -19,11 +19,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 
 #include <iostream>
-#include <thread>
-#include <string>
-#include <vector>
-#include <utility>
 #include <memory>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
 
 /** function to run the online terminal program*/
 void terminalFunction(std::vector<std::string> args);

@@ -12,11 +12,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 
 #include <algorithm>
+#include <iostream>
 #include <random>
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>
 
 /** class implementing a Watts-Strogatz-like communication pattern with messages*/
 class WattsStrogatzFederate: public BenchmarkFederate {
