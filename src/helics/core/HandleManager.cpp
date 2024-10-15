@@ -8,6 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <regex>
+#include <unordered_map>
+#include <vector>
+#include <string>
 
 namespace helics {
 BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,

@@ -23,6 +23,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <string>
+
 using zmq::socket_type;
 /*
 req = ZMQ_REQ,

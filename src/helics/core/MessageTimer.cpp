@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <utility>
+#include <memory>
 
 namespace helics {
 MessageTimer::MessageTimer(std::function<void(ActionMessage&&)> sFunction):

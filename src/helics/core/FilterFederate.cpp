@@ -17,6 +17,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "queryHelpers.hpp"
 
 #include <cassert>
+#include <tuple>
+#include <vector>
+#include <string>
+#include <utility>
 
 namespace helics {
 

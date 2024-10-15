@@ -20,6 +20,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 
 #include <iostream>
+#include <string>
+#include <utility>
 
 namespace helics {
 LogManager::~LogManager()
