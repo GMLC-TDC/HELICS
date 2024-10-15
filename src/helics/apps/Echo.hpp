@@ -39,7 +39,8 @@ consistent answers if used from multiple threads unless protected.
         Echo(int argc, char* argv[]);
         /** construct from a federate info object
     @param name the name of the echo app, can be empty to get name from fedInfo or default
-    @param fedInfo a pointer info object containing information on the desired federate configuration
+    @param fedInfo a pointer info object containing information on the desired federate
+    configuration
     */
         explicit Echo(std::string_view name, const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given core

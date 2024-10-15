@@ -884,7 +884,8 @@ void FilterFederate::organizeFilterOperations()
                     } else {
                         // TODO(PT): this will need some work to finish sorting out but should work
                         // for initial tests
-                        if (core::matchingTypes(fedInfo->allSourceFilters[ii]->inputType, currentType)) {
+                        if (core::matchingTypes(fedInfo->allSourceFilters[ii]->inputType,
+                                                currentType)) {
                             used[ii] = true;
                             usedMore = true;
                             fedInfo->sourceFilters.push_back(fedInfo->allSourceFilters[ii]);

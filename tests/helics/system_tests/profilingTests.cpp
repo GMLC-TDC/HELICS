@@ -125,7 +125,8 @@ TEST(profiling_tests, broker_basic)
 TEST(profiling_tests, broker_basic_no_flag)
 {
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
-    fedInfo.coreInitString = "--brokerinitstring=\"--name=prbroker2\" --autobroker --broker=prbroker2";
+    fedInfo.coreInitString =
+        "--brokerinitstring=\"--name=prbroker2\" --autobroker --broker=prbroker2";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 

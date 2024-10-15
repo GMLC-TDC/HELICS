@@ -55,7 +55,8 @@ external protection, that will result in undefined behavior
         Player(int argc, char* argv[]);
         /** construct from a federate info object
     @param name the name of the federate (can be empty to use defaults from fedInfo)
-    @param fedInfo a pointer info object containing information on the desired federate configuration
+    @param fedInfo a pointer info object containing information on the desired federate
+    configuration
     */
         explicit Player(std::string_view name, const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given core
@@ -63,7 +64,9 @@ external protection, that will result in undefined behavior
     @param core a pointer to core object which the federate can join
     @param fedInfo  a federate information structure
     */
-        Player(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo);
+        Player(std::string_view name,
+               const std::shared_ptr<Core>& core,
+               const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fedInfo)
     @param core a coreApp object that can be joined

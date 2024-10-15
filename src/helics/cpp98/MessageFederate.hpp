@@ -22,7 +22,8 @@ namespace helicscpp {
 class MessageFederate: public virtual Federate {
   public:
     /**constructor taking a federate information structure and using the default core
-  @param fedName the name of the messageFederate, can be left empty to use a default or one from fedInfo
+  @param fedName the name of the messageFederate, can be left empty to use a default or one from
+  fedInfo
   @param fedInfo  a federate information structure
   */
     MessageFederate(const std::string& fedName, FederateInfo& fedInfo)

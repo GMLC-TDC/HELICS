@@ -73,7 +73,7 @@ class BenchmarkFederate {
     /** sets the output format to use when printing results
      * @param format to print results in
      */
-    void setOutputFormat(OutputFormat foramt) { result_format = foramt; }
+    void setOutputFormat(OutputFormat format) { result_format = format; }
 
     // protected to give derived classes more control
   protected:
@@ -123,8 +123,8 @@ class BenchmarkFederate {
     virtual void setupArgumentParsing() {}
     /** initialization steps after command line options have been parsed, but before the federate
      * object is created
-     * @param fedInfo a reference to a helics::FederateInfo object that can be used to change how the
-     * federate object is made
+     * @param fedInfo a reference to a helics::FederateInfo object that can be used to change how
+     * the federate object is made
      */
     virtual void doParamInit(helics::FederateInfo& fedInfo) { (void)fedInfo; }
     /** initialization that needs to happen after the federate object is created, such as creating

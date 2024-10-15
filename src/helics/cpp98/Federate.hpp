@@ -85,7 +85,10 @@ class FederateInfo {
         helicsFederateInfoSetCoreName(fedInfo, coreName.c_str(), HELICS_NULL_POINTER);
     }
     /// Set the separator character
-    void setSeparator(char sep) { helicsFederateInfoSetSeparator(fedInfo, sep, HELICS_NULL_POINTER); }
+    void setSeparator(char sep)
+    {
+        helicsFederateInfoSetSeparator(fedInfo, sep, HELICS_NULL_POINTER);
+    }
     /** set the core init string to use in the federateInfo
     @param coreInit the core name to use*/
     void setCoreInit(const std::string& coreInit)

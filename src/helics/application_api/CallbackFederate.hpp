@@ -22,13 +22,15 @@ class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
     CallbackFederate();
 
     /**constructor taking a federate information structure and using the default core
-    @param fedName the name of the federate, may be left empty to use a default or one found in fedInfo
+    @param fedName the name of the federate, may be left empty to use a default or one found in
+    fedInfo
     @param fedInfo  a federate information structure
     */
     explicit CallbackFederate(std::string_view fedName, const FederateInfo& fedInfo);
 
     /**constructor taking a federate information structure and using the given core
-    @param fedName the name of the federate, may be left empty to use a default or one found in fedInfo
+    @param fedName the name of the federate, may be left empty to use a default or one found in
+    fedInfo
     @param core a pointer to core object which the federate can join
     @param fedInfo  a federate information structure
     */
@@ -37,7 +39,8 @@ class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
                      const FederateInfo& fedInfo = FederateInfo{});
 
     /**constructor taking a federate information structure and using the given CoreApp
-    @param fedName the name of the federate, may be left empty to use a default or one found in fedInfo
+    @param fedName the name of the federate, may be left empty to use a default or one found in
+    fedInfo
     @param core a CoreApp object representing the core to connect to
     @param fedInfo  a federate information structure
     */

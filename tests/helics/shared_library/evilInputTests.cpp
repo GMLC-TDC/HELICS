@@ -175,7 +175,8 @@ TEST(evil_creation_test, helicsCreateValueFederate)
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(helicsFederateIsValid(res2), HELICS_FALSE);
     helicsErrorClear(&err);
-    // auto res2=helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fedInfo, nullptr);
+    // auto res2=helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fedInfo,
+    // nullptr);
 
     char rdata[256];
     auto evil_fi = reinterpret_cast<HelicsFederateInfo>(rdata);
@@ -202,7 +203,8 @@ TEST(evil_creation_test, helicsCreateValueFederateFromConfig)
 
 TEST(evil_creation_test, helicsCreateMessageFederate)
 {
-    // auto res2=helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fedInfo, nullptr);
+    // auto res2=helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fedInfo,
+    // nullptr);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateMessageFederate("billy", nullptr, &err);
@@ -240,8 +242,8 @@ TEST(evil_creation_test, helicsCreateMessageFederateFromConfig)
 
 TEST(evil_creation_test, helicsCreateCombinationFederate)
 {
-    // HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fedInfo,
-    // HelicsError* err);
+    // HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo
+    // fedInfo, HelicsError* err);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateCombinationFederate("billy", nullptr, &err);
