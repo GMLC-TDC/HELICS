@@ -57,9 +57,9 @@ TEST(BrokerAppTests, constructor4)
 {
     std::vector<std::string> args{"constructor4", "--name", "brk4"};
     char* argv[3];
-    argv[0] = &(args[0][0]);
-    argv[1] = &(args[1][0]);
-    argv[2] = &(args[2][0]);
+    argv[0] = args[0].data();
+    argv[1] = args[1].data();
+    argv[2] = args[2].data();
 
     helics::BrokerApp App(helics::CoreType::TEST, 3, argv);
 
@@ -75,11 +75,11 @@ TEST(BrokerAppTests, constructor5)
 {
     std::vector<std::string> args{"constructor4", "--name", "brk5", "--coretype", "test"};
     char* argv[5];
-    argv[0] = &(args[0][0]);
-    argv[1] = &(args[1][0]);
-    argv[2] = &(args[2][0]);
-    argv[3] = &(args[3][0]);
-    argv[4] = &(args[4][0]);
+    argv[0] = args[0].data();
+    argv[1] = args[1].data();
+    argv[2] = args[2].data();
+    argv[3] = args[3].data();
+    argv[4] = args[4].data();
 
     helics::BrokerApp App(5, argv);
 
@@ -163,13 +163,17 @@ TEST(BrokerAppTests, constructor12)
 {
     EXPECT_THROW(helics::BrokerApp(helics::CoreType::NULLCORE, "brk12", std::vector<std::string>{}),
                  helics::HelicsException);
-#ifdef HELICS_ENABLE_ZMQ_CORE
-    EXPECT_THROW(helics::BrokerApp(helics::CoreType::ZMQ,
-                                   "brk12",
-                                   std::vector<std::string>{"10.7.5.5", "--local_interface"}),
-                 helics::ConnectionFailure);
-#endif
 }
+
+#ifdef HELICS_ENABLE_ZMQ_CORE
+TEST(BrokerAppTests, constructorZMQNoConnect)
+{
+    std::vector<std::string> input{"10.7.5.5", "--local_interface"};
+    /// test for connection error with zmq to connect with higher level broker
+    EXPECT_THROW(helics::BrokerApp(helics::CoreType::ZMQ, "brk13", input),
+                 helics::ConnectionFailure);
+}
+#endif
 
 TEST(BrokerAppTests, null)
 {
@@ -206,10 +210,10 @@ TEST(BrokerAppTests, file_logging_p2)
     app.setLogFile("logfile3.txt");
     app.connect();
 
-    helics::FederateInfo fi;
-    fi.broker = "loggerBrk1";
-    fi.coreType = helics::CoreType::TEST;
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    helics::FederateInfo fedInfo;
+    fedInfo.broker = "loggerBrk1";
+    fedInfo.coreType = helics::CoreType::TEST;
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     Fed->enterExecutingMode();
     Fed->finalize();
@@ -219,14 +223,14 @@ TEST(BrokerAppTests, file_logging_p2)
     app.waitForDisconnect();
     app.reset();
     helics::cleanupHelicsLibrary();
-    std::error_code ec;
-    bool res = std::filesystem::remove(lfilename, ec);
-    int ii = 0;
+    std::error_code errorType;
+    bool res = std::filesystem::remove(lfilename, errorType);
+    int tries = 0;
     while (!res) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        res = std::filesystem::remove(lfilename, ec);
-        ++ii;
-        if (ii > 15) {
+        res = std::filesystem::remove(lfilename, errorType);
+        ++tries;
+        if (tries > 15) {
             break;
         }
     }
