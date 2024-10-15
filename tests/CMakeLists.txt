@@ -18,10 +18,6 @@ if(hasParent)
             add_subdirectory(java)
         endif()
 
-        if(HELICS_BUILD_OCTAVE_INTERFACE)
-            add_subdirectory(octave)
-        endif()
-
         if(HELICS_BUILD_CSHARP_INTERFACE)
             # add_subdirectory(csharp)
         endif()
