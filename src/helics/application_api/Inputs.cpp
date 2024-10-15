@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <limits>
 #include <string>
 #include <vector>
+#include <memory>
+#include <utility>
 
 namespace helics {
 Input::Input(ValueFederate* valueFed,

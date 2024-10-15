@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <random>
 #include <regex>
 #include <thread>
+#include <string>
+#include <vector>
 
 namespace helics {
 void FilterOperations::set(std::string_view /*property*/, double /*val*/) {}

@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <thread>
+#include <string>
+#include <memory>
 
 int main(int argc, char* argv[])  // NOLINT
 {

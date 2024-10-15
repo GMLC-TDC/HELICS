@@ -5,6 +5,8 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include <string>
+
 #include "helics/core/ActionMessage.hpp"
 #include "helics_benchmark_main.h"
 

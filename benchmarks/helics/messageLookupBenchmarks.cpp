@@ -20,6 +20,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <random>
 #include <thread>
+#include <string>
+#include <vector>
+#include <memory>
 
 /** class implementing the hub for an echo test*/
 class messageGenerator {

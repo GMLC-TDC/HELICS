@@ -17,6 +17,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <iostream>
 #include <thread>
+#include <string>
+#include <vector>
 
 /** class implementing the hub for an echo test*/
 class EchoHub_c {

@@ -23,6 +23,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <chrono>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
 
 std::shared_ptr<BenchmarkFederate> fed;
 

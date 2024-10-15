@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <helics/cpp98/ValueFederate.hpp>
 #include <helics/cpp98/helics.hpp>  // helicsVersionString
 #include <iostream>
+#include <string>
 #ifdef _MSC_VER
 #    include <windows.h>
 #else

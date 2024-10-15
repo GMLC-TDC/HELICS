@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "MessageFederateManager.hpp"
 
 #include <utility>
+#include <string>
+#include <memory>
 
 namespace helics {
 MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& fedInfo):

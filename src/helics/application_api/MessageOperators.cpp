@@ -9,6 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/flagOperations.hpp"
 
 #include <utility>
+#include <string>
+#include <memory>
+#include <vector>
 
 namespace helics {
 MessageTimeOperator::MessageTimeOperator(std::function<Time(Time)> userTimeFunction):

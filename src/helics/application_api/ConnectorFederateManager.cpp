@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 
 #include <utility>
+#include <memory>
 
 namespace helics {
 ConnectorFederateManager::ConnectorFederateManager(Core* coreObj,

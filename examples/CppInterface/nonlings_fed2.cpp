@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <helics/cpp98/ValueFederate.hpp>
 #include <helics/cpp98/helics.hpp>  // helicsVersionString
 #include <iostream>
+#include <string>
 
 int main(int /*argc*/, char** /*argv*/)
 {
