@@ -16,11 +16,11 @@ The Matlab interface to HELICS is found at [matHELICS](https://github.com/gmlc-t
 
 ## HELICS with Simulink
 
-A simulink interface to HELICS is found at [simHELICS](https://github.com/gmlc-tdc/simhelics) repository.  This is a minimalistic interface that is build using simulink S functions.
+A simulink interface to HELICS is found at [simHELICS](https://github.com/gmlc-tdc/simhelics) repository. This is a minimalistic interface that is build using simulink S functions.
 
 ## HELICS with Octave
 
-The Octave interface to HELICS is found at [matHELICS](https://github.com/gmlc-tdc/mathelics) repository.  It is currently built with the Matlab Interface
+The Octave interface to HELICS is found at [matHELICS](https://github.com/gmlc-tdc/mathelics) repository. It is currently built with the Matlab Interface
 
 ### Notes
 

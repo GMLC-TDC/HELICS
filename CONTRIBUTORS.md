@@ -122,7 +122,7 @@ A networking library with helper functions around Asio and other network interfa
 Several CMake scripts came from other sources and were either used or modified for use in HELICS.
 
 - Lars Bilke [CodeCoverage.cmake](https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake)
-- NATIONAL HEART, LUNG, AND BLOOD INSTITUTE 
+- NATIONAL HEART, LUNG, AND BLOOD INSTITUTE
 - clang-format, clang-tidy scripts were created using tips from [Emmanuel Fleury](http://www.labri.fr/perso/fleury/posts/programming/using-clang-tidy-and-clang-format.html)
 - Viktor Kirilov, useful CMake macros [ucm](https://github.com/onqtam/ucm) particularly for the set_runtime macro to use static runtime libraries
 - scripts for cloning get repositories are included from [tschuchortdev/cmake_git_clone](https://github.com/tschuchortdev/cmake_git_clone) used with [MIT](https://github.com/tschuchortdev/cmake_git_clone/blob/master/LICENSE.TXT) License
