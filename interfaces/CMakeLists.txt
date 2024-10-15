@@ -32,11 +32,10 @@ endif()
 if(HELICS_BUILD_MATLAB_INTERFACE OR HELICS_BUILD_OCTAVE_INTERFACE)
     message(
         FATAL_ERROR
-            "The matlab and octave interfacs are no longer compiled as part of building HELICS. Please see the repository at https://github.com/gmlc-tdc/matHELICS for details.
+            "The matlab and octave interfaces are no longer compiled as part of building HELICS. Please see the repository at https://github.com/gmlc-tdc/matHELICS for details.
 Re-run cmake with the `-UHELICS_BUILD_MATLAB_INTERFACE` or `-UHELICS_BUILD_OCTAVE_INTERFACE` option to get rid of this error message."
     )
 endif()
-
 
 cmake_dependent_option(
     HELICS_BUILD_JAVA_INTERFACE "Build Java extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
@@ -59,9 +58,7 @@ option(HELICS_OVERWRITE_INTERFACE_FILES
 )
 hide_variable(HELICS_OVERWRITE_INTERFACE_FILES)
 
-if(HELICS_BUILD_CSHARP_INTERFACE
-   OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY
-)
+if(HELICS_BUILD_CSHARP_INTERFACE OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
     set(swig_required ON)
 else()
     set(swig_required OFF)
