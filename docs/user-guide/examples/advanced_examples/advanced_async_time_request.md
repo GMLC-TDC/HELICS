@@ -6,7 +6,7 @@ There are cases, though, where a federate may want to make a time request and th
 
 ## Using the Asynchronous Time Request
 
-Making the asynchronous time request is simple: to make the non-blocking time request use the `helicsFederateRequestTimeAsync()` API. This API does not return a value and does not block the federate operation. The code following this API will begin immediately executing while the rest of the federation advance through simulated time. When this federate is done with it's extra work, is uses the `helicsFederateRequestTimeComplete()` API call. This is a blocking call (just like `hliecsFederateRequestTime()` was) though it is possible the state of the federation is such that HELICS is ready to immediately grant a time.
+Making the asynchronous time request is simple: to make the non-blocking time request use the `helicsFederateRequestTimeAsync()` API. This API does not return a value and does not block the federate operation. The code following this API will begin immediately executing while the rest of the federation advances through simulated time. When this federate is done with its extra work, it uses the `helicsFederateRequestTimeComplete()` API call. This is a blocking call (just like `hliecsFederateRequestTime()` was), though it is possible the state of the federation is such that HELICS is ready to immediately grant a time.
 
 There is also a similar set of APIs when working with the iterative time requests: `helicsFederateRequestTimeIterativeAsync()` and `helicsFederateRequestTimeIterativeComplete()`.
 
