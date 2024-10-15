@@ -44,31 +44,31 @@ class FederateInfo {
         helicsFederateInfoSetCoreType(fedInfo, coretype, hThrowOnError());
     }
     /** copy constructor for federate info*/
-    FederateInfo(const FederateInfo& fedInfo)
+    FederateInfo(const FederateInfo& otherFedInfo)
     {
-        fedInfo = helicsFederateClone(fedInfo.fedInfo, hThrowOnError());
+        fedInfo = helicsFederateClone(otherFedInfo.fedInfo, hThrowOnError());
     }
     /** copy assignment for federateInfo*/
-    FederateInfo& operator=(const FederateInfo& fedInfo)
+    FederateInfo& operator=(const FederateInfo& otherFedInfo)
     {
-        HelicsFederateInfo fi_new = helicsFederateClone(fedInfo.fedInfo, hThrowOnError());
+        HelicsFederateInfo fi_new = helicsFederateClone(otherFedInfo.fedInfo, hThrowOnError());
         helicsFederateInfoFree(fedInfo);
         fedInfo = fi_new;
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     /** move constructor for federateInfo*/
-    FederateInfo(FederateInfo&& fedInfo) HELICS_NOTHROW
+    FederateInfo(FederateInfo&& otherFedInfo) HELICS_NOTHROW
     {
-        fedInfo = fedInfo.fedInfo;
-        fedInfo.fedInfo = HELICS_NULL_POINTER;
+        fedInfo = otherFedInfo.fedInfo;
+        otherFedInfo.fedInfo = HELICS_NULL_POINTER;
     }
     /** move assignment for federateInfo*/
-    FederateInfo& operator=(FederateInfo&& fedInfo) HELICS_NOTHROW
+    FederateInfo& operator=(FederateInfo&& otherFedInfo) HELICS_NOTHROW
     {
         helicsFederateInfoFree(fedInfo);
-        fedInfo = fedInfo.fedInfo;
-        fedInfo.fedInfo = HELICS_NULL_POINTER;
+        fedInfo = otherFedInfo.fedInfo;
+        otherFedInfo.fedInfo = HELICS_NULL_POINTER;
         return *this;
     }
 #endif
@@ -79,10 +79,10 @@ class FederateInfo {
         helicsFederateInfoLoadFromString(fedInfo, argString.c_str(), HELICS_NULL_POINTER);
     }
     /** set the core name to use in the federateInfo
-    @param corename the core name to use*/
-    void setCoreName(const std::string& corename)
+    @param coreName the core name to use*/
+    void setCoreName(const std::string& coreName)
     {
-        helicsFederateInfoSetCoreName(fedInfo, corename.c_str(), HELICS_NULL_POINTER);
+        helicsFederateInfoSetCoreName(fedInfo, coreName.c_str(), HELICS_NULL_POINTER);
     }
     /// Set the separator character
     void setSeparator(char sep) { helicsFederateInfoSetSeparator(fedInfo, sep, HELICS_NULL_POINTER); }
