@@ -44,8 +44,8 @@ TEST_F(dynFed, simple_observer)
     res = vFed2->requestTime(2.0);
     EXPECT_EQ(res, 2.0);
 
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.observer = true;
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.observer = true;
     // now we try to join the federation with an observer
     auto bname = brokers[0]->getIdentifier();
     auto cdyn = helics::CoreFactory::create(helics::CoreType::TEST,
@@ -53,10 +53,10 @@ TEST_F(dynFed, simple_observer)
                                             std::string("--observer --broker=") + bname);
 
     EXPECT_TRUE(cdyn->connect());
-    fi.coreName = "coredyn";
+    fedInfo.coreName = "coredyn";
 
     std::shared_ptr<helics::ValueFederate> fobs;
-    EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fi));
+    EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fedInfo));
 
     if (fobs) {
         EXPECT_NO_THROW(fobs->enterInitializingMode());
@@ -96,8 +96,8 @@ TEST_F(dynFed, observer_subscriber)
     res = vFed2->requestTime(2.0);
     EXPECT_EQ(res, 2.0);
 
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.observer = true;
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.observer = true;
 
     auto bname = brokers[0]->getIdentifier();
     auto cdyn = helics::CoreFactory::create(helics::CoreType::TEST,
@@ -105,10 +105,10 @@ TEST_F(dynFed, observer_subscriber)
                                             std::string("--observer --broker=") + bname);
 
     EXPECT_TRUE(cdyn->connect());
-    fi.coreName = "coredyn";
+    fedInfo.coreName = "coredyn";
 
     std::shared_ptr<helics::ValueFederate> fobs;
-    EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fi));
+    EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fedInfo));
     // now we try to join the federation with an observer
     if (fobs) {
         fobs->registerSubscription("pub1");
@@ -153,8 +153,8 @@ TEST_F(dynFed, observer_subscriber_value)
     res = vFed2->requestTime(2.0);
     EXPECT_EQ(res, 2.0);
 
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.observer = true;
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.observer = true;
 
     auto bname = brokers[0]->getIdentifier();
     auto cdyn = helics::CoreFactory::create(helics::CoreType::TEST,
@@ -162,10 +162,10 @@ TEST_F(dynFed, observer_subscriber_value)
                                             std::string("--observer --broker=") + bname);
 
     EXPECT_TRUE(cdyn->connect());
-    fi.coreName = "coredyn";
+    fedInfo.coreName = "coredyn";
     // now we try to join the federation with an observer
     std::shared_ptr<helics::ValueFederate> fobs;
-    EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fi));
+    EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fedInfo));
 
     if (!fobs) {
         cdyn->disconnect();
@@ -227,8 +227,8 @@ TEST_F(dynFed, observer_subscriber_value_with_buffer)
     res = vFed2->requestTime(2.0);
     EXPECT_EQ(res, 2.0);
 
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.observer = true;
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.observer = true;
 
     auto bname = brokers[0]->getIdentifier();
     auto cdyn = helics::CoreFactory::create(helics::CoreType::TEST,
@@ -236,10 +236,10 @@ TEST_F(dynFed, observer_subscriber_value_with_buffer)
                                             std::string("--observer --broker=") + bname);
 
     EXPECT_TRUE(cdyn->connect());
-    fi.coreName = "coredyn";
+    fedInfo.coreName = "coredyn";
     // now we try to join the federation with an observer
     std::shared_ptr<helics::ValueFederate> fobs;
-    EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fi));
+    EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fedInfo));
 
     if (!fobs) {
         cdyn->disconnect();

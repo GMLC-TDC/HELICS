@@ -28,7 +28,7 @@ class cfed_type_tests:
 //
 TEST_F(cfed_tests, test_file_load)
 {
-    // fi = helicsCreateFederateInfo();
+    // fedInfo = helicsCreateFederateInfo();
     // path of the JSON file is hardcoded for now
     helicscpp::CombinationFederate cFed(TEST_DIR "/combo_config.json");
     ASSERT_TRUE(cFed.baseObject() != nullptr);

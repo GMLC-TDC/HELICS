@@ -26,15 +26,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(grant_timeout, phase1)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --name gtcore1";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --name gtcore1";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
 
-    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
-    fi.coreInitString.clear();
-    fi.coreName = "gtcore1";
-    fi.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.3);
-    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
+    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fedInfo);
+    fedInfo.coreInitString.clear();
+    fedInfo.coreName = "gtcore1";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.3);
+    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fedInfo);
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed2->setLoggingCallback(
         [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
@@ -69,15 +69,15 @@ TEST(grant_timeout, phase1)
 
 TEST(grant_timeout, phase2)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --name gtcore2";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --name gtcore2";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
 
-    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
-    fi.coreInitString.clear();
-    fi.coreName = "gtcore2";
-    fi.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.2);
-    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
+    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fedInfo);
+    fedInfo.coreInitString.clear();
+    fedInfo.coreName = "gtcore2";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.2);
+    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fedInfo);
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed2->setLoggingCallback(
         [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
@@ -112,15 +112,15 @@ TEST(grant_timeout, phase2)
 
 TEST(grant_timeout, phase3)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --name gtcore3";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --name gtcore3";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
 
-    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
-    fi.coreInitString.clear();
-    fi.coreName = "gtcore3";
-    fi.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.1);
-    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
+    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fedInfo);
+    fedInfo.coreInitString.clear();
+    fedInfo.coreName = "gtcore3";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.1);
+    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fedInfo);
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed2->setLoggingCallback(
         [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
@@ -155,15 +155,15 @@ TEST(grant_timeout, phase3)
 
 TEST(grant_timeout, phase3_core)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --name gtcore3b";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --name gtcore3b";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
 
-    auto Fed1 = std::make_shared<helics::MessageFederate>("test1", fi);
-    fi.coreInitString.clear();
-    fi.coreName = "gtcore3b";
-    fi.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.1);
-    auto Fed2 = std::make_shared<helics::MessageFederate>("test2", fi);
+    auto Fed1 = std::make_shared<helics::MessageFederate>("test1", fedInfo);
+    fedInfo.coreInitString.clear();
+    fedInfo.coreName = "gtcore3b";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.1);
+    auto Fed2 = std::make_shared<helics::MessageFederate>("test2", fedInfo);
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> clog;
     Fed2->setLoggingCallback(
@@ -211,15 +211,15 @@ TEST(grant_timeout, phase3_core)
 
 TEST(grant_timeout, phase4)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --name gtcore4";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --name gtcore4";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
 
-    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
-    fi.coreInitString.clear();
-    fi.coreName = "gtcore4";
-    fi.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.1);
-    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
+    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fedInfo);
+    fedInfo.coreInitString.clear();
+    fedInfo.coreName = "gtcore4";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.1);
+    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fedInfo);
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed2->setLoggingCallback(
         [&mlog](int level, std::string_view /*unused*/, std::string_view message) {

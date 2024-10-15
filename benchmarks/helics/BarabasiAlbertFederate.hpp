@@ -53,22 +53,22 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
             return;
         }
 
-        auto cp = fed->getCorePointer();
+        auto core = fed->getCorePointer();
 
-        std::stringstream ss(targets);
+        std::stringstream targetStream(targets);
 
-        while (std::getline(ss, sb, ',')) {
+        while (std::getline(targetStream, sb, ',')) {
             targets_vector.push_back(sb);
         }
-        for (auto& i : targets_vector) {
-            cp->linkEndpoints(ept->getName(), i);
+        for (auto& target : targets_vector) {
+            core->linkEndpoints(ept->getName(), target);
         }
     }
     void doMakeReady() override
     {
         // send initial messages
         std::string txstring(100, '1');
-        for (int i = 0; i < initialMessageCount; i++) {
+        for (int ii = 0; ii < initialMessageCount; ii++) {
             ept->send(txstring);
         }
     }
@@ -79,10 +79,10 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
         while (nextTime < finalTime) {
             nextTime = fed->requestTime(finalTime);
             while (ept->hasMessage()) {
-                auto m = fed->getMessage(*ept);
-                m->source = ept->getName();
-                m->time = fed->getCurrentTime() + deltaTime;
-                ept->send(std::move(m));
+                auto message = fed->getMessage(*ept);
+                message->source = ept->getName();
+                message->time = fed->getCurrentTime() + deltaTime;
+                ept->send(std::move(message));
             }
         }
     }

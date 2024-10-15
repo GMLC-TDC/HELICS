@@ -247,13 +247,13 @@ TEST(CoreAppTests, core_global_file_ci_skip)
     helics::BrokerApp brk(helics::CoreType::TEST, "be1", "-f2");
     brk.connect();
     brk.setGlobal("GlobalB", "excited");
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "core_globale3";
-    fi.coreInitString = "-f 1";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "core_globale3";
+    fedInfo.coreInitString = "-f 1";
 
-    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
-    fi.coreName = "core_globale4";
-    auto Fed2 = std::make_shared<helics::Federate>("fed2", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
+    fedInfo.coreName = "core_globale4";
+    auto Fed2 = std::make_shared<helics::Federate>("fed2", fedInfo);
 
     helics::CoreApp app(Fed1->getCorePointer());
     auto testFile = std::string(GLOBAL_TEST_DIR) + "example_globals1.json";

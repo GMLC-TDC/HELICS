@@ -25,19 +25,19 @@ int main(int /*argc*/, char** /*argv*/)
     /* Create Federate Info object that describes the federate properties
      * Set federate name and core type from string
      */
-    helicscpp::FederateInfo fi("zmq");
+    helicscpp::FederateInfo fedInfo("zmq");
 
     /* Federate init string */
-    fi.setCoreInit(fedinitstring);
+    fedInfo.setCoreInit(fedinitstring);
 
-    fi.setProperty(HELICS_PROPERTY_TIME_DELTA, deltat);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_DELTA, deltat);
 
-    fi.setProperty(HELICS_PROPERTY_INT_MAX_ITERATIONS, 100);
+    fedInfo.setProperty(HELICS_PROPERTY_INT_MAX_ITERATIONS, 100);
 
-    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_WARNING);
+    fedInfo.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_WARNING);
 
     /* Create value federate */
-    helicscpp::ValueFederate* vfed = new helicscpp::ValueFederate("TestB Federate", fi);
+    helicscpp::ValueFederate* vfed = new helicscpp::ValueFederate("TestB Federate", fedInfo);
     std::cout << " Value federate created\n";
 
     helicscpp::Input sub = vfed->registerSubscription("testA");

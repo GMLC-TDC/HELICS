@@ -40,7 +40,7 @@ class MessageExchangeFederate: public BenchmarkFederate {
         app->add_option("--msg_size", msgSize, "the size of the messages to send")->required();
     }
 
-    void doParamInit(helics::FederateInfo& /*fi*/) override
+    void doParamInit(helics::FederateInfo& /*fedInfo*/) override
     {
         // set the destination to the other federate in the pair
         dest = "msgExchange_" + std::to_string((index + 1) % 2) + "/ept";

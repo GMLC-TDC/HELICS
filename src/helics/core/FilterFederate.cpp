@@ -850,18 +850,18 @@ void FilterFederate::processFilterInfo(ActionMessage& command)
 void FilterFederate::organizeFilterOperations()
 {
     for (auto& fc : filterCoord) {
-        auto* fi = fc.second.get();
+        auto* fedInfo = fc.second.get();
         const auto* handle = mHandles->getHandleInfo(fc.first);
         if (handle == nullptr) {
             continue;
         }
         std::string endpointType = handle->type;
 
-        if (!fi->allSourceFilters.empty()) {
-            fi->sourceFilters.clear();
-            fi->sourceFilters.reserve(fi->allSourceFilters.size());
+        if (!fedInfo->allSourceFilters.empty()) {
+            fedInfo->sourceFilters.clear();
+            fedInfo->sourceFilters.reserve(fedInfo->allSourceFilters.size());
             // Now we have to do some intelligent ordering with types
-            std::vector<bool> used(fi->allSourceFilters.size(), false);
+            std::vector<bool> used(fedInfo->allSourceFilters.size(), false);
             bool someUnused = true;
             bool usedMore = true;
             bool firstPass = true;
@@ -869,13 +869,13 @@ void FilterFederate::organizeFilterOperations()
             while (someUnused && usedMore) {
                 someUnused = false;
                 usedMore = false;
-                for (size_t ii = 0; ii < fi->allSourceFilters.size(); ++ii) {
+                for (size_t ii = 0; ii < fedInfo->allSourceFilters.size(); ++ii) {
                     if (used[ii]) {
                         continue;
                     }
                     if (firstPass) {
-                        if (fi->allSourceFilters[ii]->cloning) {
-                            fi->sourceFilters.push_back(fi->allSourceFilters[ii]);
+                        if (fedInfo->allSourceFilters[ii]->cloning) {
+                            fedInfo->sourceFilters.push_back(fedInfo->allSourceFilters[ii]);
                             used[ii] = true;
                             usedMore = true;
                         } else {
@@ -884,11 +884,11 @@ void FilterFederate::organizeFilterOperations()
                     } else {
                         // TODO(PT): this will need some work to finish sorting out but should work
                         // for initial tests
-                        if (core::matchingTypes(fi->allSourceFilters[ii]->inputType, currentType)) {
+                        if (core::matchingTypes(fedInfo->allSourceFilters[ii]->inputType, currentType)) {
                             used[ii] = true;
                             usedMore = true;
-                            fi->sourceFilters.push_back(fi->allSourceFilters[ii]);
-                            currentType = fi->allSourceFilters[ii]->outputType;
+                            fedInfo->sourceFilters.push_back(fedInfo->allSourceFilters[ii]);
+                            currentType = fedInfo->allSourceFilters[ii]->outputType;
                         } else {
                             someUnused = true;
                         }
@@ -899,12 +899,12 @@ void FilterFederate::organizeFilterOperations()
                     usedMore = true;
                 }
             }
-            for (size_t ii = 0; ii < fi->allSourceFilters.size(); ++ii) {
+            for (size_t ii = 0; ii < fedInfo->allSourceFilters.size(); ++ii) {
                 if (used[ii]) {
                     continue;
                 }
                 mLogger(HELICS_LOG_LEVEL_WARNING,
-                        fi->allSourceFilters[ii]->key,
+                        fedInfo->allSourceFilters[ii]->key,
                         "unable to match types on some filters");
             }
         }

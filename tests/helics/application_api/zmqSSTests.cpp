@@ -52,9 +52,9 @@ class FedTest {
         fed_name = "fedtest_" + std::to_string(p_index);
         pub_index = p_index;
         sub_index = s_index;
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate>(fed_name, fi);
+        helics::FederateInfo fedInfo;
+        fedInfo.coreName = coreName;
+        vFed = std::make_unique<helics::ValueFederate>(fed_name, fedInfo);
         pub = vFed->registerIndexedPublication<std::string>("fedrx", pub_index);
         sub = vFed->registerIndexedSubscription("fedrx", pub_index);
         initialized = true;

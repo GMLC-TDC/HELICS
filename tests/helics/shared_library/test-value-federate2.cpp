@@ -133,7 +133,7 @@ TEST_P(vfed2_simple_type_tests, async_calls)
 TEST_F(vfed2_tests, file_load)
 {
     HelicsFederate vFed;
-    // fi = helicsCreateFederateInfo();
+    // fedInfo = helicsCreateFederateInfo();
     // path of the JSON file is hardcoded for now
     vFed = helicsCreateValueFederateFromConfig(TEST_DIR "/example_value_fed.json", &err);
     EXPECT_EQ(err.error_code, HELICS_OK);
@@ -155,7 +155,7 @@ TEST_F(vfed2_tests, file_load)
 TEST_F(vfed2_tests, file_load_with_space)
 {
     HelicsFederate vFed;
-    // fi = helicsCreateFederateInfo();
+    // fedInfo = helicsCreateFederateInfo();
     // path of the JSON file is hardcoded for now
     vFed = helicsCreateValueFederateFromConfig(TEST_DIR "/folder with space/example_value_fed.json",
                                                &err);
@@ -171,16 +171,16 @@ TEST_F(vfed2_tests, file_load_with_space)
 
 TEST(valuefederate, fedAlias)
 {
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
-    helicsFederateInfoSetCoreName(fi, "core_alias", nullptr);
-    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker", nullptr);
-    helicsFederateInfoSetFlagOption(fi,
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
+    helicsFederateInfoSetCoreName(fedInfo, "core_alias", nullptr);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f 1 --autobroker", nullptr);
+    helicsFederateInfoSetFlagOption(fedInfo,
                                     HELICS_HANDLE_OPTION_CONNECTION_REQUIRED,
                                     HELICS_TRUE,
                                     nullptr);
-    auto Fed1 = helicsCreateValueFederate("vfed1", fi, nullptr);
-    helicsFederateInfoFree(fi);
+    auto Fed1 = helicsCreateValueFederate("vfed1", fedInfo, nullptr);
+    helicsFederateInfoFree(fedInfo);
     helicsFederateRegisterGlobalPublication(
         Fed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "parsecs", nullptr);
 
@@ -196,17 +196,17 @@ TEST(valuefederate, fedAlias)
 
 TEST(valuefederate, coreAlias)
 {
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
-    helicsFederateInfoSetCoreName(fi, "core_alias", nullptr);
-    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker", nullptr);
-    helicsFederateInfoSetFlagOption(fi,
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
+    helicsFederateInfoSetCoreName(fedInfo, "core_alias", nullptr);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f 1 --autobroker", nullptr);
+    helicsFederateInfoSetFlagOption(fedInfo,
                                     HELICS_HANDLE_OPTION_CONNECTION_REQUIRED,
                                     HELICS_TRUE,
                                     nullptr);
-    auto Fed1 = helicsCreateValueFederate("vfed1", fi, nullptr);
+    auto Fed1 = helicsCreateValueFederate("vfed1", fedInfo, nullptr);
     auto cr = helicsFederateGetCore(Fed1, nullptr);
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
     helicsFederateRegisterGlobalPublication(
         Fed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "parsecs", nullptr);
 
@@ -224,17 +224,17 @@ TEST(valuefederate, coreAlias)
 TEST(valuefederate, brokerAlias)
 {
     auto brk = helicsCreateBroker("test", "alias_broker", "-f1", nullptr);
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
-    helicsFederateInfoSetCoreName(fi, "core_alias", nullptr);
-    helicsFederateInfoSetCoreInitString(fi, "-f 1 --broker=alias_broker", nullptr);
-    helicsFederateInfoSetFlagOption(fi,
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
+    helicsFederateInfoSetCoreName(fedInfo, "core_alias", nullptr);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f 1 --broker=alias_broker", nullptr);
+    helicsFederateInfoSetFlagOption(fedInfo,
                                     HELICS_HANDLE_OPTION_CONNECTION_REQUIRED,
                                     HELICS_TRUE,
                                     nullptr);
-    auto Fed1 = helicsCreateValueFederate("vfed1", fi, nullptr);
+    auto Fed1 = helicsCreateValueFederate("vfed1", fedInfo, nullptr);
 
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
     helicsFederateRegisterGlobalPublication(
         Fed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "parsecs", nullptr);
 

@@ -18,9 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(federateInfo, constructor1)
 {
-    helics::FederateInfo fedInfo("--coretype=test --name fi");
+    helics::FederateInfo fedInfo("--coretype=test --name fedInfo");
     EXPECT_EQ(fedInfo.coreType, helics::CoreType::TEST);
-    EXPECT_EQ(fedInfo.defName, "fi");
+    EXPECT_EQ(fedInfo.defName, "fedInfo");
 }
 
 TEST(federateInfo, constructor2)

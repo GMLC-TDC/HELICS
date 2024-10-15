@@ -76,7 +76,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
         opt_max_index->required();
     }
 
-    void doParamInit(helics::FederateInfo& /*fi*/) override
+    void doParamInit(helics::FederateInfo& /*fedInfo*/) override
     {
         if (k < 1 || k > maxIndex - 1) {
             std::cerr << "ERROR: Degree can't be less than 1 or more than the federate count - 1"

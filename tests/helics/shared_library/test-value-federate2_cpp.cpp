@@ -139,7 +139,7 @@ INSTANTIATE_TEST_SUITE_P(VfedTests, VFedTypeTests, ::testing::ValuesIn(CoreTypes
 //
 TEST_F(VfedTests, test_file_load)
 {
-    // fi = helicsCreateFederateInfo();
+    // fedInfo = helicsCreateFederateInfo();
     // path of the JSON file is hardcoded for now
     helicscpp::ValueFederate vFed(TEST_DIR "/example_value_fed.json");
     ASSERT_TRUE(vFed.baseObject() != nullptr);

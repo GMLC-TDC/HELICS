@@ -17,15 +17,15 @@ SPDX-License-Identifier: BSD-3-Clause
 // this test will test basic echo functionality
 TEST(echo_tests, echo_test1)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
 
-    fi.coreName = "ecore1";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Echo echo1("echo1", fi);
+    fedInfo.coreName = "ecore1";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Echo echo1("echo1", fedInfo);
 
     echo1.addEndpoint("test");
-    // fi.logLevel = 4;
-    helics::MessageFederate mfed("source", fi);
+    // fedInfo.logLevel = 4;
+    helics::MessageFederate mfed("source", fedInfo);
     helics::Endpoint ep1(&mfed, "src");
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();
@@ -44,15 +44,15 @@ TEST(echo_tests, echo_test1)
 
 TEST(echo_tests, echo_test_delay)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
 
-    fi.coreName = "ecore2";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Echo echo1("echo1", fi);
+    fedInfo.coreName = "ecore2";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Echo echo1("echo1", fedInfo);
 
     echo1.addEndpoint("test");
     echo1.setEchoDelay(1.2);
-    helics::MessageFederate mfed("source", fi);
+    helics::MessageFederate mfed("source", fedInfo);
     helics::Endpoint ep1(&mfed, "src");
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();
@@ -73,17 +73,17 @@ TEST(echo_tests, echo_test_delay)
 
 TEST(echo_tests, echo_test_delay_period)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
 
-    fi.coreName = "ecore3";
-    fi.coreInitString = "-f 2 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.1);
-    helics::apps::Echo echo1("echo1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 0);
+    fedInfo.coreName = "ecore3";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.1);
+    helics::apps::Echo echo1("echo1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 0);
 
     echo1.addEndpoint("test");
     echo1.setEchoDelay(1.2);
-    helics::MessageFederate mfed("source", fi);
+    helics::MessageFederate mfed("source", fedInfo);
     helics::Endpoint ep1(&mfed, "src");
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();
@@ -104,15 +104,15 @@ TEST(echo_tests, echo_test_delay_period)
 
 TEST(echo_tests, echo_test_multiendpoint)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
 
-    fi.coreName = "ecore4";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Echo echo1("echo1", fi);
+    fedInfo.coreName = "ecore4";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Echo echo1("echo1", fedInfo);
     echo1.addEndpoint("test");
     echo1.addEndpoint("test2");
     echo1.setEchoDelay(1.2);
-    helics::MessageFederate mfed("source", fi);
+    helics::MessageFederate mfed("source", fedInfo);
     helics::Endpoint ep1(&mfed, "src");
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();
@@ -146,13 +146,13 @@ TEST(echo_tests, echo_test_multiendpoint)
 
 TEST(echo_tests, echo_test_fileload)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "ecore4-file";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Echo echo1("echo1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "ecore4-file";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Echo echo1("echo1", fedInfo);
     echo1.loadFile(std::string(TEST_DIR) + "/echo_example.json");
 
-    helics::MessageFederate mfed("source", fi);
+    helics::MessageFederate mfed("source", fedInfo);
     helics::Endpoint ep1(&mfed, "src");
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();

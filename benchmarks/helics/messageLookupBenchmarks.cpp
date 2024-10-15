@@ -59,10 +59,10 @@ class messageGenerator {
         perloop_message_ = perloop;
         startIndex_ = index * cntlocal;
         std::string name = "mgen_" + std::to_string(index);
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-        mFed = std::make_unique<helics::MessageFederate>(name, fi);
+        helics::FederateInfo fedInfo;
+        fedInfo.coreName = coreName;
+        fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+        mFed = std::make_unique<helics::MessageFederate>(name, fedInfo);
         epts.reserve(cnt_local_);
         for (int ii = 0; ii < cnt_local_; ++ii) {
             epts.push_back(

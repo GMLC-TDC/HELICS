@@ -46,18 +46,18 @@ TEST_F(bad_input_nosan, test_mistaken_free)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
-    auto fi = helicsCreateFederateInfo();
-    CE(helicsFederateInfoSetBroker(fi, "broker test", &err));
+    auto fedInfo = helicsCreateFederateInfo();
+    CE(helicsFederateInfoSetBroker(fedInfo, "broker test", &err));
     CE(helicsFederateEnterInitializingMode(vFed1, &err));
     CE(helicsFederateFinalize(vFed1, &err));
 
     helicsFederateInfoFree(vFed1);  // this is totally wrong but we are testing it
-    helicsFederateFree(fi);  // this is also backwards
+    helicsFederateFree(fedInfo);  // this is also backwards
 
-    helicsQueryFree(fi);  // also bad
+    helicsQueryFree(fedInfo);  // also bad
     helicsQueryFree(vFed1);
 
-    helicsFederateInfoFree(fi);  // now do the correct frees
+    helicsFederateInfoFree(fedInfo);  // now do the correct frees
     helicsFederateFree(vFed1);
 }
 
@@ -66,20 +66,20 @@ TEST_F(bad_input_nosan, test_mistaken_finalize)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
-    auto fi = helicsCreateFederateInfo();
-    CE(helicsFederateInfoSetBroker(fi, "broker test", &err));
+    auto fedInfo = helicsCreateFederateInfo();
+    CE(helicsFederateInfoSetBroker(fedInfo, "broker test", &err));
     CE(helicsFederateEnterInitializingMode(vFed1, &err));
-    helicsFederateFinalize(fi, &err);
+    helicsFederateFinalize(fedInfo, &err);
 
     EXPECT_NE(err.error_code, 0);
 
     helicsFederateInfoFree(vFed1);  // this is totally wrong but we are testing it
-    helicsFederateFree(fi);  // this is also backwards
+    helicsFederateFree(fedInfo);  // this is also backwards
 
-    helicsQueryFree(fi);  // also bad
+    helicsQueryFree(fedInfo);  // also bad
     helicsQueryFree(vFed1);
 
-    helicsFederateInfoFree(fi);  // now do the correct frees
+    helicsFederateInfoFree(fedInfo);  // now do the correct frees
     helicsFederateFree(vFed1);
 }
 

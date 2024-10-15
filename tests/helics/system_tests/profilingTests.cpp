@@ -27,10 +27,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(profiling_tests, basic)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --profiler=log";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --profiler=log";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     auto cr = Fed->getCorePointer();
@@ -75,11 +75,11 @@ TEST(profiling_tests, basic)
 
 TEST(profiling_tests, broker_basic)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString =
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString =
         "--brokerinitstring=\"--profiler=log --name=prbroker\" --autobroker --broker=prbroker";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     auto br = helics::BrokerFactory::findBroker("prbroker");
@@ -124,10 +124,10 @@ TEST(profiling_tests, broker_basic)
 
 TEST(profiling_tests, broker_basic_no_flag)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--brokerinitstring=\"--name=prbroker2\" --autobroker --broker=prbroker2";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--brokerinitstring=\"--name=prbroker2\" --autobroker --broker=prbroker2";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     auto br = helics::BrokerFactory::findBroker("prbroker2");
@@ -171,9 +171,9 @@ TEST(profiling_tests, broker_basic_no_flag)
 
 TEST(profiling_tests, fed_capture)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
@@ -214,11 +214,11 @@ TEST(profiling_tests, fed_capture)
 
 TEST(profiling_tests, fed_capture2)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setFlagOption(helics::defs::LOCAL_PROFILING_CAPTURE);
-    fi.setFlagOption(helics::defs::PROFILING);
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setFlagOption(helics::defs::LOCAL_PROFILING_CAPTURE);
+    fedInfo.setFlagOption(helics::defs::PROFILING);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
@@ -258,10 +258,10 @@ TEST(profiling_tests, fed_capture2)
 
 TEST(profiling_tests, save_file)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --profiler=save_profile.txt";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --profiler=save_profile.txt";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     Fed->enterExecutingMode();
     Fed->finalize();
@@ -321,10 +321,10 @@ TEST(profiling_tests, save_file_append)
         std::ofstream out("save_profile_app.txt");
         out << "APPENDING_TO_FILE" << std::endl;
     }
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --profiler_append=save_profile_app.txt";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --profiler_append=save_profile_app.txt";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     Fed->enterExecutingMode();
     Fed->finalize();
@@ -379,11 +379,11 @@ TEST(profiling_tests, save_file_append)
 
 TEST(profiling_tests, broker_file_save)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString =
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString =
         "--brokerinitstring=\"--profiler=save_profile2.txt --name=prbroker\" --autobroker --broker=prbroker";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     Fed->enterExecutingMode();
     Fed->finalize();
@@ -440,9 +440,9 @@ TEST(profiling_tests, broker_file_save)
 
 TEST(profiling_tests, config)
 {
-    auto fi = helics::loadFederateInfo(TEST_DIR "/../test_files/profiling_config.json");
+    auto fedInfo = helics::loadFederateInfo(TEST_DIR "/../test_files/profiling_config.json");
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     auto mlog =
         std::make_shared<gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>>();
@@ -489,9 +489,9 @@ TEST(profiling_tests, config)
 
 TEST(profiling_tests, config2)
 {
-    auto fi = helics::loadFederateInfo(TEST_DIR "/../test_files/profiling_config2.json");
+    auto fedInfo = helics::loadFederateInfo(TEST_DIR "/../test_files/profiling_config2.json");
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(

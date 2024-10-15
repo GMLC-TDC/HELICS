@@ -50,10 +50,10 @@ class EchoHub_c {
     {
         cnt_ = cnt;
         std::string name = "echohub";
-        auto* fi = helicsCreateFederateInfo();
-        helicsFederateInfoSetCoreName(fi, coreName.c_str(), nullptr);
+        auto* fedInfo = helicsCreateFederateInfo();
+        helicsFederateInfoSetCoreName(fedInfo, coreName.c_str(), nullptr);
 
-        vFed = helicsCreateValueFederate(name.c_str(), fi, nullptr);
+        vFed = helicsCreateValueFederate(name.c_str(), fedInfo, nullptr);
         pubs.reserve(cnt_);
         subs.reserve(cnt_);
         for (int ii = 0; ii < cnt_; ++ii) {
@@ -121,10 +121,10 @@ class EchoLeaf_c {
     {
         std::string name = "echoleaf_" + std::to_string(index);
         index_ = index;
-        auto* fi = helicsCreateFederateInfo();
-        helicsFederateInfoSetCoreName(fi, coreName.c_str(), nullptr);
+        auto* fedInfo = helicsCreateFederateInfo();
+        helicsFederateInfoSetCoreName(fedInfo, coreName.c_str(), nullptr);
 
-        vFed = helicsCreateValueFederate(name.c_str(), fi, nullptr);
+        vFed = helicsCreateValueFederate(name.c_str(), fedInfo, nullptr);
 
         auto leafname = std::string("leafsend_") + std::to_string(index);
         pub = helicsFederateRegisterGlobalPublication(

@@ -28,13 +28,13 @@ struct federate_realtime_tests: public FederateTestFixture, public ::testing::Te
 TEST_F(federate_realtime_tests, federate_delay_tests_ci_skip)
 {
     auto broker = AddBroker("test", 1);
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreName = "cdelay";
-    fi.coreInitString = std::string("-f 1 --broker=") + broker->getIdentifier();
-    fi.setFlagOption(helics::defs::Flags::REALTIME);
-    fi.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
-    fi.setProperty(helics::defs::Properties::PERIOD, 0.5);
-    auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "cdelay";
+    fedInfo.coreInitString = std::string("-f 1 --broker=") + broker->getIdentifier();
+    fedInfo.setFlagOption(helics::defs::Flags::REALTIME);
+    fedInfo.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
+    fedInfo.setProperty(helics::defs::Properties::PERIOD, 0.5);
+    auto fed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
 
     helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
                               fed,
@@ -70,17 +70,17 @@ TEST_F(federate_realtime_tests, federate_delay_tests_ci_skip)
 TEST_F(federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
 {
     auto broker = AddBroker("test", 1);
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
 
-    fi.coreName = "adelay";
-    fi.coreInitString = std::string("-f 2 --broker=") + broker->getIdentifier();
-    fi.setFlagOption(helics::defs::Flags::REALTIME);
-    fi.setProperty(helics::defs::Properties::RT_LAG, 0.1);
-    fi.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
-    fi.setProperty(helics::defs::Properties::PERIOD, 0.5);
-    auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
-    fi.setFlagOption(helics::defs::Flags::REALTIME, false);
-    auto fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
+    fedInfo.coreName = "adelay";
+    fedInfo.coreInitString = std::string("-f 2 --broker=") + broker->getIdentifier();
+    fedInfo.setFlagOption(helics::defs::Flags::REALTIME);
+    fedInfo.setProperty(helics::defs::Properties::RT_LAG, 0.1);
+    fedInfo.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
+    fedInfo.setProperty(helics::defs::Properties::PERIOD, 0.5);
+    auto fed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
+    fedInfo.setFlagOption(helics::defs::Flags::REALTIME, false);
+    auto fed2 = std::make_shared<helics::ValueFederate>("test2", fedInfo);
     helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
                               fed2,
                               "pub1",
@@ -124,18 +124,18 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
 TEST_F(federate_realtime_tests, federate_trigger_tests_ci_skip)
 {
     auto broker = AddBroker("test", 1);
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreName = "ctrig";
-    fi.coreInitString = std::string("-f 2 --broker=") + broker->getIdentifier();
-    fi.setFlagOption(helics::defs::Flags::REALTIME);
-    fi.setProperty(helics::defs::Properties::RT_LAG, 0.1);
-    fi.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
-    fi.setProperty(helics::defs::Properties::PERIOD, 0.5);
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "ctrig";
+    fedInfo.coreInitString = std::string("-f 2 --broker=") + broker->getIdentifier();
+    fedInfo.setFlagOption(helics::defs::Flags::REALTIME);
+    fedInfo.setProperty(helics::defs::Properties::RT_LAG, 0.1);
+    fedInfo.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
+    fedInfo.setProperty(helics::defs::Properties::PERIOD, 0.5);
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
 
-    auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
-    fi.setFlagOption(helics::defs::Flags::REALTIME, false);
-    auto fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
+    auto fed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
+    fedInfo.setFlagOption(helics::defs::Flags::REALTIME, false);
+    auto fed2 = std::make_shared<helics::ValueFederate>("test2", fedInfo);
     helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
                               fed2,
                               "pub1",

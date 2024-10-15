@@ -54,22 +54,22 @@ external protection, that will result in undefined behavior
     */
         Player(int argc, char* argv[]);
         /** construct from a federate info object
-    @param name the name of the federate (can be empty to use defaults from fi)
-    @param fi a pointer info object containing information on the desired federate configuration
+    @param name the name of the federate (can be empty to use defaults from fedInfo)
+    @param fedInfo a pointer info object containing information on the desired federate configuration
     */
-        explicit Player(std::string_view name, const FederateInfo& fi);
+        explicit Player(std::string_view name, const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate (can be empty to use defaults from fi)
+    @param name the name of the federate (can be empty to use defaults from fedInfo)
     @param core a pointer to core object which the federate can join
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Player(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Player(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate (can be empty to use defaults from fi)
+    @param name the name of the federate (can be empty to use defaults from fedInfo)
     @param core a coreApp object that can be joined
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Player(std::string_view name, CoreApp& core, const FederateInfo& fi);
+        Player(std::string_view name, CoreApp& core, const FederateInfo& fedInfo);
         /**constructor taking a file with the required information
     @param appName the name of the app
     @param configString JSON, TOML or text file or JSON string defining the federate information and

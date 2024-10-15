@@ -44,26 +44,25 @@ inline std::string getCPUModel()
     return std::string(CPUBrandString);
 }
 #elif defined(__unix__)
-#    include <cstdio>
 #    include <cstdlib>
 #    include <cstring>
 inline std::string getCPUModel()
 {  // Get the cpu from /proc/cpuinfo
-    FILE* fp = fopen("/proc/cpuinfo", "r");
-    if (fp == nullptr) {
+    FILE* file = fopen("/proc/cpuinfo", "r");
+    if (file == nullptr) {
         return std::string{};
     }
     size_t n{0};
     char* line{nullptr};
     std::string info;
-    while (getline(&line, &n, fp) > 0) {
+    while (getline(&line, &n, file) > 0) {
         if (strstr(line, "model name") != nullptr) {
             info.append(line);
             break;
         }
     }
     free(line);
-    fclose(fp);
+    fclose(file);
     auto modelLoc = info.find("model name");
 
     if (modelLoc != std::string::npos) {
@@ -115,5 +114,5 @@ inline void printHELICSsystemInfo()
         std::cout << "CPU MODEL: " << cpumodel << '\n';
     }
     std::cout << "NUM CPU:" << std::thread::hardware_concurrency() << '\n';
-    std::cout << "-------------------------------------------" << std::endl;
+    std::cout << "-------------------------------------------" << '\n';
 }

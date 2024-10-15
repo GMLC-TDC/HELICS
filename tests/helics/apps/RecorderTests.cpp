@@ -21,13 +21,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(recorder_tests, simple_recorder_test)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "rcore1";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "rcore1";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
     rec1.addSubscription("pub1");
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &vfed,
                              "pub1",
@@ -54,13 +54,13 @@ TEST(recorder_tests, simple_recorder_test)
 
 TEST(recorder_tests, simple_recorder_test2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "rcore1-t2";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "rcore1-t2";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
     rec1.addSubscription("pub1");
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &vfed,
                              "pub1",
@@ -99,12 +99,12 @@ TEST(recorder_tests, simple_recorder_test2)
 
 TEST(recorder_tests, recorder_test_message)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "rcore-tm";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "rcore-tm";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
 
     rec1.addEndpoint("src1");
@@ -131,14 +131,14 @@ class recorder_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(recorder_file_tests, test_files)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = std::string("coref") + GetParam();
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = std::string("coref") + GetParam();
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
 
     rec1.loadFile(std::string(TEST_DIR) + GetParam());
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &vfed,
                              "pub1",
@@ -206,14 +206,14 @@ class recorder_message_file_tests: public ::testing::TestWithParam<const char*> 
 
 TEST_P(recorder_message_file_tests, test_message_files)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = std::string("rcoretmf") + GetParam();
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = std::string("rcoretmf") + GetParam();
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
 
     rec1.loadFile(std::string(TEST_DIR) + GetParam());
 
-    helics::CombinationFederate cfed("block1", fi);
+    helics::CombinationFederate cfed("block1", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &cfed,
                              "pub1",
@@ -292,10 +292,10 @@ TEST_P(recorder_message_file_tests, test_message_files_cmd)
 
     helics::apps::Recorder rec1(5, argv);
 
-    helics::FederateInfo fi(helics::CoreType::IPC);
-    fi.coreInitString = "-f 1 --broker=ipc_broker";
+    helics::FederateInfo fedInfo(helics::CoreType::IPC);
+    fedInfo.coreInitString = "-f 1 --broker=ipc_broker";
 
-    helics::CombinationFederate cfed("obj", fi);
+    helics::CombinationFederate cfed("obj", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &cfed,
                              "pub1",
@@ -363,16 +363,16 @@ INSTANTIATE_TEST_SUITE_P(recorder_tests,
 
 TEST(recorder_tests, recorder_test_destendpoint_clone)
 {
-    helics::FederateInfo fi;
-    fi.coreType = helics::CoreType::TEST;
-    fi.coreName = "rcore-dep";
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo;
+    fedInfo.coreType = helics::CoreType::TEST;
+    fedInfo.coreName = "rcore-dep";
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
 
-    helics::MessageFederate mfed2("block2", fi);
+    helics::MessageFederate mfed2("block2", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
@@ -412,15 +412,15 @@ TEST(recorder_tests, recorder_test_destendpoint_clone)
 
 TEST(recorder_tests, recorder_test_srcendpoint_clone)
 {
-    helics::FederateInfo fi;
-    fi.coreType = helics::CoreType::TEST;
-    fi.coreName = "rcore2";
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo;
+    fedInfo.coreType = helics::CoreType::TEST;
+    fedInfo.coreName = "rcore2";
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::MessageFederate mfed("block1", fi);
-    helics::MessageFederate mfed2("block2", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
+    helics::MessageFederate mfed2("block2", fedInfo);
 
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
@@ -458,16 +458,16 @@ TEST(recorder_tests, recorder_test_srcendpoint_clone)
 
 TEST(recorder_tests, recorder_test_endpoint_clone)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
 
-    fi.coreName = "rcore3";
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    fedInfo.coreName = "rcore3";
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
 
-    helics::MessageFederate mfed2("block2", fi);
+    helics::MessageFederate mfed2("block2", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
@@ -514,15 +514,15 @@ class recorder_clone_file_tests: public ::testing::TestWithParam<const char*> {}
 
 TEST_P(recorder_clone_file_tests, simple_clone_test_file)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = std::string("rcore4") + GetParam();
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = std::string("rcore4") + GetParam();
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
 
-    helics::MessageFederate mfed2("block2", fi);
+    helics::MessageFederate mfed2("block2", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
@@ -574,15 +574,15 @@ INSTANTIATE_TEST_SUITE_P(recorder_tests,
 
 TEST(recorder_tests, recorder_test_saveFile1)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "rcore5";
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "rcore5";
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
 
-    helics::MessageFederate mfed2("block2", fi);
+    helics::MessageFederate mfed2("block2", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
@@ -628,14 +628,14 @@ TEST(recorder_tests, recorder_test_saveFile1)
 
 TEST(recorder_tests, recorder_test_saveFile2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "rcore6";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "rcore6";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
 
     rec1.addSubscription("pub1");
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &vfed,
                              "pub1",
@@ -674,15 +674,15 @@ TEST(recorder_tests, recorder_test_saveFile2)
 
 TEST(recorder_tests, recorder_test_saveFile3)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "rcore7";
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "rcore7";
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1);
 
-    helics::CombinationFederate mfed("block1", fi);
+    helics::CombinationFederate mfed("block1", fedInfo);
 
-    helics::MessageFederate mfed2("block2", fi);
+    helics::MessageFederate mfed2("block2", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
