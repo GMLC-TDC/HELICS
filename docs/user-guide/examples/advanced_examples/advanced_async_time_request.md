@@ -1,6 +1,6 @@
 # Asynchronous (non-blocking) Time Request
 
-Generally, when federates make a time request they do so by calling helicsFederateRequestTime(). This is a blocking call; the HELICS library will wait until it is has determined the time it will grant the federate and then will do so, returning the granted time. In many cases, this blocking call is acceptable as a time request generally means a federate has nothing to do until it receives new inputs from the rest of the federation as it has completed updating its internal model based on the last received inputs from the federation.
+Generally, when federates make a time request they do so by calling `helicsFederateRequestTime()`. This is a blocking call; the HELICS library will wait until it has reached the time it determines should be granted to the federate and then will do so, returning the granted time. In many cases, this blocking call is acceptable as a time request generally means a federate has nothing to do until it receives new inputs from the rest of the federation as it has completed updating its internal model based on the last received inputs from the federation.
 
 There are cases, though, where a federate may want to make a time request and then continue working on another computational task instead of waiting in an idle state for the time request to be granted. HELICS provides an alternative time request API to accomplish this: `helicsFederateRequestTimeAsync()`.
 
