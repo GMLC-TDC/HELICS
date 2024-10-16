@@ -18,7 +18,7 @@ Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more detail
 
 #include "zmqSocketDescriptor.h"
 
-#include <memrory>
+#include <memory>
 
 zmq::socket_t zmqSocketDescriptor::makeSocket(zmq::context_t& ctx) const
 {

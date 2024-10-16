@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <chrono>
+#include <string>
+#include <vector>
 
 /** @file these test cases test out the federateInfo object
  */

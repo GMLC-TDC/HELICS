@@ -15,6 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <helics/core/Broker.hpp>
 #include <thread>
+#include <string>
+#include <memory>
+
 /** these test cases test out the message federates
  */
 

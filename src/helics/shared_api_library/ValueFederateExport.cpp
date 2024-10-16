@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <string>
+#include <utility>
 
 /** random integer for validation purposes of inputs */
 static constexpr int InputValidationIdentifier = 0x3456'E052;
