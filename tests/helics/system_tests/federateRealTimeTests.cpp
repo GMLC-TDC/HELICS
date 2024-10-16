@@ -18,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <chrono>
 #include <future>
 #include <thread>
+#include <string>
+#include <memory>
 
 /** @file these test cases test out the real time mode for HELICS
  */

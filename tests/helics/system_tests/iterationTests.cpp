@@ -17,6 +17,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 #include <thread>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <utility>
 
 static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
     return std::string(parameter.param);

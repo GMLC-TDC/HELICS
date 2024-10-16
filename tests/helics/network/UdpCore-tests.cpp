@@ -19,6 +19,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <asio/ip/udp.hpp>
 #include <future>
 #include <thread>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace std::literals::chrono_literals;
 

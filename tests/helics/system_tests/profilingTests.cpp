@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <regex>
 #include <thread>
+#include <string>
+#include <vector>
 
 /** these test cases test out user-directed logging functionality
  */

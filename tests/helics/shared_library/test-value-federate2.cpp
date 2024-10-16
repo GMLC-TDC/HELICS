@@ -9,6 +9,8 @@ Energy, LLC.  See the top-level NOTICE for additional details.
 #include <future>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <string>
+#include <vector>
 
 /** these test cases test out the value converters and some of the other functions
  */

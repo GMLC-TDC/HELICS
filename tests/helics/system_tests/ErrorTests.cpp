@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <complex>
 #include <future>
 #include <thread>
+#include <string>
+#include <memory>
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 

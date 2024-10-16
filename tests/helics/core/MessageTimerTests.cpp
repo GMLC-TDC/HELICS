@@ -9,6 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <thread>
+#include <iostream>
+#include <utility>
+#include <memory>
+
 using namespace helics;
 
 using namespace std::literals::chrono_literals;

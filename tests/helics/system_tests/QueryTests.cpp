@@ -20,6 +20,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <nlohmann/json.hpp>
 #include <thread>
+#include <string>
+#include <memory>
+#include <utility>
 
 struct query: public FederateTestFixture, public ::testing::Test {};
 

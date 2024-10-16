@@ -21,6 +21,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <numeric>
 #include <thread>
+#include <vector>
+#include <algorithm>
+#include <string>
 
 using namespace std::literals::chrono_literals;
 

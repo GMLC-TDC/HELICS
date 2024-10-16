@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.h"
 
 #include <gtest/gtest.h>
-
+#include <string>
 /**
  tests of evil inputs for all HELICS API function calls*/
 

@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <iostream>
 #include <thread>
+#include <string>
+
 // these test cases test out the message federates
 
 class mfed_simple_type_tests:

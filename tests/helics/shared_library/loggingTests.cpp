@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <thread>
-
+#include <string>
 /** these test cases test out the value converters
  */
 #include "ctestFixtures.hpp"

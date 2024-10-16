@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <thread>
 #include <vector>
+#include <string>
 // misc test copying some of the JAVA/Python tests
 
 #ifdef HELICS_ENABLE_ZMQ_CORE

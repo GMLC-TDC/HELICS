@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <thread>
+#include <string>
+#include <iostream>
 
 /** tests for some network options*/
 

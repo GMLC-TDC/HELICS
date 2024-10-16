@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <gtest/gtest.h>
 #include <thread>
+#include <string>
+#include <cstdio>
 /** these test cases test out the message federates
  */
 
