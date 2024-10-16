@@ -321,7 +321,12 @@ if(NOT TARGET toml11::toml11)
     set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
     set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
     set(toml11_INSTALL OFF CACHE INTERNAL "")
-    add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
+    
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+        add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL SYSTEM)
+    else()
+        add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
+    endif()
     hide_variable(TOML11_USE_UNRELEASED_TOML_FEATURES)
 endif()
 
