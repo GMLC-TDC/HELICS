@@ -97,7 +97,7 @@ In JSON, the format looks like:
 }
 ```
 
-TODO: explain "from_to",...
+The "from-to" or "to-from" is used to indicate which side of the connection is un-named and thus is the producer of the data ("from") and which side is named and is the target for the data ("to"). helics_connector goes through and finds all **unconnected** interfaces on the federates themselves, finds the corresponding interface indicated as a "from" connection in the match-file, and then connects them with any existing entry in the match-file on the "to" side (even if they already have a target).
 
 Alternatively, the match-file can be specified using regular expressions. This can be a convenient way to specify a large number of interface connections if they follow a naming convention. The regular expression format takes advantage of the ability to name terms in the expression, allowing terms in one part of the expression to be used later on in the expression. In the case, the above match-file looks like this:
 
@@ -109,7 +109,7 @@ REGEX:Charger/EV(?<ev_num>\d*)_input_current, REGEX:Battery/EV(?<ev_num>)_output
 
 In this case, "ev_num" is the name given to the numerals that appear after the characters "EV" and are used in both first and second terms of the match-file. Each regular expression must be prefixed with the "REGEX:" string.
 
-TODO mixing regular expressions and direct matches
+Its possible to mix direct connections and regular expressions in the same matchfile but not because the helics_connector only works on unconnected interfaces, there is an implied precedence in the match-file that works top down. That is, connections at the top of the file over-ride those specified at the bottom of the file. Once an interface marked as a "from" is connected, it is not eligible for connections defined later in the file.
 
 
 #### Condfiguration by interface creation
