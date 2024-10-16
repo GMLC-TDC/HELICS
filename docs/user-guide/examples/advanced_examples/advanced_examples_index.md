@@ -15,6 +15,8 @@
     advanced_orchestration
     advanced_iteration
     advanced_FMU
+    advanced_async_time_request
+    advanced_helics_connector
 
 ```
 
