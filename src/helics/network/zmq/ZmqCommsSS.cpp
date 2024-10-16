@@ -18,9 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <map>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 
 static const int TX_RX_MSG_COUNT = 20;
 

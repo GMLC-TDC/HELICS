@@ -32,8 +32,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <sstream>
 #include <string>
 #include <thread>
-#include <utility>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 #ifndef HELICS_DISABLE_ASIO

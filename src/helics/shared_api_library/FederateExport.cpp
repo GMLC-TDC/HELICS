@@ -15,11 +15,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <map>
-#include <mutex>
-#include <vector>
-#include <string>
 #include <memory>
+#include <mutex>
+#include <string>
 #include <utility>
+#include <vector>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static constexpr int fedValidationIdentifier = 0x235'2188;

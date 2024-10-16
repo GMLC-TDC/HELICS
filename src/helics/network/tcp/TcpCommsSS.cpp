@@ -17,9 +17,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <map>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 
 namespace helics::tcp {
 using gmlc::networking::TcpConnection;
