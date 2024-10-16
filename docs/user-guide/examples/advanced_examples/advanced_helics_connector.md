@@ -2,7 +2,7 @@
 
 This example demonstrates the use of the "helics_connector" app to create interface connection between federates outside of the configuration JSON or API calls.
 
-- [helics\_connector](#helics_connector)
+- [helics_connector](#helics_connector)
   - [Where is the code?](#where-is-the-code)
   - [What is this co-simulation doing?](#what-is-this-co-simulation-doing)
     - [Differences compared to the Advanced Default example](#differences-compared-to-the-advanced-default-example)
@@ -10,7 +10,7 @@ This example demonstrates the use of the "helics_connector" app to create interf
     - [HELICS components](#helics-components)
       - [Configuration by match-file](#configuration-by-match-file)
       - [Match-file specification](#match-file-specification)
-      - [Condfiguration by interface creation](#condfiguration-by-interface-creation)
+      - [Configuration by interface creation](#condfiguration-by-interface-creation)
         - [Query callback](#query-callback)
         - [Configuration command response](#configuration-command-response)
         - [Interface creation timing](#interface-creation-timing)
@@ -25,7 +25,7 @@ This example code on [the use of helics_connector can be found here](https://git
 
 ## What is this co-simulation doing?
 
-This example shows how to use helics_connector to create connections between HELICS federate interfaces without specifying said connections via the JSON configuration or similar APIs. Specifically, only publications (with no targets defined), outputs (with no source defined), and endpoints need to be defined in the JSON. helics_connector then uses a match-file to establish the connections between publication outputs and inputs. 
+This example shows how to use helics_connector to create connections between HELICS federate interfaces without specifying said connections via the JSON configuration or similar APIs. Specifically, only publications (with no targets defined), outputs (with no source defined), and endpoints need to be defined in the JSON. helics_connector then uses a match-file to establish the connections between publication outputs and inputs.
 
 ### Differences compared to the Advanced Default example
 
@@ -38,7 +38,8 @@ By configuring the federates without any targeting in the input or output, helic
 ### HELICS components
 
 #### Configuration by match-file
-The only difference between the federation as defined in the "advanced default" example and this example is how the configuration is defined. The advanced_default example uses subscriptions instead of inputs in the configuration JSON while this example uses inputs. For example, a portion of the Battery federate configuration for the advanced_default examle and this example are shown below; the advanced_default configuration uses subscriptions and specifies a "key" as a data source where this example uses inputs and has no "key" value.
+
+The only difference between the federation as defined in the "advanced default" example and this example is how the configuration is defined. The advanced_default example uses subscriptions instead of inputs in the configuration JSON while this example uses inputs. For example, a portion of the Battery federate configuration for the advanced_default example and this example are shown below; the advanced_default configuration uses subscriptions and specifies a "key" as a data source where this example uses inputs and has no "key" value.
 
 ```json
 "subscriptions":[
@@ -63,6 +64,7 @@ The only difference between the federation as defined in the "advanced default" 
 ```
 
 #### Match-file specification
+
 The match-file can be specified either using a plain textfile or JSON. The simplest format specifies the individual connections between federates, one connection per line:
 
 ```
@@ -83,16 +85,16 @@ In JSON, the format looks like:
 ```json
 {
   "connections": [
-  ["Charger/EV1_output_voltage", "Battery/EV1_input_voltage", "from_to"],
-  ["Charger/EV2_output_voltage", "Battery/EV2_input_voltage", "from_to"],
-  ["Charger/EV3_output_voltage", "Battery/EV3_input_voltage", "from_to"],
-  ["Charger/EV4_output_voltage", "Battery/EV4_input_voltage", "from_to"],
-  ["Charger/EV5_output_voltage", "Battery/EV5_input_voltage", "from_to"],
-  ["Charger/EV1_input_current", "Battery/EV1_output_current", "to_from"],
-  ["Charger/EV2_input_current", "Battery/EV2_output_current", "to_from"],
-  ["Charger/EV3_input_current", "Battery/EV3_output_current", "to_from"],
-  ["Charger/EV4_input_current", "Battery/EV4_output_current", "to_from"],
-  ["Charger/EV5_input_current", "Battery/EV5_output_current", "to_from"],
+    ["Charger/EV1_output_voltage", "Battery/EV1_input_voltage", "from_to"],
+    ["Charger/EV2_output_voltage", "Battery/EV2_input_voltage", "from_to"],
+    ["Charger/EV3_output_voltage", "Battery/EV3_input_voltage", "from_to"],
+    ["Charger/EV4_output_voltage", "Battery/EV4_input_voltage", "from_to"],
+    ["Charger/EV5_output_voltage", "Battery/EV5_input_voltage", "from_to"],
+    ["Charger/EV1_input_current", "Battery/EV1_output_current", "to_from"],
+    ["Charger/EV2_input_current", "Battery/EV2_output_current", "to_from"],
+    ["Charger/EV3_input_current", "Battery/EV3_output_current", "to_from"],
+    ["Charger/EV4_input_current", "Battery/EV4_output_current", "to_from"],
+    ["Charger/EV5_input_current", "Battery/EV5_output_current", "to_from"]
   ]
 }
 ```
@@ -111,8 +113,8 @@ In this case, "ev_num" is the name given to the numerals that appear after the c
 
 Its possible to mix direct connections and regular expressions in the same matchfile but not because the helics_connector only works on unconnected interfaces, there is an implied precedence in the match-file that works top down. That is, connections at the top of the file over-ride those specified at the bottom of the file. Once an interface marked as a "from" is connected, it is not eligible for connections defined later in the file.
 
+#### Configuration by interface creation
 
-#### Condfiguration by interface creation
 A second, more complex example is also included where helics_connector facilitates a custom communication protocol between federates where the interfaces themselves are created on demand. In this case, the federates using this protocol must be written to respond to a specific query where they indicate the interfaces they could create and then respond to a specific command from helics_connector by creating the interfaces indicated by helics_federate. In both cases helics_connector uses a match-file specification to define which interfaces to create.
 
 The configuration JSON of the federate is quite different as no interfaces are defined and only timing information is included:
@@ -180,38 +182,37 @@ h.helicsQueryBufferFill(query_buffer, query_response)
 
 With "UserData" and "query_callback" defined, they now just need to be included in the main body of the federate code. An instance of the UserData object is created ("user_data") using the number of EVs and a handle (pointer) to the object is defined. Lastly, the query callback is defined via a HELICS API, referencing both "query_callback" and "user_data".
 
-```python 
+```python
 user_data = UserData(num_EVs)
 user_data_handle = h.ffi.new_handle(user_data)
 h.helicsFederateSetQueryCallback(fed, query_callback, user_data_handle)
 ```
 
 ##### Configuration command response
+
 After responding to the query, the federate also needs to respond to the command sent by helics_connection to define the interfaces it needs to create. helics_connector sends a JSON as a command with the "command" field of that object being "register_interfaces". The rest of the object has three fields: the publications, inputs, and endpoints the object needs to create.
 
 ```json
 {
-   "command" : "register_interfaces",
-   "inputs" : 
-   [
-      "Battery/EV5_input_voltage",
-      "Battery/EV4_input_voltage",
-      "Battery/EV3_input_voltage",
-      "Battery/EV2_input_voltage",
-      "Battery/EV1_input_voltage"
-   ],
-   "publications" : 
-   [
-      "Battery/EV5_output_current",
-      "Battery/EV4_output_current",
-      "Battery/EV3_output_current",
-      "Battery/EV2_output_current",
-      "Battery/EV1_output_current"
-   ]
+  "command": "register_interfaces",
+  "inputs": [
+    "Battery/EV5_input_voltage",
+    "Battery/EV4_input_voltage",
+    "Battery/EV3_input_voltage",
+    "Battery/EV2_input_voltage",
+    "Battery/EV1_input_voltage"
+  ],
+  "publications": [
+    "Battery/EV5_output_current",
+    "Battery/EV4_output_current",
+    "Battery/EV3_output_current",
+    "Battery/EV2_output_current",
+    "Battery/EV1_output_current"
+  ]
 }
 ```
 
-The example code checks to make sure the interfaces are provided as lists and then creates the interfaces as a part of the custom "register_interfaces_from_command" function. In this case, we assume all inputs are doubles; a more general command could include data types. 
+The example code checks to make sure the interfaces are provided as lists and then creates the interfaces as a part of the custom "register_interfaces_from_command" function. In this case, we assume all inputs are doubles; a more general command could include data types.
 
 ```python
 if isinstance(cmd["publications"], list):
@@ -223,17 +224,18 @@ if isinstance(cmd["inputs"], list):
 ```
 
 ##### Interface creation timing
-The above defined query response and command protocol all takes place during the initialization phase of the federate operation. To accomplish multiple asynchronous events in initializing mode, the ["iterative" version of entering initilization mode](https://python.helics.org/api/capi-py/#helicsFederateEnterInitializingMode) needs to be used. Due to the way HELICS grants time in initializing mode, the query is guaranteed to be available after enter initilizing mode. This is handled via the callback and not explicit call needs to be made. To guarantee the command message is available for acting on, the same iterative initializing mode call is made again. After this, the command is deciphered, the interfaces created, and, finally, the federate enters executing mode.
+
+The above defined query response and command protocol all takes place during the initialization phase of the federate operation. To accomplish multiple asynchronous events in initializing mode, the ["iterative" version of entering initialization mode](https://python.helics.org/api/capi-py/#helicsFederateEnterInitializingMode) needs to be used. Due to the way HELICS grants time in initializing mode, the query is guaranteed to be available after enter initializing mode. This is handled via the callback and not explicit call needs to be made. To guarantee the command message is available for acting on, the same iterative initializing mode call is made again. After this, the command is deciphered, the interfaces created, and, finally, the federate enters executing mode.
 
 ```python
 h.helicsFederateEnterInitializingModeIterative(fed)
-# Query is guaranteed to be available after this call but may be 
+# Query is guaranteed to be available after this call but may be
 # available earlier. Callback responds whenever the query comes in.
 h.helicsFederateEnterInitializingModeIterative(fed)
 command = h.helicsFederateGetCommand(fed)
   if len(command) == 0:
       raise TypeError("Empty command.")
-  try: 
+  try:
       logger.debug(f"command string: {command}")
       cmd = json.loads(command)
   except:
@@ -241,8 +243,6 @@ command = h.helicsFederateGetCommand(fed)
 register_interfaces_from_command(fed, cmd) # custom function
 h.helicsFederateEnterExecutingMode(fed)
 ```
-
-
 
 ## Execution and Results
 
@@ -261,7 +261,6 @@ Since this is only a change to the configuration method of the federation, the r
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_estimated_SOCs.png)
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_battery_SOCs.png)
-
 
 ## [Questions and Help](../../support.md)
 
