@@ -16,9 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstring>
 #include <memory>
 #include <mutex>
-#include <vector>
 #include <string>
 #include <utility>
+#include <vector>
 
 // random integer for validation purposes of endpoints
 static constexpr int EndpointValidationIdentifier = 0xB453'94C2;

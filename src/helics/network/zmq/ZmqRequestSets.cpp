@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <iostream>
 #include <memory>
-#include <utility>
 #include <string>
+#include <utility>
 
 namespace helics::zeromq {
 ZmqRequestSets::ZmqRequestSets(): ctx(ZmqContextManager::getContextPointer()) {}
