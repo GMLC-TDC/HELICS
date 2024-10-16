@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Run cpplint
-      run: cpplint --counting=detailed --exclude=*.c --recursive examples benchmarks src tests
+      run: cpplint --counting=detailed ---extensions=cpp,cxx,h,hpp,hxx --recursive examples benchmarks src tests
 
   clang-tidy:
     if: github.event_name == 'pull_request'
