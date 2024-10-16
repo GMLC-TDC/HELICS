@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <string>
+#include <memory>
 
 bool hasIndexCode(std::string_view type_name)
 {

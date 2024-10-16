@@ -18,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <filesystem>
 #include <future>
 #include <thread>
+#include <string>
+#include <vector>
 
 TEST(recorder_tests, simple_recorder_test)
 {

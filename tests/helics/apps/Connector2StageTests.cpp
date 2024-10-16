@@ -19,6 +19,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <future>
 #include <thread>
+#include <string>
+#include <vector>
+#include <memory>
 
 static std::string newCoreName(std::string_view baseName)
 {

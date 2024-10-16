@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <memory>
 
 namespace helics {
 

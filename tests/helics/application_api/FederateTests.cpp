@@ -22,6 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <thread>
 #include <string>
+#include <memory>
 
 /** these test cases test out the value converters
  */

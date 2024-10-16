@@ -15,6 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "units/units/units.hpp"
 
 #include <future>
+#include <string>
+#include <vector>
+#include <memory>
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 

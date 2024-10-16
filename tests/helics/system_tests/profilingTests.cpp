@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <string>
 #include <vector>
+#include <memory>
 
 /** these test cases test out user-directed logging functionality
  */

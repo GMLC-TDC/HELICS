@@ -20,6 +20,10 @@ using ::testing::HasSubstr;
 #include <filesystem>
 #include <future>
 #include <thread>
+#include <string>
+#include <vector>
+#include <utility>
+#include <memory>
 
 TEST(CoreAppTests, constructor1)
 {

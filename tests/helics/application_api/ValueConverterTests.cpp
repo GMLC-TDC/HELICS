@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <list>
 #include <set>
+#include <string>
+#include <limits>
+#include <vector>
 
 /** these test cases test out the value converters
  */

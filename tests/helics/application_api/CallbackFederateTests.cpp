@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 #include <utility>
+#include <memory>
 
 class callbackFed: public ::testing::Test, public FederateTestFixture {};
 

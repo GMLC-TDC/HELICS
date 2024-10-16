@@ -10,6 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "helics/application_api/data_view.hpp"
+#include <string>
+#include <vector>
+#include <utility>
+#include <memory>
 
 using namespace helics;
 

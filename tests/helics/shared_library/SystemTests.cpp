@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <csignal>
 #include <future>
 #include <thread>
+#include <string>
 
 // test generating a global from a broker and some of its error pathways
 TEST(other_tests, broker_global_value)

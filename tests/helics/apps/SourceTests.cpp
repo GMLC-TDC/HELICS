@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <future>
+#include <string>
 
 TEST(source_tests, simple_source_test)
 {

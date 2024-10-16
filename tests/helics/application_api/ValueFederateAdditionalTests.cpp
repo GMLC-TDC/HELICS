@@ -20,6 +20,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <numeric>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <memory>
+#include <vector>
 
 /** these test cases test out the value federates with some additional tests
  */

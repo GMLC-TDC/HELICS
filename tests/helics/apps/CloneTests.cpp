@@ -14,6 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <filesystem>
 #include <future>
 #include <thread>
+#include <string>
+#include <vector>
+#include <iostream>
 
 TEST(clone_tests, simple_clone_test_pub)
 {

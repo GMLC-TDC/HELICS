@@ -17,6 +17,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 #include <thread>
+#include <string>
+#include <vector>
+#include <memory>
 
 class MultibrokerFixture: public ::testing::Test {
   public:

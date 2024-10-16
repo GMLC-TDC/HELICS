@@ -14,6 +14,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 
 #include <cctype>
 #include <string>
+#include <memory>
 
 static bool hasIndexCode(const std::string& type_name)
 {

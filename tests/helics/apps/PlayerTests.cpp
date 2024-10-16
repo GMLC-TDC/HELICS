@@ -15,6 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 #include <thread>
+#include <string>
+#include <vector>
+#include <iostream>
 
 TEST(player_tests, simple_player)
 {

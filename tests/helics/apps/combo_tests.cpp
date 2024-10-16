@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstdio>
 #include <filesystem>
 #include <future>
+#include <string>
+#include <iostream>
 
 static void generateFiles(const std::filesystem::path& f1, const std::filesystem::path& f2)
 {

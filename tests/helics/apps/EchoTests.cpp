@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstdio>
 #include <future>
 #include <thread>
+#include <string>
 
 // this test will test basic echo functionality
 TEST(echo_tests, echo_test1)

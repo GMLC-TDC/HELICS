@@ -24,6 +24,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 #include <fstream>
 #include <streambuf>
+#include <string>
+#include <memory>
+#include <vector>
 
 /** these test cases test out the value federates
  */

@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 #include <cstdio>
 #include <string>
+#include <memory>
 
 /** these test cases test out the message federates
  */

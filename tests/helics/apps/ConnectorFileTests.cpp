@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/format.h>
 #include <future>
 #include <thread>
+#include <string>
 
 static constexpr std::string_view testdir = TEST_DIR "/connector/";
 
