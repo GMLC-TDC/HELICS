@@ -11,6 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "MessageFederate.hpp"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 namespace helics {
 
 Endpoint::Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle hid):

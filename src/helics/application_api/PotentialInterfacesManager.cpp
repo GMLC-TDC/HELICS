@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 
 #include <set>
+#include <string>
+#include <utility>
 
 namespace helics {
 PotentialInterfacesManager::PotentialInterfacesManager(Core* core, Federate* fed):

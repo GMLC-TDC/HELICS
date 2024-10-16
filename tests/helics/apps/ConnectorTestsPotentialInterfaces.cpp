@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/CoreApp.hpp"
 
 #include <future>
+#include <string>
 #include <thread>
 
 static constexpr std::string_view testdir = TEST_DIR "/connector/";

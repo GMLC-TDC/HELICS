@@ -9,6 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cstring>
 #include <fstream>
+#include <string>
+#include <utility>
+
 namespace helics {
 
 void ProfilerBuffer::addMessage(const std::string& data)

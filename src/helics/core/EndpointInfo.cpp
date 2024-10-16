@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/format.h>
 #include <memory>
 #include <set>
+#include <string>
 #include <utility>
 
 namespace helics {

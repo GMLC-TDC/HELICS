@@ -15,7 +15,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstdio>
 #include <filesystem>
 #include <future>
+#include <memory>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 TEST(BrokerAppTests, constructor1)
 {

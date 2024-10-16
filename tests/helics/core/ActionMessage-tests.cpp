@@ -9,7 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <cstdio>
+#include <memory>
 #include <set>
+#include <string>
+#include <utility>
 
 using namespace helics;
 

@@ -15,7 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <map>
+#include <memory>
 #include <mutex>
+#include <string>
+#include <utility>
 #include <vector>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/

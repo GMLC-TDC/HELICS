@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.hpp"
 
 #include <future>
+#include <string>
 #include <thread>
 
 struct timing2: public FederateTestFixture, public ::testing::Test {};

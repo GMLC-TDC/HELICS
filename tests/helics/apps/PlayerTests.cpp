@@ -14,7 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/Player.hpp"
 
 #include <future>
+#include <iostream>
+#include <string>
 #include <thread>
+#include <vector>
 
 TEST(player_tests, simple_player)
 {

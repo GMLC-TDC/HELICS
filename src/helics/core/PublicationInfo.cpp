@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_definitions.hpp"
 
 #include <algorithm>
+#include <string>
 #include <string_view>
 
 namespace helics {

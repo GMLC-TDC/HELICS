@@ -32,7 +32,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <sstream>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
+#include <vector>
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "MessageTimer.hpp"

@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "cpptestFixtures.hpp"
 
 #include <gtest/gtest.h>
+#include <string>
 
 struct QueryTests: public FederateTestFixture_cpp, public ::testing::Test {};
 

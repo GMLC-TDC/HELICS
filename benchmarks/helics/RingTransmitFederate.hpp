@@ -37,11 +37,11 @@ class RingTransmit: public BenchmarkFederate {
         opt_max_index->required();
     }
 
-    void doParamInit(helics::FederateInfo& fi) override
+    void doParamInit(helics::FederateInfo& fedInfo) override
     {
-        fi.setFlagOption(HELICS_FLAG_RESTRICTIVE_TIME_POLICY);
+        fedInfo.setFlagOption(HELICS_FLAG_RESTRICTIVE_TIME_POLICY);
         if (index == 0) {
-            // fi.setProperty(helics_property_int_log_level, helics_log_level_timing);
+            // fedInfo.setProperty(helics_property_int_log_level, helics_log_level_timing);
         }
     }
 

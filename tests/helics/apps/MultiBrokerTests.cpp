@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstdio>
 #include <filesystem>
 #include <future>
+#include <string>
 
 static const bool amb = helics::allowMultiBroker();
 

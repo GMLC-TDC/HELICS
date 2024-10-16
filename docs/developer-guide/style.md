@@ -24,7 +24,7 @@ for how to setup support in your preferred editor or IDE.
    class ValueFederate : public virtual Federate
    {
    public:
-       ValueFederate (const FederateInfo &fi);
+       ValueFederate (const FederateInfo &fedInfo);
    }
    ```
 

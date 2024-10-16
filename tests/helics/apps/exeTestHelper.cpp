@@ -17,6 +17,7 @@
 #include <fstream>
 #include <future>
 #include <streambuf>
+#include <string>
 
 int exeTestRunner::counter = 1;
 

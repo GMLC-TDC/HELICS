@@ -14,7 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <fstream>
 #include <iostream>
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace helics {
 CoreApp::CoreApp(CoreType ctype, std::string_view coreName, std::vector<std::string> args):

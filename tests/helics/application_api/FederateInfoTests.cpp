@@ -12,15 +12,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <chrono>
+#include <string>
+#include <vector>
 
 /** @file these test cases test out the federateInfo object
  */
 
 TEST(federateInfo, constructor1)
 {
-    helics::FederateInfo fedInfo("--coretype=test --name fi");
+    helics::FederateInfo fedInfo("--coretype=test --name fedInfo");
     EXPECT_EQ(fedInfo.coreType, helics::CoreType::TEST);
-    EXPECT_EQ(fedInfo.defName, "fi");
+    EXPECT_EQ(fedInfo.defName, "fedInfo");
 }
 
 TEST(federateInfo, constructor2)

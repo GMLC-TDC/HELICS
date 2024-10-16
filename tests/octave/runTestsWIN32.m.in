@@ -1,4 +1,0 @@
-addPath('${CMAKE_BINARY_DIR}/swig/octave')
-test valueFedTests
-test messageFedTests
-test messageFilterTests

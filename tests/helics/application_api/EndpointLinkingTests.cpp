@@ -23,7 +23,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <iostream>
 #include <numeric>
+#include <string>
 #include <thread>
+#include <vector>
 
 /** these test cases test out the message federates
  */

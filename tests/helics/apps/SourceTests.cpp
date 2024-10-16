@@ -11,13 +11,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <future>
+#include <string>
 
 TEST(source_tests, simple_source_test)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "score-source";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Source src1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "score-source";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1("player1", fedInfo);
     auto index = src1.addSignalGenerator("ramp", "ramp");
     auto gen = src1.getGenerator(index);
 
@@ -30,7 +31,7 @@ TEST(source_tests, simple_source_test)
     gen->set("level", 1.0);
     src1.addPublication("pub1", helics::DataType::HELICS_DOUBLE, 1.0);
     src1.setStartTime("pub1", 1.0);
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto fut = std::async(std::launch::async, [&src1]() {
         src1.runTo(5);
@@ -67,11 +68,11 @@ TEST(source_tests, simple_source_test)
 
 TEST(source_tests, simple_source_test2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreType = helics::CoreType::TEST;
-    fi.coreName = "score-simple";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Source src1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreType = helics::CoreType::TEST;
+    fedInfo.coreName = "score-simple";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1("player1", fedInfo);
 
     auto index = src1.addSignalGenerator("ramp", "ramp");
     auto index2 = src1.addSignalGenerator("ramp2", "ramp");
@@ -91,7 +92,7 @@ TEST(source_tests, simple_source_test2)
     gen2->set("level", 2.0);
     src1.addPublication("pub2", "ramp2", helics::DataType::HELICS_DOUBLE, 2.0);
     src1.setStartTime("pub2", 3.0);
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
     auto fut = std::async(std::launch::async, [&src1]() {
@@ -135,11 +136,11 @@ TEST(source_tests, simple_source_test2)
 
 TEST(source_tests, sine_source_test)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreType = helics::CoreType::TEST;
-    fi.coreName = "score-sine";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Source src1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreType = helics::CoreType::TEST;
+    fedInfo.coreName = "score-sine";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1("player1", fedInfo);
 
     auto index = src1.addSignalGenerator("sine", "sine");
     auto gen = src1.getGenerator(index);
@@ -150,7 +151,7 @@ TEST(source_tests, sine_source_test)
     }
     src1.addPublication("pub1", helics::DataType::HELICS_DOUBLE, 0.5);
     src1.setStartTime("pub1", 1.0);
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto fut = std::async(std::launch::async, [&src1]() {
         src1.runTo(5);
@@ -193,13 +194,13 @@ TEST(source_tests, sine_source_test)
 
 TEST(source_tests, simple_source_test_file)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "scorep";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Source src1("source1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "scorep";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1("source1", fedInfo);
     src1.loadFile(std::string(TEST_DIR) + "/simple_source_test.json");
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto fut = std::async(std::launch::async, [&src1]() {
         src1.runTo(5);
@@ -236,13 +237,13 @@ TEST(source_tests, simple_source_test_file)
 
 TEST(source_tests, simple_source_test2_file)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "score2";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Source src1("player1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "score2";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1("player1", fedInfo);
 
     src1.loadFile(std::string(TEST_DIR) + "/simple_source_test2.json");
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
     auto fut = std::async(std::launch::async, [&src1]() {
@@ -286,14 +287,14 @@ TEST(source_tests, simple_source_test2_file)
 
 TEST(source_tests, sine_source_test_file)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
 
-    fi.coreName = "score1";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Source src1("player1", fi);
+    fedInfo.coreName = "score1";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1("player1", fedInfo);
     src1.loadFile(std::string(TEST_DIR) + "/simple_sine_source.json");
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto fut = std::async(std::launch::async, [&src1]() {
         src1.runTo(5);

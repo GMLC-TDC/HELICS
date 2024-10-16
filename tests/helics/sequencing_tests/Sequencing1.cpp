@@ -14,10 +14,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "sequencingHelpers.hpp"
 
+#include <cstdio>
 #include <future>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <memory>
 #include <thread>
+#include <vector>
+
 /** these test cases test out the message federates
  */
 

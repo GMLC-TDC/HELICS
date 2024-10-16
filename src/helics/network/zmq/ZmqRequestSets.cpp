@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <utility>
 
 namespace helics::zeromq {

@@ -15,6 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <utility>
 #include <vector>
 
 /** random integer for validation purposes of inputs */

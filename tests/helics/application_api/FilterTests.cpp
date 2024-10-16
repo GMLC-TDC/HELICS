@@ -19,9 +19,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #else
 #    include "testFixtures_shared.hpp"
 #endif
+#include <cstdio>
 #include <future>
 #include <gtest/gtest.h>
+#include <memory>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
+
 /** these test cases test out the message federates
  */
 

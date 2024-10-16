@@ -14,7 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <cstdio>
+#include <string>
 #include <thread>
+#include <vector>
 
 using namespace helics;
 
@@ -76,14 +78,14 @@ TEST_P(BrokerServerTests, execution_tests)
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     brks.startServers();
 
-    FederateInfo fi(GetParam().second);
-    fi.coreName = "c1";
-    fi.brokerInitString = "-f 2";
-    auto fed1 = ValueFederate("fed1", fi);
+    FederateInfo fedInfo(GetParam().second);
+    fedInfo.coreName = "c1";
+    fedInfo.brokerInitString = "-f 2";
+    auto fed1 = ValueFederate("fed1", fedInfo);
     fed1.registerGlobalPublication("key1", "double");
-    fi.coreName = "c2";
+    fedInfo.coreName = "c2";
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed2 = ValueFederate("fed2", fi);
+    auto fed2 = ValueFederate("fed2", fedInfo);
     auto& sub = fed2.registerSubscription("key1");
     sub.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     fed1.enterExecutingModeAsync();
@@ -104,27 +106,27 @@ TEST_P(BrokerServerTests, execution_tests_duplicate)
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     brks.startServers();
 
-    FederateInfo fi(GetParam().second);
-    fi.coreName = "c1b";
+    FederateInfo fedInfo(GetParam().second);
+    fedInfo.coreName = "c1b";
 
-    auto fed1 = ValueFederate("fed1", fi);
+    auto fed1 = ValueFederate("fed1", fedInfo);
     auto& pub1 = fed1.registerGlobalPublication("key1", "double");
-    fi.coreName = "c2b";
+    fedInfo.coreName = "c2b";
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed2 = ValueFederate("fed2", fi);
+    auto fed2 = ValueFederate("fed2", fedInfo);
     auto& sub2 = fed2.registerSubscription("key1");
     sub2.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     fed1.enterExecutingModeAsync();
     EXPECT_NO_THROW(fed2.enterExecutingMode());
     fed1.enterExecutingModeComplete();
 
-    fi.coreName = "c3b";
+    fedInfo.coreName = "c3b";
     // this would test two co-sims executing simultaneously
-    auto fed3 = ValueFederate("fed3", fi);
+    auto fed3 = ValueFederate("fed3", fedInfo);
     auto& pub3 = fed3.registerGlobalPublication("key1", "double");
-    fi.coreName = "c4b";
+    fedInfo.coreName = "c4b";
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed4 = ValueFederate("fed4", fi);
+    auto fed4 = ValueFederate("fed4", fedInfo);
     auto& sub4 = fed4.registerSubscription("key1");
     sub4.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     fed3.enterExecutingModeAsync();
