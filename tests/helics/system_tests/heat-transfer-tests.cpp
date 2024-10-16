@@ -14,8 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <thread>
-#include <vector>
 #include <utility>
+#include <vector>
 
 helics::Time tend = 3600.0;  // simulation end time
 

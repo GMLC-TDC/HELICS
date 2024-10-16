@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cassert>
 #include <cctype>
-#include <string>
 #include <cstdio>
+#include <string>
 
 static bool hasIndexCode(const std::string& type_name)
 {

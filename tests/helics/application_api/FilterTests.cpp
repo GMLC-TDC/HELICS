@@ -22,11 +22,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstdio>
 #include <future>
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
-#include <memory>
 
 /** these test cases test out the message federates
  */

@@ -16,10 +16,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/CoreApp.hpp"
 
 #include <future>
-#include <thread>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 
 class MultibrokerFixture: public ::testing::Test {
   public:

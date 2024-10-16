@@ -19,11 +19,11 @@ using ::testing::HasSubstr;
 #include <cstdio>
 #include <filesystem>
 #include <future>
-#include <thread>
-#include <string>
-#include <vector>
-#include <utility>
 #include <memory>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
 
 TEST(CoreAppTests, constructor1)
 {

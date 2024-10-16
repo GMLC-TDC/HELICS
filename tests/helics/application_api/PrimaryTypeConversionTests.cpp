@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-
 /** these test cases test out the value converters
  */
 #include "helics/application_api/HelicsPrimaryTypes.hpp"

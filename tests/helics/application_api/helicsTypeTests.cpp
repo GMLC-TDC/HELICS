@@ -8,9 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/common/JsonProcessingFunctions.hpp"
 
 #include <complex>
+#include <gtest/gtest.h>
 #include <string>
 #include <vector>
-#include <gtest/gtest.h>
 
 /** these test cases test out the value converters
  */
