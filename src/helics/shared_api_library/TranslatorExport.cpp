@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <mutex>
+#include <string>
+#include <utility>
 
 static constexpr char invalidTranslatorString[] = "The given translator object is not valid";
 
