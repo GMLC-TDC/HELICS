@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <future>
 #include <iostream>
+#include <string>
 
 /** these test cases test out the value converters and some of the other functions
  */

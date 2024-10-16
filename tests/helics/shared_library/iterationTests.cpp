@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <string>
 #include <utility>
+#include <vector>
 
 struct iteration_tests: public FederateTestFixture, public ::testing::Test {};
 

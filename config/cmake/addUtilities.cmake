@@ -9,7 +9,7 @@
 
 if(NOT TARGET gmlc::utilities)
     set(GMLC_UTILITIES_INSTALL OFF CACHE INTERNAL "")
-
+    
     add_subdirectory(ThirdParty/utilities)
 
     hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
