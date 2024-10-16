@@ -20,8 +20,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmock/gmock.h"
 #include <future>
 #include <gtest/gtest.h>
-#include <thread>
 #include <string>
+#include <thread>
 
 /** these test cases test out the value converters
  */

@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gmlc/libguarded/guarded.hpp>
 #include <gtest/gtest.h>
 #include <regex>
-#include <thread>
 #include <string>
+#include <thread>
 #include <vector>
 
 /** these test cases test out user-directed logging functionality

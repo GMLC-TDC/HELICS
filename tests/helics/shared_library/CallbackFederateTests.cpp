@@ -12,9 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <utility>
-#include <memory>
 
 struct callback_federate_tests: public FederateTestFixture, public ::testing::Test {};
 

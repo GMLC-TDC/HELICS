@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/inproc/InprocCore.h"
 
 #include "gtest/gtest.h"
-
 #include <memory>
 #include <string>
 
