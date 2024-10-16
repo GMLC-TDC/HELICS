@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include "gtest/gtest.h"
-#include <thread>
-#include <string>
 #include <iostream>
+#include <string>
+#include <thread>
 
 /** tests for some network options*/
 

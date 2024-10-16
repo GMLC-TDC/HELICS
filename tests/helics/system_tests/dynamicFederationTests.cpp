@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <complex>
 #include <future>
 #include <iostream>
-#include <string>
 #include <memory>
+#include <string>
 
 /** these test cases test out the value converters
  */

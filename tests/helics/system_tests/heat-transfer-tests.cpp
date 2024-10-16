@@ -10,11 +10,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <fstream>
-#include <thread>
-#include <string>
-#include <vector>
 #include <iostream>
 #include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 #include <utility>
 
 helics::Time tend = 3600.0;  // simulation end time

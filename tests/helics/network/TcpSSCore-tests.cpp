@@ -18,12 +18,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/tcp/TcpCore.h"
 
 #include "gtest/gtest.h"
+#include <algorithm>
 #include <future>
 #include <numeric>
+#include <string>
 #include <thread>
 #include <vector>
-#include <algorithm>
-#include <string>
 
 using namespace std::literals::chrono_literals;
 

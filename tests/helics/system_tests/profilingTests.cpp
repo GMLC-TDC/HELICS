@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gmlc/libguarded/guarded.hpp>
 #include <gtest/gtest.h>
 #include <regex>
-#include <thread>
 #include <string>
+#include <thread>
 #include <vector>
 #include <memory>
 

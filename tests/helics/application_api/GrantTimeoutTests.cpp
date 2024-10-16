@@ -17,11 +17,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
 #include <gtest/gtest.h>
-#include <thread>
-#include <string>
 #include <iostream>
 #include <memory>
-
+#include <string>
+#include <thread>
 
 /** these test cases test out user-directed logging functionality
  */

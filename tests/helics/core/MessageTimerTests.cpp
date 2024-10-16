@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/MessageTimer.hpp"
 
 #include "gtest/gtest.h"
-#include <thread>
 #include <iostream>
-#include <utility>
 #include <memory>
+#include <thread>
+#include <utility>
 
 using namespace helics;
 

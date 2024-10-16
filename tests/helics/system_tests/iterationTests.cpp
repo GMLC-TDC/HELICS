@@ -16,11 +16,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.hpp"
 
 #include <future>
-#include <thread>
-#include <string>
-#include <vector>
 #include <iostream>
+#include <string>
+#include <thread>
 #include <utility>
+#include <vector>
 
 static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
     return std::string(parameter.param);

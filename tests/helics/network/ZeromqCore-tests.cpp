@@ -21,8 +21,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <future>
 #include <iostream>
-#include <thread>
 #include <string>
+#include <thread>
 
 using namespace std::literals::chrono_literals;
 
