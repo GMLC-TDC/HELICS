@@ -327,6 +327,63 @@ int BrokerBase::parseArgs(std::string_view initializationString)
     auto app = generateBaseCLI();
     auto sApp = generateCLI();
     app->add_subcommand(sApp);
+    /*
+    auto type = fileops::getConfigType(configString);
+    switch (type) {
+    case fileops::ConfigType::JSON_FILE:
+        ret.fileInUse = true;
+        ret.loadInfoFromJson(configString);
+        ret.configString = configString;
+        break;
+    case fileops::ConfigType::JSON_STRING:
+        try {
+            ret.loadInfoFromJson(configString);
+            ret.configString = configString;
+        }
+        catch (const helics::InvalidParameter&) {
+            if (fileops::looksLikeConfigToml(configString)) {
+                try {
+                    ret.loadInfoFromToml(configString);
+                    ret.configString = configString;
+                }
+                catch (const helics::InvalidParameter&) {
+                    if (fileops::looksLikeCommandLine(configString)) {
+                        ret.loadInfoFromArgsIgnoreOutput(configString);
+                        break;
+                    }
+                    throw;
+                }
+            }
+            throw;
+        }
+        break;
+    case fileops::ConfigType::TOML_FILE:
+        ret.fileInUse = true;
+        ret.loadInfoFromToml(configString);
+        ret.configString = configString;
+        break;
+    case fileops::ConfigType::TOML_STRING:
+        try {
+            ret.loadInfoFromToml(configString);
+            ret.configString = configString;
+        }
+        catch (const helics::InvalidParameter&) {
+            if (fileops::looksLikeCommandLine(configString)) {
+                ret.loadInfoFromArgsIgnoreOutput(configString);
+                break;
+            }
+            throw;
+        }
+        break;
+    case fileops::ConfigType::CMD_LINE:
+        ret.loadInfoFromArgsIgnoreOutput(configString);
+        break;
+    case fileops::ConfigType::NONE:
+        ret.defName = configString;
+    }
+
+    return ret;
+    */
     auto res = app->helics_parse(std::string(initializationString));
     return static_cast<int>(res);
 }
