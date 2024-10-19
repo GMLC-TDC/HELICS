@@ -515,8 +515,7 @@ TEST_F(mfed_tests, endpoint_linking_dest_unknown)
     SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     EXPECT_TRUE(mFed1);
-    if (!mFed1)
-    {
+    if (!mFed1) {
         return;
     }
     helics::CoreApp core(mFed1->getCorePointer());
@@ -538,8 +537,7 @@ TEST_F(mfed_tests, endpoint_linking_source_unknown)
     SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     EXPECT_TRUE(mFed1);
-    if (!mFed1)
-    {
+    if (!mFed1) {
         return;
     }
     helics::CoreApp core(mFed1->getCorePointer());
@@ -561,8 +559,7 @@ TEST_F(mfed_tests, endpoint_linking_both_unknown)
     SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     EXPECT_TRUE(mFed1);
-    if (!mFed1)
-    {
+    if (!mFed1) {
         return;
     }
     helics::CoreApp core(mFed1->getCorePointer());
@@ -585,8 +582,7 @@ TEST_F(mfed_tests, endpoint_linking_source_alias)
     SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     EXPECT_TRUE(mFed1);
-    if (!mFed1)
-    {
+    if (!mFed1) {
         return;
     }
     helics::CoreApp core(mFed1->getCorePointer());
@@ -610,8 +606,7 @@ TEST_F(mfed_tests, endpoint_linking_dest_alias)
     SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     EXPECT_TRUE(mFed1);
-    if (!mFed1)
-    {
+    if (!mFed1) {
         return;
     }
     helics::CoreApp core(mFed1->getCorePointer());
@@ -635,8 +630,7 @@ TEST_F(mfed_tests, endpoint_linking_dest_alias_rev)
     SetupTest<helics::CombinationFederate>("testA", 1, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     EXPECT_TRUE(mFed1);
-    if (!mFed1)
-    {
+    if (!mFed1) {
         return;
     }
     helics::CoreApp core(mFed1->getCorePointer());

@@ -28,14 +28,12 @@ if(NOT TARGET gmlc::networking)
     else()
         set(GMLC_NETWORKING_ENABLE_ENCRYPTION OFF CACHE INTERNAL "")
     endif()
-    
+
     if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
         add_subdirectory(ThirdParty/networking EXCLUDE_FROM_ALL SYSTEM)
     else()
         add_subdirectory(ThirdParty/networking EXCLUDE_FROM_ALL)
     endif()
-        
-    
 
     hide_variable(GMLC_NETWORKING_GENERATE_DOXYGEN_DOC)
     hide_variable(GMLC_NETWORKING_INCLUDE_BOOST)
