@@ -18,8 +18,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include <memory>
 #include <nlohmann/json.hpp>
+#include <string>
 #include <thread>
+#include <utility>
 
 struct query: public FederateTestFixture, public ::testing::Test {};
 

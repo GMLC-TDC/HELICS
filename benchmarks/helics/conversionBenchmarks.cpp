@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_benchmark_main.h"
 
 #include <benchmark/benchmark.h>
+#include <string>
+#include <vector>
 
 template<class T>
 static void BMconversion(benchmark::State& state, const T& arg)

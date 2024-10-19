@@ -41,13 +41,13 @@ class ValueFederate: public virtual Federate {
   public:
     friend class helicscpp::FederateInfo;
     /**constructor taking a federate information structure and using the default core
-   @param fedName the name of the federate, can be empty to use the name from fi or an auto
+   @param fedName the name of the federate, can be empty to use the name from fedInfo or an auto
    generated one
-   @param fi  a federate information structure
+   @param fedInfo  a federate information structure
    */
-    explicit ValueFederate(const std::string& fedName, FederateInfo& fi)
+    explicit ValueFederate(const std::string& fedName, FederateInfo& fedInfo)
     {
-        fed = helicsCreateValueFederate(fedName.c_str(), fi.getInfo(), hThrowOnError());
+        fed = helicsCreateValueFederate(fedName.c_str(), fedInfo.getInfo(), hThrowOnError());
         if (fed == NULL) {
             throw(HelicsException(HELICS_ERROR_REGISTRATION_FAILURE, "Fed==NULL"));
         }

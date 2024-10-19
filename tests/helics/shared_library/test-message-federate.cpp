@@ -10,7 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <string>
 #include <thread>
+
 // these test cases test out the message federates
 
 class mfed_simple_type_tests:
@@ -367,13 +369,13 @@ TEST(message_object, test1_nosan)
 {
     auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetBroker(fi, "brk1", nullptr);
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetBroker(fedInfo, "brk1", nullptr);
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, nullptr);
 
-    auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
+    auto fed = helicsCreateMessageFederate("fed1", fedInfo, nullptr);
 
-    auto fed2 = helicsCreateCombinationFederate("fed2", fi, nullptr);
+    auto fed2 = helicsCreateCombinationFederate("fed2", fedInfo, nullptr);
 
     auto m1 = helicsFederateCreateMessage(fed, nullptr);
     EXPECT_NE(m1, nullptr);
@@ -447,7 +449,7 @@ TEST(message_object, test1_nosan)
     helicsMessageReserve(m2, -2, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
     helicsFederateFinalize(fed, nullptr);
     helicsFederateFinalize(fed2, nullptr);
     helicsBrokerDisconnect(brk, nullptr);

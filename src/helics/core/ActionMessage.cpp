@@ -22,7 +22,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/format.h>
 #include <frozen/string.h>
 #include <frozen/unordered_map.h>
+#include <memory>
 #include <ostream>
+#include <string>
 #include <utility>
 #include <vector>
 

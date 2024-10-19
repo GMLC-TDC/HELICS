@@ -17,16 +17,16 @@ SPDX-License-Identifier: BSD-3-Clause
 // this test will test basic probe functionality
 TEST(probe, probe2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
 
-    fi.coreName = "ecore1";
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f 2";
-    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Probe probe1("probe1", fi);
-    fi.coreInitString.clear();
-    helics::apps::Probe probe2("probe2", fi);
+    fedInfo.coreName = "ecore1";
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f 2";
+    fedInfo.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Probe probe1("probe1", fedInfo);
+    fedInfo.coreInitString.clear();
+    helics::apps::Probe probe2("probe2", fedInfo);
 
     auto fut1 = std::async(std::launch::async, [&probe1]() { probe1.runTo(3.0); });
     auto fut2 = std::async(std::launch::async, [&probe2]() { probe2.runTo(3.0); });
@@ -44,17 +44,17 @@ TEST(probe, probe2)
 
 TEST(probe, probe4)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
 
-    fi.coreInitString = "--autobroker";
-    fi.brokerInitString = "-f 4";
-    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::apps::Probe probe1("probe1", fi);
-    fi.coreInitString.clear();
-    helics::apps::Probe probe2("probe2", fi);
-    helics::apps::Probe probe3("probe3", fi);
-    helics::apps::Probe probe4("probe4", fi);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.brokerInitString = "-f 4";
+    fedInfo.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Probe probe1("probe1", fedInfo);
+    fedInfo.coreInitString.clear();
+    helics::apps::Probe probe2("probe2", fedInfo);
+    helics::apps::Probe probe3("probe3", fedInfo);
+    helics::apps::Probe probe4("probe4", fedInfo);
 
     auto fut1 = std::async(std::launch::async, [&probe1]() { probe1.runTo(4.0); });
     auto fut2 = std::async(std::launch::async, [&probe2]() { probe2.runTo(4.0); });

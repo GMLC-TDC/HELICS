@@ -321,7 +321,12 @@ if(NOT TARGET toml11::toml11)
     set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
     set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
     set(toml11_INSTALL OFF CACHE INTERNAL "")
-    add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
+
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+        add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL SYSTEM)
+    else()
+        add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
+    endif()
     hide_variable(TOML11_USE_UNRELEASED_TOML_FEATURES)
 endif()
 
@@ -825,7 +830,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         libs
         swig
         java
-        octave
         csharp
         benchmarks
     )
@@ -844,14 +848,12 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_BENCHMARKS_DISPLAY_NAME "Benchmarks")
     set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
     set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
-    set(CPACK_COMPONENT_OCTAVE_DISPLAY_NAME "Octave")
     set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
 
     set(CPACK_COMPONENT_GROUP_INTERFACES_DISPLAY_NAME "Interfaces")
     set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "Additional language interfaces for HELICS")
     set(CPACK_COMPONENT_SWIG_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
-    set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
 
     set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DISPLAY_NAME "Development")
@@ -871,7 +873,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         "SWIG files needed for building 3rd party language interfaces (requires Development Headers)"
     )
     set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
-    set(CPACK_COMPONENT_OCTAVE_DESCRIPTION "Octave language interface")
     set(CPACK_COMPONENT_CSHARP_DESCRIPTION "C# language interface")
 
     set(CPACK_COMPONENT_SWIG_DEPENDS headers)

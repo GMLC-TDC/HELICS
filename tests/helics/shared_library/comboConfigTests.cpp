@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ctestFixtures.hpp"
 
 #include <gtest/gtest.h>
+#include <string>
 
 struct config_tests: public FederateTestFixture, public ::testing::Test {};
 

@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helics_definitions.hpp"
 
 #include <iostream>
+#include <memory>
+#include <string>
 #include <thread>
 
 int main(int argc, char* argv[])
@@ -40,24 +42,24 @@ int main(int argc, char* argv[])
 
     auto ret = app.helics_parse(argc, argv);
 
-    helics::FederateInfo fi;
+    helics::FederateInfo fedInfo;
     if (ret == helics::helicsCLI11App::ParseOutput::HELP_CALL) {
-        (void)(fi.loadInfoFromArgs("--help"));
+        (void)(fedInfo.loadInfoFromArgs("--help"));
         return 0;
     } else if (ret != helics::helicsCLI11App::ParseOutput::OK) {
         return -1;
     }
-    fi.defName = "fed";
-    fi.loadInfoFromArgs(app.remainArgs());
+    fedInfo.defName = "fed";
+    fedInfo.loadInfoFromArgs(app.remainArgs());
 
     std::string etarget = mtarget + "/" + targetEndpoint;
 
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
     if (app["--startbroker"]->count() > 0) {
-        brk = helics::BrokerApp(fi.coreType, brokerArgs);
+        brk = helics::BrokerApp(fedInfo.coreType, brokerArgs);
     }
 
-    auto cFed = std::make_unique<helics::CombinationFederate>(std::string{}, fi);
+    auto cFed = std::make_unique<helics::CombinationFederate>(std::string{}, fedInfo);
     auto name = cFed->getName();
     std::cout << " registering endpoint '" << myendpoint << "' for " << name << '\n';
 

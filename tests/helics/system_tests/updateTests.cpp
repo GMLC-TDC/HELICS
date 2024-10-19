@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <array>
 #include <future>
+#include <string>
+#include <vector>
 /** tests for the different flag options and considerations*/
 
 struct update_tests: public FederateTestFixture, public ::testing::Test {};

@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #ifdef HELICS_ENABLE_ZMQ_CORE

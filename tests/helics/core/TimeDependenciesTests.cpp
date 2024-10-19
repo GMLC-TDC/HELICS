@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/TimeDependencies.hpp"
 
 #include "gtest/gtest.h"
+#include <vector>
 
 using namespace helics;
 

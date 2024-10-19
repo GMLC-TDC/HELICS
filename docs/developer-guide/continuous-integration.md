@@ -34,7 +34,6 @@ There are also a few tests run daily:
 
 All PR's and branches trigger a set of builds using Docker images on Circle-CI.
 
-- Octave tests - tests the Octave interface and runs some tests
 - Clang-MSAN - runs the clang memory sanitizer
 - Clang-ASAN - runs the clang address sanitizer and undefined behavior sanitizer
 - Clang-TSAN - runs the clang thread sanitizer

@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <frozen/unordered_map.h>
 #include <map>
 #include <set>
+#include <string>
 #include <unordered_map>
 
 namespace frozen {

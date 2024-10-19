@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../network/NetworkBrokerData.hpp"
 #include "spdlog/spdlog.h"
 
+#include <memory>
+#include <string>
 #include <utility>
 
 namespace helics::apps {

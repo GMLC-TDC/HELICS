@@ -28,102 +28,105 @@ namespace helicscpp {
 class FederateInfo {
   public:
     /** constructor*/
-    FederateInfo() { fi = helicsCreateFederateInfo(); }
+    FederateInfo() { fedInfo = helicsCreateFederateInfo(); }
     /** construct from a type string
     @param coretype the type of core to use for the federate*/
     explicit FederateInfo(const std::string& coretype)
     {
-        fi = helicsCreateFederateInfo();
-        helicsFederateInfoSetCoreTypeFromString(fi, coretype.c_str(), hThrowOnError());
+        fedInfo = helicsCreateFederateInfo();
+        helicsFederateInfoSetCoreTypeFromString(fedInfo, coretype.c_str(), hThrowOnError());
     }
     /** construct from a type
    @param coretype the type of core to use for the federate*/
     explicit FederateInfo(int coretype)
     {
-        fi = helicsCreateFederateInfo();
-        helicsFederateInfoSetCoreType(fi, coretype, hThrowOnError());
+        fedInfo = helicsCreateFederateInfo();
+        helicsFederateInfoSetCoreType(fedInfo, coretype, hThrowOnError());
     }
     /** copy constructor for federate info*/
-    FederateInfo(const FederateInfo& fedInfo)
+    FederateInfo(const FederateInfo& otherFedInfo)
     {
-        fi = helicsFederateClone(fedInfo.fi, hThrowOnError());
+        fedInfo = helicsFederateClone(otherFedInfo.fedInfo, hThrowOnError());
     }
     /** copy assignment for federateInfo*/
-    FederateInfo& operator=(const FederateInfo& fedInfo)
+    FederateInfo& operator=(const FederateInfo& otherFedInfo)
     {
-        HelicsFederateInfo fi_new = helicsFederateClone(fedInfo.fi, hThrowOnError());
-        helicsFederateInfoFree(fi);
-        fi = fi_new;
+        HelicsFederateInfo fi_new = helicsFederateClone(otherFedInfo.fedInfo, hThrowOnError());
+        helicsFederateInfoFree(fedInfo);
+        fedInfo = fi_new;
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     /** move constructor for federateInfo*/
-    FederateInfo(FederateInfo&& fedInfo) HELICS_NOTHROW
+    FederateInfo(FederateInfo&& otherFedInfo) HELICS_NOTHROW
     {
-        fi = fedInfo.fi;
-        fedInfo.fi = HELICS_NULL_POINTER;
+        fedInfo = otherFedInfo.fedInfo;
+        otherFedInfo.fedInfo = HELICS_NULL_POINTER;
     }
     /** move assignment for federateInfo*/
-    FederateInfo& operator=(FederateInfo&& fedInfo) HELICS_NOTHROW
+    FederateInfo& operator=(FederateInfo&& otherFedInfo) HELICS_NOTHROW
     {
-        helicsFederateInfoFree(fi);
-        fi = fedInfo.fi;
-        fedInfo.fi = HELICS_NULL_POINTER;
+        helicsFederateInfoFree(fedInfo);
+        fedInfo = otherFedInfo.fedInfo;
+        otherFedInfo.fedInfo = HELICS_NULL_POINTER;
         return *this;
     }
 #endif
     /** destructor*/
-    ~FederateInfo() { helicsFederateInfoFree(fi); }
+    ~FederateInfo() { helicsFederateInfoFree(fedInfo); }
     void loadFromArgs(const std::string& argString)
     {
-        helicsFederateInfoLoadFromString(fi, argString.c_str(), HELICS_NULL_POINTER);
+        helicsFederateInfoLoadFromString(fedInfo, argString.c_str(), HELICS_NULL_POINTER);
     }
     /** set the core name to use in the federateInfo
-    @param corename the core name to use*/
-    void setCoreName(const std::string& corename)
+    @param coreName the core name to use*/
+    void setCoreName(const std::string& coreName)
     {
-        helicsFederateInfoSetCoreName(fi, corename.c_str(), HELICS_NULL_POINTER);
+        helicsFederateInfoSetCoreName(fedInfo, coreName.c_str(), HELICS_NULL_POINTER);
     }
     /// Set the separator character
-    void setSeparator(char sep) { helicsFederateInfoSetSeparator(fi, sep, HELICS_NULL_POINTER); }
+    void setSeparator(char sep)
+    {
+        helicsFederateInfoSetSeparator(fedInfo, sep, HELICS_NULL_POINTER);
+    }
     /** set the core init string to use in the federateInfo
     @param coreInit the core name to use*/
     void setCoreInit(const std::string& coreInit)
     {
-        helicsFederateInfoSetCoreInitString(fi, coreInit.c_str(), HELICS_NULL_POINTER);
+        helicsFederateInfoSetCoreInitString(fedInfo, coreInit.c_str(), HELICS_NULL_POINTER);
     }
     /// Set a string for the broker initialization in command line argument format
     void setBrokerInit(const std::string& brokerInit)
     {
-        helicsFederateInfoSetBrokerInitString(fi, brokerInit.c_str(), HELICS_IGNORE_ERROR);
+        helicsFederateInfoSetBrokerInitString(fedInfo, brokerInit.c_str(), HELICS_IGNORE_ERROR);
     }
     /** set the core type from a string with the core type
     @param coretype the string defining a core type
     */
     void setCoreType(const std::string& coretype)
     {
-        helicsFederateInfoSetCoreTypeFromString(fi, coretype.c_str(), hThrowOnError());
+        helicsFederateInfoSetCoreTypeFromString(fedInfo, coretype.c_str(), hThrowOnError());
     }
     /** set the core type from an integer \ref HelicsCoreTypes
     @param coretype an integer code with the federate type
     */
     void setCoreType(int coretype)
     {
-        helicsFederateInfoSetCoreType(fi, coretype, HELICS_NULL_POINTER);
+        helicsFederateInfoSetCoreType(fedInfo, coretype, HELICS_NULL_POINTER);
     }
     /** set the broker to connect with
     @param broker a string with the broker connection information or name
     */
     void setBroker(const std::string& broker)
     {
-        helicsFederateInfoSetBroker(fi, broker.c_str(), HELICS_NULL_POINTER);
+        helicsFederateInfoSetBroker(fedInfo, broker.c_str(), HELICS_NULL_POINTER);
     }
     /** set the broker key to use
     @param brokerkey a string with the broker key information
     */
     void setBrokerKey(const std::string& brokerkey)
     {
-        helicsFederateInfoSetBrokerKey(fi, brokerkey.c_str(), HELICS_NULL_POINTER);
+        helicsFederateInfoSetBrokerKey(fedInfo, brokerkey.c_str(), HELICS_NULL_POINTER);
     }
     /** set a flag
     @param flag /ref helics_federate_flags
@@ -131,7 +134,7 @@ class FederateInfo {
     */
     void setFlagOption(int flag, bool value = true)
     {
-        helicsFederateInfoSetFlagOption(fi,
+        helicsFederateInfoSetFlagOption(fedInfo,
                                         flag,
                                         value ? HELICS_TRUE : HELICS_FALSE,
                                         HELICS_NULL_POINTER);
@@ -142,7 +145,7 @@ class FederateInfo {
     */
     void setProperty(int timeProperty, HelicsTime timeValue)
     {
-        helicsFederateInfoSetTimeProperty(fi, timeProperty, timeValue, HELICS_NULL_POINTER);
+        helicsFederateInfoSetTimeProperty(fedInfo, timeProperty, timeValue, HELICS_NULL_POINTER);
     }
     /** set an integral federate or core property
   @param integerProperty /ref helics_federate_properties an integer code with the property
@@ -150,17 +153,17 @@ class FederateInfo {
   */
     void setProperty(int integerProperty, int propertyValue)
     {
-        helicsFederateInfoSetIntegerProperty(fi,
+        helicsFederateInfoSetIntegerProperty(fedInfo,
                                              integerProperty,
                                              propertyValue,
                                              HELICS_NULL_POINTER);
     }
 
     /** get the underlying HelicsFederateInfo object*/
-    HelicsFederateInfo getInfo() { return fi; }
+    HelicsFederateInfo getInfo() { return fedInfo; }
 
   private:
-    HelicsFederateInfo fi;  //!< handle for the underlying federate_info object
+    HelicsFederateInfo fedInfo;  //!< handle for the underlying federate_info object
 };
 
 #if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0

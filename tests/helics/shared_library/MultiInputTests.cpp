@@ -11,7 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "cpptestFixtures.hpp"
 
 #include <gtest/gtest.h>
-
+#include <string>
+#include <vector>
 /** these test cases test out the value federates
  */
 

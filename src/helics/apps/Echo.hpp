@@ -38,24 +38,25 @@ consistent answers if used from multiple threads unless protected.
     */
         Echo(int argc, char* argv[]);
         /** construct from a federate info object
-    @param name the name of the echo app, can be empty to get name from fi or default
-    @param fi a pointer info object containing information on the desired federate configuration
+    @param name the name of the echo app, can be empty to get name from fedInfo or default
+    @param fedInfo a pointer info object containing information on the desired federate
+    configuration
     */
-        explicit Echo(std::string_view name, const FederateInfo& fi);
+        explicit Echo(std::string_view name, const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the echo app, can be empty to get name from fi or default
+    @param name the name of the echo app, can be empty to get name from fedInfo or default
     @param core a pointer to core object which the federate can join
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Echo(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Echo(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate (can be empty to use defaults from fi)
+    @param name the name of the federate (can be empty to use defaults from fedInfo)
     @param core a coreApp object that can be joined
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Echo(std::string_view name, CoreApp& core, const FederateInfo& fi);
+        Echo(std::string_view name, CoreApp& core, const FederateInfo& fedInfo);
         /**constructor taking a file with the required information
-    @param name the name of the echo app, can be empty to get name from fi or default
+    @param name the name of the echo app, can be empty to get name from fedInfo or default
     @param jsonString file or JSON string defining the federate information and other configuration
     */
         Echo(std::string_view name, const std::string& jsonString);

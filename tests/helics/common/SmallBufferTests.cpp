@@ -12,6 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/core/SmallBuffer.hpp"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 using namespace helics;
 
 TEST(small_buffer_tests, empty)

@@ -92,7 +92,6 @@ A daily job runs tests on Linux to gather code coverage results that are uploade
 
 Sanitizers and some install tests are run in Docker containers on Circle CI for all commits and PRs.
 
-- Octave tests - tests the Octave interface and runs some tests
 - Clang-MSAN - runs the clang memory sanitizer
 - Clang-ASAN - runs the clang address sanitizer and undefined behavior sanitizer
 - Clang-TSAN - runs the clang thread sanitizer

@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.h"
 
 #include <gtest/gtest.h>
-
+#include <string>
 /**
  tests of evil inputs for all HELICS API function calls*/
 
@@ -159,9 +159,9 @@ TEST(evil_creation_test, helicsCreateBrokerFromArgs)
 
 TEST(evil_creation_test, helicsCreateValueFederate)
 {
-    // HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fi,
+    // HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fedInfo,
     // HelicsError* err); HelicsFederate helicsCreateValueFederate(const char* fedName,
-    // HelicsFederateInfo fi, HelicsError* err);
+    // HelicsFederateInfo fedInfo, HelicsError* err);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateValueFederate("billy", nullptr, &err);
@@ -169,13 +169,14 @@ TEST(evil_creation_test, helicsCreateValueFederate)
     EXPECT_EQ(helicsFederateIsValid(res1), HELICS_FALSE);
     helicsErrorClear(&err);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_NNG, nullptr);
-    auto res2 = helicsCreateValueFederate("billy", fi, &err);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_NNG, nullptr);
+    auto res2 = helicsCreateValueFederate("billy", fedInfo, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(helicsFederateIsValid(res2), HELICS_FALSE);
     helicsErrorClear(&err);
-    // auto res2=helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fi, nullptr);
+    // auto res2=helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fedInfo,
+    // nullptr);
 
     char rdata[256];
     auto evil_fi = reinterpret_cast<HelicsFederateInfo>(rdata);
@@ -202,7 +203,8 @@ TEST(evil_creation_test, helicsCreateValueFederateFromConfig)
 
 TEST(evil_creation_test, helicsCreateMessageFederate)
 {
-    // auto res2=helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fi, nullptr);
+    // auto res2=helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fedInfo,
+    // nullptr);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateMessageFederate("billy", nullptr, &err);
@@ -210,9 +212,9 @@ TEST(evil_creation_test, helicsCreateMessageFederate)
     EXPECT_EQ(helicsFederateIsValid(res1), HELICS_FALSE);
     helicsErrorClear(&err);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_NNG, nullptr);
-    auto res2 = helicsCreateMessageFederate("billy", fi, &err);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_NNG, nullptr);
+    auto res2 = helicsCreateMessageFederate("billy", fedInfo, &err);
     EXPECT_EQ(helicsFederateIsValid(res2), HELICS_FALSE);
     helicsErrorClear(&err);
     char rdata[256];
@@ -240,8 +242,8 @@ TEST(evil_creation_test, helicsCreateMessageFederateFromConfig)
 
 TEST(evil_creation_test, helicsCreateCombinationFederate)
 {
-    // HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fi,
-    // HelicsError* err);
+    // HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo
+    // fedInfo, HelicsError* err);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateCombinationFederate("billy", nullptr, &err);
@@ -249,9 +251,9 @@ TEST(evil_creation_test, helicsCreateCombinationFederate)
     EXPECT_EQ(helicsFederateIsValid(res1), HELICS_FALSE);
     helicsErrorClear(&err);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_NNG, nullptr);
-    auto res2 = helicsCreateCombinationFederate("billy", fi, &err);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_NNG, nullptr);
+    auto res2 = helicsCreateCombinationFederate("billy", fedInfo, &err);
     EXPECT_EQ(helicsFederateIsValid(res2), HELICS_FALSE);
     helicsErrorClear(&err);
     char rdata[256];
@@ -280,8 +282,8 @@ TEST(evil_creation_test, helicsCreateCombinationFederateFromConfig)
 TEST(evil_creation_test, helicsCreateFederateInfo)
 {
     // HelicsFederateInfo helicsCreateFederateInfo(void);
-    auto fi = helicsCreateFederateInfo();
-    EXPECT_NE(fi, nullptr);
+    auto fedInfo = helicsCreateFederateInfo();
+    EXPECT_NE(fedInfo, nullptr);
 }
 
 TEST(evil_creation_test, helicsCreateQuery)
@@ -892,9 +894,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerInitString)
     helicsErrorClear(&err);
     helicsFederateInfoSetBrokerInitString(evil_fi, "", &err);
     EXPECT_NE(err.error_code, 0);
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetBrokerInitString(fi, nullptr, &err);
+    helicsFederateInfoSetBrokerInitString(fedInfo, nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -922,12 +924,12 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreTypeFromString)
     helicsErrorClear(&err);
     helicsFederateInfoSetCoreTypeFromString(evil_fi, "nullcore", &err);
     EXPECT_NE(err.error_code, 0);
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetCoreTypeFromString(fi, nullptr, &err);
+    helicsFederateInfoSetCoreTypeFromString(fedInfo, nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
 
-    helicsFederateInfoSetCoreTypeFromString(fi, "evil_core", &err);
+    helicsFederateInfoSetCoreTypeFromString(fedInfo, "evil_core", &err);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -956,9 +958,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerKey)
     helicsFederateInfoSetBrokerKey(evil_fi, "broker_key", &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetBrokerKey(fi, nullptr, &err);
+    helicsFederateInfoSetBrokerKey(fedInfo, nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -977,9 +979,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerPort)
     helicsFederateInfoSetBrokerPort(evil_fi, 9999, &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetBrokerPort(fi, 9999, &err);
+    helicsFederateInfoSetBrokerPort(fedInfo, 9999, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -998,9 +1000,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetLocalPort)
     helicsFederateInfoSetLocalPort(evil_fi, "9999", &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetLocalPort(fi, nullptr, &err);
+    helicsFederateInfoSetLocalPort(fedInfo, nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -1016,9 +1018,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetFlagOption)
     helicsFederateInfoSetFlagOption(evil_fi, 9, HELICS_FALSE, &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetFlagOption(fi, 0, HELICS_FALSE, &err);
+    helicsFederateInfoSetFlagOption(fedInfo, 0, HELICS_FALSE, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -1034,9 +1036,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetSeparator)
     helicsFederateInfoSetSeparator(evil_fi, '-', &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetSeparator(fi, '&', &err);
+    helicsFederateInfoSetSeparator(fedInfo, '&', &err);
     EXPECT_EQ(err.error_code, 0);
 }
 

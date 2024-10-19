@@ -16,18 +16,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstdio>
 #include <filesystem>
 #include <future>
+#include <iostream>
+#include <string>
 
 static void generateFiles(const std::filesystem::path& f1, const std::filesystem::path& f2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "ccore2";
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "ccore2";
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::CombinationFederate mfed("block1", fi);
+    helics::CombinationFederate mfed("block1", fedInfo);
 
-    helics::MessageFederate mfed2("block2", fi);
+    helics::MessageFederate mfed2("block2", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
@@ -96,12 +98,12 @@ static void generateFiles(const std::filesystem::path& f1, const std::filesystem
 
 static void useFile(const std::string& corename, const std::string& file)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = corename;
-    fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = corename;
+    fedInfo.coreInitString = "-f 1 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::apps::Player play1("play1", fi);
+    helics::apps::Player play1("play1", fedInfo);
     play1.loadFile(file);
 
     play1.initialize();
@@ -119,15 +121,15 @@ static const std::string Message2(55, 17);
 
 static void generateFiles2(const std::filesystem::path& f1, const std::filesystem::path& f2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "ccore2b";
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "ccore2b";
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::CombinationFederate mfed("block1", fi);
+    helics::CombinationFederate mfed("block1", fedInfo);
 
-    helics::MessageFederate mfed2("block2", fi);
+    helics::MessageFederate mfed2("block2", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
@@ -196,12 +198,12 @@ static void generateFiles2(const std::filesystem::path& f1, const std::filesyste
 
 static void useFile2(const std::string& corename, const std::string& file)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = corename;
-    fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = corename;
+    fedInfo.coreInitString = "-f 1 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::apps::Player play1("play1", fi);
+    helics::apps::Player play1("play1", fedInfo);
     play1.loadFile(file);
 
     play1.initialize();
@@ -250,15 +252,15 @@ TEST(combo, save_load_file2)
 
 static void generateFiles_binary(const std::filesystem::path& f1, const std::filesystem::path& f2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "ccore3";
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "ccore3";
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1("rec1", fedInfo);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::CombinationFederate mfed("block1", fi);
+    helics::CombinationFederate mfed("block1", fedInfo);
 
-    helics::MessageFederate mfed2("block2", fi);
+    helics::MessageFederate mfed2("block2", fedInfo);
     helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
@@ -328,13 +330,13 @@ static void generateFiles_binary(const std::filesystem::path& f1, const std::fil
 
 static void useFileBinary(const std::string& corename, const std::string& file)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreType = helics::CoreType::TEST;
-    fi.coreName = corename;
-    fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreType = helics::CoreType::TEST;
+    fedInfo.coreName = corename;
+    fedInfo.coreInitString = "-f 1 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    helics::apps::Player play1("play1", fi);
+    helics::apps::Player play1("play1", fedInfo);
     play1.loadFile(file);
 
     play1.initialize();
@@ -378,14 +380,14 @@ TEST(combo, save_load_file_binary)
 
 TEST(combo, check_combination_file_load)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "ccore_combo";
-    fi.coreInitString = "-f 3 --autobroker";
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "ccore_combo";
+    fedInfo.coreInitString = "-f 3 --autobroker";
 
-    helics::apps::Player play1("play1", fi);
+    helics::apps::Player play1("play1", fedInfo);
     play1.loadFile(TEST_DIR "test_HELICS_player.json");
 
-    helics::apps::Recorder rec1("rec1", fi);
+    helics::apps::Recorder rec1("rec1", fedInfo);
     rec1.loadFile(TEST_DIR "test_HELICS_recorder.json");
 
     helics::CombinationFederate fed("", TEST_DIR "federate_config.json");

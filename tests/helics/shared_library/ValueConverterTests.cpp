@@ -9,6 +9,7 @@ Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more detail
 #include <complex>
 #include <list>
 #include <set>
+#include <string>
 
 /** these test cases test out the value converters
  */
