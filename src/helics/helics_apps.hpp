@@ -16,3 +16,4 @@ Header file for inclusion of the entire apps library
 #include "apps/Recorder.hpp"
 #include "apps/Source.hpp"
 #include "apps/Tracer.hpp"
+#include "apps/Connector.hpp"
