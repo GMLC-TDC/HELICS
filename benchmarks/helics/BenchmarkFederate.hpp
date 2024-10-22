@@ -29,13 +29,13 @@ class BenchmarkFederate {
 
     // getters and setters for parameters
     /** sets the delta time parameter
-     * @param dt the delta time to set
+     * @param delta the delta time to set
      */
     void setDeltaTime(helics::Time delta) { deltaTime = delta; }
     /** gets the delta time parameter*/
     helics::Time getDeltaTime() { return deltaTime; }
     /** sets the final time parameter
-     * @param t the final/stop time*/
+     * @param time the final/stop time*/
     void setFinalTime(helics::Time time) { finalTime = time; }
     /** gets the final time parameter*/
     helics::Time getFinalTime() { return finalTime; }

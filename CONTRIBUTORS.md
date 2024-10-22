@@ -122,7 +122,6 @@ A networking library with helper functions around Asio and other network interfa
 Several CMake scripts came from other sources and were either used or modified for use in HELICS.
 
 - Lars Bilke [CodeCoverage.cmake](https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake)
-- NATIONAL HEART, LUNG, AND BLOOD INSTITUTE
 - clang-format, clang-tidy scripts were created using tips from [Emmanuel Fleury](http://www.labri.fr/perso/fleury/posts/programming/using-clang-tidy-and-clang-format.html)
 - Viktor Kirilov, useful CMake macros [ucm](https://github.com/onqtam/ucm) particularly for the set_runtime macro to use static runtime libraries
 - scripts for cloning get repositories are included from [tschuchortdev/cmake_git_clone](https://github.com/tschuchortdev/cmake_git_clone) used with [MIT](https://github.com/tschuchortdev/cmake_git_clone/blob/master/LICENSE.TXT) License
@@ -134,7 +133,7 @@ A list of optional component that are not included in HELICS but are optionally 
 
 ### [BOOST](https://www.boost.org)
 
-Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast from Boost 1.70 or higher. Boost is licensed under the Boost Software License. Boost can be removed entirely from the source code with the use of a [cmake](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) flag.
+Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast from Boost 1.72 or higher. Boost is licensed under the Boost Software License. Boost can be removed entirely from the source code with the use of a [cmake](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) flag.
 
 #### [zmq](http://www.zeromq.org)
 
