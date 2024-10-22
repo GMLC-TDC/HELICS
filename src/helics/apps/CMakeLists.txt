@@ -56,9 +56,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         list(APPEND helics_apps_broker_files AsioBrokerServer.cpp)
     endif()
 
-    if( NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
-                                               OR HELICS_DISABLE_ASIO)
-    )
+    if(NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         message(STATUS "Building webserver Boost version ${Boost_VERSION} ${BOOST_VERSION_LEVEL}")
         list(APPEND helics_apps_broker_files helicsWebServer.cpp RestApiConnection.cpp)
         list(APPEND helics_apps_broker_headers helicsWebServer.hpp indexPage.hpp
@@ -87,9 +85,7 @@ if(HELICS_BUILD_APP_LIBRARY)
                 gmlc::networking
     )
 
-    if( NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
-                                               OR HELICS_DISABLE_ASIO)
-    )
+    if(NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)
         if(${Boost_VERSION_MINOR} LESS 81)
             target_compile_definitions(helics_apps PUBLIC BOOST_BEAST_USE_STD_STRING_VIEW)
