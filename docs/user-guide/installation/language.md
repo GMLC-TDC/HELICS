@@ -12,15 +12,15 @@ To install HELICS with Java support, you will need to add `HELICS_BUILD_JAVA_INT
 
 ## HELICS with MATLAB
 
-The Matlab interface to HELICS is found at [matHELICS](https://github.com/gmlc-tdc/mathelics) repository.
+The Matlab interface to HELICS is found in the [matHELICS](https://github.com/gmlc-tdc/mathelics) repository.
 
 ## HELICS with Simulink
 
-A simulink interface to HELICS is found at [simHELICS](https://github.com/gmlc-tdc/simhelics) repository. This is a minimalistic interface that is build using simulink S functions.
+A Simulink interface to HELICS is found in the [simHELICS](https://github.com/gmlc-tdc/simhelics) repository. This is a minimalistic interface that is built using Simulink S-functions.
 
 ## HELICS with Octave
 
-The Octave interface to HELICS is found at [matHELICS](https://github.com/gmlc-tdc/mathelics) repository. It is currently built with the Matlab Interface
+The Octave interface to HELICS is found in the [matHELICS](https://github.com/gmlc-tdc/mathelics) repository. It is currently built with the Matlab Interface.
 
 ### Notes
 
