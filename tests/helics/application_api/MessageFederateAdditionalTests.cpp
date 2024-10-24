@@ -17,7 +17,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <memory>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 /** these test cases test out the message federates
  */

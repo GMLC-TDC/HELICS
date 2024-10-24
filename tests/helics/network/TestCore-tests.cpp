@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/test/TestCore.h"
 
 #include "gtest/gtest.h"
+#include <memory>
+#include <string>
 
 using helics::Core;
 using namespace helics::CoreFactory;

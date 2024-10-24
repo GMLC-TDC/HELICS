@@ -20,9 +20,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <charconv>
 #include <iostream>
+#include <memory>
 #include <set>
+#include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace frozen {
 template<>

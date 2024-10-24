@@ -11,7 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <future>
 #include <iostream>
+#include <string>
 #include <thread>
+#include <utility>
 // these test cases test out the message federates
 
 static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {

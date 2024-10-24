@@ -29,51 +29,51 @@ class BenchmarkFederate {
 
     // getters and setters for parameters
     /** sets the delta time parameter
-     * @param dt the delta time to set
+     * @param delta the delta time to set
      */
-    void setDeltaTime(helics::Time dt) { deltaTime = dt; }
+    void setDeltaTime(helics::Time delta) { deltaTime = delta; }
     /** gets the delta time parameter*/
     helics::Time getDeltaTime() { return deltaTime; }
     /** sets the final time parameter
-     * @param t the final/stop time*/
-    void setFinalTime(helics::Time t) { finalTime = t; }
+     * @param time the final/stop time*/
+    void setFinalTime(helics::Time time) { finalTime = time; }
     /** gets the final time parameter*/
     helics::Time getFinalTime() { return finalTime; }
 
     /** sets the index parameter
-     * @param i the index
+     * @param newIndex the index to set
      */
-    void setIndex(int i) { index = i; }
+    void setIndex(int newIndex) { index = newIndex; }
     /** gets the index parameter*/
     [[nodiscard]] int getIndex() const { return index; }
     /** sets the max index parameter
-     * @param i the max index
+     * @param newIndex the max index
      */
-    void setMaxIndex(int i) { maxIndex = i; }
+    void setMaxIndex(int newIndex) { maxIndex = newIndex; }
     /** gets the max index parameter*/
     [[nodiscard]] int getMaxIndex() const { return maxIndex; }
 
     // functions for setting callbacks
     /** sets a callback function to call immediately after doMainLoop() returns, but before
      * the helics finalize() call
-     * @param cb a function that takes no arguments and returns void
+     * @param callback a function that takes no arguments and returns void
      */
-    void setBeforeFinalizeCallback(std::function<void()> cb = {})
+    void setBeforeFinalizeCallback(std::function<void()> callback = {})
     {
-        callBeforeFinalize = std::move(cb);
+        callBeforeFinalize = std::move(callback);
     }
     /** sets a callback function to all after the helics finalize() call completes
-     * @param cb a function that takes no arguments and returns void
+     * @param callback a function that takes no arguments and returns void
      */
-    void setAfterFinalizeCallback(std::function<void()> cb = {})
+    void setAfterFinalizeCallback(std::function<void()> callback = {})
     {
-        callAfterFinalize = std::move(cb);
+        callAfterFinalize = std::move(callback);
     }
 
     /** sets the output format to use when printing results
-     * @param f format to print results in
+     * @param format to print results in
      */
-    void setOutputFormat(OutputFormat f) { result_format = f; }
+    void setOutputFormat(OutputFormat format) { result_format = format; }
 
     // protected to give derived classes more control
   protected:
@@ -123,10 +123,10 @@ class BenchmarkFederate {
     virtual void setupArgumentParsing() {}
     /** initialization steps after command line options have been parsed, but before the federate
      * object is created
-     * @param fi a reference to a helics::FederateInfo object that can be used to change how the
-     * federate object is made
+     * @param fedInfo a reference to a helics::FederateInfo object that can be used to change how
+     * the federate object is made
      */
-    virtual void doParamInit(helics::FederateInfo& fi) { (void)fi; }
+    virtual void doParamInit(helics::FederateInfo& fedInfo) { (void)fedInfo; }
     /** initialization that needs to happen after the federate object is created, such as creating
      * endpoints and inputs*/
     virtual void doFedInit() {}
@@ -203,22 +203,22 @@ class BenchmarkFederate {
     template<typename... Args>
     int initialize(const std::string& coreName, Args... args)
     {
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        return initialize(fi, args...);
+        helics::FederateInfo fedInfo;
+        fedInfo.coreName = coreName;
+        return initialize(fedInfo, args...);
     }
 
     /** initialize function parses options and sets up parameters
-     * @param fi a helics::FederateInfo object
+     * @param fedInfo a helics::FederateInfo object
      * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of
      * strings)
      * @return 0 on success, non-zero indicates failure
      */
     template<typename... Args>
-    int initialize(const helics::FederateInfo& fi, Args... args)
+    int initialize(const helics::FederateInfo& fedInfo, Args... args)
     {
         setupArgumentParsing();
-        return internalInitialize(fi, parseArgs(args...));
+        return internalInitialize(fedInfo, parseArgs(args...));
     }
 
     /** make the federate ready to run; enter execution mode and setup initial state*/
@@ -288,17 +288,17 @@ class BenchmarkFederate {
 
     /** internal initialization function that handles federate info arguments and calling derived
      * class virtual functions*/
-    int internalInitialize(helics::FederateInfo fi, int parseArgsResult)
+    int internalInitialize(helics::FederateInfo fedInfo, int parseArgsResult)
     {
         if (parseArgsResult != 0) {
             initialized = false;
             return parseArgsResult;
         }
-        fi.loadInfoFromArgs(app->remainArgs());
+        fedInfo.loadInfoFromArgs(app->remainArgs());
 
-        doParamInit(fi);
+        doParamInit(fedInfo);
         std::string name = getName();
-        fed = std::make_unique<helics::CombinationFederate>(name, fi);
+        fed = std::make_unique<helics::CombinationFederate>(name, fedInfo);
         doFedInit();
         initialized = true;
         return 0;
@@ -310,12 +310,12 @@ class BenchmarkFederate {
     {
         auto res = app->helics_parse(args...);
 
-        helics::FederateInfo fi;
+        helics::FederateInfo fedInfo;
         if (res != helics::helicsCLI11App::ParseOutput::OK) {
             switch (res) {
                 case helics::helicsCLI11App::ParseOutput::HELP_CALL:
                 case helics::helicsCLI11App::ParseOutput::HELP_ALL_CALL:
-                    fi.loadInfoFromArgs("--help");
+                    fedInfo.loadInfoFromArgs("--help");
                     [[fallthrough]];
                 case helics::helicsCLI11App::ParseOutput::VERSION_CALL:
                 case helics::helicsCLI11App::ParseOutput::SUCCESS_TERMINATION:

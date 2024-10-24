@@ -72,12 +72,12 @@ struct FederateTestFixture {
             initString.append(extraCoreArgs);
         }
 
-        helics::FederateInfo fi(helics::coreTypeFromString(CoreType_name));
+        helics::FederateInfo fedInfo(helics::coreTypeFromString(CoreType_name));
         if (time_delta != helics::timeZero) {
-            fi.setProperty(HELICS_PROPERTY_TIME_DELTA, time_delta);
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_DELTA, time_delta);
         }
         if (!extraFederateArgs.empty()) {
-            fi.loadInfoFromArgsIgnoreOutput(extraFederateArgs);
+            fedInfo.loadInfoFromArgsIgnoreOutput(extraFederateArgs);
         }
         switch (setup) {
             case 1:
@@ -90,12 +90,12 @@ struct FederateTestFixture {
                 //                                          std::to_string (count));
                 helics::CoreApp core(CoreType,
                                      initString + " --federates " + std::to_string(count));
-                fi.coreName = core.getIdentifier();
+                fedInfo.coreName = core.getIdentifier();
 
                 federates.resize(count + offset);
                 for (int ii = 0; ii < count; ++ii) {
                     auto fedname = name_prefix + std::to_string(ii + offset);
-                    auto fed = std::make_shared<FedType>(fedname, fi);
+                    auto fed = std::make_shared<FedType>(fedname, fedInfo);
                     federates[ii + offset] = fed;
                 }
             } break;
@@ -109,10 +109,10 @@ struct FederateTestFixture {
                     //     std::to_string (ii + offset),
                     //                                    initString + " --federates 1");
                     helics::CoreApp core(CoreType, initString + " --federates 1");
-                    fi.coreName = core.getIdentifier();
+                    fedInfo.coreName = core.getIdentifier();
 
                     auto fedname = name_prefix + std::to_string(ii + offset);
-                    auto fed = std::make_shared<FedType>(fedname, fi);
+                    auto fed = std::make_shared<FedType>(fedname, fedInfo);
                     federates[ii + offset] = fed;
                 }
             } break;
@@ -156,14 +156,14 @@ struct FederateTestFixture {
                     helics::CoreApp core(CoreType,
                                          initString + " --federates " +
                                              std::to_string((ii < count - 1) ? 2 : 1));
-                    fi.coreName = core.getIdentifier();
+                    fedInfo.coreName = core.getIdentifier();
 
                     auto fedname = name_prefix + std::to_string(ii + offset);
-                    auto fed = std::make_shared<FedType>(fedname, fi);
+                    auto fed = std::make_shared<FedType>(fedname, fedInfo);
                     federates[ii + offset] = fed;
                     if (ii + 1 < count) {
                         auto fedname2 = name_prefix + std::to_string(ii + offset + 1);
-                        auto fed2 = std::make_shared<FedType>(fedname2, fi);
+                        auto fed2 = std::make_shared<FedType>(fedname2, fedInfo);
                         federates[ii + offset + 1] = fed2;
                     }
                 }

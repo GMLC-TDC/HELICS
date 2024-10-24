@@ -54,20 +54,20 @@ namespace apps {
             std::cout << app.help();
         }
     }
-    Source::Source(std::string_view appName, const FederateInfo& fi): App(appName, fi)
+    Source::Source(std::string_view appName, const FederateInfo& fedInfo): App(appName, fedInfo)
     {
         initialSetup();
     }
 
     Source::Source(std::string_view appName,
                    const std::shared_ptr<Core>& core,
-                   const FederateInfo& fi): App(appName, core, fi)
+                   const FederateInfo& fedInfo): App(appName, core, fedInfo)
     {
         initialSetup();
     }
 
-    Source::Source(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-        App(appName, core, fi)
+    Source::Source(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+        App(appName, core, fedInfo)
     {
         initialSetup();
     }

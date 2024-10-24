@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <gtest/gtest.h>
 #include <sstream>
+#include <string>
 
 class combofed_single_type_tests:
     public ::testing::TestWithParam<const char*>,

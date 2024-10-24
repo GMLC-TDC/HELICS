@@ -12,7 +12,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     cmake_dependent_advanced_option(
         HELICS_DISABLE_WEBSERVER
         "Disable the embedded webserver app structure in the broker server" OFF
-        "NOT HELICS_DISABLE_BOOST;Boost_VERSION VERSION_GREATER 1.69" ON
+        "NOT HELICS_DISABLE_BOOST" ON
     )
     set(helics_apps_public_headers
         Player.hpp
@@ -56,9 +56,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         list(APPEND helics_apps_broker_files AsioBrokerServer.cpp)
     endif()
 
-    if(BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
-                                               OR HELICS_DISABLE_ASIO)
-    )
+    if(NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         message(STATUS "Building webserver Boost version ${Boost_VERSION} ${BOOST_VERSION_LEVEL}")
         list(APPEND helics_apps_broker_files helicsWebServer.cpp RestApiConnection.cpp)
         list(APPEND helics_apps_broker_headers helicsWebServer.hpp indexPage.hpp
@@ -87,11 +85,11 @@ if(HELICS_BUILD_APP_LIBRARY)
                 gmlc::networking
     )
 
-    if(BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
-                                               OR HELICS_DISABLE_ASIO)
-    )
+    if(NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)
-        target_compile_definitions(helics_apps PUBLIC BOOST_BEAST_USE_STD_STRING_VIEW)
+        if(${Boost_VERSION_MINOR} LESS 81)
+            target_compile_definitions(helics_apps PUBLIC BOOST_BEAST_USE_STD_STRING_VIEW)
+        endif()
         target_compile_definitions(helics_apps PUBLIC HELICS_ENABLE_WEBSERVER=1)
         if(WIN32)
             target_link_libraries(helics_apps PRIVATE bcrypt)

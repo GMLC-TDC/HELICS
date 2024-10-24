@@ -26,7 +26,11 @@ if(NOT TARGET spdlog::spdlog)
         set(SPDLOG_FMT_EXTERNAL ON CACHE INTERNAL "")
 
         # use the vendored SPDLOG library
-        add_subdirectory(ThirdParty/spdlog)
+        if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+            add_subdirectory(ThirdParty/spdlog EXCLUDE_FROM_ALL SYSTEM)
+        else()
+            add_subdirectory(ThirdParty/spdlog EXCLUDE_FROM_ALL)
+        endif()
 
         set_target_properties(spdlog PROPERTIES FOLDER Extern)
         hide_variable(SPDLOG_BUILD_ALL)

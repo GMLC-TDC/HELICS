@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 
 #include "gtest/gtest.h"
+#include <string>
 
 TEST(CoreConfig, test1)
 {

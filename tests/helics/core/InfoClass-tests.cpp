@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/InputInfo.hpp"
 
 #include "gtest/gtest.h"
+#include <memory>
+#include <utility>
 
 TEST(InfoClass_tests, basichandleinfo)
 {

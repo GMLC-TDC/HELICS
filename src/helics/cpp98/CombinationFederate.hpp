@@ -20,10 +20,10 @@ class CombinationFederate: public ValueFederate, public MessageFederate {
   public:
     /** construct a combination federate
     @param name the name of the federate
-    @param fi the federateInfo object to use for the construction information*/
-    explicit CombinationFederate(const std::string& name, FederateInfo& fi)
+    @param fedInfo the federateInfo object to use for the construction information*/
+    explicit CombinationFederate(const std::string& name, FederateInfo& fedInfo)
     {
-        fed = helicsCreateCombinationFederate(name.c_str(), fi.getInfo(), hThrowOnError());
+        fed = helicsCreateCombinationFederate(name.c_str(), fedInfo.getInfo(), hThrowOnError());
     }
     /** construct a combination Federate from a configuration string either a file or json/toml
      * string*/

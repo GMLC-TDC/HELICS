@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 #include "helics_benchmark_main.h"
 
+#include <string>
+
 using namespace helics;  // NOLINT
 
 static ActionMessage generateTestMessage1()

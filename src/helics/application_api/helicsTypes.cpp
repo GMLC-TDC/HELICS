@@ -25,8 +25,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <numeric>
 #include <regex>
 #include <sstream>
+#include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 using namespace gmlc::utilities;  // NOLINT
 

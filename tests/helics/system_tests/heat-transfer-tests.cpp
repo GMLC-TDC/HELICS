@@ -10,7 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <fstream>
+#include <iostream>
+#include <memory>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 helics::Time tend = 3600.0;  // simulation end time
 
@@ -47,11 +52,11 @@ class HeatUnitBlock {
     void initialize(const std::string& coreName)
     {
         std::string name = "heatUnit_(" + std::to_string(x) + "," + std::to_string(y) + ")";
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        fi.setProperty(HELICS_PROPERTY_TIME_DELTA, deltaTime);
-        fi.setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
-        vFed = std::make_unique<helics::ValueFederate>(name, fi);
+        helics::FederateInfo fedInfo;
+        fedInfo.coreName = coreName;
+        fedInfo.setProperty(HELICS_PROPERTY_TIME_DELTA, deltaTime);
+        fedInfo.setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
+        vFed = std::make_unique<helics::ValueFederate>(name, fedInfo);
         pub = &vFed->registerIndexedPublication<double>("temp", x, y);
         if (x - 1 < 0) {
             sub[0] = &vFed->registerSubscription("temp_wall");
@@ -119,9 +124,9 @@ class Wall {
     void initialize(const std::string& coreName)
     {
         std::string name = "Wall";
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate>(name, fi);
+        helics::FederateInfo fedInfo;
+        fedInfo.coreName = coreName;
+        vFed = std::make_unique<helics::ValueFederate>(name, fedInfo);
         pub = &vFed->registerGlobalPublication<double>("temp_wall");
         initialized = true;
     }
@@ -178,11 +183,11 @@ class observer {
     void initialize(const std::string& coreName)
     {
         std::string name = "observer";
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        fi.setFlagOption(HELICS_FLAG_OBSERVER);
-        fi.setProperty(HELICS_PROPERTY_TIME_DELTA, 10.0);
-        vFed = std::make_unique<helics::ValueFederate>(name, fi);
+        helics::FederateInfo fedInfo;
+        fedInfo.coreName = coreName;
+        fedInfo.setFlagOption(HELICS_FLAG_OBSERVER);
+        fedInfo.setProperty(HELICS_PROPERTY_TIME_DELTA, 10.0);
+        vFed = std::make_unique<helics::ValueFederate>(name, fedInfo);
         vSub = helics::VectorSubscription2d<double>(vFed.get(), subName, 0, m_count, 0, 1, 0.0);
         initialized = true;
     }

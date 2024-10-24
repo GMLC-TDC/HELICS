@@ -23,6 +23,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <chrono>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
 
 std::shared_ptr<BenchmarkFederate> fed;
 
@@ -87,8 +90,8 @@ int main(int argc, char* argv[])
             return (static_cast<int>(parseResult) > 0) ? 0 : static_cast<int>(parseResult);
         }
 
-        helics::FederateInfo fi;
-        int rc = fed->initialize(fi, app.remaining_for_passthrough(true));
+        helics::FederateInfo fedInfo;
+        int rc = fed->initialize(fedInfo, app.remaining_for_passthrough(true));
         if (rc != 0) {
             exit(rc);
         }

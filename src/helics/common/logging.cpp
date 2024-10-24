@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/string_viewOps.h"
 
 #include <map>
+#include <string>
 #include <unordered_map>
 
 namespace helics {

@@ -29,18 +29,14 @@ Re-run cmake with the `-U${tmp_py_interface_option}` option to get rid of this e
     )
 endif()
 
-if(HELICS_BUILD_MATLAB_INTERFACE)
+if(HELICS_BUILD_MATLAB_INTERFACE OR HELICS_BUILD_OCTAVE_INTERFACE)
     message(
         FATAL_ERROR
-            "The matlab interface is no longer compiled as part of building HELICS. Please see the new repository at https://github.com/gmlc-tdc/matHELICS for details.
-Re-run cmake with the `-UHELICS_BUILD_MATLAB_INTERFACE` option to get rid of this error message."
+            "The matlab and octave interfaces are no longer compiled as part of building HELICS. Please see the repository at https://github.com/gmlc-tdc/matHELICS for details.
+Re-run cmake with the `-UHELICS_BUILD_MATLAB_INTERFACE` or `-UHELICS_BUILD_OCTAVE_INTERFACE` option to get rid of this error message."
     )
 endif()
 
-cmake_dependent_option(
-    HELICS_BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB"
-    OFF
-)
 cmake_dependent_option(
     HELICS_BUILD_JAVA_INTERFACE "Build Java extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
 )
@@ -62,9 +58,7 @@ option(HELICS_OVERWRITE_INTERFACE_FILES
 )
 hide_variable(HELICS_OVERWRITE_INTERFACE_FILES)
 
-if(HELICS_BUILD_CSHARP_INTERFACE OR HELICS_BUILD_OCTAVE_INTERFACE
-   OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY
-)
+if(HELICS_BUILD_CSHARP_INTERFACE OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
     set(swig_required ON)
 else()
     set(swig_required OFF)
@@ -76,7 +70,7 @@ cmake_dependent_option(
     HELICS_ENABLE_SWIG
     "use swig to generate the interface files"
     OFF
-    "HELICS_BUILD_MATLAB_INTERFACE OR HELICS_BUILD_JAVA_INTERFACE;NOT swig_required"
+    " HELICS_BUILD_JAVA_INTERFACE;NOT swig_required"
     ${swig_required}
 )
 # cmake-format: on
@@ -125,10 +119,6 @@ include_directories(${HELICS_SWIG_INCLUDE_DIRS})
 
 if(HELICS_BUILD_JAVA_INTERFACE)
     add_subdirectory(java)
-endif()
-
-if(HELICS_BUILD_OCTAVE_INTERFACE)
-    add_subdirectory(octave)
 endif()
 
 if(HELICS_BUILD_CSHARP_INTERFACE)

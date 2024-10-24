@@ -28,6 +28,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <fmt/format.h>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <thread>

@@ -16,10 +16,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <deque>
 #include <fmt/format.h>
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <regex>
 #include <set>
+#include <string>
 #include <string_view>
 #include <tuple>
 #include <type_traits>

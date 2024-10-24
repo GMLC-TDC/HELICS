@@ -24,9 +24,9 @@ int main(int argc, char** argv)
     auto crA1 = helics::CoreFactory::create(helics::CoreType::ZMQ, "--brokername=brokerA");
 
     crA1->connect();
-    helics::FederateInfo fi;
+    helics::FederateInfo fedInfo;
 
-    helics::CombinationFederate fedA1("fedA_1", crA1, fi);
+    helics::CombinationFederate fedA1("fedA_1", crA1, fedInfo);
     auto crA2 = helics::CoreFactory::create(helics::CoreType::ZMQ, "--brokername=brokerA");
 
     fedA1.registerGlobalPublication<double>("pub1", "V");
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     cf.addSourceTarget("endpointA2_1");
 
     crA2->connect();
-    helics::CombinationFederate fedA2("fedA_2", crA2, fi);
+    helics::CombinationFederate fedA2("fedA_2", crA2, fedInfo);
     fedA2.registerGlobalEndpoint("endpointA2_1");
     fedA2.registerGlobalEndpoint("endpointA2_2");
     auto& I2 = fedA2.registerGlobalInput<double>("input_A2");
@@ -46,11 +46,11 @@ int main(int argc, char** argv)
 
     auto crB1 = helics::CoreFactory::create(helics::CoreType::ZMQ, "--brokername=brokerB");
     crB1->connect();
-    helics::CombinationFederate fedB1("fedB_1", crB1, fi);
+    helics::CombinationFederate fedB1("fedB_1", crB1, fedInfo);
 
     auto crB2 = helics::CoreFactory::create(helics::CoreType::ZMQ, "--brokername=brokerB");
     crB2->connect();
-    helics::CombinationFederate fedB2("fedB_2", crB2, fi);
+    helics::CombinationFederate fedB2("fedB_2", crB2, fedInfo);
     std::chrono::seconds timeout(30);
     if (argc >= 2) {
         char* eptr{nullptr};

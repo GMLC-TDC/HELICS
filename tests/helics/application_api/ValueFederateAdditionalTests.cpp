@@ -18,8 +18,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <future>
 #include <gtest/gtest.h>
+#include <memory>
 #include <numeric>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 /** these test cases test out the value federates with some additional tests
  */

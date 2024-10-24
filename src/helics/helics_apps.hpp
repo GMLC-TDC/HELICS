@@ -11,6 +11,7 @@ Header file for inclusion of the entire apps library
 #pragma once
 
 #include "apps/BrokerApp.hpp"
+#include "apps/Connector.hpp"
 #include "apps/Echo.hpp"
 #include "apps/Player.hpp"
 #include "apps/Recorder.hpp"

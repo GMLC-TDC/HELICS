@@ -82,7 +82,7 @@ The HELICS team holds office hours [every-other Thursday](https://helics.org/HEL
 
 ### Language Bindings
 
-HELICS provides a rich set of APIs for other languages including [Python](https://github.com/GMLC-TDC/pyhelics), C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and [Matlab](https://github.com/GMLC-TDC/matHELICS). [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages is growing all the time. See [Language bindings](https://docs.helics.org/en/latest/user-guide/installation/language.html) for additional details.
+HELICS provides a rich set of APIs for other languages including [Python](https://github.com/GMLC-TDC/pyhelics), C, Java, [Octave](https://github.com/GMLC-TDC/matHELICS), [Julia](https://github.com/GMLC-TDC/HELICS.jl), [Matlab](https://github.com/GMLC-TDC/matHELICS), and [Simulink](https://github.com/GMLC-TDC/simHELICS). [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages continues to grow. See [Language bindings](https://docs.helics.org/en/latest/user-guide/installation/language.html) for additional details.
 
 ## Documentation
 

@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cassert>
 #include <cctype>
+#include <cstdio>
+#include <string>
 
 static bool hasIndexCode(const std::string& type_name)
 {
@@ -164,9 +166,9 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
         initString.append(extraCoreArgs);
     }
 
-    HelicsFederateInfo fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreTypeFromString(fi, CoreType_name.c_str(), &err);
-    helicsFederateInfoSetTimeProperty(fi, HELICS_PROPERTY_TIME_DELTA, time_delta, &err);
+    HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreTypeFromString(fedInfo, CoreType_name.c_str(), &err);
+    helicsFederateInfoSetTimeProperty(fedInfo, HELICS_PROPERTY_TIME_DELTA, time_delta, &err);
 
     switch (setup) {
         case 1:
@@ -174,13 +176,13 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
             auto init = initString + " --federates " + std::to_string(count);
             auto core = helicsCreateCore(CoreType_name.c_str(), nullptr, init.c_str(), &err);
 
-            helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
+            helicsFederateInfoSetCoreName(fedInfo, helicsCoreGetIdentifier(core), &err);
             assert(err.error_code == 0);
             size_t offset = federates.size();
             federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii) {
                 auto name = name_prefix + std::to_string(ii + offset);
-                auto fed = ctor(name.c_str(), fi, &err);
+                auto fed = ctor(name.c_str(), fedInfo, &err);
                 assert(err.error_code == 0);
                 federates[ii + offset] = fed;
             }
@@ -193,10 +195,10 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
                 auto init = initString + " --federates 1";
                 auto core = helicsCreateCore(CoreType_name.c_str(), nullptr, init.c_str(), &err);
 
-                helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
+                helicsFederateInfoSetCoreName(fedInfo, helicsCoreGetIdentifier(core), &err);
                 assert(err.error_code == 0);
                 auto name = name_prefix + std::to_string(ii + offset);
-                auto fed = ctor(name.c_str(), fi, &err);
+                auto fed = ctor(name.c_str(), fedInfo, &err);
                 assert(err.error_code == 0);
                 federates[ii + offset] = fed;
                 helicsCoreFree(core);
@@ -222,7 +224,7 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
             }
         } break;
     }
-    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fedInfo);
 }
 
 HelicsFederate FederateTestFixture::GetFederateAt(int index)

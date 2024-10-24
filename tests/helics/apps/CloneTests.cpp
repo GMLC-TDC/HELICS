@@ -13,17 +13,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstdio>
 #include <filesystem>
 #include <future>
+#include <iostream>
+#include <string>
 #include <thread>
+#include <vector>
 
 TEST(clone_tests, simple_clone_test_pub)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "clone_core1";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Clone c1("c1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "clone_core1";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Clone c1("c1", fedInfo);
     c1.setFederateToClone("block1");
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &vfed,
                              "pub1",
@@ -50,14 +53,14 @@ TEST(clone_tests, simple_clone_test_pub)
 
 TEST(clone_tests, simple_clone_test_pub2)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "clone_core2";
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Clone c1("c1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "clone_core2";
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Clone c1("c1", fedInfo);
 
     c1.setFederateToClone("block1");
 
-    helics::ValueFederate vfed("block1", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &vfed,
                              "pub1",
@@ -104,14 +107,14 @@ TEST(clone_tests, simple_clone_test_pub2)
 
 TEST(clone_tests, simple_clone_test_message)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "clone_core4";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Clone c1("c1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "clone_core4";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Clone c1("c1", fedInfo);
     c1.setFederateToClone("block1");
 
-    helics::MessageFederate mfed("block1", fi);
+    helics::MessageFederate mfed("block1", fedInfo);
     auto& ept = mfed.registerGlobalEndpoint("ept1", "etype");
     auto& ept2 = mfed.registerGlobalEndpoint("ept3");
     mfed.registerEndpoint("e3");
@@ -153,14 +156,14 @@ TEST(clone_tests, simple_clone_test_message)
 
 TEST(clone_tests, simple_clone_test_combo)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "clone_core6";
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Clone c1("c1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "clone_core6";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    fedInfo.coreInitString = "-f 2 --autobroker";
+    helics::apps::Clone c1("c1", fedInfo);
     c1.setFederateToClone("block1");
 
-    helics::CombinationFederate mfed("block1", fi);
+    helics::CombinationFederate mfed("block1", fedInfo);
     auto& ept = mfed.registerGlobalEndpoint("ept1", "etype");
     auto& ept2 = mfed.registerGlobalEndpoint("ept3");
     mfed.registerEndpoint("e3");
@@ -232,15 +235,15 @@ TEST(clone_tests, simple_clone_test_combo)
 
 TEST(clone_tests, simple_clone_test_sub)
 {
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreName = "clone_core8";
-    fi.coreInitString = "-f 3 --autobroker";
-    helics::apps::Clone c1("c1", fi);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreName = "clone_core8";
+    fedInfo.coreInitString = "-f 3 --autobroker";
+    helics::apps::Clone c1("c1", fedInfo);
 
     c1.setFederateToClone("block1");
 
-    helics::ValueFederate vfed("block1", fi);
-    helics::ValueFederate vfed2("block2", fi);
+    helics::ValueFederate vfed("block1", fedInfo);
+    helics::ValueFederate vfed2("block2", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &vfed,
                              "pub1",
