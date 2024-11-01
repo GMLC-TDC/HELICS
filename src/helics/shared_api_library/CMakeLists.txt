@@ -16,6 +16,7 @@ set(helicsShared_headers
     MessageFilters.h
     Translators.h
     helicsCallbacks.h
+    helicsApps.h
 )
 
 set(helicsShared_sources
@@ -29,6 +30,13 @@ set(helicsShared_sources
     helicsData.cpp
     internal/api_objects.h
 )
+
+
+if (TARGET HELICS::apps)
+    list(APPEND helicsShared_sources helicsAppsExport.cpp)
+else()
+    list(APPEND helicsShared_sources helicsAppsExportNull.cpp)
+endif()
 
 include(GenerateExportHeader)
 
@@ -46,6 +54,7 @@ if(Python_EXECUTABLE)
                 Translators.h
                 helicsData.h
                 helicsCore.h
+                helicsApps.h
                 Translators.h
                 api-data.h
                 ../helics_enums.h
@@ -109,6 +118,9 @@ set_target_properties(helics PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HE
 
 set_target_properties(helics PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden)
 target_link_libraries(helics PRIVATE helics_application_api)
+if (TARGET HELICS::apps)
+    target_link_libraries(helics PRIVATE HELICS::apps)
+endif()
 target_link_libraries(helics PRIVATE compile_flags_target)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
@@ -117,7 +129,6 @@ endif()
 
 if(UNIX OR MINGW)
     if(NOT APPLE)
-        if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
             include(CheckLinkerFlag)
             check_linker_flag(
                 CXX "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt"
@@ -132,12 +143,6 @@ if(UNIX OR MINGW)
             if(flag_linker_exclude_libs)
                 target_link_libraries(helics PRIVATE -Wl,--exclude-libs,ALL)
             endif()
-        else()
-            target_link_libraries(
-                helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
-            )
-            target_link_libraries(helics PRIVATE -Wl,--exclude-libs,ALL)
-        endif()
     else(NOT_APPLE)
         target_link_libraries(
             helics PRIVATE -Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/export_mac.txt
