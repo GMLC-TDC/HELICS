@@ -31,8 +31,7 @@ set(helicsShared_sources
     internal/api_objects.h
 )
 
-
-if (TARGET HELICS::apps)
+if(TARGET HELICS::apps)
     list(APPEND helicsShared_sources helicsAppsExport.cpp)
 else()
     list(APPEND helicsShared_sources helicsAppsExportNull.cpp)
@@ -118,7 +117,7 @@ set_target_properties(helics PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HE
 
 set_target_properties(helics PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden)
 target_link_libraries(helics PRIVATE helics_application_api)
-if (TARGET HELICS::apps)
+if(TARGET HELICS::apps)
     target_link_libraries(helics PRIVATE HELICS::apps)
 endif()
 target_link_libraries(helics PRIVATE compile_flags_target)
@@ -129,20 +128,20 @@ endif()
 
 if(UNIX OR MINGW)
     if(NOT APPLE)
-            include(CheckLinkerFlag)
-            check_linker_flag(
-                CXX "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt"
-                flag_linker_version_script
+        include(CheckLinkerFlag)
+        check_linker_flag(
+            CXX "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt"
+            flag_linker_version_script
+        )
+        if(flag_linker_version_script)
+            target_link_libraries(
+                helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
             )
-            if(flag_linker_version_script)
-                target_link_libraries(
-                    helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
-                )
-            endif()
-            check_linker_flag(CXX "-Wl,--exclude-libs,ALL" flag_linker_exclude_libs)
-            if(flag_linker_exclude_libs)
-                target_link_libraries(helics PRIVATE -Wl,--exclude-libs,ALL)
-            endif()
+        endif()
+        check_linker_flag(CXX "-Wl,--exclude-libs,ALL" flag_linker_exclude_libs)
+        if(flag_linker_exclude_libs)
+            target_link_libraries(helics PRIVATE -Wl,--exclude-libs,ALL)
+        endif()
     else(NOT_APPLE)
         target_link_libraries(
             helics PRIVATE -Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/export_mac.txt

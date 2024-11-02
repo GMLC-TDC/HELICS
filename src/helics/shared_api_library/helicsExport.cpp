@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsVersion.hpp"
 #include "../helics.hpp"
 #include "helics/helics-config.h"
-#include "helicsCore.h"
 #include "helicsApps.h"
+#include "helicsCore.h"
 #include "internal/api_objects.h"
 
 #include <algorithm>
@@ -1364,7 +1364,6 @@ int MasterObjectHolder::addFed(std::unique_ptr<helics::FedObject> fed)
     return index;
 }
 
-
 int MasterObjectHolder::addApp(std::unique_ptr<helics::AppObject> app)
 {
     auto handle = apps.lock();
@@ -1467,7 +1466,7 @@ void MasterObjectHolder::clearApp(int index)
         (*appList)[index]->valid = 0;
         (*appList)[index] = nullptr;
         if (appList->size() > 10) {
-            if (std::none_of(appList->begin(),appList->end(), [](const auto& app) { return static_cast<bool>(app); })) {
+            if (std::none_of(appList->begin(), appList->end(), [](const auto& app) { return static_cast<bool>(app); })) {
                 appList->clear();
             }
         }
@@ -1505,10 +1504,10 @@ void MasterObjectHolder::deleteAll()
         fedHandle->clear();
     }
     {
-        auto appHandle =apps.lock();
-        for (auto& app: appHandle) {
+        auto appHandle = apps.lock();
+        for (auto& app : appHandle) {
             if ((app) && (app->app)) {
-                helicsAppFinalize(reinterpret_cast<HelicsApp>(app.get()),nullptr);
+                helicsAppFinalize(reinterpret_cast<HelicsApp>(app.get()), nullptr);
                 app->valid = 0;
             }
         }

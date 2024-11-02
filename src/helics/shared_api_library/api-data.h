@@ -65,8 +65,8 @@ typedef void* HelicsBroker;
 typedef void* HelicsFederate;
 
 /**
-* opaque object representing a helics app
-*/
+ * opaque object representing a helics app
+ */
 // typedef void* helics_federate;
 typedef void* HelicsApp;
 

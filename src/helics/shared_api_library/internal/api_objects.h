@@ -39,8 +39,7 @@ class Endpoint;
 class Filter;
 class Translator;
 
-namespace apps
-{
+namespace apps {
     class App;
 }
 
@@ -76,10 +75,9 @@ class CoreObject {
 /** get the CoreObject from a HelicsCore and verify it is valid*/
 CoreObject* getCoreObject(HelicsCore core, HelicsError* err) noexcept;
 
-
 /** object representing an app*/
 class AppObject {
-public:
+  public:
     std::string type;  //!< the target of the query
     std::shared_ptr<apps::App> app;
     int index{-2};
@@ -183,7 +181,6 @@ class QueryObject {
     int valid{0};
 };
 
-
 }  // namespace helics
 
 /** definitions to simplify error returns if an error already exists*/
@@ -225,7 +222,7 @@ helics::FederateInfo* getFedInfo(HelicsFederateInfo fedInfo, HelicsError* err);
 helics::Core* getCore(HelicsCore core, HelicsError* err);
 helics::Broker* getBroker(HelicsBroker broker, HelicsError* err);
 helics::Message* getMessageObj(HelicsMessage message, HelicsError* err);
-helics::apps::App *getApp(HelicsApp, HelicsError *err);
+helics::apps::App* getApp(HelicsApp, HelicsError* err);
 /** generate a new helicsFederate and store it in the master*/
 HelicsFederate generateNewHelicsFederateObject(std::shared_ptr<helics::Federate> fed, helics::FederateType type);
 
@@ -280,7 +277,7 @@ class MasterObjectHolder {
     bool removeFed(std::string_view name, int validationCode);
     /** add an app to the holder*/
     int addApp(std::unique_ptr<helics::AppObject> app);
-   
+
     void clearBroker(int index);
     void clearCore(int index);
     void clearFed(int index);

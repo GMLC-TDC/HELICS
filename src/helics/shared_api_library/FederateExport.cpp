@@ -457,12 +457,11 @@ void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fedInfo, int intege
     info->setProperty(integerProperty, propertyValue);
 }
 
-
-HelicsFederate generateNewHelicsFederateObject(std::shared_ptr<helics::Federate> fed,helics::FederateType type)
+HelicsFederate generateNewHelicsFederateObject(std::shared_ptr<helics::Federate> fed, helics::FederateType type)
 {
     auto fedI = std::make_unique<helics::FedObject>();
-    fedI->fedptr=fed;
-    fedI->type=type;
+    fedI->fedptr = fed;
+    fedI->type = type;
     fedI->valid = fedValidationIdentifier;
     auto* hfed = reinterpret_cast<HelicsFederate>(fedI.get());
     getMasterHolder()->addFed(std::move(fedI));
@@ -473,24 +472,24 @@ HelicsFederate generateNewHelicsFederateObject(std::shared_ptr<helics::Federate>
 HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fedInfo, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
-    
+
     std::shared_ptr<helics::Federate> fed;
     try {
         if (fedInfo == nullptr) {
-            fed=std::make_shared<helics::ValueFederate>(AS_STRING(fedName), helics::FederateInfo());
+            fed = std::make_shared<helics::ValueFederate>(AS_STRING(fedName), helics::FederateInfo());
         } else {
             auto* info = getFedInfo(fedInfo, err);
             if (info == nullptr) {
                 return nullptr;
             }
-            fed=std::make_shared<helics::ValueFederate>(AS_STRING(fedName), *info);
+            fed = std::make_shared<helics::ValueFederate>(AS_STRING(fedName), *info);
         }
     }
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
-    return generateNewHelicsFederateObject(std::move(fed),helics::FederateType::VALUE);
+    return generateNewHelicsFederateObject(std::move(fed), helics::FederateType::VALUE);
 }
 
 HelicsFederate helicsCreateValueFederateFromConfig(const char* configFile, HelicsError* err)
@@ -504,7 +503,7 @@ HelicsFederate helicsCreateValueFederateFromConfig(const char* configFile, Helic
         helicsErrorHandler(err);
         return nullptr;
     }
-    return generateNewHelicsFederateObject(std::move(fed),helics::FederateType::VALUE);
+    return generateNewHelicsFederateObject(std::move(fed), helics::FederateType::VALUE);
 }
 
 /* Creation and destruction of Federates */
@@ -527,7 +526,7 @@ HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateIn
         helicsErrorHandler(err);
         return nullptr;
     }
-    return generateNewHelicsFederateObject(std::move(fed),helics::FederateType::MESSAGE);
+    return generateNewHelicsFederateObject(std::move(fed), helics::FederateType::MESSAGE);
 }
 
 HelicsFederate helicsCreateMessageFederateFromConfig(const char* configFile, HelicsError* err)
@@ -542,7 +541,7 @@ HelicsFederate helicsCreateMessageFederateFromConfig(const char* configFile, Hel
         helicsErrorHandler(err);
         return nullptr;
     }
-    return generateNewHelicsFederateObject(std::move(fed),helics::FederateType::MESSAGE);
+    return generateNewHelicsFederateObject(std::move(fed), helics::FederateType::MESSAGE);
 }
 
 /* Creation and destruction of Federates */
@@ -558,14 +557,14 @@ HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFedera
             if (info == nullptr) {
                 return nullptr;
             }
-           fed = std::make_shared<helics::CombinationFederate>(AS_STRING(fedName), *info);
+            fed = std::make_shared<helics::CombinationFederate>(AS_STRING(fedName), *info);
         }
     }
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
-    return generateNewHelicsFederateObject(std::move(fed),helics::FederateType::COMBINATION);
+    return generateNewHelicsFederateObject(std::move(fed), helics::FederateType::COMBINATION);
 }
 
 HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile, HelicsError* err)
@@ -580,7 +579,7 @@ HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile,
         return nullptr;
     }
 
-    return generateNewHelicsFederateObject(std::move(fed),helics::FederateType::COMBINATION);
+    return generateNewHelicsFederateObject(std::move(fed), helics::FederateType::COMBINATION);
 }
 
 /* Creation and destruction of Federates */
@@ -596,14 +595,14 @@ HelicsFederate helicsCreateCallbackFederate(const char* fedName, HelicsFederateI
             if (info == nullptr) {
                 return nullptr;
             }
-            fed= std::make_shared<helics::CallbackFederate>(AS_STRING(fedName), *info);
+            fed = std::make_shared<helics::CallbackFederate>(AS_STRING(fedName), *info);
         }
     }
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
-    return generateNewHelicsFederateObject(std::move(fed),helics::FederateType::CALLBACK);
+    return generateNewHelicsFederateObject(std::move(fed), helics::FederateType::CALLBACK);
 }
 
 HelicsFederate helicsCreateCallbackFederateFromConfig(const char* configFile, HelicsError* err)
@@ -618,7 +617,7 @@ HelicsFederate helicsCreateCallbackFederateFromConfig(const char* configFile, He
         return nullptr;
     }
 
-    return generateNewHelicsFederateObject(std::move(fed),helics::FederateType::CALLBACK);
+    return generateNewHelicsFederateObject(std::move(fed), helics::FederateType::CALLBACK);
 }
 
 HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err)
@@ -627,7 +626,7 @@ HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err)
     if (fedObj == nullptr) {
         return nullptr;
     }
-    return generateNewHelicsFederateObject(fedObj->fedptr,fedObj->type);
+    return generateNewHelicsFederateObject(fedObj->fedptr, fedObj->type);
 }
 
 HelicsFederate helicsGetFederateByName(const char* fedName, HelicsError* err)
@@ -651,7 +650,7 @@ HelicsFederate helicsGetFederateByName(const char* fedName, HelicsError* err)
         }
         return nullptr;
     }
-    return generateNewHelicsFederateObject(fed->fedptr,fed->type);
+    return generateNewHelicsFederateObject(fed->fedptr, fed->type);
 }
 
 void helicsFederateProtect(const char* fedName, HelicsError* err)
