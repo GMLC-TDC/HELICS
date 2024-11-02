@@ -123,7 +123,7 @@ if (TARGET HELICS::apps)
 endif()
 target_link_libraries(helics PRIVATE compile_flags_target)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(helics PUBLIC -Wno-documentation)
 endif()
 

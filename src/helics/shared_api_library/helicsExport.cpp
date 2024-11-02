@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../helics.hpp"
 #include "helics/helics-config.h"
 #include "helicsCore.h"
+#include "helicsApps.h"
 #include "internal/api_objects.h"
 
 #include <algorithm>
@@ -1363,6 +1364,16 @@ int MasterObjectHolder::addFed(std::unique_ptr<helics::FedObject> fed)
     return index;
 }
 
+
+int MasterObjectHolder::addApp(std::unique_ptr<helics::AppObject> app)
+{
+    auto handle = apps.lock();
+    auto index = static_cast<int>(handle->size());
+    app->index = index;
+    handle->push_back(std::move(app));
+    return index;
+}
+
 helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName)
 {
     auto handle = feds.lock();
@@ -1449,6 +1460,20 @@ void MasterObjectHolder::clearFed(int index)
     }
 }
 
+void MasterObjectHolder::clearApp(int index)
+{
+    auto appList = apps.lock();
+    if ((index < static_cast<int>(appList->size())) && (index >= 0)) {
+        (*appList)[index]->valid = 0;
+        (*appList)[index] = nullptr;
+        if (appList->size() > 10) {
+            if (std::none_of(appList->begin(),appList->end(), [](const auto& app) { return static_cast<bool>(app); })) {
+                appList->clear();
+            }
+        }
+    }
+}
+
 void MasterObjectHolder::abortAll(int code, std::string_view error)
 {
     {
@@ -1478,6 +1503,16 @@ void MasterObjectHolder::deleteAll()
             }
         }
         fedHandle->clear();
+    }
+    {
+        auto appHandle =apps.lock();
+        for (auto& app: appHandle) {
+            if ((app) && (app->app)) {
+                helicsAppFinalize(reinterpret_cast<HelicsApp>(app.get()),nullptr);
+                app->valid = 0;
+            }
+        }
+        appHandle->clear();
     }
     {
         auto coreHandle = cores.lock();

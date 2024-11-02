@@ -277,15 +277,15 @@ void App::loadJsonFileConfiguration(const std::string& appName,
     auto doc = fileops::loadJson(jsonString);
 
     if (doc.contains("app")) {
-        auto appConfig = doc["app"];
+        auto& appConfig = doc["app"];
         loadConfigOptions(appConfig);
     }
     if (doc.contains("config")) {
-        auto appConfig = doc["config"];
+        auto& appConfig = doc["config"];
         loadConfigOptions(appConfig);
     }
     if (doc.contains(appName)) {
-        auto appConfig = doc[appName];
+        auto& appConfig = doc[appName];
         loadConfigOptions(appConfig);
     }
 }
