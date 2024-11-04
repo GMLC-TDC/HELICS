@@ -7,11 +7,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/core-exceptions.hpp"
 #include "../core/coreTypeOperations.hpp"
+#include "../core/CoreTypes.hpp"
+#include "../application_api/FederateInfo.hpp"
 #include "../helics.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
 #include "helicsCallbacks.h"
 #include "helicsCore.h"
 #include "internal/api_objects.h"
+#include "api-data.h"
+#include "helics/helics_enums.h"
 
 #include <iostream>
 #include <map>
@@ -460,7 +464,7 @@ void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fedInfo, int intege
 HelicsFederate generateNewHelicsFederateObject(std::shared_ptr<helics::Federate> fed, helics::FederateType type)
 {
     auto fedI = std::make_unique<helics::FedObject>();
-    fedI->fedptr = fed;
+    fedI->fedptr = std::move(fed);
     fedI->type = type;
     fedI->valid = fedValidationIdentifier;
     auto* hfed = reinterpret_cast<HelicsFederate>(fedI.get());

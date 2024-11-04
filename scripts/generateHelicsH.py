@@ -3,7 +3,7 @@
 """
 Created on Mon Dec  7 14:25:17 2020
 
-@author: phlpt
+@author: Philip Top
 """
 
 import re
@@ -73,6 +73,7 @@ files = [
     "src/helics/shared_api_library/api-data.h",
     "src/helics/shared_api_library/helicsData.h",
     "src/helics/shared_api_library/helicsCore.h",
+    "src/helics/shared_api_library/helicsApps.h",
     "src/helics/shared_api_library/ValueFederate.h",
     "src/helics/shared_api_library/MessageFederate.h",
     "src/helics/shared_api_library/MessageFilters.h",

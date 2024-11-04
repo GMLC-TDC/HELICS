@@ -90,7 +90,7 @@ HELICS_EXPORT void helicsAppRunTo(HelicsApp app, HelicsTime stopTime, HelicsErro
  */
 HELICS_EXPORT void helicsAppFinalize(HelicsApp app, HelicsError* err);
 
-/** check if the App is ready to run*/
+/** check if the App is active and ready to run*/
 HELICS_EXPORT HelicsBool helicsAppIsActive(HelicsApp app);
 
 #ifdef __cplusplus

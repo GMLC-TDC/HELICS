@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsApps.h"
 #include "helicsCore.h"
 #include "internal/api_objects.h"
+#include "api-data.h"
 
 #include <algorithm>
 #include <atomic>

@@ -12,14 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics_apps.hpp"
 #include "helicsApps.h"
 #include "internal/api_objects.h"
+#include "api-data.h"
 
-#include <iostream>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <string>
 #include <utility>
-#include <vector>
+
 
 namespace helics {
 
@@ -54,9 +50,9 @@ helics::apps::App* getApp(HelicsApp app, HelicsError* err)
     return appObj->app.get();
 }
 
-std::shared_ptr<helics::apps::App> getAppSharedPtr(HelicsApp core, HelicsError* err)
+std::shared_ptr<helics::apps::App> getAppSharedPtr(HelicsApp app, HelicsError* err)
 {
-    auto* appObj = helics::getAppObject(core, err);
+    auto* appObj = helics::getAppObject(app, err);
     if (appObj == nullptr) {
         return nullptr;
     }
@@ -103,6 +99,7 @@ HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* 
     }
 
     try {
+        auto cstring=AS_STRING(configFile);
         auto app = std::make_unique<helics::AppObject>();
         app->valid = helics::appValidationIdentifier;
         auto nstring = AS_STRING_VIEW(appName);
@@ -111,8 +108,8 @@ HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* 
             return nullptr;
         }
 
-        std::string_view appTypeName(appType);
-        bool loadFile = true;
+        const std::string_view appTypeName(appType);
+        bool loadFile = !cstring.empty();
         if (fedInfo == nullptr) {
             helics::FederateInfo newFedInfo = helics::loadFederateInfo(AS_STRING(configFile));
             app->app = buildApp(appTypeName, nstring, newFedInfo);
@@ -129,8 +126,8 @@ HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* 
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAppTypeString);
             return nullptr;
         }
-        if (loadFile) {
-            app->app->loadFile(AS_STRING(configFile));
+        if (loadFile && !cstring.empty()) {
+            app->app->loadFile(cstring);
         }
         auto* retapp = reinterpret_cast<HelicsApp>(app.get());
         getMasterHolder()->addApp(std::move(app));
