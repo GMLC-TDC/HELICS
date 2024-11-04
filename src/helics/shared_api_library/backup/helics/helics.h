@@ -510,6 +510,12 @@ typedef void* HelicsBroker;
 typedef void* HelicsFederate;
 
 /**
+ * opaque object representing a helics app
+ */
+// typedef void* helics_federate;
+typedef void* HelicsApp;
+
+/**
  * opaque object representing a filter info object structure
  */
 // typedef void* helics_federate_info;
@@ -2606,6 +2612,80 @@ HELICS_EXPORT void helicsQueryFree(HelicsQuery query);
  * @details This runs some cleanup routines and tries to close out any residual thread that haven't been shutdown yet.
  */
 HELICS_EXPORT void helicsCleanupLibrary(void);
+
+/**
+* Create a helics app object
+*
+* @details create a helics App object
+*
+* @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config file.
+* @param appType the type of app to create
+* @param configFile configuration file or string to pass into the app, can be NULL or empty
+* @param fedInfo the federate information to pass into the app, can be NULL
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+*
+* @return An opaque value app object nullptr if the object creation failed.
+*/
+HELICS_EXPORT HelicsApp
+    helicsCreateApp(const char* appName, const char* appType, const char* configFile, HelicsFederateInfo fedInfo, HelicsError* err);
+
+/** run the App
+* @details execute the app to completion
+* @param app the app to execute
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+*
+* @return An opaque value federate object that can be used in any of the federate methods, not recommended to use this object to advance
+time, the app will not likely function normally, other query, or information calls, or modification calls on the federate are fine.
+*/
+HELICS_EXPORT HelicsFederate helicsAppGetFederate(HelicsApp app, HelicsError* err);
+
+/**
+* Create a helics app object
+*
+* @details create a helics App object
+*
+* @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config file.
+* @param appType the type of app to create
+* @param configFile configuration file or string to pass into the app, can be NULL or empty
+* @param fedInfo the federate information to pass into the app, can be NULL
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+*
+* @return An opaque value app object nullptr if the object creation failed.
+*/
+HELICS_EXPORT void helicsAppLoadFile(HelicsApp app, const char* configFile, HelicsError* err);
+
+/** initialize the App federate
+ * @details generate all the interfaces and load data for the application
+ * @param app the app to initialize
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsAppInitialize(HelicsApp app, HelicsError* err);
+
+/** run the App
+ * @details execute the app to completion
+ * @param app the app to execute
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsAppRun(HelicsApp app, HelicsError* err);
+
+/** run and app to a specified stop time
+ * @details it is possible to call this method repeatedly with different times
+ * @param app the app to run
+ * @param stopTime the desired stop time
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsAppRunTo(HelicsApp app, HelicsTime stopTime, HelicsError* err);
+
+/** finalize the app
+ * @param app the app to execute
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsAppFinalize(HelicsApp app, HelicsError* err);
+
+/** check if the App is active and ready to run*/
+HELICS_EXPORT HelicsBool helicsAppIsActive(HelicsApp app);
 
 /**
  * input/publication registration
