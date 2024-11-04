@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/coreTypeOperations.hpp"
 #include "../core/helicsVersion.hpp"
 #include "../helics.hpp"
+#include "../helics_enums.h"
 #include "api-data.h"
 #include "helics/helics-config.h"
 #include "helicsApps.h"
@@ -17,16 +18,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "internal/api_objects.h"
 
 #include <algorithm>
-#include <atomic>
 #include <csignal>
-#include <future>
-#include <iostream>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
+#include <string_view>
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 #    include "../network/zmq/ZmqContextManager.h"

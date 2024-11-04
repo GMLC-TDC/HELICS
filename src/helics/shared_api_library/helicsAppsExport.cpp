@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "internal/api_objects.h"
 
 #include <utility>
+#include <memory>
 
 namespace helics {
 
