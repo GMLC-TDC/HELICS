@@ -5,17 +5,17 @@ additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "../application_api/FederateInfo.hpp"
+#include "../core/CoreTypes.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/coreTypeOperations.hpp"
-#include "../core/CoreTypes.hpp"
-#include "../application_api/FederateInfo.hpp"
 #include "../helics.hpp"
+#include "api-data.h"
 #include "gmlc/concurrency/TripWire.hpp"
+#include "helics/helics_enums.h"
 #include "helicsCallbacks.h"
 #include "helicsCore.h"
 #include "internal/api_objects.h"
-#include "api-data.h"
-#include "helics/helics_enums.h"
 
 #include <iostream>
 #include <map>

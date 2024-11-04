@@ -8,14 +8,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../core/coreTypeOperations.hpp"
 #include "../helics.hpp"
+#include "api-data.h"
 #include "gmlc/concurrency/TripWire.hpp"
 #include "helics/helics_apps.hpp"
 #include "helicsApps.h"
 #include "internal/api_objects.h"
-#include "api-data.h"
 
 #include <utility>
-
 
 namespace helics {
 
@@ -99,7 +98,7 @@ HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* 
     }
 
     try {
-        auto cstring=AS_STRING(configFile);
+        auto cstring = AS_STRING(configFile);
         auto app = std::make_unique<helics::AppObject>();
         app->valid = helics::appValidationIdentifier;
         auto nstring = AS_STRING_VIEW(appName);

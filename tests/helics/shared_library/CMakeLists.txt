@@ -73,9 +73,10 @@ target_compile_definitions(
 )
 
 if(TARGET HELICS::apps)
-target_compile_definitions(
-    shared-library-tests PRIVATE "-DAPP_TEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../apps/test_files/\""
-)
+    target_compile_definitions(
+        shared-library-tests
+        PRIVATE "-DAPP_TEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../apps/test_files/\""
+    )
 endif()
 
 add_test(NAME shared-library-tests COMMAND shared-library-tests)
