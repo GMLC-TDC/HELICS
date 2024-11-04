@@ -21,10 +21,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <csignal>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
-#include <string_view>
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 #    include "../network/zmq/ZmqContextManager.h"
