@@ -79,8 +79,160 @@ TEST(app_tests, simple_player)
 
     retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 5.0);
-    helicsFederateFinalize(vFed, &err);
+    helicsFederateDestroy(vFed);
     fut.get();
     EXPECT_EQ(err2.error_code, 0);
     EXPECT_EQ(err.error_code, 0);
+}
+
+
+TEST(app_tests, recorder)
+{
+
+    auto err = helicsErrorInitialize();
+    HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
+    helicsFederateInfoSetCoreName(fedInfo, "pcore1", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
+
+    auto rec1 = helicsCreateApp("rec1", "recorder", NULL, fedInfo, &err);
+    EXPECT_TRUE(helicsAppIsActive(rec1) == HELICS_TRUE);
+
+    helicsAppLoadFile(rec1, (std::string(APP_TEST_DIR) + "example3rec.json").c_str(), &err);
+    EXPECT_EQ(err.error_code, 0);
+
+
+    auto vFed = helicsCreateValueFederate("block1", fedInfo, &err);
+    auto pub1=helicsFederateRegisterGlobalPublication(vFed,"pub1",HELICS_DATA_TYPE_DOUBLE,NULL,&err);
+    auto pub2=helicsFederateRegisterGlobalPublication(vFed,"pub2",HELICS_DATA_TYPE_DOUBLE,NULL,&err);
+
+    auto err2 = helicsErrorInitialize();
+
+    auto fut = std::async(std::launch::async, [&rec1, &err2]() { helicsAppRunTo(rec1,4.0, &err2); });
+    helicsFederateEnterExecutingMode(vFed, &err);
+    auto retTime = helicsFederateRequestTime(vFed,1,&err);
+    EXPECT_EQ(retTime, 1.0);
+    helicsPublicationPublishDouble(pub1,3.4,&err);
+
+
+    retTime = helicsFederateRequestTime(vFed,1.5,&err);
+    EXPECT_EQ(retTime, 1.5);
+    helicsPublicationPublishDouble(pub2,5.7,&err);
+
+    retTime = helicsFederateRequestTime(vFed,2,&err);
+    EXPECT_EQ(retTime, 2.0);
+    helicsPublicationPublishDouble(pub1,4.7,&err);
+
+    retTime = helicsFederateRequestTime(vFed,3.0,&err);
+    EXPECT_EQ(retTime, 3.0);
+    helicsPublicationPublishString(pub2, "3.9", &err);
+
+    retTime = helicsFederateRequestTime(vFed,5.0,&err);
+    EXPECT_EQ(retTime, 5.0);
+
+    helicsFederateDestroy(vFed);
+
+    fut.get();
+
+    helicsAppDestroy(rec1);
+
+    EXPECT_EQ(helicsAppIsActive(rec1),HELICS_FALSE);
+}
+
+
+TEST(app_tests, connector)
+{
+
+    auto err = helicsErrorInitialize();
+    HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
+    helicsFederateInfoSetTimeProperty(fedInfo,HELICS_PROPERTY_TIME_PERIOD, 1.0,&err);
+    helicsFederateInfoSetCoreName(fedInfo, "ccoref5", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
+
+    auto conn1 = helicsCreateApp("connector1", "connector", NULL, fedInfo, &err);
+    EXPECT_TRUE(helicsAppIsActive(conn1) == HELICS_TRUE);
+
+    helicsAppLoadFile(conn1, (std::string(APP_TEST_DIR) + "connector/simple_tags.txt").c_str(), &err);
+    EXPECT_EQ(err.error_code, 0);
+
+
+    auto vFed = helicsCreateValueFederate("c1", fedInfo, &err);
+
+    auto pub1=helicsFederateRegisterGlobalPublication(vFed,"pub1",HELICS_DATA_TYPE_DOUBLE,nullptr,&err);
+
+    auto inp1 = helicsFederateRegisterGlobalInput(vFed,"inp1",HELICS_DATA_TYPE_DOUBLE,nullptr,&err);
+    auto inp2 = helicsFederateRegisterGlobalInput(vFed,"inp2",HELICS_DATA_TYPE_DOUBLE,nullptr,&err);
+    helicsFederateSetGlobal(vFed,"tag2", "true",&err);
+    auto err2 = helicsErrorInitialize();
+    auto fut = std::async(std::launch::async, [&conn1, &err2]() { helicsAppRun(conn1, &err2); });
+    helicsFederateEnterExecutingMode(vFed, &err);
+
+
+    const double testValue = 3452.562;
+    helicsPublicationPublishDouble(pub1,testValue,&err);
+    
+    auto retTime = helicsFederateRequestTime(vFed,5.0,&err);
+    EXPECT_EQ(retTime, 1.0);
+    auto val = helicsInputGetDouble(inp1,&err);
+    EXPECT_EQ(val, HELICS_INVALID_DOUBLE);
+
+    val = helicsInputGetDouble(inp2,&err);
+    EXPECT_EQ(val, testValue);
+   helicsFederateDestroy(vFed);
+    fut.get();
+    EXPECT_EQ(err2.error_code,0);
+
+    helicsAppDestroy(conn1);
+}
+
+
+
+TEST(app_tests, echo)
+{
+
+    auto err = helicsErrorInitialize();
+    HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
+    helicsFederateInfoSetCoreName(fedInfo, "ecore4-file", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
+
+    auto echo1 = helicsCreateApp("echo1", "echo", NULL, fedInfo, &err);
+    EXPECT_TRUE(helicsAppIsActive(echo1) == HELICS_TRUE);
+
+    helicsAppLoadFile(echo1, (std::string(APP_TEST_DIR) + "echo_example.json").c_str(), &err);
+    EXPECT_EQ(err.error_code, 0);
+
+    auto mFed = helicsCreateMessageFederate("source", fedInfo, &err);
+
+    auto ep1=helicsFederateRegisterEndpoint(mFed,"src","",&err);
+    auto err2 = helicsErrorInitialize();
+    auto fut = std::async(std::launch::async, [&echo1, &err2]() { helicsAppRunTo(echo1,5.0, &err2); });
+    helicsFederateEnterExecutingMode(mFed, &err);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    helicsEndpointSendStringTo(ep1,"hello world", "test",&err);
+    helicsFederateRequestTime(mFed,1.0,&err);
+    helicsEndpointSendStringTo(ep1,"hello again", "test2",&err);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_FALSE(helicsEndpointHasMessage(ep1));
+    auto ntime = helicsFederateRequestTime(mFed,2.0,&err);
+    EXPECT_DOUBLE_EQ(ntime, HELICS_TIME_EPSILON + 1.2);
+    EXPECT_TRUE(helicsEndpointHasMessage(ep1));
+    auto m = helicsEndpointGetMessage(ep1);
+    ASSERT_TRUE(m);
+    EXPECT_STREQ(helicsMessageGetString(m), "hello world");
+    EXPECT_STREQ(helicsMessageGetSource(m), "test");
+
+    ntime = ntime = helicsFederateRequestTime(mFed,3.0,&err);
+    EXPECT_EQ(ntime, 2.2);
+    EXPECT_TRUE(helicsEndpointHasMessage(ep1));
+    helicsMessageFree(m);
+    m = helicsEndpointGetMessage(ep1);
+    ASSERT_TRUE(m);
+    EXPECT_STREQ(helicsMessageGetString(m), "hello again");
+    EXPECT_STREQ(helicsMessageGetSource(m), "test2");
+    helicsMessageFree(m);
+   helicsFederateDestroy(mFed);
+    fut.get();
+    EXPECT_EQ(err2.error_code,0);
 }

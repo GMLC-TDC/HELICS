@@ -871,14 +871,14 @@ double helicsInputGetDouble(HelicsInput inp, HelicsError* err)
 {
     auto* inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {
-        return HELICS_TIME_INVALID;
+        return HELICS_INVALID_DOUBLE;
     }
     try {
         return inpObj->inputPtr->getValue<double>();
     }
     catch (...) {
         helicsErrorHandler(err);
-        return HELICS_TIME_INVALID;
+        return HELICS_INVALID_DOUBLE;
     }
 }
 

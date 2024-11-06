@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/core-exceptions.hpp"
 #include "../core/coreTypeOperations.hpp"
+#include "../core/CoreFactory.hpp"
+#include "../common/configFileHelpers.hpp"
 #include "../helics.hpp"
 #include "api-data.h"
 #include "gmlc/concurrency/TripWire.hpp"
@@ -110,8 +112,9 @@ HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* 
 
         const std::string_view appTypeName(appType);
         bool loadFile = !cstring.empty();
-        if (fedInfo == nullptr) {
-            helics::FederateInfo newFedInfo = helics::loadFederateInfo(AS_STRING(configFile));
+        if (fedInfo == nullptr && helics::fileops::getConfigType(cstring)!=helics::fileops::ConfigType::NONE) {
+            
+            helics::FederateInfo newFedInfo = helics::loadFederateInfo(cstring);
             app->app = buildApp(appTypeName, nstring, newFedInfo);
             loadFile = false;
         } else {
@@ -222,6 +225,23 @@ void helicsAppFinalize(HelicsApp app, HelicsError* err)
     catch (...) {
         helicsErrorHandler(err);
     }
+}
+
+void helicsAppFree(HelicsApp app)
+{
+    auto* appObj = helics::getAppObject(app, nullptr);
+    if (appObj != nullptr) {
+        appObj->valid = 0;
+        getMasterHolder()->clearApp(appObj->index);
+    }
+
+    helics::CoreFactory::cleanUpCores();
+}
+
+void helicsAppDestroy(HelicsApp app)
+{
+    helicsAppFinalize(app,nullptr);
+    helicsAppFree(app);
 }
 
 HelicsBool helicsAppIsActive(HelicsApp app)
