@@ -246,7 +246,7 @@ void helicsEndpointSendString(HelicsEndpoint endpoint, const char* message, Heli
         return;
     }
     try {
-        if (message == nullptr)  {
+        if (message == nullptr) {
             endObj->endPtr->send(gHelicsEmptyStr);
         } else {
             endObj->endPtr->send(message);
@@ -264,7 +264,7 @@ void helicsEndpointSendStringTo(HelicsEndpoint endpoint, const char* message, co
         return;
     }
     try {
-        endObj->endPtr->sendTo(AS_STRING_VIEW(message),AS_STRING_VIEW(dest));
+        endObj->endPtr->sendTo(AS_STRING_VIEW(message), AS_STRING_VIEW(dest));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -278,18 +278,14 @@ void helicsEndpointSendStringAt(HelicsEndpoint endpoint, const char* message, He
         return;
     }
     try {
-        endObj->endPtr->sendAt(AS_STRING_VIEW(message),  time);
+        endObj->endPtr->sendAt(AS_STRING_VIEW(message), time);
     }
     catch (...) {
         helicsErrorHandler(err);
     }
 }
 
-void helicsEndpointSendStringToAt(HelicsEndpoint endpoint,
-    const char* message,
-    const char* dest,
-    HelicsTime time,
-    HelicsError* err)
+void helicsEndpointSendStringToAt(HelicsEndpoint endpoint, const char* message, const char* dest, HelicsTime time, HelicsError* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {

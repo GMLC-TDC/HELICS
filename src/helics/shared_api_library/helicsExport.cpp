@@ -19,11 +19,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <csignal>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <thread>
-#include <iostream>
 #include <utility>
 #include <vector>
 

@@ -5,10 +5,10 @@ additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "../common/configFileHelpers.hpp"
+#include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/coreTypeOperations.hpp"
-#include "../core/CoreFactory.hpp"
-#include "../common/configFileHelpers.hpp"
 #include "../helics.hpp"
 #include "api-data.h"
 #include "gmlc/concurrency/TripWire.hpp"
@@ -112,8 +112,7 @@ HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* 
 
         const std::string_view appTypeName(appType);
         bool loadFile = !cstring.empty();
-        if (fedInfo == nullptr && helics::fileops::getConfigType(cstring)!=helics::fileops::ConfigType::NONE) {
-            
+        if (fedInfo == nullptr && helics::fileops::getConfigType(cstring) != helics::fileops::ConfigType::NONE) {
             helics::FederateInfo newFedInfo = helics::loadFederateInfo(cstring);
             app->app = buildApp(appTypeName, nstring, newFedInfo);
             loadFile = false;
@@ -240,7 +239,7 @@ void helicsAppFree(HelicsApp app)
 
 void helicsAppDestroy(HelicsApp app)
 {
-    helicsAppFinalize(app,nullptr);
+    helicsAppFinalize(app, nullptr);
     helicsAppFree(app);
 }
 

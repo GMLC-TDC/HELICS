@@ -91,13 +91,13 @@ HELICS_EXPORT void helicsAppRunTo(HelicsApp app, HelicsTime stopTime, HelicsErro
 HELICS_EXPORT void helicsAppFinalize(HelicsApp app, HelicsError* err);
 
 /** finalize the app
-* @param app the app to free
-*/
+ * @param app the app to free
+ */
 HELICS_EXPORT void helicsAppFree(HelicsApp app);
 
 /** disconnect and free an App
-* @param app the app to destroy
-*/
+ * @param app the app to destroy
+ */
 HELICS_EXPORT void helicsAppDestroy(HelicsApp app);
 
 /** check if the App is active and ready to run*/
