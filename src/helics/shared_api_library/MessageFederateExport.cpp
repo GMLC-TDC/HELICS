@@ -477,7 +477,7 @@ Message* MessageHolder::addMessage(std::unique_ptr<helics::Message>& mess)
     if (!mess) {
         return nullptr;
     }
-    Message* m = mess.get();
+    Message* message = mess.get();
     mess->backReference = static_cast<void*>(this);
     if (!freeMessageSlots.empty()) {
         auto index = freeMessageSlots.back();
@@ -488,7 +488,7 @@ Message* MessageHolder::addMessage(std::unique_ptr<helics::Message>& mess)
         mess->counter = static_cast<int32_t>(messages.size());
         messages.push_back(std::move(mess));
     }
-    return m;
+    return message;
 }
 Message* MessageHolder::newMessage()
 {
