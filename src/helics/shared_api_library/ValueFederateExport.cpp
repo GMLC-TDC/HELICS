@@ -771,8 +771,8 @@ HelicsDataBuffer helicsInputGetDataBuffer(HelicsInput inp, HelicsError* err)
     if (inpObj == nullptr) {
         return (nullptr);
     }
-    const helics::data_view dv = inpObj->inputPtr->getBytes();
-    auto* ptr = new helics::SmallBuffer(dv.string_view());
+    const helics::data_view bytes = inpObj->inputPtr->getBytes();
+    auto* ptr = new helics::SmallBuffer(bytes.string_view());
     return createAPIDataBuffer(*ptr);
 }
 
@@ -1061,7 +1061,7 @@ void helicsInputGetNamedPoint(HelicsInput inp, char* outputString, int maxString
     try {
         helics::NamedPoint npoint = inpObj->inputPtr->getValue<helics::NamedPoint>();
         if (outputString != nullptr && maxStringLen > 0) {
-            int length = std::min(static_cast<int>(npoint.name.size()), maxStringLen);
+            const int length = std::min(static_cast<int>(npoint.name.size()), maxStringLen);
             memcpy(outputString, npoint.name.data(), length);
 
             if (length == maxStringLen) {
