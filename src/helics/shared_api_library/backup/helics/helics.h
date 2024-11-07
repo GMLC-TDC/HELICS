@@ -460,6 +460,8 @@ typedef enum { /* NOLINT */
 #define HELICS_BIG_NUMBER 9223372036.854774
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
 
+#define HELICS_INVALID_DOUBLE -1E49
+
 /**
  * @file
  * @brief Data structures for the C api
@@ -2684,6 +2686,16 @@ HELICS_EXPORT void helicsAppRunTo(HelicsApp app, HelicsTime stopTime, HelicsErro
  */
 HELICS_EXPORT void helicsAppFinalize(HelicsApp app, HelicsError* err);
 
+/** finalize the app
+* @param app the app to free
+*/
+HELICS_EXPORT void helicsAppFree(HelicsApp app);
+
+/** disconnect and free an App
+* @param app the app to destroy
+*/
+HELICS_EXPORT void helicsAppDestroy(HelicsApp app);
+
 /** check if the App is active and ready to run*/
 HELICS_EXPORT HelicsBool helicsAppIsActive(HelicsApp app);
 
@@ -3888,6 +3900,62 @@ HELICS_EXPORT void helicsEndpointSetDefaultDestination(HelicsEndpoint endpoint, 
  * @return A string with the default destination.
  */
 HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(HelicsEndpoint endpoint);
+
+/**
+* Send a message to the targeted destination.
+*
+* @param endpoint The endpoint to send the data from.
+* @param message The string to send.
+* @param[in,out] err A pointer to an error object for catching errors.
+*/
+HELICS_EXPORT void helicsEndpointSendString(HelicsEndpoint endpoint, const char* message, int inputDataLength, HelicsError* err);
+
+/**
+* Send a message to the specified destination.
+*
+* @param endpoint The endpoint to send the data from.
+
+* @param message The string to send.
+*
+* @param dst The target destination. Use nullptr to send to the default destination.
+* @param[in,out] err A pointer to an error object for catching errors.
+*/
+HELICS_EXPORT void
+helicsEndpointSendStringTo(HelicsEndpoint endpoint, const char* message, const char* dst, HelicsError* err);
+
+/**
+* Send a message to the specified destination at a specific time.
+*
+* @param endpoint The endpoint to send the data from.
+* @param message The data to send.
+*
+* @param dst The target destination. Use nullptr to send to the default destination.
+*
+* @param time The time the message should be sent.
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+*/
+
+HELICS_EXPORT void helicsEndpointSendStringToAt(HelicsEndpoint endpoint,
+    const char* message,
+    const char* dst,
+    HelicsTime time,
+    HelicsError* err);
+
+/**
+* Send a message at a specific time to the targeted destinations
+*
+* @param endpoint The endpoint to send the data from.
+*
+* @param message The data to send.
+*
+* @param time The time the message should be sent.
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+*/
+
+HELICS_EXPORT void
+helicsEndpointSendStringAt(HelicsEndpoint endpoint, const char* message, HelicsTime time, HelicsError* err);
 
 /**
  * Send a message to the targeted destination.
