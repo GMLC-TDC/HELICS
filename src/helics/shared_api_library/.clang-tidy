@@ -28,6 +28,7 @@ Checks: "
   portability-*,
   readability-*,
   -readability-magic-numbers,
+  -readability-avoid-unconditional-preprocessor-if,
   performance-*
   "
 
@@ -57,6 +58,7 @@ WarningsAsErrors: "
   readability-*,
   -readability-magic-numbers,
   -readability-identifier-naming,
+  -readability-avoid-unconditional-preprocessor-if,
   performance-*
   "
 

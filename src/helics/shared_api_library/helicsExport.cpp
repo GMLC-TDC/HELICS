@@ -74,35 +74,37 @@ void helicsErrorClear(HelicsError* err)
     }
 }
 
-static void signalHandler(int /*signum*/)
-{
-    helicsAbort(HELICS_ERROR_USER_ABORT, "user abort");
-    // add a sleep to give the abort a chance to propagate to other federates
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    std::cout << std::endl;
-    exit(HELICS_ERROR_USER_ABORT);
-}
+namespace {
+    void signalHandler(int /*signum*/)
+    {
+        helicsAbort(HELICS_ERROR_USER_ABORT, "user abort");
+        // add a sleep to give the abort a chance to propagate to other federates
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::cout << std::flush;
+        exit(HELICS_ERROR_USER_ABORT);
+    }
 
-static void signalHandlerNoExit(int /*signum*/)
-{
-    helicsAbort(HELICS_ERROR_USER_ABORT, "user abort");
-    // add a sleep to give the abort a chance to propagate to other federates
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    std::cout << std::endl;
-}
+    void signalHandlerNoExit(int /*signum*/)
+    {
+        helicsAbort(HELICS_ERROR_USER_ABORT, "user abort");
+        // add a sleep to give the abort a chance to propagate to other federates
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::cout << std::flush;
+    }
 
-static void signalHandlerThreaded(int signum)
-{
-    std::thread sigthread(signalHandler, signum);
-    sigthread.detach();
-}
+    void signalHandlerThreaded(int signum)
+    {
+        std::thread sigthread(signalHandler, signum);
+        sigthread.detach();
+    }
 
-static void signalHandlerThreadedNoExit(int signum)
-{
-    std::thread sigthread(signalHandlerNoExit, signum);
-    sigthread.detach();
-}
+    void signalHandlerThreadedNoExit(int signum)
+    {
+        std::thread sigthread(signalHandlerNoExit, signum);
+        sigthread.detach();
+    }
 
+}
 void helicsLoadSignalHandler()
 {
     static_cast<void>(signal(SIGINT, signalHandler));
@@ -118,49 +120,51 @@ void helicsClearSignalHandler()
     static_cast<void>(signal(SIGINT, SIG_DFL));
 }
 
-static HelicsBool (*keyHandler)(int) = nullptr;
+namespace {
+    HelicsBool(*keyHandler)(int) = nullptr;
 
-static void signalHandlerCallback(int signum)
-{
-    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
-    if (keyHandler != nullptr) {
-        runDefaultSignalHandler = keyHandler(signum);
+    void signalHandlerCallback(int signum)
+    {
+        HelicsBool runDefaultSignalHandler{ HELICS_TRUE };
+        if (keyHandler != nullptr) {
+            runDefaultSignalHandler = keyHandler(signum);
+        }
+        if (runDefaultSignalHandler != HELICS_FALSE) {
+            signalHandler(signum);
+        }
     }
-    if (runDefaultSignalHandler != HELICS_FALSE) {
-        signalHandler(signum);
-    }
-}
 
-static void signalHandlerCallbackNoExit(int signum)
-{
-    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
-    if (keyHandler != nullptr) {
-        runDefaultSignalHandler = keyHandler(signum);
+    void signalHandlerCallbackNoExit(int signum)
+    {
+        HelicsBool runDefaultSignalHandler{ HELICS_TRUE };
+        if (keyHandler != nullptr) {
+            runDefaultSignalHandler = keyHandler(signum);
+        }
+        if (runDefaultSignalHandler != HELICS_FALSE) {
+            signalHandlerNoExit(signum);
+        }
     }
-    if (runDefaultSignalHandler != HELICS_FALSE) {
-        signalHandlerNoExit(signum);
-    }
-}
 
-static void signalHandlerThreadedCallback(int signum)
-{
-    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
-    if (keyHandler != nullptr) {
-        runDefaultSignalHandler = keyHandler(signum);
+    void signalHandlerThreadedCallback(int signum)
+    {
+        HelicsBool runDefaultSignalHandler{ HELICS_TRUE };
+        if (keyHandler != nullptr) {
+            runDefaultSignalHandler = keyHandler(signum);
+        }
+        if (runDefaultSignalHandler != HELICS_FALSE) {
+            signalHandlerThreaded(signum);
+        }
     }
-    if (runDefaultSignalHandler != HELICS_FALSE) {
-        signalHandlerThreaded(signum);
-    }
-}
 
-static void signalHandlerThreadedCallbackNoExit(int signum)
-{
-    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
-    if (keyHandler != nullptr) {
-        runDefaultSignalHandler = keyHandler(signum);
-    }
-    if (runDefaultSignalHandler != HELICS_FALSE) {
-        signalHandlerThreadedNoExit(signum);
+    void signalHandlerThreadedCallbackNoExit(int signum)
+    {
+        HelicsBool runDefaultSignalHandler{ HELICS_TRUE };
+        if (keyHandler != nullptr) {
+            runDefaultSignalHandler = keyHandler(signum);
+        }
+        if (runDefaultSignalHandler != HELICS_FALSE) {
+            signalHandlerThreadedNoExit(signum);
+        }
     }
 }
 
@@ -1099,27 +1103,28 @@ void helicsAbort(int errorCode, const char* message)
     }
 }
 
-static constexpr const char* invalidQueryString = "Query object is invalid";
+namespace {
+    constexpr const char* invalidQueryString = "Query object is invalid";
 
-static constexpr int validQueryIdentifier = 0x2706'3885;
+    constexpr int validQueryIdentifier = 0x2706'3885;
 
-static helics::QueryObject* getQueryObj(HelicsQuery query, HelicsError* err)
-{
-    if ((err != nullptr) && (err->error_code != 0)) {
-        return nullptr;
+    helics::QueryObject* getQueryObj(HelicsQuery query, HelicsError* err)
+    {
+        if ((err != nullptr) && (err->error_code != 0)) {
+            return nullptr;
+        }
+        if (query == nullptr) {
+            assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidQueryString);
+            return nullptr;
+        }
+        auto* queryPtr = reinterpret_cast<helics::QueryObject*>(query);
+        if (queryPtr->valid != validQueryIdentifier) {
+            assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidQueryString);
+            return nullptr;
+        }
+        return queryPtr;
     }
-    if (query == nullptr) {
-        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidQueryString);
-        return nullptr;
-    }
-    auto* queryPtr = reinterpret_cast<helics::QueryObject*>(query);
-    if (queryPtr->valid != validQueryIdentifier) {
-        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidQueryString);
-        return nullptr;
-    }
-    return queryPtr;
 }
-
 HelicsQuery helicsCreateQuery(const char* target, const char* query)
 {
     auto* queryObj = new helics::QueryObject;
