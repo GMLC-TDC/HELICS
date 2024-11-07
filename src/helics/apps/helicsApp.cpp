@@ -160,7 +160,8 @@ std::vector<int> AppTextParser::preParseFile(const std::vector<char>& klines)
         }
         if (inMline) {
             if (firstChar + 2 < str.size()) {
-                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') && (str[firstChar + 2] == ']')) {
+                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') &&
+                    (str[firstChar + 2] == ']')) {
                     inMline = false;
                 }
             }

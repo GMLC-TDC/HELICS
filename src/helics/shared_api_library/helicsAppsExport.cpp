@@ -64,35 +64,35 @@ std::shared_ptr<helics::apps::App> getAppSharedPtr(HelicsApp app, HelicsError* e
 static constexpr char nullcstr[] = "";
 
 namespace {
-    std::shared_ptr<helics::apps::App> buildApp(std::string_view type, std::string_view appName, helics::FederateInfo& fedInfo)
-    {
-        if (type == "player") {
-            return std::make_shared<helics::apps::Player>(appName, fedInfo);
-        }
-        if (type == "recorder") {
-            return std::make_shared<helics::apps::Recorder>(appName, fedInfo);
-        }
-        if (type == "connector") {
-            return std::make_shared<helics::apps::Connector>(appName, fedInfo);
-        }
-        if (type == "echo") {
-            return std::make_shared<helics::apps::Echo>(appName, fedInfo);
-        }
-        if (type == "clone") {
-            return std::make_shared<helics::apps::Clone>(appName, fedInfo);
-        }
-        if (type == "probe") {
-            return std::make_shared<helics::apps::Probe>(appName, fedInfo);
-        }
-        if (type == "tracer") {
-            return std::make_shared<helics::apps::Tracer>(appName, fedInfo);
-        }
-        if (type == "source") {
-            return std::make_shared<helics::apps::Source>(appName, fedInfo);
-        }
-        return nullptr;
+std::shared_ptr<helics::apps::App> buildApp(std::string_view type, std::string_view appName, helics::FederateInfo& fedInfo)
+{
+    if (type == "player") {
+        return std::make_shared<helics::apps::Player>(appName, fedInfo);
     }
+    if (type == "recorder") {
+        return std::make_shared<helics::apps::Recorder>(appName, fedInfo);
+    }
+    if (type == "connector") {
+        return std::make_shared<helics::apps::Connector>(appName, fedInfo);
+    }
+    if (type == "echo") {
+        return std::make_shared<helics::apps::Echo>(appName, fedInfo);
+    }
+    if (type == "clone") {
+        return std::make_shared<helics::apps::Clone>(appName, fedInfo);
+    }
+    if (type == "probe") {
+        return std::make_shared<helics::apps::Probe>(appName, fedInfo);
+    }
+    if (type == "tracer") {
+        return std::make_shared<helics::apps::Tracer>(appName, fedInfo);
+    }
+    if (type == "source") {
+        return std::make_shared<helics::apps::Source>(appName, fedInfo);
+    }
+    return nullptr;
 }
+}  // namespace
 HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* configFile, HelicsFederateInfo fedInfo, HelicsError* err)
 {
     static constexpr const char* invalidAppTypeString =

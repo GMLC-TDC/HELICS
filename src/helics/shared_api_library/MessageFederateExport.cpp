@@ -21,60 +21,57 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace {
-    // random integer for validation purposes of endpoints
-    constexpr int EndpointValidationIdentifier = 0xB453'94C2;
+// random integer for validation purposes of endpoints
+constexpr int EndpointValidationIdentifier = 0xB453'94C2;
 
-    auto endpointSearch = [](const helics::InterfaceHandle& hnd, const auto& testEndpoint) {
-        return hnd < testEndpoint->endPtr->getHandle();
-    };
+auto endpointSearch = [](const helics::InterfaceHandle& hnd, const auto& testEndpoint) { return hnd < testEndpoint->endPtr->getHandle(); };
 
-    inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<helics::EndpointObject> ept)
-    {
-        auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-        ept->valid = EndpointValidationIdentifier;
-        ept->fed = fedObj;
-        HelicsEndpoint hept = ept.get();
+inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<helics::EndpointObject> ept)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    ept->valid = EndpointValidationIdentifier;
+    ept->fed = fedObj;
+    HelicsEndpoint hept = ept.get();
 
-        if (fedObj->epts.empty() || ept->endPtr->getHandle() > fedObj->epts.back()->endPtr->getHandle()) {
-            fedObj->epts.push_back(std::move(ept));
-        }
-        else {
-            auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), ept->endPtr->getHandle(), endpointSearch);
-            fedObj->epts.insert(ind, std::move(ept));
-        }
-        return hept;
+    if (fedObj->epts.empty() || ept->endPtr->getHandle() > fedObj->epts.back()->endPtr->getHandle()) {
+        fedObj->epts.push_back(std::move(ept));
+    } else {
+        auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), ept->endPtr->getHandle(), endpointSearch);
+        fedObj->epts.insert(ind, std::move(ept));
     }
-
-    HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint& endp)
-    {
-        auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-        const auto handle = endp.getHandle();
-        auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), handle, endpointSearch);
-        if (ind != fedObj->epts.end() && (*ind)->endPtr->getHandle() == handle) {
-            HelicsEndpoint hend = ind->get();
-            return hend;
-        }
-        auto end = std::make_unique<helics::EndpointObject>();
-        end->endPtr = &endp;
-        end->fedptr = getMessageFedSharedPtr(fed, nullptr);
-        return addEndpoint(fed, std::move(end));
-    }
-
-    constexpr char nullcstr[] = "";
-
-    constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
-
-    helics::EndpointObject* verifyEndpoint(HelicsEndpoint ept, HelicsError* err)
-    {
-        HELICS_ERROR_CHECK(err, nullptr);
-        auto* endObj = reinterpret_cast<helics::EndpointObject*>(ept);
-        if (endObj == nullptr || endObj->valid != EndpointValidationIdentifier) {
-            assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidEndpoint);
-            return nullptr;
-        }
-        return endObj;
-    }
+    return hept;
 }
+
+HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint& endp)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    const auto handle = endp.getHandle();
+    auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), handle, endpointSearch);
+    if (ind != fedObj->epts.end() && (*ind)->endPtr->getHandle() == handle) {
+        HelicsEndpoint hend = ind->get();
+        return hend;
+    }
+    auto end = std::make_unique<helics::EndpointObject>();
+    end->endPtr = &endp;
+    end->fedptr = getMessageFedSharedPtr(fed, nullptr);
+    return addEndpoint(fed, std::move(end));
+}
+
+constexpr char nullcstr[] = "";
+
+constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
+
+helics::EndpointObject* verifyEndpoint(HelicsEndpoint ept, HelicsError* err)
+{
+    HELICS_ERROR_CHECK(err, nullptr);
+    auto* endObj = reinterpret_cast<helics::EndpointObject*>(ept);
+    if (endObj == nullptr || endObj->valid != EndpointValidationIdentifier) {
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidEndpoint);
+        return nullptr;
+    }
+    return endObj;
+}
+}  // namespace
 
 HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err)
 {

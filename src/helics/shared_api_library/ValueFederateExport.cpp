@@ -20,111 +20,109 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace {
-    /** random integer for validation purposes of inputs */
-    constexpr int InputValidationIdentifier = 0x3456'E052;
+/** random integer for validation purposes of inputs */
+constexpr int InputValidationIdentifier = 0x3456'E052;
 
-    /** random integer for validation purposes of publications */
-    constexpr int PublicationValidationIdentifier = 0x97B1'00A5;
+/** random integer for validation purposes of publications */
+constexpr int PublicationValidationIdentifier = 0x97B1'00A5;
 
-    constexpr char invalidInputString[] = "The given input object does not point to a valid object";
+constexpr char invalidInputString[] = "The given input object does not point to a valid object";
 
-    constexpr char invalidPublicationString[] = "The given publication object does not point to a valid object";
+constexpr char invalidPublicationString[] = "The given publication object does not point to a valid object";
 
-    helics::InputObject* verifyInput(HelicsInput inp, HelicsError* err)
-    {
-        HELICS_ERROR_CHECK(err, nullptr);
-        if (inp == nullptr) {
-            assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidInputString);
-            return nullptr;
-        }
-        auto* inpObj = reinterpret_cast<helics::InputObject*>(inp);
-        if (inpObj->valid != InputValidationIdentifier) {
-            assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidInputString);
-            return nullptr;
-        }
-        return inpObj;
+helics::InputObject* verifyInput(HelicsInput inp, HelicsError* err)
+{
+    HELICS_ERROR_CHECK(err, nullptr);
+    if (inp == nullptr) {
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidInputString);
+        return nullptr;
     }
-
-    helics::PublicationObject* verifyPublication(HelicsPublication pub, HelicsError* err)
-    {
-        HELICS_ERROR_CHECK(err, nullptr);
-        if (pub == nullptr) {
-            assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidPublicationString);
-            return nullptr;
-        }
-        auto* pubObj = reinterpret_cast<helics::PublicationObject*>(pub);
-        if (pubObj->valid != PublicationValidationIdentifier) {
-            assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidPublicationString);
-            return nullptr;
-        }
-        return pubObj;
+    auto* inpObj = reinterpret_cast<helics::InputObject*>(inp);
+    if (inpObj->valid != InputValidationIdentifier) {
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidInputString);
+        return nullptr;
     }
+    return inpObj;
+}
 
-    auto inputSearch = [](const helics::InterfaceHandle& hnd, const auto& testInput) { return hnd < testInput->inputPtr->getHandle(); };
+helics::PublicationObject* verifyPublication(HelicsPublication pub, HelicsError* err)
+{
+    HELICS_ERROR_CHECK(err, nullptr);
+    if (pub == nullptr) {
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidPublicationString);
+        return nullptr;
+    }
+    auto* pubObj = reinterpret_cast<helics::PublicationObject*>(pub);
+    if (pubObj->valid != PublicationValidationIdentifier) {
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidPublicationString);
+        return nullptr;
+    }
+    return pubObj;
+}
 
-    inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::InputObject> inp)
-    {
-        auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-        inp->valid = InputValidationIdentifier;
-        HelicsInput hinp = inp.get();
-        if (fedObj->inputs.empty() || inp->inputPtr->getHandle() > fedObj->inputs.back()->inputPtr->getHandle()) {
-            fedObj->inputs.push_back(std::move(inp));
-        }
-        else {
-            auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), inp->inputPtr->getHandle(), inputSearch);
-            fedObj->inputs.insert(ind, std::move(inp));
-        }
+auto inputSearch = [](const helics::InterfaceHandle& hnd, const auto& testInput) { return hnd < testInput->inputPtr->getHandle(); };
+
+inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::InputObject> inp)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    inp->valid = InputValidationIdentifier;
+    HelicsInput hinp = inp.get();
+    if (fedObj->inputs.empty() || inp->inputPtr->getHandle() > fedObj->inputs.back()->inputPtr->getHandle()) {
+        fedObj->inputs.push_back(std::move(inp));
+    } else {
+        auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), inp->inputPtr->getHandle(), inputSearch);
+        fedObj->inputs.insert(ind, std::move(inp));
+    }
+    return hinp;
+}
+
+HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input& input)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    const auto handle = input.getHandle();
+    auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), handle, inputSearch);
+    if (ind != fedObj->inputs.end() && (*ind)->inputPtr->getHandle() == handle) {
+        HelicsInput hinp = ind->get();
         return hinp;
     }
+    auto inp = std::make_unique<helics::InputObject>();
+    inp->inputPtr = &input;
+    inp->fedptr = getValueFedSharedPtr(fed, nullptr);
+    return addInput(fed, std::move(inp));
+}
 
-    HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input& input)
-    {
-        auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-        const auto handle = input.getHandle();
-        auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), handle, inputSearch);
-        if (ind != fedObj->inputs.end() && (*ind)->inputPtr->getHandle() == handle) {
-            HelicsInput hinp = ind->get();
-            return hinp;
-        }
-        auto inp = std::make_unique<helics::InputObject>();
-        inp->inputPtr = &input;
-        inp->fedptr = getValueFedSharedPtr(fed, nullptr);
-        return addInput(fed, std::move(inp));
+auto pubSearch = [](const helics::InterfaceHandle& hnd, const auto& testPub) { return hnd < testPub->pubPtr->getHandle(); };
+
+HelicsPublication addPublication(HelicsFederate fed, std::unique_ptr<helics::PublicationObject> pub)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    pub->valid = PublicationValidationIdentifier;
+    HelicsPublication hpub = pub.get();
+    if (fedObj->pubs.empty() || pub->pubPtr->getHandle() > fedObj->pubs.back()->pubPtr->getHandle()) {
+        fedObj->pubs.push_back(std::move(pub));
+    } else {
+        auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), pub->pubPtr->getHandle(), pubSearch);
+        fedObj->pubs.insert(ind, std::move(pub));
     }
 
-    auto pubSearch = [](const helics::InterfaceHandle& hnd, const auto& testPub) { return hnd < testPub->pubPtr->getHandle(); };
+    return hpub;
+}
 
-    HelicsPublication addPublication(HelicsFederate fed, std::unique_ptr<helics::PublicationObject> pub)
-    {
-        auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-        pub->valid = PublicationValidationIdentifier;
-        HelicsPublication hpub = pub.get();
-        if (fedObj->pubs.empty() || pub->pubPtr->getHandle() > fedObj->pubs.back()->pubPtr->getHandle()) {
-            fedObj->pubs.push_back(std::move(pub));
-        }
-        else {
-            auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), pub->pubPtr->getHandle(), pubSearch);
-            fedObj->pubs.insert(ind, std::move(pub));
-        }
-
+HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Publication& pub)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    const auto handle = pub.getHandle();
+    auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), handle, pubSearch);
+    if (ind != fedObj->pubs.end() && (*ind)->pubPtr->getHandle() == handle) {
+        HelicsPublication hpub = ind->get();
         return hpub;
     }
-
-    HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Publication& pub)
-    {
-        auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-        const auto handle = pub.getHandle();
-        auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), handle, pubSearch);
-        if (ind != fedObj->pubs.end() && (*ind)->pubPtr->getHandle() == handle) {
-            HelicsPublication hpub = ind->get();
-            return hpub;
-        }
-        auto pubObj = std::make_unique<helics::PublicationObject>();
-        pubObj->pubPtr = &pub;
-        pubObj->fedptr = getValueFedSharedPtr(fed, nullptr);
-        return addPublication(fed, std::move(pubObj));
-    }
+    auto pubObj = std::make_unique<helics::PublicationObject>();
+    pubObj->pubPtr = &pub;
+    pubObj->fedptr = getValueFedSharedPtr(fed, nullptr);
+    return addPublication(fed, std::move(pubObj));
 }
+}  // namespace
 /* input/pub registration */
 HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* key, const char* units, HelicsError* err)
 {

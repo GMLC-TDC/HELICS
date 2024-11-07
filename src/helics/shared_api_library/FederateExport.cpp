@@ -950,11 +950,10 @@ void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err)
     }
 }
 
-namespace
+namespace {
+helics::IterationRequest getIterationRequest(HelicsIterationRequest iterate)
 {
-    helics::IterationRequest getIterationRequest(HelicsIterationRequest iterate)
-    {
-        switch (iterate) {
+    switch (iterate) {
         case HELICS_ITERATION_REQUEST_NO_ITERATION:
         default:
             return helics::IterationRequest::NO_ITERATIONS;
@@ -967,12 +966,12 @@ namespace
             return helics::IterationRequest::HALT_OPERATIONS;  // LCOV_EXCL_LINE
         case HELICS_ITERATION_REQUEST_ERROR:
             return helics::IterationRequest::ERROR_CONDITION;  // LCOV_EXCL_LINE
-        }
     }
+}
 
-    HelicsIterationResult getIterationStatus(helics::IterationResult iterationState)
-    {
-        switch (iterationState) {
+HelicsIterationResult getIterationStatus(helics::IterationResult iterationState)
+{
+    switch (iterationState) {
         case helics::IterationResult::NEXT_STEP:
             return HELICS_ITERATION_RESULT_NEXT_STEP;
         case helics::IterationResult::ITERATING:
@@ -983,9 +982,9 @@ namespace
             return HELICS_ITERATION_RESULT_ERROR;  // LCOV_EXCL_LINE
         case helics::IterationResult::HALTED:
             return HELICS_ITERATION_RESULT_HALTED;
-        }
     }
 }
+}  // namespace
 HelicsIterationResult helicsFederateEnterExecutingModeIterative(HelicsFederate fed, HelicsIterationRequest iterate, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
@@ -1219,13 +1218,12 @@ void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, 
     }
 }
 
-namespace
+namespace {
+HelicsFederateState stateConversion(helics::Federate::Modes mode)
 {
-    HelicsFederateState stateConversion(helics::Federate::Modes mode)
-    {
-        return static_cast<HelicsFederateState>(static_cast<int32_t>(static_cast<std::underlying_type<helics::Federate::Modes>::type>(mode)));
-    }
+    return static_cast<HelicsFederateState>(static_cast<int32_t>(static_cast<std::underlying_type<helics::Federate::Modes>::type>(mode)));
 }
+}  // namespace
 
 HelicsFederateState helicsFederateGetState(HelicsFederate fed, HelicsError* err)
 {
