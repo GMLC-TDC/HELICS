@@ -34,10 +34,10 @@ TEST(app_tests, simple_player)
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreName(fedInfo, "pcore1", &err);
+    helicsFederateInfoSetCoreName(fedInfo, "pscore1", &err);
     helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
 
-    auto play1 = helicsCreateApp("player1", "player", NULL, fedInfo, &err);
+    auto play1 = helicsCreateApp("playerc1", "player", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(play1) == HELICS_TRUE);
 
     auto play1Fed = helicsAppGetFederate(play1, &err);
@@ -90,10 +90,10 @@ TEST(app_tests, recorder)
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
-    helicsFederateInfoSetCoreName(fedInfo, "pcore1", &err);
+    helicsFederateInfoSetCoreName(fedInfo, "rcore1", &err);
     helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
 
-    auto rec1 = helicsCreateApp("rec1", "recorder", NULL, fedInfo, &err);
+    auto rec1 = helicsCreateApp("recc1", "recorder", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(rec1) == HELICS_TRUE);
 
     helicsAppLoadFile(rec1, (std::string(APP_TEST_DIR) + "example3rec.json").c_str(), &err);
@@ -147,7 +147,7 @@ TEST(app_tests, connector)
     helicsFederateInfoSetCoreName(fedInfo, "ccoref5", &err);
     helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
 
-    auto conn1 = helicsCreateApp("connector1", "connector", NULL, fedInfo, &err);
+    auto conn1 = helicsCreateApp("connectorc1", "connector", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(conn1) == HELICS_TRUE);
 
     helicsAppLoadFile(conn1,
@@ -194,7 +194,7 @@ TEST(app_tests, echo)
     helicsFederateInfoSetCoreName(fedInfo, "ecore4-file", &err);
     helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
 
-    auto echo1 = helicsCreateApp("echo1", "echo", NULL, fedInfo, &err);
+    auto echo1 = helicsCreateApp("echoc1", "echo", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(echo1) == HELICS_TRUE);
 
     helicsAppLoadFile(echo1, (std::string(APP_TEST_DIR) + "echo_example.json").c_str(), &err);
