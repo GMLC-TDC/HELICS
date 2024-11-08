@@ -932,6 +932,37 @@ TEST_F(function_nosan, messageFed_event)
     EXPECT_NE(err.error_code, 0);
 }
 
+TEST_F(function_nosan, messageFed_string_event)
+{
+    SetupTest(helicsCreateMessageFederate, "test", 1);
+    auto mFed1 = GetFederateAt(0);
+
+    auto ept1 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", nullptr);
+    EXPECT_NE(ept1, nullptr);
+    auto ept2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(ept2, nullptr);
+    helicsErrorClear(&err);
+    // send events without destinations
+    helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
+    helicsFederateEnterExecutingMode(mFed1, nullptr);
+
+    helicsEndpointSendStringAt(ept1, nullptr, 0.0, &err);
+
+    helicsEndpointSendStringToAt(ept1, "ept1", nullptr,0.0, &err);
+
+    char data[5] = "test";
+    helicsEndpointSendStringAt(ept1, data, 0.0, &err);
+    helicsFederateRequestNextStep(mFed1, nullptr);
+    auto cnt = helicsEndpointPendingMessageCount(ept1);
+    EXPECT_EQ(cnt, 3);
+
+    helicsFederateFinalize(mFed1, nullptr);
+    //  can't send an event after the federate is finalized
+    helicsEndpointSendStringAt(ept1, data, 0.0, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
 TEST_F(function_nosan, messageFed_messageObject)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);

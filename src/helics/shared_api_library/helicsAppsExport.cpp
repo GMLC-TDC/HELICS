@@ -61,8 +61,6 @@ std::shared_ptr<helics::apps::App> getAppSharedPtr(HelicsApp app, HelicsError* e
     return appObj->app;
 }
 
-static constexpr char nullcstr[] = "";
-
 namespace {
 std::shared_ptr<helics::apps::App> buildApp(std::string_view type, std::string_view appName, helics::FederateInfo& fedInfo)
 {

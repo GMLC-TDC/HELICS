@@ -164,7 +164,7 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(HelicsEndpoint end
  * @param message The string to send.
  * @param[in,out] err A pointer to an error object for catching errors.
  */
-HELICS_EXPORT void helicsEndpointSendString(HelicsEndpoint endpoint, const char* message, int inputDataLength, HelicsError* err);
+HELICS_EXPORT void helicsEndpointSendString(HelicsEndpoint endpoint, const char* message, HelicsError* err);
 
 /**
 * Send a message to the specified destination.

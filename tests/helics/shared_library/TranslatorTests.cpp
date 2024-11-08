@@ -380,7 +380,7 @@ TEST_F(translator, custom_translator)
     CE(HelicsFederateState state = helicsFederateGetState(vFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data = "45.7";
-    CE(helicsEndpointSendBytes(e1, data.c_str(), static_cast<int>(data.size()), &err));
+    CE(helicsEndpointSendString(e1, data.c_str(), &err));
 
     helicsPublicationPublishDouble(p1, 99.23, &err);
 
