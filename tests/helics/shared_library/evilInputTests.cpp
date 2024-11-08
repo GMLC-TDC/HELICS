@@ -2645,12 +2645,12 @@ TEST(evil_input_test, helicsInputGetDouble)
     err.error_code = 45;
     auto res1 = helicsInputGetDouble(nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
-    EXPECT_EQ(res1, HELICS_TIME_INVALID);
+    EXPECT_EQ(res1, HELICS_INVALID_DOUBLE);
     helicsErrorClear(&err);
     auto res2 = helicsInputGetDouble(nullptr, nullptr);
-    EXPECT_EQ(res2, HELICS_TIME_INVALID);
+    EXPECT_EQ(res2, HELICS_INVALID_DOUBLE);
     auto res3 = helicsInputGetDouble(evil_input, &err);
-    EXPECT_EQ(res3, HELICS_TIME_INVALID);
+    EXPECT_EQ(res3, HELICS_INVALID_DOUBLE);
     EXPECT_NE(err.error_code, 0);
 }
 
