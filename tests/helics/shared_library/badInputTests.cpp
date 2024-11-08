@@ -949,7 +949,7 @@ TEST_F(function_nosan, messageFed_string_event)
 
     helicsEndpointSendStringAt(ept1, nullptr, 0.0, &err);
 
-    helicsEndpointSendStringToAt(ept1, "ept1", nullptr,0.0, &err);
+    helicsEndpointSendStringToAt(ept1, "ept1", nullptr, 0.0, &err);
 
     char data[5] = "test";
     helicsEndpointSendStringAt(ept1, data, 0.0, &err);

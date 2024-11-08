@@ -3709,7 +3709,7 @@ TEST(evil_endpoint_test, helicsEndpointSendBytesAt)
     EXPECT_NE(err.error_code, 0);
 }
 
-//send string
+// send string
 
 TEST(evil_endpoint_test, helicsEndpointSendStringTo)
 {
