@@ -732,8 +732,7 @@ received
     @param trans the translator object to set the operation on
     @param transOp a shared_ptr to a \ref TranslatorOperator
     */
-    void setTranslatorOperator(Translator& trans,
-                               std::shared_ptr<TranslatorOperator> transOp);
+    void setTranslatorOperator(Translator& trans, std::shared_ptr<TranslatorOperator> transOp);
 
     /** get the number of translators registered through this federate*/
     int getTranslatorCount() const;

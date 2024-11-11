@@ -63,7 +63,7 @@ class FilterOperations {
     */
     virtual std::string getString(std::string_view property);
 
-    /** retreive the filter operator*/
+    /** retrieve the filter operator*/
     virtual std::shared_ptr<FilterOperator> getOperator() = 0;
 };
 

@@ -90,11 +90,10 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     virtual std::string getString(std::string_view property);
 
     /** set a double valued property on a filter
-    @param property the name of the property of the filter to retreive
+    @param property the name of the property of the filter to retrieve
     */
     virtual double getProperty(std::string_view property);
 
-    
     /** add a target to the filter*/
     void addTarget(std::string_view target) { addSourceTarget(target); }
 
