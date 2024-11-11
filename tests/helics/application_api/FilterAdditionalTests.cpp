@@ -358,11 +358,11 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
 
     auto& filter1 = fFed->registerFilter("filter1");
     filter1.addSourceTarget("port1");
-    auto op = std::make_shared<helics::RandomDropFilterOperation>();
+    auto randomOp = std::make_shared<helics::RandomDropFilterOperation>();
     double prob = 0.45;
-    op->set("prob", prob);
-    EXPECT_DOUBLE_EQ(op->getProperty("prob"), prob);
-    filter1.setOperator(op->getOperator());
+    randomOp->set("prob", prob);
+    EXPECT_DOUBLE_EQ(randomOp->getProperty("prob"), prob);
+    filter1.setOperator(randomOp->getOperator());
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
