@@ -1394,7 +1394,7 @@ TEST(federate, error_after_disconnect)
     EXPECT_NO_THROW(Fed1->addDependency("otherFed"));
 
     EXPECT_THROW(filt1.addDestinationTarget("ept"), helics::InvalidFunctionCall);
-    EXPECT_NO_THROW(Fed1->setFilterOperator(filt1, {}));
+    EXPECT_NO_THROW(filt1.setOperator({}));
 
     EXPECT_THROW(Fed1->localError(99), helics::FederateError);
     EXPECT_THROW(Fed1->globalError(99), helics::FederateError);

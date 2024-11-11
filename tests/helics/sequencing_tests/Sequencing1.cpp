@@ -103,8 +103,8 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
 
     auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
     timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 1.25; });
-    fFed1->setFilterOperator(f1, timeOperator);
-    fFed2->setFilterOperator(f2, timeOperator);
+    f1.setOperator(timeOperator);
+    f2.setOperator(timeOperator);
 
     fFed1->enterExecutingModeAsync();
     fFed2->enterExecutingModeAsync();
