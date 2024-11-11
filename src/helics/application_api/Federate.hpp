@@ -697,7 +697,8 @@ received
     @param filt the filter object to set the operation on
     @param filtOp a shared_ptr to a \ref FilterOperator
     */
-    [[deprecated]] static void setFilterOperator(Filter& filt, std::shared_ptr<FilterOperator> filtOp);
+    [[deprecated]] static void setFilterOperator(Filter& filt,
+                                                 std::shared_ptr<FilterOperator> filtOp);
 
     /** get the number of filters registered through this federate*/
     int getFilterCount() const;
@@ -736,7 +737,8 @@ received
     @param trans the translator object to set the operation on
     @param transOp a shared_ptr to a \ref TranslatorOperator
     */
-    [[deprecated]] static void setTranslatorOperator(Translator& trans, std::shared_ptr<TranslatorOperator> transOp);
+    [[deprecated]] static void setTranslatorOperator(Translator& trans,
+                                                     std::shared_ptr<TranslatorOperator> transOp);
 
     /** get the number of translators registered through this federate*/
     int getTranslatorCount() const;

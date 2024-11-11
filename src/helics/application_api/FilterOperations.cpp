@@ -207,7 +207,10 @@ class RandomDelayGenerator {
     std::atomic<double> param1{0.0};  //!< parameter 1 typically mean or min
     std::atomic<double> param2{0.0};  //!< parameter 2 typically stddev or max
 
-    [[nodiscard]] double generate() const { return randDouble(dist.load(), param1.load(), param2.load()); }
+    [[nodiscard]] double generate() const
+    {
+        return randDouble(dist.load(), param1.load(), param2.load());
+    }
 };
 
 RandomDelayFilterOperation::RandomDelayFilterOperation():
@@ -253,7 +256,7 @@ double RandomDelayFilterOperation::getProperty(std::string_view property)
         return (rdelayGen->param1.load());
     }
     if ((property == "param2") || (property == "stddev") || (property == "max") ||
-               (property == "beta")) {
+        (property == "beta")) {
         return (rdelayGen->param2.load());
     }
     return FilterOperations::getProperty(property);
