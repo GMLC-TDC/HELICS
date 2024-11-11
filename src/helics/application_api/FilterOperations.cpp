@@ -23,8 +23,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
 void FilterOperations::set(std::string_view /*property*/, double /*val*/) {}
 void FilterOperations::setString(std::string_view /*property*/, std::string_view /*val*/) {}
+
+double FilterOperations::getProperty(std::string_view /*property*/) {return invalidDouble;}
+std::string  FilterOperations::getString(std::string_view /*property*/) { return {}; }
 
 DelayFilterOperation::DelayFilterOperation(Time delayTime): delay(delayTime)
 {
@@ -54,6 +58,22 @@ void DelayFilterOperation::setString(std::string_view property, std::string_view
             throw(helics::InvalidParameter(std::string(val) + " is not a valid time string"));
         }
     }
+}
+
+double DelayFilterOperation::getProperty(std::string_view property)
+{
+    if (property == "delay") {
+        return static_cast<double>(delay.load());
+    }
+    return FilterOperations::getProperty(property);
+}
+
+std::string DelayFilterOperation::getString(std::string_view property)
+{
+    if (property == "delay") {
+        return std::to_string(delay.load());
+    }
+    return FilterOperations::getString(property);
 }
 
 std::shared_ptr<FilterOperator> DelayFilterOperation::getOperator()
@@ -220,6 +240,41 @@ void RandomDelayFilterOperation::setString(std::string_view property, std::strin
     }
 }
 
+
+double RandomDelayFilterOperation::getProperty(std::string_view property)
+{
+    if ((property == "param1") || (property == "mean") || (property == "min") ||
+        (property == "alpha")) {
+        return (rdelayGen->param1.load());
+    } else if ((property == "param2") || (property == "stddev") || (property == "max") ||
+        (property == "beta")) {
+        return (rdelayGen->param2.load());
+    }
+    return FilterOperations::getProperty(property);
+}
+
+std::string  RandomDelayFilterOperation::getString(std::string_view property)
+{
+    if ((property == "dist") || (property == "distribution")) {
+        auto currentDist=rdelayGen->dist.load();
+        for (const auto& distPair : distMap)
+        {
+            if (distPair.second == currentDist)
+            {
+                return std::string(distPair.first);
+            }
+        }
+    }
+    else if ((property == "param1") || (property == "mean") || (property == "min") ||
+        (property == "alpha")) {
+        return std::to_string(rdelayGen->param1.load());
+    } else if ((property == "param2") || (property == "stddev") || (property == "max") ||
+        (property == "beta")) {
+        return std::to_string(rdelayGen->param2.load());
+    }
+    return FilterOperations::getString(property);
+}
+
 std::shared_ptr<FilterOperator> RandomDelayFilterOperation::getOperator()
 {
     return std::static_pointer_cast<FilterOperator>(td);
@@ -241,6 +296,23 @@ void RandomDropFilterOperation::set(std::string_view property, double val)
 }
 void RandomDropFilterOperation::setString(std::string_view /*property*/, std::string_view /*val*/)
 {
+}
+
+
+double RandomDropFilterOperation::getProperty(std::string_view property)
+{
+    if ((property == "dropprob") || (property == "prob")) {
+        return dropProb.load();
+    }
+    return FilterOperations::getProperty(property);
+}
+
+std::string  RandomDropFilterOperation::getString(std::string_view property)
+{
+    if ((property == "dropprob") || (property == "prob")) {
+        return std::to_string(dropProb.load());
+    }
+    return FilterOperations::getString(property);
 }
 
 std::shared_ptr<FilterOperator> RandomDropFilterOperation::getOperator()
@@ -273,11 +345,47 @@ void RerouteFilterOperation::setString(std::string_view property, std::string_vi
         }
         catch (const std::regex_error& re) {
             std::cerr << "filter expression is not a valid Regular expression " << re.what()
-                      << std::endl;
+                <<'\n';
             throw(helics::InvalidParameter(
                 std::string("filter expression is not a valid Regular expression ") + re.what()));
         }
     }
+}
+
+
+double RerouteFilterOperation::getProperty(std::string_view property)
+{
+    return FilterOperations::getProperty(property);
+}
+
+std::string RerouteFilterOperation::getString(std::string_view property)
+{
+    if (property == "newdestination") {
+        return newDest.load();
+    } else if (property == "condition") {
+       
+       auto cond = conditions.lock();
+       if (cond->empty())
+       {
+           return {};
+       }
+       if (cond->size() == 1)
+       {
+           return *cond->begin();
+       }
+       std::string results{"["};
+       for (auto& condition : cond)
+       {
+           results.push_back('"');
+           results.append(condition);
+           results.push_back('"');
+           results.push_back(',');
+       }
+       results.pop_back();
+       results.push_back(']');
+       return results; 
+    }
+    return FilterOperations::getString(property);
 }
 
 std::shared_ptr<FilterOperator> RerouteFilterOperation::getOperator()
@@ -325,6 +433,14 @@ FirewallFilterOperation::~FirewallFilterOperation() = default;
 void FirewallFilterOperation::set(std::string_view /*property*/, double /*val*/) {}
 
 void FirewallFilterOperation::setString(std::string_view /*property*/, std::string_view /*val*/) {}
+
+double FirewallFilterOperation::getProperty(std::string_view property) {
+    return FilterOperations::getProperty(property);
+}
+
+std::string FirewallFilterOperation::getString(std::string_view property) {
+    return FilterOperations::getString(property);
+}
 
 std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator()
 {
@@ -377,6 +493,38 @@ void CloneFilterOperation::setString(std::string_view property, std::string_view
         throw(helics::InvalidParameter(std::string(
             std::string("property ") + std::string(property) + " is not a known property")));
     }
+}
+
+
+double CloneFilterOperation::getProperty(std::string_view property) {
+    return FilterOperations::getProperty(property);
+}
+
+std::string CloneFilterOperation::getString(std::string_view property) {
+
+    if (property == "delivery") {
+        auto handle = deliveryAddresses.lock();
+        if (handle->empty())
+        {
+            return {};
+        }
+        if (handle->size() == 1)
+        {
+            return *(handle->begin());
+        }
+        std::string results{"["};
+        for (auto& address : handle)
+        {
+            results.push_back('"');
+            results.append(address);
+            results.push_back('"');
+            results.push_back(',');
+        }
+        results.pop_back();
+        results.push_back(']');
+        return results; 
+    }
+    return FilterOperations::getString(property);
 }
 
 std::shared_ptr<FilterOperator> CloneFilterOperation::getOperator()

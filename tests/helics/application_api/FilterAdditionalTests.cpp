@@ -241,8 +241,9 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
         "condition",
         "test");  // match all messages with a destination endpoint starting with "test"
 
+    EXPECT_EQ(filter_op->getString("condition"),"test");
     fFed->setFilterOperator(f1, filter_op->getOperator());
-
+    EXPECT_TRUE(f1.getString("unknown").empty());
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
@@ -300,7 +301,8 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     Filt.addSourceTarget("port1");
     double drop_prob = 0.75;
     Filt.set("dropprob", drop_prob);
-
+    EXPECT_DOUBLE_EQ(Filt.getProperty("dropprob"),0.75);
+    EXPECT_DOUBLE_EQ(Filt.getProperty("who_cares"),helics::invalidDouble);
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
@@ -358,6 +360,7 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
     auto op = std::make_shared<helics::RandomDropFilterOperation>();
     double prob = 0.45;
     op->set("prob", prob);
+    EXPECT_DOUBLE_EQ(op->getProperty("prob"),prob);
     fFed->setFilterOperator(f1, op->getOperator());
 
     fFed->enterExecutingModeAsync();
@@ -531,6 +534,9 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
 
     Filt.set("param1", 4);  // max_delay=4
     Filt.set("param2", 0.5);  // prob
+
+    EXPECT_EQ(Filt.getString("param1"),"4.000000");
+    EXPECT_DOUBLE_EQ(Filt.getProperty("param2"),0.5);  // prob
 
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
