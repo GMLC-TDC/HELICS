@@ -92,12 +92,12 @@ INSTANTIATE_TEST_SUITE_P(sequencing_tests,
 class sequencing2: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
 static bool twoStageFilterTest(std::shared_ptr<helics::MessageFederate>& mFed,
-                                  std::shared_ptr<helics::MessageFederate>& fFed1,
-                                  std::shared_ptr<helics::MessageFederate>& fFed2,
-                                  helics::Endpoint& port1,
-                                  helics::Endpoint& port2,
-                                  helics::Filter& filter1,
-                                  helics::Filter& filter2)
+                               std::shared_ptr<helics::MessageFederate>& fFed1,
+                               std::shared_ptr<helics::MessageFederate>& fFed2,
+                               helics::Endpoint& port1,
+                               helics::Endpoint& port2,
+                               helics::Filter& filter1,
+                               helics::Filter& filter2)
 {
     bool correct = true;
 
