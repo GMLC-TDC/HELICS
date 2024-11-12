@@ -64,7 +64,7 @@ class Filter {
     /** get a string property on a filter
     @param property the name of the property of the filter to change
     */
-    const char * getString(const std::string& property)
+    const char* getString(const std::string& property)
     {
         return helicsFilterGetPropertyString(filt, property.c_str());
     }

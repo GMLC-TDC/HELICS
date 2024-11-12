@@ -210,14 +210,15 @@ HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, co
 HELICS_EXPORT double helicsFilterGetPropertyDouble(HelicsFilter filt, const char* prop);
 
 /**
-* Set a string property on a filter.  The string output memory is valid until a subsequent call to to getPropertyString on the particular filter
+* Set a string property on a filter.  The string output memory is valid until a subsequent call to to getPropertyString on the particular
+filter
 *
 * @param filt The filter to modify.
 * @param prop A string containing the property to set.
 *
 
 */
-HELICS_EXPORT const char *helicsFilterGetPropertyString(HelicsFilter filt, const char* prop);
+HELICS_EXPORT const char* helicsFilterGetPropertyString(HelicsFilter filt, const char* prop);
 
 /**
  * Add a destination target to a filter.

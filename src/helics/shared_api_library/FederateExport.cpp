@@ -499,7 +499,7 @@ HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo
 HelicsFederate helicsCreateValueFederateFromConfig(const char* configFile, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
-    CHECK_NULL_STRING(configFile,nullptr);
+    CHECK_NULL_STRING(configFile, nullptr);
     std::shared_ptr<helics::Federate> fed;
     try {
         fed = std::make_shared<helics::ValueFederate>(AS_STRING(configFile));
@@ -537,7 +537,7 @@ HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateIn
 HelicsFederate helicsCreateMessageFederateFromConfig(const char* configFile, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
-    CHECK_NULL_STRING(configFile,nullptr);
+    CHECK_NULL_STRING(configFile, nullptr);
     std::shared_ptr<helics::Federate> fed;
 
     try {
@@ -576,7 +576,7 @@ HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFedera
 HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
-    CHECK_NULL_STRING(configFile,nullptr);
+    CHECK_NULL_STRING(configFile, nullptr);
     std::shared_ptr<helics::Federate> fed;
     try {
         fed = std::make_shared<helics::CombinationFederate>(AS_STRING(configFile));
