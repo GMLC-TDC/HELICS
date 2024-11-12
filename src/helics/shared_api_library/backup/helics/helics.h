@@ -1346,7 +1346,7 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName
  * @details Combination federates are both value federates and message federates, objects can be used in all functions
  *          that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument
  *
- * @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
+ * @param configFile A JSON file or a JSON string,TOML file, or command line arguments that contains setup and configuration information.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
@@ -4778,6 +4778,28 @@ HELICS_EXPORT void helicsFilterSet(HelicsFilter filt, const char* prop, double v
 
  */
 HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val, HelicsError* err);
+
+/**
+* Get a double property from a filter
+*
+* @param filt The filter to modify.
+* @param prop A string containing the property to set.
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+
+*/
+HELICS_EXPORT double helicsFilterGetPropertyDouble(HelicsFilter filt, const char* prop);
+
+/**
+* Set a string property on a filter.  The string output memory is valid until a subsequent call to to getPropertyString on the particular
+filter
+*
+* @param filt The filter to modify.
+* @param prop A string containing the property to set.
+*
+
+*/
+HELICS_EXPORT const char* helicsFilterGetPropertyString(HelicsFilter filt, const char* prop);
 
 /**
  * Add a destination target to a filter.
