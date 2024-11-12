@@ -161,6 +161,57 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(HelicsEndpoint end
  * Send a message to the targeted destination.
  *
  * @param endpoint The endpoint to send the data from.
+ * @param message The string to send.
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+HELICS_EXPORT void helicsEndpointSendString(HelicsEndpoint endpoint, const char* message, HelicsError* err);
+
+/**
+* Send a message to the specified destination.
+*
+* @param endpoint The endpoint to send the data from.
+
+* @param message The string to send.
+*
+* @param dst The target destination. Use nullptr to send to the default destination.
+* @param[in,out] err A pointer to an error object for catching errors.
+*/
+HELICS_EXPORT void helicsEndpointSendStringTo(HelicsEndpoint endpoint, const char* message, const char* dst, HelicsError* err);
+
+/**
+ * Send a message to the specified destination at a specific time.
+ *
+ * @param endpoint The endpoint to send the data from.
+ * @param message The data to send.
+ *
+ * @param dst The target destination. Use nullptr to send to the default destination.
+ *
+ * @param time The time the message should be sent.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+
+HELICS_EXPORT void
+    helicsEndpointSendStringToAt(HelicsEndpoint endpoint, const char* message, const char* dst, HelicsTime time, HelicsError* err);
+
+/**
+ * Send a message at a specific time to the targeted destinations.
+ *
+ * @param endpoint The endpoint to send the data from.
+ *
+ * @param message The data to send.
+ *
+ * @param time The time the message should be sent.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+
+HELICS_EXPORT void helicsEndpointSendStringAt(HelicsEndpoint endpoint, const char* message, HelicsTime time, HelicsError* err);
+
+/**
+ * Send a message to the targeted destination.
+ *
+ * @param endpoint The endpoint to send the data from.
  * @param data The data to send.
  *
  * @param inputDataLength The length of the data to send.

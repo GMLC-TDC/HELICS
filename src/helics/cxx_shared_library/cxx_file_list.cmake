@@ -78,6 +78,7 @@ set(helics_apps_public_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/Source.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/Tracer.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/helicsApp.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/apps/Probe.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/Connector.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/Clone.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/apps/CoreApp.hpp

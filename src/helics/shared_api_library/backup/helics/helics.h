@@ -460,6 +460,8 @@ typedef enum { /* NOLINT */
 #define HELICS_BIG_NUMBER 9223372036.854774
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
 
+#define HELICS_INVALID_DOUBLE -1E49
+
 /**
  * @file
  * @brief Data structures for the C api
@@ -508,6 +510,12 @@ typedef void* HelicsBroker;
  */
 // typedef void* helics_federate;
 typedef void* HelicsFederate;
+
+/**
+ * opaque object representing a helics app
+ */
+// typedef void* helics_federate;
+typedef void* HelicsApp;
 
 /**
  * opaque object representing a filter info object structure
@@ -2608,6 +2616,90 @@ HELICS_EXPORT void helicsQueryFree(HelicsQuery query);
 HELICS_EXPORT void helicsCleanupLibrary(void);
 
 /**
+* Create a helics app object
+*
+* @details create a helics App object
+*
+* @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config file.
+* @param appType the type of app to create
+* @param configFile configuration file or string to pass into the app, can be NULL or empty
+* @param fedInfo the federate information to pass into the app, can be NULL
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+*
+* @return An opaque value app object nullptr if the object creation failed.
+*/
+HELICS_EXPORT HelicsApp
+    helicsCreateApp(const char* appName, const char* appType, const char* configFile, HelicsFederateInfo fedInfo, HelicsError* err);
+
+/** run the App
+* @details execute the app to completion
+* @param app the app to execute
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+*
+* @return An opaque value federate object that can be used in any of the federate methods, not recommended to use this object to advance
+time, the app will not likely function normally, other query, or information calls, or modification calls on the federate are fine.
+*/
+HELICS_EXPORT HelicsFederate helicsAppGetFederate(HelicsApp app, HelicsError* err);
+
+/**
+* Create a helics app object
+*
+* @details create a helics App object
+*
+* @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config file.
+* @param appType the type of app to create
+* @param configFile configuration file or string to pass into the app, can be NULL or empty
+* @param fedInfo the federate information to pass into the app, can be NULL
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+*
+* @return An opaque value app object nullptr if the object creation failed.
+*/
+HELICS_EXPORT void helicsAppLoadFile(HelicsApp app, const char* configFile, HelicsError* err);
+
+/** initialize the App federate
+ * @details generate all the interfaces and load data for the application
+ * @param app the app to initialize
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsAppInitialize(HelicsApp app, HelicsError* err);
+
+/** run the App
+ * @details execute the app to completion
+ * @param app the app to execute
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsAppRun(HelicsApp app, HelicsError* err);
+
+/** run and app to a specified stop time
+ * @details it is possible to call this method repeatedly with different times
+ * @param app the app to run
+ * @param stopTime the desired stop time
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsAppRunTo(HelicsApp app, HelicsTime stopTime, HelicsError* err);
+
+/** finalize the app
+ * @param app the app to execute
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsAppFinalize(HelicsApp app, HelicsError* err);
+
+/** finalize the app
+ * @param app the app to free
+ */
+HELICS_EXPORT void helicsAppFree(HelicsApp app);
+
+/** disconnect and free an App
+ * @param app the app to destroy
+ */
+HELICS_EXPORT void helicsAppDestroy(HelicsApp app);
+
+/** check if the App is active and ready to run*/
+HELICS_EXPORT HelicsBool helicsAppIsActive(HelicsApp app);
+
+/**
  * input/publication registration
  */
 
@@ -3808,6 +3900,57 @@ HELICS_EXPORT void helicsEndpointSetDefaultDestination(HelicsEndpoint endpoint, 
  * @return A string with the default destination.
  */
 HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(HelicsEndpoint endpoint);
+
+/**
+ * Send a message to the targeted destination.
+ *
+ * @param endpoint The endpoint to send the data from.
+ * @param message The string to send.
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+HELICS_EXPORT void helicsEndpointSendString(HelicsEndpoint endpoint, const char* message, HelicsError* err);
+
+/**
+* Send a message to the specified destination.
+*
+* @param endpoint The endpoint to send the data from.
+
+* @param message The string to send.
+*
+* @param dst The target destination. Use nullptr to send to the default destination.
+* @param[in,out] err A pointer to an error object for catching errors.
+*/
+HELICS_EXPORT void helicsEndpointSendStringTo(HelicsEndpoint endpoint, const char* message, const char* dst, HelicsError* err);
+
+/**
+ * Send a message to the specified destination at a specific time.
+ *
+ * @param endpoint The endpoint to send the data from.
+ * @param message The data to send.
+ *
+ * @param dst The target destination. Use nullptr to send to the default destination.
+ *
+ * @param time The time the message should be sent.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+
+HELICS_EXPORT void
+    helicsEndpointSendStringToAt(HelicsEndpoint endpoint, const char* message, const char* dst, HelicsTime time, HelicsError* err);
+
+/**
+ * Send a message at a specific time to the targeted destinations
+ *
+ * @param endpoint The endpoint to send the data from.
+ *
+ * @param message The data to send.
+ *
+ * @param time The time the message should be sent.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+
+HELICS_EXPORT void helicsEndpointSendStringAt(HelicsEndpoint endpoint, const char* message, HelicsTime time, HelicsError* err);
 
 /**
  * Send a message to the targeted destination.

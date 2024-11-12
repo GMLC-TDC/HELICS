@@ -32,11 +32,16 @@ class Broker;
 class ValueFederate;
 class MessageFederate;
 class CallbackFederate;
+class FederateInfo;
 class Input;
 class Publication;
 class Endpoint;
 class Filter;
 class Translator;
+
+namespace apps {
+    class App;
+}
 
 class FilterObject;
 class TranslatorObject;
@@ -69,6 +74,15 @@ class CoreObject {
 
 /** get the CoreObject from a HelicsCore and verify it is valid*/
 CoreObject* getCoreObject(HelicsCore core, HelicsError* err) noexcept;
+
+/** object representing an app*/
+class AppObject {
+  public:
+    std::string type;  //!< the target of the query
+    std::shared_ptr<apps::App> app;
+    int index{-2};
+    int valid{0};
+};
 
 class InputObject;
 class PublicationObject;
@@ -204,9 +218,13 @@ helics::Federate* getFed(HelicsFederate fed, HelicsError* err);
 helics::ValueFederate* getValueFed(HelicsFederate fed, HelicsError* err);
 helics::MessageFederate* getMessageFed(HelicsFederate fed, HelicsError* err);
 helics::CallbackFederate* getCallbackFed(HelicsFederate fed, HelicsError* err);
+helics::FederateInfo* getFedInfo(HelicsFederateInfo fedInfo, HelicsError* err);
 helics::Core* getCore(HelicsCore core, HelicsError* err);
 helics::Broker* getBroker(HelicsBroker broker, HelicsError* err);
 helics::Message* getMessageObj(HelicsMessage message, HelicsError* err);
+helics::apps::App* getApp(HelicsApp, HelicsError* err);
+/** generate a new helicsFederate and store it in the master*/
+HelicsFederate generateNewHelicsFederateObject(std::shared_ptr<helics::Federate> fed, helics::FederateType type);
 
 std::unique_ptr<helics::Message> getMessageUniquePtr(HelicsMessage message, HelicsError* err);
 /** create a message object from a message pointer*/
@@ -222,6 +240,8 @@ std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, 
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::CallbackFederate> getCallbackFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::Core> getCoreSharedPtr(HelicsCore core, HelicsError* err);
+
+std::shared_ptr<helics::apps::App> getAppSharedPtr(HelicsApp app, HelicsError* err);
 /**centralized error handler for the C interface*/
 void helicsErrorHandler(HelicsError* err) noexcept;
 /** check if the output argument string is valid
@@ -238,6 +258,7 @@ class MasterObjectHolder {
     guarded<std::deque<std::unique_ptr<helics::BrokerObject>>> brokers;
     guarded<std::deque<std::unique_ptr<helics::CoreObject>>> cores;
     guarded<std::deque<std::unique_ptr<helics::FedObject>>> feds;
+    guarded<std::deque<std::unique_ptr<helics::AppObject>>> apps;
     gmlc::concurrency::TripWireDetector tripDetect;  //!< detector for library termination
     guarded<std::deque<std::string>> errorStrings;  //!< container for strings generated from error conditions
   public:
@@ -254,9 +275,13 @@ class MasterObjectHolder {
     int addFed(std::unique_ptr<helics::FedObject> fed);
     /** remove a federate object*/
     bool removeFed(std::string_view name, int validationCode);
+    /** add an app to the holder*/
+    int addApp(std::unique_ptr<helics::AppObject> app);
+
     void clearBroker(int index);
     void clearCore(int index);
     void clearFed(int index);
+    void clearApp(int index);
     void deleteAll();
     void abortAll(int errorCode, std::string_view error);
     /** store an error string to a string buffer
