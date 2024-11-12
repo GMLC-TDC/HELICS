@@ -195,7 +195,7 @@ HELICS_EXPORT void
     helicsEndpointSendStringToAt(HelicsEndpoint endpoint, const char* message, const char* dst, HelicsTime time, HelicsError* err);
 
 /**
- * Send a message at a specific time to the targeted destinations
+ * Send a message at a specific time to the targeted destinations.
  *
  * @param endpoint The endpoint to send the data from.
  *
