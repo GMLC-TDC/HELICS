@@ -47,18 +47,19 @@ time, the app will not likely function normally; other query, information calls,
 HELICS_EXPORT HelicsFederate helicsAppGetFederate(HelicsApp app, HelicsError* err);
 
 /**
-* Create a HelicsApp object.
-*
-* @details Create a HelicsApp object.
-*
-* @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config file.
-* @param appType The type of app to create.
-* @param configFile Configuration file or string to pass into the app, can be NULL or empty.
-* @param fedInfo The federate information to pass into the app, can be NULL.
-* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-*
-* @return An opaque value app object, or nullptr if the object creation failed.
-*/
+ * Create a HelicsApp object.
+ *
+ * @details Create a HelicsApp object.
+ *
+ * @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config
+ * file.
+ * @param appType The type of app to create.
+ * @param configFile Configuration file or string to pass into the app, can be NULL or empty.
+ * @param fedInfo The federate information to pass into the app, can be NULL.
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ *
+ * @return An opaque value app object, or nullptr if the object creation failed.
+ */
 HELICS_EXPORT void helicsAppLoadFile(HelicsApp app, const char* configFile, HelicsError* err);
 
 /** Initialize the HelicsApp federate.
@@ -100,9 +101,9 @@ HELICS_EXPORT void helicsAppFree(HelicsApp app);
 HELICS_EXPORT void helicsAppDestroy(HelicsApp app);
 
 /** Check if the HelicsApp is active and ready to run.
-* @param app The app to check.
-* @return True if the app is active, otherwise false.
-*/
+ * @param app The app to check.
+ * @return True if the app is active, otherwise false.
+ */
 HELICS_EXPORT HelicsBool helicsAppIsActive(HelicsApp app);
 
 #ifdef __cplusplus
