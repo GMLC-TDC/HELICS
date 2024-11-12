@@ -54,6 +54,20 @@ class Filter {
     {
         helicsFilterSetString(filt, property.c_str(), val.c_str(), hThrowOnError());
     }
+    /** get the value of a filter property
+    @param property the name of the property of the filter to change
+    */
+    double getProperty(const std::string& property)
+    {
+        return helicsFilterGetPropertyDouble(filt, property.c_str());
+    }
+    /** get a string property on a filter
+    @param property the name of the property of the filter to change
+    */
+    const char * getString(const std::string& property)
+    {
+        return helicsFilterGetPropertyString(filt, property.c_str());
+    }
 
     /** add a destination target to a cloning filter
     @details all messages going to a destination are copied to the delivery address(es)*/

@@ -247,7 +247,8 @@ TEST_P(filter_simple_type_tests, function_mObj)
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 2.5, &err));
-
+    CE(double val=helicsFilterGetPropertyDouble(f1, "delay"));
+    EXPECT_DOUBLE_EQ(val,2.5);
     CE(helicsFederateEnterExecutingModeAsync(fFed, &err));
     CE(helicsFederateEnterExecutingMode(mFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
@@ -536,6 +537,7 @@ TEST_F(filter, clone_test)
 
     auto f1 = helicsFederateRegisterCloningFilter(dcFed, nullptr, &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
+    EXPECT_STREQ(helicsFilterGetPropertyString(f1,"delivery"),"cm");
     EXPECT_TRUE(err.error_code == HELICS_OK);
     CE(helicsFilterAddSourceTarget(f1, "src", &err));
 

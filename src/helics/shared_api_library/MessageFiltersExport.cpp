@@ -358,6 +358,42 @@ void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val,
     }
 }
 
+double helicsFilterGetPropertyDouble(HelicsFilter filt, const char* prop)
+{
+    auto* filter = getFilter(filt, nullptr);
+    if (filter == nullptr || prop==nullptr) {
+        return HELICS_TIME_INVALID;
+    }
+    try {
+        return filter->getProperty(prop);
+    }
+    catch (...) {
+        return HELICS_TIME_INVALID;
+    }
+}
+
+
+const char* helicsFilterGetPropertyString(HelicsFilter filt, const char* prop)
+{
+    static constexpr char nullStr[] = "";
+    auto* fObj = getFilterObj(filt, nullptr);
+    if (fObj == nullptr||prop==nullptr) {
+        return nullStr;
+    }
+    try {
+        auto res=fObj->filtPtr->getString(prop);
+        if (res.empty())
+        {
+            return nullStr;
+        }
+        fObj->buffer=res;
+        return fObj->buffer.c_str();
+    }
+    catch (...) {
+        return nullStr;
+    }
+}
+
 void helicsFilterAddDestinationTarget(HelicsFilter filt, const char* dest, HelicsError* err)
 {
     auto* filter = getFilter(filt, err);
