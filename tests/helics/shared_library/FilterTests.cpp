@@ -517,12 +517,12 @@ TEST_P(filter_simple_type_tests, message_filter_function3)
 
     EXPECT_TRUE(helicsEndpointHasMessage(port2));
 
-    auto m2 = helicsEndpointGetMessage(port2);
-    EXPECT_STREQ(helicsMessageGetSource(m2), "port1");
-    EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "port1");
-    EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
-    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
-    EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
+    auto message2 = helicsEndpointGetMessage(port2);
+    EXPECT_STREQ(helicsMessageGetSource(message2), "port1");
+    EXPECT_STREQ(helicsMessageGetOriginalSource(message2), "port1");
+    EXPECT_STREQ(helicsMessageGetDestination(message2), "port2");
+    EXPECT_EQ(helicsMessageGetByteCount(message2), static_cast<int64_t>(data.size()));
+    EXPECT_EQ(helicsMessageGetTime(message2), 2.5);
 
     EXPECT_TRUE(helicsEndpointHasMessage(port1));
     CE(helicsFederateFinalize(mFed, &err));
@@ -577,11 +577,11 @@ TEST_F(filter, clone_test)
     EXPECT_EQ(res, HELICS_TRUE);
 
     if (res == HELICS_TRUE) {
-        auto m2 = helicsEndpointGetMessage(destEpt);
-        EXPECT_STREQ(helicsMessageGetSource(m2), "src");
-        EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
-        EXPECT_STREQ(helicsMessageGetDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
+        auto message2 = helicsEndpointGetMessage(destEpt);
+        EXPECT_STREQ(helicsMessageGetSource(message2), "src");
+        EXPECT_STREQ(helicsMessageGetOriginalSource(message2), "src");
+        EXPECT_STREQ(helicsMessageGetDestination(message2), "dest");
+        EXPECT_EQ(helicsMessageGetByteCount(message2), static_cast<int64_t>(data.size()));
     }
 
     // now check the message clone
