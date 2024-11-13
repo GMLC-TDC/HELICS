@@ -419,7 +419,8 @@ TEST_P(filter_simple_type_tests, function2)
     CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
-    CE(helicsEndpointSendBytesTo(port1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
+    CE(helicsEndpointSendBytesTo(
+        port1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
     CE(helicsFederateRequestTime(fFed, 1.0, &err));
@@ -427,7 +428,8 @@ TEST_P(filter_simple_type_tests, function2)
 
     auto res = helicsFederateHasMessage(mFed);
     EXPECT_TRUE(!res);
-    CE(helicsEndpointSendBytesTo(port2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
+    CE(helicsEndpointSendBytesTo(
+        port2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
     CE(helicsFederateRequestTimeAsync(mFed, 2.0, &err));
     CE(helicsFederateRequestTime(fFed, 2.0, &err));
     CE(helicsFederateRequestTimeComplete(mFed, &err));
@@ -491,7 +493,8 @@ TEST_P(filter_simple_type_tests, message_filter_function3)
     CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data = "hello world";
-    CE(helicsEndpointSendBytesTo(port1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
+    CE(helicsEndpointSendBytesTo(
+        port1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
     CE(helicsFederateRequestTime(fFed, 1.0, &err));
@@ -499,7 +502,8 @@ TEST_P(filter_simple_type_tests, message_filter_function3)
 
     auto res = helicsFederateHasMessage(mFed);
     EXPECT_TRUE(!res);
-    CE(helicsEndpointSendBytesTo(port2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
+    CE(helicsEndpointSendBytesTo(
+        port2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
     CE(helicsFederateRequestTimeAsync(mFed, 2.0, &err));
     CE(helicsFederateRequestTime(fFed, 2.0, &err));
     CE(helicsFederateRequestTimeComplete(mFed, &err));
@@ -560,7 +564,8 @@ TEST_F(filter, clone_test)
     CE(HelicsFederateState state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
-    CE(helicsEndpointSendBytesTo(srcEpt, data.c_str(), static_cast<int>(data.size()), "dest", &err));
+    CE(helicsEndpointSendBytesTo(
+        srcEpt, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
     CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
     CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));

@@ -23,87 +23,83 @@ static constexpr char invalidFilterString[] = "The given filter object is not va
 static const int filterValidationIdentifier = 0xEC26'0127;
 
 namespace {
-    auto filterSearch = [](const helics::InterfaceHandle& hnd, const auto& testFilter) {
-        return hnd < testFilter->filtPtr->getHandle();
-    };
+auto filterSearch = [](const helics::InterfaceHandle& hnd, const auto& testFilter) { return hnd < testFilter->filtPtr->getHandle(); };
 
-    HelicsFilter federateAddFilter(HelicsFederate fed, std::unique_ptr<helics::FilterObject> filt)
-    {
-        auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-        filt->valid = filterValidationIdentifier;
-        HelicsFilter hfilt = filt.get();
-        if (fedObj->filters.empty() || filt->filtPtr->getHandle() > fedObj->filters.back()->filtPtr->getHandle()) {
-            fedObj->filters.push_back(std::move(filt));
-        }
-        else {
-            auto ind = std::upper_bound(fedObj->filters.begin(), fedObj->filters.end(), filt->filtPtr->getHandle(), filterSearch);
-            fedObj->filters.insert(ind, std::move(filt));
-        }
+HelicsFilter federateAddFilter(HelicsFederate fed, std::unique_ptr<helics::FilterObject> filt)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    filt->valid = filterValidationIdentifier;
+    HelicsFilter hfilt = filt.get();
+    if (fedObj->filters.empty() || filt->filtPtr->getHandle() > fedObj->filters.back()->filtPtr->getHandle()) {
+        fedObj->filters.push_back(std::move(filt));
+    } else {
+        auto ind = std::upper_bound(fedObj->filters.begin(), fedObj->filters.end(), filt->filtPtr->getHandle(), filterSearch);
+        fedObj->filters.insert(ind, std::move(filt));
+    }
+    return hfilt;
+}
+
+HelicsFilter findOrCreateFederateFilter(HelicsFederate fed, helics::Filter& filter)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    const auto handle = filter.getHandle();
+    auto ind = std::upper_bound(fedObj->filters.begin(), fedObj->filters.end(), handle, filterSearch);
+    if (ind != fedObj->filters.end() && (*ind)->filtPtr->getHandle() == handle) {
+        HelicsFilter hfilt = ind->get();
         return hfilt;
     }
 
-    HelicsFilter findOrCreateFederateFilter(HelicsFederate fed, helics::Filter& filter)
-    {
-        auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-        const auto handle = filter.getHandle();
-        auto ind = std::upper_bound(fedObj->filters.begin(), fedObj->filters.end(), handle, filterSearch);
-        if (ind != fedObj->filters.end() && (*ind)->filtPtr->getHandle() == handle) {
-            HelicsFilter hfilt = ind->get();
-            return hfilt;
-        }
+    auto filt = std::make_unique<helics::FilterObject>();
+    filt->filtPtr = &filter;
+    filt->cloning = filter.isCloningFilter();
+    filt->fedptr = getFedSharedPtr(fed, nullptr);
+    return federateAddFilter(fed, std::move(filt));
+}
 
-        auto filt = std::make_unique<helics::FilterObject>();
-        filt->filtPtr = &filter;
-        filt->cloning = filter.isCloningFilter();
-        filt->fedptr = getFedSharedPtr(fed, nullptr);
-        return federateAddFilter(fed, std::move(filt));
+/*
+HelicsFilter findCoreFilter(HelicsCore core, helics::InterfaceHandle handle)
+{
+    auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
+    auto ind=std::upper_bound(coreObj->filters.begin(),coreObj->filters.end(),handle,filterSearch);
+    if ((*ind)->filtPtr->getHandle() == handle)
+    {
+        HelicsFilter hfilt=ind->get();
+        return hfilt;
     }
+    return nullptr;
+}
+*/
 
-    /*
-    HelicsFilter findCoreFilter(HelicsCore core, helics::InterfaceHandle handle)
-    {
-        auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
-        auto ind=std::upper_bound(coreObj->filters.begin(),coreObj->filters.end(),handle,filterSearch);
-        if ((*ind)->filtPtr->getHandle() == handle)
-        {
-            HelicsFilter hfilt=ind->get();
-            return hfilt;
-        }
+helics::FilterObject* getFilterObj(HelicsFilter filt, HelicsError* err)
+{
+    HELICS_ERROR_CHECK(err, nullptr);
+    if (filt == nullptr) {
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidFilterString);
         return nullptr;
     }
-    */
-
-    helics::FilterObject* getFilterObj(HelicsFilter filt, HelicsError* err)
-    {
-        HELICS_ERROR_CHECK(err, nullptr);
-        if (filt == nullptr) {
-            assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidFilterString);
-            return nullptr;
-        }
-        auto* fObj = reinterpret_cast<helics::FilterObject*>(filt);
-        if (fObj->valid != filterValidationIdentifier) {
-            assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidFilterString);
-            return nullptr;
-        }
-        return fObj;
+    auto* fObj = reinterpret_cast<helics::FilterObject*>(filt);
+    if (fObj->valid != filterValidationIdentifier) {
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidFilterString);
+        return nullptr;
     }
-
-    // core is assumed to be valid here
-    HelicsFilter coreAddFilter(HelicsCore core, std::unique_ptr<helics::FilterObject> filt)
-    {
-        auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
-        filt->valid = filterValidationIdentifier;
-        HelicsFilter hfilt = filt.get();
-        if (coreObj->filters.empty() || filt->filtPtr->getHandle() > coreObj->filters.back()->filtPtr->getHandle()) {
-            coreObj->filters.push_back(std::move(filt));
-        }
-        else {
-            auto ind = std::upper_bound(coreObj->filters.begin(), coreObj->filters.end(), filt->filtPtr->getHandle(), filterSearch);
-            coreObj->filters.insert(ind, std::move(filt));
-        }
-        return hfilt;
-    }
+    return fObj;
 }
+
+// core is assumed to be valid here
+HelicsFilter coreAddFilter(HelicsCore core, std::unique_ptr<helics::FilterObject> filt)
+{
+    auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
+    filt->valid = filterValidationIdentifier;
+    HelicsFilter hfilt = filt.get();
+    if (coreObj->filters.empty() || filt->filtPtr->getHandle() > coreObj->filters.back()->filtPtr->getHandle()) {
+        coreObj->filters.push_back(std::move(filt));
+    } else {
+        auto ind = std::upper_bound(coreObj->filters.begin(), coreObj->filters.end(), filt->filtPtr->getHandle(), filterSearch);
+        coreObj->filters.insert(ind, std::move(filt));
+    }
+    return hfilt;
+}
+}  // namespace
 HelicsFilter helicsFederateRegisterFilter(HelicsFederate fed, HelicsFilterTypes type, const char* name, HelicsError* err)
 {
     // now generate a generic subscription
@@ -289,29 +285,29 @@ HelicsFilter helicsFederateGetFilterByIndex(HelicsFederate fed, int index, Helic
 }
 
 namespace {
-    helics::Filter* getFilter(HelicsFilter filt, HelicsError* err)
-    {
-        auto* fObj = getFilterObj(filt, err);
-        if (fObj == nullptr) {
-            return nullptr;
-        }
-        return fObj->filtPtr;
+helics::Filter* getFilter(HelicsFilter filt, HelicsError* err)
+{
+    auto* fObj = getFilterObj(filt, err);
+    if (fObj == nullptr) {
+        return nullptr;
     }
-
-    helics::CloningFilter* getCloningFilter(HelicsFilter filt, HelicsError* err)
-    {
-        auto* fObj = getFilterObj(filt, err);
-        if (fObj == nullptr) {
-            return nullptr;
-        }
-        if (!fObj->cloning) {
-            static constexpr char nonCloningFilterString[] = "filter must be a cloning filter";
-            assignError(err, HELICS_ERROR_INVALID_OBJECT, nonCloningFilterString);
-            return nullptr;
-        }
-        return dynamic_cast<helics::CloningFilter*>(fObj->filtPtr);
-    }
+    return fObj->filtPtr;
 }
+
+helics::CloningFilter* getCloningFilter(HelicsFilter filt, HelicsError* err)
+{
+    auto* fObj = getFilterObj(filt, err);
+    if (fObj == nullptr) {
+        return nullptr;
+    }
+    if (!fObj->cloning) {
+        static constexpr char nonCloningFilterString[] = "filter must be a cloning filter";
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, nonCloningFilterString);
+        return nullptr;
+    }
+    return dynamic_cast<helics::CloningFilter*>(fObj->filtPtr);
+}
+}  // namespace
 HelicsBool helicsFilterIsValid(HelicsFilter filt)
 {
     auto* filter = getFilter(filt, nullptr);
