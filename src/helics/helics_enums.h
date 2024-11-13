@@ -434,7 +434,7 @@ typedef enum { /* NOLINT */
 #define HELICS_BIG_NUMBER 9223372036.854774
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
 
-#define HELICS_INVALID_DOUBLE -1E49
+#define HELICS_INVALID_DOUBLE (-1E49)
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
