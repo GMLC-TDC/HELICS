@@ -107,7 +107,7 @@ TEST(app_tests, recorder)
 
     auto err2 = helicsErrorInitialize();
 
-    auto thread1 = std::thread( [&rec1, &err2]() { helicsAppRunTo(rec1, 4.0, &err2); });
+    auto thread1 = std::thread([&rec1, &err2]() { helicsAppRunTo(rec1, 4.0, &err2); });
     helicsFederateEnterExecutingMode(vFed, &err);
     auto retTime = helicsFederateRequestTime(vFed, 1, &err);
     EXPECT_EQ(retTime, 1.0);
@@ -229,6 +229,6 @@ TEST(app_tests, echo)
     EXPECT_STREQ(helicsMessageGetSource(message), "test2");
     helicsMessageFree(message);
     helicsFederateDestroy(mFed);
-   thread1.join();
+    thread1.join();
     EXPECT_EQ(err2.error_code, 0);
 }
