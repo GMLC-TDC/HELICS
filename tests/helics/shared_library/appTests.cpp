@@ -39,26 +39,26 @@ TEST(app_tests, simple_player)
 
     auto play1 = helicsCreateApp("playerc1", "player", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(play1) == HELICS_TRUE);
-    std::cout<<"out1\n";
+    std::cout << "out1\n";
     auto play1Fed = helicsAppGetFederate(play1, &err);
     EXPECT_TRUE(helicsFederateIsValid(play1Fed));
 
     helicsAppLoadFile(play1, (std::string(APP_TEST_DIR) + "example1.player").c_str(), &err);
     EXPECT_EQ(err.error_code, 0);
     auto vFed = helicsCreateValueFederate("block1", fedInfo, &err);
-    std::cout<<"out2\n";
+    std::cout << "out2\n";
     auto sub1 = helicsFederateRegisterSubscription(vFed, "pub1", nullptr, &err);
     auto sub2 = helicsFederateRegisterSubscription(vFed, "pub2", nullptr, &err);
     auto err2 = helicsErrorInitialize();
 
     auto thread1 = std::thread([&play1, &err2]() { helicsAppRun(play1, &err2); });
     helicsFederateEnterExecutingMode(vFed, &err);
-    std::cout<<"out3\n";
+    std::cout << "out3\n";
     auto val = helicsInputGetDouble(sub1, &err);
     EXPECT_EQ(val, 0.3);
     auto retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 1.0);
-    std::cout<<"out4\n";
+    std::cout << "out4\n";
     val = helicsInputGetDouble(sub1, &err);
     EXPECT_EQ(val, 0.5);
     val = helicsInputGetDouble(sub2, &err);
@@ -70,7 +70,7 @@ TEST(app_tests, simple_player)
     EXPECT_EQ(val, 0.7);
     val = helicsInputGetDouble(sub2, &err);
     EXPECT_EQ(val, 0.6);
-    std::cout<<"out5\n";
+    std::cout << "out5\n";
     retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 3.0);
     val = helicsInputGetDouble(sub1, &err);
@@ -80,13 +80,13 @@ TEST(app_tests, simple_player)
 
     retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 5.0);
-    std::cout<<"out6\n";
+    std::cout << "out6\n";
     helicsFederateDestroy(vFed);
-    std::cout<<"out7\n";
+    std::cout << "out7\n";
     thread1.join();
     EXPECT_EQ(err2.error_code, 0);
     EXPECT_EQ(err.error_code, 0);
-    std::cout<<"out8\n";
+    std::cout << "out8\n";
 }
 
 TEST(app_tests, recorder)
