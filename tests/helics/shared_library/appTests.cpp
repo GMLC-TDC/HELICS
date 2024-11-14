@@ -45,7 +45,7 @@ TEST(app_tests, simple_player)
 
     helicsAppLoadFile(play1, (std::string(APP_TEST_DIR) + "example1.player").c_str(), &err);
     EXPECT_EQ(err.error_code, 0);
-    helicsFederateInfoSetCoreInitString(fedInfo,"",&err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "", &err);
 
     auto vFed = helicsCreateValueFederate("block1", fedInfo, &err);
     std::cout << "out2\n";
@@ -55,7 +55,7 @@ TEST(app_tests, simple_player)
 
     auto thread1 = std::thread([&play1, &err2]() { helicsAppRun(play1, &err2); });
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    std::cout<<"out2b\n";
+    std::cout << "out2b\n";
     helicsFederateEnterExecutingMode(vFed, &err);
     std::cout << "out3\n";
     auto val = helicsInputGetDouble(sub1, &err);
