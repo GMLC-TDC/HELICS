@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 extern "C" {
 #endif
 
+/** HELICS_TRUE if the app library is enabled*/
+HELICS_EXPORT HelicsBool helicsAppEnabled();
 /**
 * Create a HelicsApp object.
 *

@@ -26,17 +26,23 @@ TEST(app_tests, load_error)
     EXPECT_NE(err.error_code, 0);
 }
 
-/** this the same test as in the player tests
+
+/** this is the same test as in the player tests
 just meant to test the methods in C not the player itself
 */
 TEST(app_tests, simple_player)
 {
+    if (helicsAppEnabled() != HELICS_TRUE)
+    {
+        EXPECT_TRUE(true);
+        return;
+    }
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreName(fedInfo, "pscore1", &err);
     helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
-
+    std::cout << "out0\n";
     auto play1 = helicsCreateApp("playerc1", "player", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(play1) == HELICS_TRUE);
     std::cout << "out1\n";
@@ -95,6 +101,11 @@ TEST(app_tests, simple_player)
 
 TEST(app_tests, recorder)
 {
+    if (helicsAppEnabled() != HELICS_TRUE)
+    {
+        EXPECT_TRUE(true);
+        return;
+    }
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
@@ -147,6 +158,11 @@ TEST(app_tests, recorder)
 
 TEST(app_tests, connector)
 {
+    if (helicsAppEnabled() != HELICS_TRUE)
+    {
+        EXPECT_TRUE(true);
+        return;
+    }
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
@@ -195,6 +211,11 @@ TEST(app_tests, connector)
 
 TEST(app_tests, echo)
 {
+    if (helicsAppEnabled() != HELICS_TRUE)
+    {
+        EXPECT_TRUE(true);
+        return;
+    }
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);

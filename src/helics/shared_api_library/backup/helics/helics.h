@@ -2615,6 +2615,8 @@ HELICS_EXPORT void helicsQueryFree(HelicsQuery query);
  */
 HELICS_EXPORT void helicsCleanupLibrary(void);
 
+/** HELICS_TRUE if the app library is enabled*/
+HELICS_EXPORT HelicsBool helicsAppEnabled();
 /**
 * Create a HelicsApp object.
 *
