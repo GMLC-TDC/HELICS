@@ -23,7 +23,6 @@ static constexpr const char* notLoadedString =
 
 static constexpr char nullcstr[] = "";
 
-
 HelicsBool helicsAppEnabled()
 {
     return HELICS_FALSE;

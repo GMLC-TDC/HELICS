@@ -26,14 +26,12 @@ TEST(app_tests, load_error)
     EXPECT_NE(err.error_code, 0);
 }
 
-
 /** this is the same test as in the player tests
 just meant to test the methods in C not the player itself
 */
 TEST(app_tests, simple_player)
 {
-    if (helicsAppEnabled() != HELICS_TRUE)
-    {
+    if (helicsAppEnabled() != HELICS_TRUE) {
         EXPECT_TRUE(true);
         return;
     }
@@ -101,8 +99,7 @@ TEST(app_tests, simple_player)
 
 TEST(app_tests, recorder)
 {
-    if (helicsAppEnabled() != HELICS_TRUE)
-    {
+    if (helicsAppEnabled() != HELICS_TRUE) {
         EXPECT_TRUE(true);
         return;
     }
@@ -158,8 +155,7 @@ TEST(app_tests, recorder)
 
 TEST(app_tests, connector)
 {
-    if (helicsAppEnabled() != HELICS_TRUE)
-    {
+    if (helicsAppEnabled() != HELICS_TRUE) {
         EXPECT_TRUE(true);
         return;
     }
@@ -211,8 +207,7 @@ TEST(app_tests, connector)
 
 TEST(app_tests, echo)
 {
-    if (helicsAppEnabled() != HELICS_TRUE)
-    {
+    if (helicsAppEnabled() != HELICS_TRUE) {
         EXPECT_TRUE(true);
         return;
     }
