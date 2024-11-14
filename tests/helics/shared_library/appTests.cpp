@@ -51,7 +51,7 @@ TEST(app_tests, simple_player)
     auto sub2 = helicsFederateRegisterSubscription(vFed, "pub2", nullptr, &err);
     auto err2 = helicsErrorInitialize();
 
-    auto fut = std::async(std::launch::async, [&play1, &err2]() { helicsAppRun(play1, &err2); });
+    auto thread1 = std::thread([&play1, &err2]() { helicsAppRun(play1, &err2); });
     helicsFederateEnterExecutingMode(vFed, &err);
     auto val = helicsInputGetDouble(sub1, &err);
     EXPECT_EQ(val, 0.3);
@@ -80,7 +80,7 @@ TEST(app_tests, simple_player)
     retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 5.0);
     helicsFederateDestroy(vFed);
-    fut.get();
+    thread1.join();
     EXPECT_EQ(err2.error_code, 0);
     EXPECT_EQ(err.error_code, 0);
 }
@@ -107,8 +107,7 @@ TEST(app_tests, recorder)
 
     auto err2 = helicsErrorInitialize();
 
-    auto fut =
-        std::async(std::launch::async, [&rec1, &err2]() { helicsAppRunTo(rec1, 4.0, &err2); });
+    auto thread1 = std::thread( [&rec1, &err2]() { helicsAppRunTo(rec1, 4.0, &err2); });
     helicsFederateEnterExecutingMode(vFed, &err);
     auto retTime = helicsFederateRequestTime(vFed, 1, &err);
     EXPECT_EQ(retTime, 1.0);
@@ -131,7 +130,7 @@ TEST(app_tests, recorder)
 
     helicsFederateDestroy(vFed);
 
-    fut.get();
+    thread1.join();
 
     helicsAppDestroy(rec1);
 
@@ -166,7 +165,7 @@ TEST(app_tests, connector)
         helicsFederateRegisterGlobalInput(vFed, "inp2", HELICS_DATA_TYPE_DOUBLE, nullptr, &err);
     helicsFederateSetGlobal(vFed, "tag2", "true", &err);
     auto err2 = helicsErrorInitialize();
-    auto fut = std::async(std::launch::async, [&conn1, &err2]() { helicsAppRun(conn1, &err2); });
+    auto thread1 = std::thread([&conn1, &err2]() { helicsAppRun(conn1, &err2); });
     helicsFederateEnterExecutingMode(vFed, &err);
 
     const double testValue = 3452.562;
@@ -180,7 +179,7 @@ TEST(app_tests, connector)
     val = helicsInputGetDouble(inp2, &err);
     EXPECT_EQ(val, testValue);
     helicsFederateDestroy(vFed);
-    fut.get();
+    thread1.join();
     EXPECT_EQ(err2.error_code, 0);
 
     helicsAppDestroy(conn1);
@@ -204,8 +203,7 @@ TEST(app_tests, echo)
 
     auto ep1 = helicsFederateRegisterEndpoint(mFed, "src", "", &err);
     auto err2 = helicsErrorInitialize();
-    auto fut =
-        std::async(std::launch::async, [&echo1, &err2]() { helicsAppRunTo(echo1, 5.0, &err2); });
+    auto thread1 = std::thread([&echo1, &err2]() { helicsAppRunTo(echo1, 5.0, &err2); });
     helicsFederateEnterExecutingMode(mFed, &err);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     helicsEndpointSendStringTo(ep1, "hello world", "test", &err);
@@ -231,6 +229,6 @@ TEST(app_tests, echo)
     EXPECT_STREQ(helicsMessageGetSource(message), "test2");
     helicsMessageFree(message);
     helicsFederateDestroy(mFed);
-    fut.get();
+   thread1.join();
     EXPECT_EQ(err2.error_code, 0);
 }
