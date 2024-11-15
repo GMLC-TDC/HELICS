@@ -110,7 +110,7 @@ TEST(app_tests, recorder)
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreName(fedInfo, "rcore1", &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --brokername=rec_broker --autobroker", &err);
 
     auto rec1 = helicsCreateApp("recc1", "recorder", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(rec1) == HELICS_TRUE);
@@ -167,7 +167,7 @@ TEST(app_tests, connector)
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetTimeProperty(fedInfo, HELICS_PROPERTY_TIME_PERIOD, 1.0, &err);
     helicsFederateInfoSetCoreName(fedInfo, "ccoref5", &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --brokername=conn_broker --autobroker", &err);
 
     auto conn1 = helicsCreateApp("connectorc1", "connector", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(conn1) == HELICS_TRUE);
@@ -218,7 +218,7 @@ TEST(app_tests, echo)
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreName(fedInfo, "ecore4-file", &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --brokername=echo_broker --autobroker", &err);
 
     auto echo1 = helicsCreateApp("echoc1", "echo", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(echo1) == HELICS_TRUE);
