@@ -35,15 +35,16 @@ TEST(app_tests, simple_player)
         EXPECT_TRUE(true);
         return;
     }
+    std::cout << "out-1"<<std::endl;
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreName(fedInfo, "pscore1", &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
-    std::cout << "out0\n";
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --brokername=player_broker --autobroker", &err);
+    std::cout << "out0"<<std::endl;
     auto play1 = helicsCreateApp("playerc1", "player", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(play1) == HELICS_TRUE);
-    std::cout << "out1\n";
+    std::cout << "out1"<<std::endl;
     auto play1Fed = helicsAppGetFederate(play1, &err);
     EXPECT_TRUE(helicsFederateIsValid(play1Fed));
 
@@ -52,21 +53,21 @@ TEST(app_tests, simple_player)
     helicsFederateInfoSetCoreInitString(fedInfo, "", &err);
 
     auto vFed = helicsCreateValueFederate("block1", fedInfo, &err);
-    std::cout << "out2\n";
+    std::cout << "out2"<<std::endl;
     auto sub1 = helicsFederateRegisterSubscription(vFed, "pub1", nullptr, &err);
     auto sub2 = helicsFederateRegisterSubscription(vFed, "pub2", nullptr, &err);
     auto err2 = helicsErrorInitialize();
 
     auto thread1 = std::thread([&play1, &err2]() { helicsAppRun(play1, &err2); });
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    std::cout << "out2b\n";
+    std::cout << "out2b"<<std::endl;
     helicsFederateEnterExecutingMode(vFed, &err);
-    std::cout << "out3\n";
+    std::cout << "out3"<<std::endl;
     auto val = helicsInputGetDouble(sub1, &err);
     EXPECT_EQ(val, 0.3);
     auto retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 1.0);
-    std::cout << "out4\n";
+    std::cout << "out4"<<std::endl;
     val = helicsInputGetDouble(sub1, &err);
     EXPECT_EQ(val, 0.5);
     val = helicsInputGetDouble(sub2, &err);
@@ -78,7 +79,7 @@ TEST(app_tests, simple_player)
     EXPECT_EQ(val, 0.7);
     val = helicsInputGetDouble(sub2, &err);
     EXPECT_EQ(val, 0.6);
-    std::cout << "out5\n";
+    std::cout << "out5"<<std::endl;
     retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 3.0);
     val = helicsInputGetDouble(sub1, &err);
@@ -88,13 +89,13 @@ TEST(app_tests, simple_player)
 
     retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 5.0);
-    std::cout << "out6\n";
+    std::cout << "out6"<<std::endl;
     helicsFederateDestroy(vFed);
-    std::cout << "out7\n";
+    std::cout << "out7"<<std::endl;
     thread1.join();
     EXPECT_EQ(err2.error_code, 0);
     EXPECT_EQ(err.error_code, 0);
-    std::cout << "out8\n";
+    std::cout << "out8"<<std::endl;
 }
 
 TEST(app_tests, recorder)
