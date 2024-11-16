@@ -199,10 +199,10 @@ HELICS_EXPORT void helicsFilterSet(HelicsFilter filt, const char* prop, double v
 HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val, HelicsError* err);
 
 /**
-* Get a double property from a filter
+* Get a double property from a filter.
 *
-* @param filt The filter to modify.
-* @param prop A string containing the property to set.
+* @param filt The filter to retrieve a value from.
+* @param prop A string containing the property to get.
 *
 * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -210,11 +210,11 @@ HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, co
 HELICS_EXPORT double helicsFilterGetPropertyDouble(HelicsFilter filt, const char* prop);
 
 /**
-* Set a string property on a filter.  The string output memory is valid until a subsequent call to to getPropertyString on the particular
-filter
+* Get a string property on a filter.  The string output memory is valid until a subsequent call to getPropertyString on the particular
+filter.
 *
-* @param filt The filter to modify.
-* @param prop A string containing the property to set.
+* @param filt The filter to retrieve a value from.
+* @param prop A string containing the property to get.
 *
 
 */

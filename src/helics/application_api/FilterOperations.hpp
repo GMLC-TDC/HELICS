@@ -53,13 +53,11 @@ class FilterOperations {
     virtual void setString(std::string_view property, std::string_view val);
 
     /** get a property from a filter
-    @param property the name of the property of the filter to change
-    @param val the numerical value of the property
+    @param property the name of the property of the filter to get
     */
     virtual double getProperty(std::string_view property);
     /** get a string property on a filter
-    @param property the name of the property of the filter to change
-    @param val the numerical value of the property
+    @param property the name of the property of the filter to get
     */
     virtual std::string getString(std::string_view property);
 

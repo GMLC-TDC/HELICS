@@ -55,14 +55,14 @@ class Filter {
         helicsFilterSetString(filt, property.c_str(), val.c_str(), hThrowOnError());
     }
     /** get the value of a filter property
-    @param property the name of the property of the filter to change
+    @param property the name of the property of the filter to get
     */
     double getProperty(const std::string& property)
     {
         return helicsFilterGetPropertyDouble(filt, property.c_str());
     }
     /** get a string property on a filter
-    @param property the name of the property of the filter to change
+    @param property the name of the property of the filter to get
     */
     const char* getString(const std::string& property)
     {
