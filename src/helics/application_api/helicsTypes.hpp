@@ -496,7 +496,7 @@ inline X invalidValue()
 }
 
 /// defined constant for an invalid value as a double
-constexpr double invalidDouble = -1e49;
+constexpr double invalidDouble = HELICS_INVALID_DOUBLE;
 
 template<>
 constexpr double invalidValue<double>()

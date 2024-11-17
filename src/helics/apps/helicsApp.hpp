@@ -111,6 +111,9 @@ necessary
     /** get a const reference to the federate*/
     const CombinationFederate& accessUnderlyingFederate() const { return *fed; }
 
+    /** get a copy of the federate pointer (this can be dangerous if misused) */
+    std::shared_ptr<CombinationFederate> getUnderlyingFederatePointer() { return fed; }
+
   protected:
     /** load from a jsonString
 @param jsonString either a JSON filename or a string containing JSON

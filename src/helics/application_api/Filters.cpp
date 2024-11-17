@@ -141,6 +141,22 @@ void Filter::setString(std::string_view property, std::string_view val)
     }
 }
 
+double Filter::getProperty(std::string_view property)
+{
+    if (filtOp) {
+        return filtOp->getProperty(property);
+    }
+    return invalidDouble;
+}
+
+std::string Filter::getString(std::string_view property)
+{
+    if (filtOp) {
+        return filtOp->getString(property);
+    }
+    return {};
+}
+
 CloningFilter::CloningFilter(Core* core, std::string_view filtName):
     Filter(core, filtName, InterfaceHandle())
 {

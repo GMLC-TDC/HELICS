@@ -19,13 +19,16 @@ Checks: "
   clang-analyzer-*,
   bugprone-*,
   -bugprone-narrowing-conversions,
+  -bugprone-easily-swappable-parameters,
   misc-*,
   -misc-non-private-member-variables-in-classes,
+  -misc-include-cleaner,
   cert-*,
   -cert-err58-cpp,
   portability-*,
   readability-*,
   -readability-magic-numbers,
+  -readability-avoid-unconditional-preprocessor-if,
   performance-*
   "
 
@@ -50,10 +53,12 @@ WarningsAsErrors: "
   -bugprone-easily-swappable-parameters,
   misc-*,
   -misc-non-private-member-variables-in-classes,
+  -misc-include-cleaner,
   portability-*,
   readability-*,
   -readability-magic-numbers,
   -readability-identifier-naming,
+  -readability-avoid-unconditional-preprocessor-if,
   performance-*
   "
 

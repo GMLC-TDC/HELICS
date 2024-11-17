@@ -110,8 +110,7 @@ TEST_P(filter_single_type_test, message_filter_function)
     EXPECT_TRUE(filt1.getHandle().isValid());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
     timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 2.5; });
-    fFed->setFilterOperator(filt1, timeOperator);
-
+    filt1.setOperator(timeOperator);
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
@@ -241,8 +240,7 @@ TEST_P(filter_single_type_test, message_dest_filter_function)
     EXPECT_TRUE(filt1.getHandle().isValid());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
     timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 2.5; });
-    fFed->setFilterOperator(filt1, timeOperator);
-
+    filt1.setOperator(timeOperator);
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
@@ -304,8 +302,7 @@ TEST_P(filter_single_type_test, message_source_filter_function)
     EXPECT_TRUE(filt1.getHandle().isValid());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
     timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 2.5; });
-    mFed2->setFilterOperator(filt1, timeOperator);
-
+    filt1.setOperator(timeOperator);
     mFed1->enterExecutingModeAsync();
     mFed2->enterExecutingMode();
     mFed1->enterExecutingModeComplete();
@@ -431,9 +428,8 @@ static bool twoStageFilterTest(std::shared_ptr<helics::MessageFederate>& mFed,
 
     auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
     timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 1.25; });
-    fFed1->setFilterOperator(filt1, timeOperator);
-    fFed2->setFilterOperator(filt2, timeOperator);
-
+    filt1.setOperator(timeOperator);
+    filt2.setOperator(timeOperator);
     fFed1->enterExecutingModeAsync();
     fFed2->enterExecutingModeAsync();
     mFed->enterExecutingMode();
@@ -2055,8 +2051,7 @@ TEST_P(filter_single_type_test, message_filter_function2)
     EXPECT_TRUE(filt1.getHandle().isValid());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
     timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 2.5; });
-    fFed->setFilterOperator(filt1, timeOperator);
-
+    filt1.setOperator(timeOperator);
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
@@ -2118,8 +2113,7 @@ TEST_P(filter_single_type_test, message_filter_function2_rem_target)
     EXPECT_TRUE(filt1.getHandle().isValid());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
     timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 2.5; });
-    fFed->setFilterOperator(filt1, timeOperator);
-
+    filt1.setOperator(timeOperator);
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();

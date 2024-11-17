@@ -199,6 +199,28 @@ HELICS_EXPORT void helicsFilterSet(HelicsFilter filt, const char* prop, double v
 HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val, HelicsError* err);
 
 /**
+* Get a double property from a filter.
+*
+* @param filt The filter to retrieve a value from.
+* @param prop A string containing the property to get.
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+
+*/
+HELICS_EXPORT double helicsFilterGetPropertyDouble(HelicsFilter filt, const char* prop);
+
+/**
+* Get a string property on a filter.  The string output memory is valid until a subsequent call to getPropertyString on the particular
+filter.
+*
+* @param filt The filter to retrieve a value from.
+* @param prop A string containing the property to get.
+*
+
+*/
+HELICS_EXPORT const char* helicsFilterGetPropertyString(HelicsFilter filt, const char* prop);
+
+/**
  * Add a destination target to a filter.
  *
  * @details All messages going to a destination are copied to the delivery address(es).

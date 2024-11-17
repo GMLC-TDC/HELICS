@@ -154,35 +154,36 @@ std::vector<int> AppTextParser::preParseFile(const std::vector<char>& klines)
         if (str.empty()) {
             continue;
         }
-        auto fc = str.find_first_not_of(" \t\n\r\0");
-        if (fc == std::string::npos) {
+        auto firstChar = str.find_first_not_of(" \t\n\r\0");
+        if (firstChar == std::string::npos) {
             continue;
         }
         if (inMline) {
-            if (fc + 2 < str.size()) {
-                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']')) {
+            if (firstChar + 2 < str.size()) {
+                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') &&
+                    (str[firstChar + 2] == ']')) {
                     inMline = false;
                 }
             }
             continue;
         }
-        if (str[fc] == '#') {
-            if (fc + 2 < str.size()) {
-                if ((str[fc + 1] == '#') && (str[fc + 2] == '[')) {
+        if (str[firstChar] == '#') {
+            if (firstChar + 2 < str.size()) {
+                if ((str[firstChar + 1] == '#') && (str[firstChar + 2] == '[')) {
                     inMline = true;
                 }
             }
             continue;
         }
-        if (str[fc] == '!') {
-            configStr += str.substr(fc + 1);
+        if (str[firstChar] == '!') {
+            configStr += str.substr(firstChar + 1);
             configStr.push_back('\n');
             continue;
         }
 
         ++counts[0];
         for (std::size_t ii = 0; ii < klines.size(); ++ii) {
-            if (str[fc] == klines[ii]) {
+            if (str[firstChar] == klines[ii]) {
                 ++counts[ii + 1];
             }
         }
@@ -277,15 +278,15 @@ void App::loadJsonFileConfiguration(const std::string& appName,
     auto doc = fileops::loadJson(jsonString);
 
     if (doc.contains("app")) {
-        auto appConfig = doc["app"];
+        auto& appConfig = doc["app"];
         loadConfigOptions(appConfig);
     }
     if (doc.contains("config")) {
-        auto appConfig = doc["config"];
+        auto& appConfig = doc["config"];
         loadConfigOptions(appConfig);
     }
     if (doc.contains(appName)) {
-        auto appConfig = doc[appName];
+        auto& appConfig = doc[appName];
         loadConfigOptions(appConfig);
     }
 }

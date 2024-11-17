@@ -122,6 +122,49 @@ TEST_P(mfed_simple_type_tests, send_receive)
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
+TEST_F(mfed_tests, send_receive_string)
+{
+    SetupTest(helicsCreateMessageFederate, "test", 1);
+    auto mFed1 = GetFederateAt(0);
+
+    auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err);
+    auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ep2", "random", &err);
+    EXPECT_EQ(err.error_code, HELICS_OK);
+    CE(helicsFederateSetTimeProperty(mFed1, HELICS_PROPERTY_TIME_DELTA, 1.0, &err));
+
+    CE(helicsFederateEnterExecutingMode(mFed1, &err));
+
+    CE(HelicsFederateState mFed1State = helicsFederateGetState(mFed1, &err));
+    EXPECT_TRUE(mFed1State == HELICS_STATE_EXECUTION);
+    std::string data(500, 'a');
+
+    CE(helicsEndpointSendStringToAt(epid, data.c_str(), "ep2", 0.0, &err));
+    HelicsTime time;
+    CE(time = helicsFederateRequestTime(mFed1, 1.0, &err));
+    EXPECT_EQ(time, 1.0);
+
+    auto res = helicsFederateHasMessage(mFed1);
+    EXPECT_TRUE(res);
+    res = helicsEndpointHasMessage(epid);
+    EXPECT_TRUE(res == false);
+    res = helicsEndpointHasMessage(epid2);
+    EXPECT_TRUE(res);
+
+    auto M = helicsEndpointGetMessage(epid2);
+    // ASSERT_TRUE (M);
+    ASSERT_EQ(helicsMessageGetByteCount(M), 500);
+    char* dptr = reinterpret_cast<char*>(helicsMessageGetBytesPointer(M));
+    if (dptr != nullptr) {
+        EXPECT_EQ(dptr[245], 'a');
+    } else {
+        ASSERT_TRUE(false) << "data is nullptr";
+    }
+    CE(helicsFederateFinalize(mFed1, &err));
+
+    CE(mFed1State = helicsFederateGetState(mFed1, &err));
+    EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
+}
+
 TEST_P(mfed_simple_type_tests, send_receive_mobj)
 {
     SetupTest(helicsCreateMessageFederate, GetParam(), 1);

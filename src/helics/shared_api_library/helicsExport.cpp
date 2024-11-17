@@ -10,18 +10,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/coreTypeOperations.hpp"
 #include "../core/helicsVersion.hpp"
 #include "../helics.hpp"
+#include "../helics_enums.h"
+#include "api-data.h"
 #include "helics/helics-config.h"
+#include "helicsApps.h"
 #include "helicsCore.h"
 #include "internal/api_objects.h"
 
 #include <algorithm>
-#include <atomic>
 #include <csignal>
-#include <future>
 #include <iostream>
 #include <memory>
-#include <mutex>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -73,35 +74,37 @@ void helicsErrorClear(HelicsError* err)
     }
 }
 
-static void signalHandler(int /*signum*/)
+namespace {
+void signalHandler(int /*signum*/)
 {
     helicsAbort(HELICS_ERROR_USER_ABORT, "user abort");
     // add a sleep to give the abort a chance to propagate to other federates
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    std::cout << std::endl;
+    std::cout << std::flush;
     exit(HELICS_ERROR_USER_ABORT);
 }
 
-static void signalHandlerNoExit(int /*signum*/)
+void signalHandlerNoExit(int /*signum*/)
 {
     helicsAbort(HELICS_ERROR_USER_ABORT, "user abort");
     // add a sleep to give the abort a chance to propagate to other federates
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    std::cout << std::endl;
+    std::cout << std::flush;
 }
 
-static void signalHandlerThreaded(int signum)
+void signalHandlerThreaded(int signum)
 {
     std::thread sigthread(signalHandler, signum);
     sigthread.detach();
 }
 
-static void signalHandlerThreadedNoExit(int signum)
+void signalHandlerThreadedNoExit(int signum)
 {
     std::thread sigthread(signalHandlerNoExit, signum);
     sigthread.detach();
 }
 
+}  // namespace
 void helicsLoadSignalHandler()
 {
     static_cast<void>(signal(SIGINT, signalHandler));
@@ -117,9 +120,10 @@ void helicsClearSignalHandler()
     static_cast<void>(signal(SIGINT, SIG_DFL));
 }
 
-static HelicsBool (*keyHandler)(int) = nullptr;
+namespace {
+HelicsBool (*keyHandler)(int) = nullptr;
 
-static void signalHandlerCallback(int signum)
+void signalHandlerCallback(int signum)
 {
     HelicsBool runDefaultSignalHandler{HELICS_TRUE};
     if (keyHandler != nullptr) {
@@ -130,7 +134,7 @@ static void signalHandlerCallback(int signum)
     }
 }
 
-static void signalHandlerCallbackNoExit(int signum)
+void signalHandlerCallbackNoExit(int signum)
 {
     HelicsBool runDefaultSignalHandler{HELICS_TRUE};
     if (keyHandler != nullptr) {
@@ -141,7 +145,7 @@ static void signalHandlerCallbackNoExit(int signum)
     }
 }
 
-static void signalHandlerThreadedCallback(int signum)
+void signalHandlerThreadedCallback(int signum)
 {
     HelicsBool runDefaultSignalHandler{HELICS_TRUE};
     if (keyHandler != nullptr) {
@@ -152,7 +156,7 @@ static void signalHandlerThreadedCallback(int signum)
     }
 }
 
-static void signalHandlerThreadedCallbackNoExit(int signum)
+void signalHandlerThreadedCallbackNoExit(int signum)
 {
     HelicsBool runDefaultSignalHandler{HELICS_TRUE};
     if (keyHandler != nullptr) {
@@ -162,6 +166,7 @@ static void signalHandlerThreadedCallbackNoExit(int signum)
         signalHandlerThreadedNoExit(signum);
     }
 }
+}  // namespace
 
 void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int), HelicsBool useSeparateThread)
 {
@@ -1098,11 +1103,12 @@ void helicsAbort(int errorCode, const char* message)
     }
 }
 
-static constexpr const char* invalidQueryString = "Query object is invalid";
+namespace {
+constexpr const char* invalidQueryString = "Query object is invalid";
 
-static constexpr int validQueryIdentifier = 0x2706'3885;
+constexpr int validQueryIdentifier = 0x2706'3885;
 
-static helics::QueryObject* getQueryObj(HelicsQuery query, HelicsError* err)
+helics::QueryObject* getQueryObj(HelicsQuery query, HelicsError* err)
 {
     if ((err != nullptr) && (err->error_code != 0)) {
         return nullptr;
@@ -1118,7 +1124,7 @@ static helics::QueryObject* getQueryObj(HelicsQuery query, HelicsError* err)
     }
     return queryPtr;
 }
-
+}  // namespace
 HelicsQuery helicsCreateQuery(const char* target, const char* query)
 {
     auto* queryObj = new helics::QueryObject;
@@ -1363,6 +1369,15 @@ int MasterObjectHolder::addFed(std::unique_ptr<helics::FedObject> fed)
     return index;
 }
 
+int MasterObjectHolder::addApp(std::unique_ptr<helics::AppObject> app)
+{
+    auto handle = apps.lock();
+    auto index = static_cast<int>(handle->size());
+    app->index = index;
+    handle->push_back(std::move(app));
+    return index;
+}
+
 helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName)
 {
     auto handle = feds.lock();
@@ -1449,6 +1464,20 @@ void MasterObjectHolder::clearFed(int index)
     }
 }
 
+void MasterObjectHolder::clearApp(int index)
+{
+    auto appList = apps.lock();
+    if ((index < static_cast<int>(appList->size())) && (index >= 0)) {
+        (*appList)[index]->valid = 0;
+        (*appList)[index] = nullptr;
+        if (appList->size() > 10) {
+            if (std::none_of(appList->begin(), appList->end(), [](const auto& app) { return static_cast<bool>(app); })) {
+                appList->clear();
+            }
+        }
+    }
+}
+
 void MasterObjectHolder::abortAll(int code, std::string_view error)
 {
     {
@@ -1478,6 +1507,16 @@ void MasterObjectHolder::deleteAll()
             }
         }
         fedHandle->clear();
+    }
+    {
+        auto appHandle = apps.lock();
+        for (auto& app : appHandle) {
+            if ((app) && (app->app)) {
+                helicsAppFinalize(reinterpret_cast<HelicsApp>(app.get()), nullptr);
+                app->valid = 0;
+            }
+        }
+        appHandle->clear();
     }
     {
         auto coreHandle = cores.lock();
