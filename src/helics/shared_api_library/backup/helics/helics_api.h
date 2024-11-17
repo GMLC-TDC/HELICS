@@ -218,7 +218,7 @@ typedef enum {
 #define HELICS_BIG_NUMBER 9223372036.854774
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
 
-#define HELICS_INVALID_DOUBLE -1E49
+#define HELICS_INVALID_DOUBLE (-1E49)
 typedef void* HelicsInput;
 
 typedef void* HelicsPublication;
@@ -509,6 +509,7 @@ void helicsQuerySetQueryString(HelicsQuery query, const char* queryString, Helic
 void helicsQuerySetOrdering(HelicsQuery query, int32_t mode, HelicsError* err);
 void helicsQueryFree(HelicsQuery query);
 void helicsCleanupLibrary(void);
+HelicsBool helicsAppEnabled();
 HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* configFile, HelicsFederateInfo fedInfo, HelicsError* err);
 HelicsFederate helicsAppGetFederate(HelicsApp app, HelicsError* err);
 void helicsAppLoadFile(HelicsApp app, const char* configFile, HelicsError* err);
@@ -713,6 +714,8 @@ HelicsBool helicsFilterIsValid(HelicsFilter filt);
 const char* helicsFilterGetName(HelicsFilter filt);
 void helicsFilterSet(HelicsFilter filt, const char* prop, double val, HelicsError* err);
 void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val, HelicsError* err);
+double helicsFilterGetPropertyDouble(HelicsFilter filt, const char* prop);
+const char* helicsFilterGetPropertyString(HelicsFilter filt, const char* prop);
 void helicsFilterAddDestinationTarget(HelicsFilter filt, const char* dst, HelicsError* err);
 void helicsFilterAddSourceTarget(HelicsFilter filt, const char* source, HelicsError* err);
 void helicsFilterAddDeliveryEndpoint(HelicsFilter filt, const char* deliveryEndpoint, HelicsError* err);

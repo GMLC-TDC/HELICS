@@ -18,6 +18,7 @@ Checks: "
   clang-analyzer-*,
   bugprone-*,
   -bugprone-narrowing-conversions,
+  -bugprone-easily-swappable-parameters,
   cert-*,
   -cert-err58-cpp,
   portability-*,

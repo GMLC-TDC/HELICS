@@ -561,7 +561,7 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName
  * @details Combination federates are both value federates and message federates, objects can be used in all functions
  *          that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument
  *
- * @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
+ * @param configFile A JSON file or a JSON string,TOML file, or command line arguments that contains setup and configuration information.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 

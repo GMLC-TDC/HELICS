@@ -23,6 +23,11 @@ static constexpr const char* notLoadedString =
 
 static constexpr char nullcstr[] = "";
 
+HelicsBool helicsAppEnabled()
+{
+    return HELICS_FALSE;
+}
+
 HelicsApp helicsCreateApp(const char* /*appName*/,
                           const char* /*appType*/,
                           const char* /*configFile*/,

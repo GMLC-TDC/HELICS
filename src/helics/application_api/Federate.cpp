@@ -2034,9 +2034,9 @@ int Federate::getFilterCount() const
     return cManager->getFilterCount();
 }
 
-void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> filtOp)
+void Federate::setFilterOperator(Filter& filt, std::shared_ptr<FilterOperator> filtOp)
 {
-    coreObject->setFilterOperator(filt.getHandle(), std::move(filtOp));
+    filt.setOperator(std::move(filtOp));
 }
 
 const Translator& Federate::getTranslator(std::string_view translatorName) const
@@ -2057,10 +2057,10 @@ Translator& Federate::getTranslator(std::string_view translatorName)
     return trans;
 }
 
-void Federate::setTranslatorOperator(const Translator& trans,
+void Federate::setTranslatorOperator(Translator& trans,
                                      std::shared_ptr<TranslatorOperator> transOps)
 {
-    coreObject->setTranslatorOperator(trans.getHandle(), std::move(transOps));
+    trans.setOperator(std::move(transOps));
 }
 
 int Federate::getTranslatorCount() const

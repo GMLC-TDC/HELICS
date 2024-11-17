@@ -23,8 +23,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
 void FilterOperations::set(std::string_view /*property*/, double /*val*/) {}
 void FilterOperations::setString(std::string_view /*property*/, std::string_view /*val*/) {}
+
+double FilterOperations::getProperty(std::string_view /*property*/)
+{
+    return invalidDouble;
+}
+std::string FilterOperations::getString(std::string_view /*property*/)
+{
+    return {};
+}
 
 DelayFilterOperation::DelayFilterOperation(Time delayTime): delay(delayTime)
 {
@@ -54,6 +64,22 @@ void DelayFilterOperation::setString(std::string_view property, std::string_view
             throw(helics::InvalidParameter(std::string(val) + " is not a valid time string"));
         }
     }
+}
+
+double DelayFilterOperation::getProperty(std::string_view property)
+{
+    if (property == "delay") {
+        return static_cast<double>(delay.load());
+    }
+    return FilterOperations::getProperty(property);
+}
+
+std::string DelayFilterOperation::getString(std::string_view property)
+{
+    if (property == "delay") {
+        return std::to_string(delay.load());
+    }
+    return FilterOperations::getString(property);
 }
 
 std::shared_ptr<FilterOperator> DelayFilterOperation::getOperator()
@@ -99,7 +125,7 @@ static const std::map<std::string_view, RandomDistributions> distMap{
     {"fisher_f", RandomDistributions::FISHER_F},
     {"student_t", RandomDistributions::STUDENT_T}};
 
-double randDouble(RandomDistributions dist, double p1, double p2)
+double randDouble(RandomDistributions dist, double param1, double param2)
 {
     static thread_local std::mt19937 generator(
         std::random_device{}() +
@@ -108,65 +134,65 @@ double randDouble(RandomDistributions dist, double p1, double p2)
     switch (dist) {
         case RandomDistributions::CONSTANT:
         default:
-            return p1;
+            return param1;
         case RandomDistributions::UNIFORM: {
-            std::uniform_real_distribution<double> distribution(p1, p2);
+            std::uniform_real_distribution<double> distribution(param1, param2);
             return distribution(generator);
         }
         case RandomDistributions::NORMAL: {
-            std::normal_distribution<double> distribution(p1, p2);
+            std::normal_distribution<double> distribution(param1, param2);
             return distribution(generator);
         }
         case RandomDistributions::LOGNORMAL: {
-            std::lognormal_distribution<double> distribution(p1, p2);
+            std::lognormal_distribution<double> distribution(param1, param2);
             return distribution(generator);
         }
         case RandomDistributions::CAUCHY: {
-            std::cauchy_distribution<double> distribution(p1, p2);
+            std::cauchy_distribution<double> distribution(param1, param2);
             return distribution(generator);
         }
         case RandomDistributions::CHI_SQUARED: {
-            std::chi_squared_distribution<double> distribution(p1);
+            std::chi_squared_distribution<double> distribution(param1);
             return distribution(generator);
         }
         case RandomDistributions::EXPONENTIAL: {
-            std::exponential_distribution<double> distribution(p1);
+            std::exponential_distribution<double> distribution(param1);
             return distribution(generator);
         }
         case RandomDistributions::EXTREME_VALUE: {
-            std::extreme_value_distribution<double> distribution(p1, p2);
+            std::extreme_value_distribution<double> distribution(param1, param2);
             return distribution(generator);
         }
         case RandomDistributions::FISHER_F: {
-            std::fisher_f_distribution<double> distribution(p1, p2);
+            std::fisher_f_distribution<double> distribution(param1, param2);
             return distribution(generator);
         }
         case RandomDistributions::WEIBULL: {
-            std::weibull_distribution<double> distribution(p1, p2);
+            std::weibull_distribution<double> distribution(param1, param2);
             return distribution(generator);
         }
         case RandomDistributions::STUDENT_T: {
-            std::student_t_distribution<double> distribution(p1);
+            std::student_t_distribution<double> distribution(param1);
             return distribution(generator);
         }
         case RandomDistributions::GEOMETRIC: {  // integer multiples of some period
-            std::geometric_distribution<int> distribution(p1);
-            return distribution(generator) * p2;
+            std::geometric_distribution<int> distribution(param1);
+            return distribution(generator) * param2;
         }
         case RandomDistributions::POISSON: {  // integer multiples of some period
-            std::poisson_distribution<int> distribution(p1);
-            return distribution(generator) * p2;
+            std::poisson_distribution<int> distribution(param1);
+            return distribution(generator) * param2;
         }
         case RandomDistributions::BERNOULLI: {
-            std::bernoulli_distribution distribution(p1);
-            return distribution(generator) ? p2 : 0.0;
+            std::bernoulli_distribution distribution(param1);
+            return distribution(generator) ? param2 : 0.0;
         }
         case RandomDistributions::BINOMIAL: {
-            std::binomial_distribution<int> distribution(static_cast<int>(p1), p2);
+            std::binomial_distribution<int> distribution(static_cast<int>(param1), param2);
             return static_cast<double>(distribution(generator));
         }
         case RandomDistributions::GAMMA: {
-            std::gamma_distribution<double> distribution(p1, p2);
+            std::gamma_distribution<double> distribution(param1, param2);
             return distribution(generator);
         } break;
     }
@@ -181,7 +207,10 @@ class RandomDelayGenerator {
     std::atomic<double> param1{0.0};  //!< parameter 1 typically mean or min
     std::atomic<double> param2{0.0};  //!< parameter 2 typically stddev or max
 
-    double generate() const { return randDouble(dist.load(), param1.load(), param2.load()); }
+    [[nodiscard]] double generate() const
+    {
+        return randDouble(dist.load(), param1.load(), param2.load());
+    }
 };
 
 RandomDelayFilterOperation::RandomDelayFilterOperation():
@@ -211,13 +240,45 @@ void RandomDelayFilterOperation::setString(std::string_view property, std::strin
         }
     } else if ((property == "param1") || (property == "mean") || (property == "min") ||
                (property == "alpha")) {
-        auto tm = gmlc::utilities::loadTimeFromString<helics::Time>(val);
-        rdelayGen->param1.store(static_cast<double>(tm));
+        auto time = gmlc::utilities::loadTimeFromString<helics::Time>(val);
+        rdelayGen->param1.store(static_cast<double>(time));
     } else if ((property == "param2") || (property == "stddev") || (property == "max") ||
                (property == "beta")) {
-        auto tm = gmlc::utilities::loadTimeFromString<helics::Time>(val);
-        rdelayGen->param2.store(static_cast<double>(tm));
+        auto time = gmlc::utilities::loadTimeFromString<helics::Time>(val);
+        rdelayGen->param2.store(static_cast<double>(time));
     }
+}
+
+double RandomDelayFilterOperation::getProperty(std::string_view property)
+{
+    if ((property == "param1") || (property == "mean") || (property == "min") ||
+        (property == "alpha")) {
+        return (rdelayGen->param1.load());
+    }
+    if ((property == "param2") || (property == "stddev") || (property == "max") ||
+        (property == "beta")) {
+        return (rdelayGen->param2.load());
+    }
+    return FilterOperations::getProperty(property);
+}
+
+std::string RandomDelayFilterOperation::getString(std::string_view property)
+{
+    if ((property == "dist") || (property == "distribution")) {
+        auto currentDist = rdelayGen->dist.load();
+        for (const auto& distPair : distMap) {
+            if (distPair.second == currentDist) {
+                return std::string(distPair.first);
+            }
+        }
+    } else if ((property == "param1") || (property == "mean") || (property == "min") ||
+               (property == "alpha")) {
+        return std::to_string(rdelayGen->param1.load());
+    } else if ((property == "param2") || (property == "stddev") || (property == "max") ||
+               (property == "beta")) {
+        return std::to_string(rdelayGen->param2.load());
+    }
+    return FilterOperations::getString(property);
 }
 
 std::shared_ptr<FilterOperator> RandomDelayFilterOperation::getOperator()
@@ -241,6 +302,22 @@ void RandomDropFilterOperation::set(std::string_view property, double val)
 }
 void RandomDropFilterOperation::setString(std::string_view /*property*/, std::string_view /*val*/)
 {
+}
+
+double RandomDropFilterOperation::getProperty(std::string_view property)
+{
+    if ((property == "dropprob") || (property == "prob")) {
+        return dropProb.load();
+    }
+    return FilterOperations::getProperty(property);
+}
+
+std::string RandomDropFilterOperation::getString(std::string_view property)
+{
+    if ((property == "dropprob") || (property == "prob")) {
+        return std::to_string(dropProb.load());
+    }
+    return FilterOperations::getString(property);
 }
 
 std::shared_ptr<FilterOperator> RandomDropFilterOperation::getOperator()
@@ -273,11 +350,43 @@ void RerouteFilterOperation::setString(std::string_view property, std::string_vi
         }
         catch (const std::regex_error& re) {
             std::cerr << "filter expression is not a valid Regular expression " << re.what()
-                      << std::endl;
+                      << '\n';
             throw(helics::InvalidParameter(
                 std::string("filter expression is not a valid Regular expression ") + re.what()));
         }
     }
+}
+
+double RerouteFilterOperation::getProperty(std::string_view property)
+{
+    return FilterOperations::getProperty(property);
+}
+
+std::string RerouteFilterOperation::getString(std::string_view property)
+{
+    if (property == "newdestination") {
+        return newDest.load();
+    }
+    if (property == "condition") {
+        auto cond = conditions.lock();
+        if (cond->empty()) {
+            return {};
+        }
+        if (cond->size() == 1) {
+            return *cond->begin();
+        }
+        std::string results{"["};
+        for (const auto& condition : cond) {
+            results.push_back('"');
+            results.append(condition);
+            results.push_back('"');
+            results.push_back(',');
+        }
+        results.pop_back();
+        results.push_back(']');
+        return results;
+    }
+    return FilterOperations::getString(property);
 }
 
 std::shared_ptr<FilterOperator> RerouteFilterOperation::getOperator()
@@ -290,9 +399,9 @@ std::string newDestGeneration(const std::string& src, const std::string& dest, s
     if (formula.find_first_of('$') == std::string::npos) {
         return formula;
     }
-    std::regex srcreg(R"(\$\{source\})");
+    const std::regex srcreg(R"(\$\{source\})");
     formula = std::regex_replace(formula, srcreg, std::string{src});
-    std::regex destreg(R"(\$\{dest\})");
+    const std::regex destreg(R"(\$\{dest\})");
     formula = std::regex_replace(formula, destreg, std::string{dest});
     return formula;
 }
@@ -305,8 +414,8 @@ std::string RerouteFilterOperation::rerouteOperation(const std::string& src,
         return newDestGeneration(src, dest, newDest.load());
     }
 
-    for (const auto& sr : *cond) {
-        std::regex reg(sr);
+    for (const auto& condition : *cond) {
+        const std::regex reg(condition);
         if (std::regex_search(dest, reg, std::regex_constants::match_any)) {
             return newDestGeneration(src, dest, newDest.load());
         }
@@ -325,6 +434,16 @@ FirewallFilterOperation::~FirewallFilterOperation() = default;
 void FirewallFilterOperation::set(std::string_view /*property*/, double /*val*/) {}
 
 void FirewallFilterOperation::setString(std::string_view /*property*/, std::string_view /*val*/) {}
+
+double FirewallFilterOperation::getProperty(std::string_view property)
+{
+    return FilterOperations::getProperty(property);
+}
+
+std::string FirewallFilterOperation::getString(std::string_view property)
+{
+    return FilterOperations::getString(property);
+}
 
 std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator()
 {
@@ -377,6 +496,35 @@ void CloneFilterOperation::setString(std::string_view property, std::string_view
         throw(helics::InvalidParameter(std::string(
             std::string("property ") + std::string(property) + " is not a known property")));
     }
+}
+
+double CloneFilterOperation::getProperty(std::string_view property)
+{
+    return FilterOperations::getProperty(property);
+}
+
+std::string CloneFilterOperation::getString(std::string_view property)
+{
+    if (property == "delivery") {
+        auto handle = deliveryAddresses.lock();
+        if (handle->empty()) {
+            return {};
+        }
+        if (handle->size() == 1) {
+            return *(handle->begin());
+        }
+        std::string results{"["};
+        for (auto& address : handle) {
+            results.push_back('"');
+            results.append(address);
+            results.push_back('"');
+            results.push_back(',');
+        }
+        results.pop_back();
+        results.push_back(']');
+        return results;
+    }
+    return FilterOperations::getString(property);
 }
 
 std::shared_ptr<FilterOperator> CloneFilterOperation::getOperator()

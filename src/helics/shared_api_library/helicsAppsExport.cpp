@@ -91,6 +91,11 @@ std::shared_ptr<helics::apps::App> buildApp(std::string_view type, std::string_v
     return nullptr;
 }
 }  // namespace
+
+HelicsBool helicsAppEnabled()
+{
+    return HELICS_TRUE;
+}
 HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* configFile, HelicsFederateInfo fedInfo, HelicsError* err)
 {
     static constexpr const char* invalidAppTypeString =

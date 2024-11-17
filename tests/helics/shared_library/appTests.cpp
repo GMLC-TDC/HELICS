@@ -26,36 +26,41 @@ TEST(app_tests, load_error)
     EXPECT_NE(err.error_code, 0);
 }
 
-/** this the same test as in the player tests
+/** this is the same test as in the player tests
 just meant to test the methods in C not the player itself
 */
 TEST(app_tests, simple_player)
 {
+    if (helicsAppEnabled() != HELICS_TRUE) {
+        EXPECT_TRUE(true);
+        return;
+    }
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreName(fedInfo, "pscore1", &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
-
+    helicsFederateInfoSetCoreInitString(fedInfo,
+                                        "-f2 --brokername=player_broker --autobroker",
+                                        &err);
     auto play1 = helicsCreateApp("playerc1", "player", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(play1) == HELICS_TRUE);
-
     auto play1Fed = helicsAppGetFederate(play1, &err);
     EXPECT_TRUE(helicsFederateIsValid(play1Fed));
 
     helicsAppLoadFile(play1, (std::string(APP_TEST_DIR) + "example1.player").c_str(), &err);
     EXPECT_EQ(err.error_code, 0);
-    auto vFed = helicsCreateValueFederate("block1", fedInfo, &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "", &err);
 
+    auto vFed = helicsCreateValueFederate("block1", fedInfo, &err);
     auto sub1 = helicsFederateRegisterSubscription(vFed, "pub1", nullptr, &err);
     auto sub2 = helicsFederateRegisterSubscription(vFed, "pub2", nullptr, &err);
     auto err2 = helicsErrorInitialize();
 
-    auto fut = std::async(std::launch::async, [&play1, &err2]() { helicsAppRun(play1, &err2); });
+    auto thread1 = std::thread([&play1, &err2]() { helicsAppRun(play1, &err2); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     helicsFederateEnterExecutingMode(vFed, &err);
     auto val = helicsInputGetDouble(sub1, &err);
     EXPECT_EQ(val, 0.3);
-
     auto retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 1.0);
     val = helicsInputGetDouble(sub1, &err);
@@ -69,7 +74,6 @@ TEST(app_tests, simple_player)
     EXPECT_EQ(val, 0.7);
     val = helicsInputGetDouble(sub2, &err);
     EXPECT_EQ(val, 0.6);
-
     retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 3.0);
     val = helicsInputGetDouble(sub1, &err);
@@ -80,18 +84,22 @@ TEST(app_tests, simple_player)
     retTime = helicsFederateRequestTime(vFed, 5, &err);
     EXPECT_EQ(retTime, 5.0);
     helicsFederateDestroy(vFed);
-    fut.get();
+    thread1.join();
     EXPECT_EQ(err2.error_code, 0);
     EXPECT_EQ(err.error_code, 0);
 }
 
 TEST(app_tests, recorder)
 {
+    if (helicsAppEnabled() != HELICS_TRUE) {
+        EXPECT_TRUE(true);
+        return;
+    }
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreName(fedInfo, "rcore1", &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --brokername=rec_broker --autobroker", &err);
 
     auto rec1 = helicsCreateApp("recc1", "recorder", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(rec1) == HELICS_TRUE);
@@ -107,8 +115,7 @@ TEST(app_tests, recorder)
 
     auto err2 = helicsErrorInitialize();
 
-    auto fut =
-        std::async(std::launch::async, [&rec1, &err2]() { helicsAppRunTo(rec1, 4.0, &err2); });
+    auto thread1 = std::thread([&rec1, &err2]() { helicsAppRunTo(rec1, 4.0, &err2); });
     helicsFederateEnterExecutingMode(vFed, &err);
     auto retTime = helicsFederateRequestTime(vFed, 1, &err);
     EXPECT_EQ(retTime, 1.0);
@@ -131,7 +138,7 @@ TEST(app_tests, recorder)
 
     helicsFederateDestroy(vFed);
 
-    fut.get();
+    thread1.join();
 
     helicsAppDestroy(rec1);
 
@@ -140,12 +147,16 @@ TEST(app_tests, recorder)
 
 TEST(app_tests, connector)
 {
+    if (helicsAppEnabled() != HELICS_TRUE) {
+        EXPECT_TRUE(true);
+        return;
+    }
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetTimeProperty(fedInfo, HELICS_PROPERTY_TIME_PERIOD, 1.0, &err);
     helicsFederateInfoSetCoreName(fedInfo, "ccoref5", &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --brokername=conn_broker --autobroker", &err);
 
     auto conn1 = helicsCreateApp("connectorc1", "connector", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(conn1) == HELICS_TRUE);
@@ -166,7 +177,7 @@ TEST(app_tests, connector)
         helicsFederateRegisterGlobalInput(vFed, "inp2", HELICS_DATA_TYPE_DOUBLE, nullptr, &err);
     helicsFederateSetGlobal(vFed, "tag2", "true", &err);
     auto err2 = helicsErrorInitialize();
-    auto fut = std::async(std::launch::async, [&conn1, &err2]() { helicsAppRun(conn1, &err2); });
+    auto thread1 = std::thread([&conn1, &err2]() { helicsAppRun(conn1, &err2); });
     helicsFederateEnterExecutingMode(vFed, &err);
 
     const double testValue = 3452.562;
@@ -180,7 +191,7 @@ TEST(app_tests, connector)
     val = helicsInputGetDouble(inp2, &err);
     EXPECT_EQ(val, testValue);
     helicsFederateDestroy(vFed);
-    fut.get();
+    thread1.join();
     EXPECT_EQ(err2.error_code, 0);
 
     helicsAppDestroy(conn1);
@@ -188,11 +199,15 @@ TEST(app_tests, connector)
 
 TEST(app_tests, echo)
 {
+    if (helicsAppEnabled() != HELICS_TRUE) {
+        EXPECT_TRUE(true);
+        return;
+    }
     auto err = helicsErrorInitialize();
     HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreName(fedInfo, "ecore4-file", &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --autobroker", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f2 --brokername=echo_broker --autobroker", &err);
 
     auto echo1 = helicsCreateApp("echoc1", "echo", NULL, fedInfo, &err);
     EXPECT_TRUE(helicsAppIsActive(echo1) == HELICS_TRUE);
@@ -204,8 +219,7 @@ TEST(app_tests, echo)
 
     auto ep1 = helicsFederateRegisterEndpoint(mFed, "src", "", &err);
     auto err2 = helicsErrorInitialize();
-    auto fut =
-        std::async(std::launch::async, [&echo1, &err2]() { helicsAppRunTo(echo1, 5.0, &err2); });
+    auto thread1 = std::thread([&echo1, &err2]() { helicsAppRunTo(echo1, 5.0, &err2); });
     helicsFederateEnterExecutingMode(mFed, &err);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     helicsEndpointSendStringTo(ep1, "hello world", "test", &err);
@@ -231,6 +245,6 @@ TEST(app_tests, echo)
     EXPECT_STREQ(helicsMessageGetSource(message), "test2");
     helicsMessageFree(message);
     helicsFederateDestroy(mFed);
-    fut.get();
+    thread1.join();
     EXPECT_EQ(err2.error_code, 0);
 }
