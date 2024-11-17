@@ -983,7 +983,7 @@ public class helics implements helicsConstants {
    * Combination federates are both value federates and message federates, objects can be used in all functions<br>
    *          that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument<br>
    * <br>
-   * @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.<br>
+   * @param configFile A JSON file or a JSON string,TOML file, or command line arguments that contains setup and configuration information.<br>
    * <br>
    * @param err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
    * <br>
@@ -2469,6 +2469,128 @@ public class helics implements helicsConstants {
   }
 
   /**
+   *  HELICS_TRUE if the app library is enabled
+   */
+  public static int helicsAppEnabled() {
+    return helicsJNI.helicsAppEnabled();
+  }
+
+  /**
+   * Create a HelicsApp object.<br>
+   * <br>
+   * Create a HelicsApp object.<br>
+   * <br>
+   * @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config file.<br>
+   * @param appType The type of app to create.<br>
+   * @param configFile Configuration file or string to pass into the app, can be NULL or empty.<br>
+   * @param fedInfo The federate information to pass into the app, can be NULL.<br>
+   * @param err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
+   * <br>
+   * <br>
+   * @return An opaque value app object, or nullptr if the object creation failed.
+   */
+  public static SWIGTYPE_p_void helicsCreateApp(String appName, String appType, String configFile, SWIGTYPE_p_void fedInfo) {
+    long cPtr = helicsJNI.helicsCreateApp(appName, appType, configFile, SWIGTYPE_p_void.getCPtr(fedInfo));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
+   *  Run the HelicsApp.<br>
+   * Execute the HelicsApp to completion<br>
+   * @param app The app to execute.<br>
+   * @param err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
+   * <br>
+   * @return An opaque value federate object that can be used in any of the federate methods, not recommended to use this object to advance<br>
+   * time, the app will not likely function normally; other query, information calls, or modification calls on the federate are fine.
+   */
+  public static SWIGTYPE_p_void helicsAppGetFederate(SWIGTYPE_p_void app) {
+    long cPtr = helicsJNI.helicsAppGetFederate(SWIGTYPE_p_void.getCPtr(app));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
+   * Create a HelicsApp object.<br>
+   * <br>
+   * Create a HelicsApp object.<br>
+   * <br>
+   * <br>
+   * <br>
+   * @param configFile Configuration file or string to pass into the app, can be NULL or empty.<br>
+   * <br>
+   * @param err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
+   * <br>
+   * @return An opaque value app object, or nullptr if the object creation failed.
+   */
+  public static void helicsAppLoadFile(SWIGTYPE_p_void app, String configFile) {
+    helicsJNI.helicsAppLoadFile(SWIGTYPE_p_void.getCPtr(app), configFile);
+  }
+
+  /**
+   *  Initialize the HelicsApp federate.<br>
+   * Generate all the interfaces and load data for the application.<br>
+   * @param app The app to initialize.<br>
+   * @param err An error object that will contain an error code and string if any error occurred during the execution of the function.
+   */
+  public static void helicsAppInitialize(SWIGTYPE_p_void app) {
+    helicsJNI.helicsAppInitialize(SWIGTYPE_p_void.getCPtr(app));
+  }
+
+  /**
+   *  Run the HelicsApp.<br>
+   * Execute the app to completion.<br>
+   * @param app The app to execute.<br>
+   * @param err An error object that will contain an error code and string if any error occurred during the execution of the function.
+   */
+  public static void helicsAppRun(SWIGTYPE_p_void app) {
+    helicsJNI.helicsAppRun(SWIGTYPE_p_void.getCPtr(app));
+  }
+
+  /**
+   *  Run a HelicsApp to a specified stop time.<br>
+   * It is possible to call this method repeatedly with different times.<br>
+   * @param app The app to run.<br>
+   * @param stopTime The desired stop time.<br>
+   * @param err An error object that will contain an error code and string if any error occurred during the execution of the function.
+   */
+  public static void helicsAppRunTo(SWIGTYPE_p_void app, double stopTime) {
+    helicsJNI.helicsAppRunTo(SWIGTYPE_p_void.getCPtr(app), stopTime);
+  }
+
+  /**
+   *  Finalize the HelicsApp.<br>
+   * @param app The app to finalize.<br>
+   * @param err An error object that will contain an error code and string if any error occurred during the execution of the function.
+   */
+  public static void helicsAppFinalize(SWIGTYPE_p_void app) {
+    helicsJNI.helicsAppFinalize(SWIGTYPE_p_void.getCPtr(app));
+  }
+
+  /**
+   *  Free the HelicsApp object.<br>
+   * @param app The app to free.
+   */
+  public static void helicsAppFree(SWIGTYPE_p_void app) {
+    helicsJNI.helicsAppFree(SWIGTYPE_p_void.getCPtr(app));
+  }
+
+  /**
+   *  Disconnect and free a HelicsApp.<br>
+   * @param app The app to destroy.
+   */
+  public static void helicsAppDestroy(SWIGTYPE_p_void app) {
+    helicsJNI.helicsAppDestroy(SWIGTYPE_p_void.getCPtr(app));
+  }
+
+  /**
+   *  Check if the HelicsApp is active and ready to run.<br>
+   * @param app The app to check.<br>
+   * @return True if the app is active, otherwise false.
+   */
+  public static int helicsAppIsActive(SWIGTYPE_p_void app) {
+    return helicsJNI.helicsAppIsActive(SWIGTYPE_p_void.getCPtr(app));
+  }
+
+  /**
    * input/publication registration<br>
    * <br>
    * Create an input and add a publication target.<br>
@@ -3833,6 +3955,62 @@ public class helics implements helicsConstants {
    * Send a message to the targeted destination.<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
+   * @param message The string to send.<br>
+   * @param err A pointer to an error object for catching errors.
+   */
+  public static void helicsEndpointSendString(SWIGTYPE_p_void endpoint, String message) {
+    helicsJNI.helicsEndpointSendString(SWIGTYPE_p_void.getCPtr(endpoint), message);
+  }
+
+  /**
+   * Send a message to the specified destination.<br>
+   * <br>
+   * @param endpoint The endpoint to send the data from.<br>
+   * <br>
+   * @param message The string to send.<br>
+   * <br>
+   * @param dst The target destination. Use nullptr to send to the default destination.<br>
+   * @param err A pointer to an error object for catching errors.
+   */
+  public static void helicsEndpointSendStringTo(SWIGTYPE_p_void endpoint, String message, String dst) {
+    helicsJNI.helicsEndpointSendStringTo(SWIGTYPE_p_void.getCPtr(endpoint), message, dst);
+  }
+
+  /**
+   * Send a message to the specified destination at a specific time.<br>
+   * <br>
+   * @param endpoint The endpoint to send the data from.<br>
+   * @param message The data to send.<br>
+   * <br>
+   * @param dst The target destination. Use nullptr to send to the default destination.<br>
+   * <br>
+   * @param time The time the message should be sent.<br>
+   * <br>
+   * @param err A pointer to an error object for catching errors.
+   */
+  public static void helicsEndpointSendStringToAt(SWIGTYPE_p_void endpoint, String message, String dst, double time) {
+    helicsJNI.helicsEndpointSendStringToAt(SWIGTYPE_p_void.getCPtr(endpoint), message, dst, time);
+  }
+
+  /**
+   * Send a message at a specific time to the targeted destinations.<br>
+   * <br>
+   * @param endpoint The endpoint to send the data from.<br>
+   * <br>
+   * @param message The data to send.<br>
+   * <br>
+   * @param time The time the message should be sent.<br>
+   * <br>
+   * @param err A pointer to an error object for catching errors.
+   */
+  public static void helicsEndpointSendStringAt(SWIGTYPE_p_void endpoint, String message, double time) {
+    helicsJNI.helicsEndpointSendStringAt(SWIGTYPE_p_void.getCPtr(endpoint), message, time);
+  }
+
+  /**
+   * Send a message to the targeted destination.<br>
+   * <br>
+   * @param endpoint The endpoint to send the data from.<br>
    * @param data The data to send.<br>
    * <br>
    * @param inputDataLength The length of the data to send.<br>
@@ -4778,6 +4956,29 @@ public class helics implements helicsConstants {
    */
   public static void helicsFilterSetString(SWIGTYPE_p_void filt, String prop, String val) {
     helicsJNI.helicsFilterSetString(SWIGTYPE_p_void.getCPtr(filt), prop, val);
+  }
+
+  /**
+   * Get a double property from a filter.<br>
+   * <br>
+   * @param filt The filter to retrieve a value from.<br>
+   * @param prop A string containing the property to get.<br>
+   * <br>
+   * 
+   */
+  public static double helicsFilterGetPropertyDouble(SWIGTYPE_p_void filt, String prop) {
+    return helicsJNI.helicsFilterGetPropertyDouble(SWIGTYPE_p_void.getCPtr(filt), prop);
+  }
+
+  /**
+   * Get a string property on a filter.  The string output memory is valid until a subsequent call to getPropertyString on the particular<br>
+   * filter.<br>
+   * <br>
+   * @param filt The filter to retrieve a value from.<br>
+   * @param prop A string containing the property to get.
+   */
+  public static String helicsFilterGetPropertyString(SWIGTYPE_p_void filt, String prop) {
+    return helicsJNI.helicsFilterGetPropertyString(SWIGTYPE_p_void.getCPtr(filt), prop);
   }
 
   /**
