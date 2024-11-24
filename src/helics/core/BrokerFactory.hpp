@@ -32,7 +32,7 @@ namespace BrokerFactory {
     class BrokerTypeBuilder final: public BrokerBuilder {
       public:
         static_assert(std::is_base_of<Broker, BrokerTYPE>::value,
-                      "Type does not inherit from helics::Core");
+                      "Type does not inherit from helics::Broker");
 
         using broker_build_type = BrokerTYPE;
         virtual std::shared_ptr<Broker> build(std::string_view name) override
@@ -55,6 +55,7 @@ namespace BrokerFactory {
         defineBrokerBuilder(bbld, brokerTypeName, code);
         return bbld;
     }
+
     /**
      * Creates a Broker object of the specified type.
      *

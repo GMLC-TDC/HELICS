@@ -11,13 +11,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CommonCore.hpp"
 #include "CoreTypes.hpp"
+#include "coreTypeOperations.hpp"
 #include "EmptyCore.hpp"
 #include "core-exceptions.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/libguarded/shared_guarded.hpp"
 #include "helics/helics-config.h"
-#include "helicsCLI11.hpp"
 
 #include <cassert>
 #include <cstring>
@@ -134,12 +134,7 @@ Core* getEmptyCorePtr()
 
 std::shared_ptr<Core> create(std::string_view initializationString)
 {
-    helicsCLI11App tparser;
-    tparser.remove_helics_specifics();
-    tparser.addTypeOption();
-    tparser.allow_extras();
-    tparser.parse(std::string(initializationString));
-    return create(tparser.getCoreType(), gHelicsEmptyString, tparser.remaining_for_passthrough());
+    return create(CoreType::EXTRACT, gHelicsEmptyString, initializationString);
 }
 
 std::shared_ptr<Core> create(CoreType type, std::string_view configureString)
@@ -150,6 +145,20 @@ std::shared_ptr<Core> create(CoreType type, std::string_view configureString)
 std::shared_ptr<Core>
     create(CoreType type, std::string_view coreName, std::string_view configureString)
 {
+    std::string newName;
+    CoreType newType;
+    if (type == CoreType::EXTRACT || coreName.empty())
+    {
+        std::tie(newType,newName) = core::extractCoreType(std::string{configureString});
+        if (coreName.empty() && !newName.empty())
+        {
+            coreName=newName;
+        }
+        if (type == CoreType::EXTRACT)
+        {
+            type=newType;
+        }
+    }
     auto core = makeCore(type, coreName);
     if (!core) {
         throw(helics::RegistrationFailure("unable to create core"));
@@ -165,13 +174,7 @@ std::shared_ptr<Core>
 
 std::shared_ptr<Core> create(std::vector<std::string> args)
 {
-    helicsCLI11App tparser;
-    tparser.remove_helics_specifics();
-    tparser.addTypeOption();
-
-    tparser.allow_extras();
-    tparser.parse(std::move(args));
-    return create(tparser.getCoreType(), gHelicsEmptyString, tparser.remaining_for_passthrough());
+    return create(CoreType::EXTRACT, gHelicsEmptyString, args);
 }
 
 std::shared_ptr<Core> create(CoreType type, std::vector<std::string> args)
@@ -182,6 +185,22 @@ std::shared_ptr<Core> create(CoreType type, std::vector<std::string> args)
 std::shared_ptr<Core>
     create(CoreType type, std::string_view coreName, std::vector<std::string> args)
 {
+
+    std::string newName;
+    CoreType newType;
+    if (type == CoreType::EXTRACT || coreName.empty())
+    {
+        std::tie(newType,newName) = core::extractCoreType(args);
+        if (coreName.empty() && !newName.empty())
+        {
+            coreName=newName;
+        }
+        if (type == CoreType::EXTRACT)
+        {
+            type=newType;
+        }
+    }
+
     auto core = makeCore(type, coreName);
     core->configureFromVector(std::move(args));
     if (!registerCore(core, type)) {
@@ -194,13 +213,7 @@ std::shared_ptr<Core>
 
 std::shared_ptr<Core> create(int argc, char* argv[])
 {
-    helicsCLI11App tparser;
-    tparser.remove_helics_specifics();
-    tparser.addTypeOption();
-
-    tparser.allow_extras();
-    tparser.parse(argc, argv);
-    return create(tparser.getCoreType(), tparser.remaining_for_passthrough());
+    return create(CoreType::EXTRACT, gHelicsEmptyString, argc,argv);
 }
 
 std::shared_ptr<Core> create(CoreType type, int argc, char* argv[])
@@ -210,6 +223,20 @@ std::shared_ptr<Core> create(CoreType type, int argc, char* argv[])
 
 std::shared_ptr<Core> create(CoreType type, std::string_view coreName, int argc, char* argv[])
 {
+    std::string newName;
+    CoreType newType;
+    if (type == CoreType::EXTRACT || coreName.empty())
+    {
+        std::tie(newType,newName) = core::extractCoreType(argc,argv);
+        if (coreName.empty() && !newName.empty())
+        {
+            coreName=newName;
+        }
+        if (type == CoreType::EXTRACT)
+        {
+            type=newType;
+        }
+    }
     auto core = makeCore(type, coreName);
     core->configureFromArgs(argc, argv);
     if (!registerCore(core, type)) {

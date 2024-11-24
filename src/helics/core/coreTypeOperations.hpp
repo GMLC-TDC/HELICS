@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 /** @file
 @details function definitions for operations on core types
@@ -39,5 +40,12 @@ bool matchingTypes(std::string_view type1, std::string_view type2);
 
 /** generate an extended version and system info string in json format*/
 std::string systemInfo();
+
+
+/** methods to extract the core type and name from various forms of arguments*/
+std::pair<CoreType,std::string> extractCoreType(const std::string &configureString);
+std::pair<CoreType,std::string> extractCoreType(const std::vector<std::string> &args);
+std::pair<CoreType,std::string> extractCoreType(int argc, char *argv[]);
+
 
 }  // namespace helics::core

@@ -154,6 +154,8 @@ class BrokerBase {
     decltype(std::chrono::steady_clock::now()) disconnectTime;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
+    std::string configString; //!< storage for a config file location
+    bool fileInUse{false};
   private:
     /// buffer for profiling messages
     std::shared_ptr<ProfilerBuffer> prBuff;
@@ -170,6 +172,17 @@ class BrokerBase {
     explicit BrokerBase(std::string_view broker_name, bool DisableQueue = false);
 
     virtual ~BrokerBase();
+
+    /** load broker information object from a toml string either a file or toml string
+    @param toml a string containing the name of the toml file or toml contents
+    */
+    void loadInfoFromToml(const std::string& toml, bool runArgParser = true);
+
+    /** load broker information from a JSON string either a file or JSON string
+    @param json a string containing the name of the JSON file or JSON contents
+    */
+    void loadInfoFromJson(const std::string& json, bool runArgParser = true);
+
     /** parse configuration information from command line arguments
     @return 0 for OK, positive numbers for expected information calls and negative number for error
     */
