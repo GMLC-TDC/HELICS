@@ -22,6 +22,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <string>
 #include <unordered_map>
+#include <memory>
+#include <vector>
+#include <utility>
 
 namespace frozen {
 template<>
@@ -315,24 +318,24 @@ bool matchingTypes(std::string_view type1, std::string_view type2)
 namespace {
     std::unique_ptr<helicsCLI11App> makeCLITypeApp(std::string& corestring, std::string& namestring)
     {
-        auto app = std::make_unique<helicsCLI11App>("type extraction app");
-        app->remove_helics_specifics();
-        app->option_defaults()->ignore_case()->ignore_underscore();
-        app->allow_config_extras(CLI::config_extras_mode::ignore_all);
-        app->allow_extras();
-        app->set_config("--config-file,--config,config",
-                        "helicsConfig.ini",
-                        "specify a configuration file");
+    auto app = std::make_unique<helicsCLI11App>("type extraction app");
+    app->remove_helics_specifics();
+    app->option_defaults()->ignore_case()->ignore_underscore();
+    app->allow_config_extras(CLI::config_extras_mode::ignore_all);
+    app->allow_extras();
+    app->set_config("--config-file,--config,config",
+        "helicsConfig.ini",
+        "specify a configuration file");
         app->add_option("--name,--identifier", namestring);
-        auto* fmtr = addJsonConfig(app.get());
-        fmtr->maxLayers(0);
-        fmtr->promoteSection("helics");
-        auto* networking = app->add_option_group("network type")->immediate_callback();
+    auto* fmtr = addJsonConfig(app.get());
+    fmtr->maxLayers(0);
+    fmtr->promoteSection("helics");
+    auto* networking = app->add_option_group("network type")->immediate_callback();
         networking->add_option("--core", corestring);
         networking->add_option("--coretype,-t", corestring)->envname("HELICS_CORE_TYPE");
-        app->add_subcommand("broker")->fallthrough();
-        app->add_subcommand("core")->fallthrough();
-        return app;
+    app->add_subcommand("broker")->fallthrough();
+    app->add_subcommand("core")->fallthrough();
+    return app;
     }
 }  // namespace
 
@@ -341,9 +344,9 @@ std::pair<CoreType, std::string> extractCoreType(const std::string& configureStr
     std::string corestring;
     std::string namestring;
     auto app = makeCLITypeApp(corestring, namestring);
-    auto type = fileops::getConfigType(configureString);
-    try {
-        switch (type) {
+        auto type = fileops::getConfigType(configureString);
+        try {
+            switch (type) {
             case fileops::ConfigType::JSON_FILE: {
                 std::ifstream file{configureString};
                 app->parse_from_stream(file);
@@ -381,14 +384,14 @@ std::pair<CoreType, std::string> extractCoreType(const std::string& configureStr
                 break;
             case fileops::ConfigType::NONE:
                 break;
+            }
         }
-    }
     catch (const std::exception&) {
-        corestring.clear();
-    }
+            corestring.clear();
+        }
     if (corestring.empty()) {
         return {CoreType::DEFAULT, namestring};
-    }
+        }
     return {coreTypeFromString(corestring), namestring};
 }
 

@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <future>
+#include <string>
 
 /** test the assignment and retrieval of global value from a broker object*/
 TEST(brokers, global_value)
