@@ -60,7 +60,7 @@ typedef enum { /* NOLINT */
                   calls*/
                HELICS_CORE_TYPE_EMPTY = 77,
                /** core type specification to allow extraction from later arguments or files*/
-               HELICS_CORE_TYPE_EXTRACT=101
+               HELICS_CORE_TYPE_EXTRACT = 101
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/

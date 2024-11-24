@@ -68,7 +68,7 @@ enum class CoreType : int {
     EMPTY = HELICS_CORE_TYPE_EMPTY,  //!< core type that does nothing and can't communicate
     UNRECOGNIZED = 22,  //!< unknown
     MULTI = 45,  //!< use the multi-broker
-    EXTRACT=HELICS_CORE_TYPE_EXTRACT //!< extract core type from later arguments/files
+    EXTRACT = HELICS_CORE_TYPE_EXTRACT  //!< extract core type from later arguments/files
 };
 
 /** enumeration of the possible message processing results*/

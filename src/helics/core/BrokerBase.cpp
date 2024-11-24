@@ -7,13 +7,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerBase.hpp"
 
-#include "../common/logging.hpp"
 #include "../common/configFileHelpers.hpp"
+#include "../common/logging.hpp"
 #include "AsyncTimeCoordinator.hpp"
 #include "ForwardingTimeCoordinator.hpp"
 #include "GlobalTimeCoordinator.hpp"
 #include "LogManager.hpp"
 #include "ProfilerBuffer.hpp"
+#include "core-exceptions.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
@@ -23,7 +24,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
-#include "core-exceptions.hpp"
 
 #include <fmt/format.h>
 
@@ -326,62 +326,59 @@ int BrokerBase::parseArgs(std::vector<std::string> args)
 
 int BrokerBase::parseArgs(std::string_view initializationString)
 {
-
     auto type = fileops::getConfigType(initializationString);
-    
-    
+
     switch (type) {
-    case fileops::ConfigType::JSON_FILE:
-        fileInUse = true;
-        loadInfoFromJson(std::string(initializationString));
-        configString = initializationString;
-        return 0;
-    case fileops::ConfigType::JSON_STRING:
-        try {
-           loadInfoFromJson(std::string(initializationString));
-           configString = initializationString;
-           return 0;
-        }
-        catch (const helics::InvalidParameter&) {
-            if (fileops::looksLikeConfigToml(initializationString)) {
-                try {
-                    loadInfoFromToml(std::string(initializationString));
-                    configString = initializationString;
-                    return 0;
-                }
-                catch (const helics::InvalidParameter&) {
-                    if (fileops::looksLikeCommandLine(initializationString)) {
-                       
-                        break;
-                    }
-                    throw;
-                }
+        case fileops::ConfigType::JSON_FILE:
+            fileInUse = true;
+            loadInfoFromJson(std::string(initializationString));
+            configString = initializationString;
+            return 0;
+        case fileops::ConfigType::JSON_STRING:
+            try {
+                loadInfoFromJson(std::string(initializationString));
+                configString = initializationString;
+                return 0;
             }
-            throw;
-        }
-        break;
-    case fileops::ConfigType::TOML_FILE:
-        fileInUse = true;
-        loadInfoFromToml(std::string(initializationString));
-        configString = initializationString;
-        return 0;
-    case fileops::ConfigType::TOML_STRING:
-        try {
+            catch (const helics::InvalidParameter&) {
+                if (fileops::looksLikeConfigToml(initializationString)) {
+                    try {
+                        loadInfoFromToml(std::string(initializationString));
+                        configString = initializationString;
+                        return 0;
+                    }
+                    catch (const helics::InvalidParameter&) {
+                        if (fileops::looksLikeCommandLine(initializationString)) {
+                            break;
+                        }
+                        throw;
+                    }
+                }
+                throw;
+            }
+            break;
+        case fileops::ConfigType::TOML_FILE:
+            fileInUse = true;
             loadInfoFromToml(std::string(initializationString));
             configString = initializationString;
             return 0;
-        }
-        catch (const helics::InvalidParameter&) {
-            if (fileops::looksLikeCommandLine(configString)) {
-                break;
+        case fileops::ConfigType::TOML_STRING:
+            try {
+                loadInfoFromToml(std::string(initializationString));
+                configString = initializationString;
+                return 0;
             }
-            throw;
-        }
-        break;
-    case fileops::ConfigType::CMD_LINE:
-        break;
-    case fileops::ConfigType::NONE:
-        return 0;
+            catch (const helics::InvalidParameter&) {
+                if (fileops::looksLikeCommandLine(configString)) {
+                    break;
+                }
+                throw;
+            }
+            break;
+        case fileops::ConfigType::CMD_LINE:
+            break;
+        case fileops::ConfigType::NONE:
+            return 0;
     }
 
     auto app = generateBaseCLI();
@@ -389,10 +386,7 @@ int BrokerBase::parseArgs(std::string_view initializationString)
     app->add_subcommand(sApp);
     auto res = app->helics_parse(std::string(initializationString));
     return static_cast<int>(res);
-    
 }
-
-
 
 void BrokerBase::loadInfoFromJson(const std::string& jsonString, bool runArgParser)
 {
@@ -405,7 +399,7 @@ void BrokerBase::loadInfoFromJson(const std::string& jsonString, bool runArgPars
     }
     const bool hasHelicsSection = doc.contains("helics");
     bool hasHelicsSubSection{false};
-    bool hasHelicsBrokerSubSection{ false };
+    bool hasHelicsBrokerSubSection{false};
     if (hasHelicsSection) {
         hasHelicsSubSection = doc["helics"].contains("helics");
         hasHelicsBrokerSubSection = doc["helics"].contains("broker");
@@ -430,15 +424,13 @@ void BrokerBase::loadInfoFromJson(const std::string& jsonString, bool runArgPars
                         std::istringstream jstringHelicsSub(jsonString);
                         app->parse_from_stream(jstringHelicsSub);
                     }
-                    if (hasHelicsBrokerSubSection)
-                    {
+                    if (hasHelicsBrokerSubSection) {
                         app->get_config_formatter_base()->section("helics.broker");
                         std::istringstream jstringHelicsSub(jsonString);
                         app->parse_from_stream(jstringHelicsSub);
                     }
                 }
-                if (hasBrokerSection)
-                {
+                if (hasBrokerSection) {
                     app->get_config_formatter_base()->section("broker");
                     std::istringstream jstringBroker(jsonString);
                     app->parse_from_stream(jstringBroker);
@@ -457,16 +449,14 @@ void BrokerBase::loadInfoFromJson(const std::string& jsonString, bool runArgPars
                         app->get_config_formatter_base()->section("helics.helics");
                         app->parse_from_stream(file);
                     }
-                    if (hasHelicsBrokerSubSection)
-                    {
+                    if (hasHelicsBrokerSubSection) {
                         file.clear();
                         file.seekg(0);
                         app->get_config_formatter_base()->section("helics.broker");
                         app->parse_from_stream(file);
                     }
                 }
-                if (hasBrokerSection)
-                {
+                if (hasBrokerSection) {
                     file.clear();
                     file.seekg(0);
                     app->get_config_formatter_base()->section("broker");
@@ -480,7 +470,6 @@ void BrokerBase::loadInfoFromJson(const std::string& jsonString, bool runArgPars
     }
 }
 
-
 void BrokerBase::loadInfoFromToml(const std::string& tomlString, bool runArgParser)
 {
     toml::value doc;
@@ -490,7 +479,6 @@ void BrokerBase::loadInfoFromToml(const std::string& tomlString, bool runArgPars
     catch (const std::invalid_argument& iarg) {
         throw(helics::InvalidParameter(iarg.what()));
     }
-
 
     if (runArgParser) {
         auto app = generateBaseCLI();

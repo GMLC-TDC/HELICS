@@ -6,22 +6,22 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "coreTypeOperations.hpp"
 
+#include "../common/configFileHelpers.hpp"
 #include "CoreTypes.hpp"
 #include "core-exceptions.hpp"
 #include "helics/helics-config.h"
 #include "helicsCLI11JsonConfig.hpp"
-#include "../common/configFileHelpers.hpp"
 
 #include <algorithm>
 #include <cctype>
 #include <frozen/set.h>
 #include <frozen/string.h>
 #include <frozen/unordered_map.h>
+#include <iostream>
 #include <map>
 #include <set>
 #include <string>
 #include <unordered_map>
-#include <iostream>
 
 namespace frozen {
 template<>
@@ -312,45 +312,38 @@ bool matchingTypes(std::string_view type1, std::string_view type2)
     return (res != global_match_strings.end());
 }
 
-namespace
-{
-    std::unique_ptr<helicsCLI11App> makeCLITypeApp(std::string &corestring,std::string &namestring)
+namespace {
+    std::unique_ptr<helicsCLI11App> makeCLITypeApp(std::string& corestring, std::string& namestring)
     {
-    auto app = std::make_unique<helicsCLI11App>("type extraction app");
-    app->remove_helics_specifics();
-    app->option_defaults()->ignore_case()->ignore_underscore();
-    app->allow_config_extras(CLI::config_extras_mode::ignore_all);
-    app->allow_extras();
-    app->set_config("--config-file,--config,config",
-        "helicsConfig.ini",
-        "specify a configuration file");
-    app->add_option("--name,--identifier",namestring);
-    auto* fmtr = addJsonConfig(app.get());
-    fmtr->maxLayers(0);
-    fmtr->promoteSection("helics");
-    auto* networking = app->add_option_group("network type")->immediate_callback();
-    networking
-        ->add_option(
-            "--core",corestring);
-    networking
-        ->add_option(
-            "--coretype,-t",corestring)
-        ->envname("HELICS_CORE_TYPE");
-    app->add_subcommand("broker")->fallthrough();
-    app->add_subcommand("core")->fallthrough();
-    return app;
-}
-}
+        auto app = std::make_unique<helicsCLI11App>("type extraction app");
+        app->remove_helics_specifics();
+        app->option_defaults()->ignore_case()->ignore_underscore();
+        app->allow_config_extras(CLI::config_extras_mode::ignore_all);
+        app->allow_extras();
+        app->set_config("--config-file,--config,config",
+                        "helicsConfig.ini",
+                        "specify a configuration file");
+        app->add_option("--name,--identifier", namestring);
+        auto* fmtr = addJsonConfig(app.get());
+        fmtr->maxLayers(0);
+        fmtr->promoteSection("helics");
+        auto* networking = app->add_option_group("network type")->immediate_callback();
+        networking->add_option("--core", corestring);
+        networking->add_option("--coretype,-t", corestring)->envname("HELICS_CORE_TYPE");
+        app->add_subcommand("broker")->fallthrough();
+        app->add_subcommand("core")->fallthrough();
+        return app;
+    }
+}  // namespace
 
-
-std::pair<CoreType,std::string> extractCoreType(const std::string & configureString)
+std::pair<CoreType, std::string> extractCoreType(const std::string& configureString)
 {
     std::string corestring;
     std::string namestring;
-    auto app=makeCLITypeApp(corestring,namestring);
-        auto type = fileops::getConfigType(configureString);
-        try {
-            switch (type) {
+    auto app = makeCLITypeApp(corestring, namestring);
+    auto type = fileops::getConfigType(configureString);
+    try {
+        switch (type) {
             case fileops::ConfigType::JSON_FILE: {
                 std::ifstream file{configureString};
                 app->parse_from_stream(file);
@@ -359,10 +352,12 @@ std::pair<CoreType,std::string> extractCoreType(const std::string & configureStr
             case fileops::ConfigType::JSON_STRING: {
                 std::istringstream jstring{configureString};
                 app->parse_from_stream(jstring);
-                break; }
+                break;
+            }
             case fileops::ConfigType::TOML_FILE: {
                 app->allow_extras();
-                auto dptr = std::static_pointer_cast<HelicsConfigJSON>(app->get_config_formatter_base());
+                auto dptr =
+                    std::static_pointer_cast<HelicsConfigJSON>(app->get_config_formatter_base());
                 if (dptr) {
                     dptr->skipJson(true);
                 }
@@ -370,10 +365,10 @@ std::pair<CoreType,std::string> extractCoreType(const std::string & configureStr
                 app->parse_from_stream(file);
                 break;
             }
-            case fileops::ConfigType::TOML_STRING:
-            {
+            case fileops::ConfigType::TOML_STRING: {
                 app->allow_extras();
-                auto dptr = std::static_pointer_cast<HelicsConfigJSON>(app->get_config_formatter_base());
+                auto dptr =
+                    std::static_pointer_cast<HelicsConfigJSON>(app->get_config_formatter_base());
                 if (dptr) {
                     dptr->skipJson(true);
                 }
@@ -386,45 +381,40 @@ std::pair<CoreType,std::string> extractCoreType(const std::string & configureStr
                 break;
             case fileops::ConfigType::NONE:
                 break;
-            }
         }
-        catch (const std::exception&)
-        {
-            corestring.clear();
-        }
-        if (corestring.empty())
-        {
-            return { CoreType::DEFAULT,namestring };
-        }
-        return { coreTypeFromString(corestring),namestring };
     }
-
-std::pair<CoreType,std::string> extractCoreType(const std::vector<std::string>& args)
-{
-    std::string corestring;
-    std::string namestring;
-    auto app=makeCLITypeApp(corestring,namestring);
-    auto vec=args;
-    app->helics_parse(vec);
-    if (corestring.empty())
-    {
-        return { CoreType::DEFAULT,namestring };
+    catch (const std::exception&) {
+        corestring.clear();
     }
-    return { coreTypeFromString(corestring),namestring };
-    
+    if (corestring.empty()) {
+        return {CoreType::DEFAULT, namestring};
+    }
+    return {coreTypeFromString(corestring), namestring};
 }
 
-std::pair<CoreType,std::string> extractCoreType(int argc, char* argv[])
+std::pair<CoreType, std::string> extractCoreType(const std::vector<std::string>& args)
 {
     std::string corestring;
     std::string namestring;
-    auto app=makeCLITypeApp(corestring,namestring);
-    app->helics_parse(argc,argv);
-    if (corestring.empty())
-    {
-        return { CoreType::DEFAULT,namestring };
+    auto app = makeCLITypeApp(corestring, namestring);
+    auto vec = args;
+    app->helics_parse(vec);
+    if (corestring.empty()) {
+        return {CoreType::DEFAULT, namestring};
     }
-    return { coreTypeFromString(corestring),namestring };
+    return {coreTypeFromString(corestring), namestring};
+}
+
+std::pair<CoreType, std::string> extractCoreType(int argc, char* argv[])
+{
+    std::string corestring;
+    std::string namestring;
+    auto app = makeCLITypeApp(corestring, namestring);
+    app->helics_parse(argc, argv);
+    if (corestring.empty()) {
+        return {CoreType::DEFAULT, namestring};
+    }
+    return {coreTypeFromString(corestring), namestring};
 }
 
 }  // namespace helics::core

@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CoreBroker.hpp"
 #include "CoreTypes.hpp"
-#include "coreTypeOperations.hpp"
 #include "core-exceptions.hpp"
+#include "coreTypeOperations.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
@@ -112,16 +112,13 @@ std::shared_ptr<Broker>
 {
     std::string newName;
     CoreType newType;
-    if (type == CoreType::EXTRACT || brokerName.empty())
-    {
-        std::tie(newType,newName) = core::extractCoreType(std::string{configureString});
-        if (brokerName.empty() && !newName.empty())
-        {
-            brokerName=newName;
+    if (type == CoreType::EXTRACT || brokerName.empty()) {
+        std::tie(newType, newName) = core::extractCoreType(std::string{configureString});
+        if (brokerName.empty() && !newName.empty()) {
+            brokerName = newName;
         }
-        if (type == CoreType::EXTRACT)
-        {
-            type=newType;
+        if (type == CoreType::EXTRACT) {
+            type = newType;
         }
     }
     auto broker = makeBroker(type, brokerName);
@@ -146,16 +143,13 @@ std::shared_ptr<Broker> create(CoreType type, std::string_view brokerName, int a
 {
     std::string newName;
     CoreType newType;
-    if (type == CoreType::EXTRACT || brokerName.empty())
-    {
-        std::tie(newType,newName) = core::extractCoreType(argc,argv);
-        if (brokerName.empty() && !newName.empty())
-        {
-            brokerName=newName;
+    if (type == CoreType::EXTRACT || brokerName.empty()) {
+        std::tie(newType, newName) = core::extractCoreType(argc, argv);
+        if (brokerName.empty() && !newName.empty()) {
+            brokerName = newName;
         }
-        if (type == CoreType::EXTRACT)
-        {
-            type=newType;
+        if (type == CoreType::EXTRACT) {
+            type = newType;
         }
     }
     auto broker = makeBroker(type, brokerName);
@@ -178,16 +172,13 @@ std::shared_ptr<Broker>
 {
     std::string newName;
     CoreType newType;
-    if (type == CoreType::EXTRACT || brokerName.empty())
-    {
-        std::tie(newType,newName) = core::extractCoreType(args);
-        if (brokerName.empty() && !newName.empty())
-        {
-            brokerName=newName;
+    if (type == CoreType::EXTRACT || brokerName.empty()) {
+        std::tie(newType, newName) = core::extractCoreType(args);
+        if (brokerName.empty() && !newName.empty()) {
+            brokerName = newName;
         }
-        if (type == CoreType::EXTRACT)
-        {
-            type=newType;
+        if (type == CoreType::EXTRACT) {
+            type = newType;
         }
     }
     auto broker = makeBroker(type, brokerName);

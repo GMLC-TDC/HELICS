@@ -154,8 +154,9 @@ class BrokerBase {
     decltype(std::chrono::steady_clock::now()) disconnectTime;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
-    std::string configString; //!< storage for a config file location
+    std::string configString;  //!< storage for a config file location
     bool fileInUse{false};
+
   private:
     /// buffer for profiling messages
     std::shared_ptr<ProfilerBuffer> prBuff;

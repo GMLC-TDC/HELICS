@@ -89,20 +89,21 @@ TEST(brokers, subbroker_min)
     brk->disconnect();
 
     EXPECT_TRUE(brk3->waitForDisconnect());
-    
 }
-
 
 /** test the assignment and retrieval of global value from a broker object*/
 TEST(brokers, subbroker_min_files)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::EXTRACT,
-        "",
-       std::string(TEST_DIR)+"broker_test_subbroker.json");
+                                             "",
+                                             std::string(TEST_DIR) + "broker_test_subbroker.json");
 
-    EXPECT_EQ(brk->getIdentifier(),"gbroker_f1");
+    EXPECT_EQ(brk->getIdentifier(), "gbroker_f1");
 
-    auto brk2 = helics::BrokerFactory::create(helics::CoreType::EXTRACT, "", std::string(TEST_DIR)+"broker_test_subbroker2.toml");
+    auto brk2 =
+        helics::BrokerFactory::create(helics::CoreType::EXTRACT,
+                                      "",
+                                      std::string(TEST_DIR) + "broker_test_subbroker2.toml");
 
     auto cr1 = helics::CoreFactory::create(helics::CoreType::TEST, "--name=cf1 --broker=gbf2");
 
@@ -120,7 +121,8 @@ TEST(brokers, subbroker_min_files)
     // this should not allow initializingMode entry since only 1 subbroker
     EXPECT_EQ(res, std::future_status::timeout);
 
-    auto cr2 = helics::CoreFactory::create(helics::CoreType::EXTRACT,std::string(TEST_DIR)+"broker_test_core.json");
+    auto cr2 = helics::CoreFactory::create(helics::CoreType::EXTRACT,
+                                           std::string(TEST_DIR) + "broker_test_core.json");
     auto fid3 = cr2->registerFederate("fed3", cf1);
 
     auto fut3 =
@@ -130,7 +132,9 @@ TEST(brokers, subbroker_min_files)
     // this should still not allow initializingMode entry since still only 1 subbroker
     EXPECT_EQ(res, std::future_status::timeout);
 
-    auto brk3 = helics::BrokerFactory::create(helics::CoreType::TEST, "gbf3", "{\"broker\":\"gbroker_f1\"}");
+    auto brk3 = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                              "gbf3",
+                                              "{\"broker\":\"gbroker_f1\"}");
 
     auto cr3 = helics::CoreFactory::create(helics::CoreType::TEST, "cf3", "broker=\"gbf3\"");
     auto fid4 = cr3->registerFederate("fed4", cf1);

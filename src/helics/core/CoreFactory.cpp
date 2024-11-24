@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CommonCore.hpp"
 #include "CoreTypes.hpp"
-#include "coreTypeOperations.hpp"
 #include "EmptyCore.hpp"
 #include "core-exceptions.hpp"
+#include "coreTypeOperations.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/libguarded/shared_guarded.hpp"
@@ -147,16 +147,13 @@ std::shared_ptr<Core>
 {
     std::string newName;
     CoreType newType;
-    if (type == CoreType::EXTRACT || coreName.empty())
-    {
-        std::tie(newType,newName) = core::extractCoreType(std::string{configureString});
-        if (coreName.empty() && !newName.empty())
-        {
-            coreName=newName;
+    if (type == CoreType::EXTRACT || coreName.empty()) {
+        std::tie(newType, newName) = core::extractCoreType(std::string{configureString});
+        if (coreName.empty() && !newName.empty()) {
+            coreName = newName;
         }
-        if (type == CoreType::EXTRACT)
-        {
-            type=newType;
+        if (type == CoreType::EXTRACT) {
+            type = newType;
         }
     }
     auto core = makeCore(type, coreName);
@@ -185,19 +182,15 @@ std::shared_ptr<Core> create(CoreType type, std::vector<std::string> args)
 std::shared_ptr<Core>
     create(CoreType type, std::string_view coreName, std::vector<std::string> args)
 {
-
     std::string newName;
     CoreType newType;
-    if (type == CoreType::EXTRACT || coreName.empty())
-    {
-        std::tie(newType,newName) = core::extractCoreType(args);
-        if (coreName.empty() && !newName.empty())
-        {
-            coreName=newName;
+    if (type == CoreType::EXTRACT || coreName.empty()) {
+        std::tie(newType, newName) = core::extractCoreType(args);
+        if (coreName.empty() && !newName.empty()) {
+            coreName = newName;
         }
-        if (type == CoreType::EXTRACT)
-        {
-            type=newType;
+        if (type == CoreType::EXTRACT) {
+            type = newType;
         }
     }
 
@@ -213,7 +206,7 @@ std::shared_ptr<Core>
 
 std::shared_ptr<Core> create(int argc, char* argv[])
 {
-    return create(CoreType::EXTRACT, gHelicsEmptyString, argc,argv);
+    return create(CoreType::EXTRACT, gHelicsEmptyString, argc, argv);
 }
 
 std::shared_ptr<Core> create(CoreType type, int argc, char* argv[])
@@ -225,16 +218,13 @@ std::shared_ptr<Core> create(CoreType type, std::string_view coreName, int argc,
 {
     std::string newName;
     CoreType newType;
-    if (type == CoreType::EXTRACT || coreName.empty())
-    {
-        std::tie(newType,newName) = core::extractCoreType(argc,argv);
-        if (coreName.empty() && !newName.empty())
-        {
-            coreName=newName;
+    if (type == CoreType::EXTRACT || coreName.empty()) {
+        std::tie(newType, newName) = core::extractCoreType(argc, argv);
+        if (coreName.empty() && !newName.empty()) {
+            coreName = newName;
         }
-        if (type == CoreType::EXTRACT)
-        {
-            type=newType;
+        if (type == CoreType::EXTRACT) {
+            type = newType;
         }
     }
     auto core = makeCore(type, coreName);
