@@ -171,7 +171,7 @@ std::shared_ptr<Core>
 
 std::shared_ptr<Core> create(std::vector<std::string> args)
 {
-    return create(CoreType::EXTRACT, gHelicsEmptyString, args);
+    return create(CoreType::EXTRACT, gHelicsEmptyString, std::move(args));
 }
 
 std::shared_ptr<Core> create(CoreType type, std::vector<std::string> args)

@@ -71,7 +71,7 @@ std::string to_string(CoreType type)
         case CoreType::EMPTY:
             return "empty_";
         default:
-            return std::string();
+            return {};
     }
 }
 static constexpr frozen::unordered_map<std::string_view, CoreType, 57> coreTypes{
@@ -323,9 +323,8 @@ namespace {
     app->option_defaults()->ignore_case()->ignore_underscore();
     app->allow_config_extras(CLI::config_extras_mode::ignore_all);
     app->allow_extras();
-    app->set_config("--config-file,--config,config",
-        "helicsConfig.ini",
-        "specify a configuration file");
+    app->set_config("--config-file,--config",
+        "");
         app->add_option("--name,--identifier", namestring);
     auto* fmtr = addJsonConfig(app.get());
     fmtr->maxLayers(0);

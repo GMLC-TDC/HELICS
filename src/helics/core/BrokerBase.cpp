@@ -83,7 +83,7 @@ BrokerBase::~BrokerBase()
             joinAllThreads();
         }
         catch (...) {
-            // no exceptions in the destructor
+            ;// no exceptions in the destructor
         }
     }
 }
@@ -376,9 +376,9 @@ int BrokerBase::parseArgs(std::string_view initializationString)
             }
             break;
         case fileops::ConfigType::CMD_LINE:
-            break;
         case fileops::ConfigType::NONE:
-            return 0;
+            //with NONE there are default command line and environment possibilities
+            break;
     }
 
     auto app = generateBaseCLI();
@@ -842,7 +842,7 @@ static void
                 bbase->addActionMessage(CMD_TICK);
             }
             catch (std::exception& e) {
-                std::cerr << "exception caught from addActionMessage" << e.what() << std::endl;
+                std::cerr << "exception caught from addActionMessage" << e.what() << '\n';
             }
         } else {
             ActionMessage tick(CMD_TICK);

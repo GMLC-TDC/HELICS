@@ -135,7 +135,7 @@ TEST(brokers, subbroker_min_files)
 
     auto brk3 = helics::BrokerFactory::create(helics::CoreType::TEST,
                                               "gbf3",
-                                              "{\"broker\":\"gbroker_f1\"}");
+        R"({"broker":"gbroker_f1"})");
 
     auto cr3 = helics::CoreFactory::create(helics::CoreType::TEST, "cf3", "broker=\"gbf3\"");
     auto fid4 = cr3->registerFederate("fed4", cf1);
