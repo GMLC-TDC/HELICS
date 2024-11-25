@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 #include <string_view>
-#include <vector>
 #include <utility>
+#include <vector>
 
 /** @file
 @details function definitions for operations on core types

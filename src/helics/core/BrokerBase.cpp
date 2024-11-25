@@ -83,7 +83,7 @@ BrokerBase::~BrokerBase()
             joinAllThreads();
         }
         catch (...) {
-            ;// no exceptions in the destructor
+            ;  // no exceptions in the destructor
         }
     }
 }
@@ -377,7 +377,7 @@ int BrokerBase::parseArgs(std::string_view initializationString)
             break;
         case fileops::ConfigType::CMD_LINE:
         case fileops::ConfigType::NONE:
-            //with NONE there are default command line and environment possibilities
+            // with NONE there are default command line and environment possibilities
             break;
     }
 

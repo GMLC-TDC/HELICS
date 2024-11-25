@@ -599,10 +599,11 @@ class error_tests_type: public ::testing::TestWithParam<const char*>, public Fed
 /** test simple creation and destruction*/
 TEST_P(error_tests_type, duplicate_broker_name)
 {
-    std::string bname=std::string("brk_dup_")+GetParam();
-    auto broker = AddBroker(GetParam(), std::string("--name=")+bname);
+    std::string bname = std::string("brk_dup_") + GetParam();
+    auto broker = AddBroker(GetParam(), std::string("--name=") + bname);
     EXPECT_TRUE(broker->isConnected());
-    EXPECT_THROW(AddBroker(GetParam(), std::string("--name=")+bname+" --timeout=500"), helics::RegistrationFailure);
+    EXPECT_THROW(AddBroker(GetParam(), std::string("--name=") + bname + " --timeout=500"),
+                 helics::RegistrationFailure);
     broker->disconnect();
     helics::cleanupHelicsLibrary();
 }
