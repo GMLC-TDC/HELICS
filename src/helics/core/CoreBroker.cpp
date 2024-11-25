@@ -172,17 +172,17 @@ void CoreBroker::makeConnections(const std::string& file)
     auto type = fileops::getConfigType(file);
 
     switch (type) {
-    case fileops::ConfigType::JSON_FILE:
-    case fileops::ConfigType::JSON_STRING:
-        fileops::makeConnectionsJson(this, file);
-        break;
-    case fileops::ConfigType::TOML_FILE:
-    case fileops::ConfigType::TOML_STRING:
-        fileops::makeConnectionsToml(this, file);
-    case fileops::ConfigType::CMD_LINE:
-    case fileops::ConfigType::NONE:
-        // with NONE there are default command line and environment possibilities
-        break;
+        case fileops::ConfigType::JSON_FILE:
+        case fileops::ConfigType::JSON_STRING:
+            fileops::makeConnectionsJson(this, file);
+            break;
+        case fileops::ConfigType::TOML_FILE:
+        case fileops::ConfigType::TOML_STRING:
+            fileops::makeConnectionsToml(this, file);
+        case fileops::ConfigType::CMD_LINE:
+        case fileops::ConfigType::NONE:
+            // with NONE there are default command line and environment possibilities
+            break;
     }
 }
 
@@ -2419,8 +2419,7 @@ bool CoreBroker::connect()
                             fmt::format("Broker {} connected on {}",
                                         getIdentifier(),
                                         getAddress()));
-                if (!configString.empty())
-                {
+                if (!configString.empty()) {
                     makeConnections(configString);
                 }
             } else {
@@ -2433,7 +2432,6 @@ bool CoreBroker::connect()
                 std::this_thread::sleep_for(std::chrono::milliseconds(20));
             }
         }
-       
     }
     return isConnected();
 }

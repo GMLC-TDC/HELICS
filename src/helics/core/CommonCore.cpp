@@ -163,8 +163,7 @@ bool CommonCore::connect()
                 transmit(parent_route_id, reg);
                 setBrokerState(BrokerState::CONNECTED);
                 disconnection.activate();
-                if (!configString.empty())
-                {
+                if (!configString.empty()) {
                     makeConnections(configString);
                 }
             } else {
@@ -2024,17 +2023,17 @@ void CommonCore::makeConnections(const std::string& file)
     auto type = fileops::getConfigType(file);
 
     switch (type) {
-    case fileops::ConfigType::JSON_FILE:
-    case fileops::ConfigType::JSON_STRING:
-        fileops::makeConnectionsJson(this, file);
-        break;
-    case fileops::ConfigType::TOML_FILE:
-    case fileops::ConfigType::TOML_STRING:
-        fileops::makeConnectionsToml(this, file);
-    case fileops::ConfigType::CMD_LINE:
-    case fileops::ConfigType::NONE:
-        // with NONE there are default command line and environment possibilities
-        break;
+        case fileops::ConfigType::JSON_FILE:
+        case fileops::ConfigType::JSON_STRING:
+            fileops::makeConnectionsJson(this, file);
+            break;
+        case fileops::ConfigType::TOML_FILE:
+        case fileops::ConfigType::TOML_STRING:
+            fileops::makeConnectionsToml(this, file);
+        case fileops::ConfigType::CMD_LINE:
+        case fileops::ConfigType::NONE:
+            // with NONE there are default command line and environment possibilities
+            break;
     }
 }
 

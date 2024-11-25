@@ -601,7 +601,10 @@ void BrokerBase::writeProfilingData()
             prBuff->writeFile();
         }
         catch (const std::ios_base::failure&) {
-            sendToLogger(parent_broker_id,LogLevels::ERROR_LEVEL,identifier,"Unable to write profiling buffer data");
+            sendToLogger(parent_broker_id,
+                         LogLevels::ERROR_LEVEL,
+                         identifier,
+                         "Unable to write profiling buffer data");
         }
     }
 }

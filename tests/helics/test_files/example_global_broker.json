@@ -1,8 +1,8 @@
 //this should be a valid json file (except comments are not recognized in standard JSON)
 {
-"coretype":"test",
-"federates":2,
-"name":"brk_globalb",
+  "coretype": "test",
+  "federates": 2,
+  "name": "brk_globalb",
   //example json file with globals [<global name>, <string global value>]
   "globals": [
     ["global1", "this is a global1 value"],
