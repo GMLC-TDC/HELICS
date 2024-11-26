@@ -584,8 +584,8 @@ TEST_F(error_tests, missing_required_ept)
     auto fed2 = GetFederateAs<helics::MessageFederate>(1);
 
     fed1->registerGlobalTargetedEndpoint("t1", "");
-    auto& ept2 = fed2->registerGlobalTargetedEndpoint("abcd", "");
-    ept2.setOption(helics::defs::Options::CONNECTION_REQUIRED);
+    auto& ept1 = fed2->registerGlobalTargetedEndpoint("abcd", "");
+    ept1.setOption(helics::defs::Options::CONNECTION_REQUIRED);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
