@@ -84,7 +84,7 @@ helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnit
         }
         const toml::value emptyVal;
         auto val = toml::find_or(timeElement, "value", emptyVal);
-        if (!val.is_uninitialized()) {
+        if (!val.is_empty()) {
             if (val.is_integer()) {
                 return {val.as_integer(), defaultUnits};
             }

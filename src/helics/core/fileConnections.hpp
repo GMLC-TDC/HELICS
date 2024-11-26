@@ -33,12 +33,12 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
     }
 
     auto conns = toml::find_or(doc, "connections", uVal);
-    if (!conns.is_uninitialized()) {
+    if (!conns.is_empty()) {
         auto& connArray = conns.as_array();
         for (const auto& conn : connArray) {
             if (conn.is_array()) {
                 auto& connAct = conn.as_array();
-                brk->dataLink(connAct[0].as_string().str, connAct[1].as_string().str);
+                brk->dataLink(connAct[0].as_string(), connAct[1].as_string());
             } else {
                 std::string pub = getOrDefault(conn, "publication", std::string());
                 if (!pub.empty()) {
@@ -70,12 +70,12 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
         }
     }
     auto lnks = toml::find_or(doc, "links", uVal);
-    if (!lnks.is_uninitialized()) {
+    if (!lnks.is_empty()) {
         auto& connArray = lnks.as_array();
         for (const auto& conn : connArray) {
             if (conn.is_array()) {
                 auto& connAct = conn.as_array();
-                brk->linkEndpoints(connAct[0].as_string().str, connAct[1].as_string().str);
+                brk->linkEndpoints(connAct[0].as_string(), connAct[1].as_string());
             } else {
                 std::string pub = getOrDefault(conn, "publication", std::string());
                 if (!pub.empty()) {
@@ -107,13 +107,13 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
         }
     }
     auto filts = toml::find_or(doc, "filters", uVal);
-    if (!filts.is_uninitialized()) {
+    if (!filts.is_empty()) {
         auto& filtArray = filts.as_array();
         for (const auto& filt : filtArray) {
             if (filt.is_array()) {
                 auto& filtAct = filt.as_array();
-                brk->addSourceFilterToEndpoint(filtAct[0].as_string().str,
-                                               filtAct[1].as_string().str);
+                brk->addSourceFilterToEndpoint(filtAct[0].as_string(),
+                                               filtAct[1].as_string());
             } else {
                 std::string fname = getOrDefault(filt, "filter", std::string());
                 if (!fname.empty()) {
@@ -133,27 +133,27 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
         }
     }
     auto globals = toml::find_or(doc, "globals", uVal);
-    if (!globals.is_uninitialized()) {
+    if (!globals.is_empty()) {
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
-                brk->setGlobal(val.as_array()[0].as_string().str,
-                               val.as_array()[1].as_string().str);
+                brk->setGlobal(val.as_array()[0].as_string(),
+                               val.as_array()[1].as_string());
             }
         } else {
             for (const auto& val : globals.as_table()) {
-                brk->setGlobal(val.first, val.second.as_string().str);
+                brk->setGlobal(val.first, val.second.as_string());
             }
         }
     }
     auto aliases = toml::find_or(doc, "aliases", uVal);
-    if (!aliases.is_uninitialized()) {
+    if (!aliases.is_empty()) {
         if (aliases.is_array()) {
             for (auto& val : aliases.as_array()) {
-                brk->addAlias(val.as_array()[0].as_string().str, val.as_array()[1].as_string().str);
+                brk->addAlias(val.as_array()[0].as_string(), val.as_array()[1].as_string());
             }
         } else {
             for (const auto& val : aliases.as_table()) {
-                brk->addAlias(val.first, val.second.as_string().str);
+                brk->addAlias(val.first, val.second.as_string());
             }
         }
     }
