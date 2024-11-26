@@ -158,7 +158,7 @@ TEST_F(network_tests, test_otherport2)
     }
 }
 
-TEST_F(network_tests, test_otherport_fail)
+TEST_F(network_tests, otherport_fail)
 {
     const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:33100";
     auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
@@ -172,17 +172,18 @@ TEST_F(network_tests, test_otherport_fail)
     }
 }
 
-TEST_F(network_tests, test_otherport_env)
+TEST_F(network_tests, otherport_env)
 {
     setEnvironmentVariable("HELICS_CONNECTION_PORT", "33102");
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     const std::string brokerArgs = "-f 2";
     auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
-    helics::FederateInfo fedInfo("--core_type=ZMQ --corename=c1");
+    helics::FederateInfo fedInfo("--core_type=ZMQ --corename=cop1");
     helics::ValueFederate fed1("fed1", fedInfo);
 
-    helics::FederateInfo fi2("--core_type=ZMQ --broker=tcp://127.0.0.1:33102 --corename=c2");
+    helics::FederateInfo fi2("--core_type=ZMQ --broker=tcp://127.0.0.1:33102 --corename=cop2");
     helics::ValueFederate fed2("fed2", fi2);
 
     fed2.enterExecutingModeAsync();

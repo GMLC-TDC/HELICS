@@ -147,8 +147,8 @@ TEST_F(error_tests, single_thread_fed)
 
     EXPECT_THROW(fed1->requestTimeAsync(3.2), helics::InvalidFunctionCall);
     EXPECT_THROW(fed1->requestTimeComplete(), helics::InvalidFunctionCall);
-    auto t1 = fed1->requestTime(2.0);
-    EXPECT_EQ(t1, 2.0);
+    auto time = fed1->requestTime(2.0);
+    EXPECT_EQ(time, 2.0);
 
     EXPECT_THROW(fed1->requestTimeIterativeAsync(3.2, helics::IterationRequest::FORCE_ITERATION),
                  helics::InvalidFunctionCall);
@@ -483,8 +483,8 @@ TEST_F(error_tests, missing_required_pub)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
     fed1->registerGlobalPublication("t1", "");
-    auto& i2 = fed2->registerSubscription("abcd", "");
-    i2.setOption(helics::defs::Options::CONNECTION_REQUIRED);
+    auto& sub1 = fed2->registerSubscription("abcd", "");
+    sub1.setOption(helics::defs::Options::CONNECTION_REQUIRED);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -584,8 +584,8 @@ TEST_F(error_tests, missing_required_ept)
     auto fed2 = GetFederateAs<helics::MessageFederate>(1);
 
     fed1->registerGlobalTargetedEndpoint("t1", "");
-    auto& e2 = fed2->registerGlobalTargetedEndpoint("abcd", "");
-    e2.setOption(helics::defs::Options::CONNECTION_REQUIRED);
+    auto& ept1 = fed2->registerGlobalTargetedEndpoint("abcd", "");
+    ept1.setOption(helics::defs::Options::CONNECTION_REQUIRED);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -597,11 +597,13 @@ TEST_F(error_tests, missing_required_ept)
 class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 /** test simple creation and destruction*/
-TEST_P(error_tests_type, test_duplicate_broker_name)
+TEST_P(error_tests_type, duplicate_broker_name)
 {
-    auto broker = AddBroker(GetParam(), "--name=brk1");
+    std::string bname = std::string("brk_dup_") + GetParam();
+    auto broker = AddBroker(GetParam(), std::string("--name=") + bname);
     EXPECT_TRUE(broker->isConnected());
-    EXPECT_THROW(AddBroker(GetParam(), "--name=brk1 --timeout=500"), helics::RegistrationFailure);
+    EXPECT_THROW(AddBroker(GetParam(), std::string("--name=") + bname + " --timeout=500"),
+                 helics::RegistrationFailure);
     broker->disconnect();
     helics::cleanupHelicsLibrary();
 }

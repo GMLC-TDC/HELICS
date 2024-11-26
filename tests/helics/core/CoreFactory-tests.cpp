@@ -139,7 +139,7 @@ TEST(CoreFactory_tests, udpCore_test)
 }
 #endif
 
-/** This test should be removed once log levels with numbers is re-enabled ~helics 3.3 */
+/** This test should be removed once log levels with numbers is re-enabled if ever */
 TEST(core, core_log_command_failures)
 {
     EXPECT_THROW(helics::CoreFactory::create(helics::CoreType::TEST,

@@ -163,6 +163,9 @@ bool CommonCore::connect()
                 transmit(parent_route_id, reg);
                 setBrokerState(BrokerState::CONNECTED);
                 disconnection.activate();
+                if (!configString.empty()) {
+                    makeConnections(configString);
+                }
             } else {
                 setBrokerState(BrokerState::CONFIGURED);
             }
@@ -2017,10 +2020,20 @@ InterfaceHandle CommonCore::getTranslator(std::string_view name) const
 
 void CommonCore::makeConnections(const std::string& file)
 {
-    if (fileops::hasTomlExtension(file)) {
-        fileops::makeConnectionsToml(this, file);
-    } else {
-        fileops::makeConnectionsJson(this, file);
+    auto type = fileops::getConfigType(file);
+
+    switch (type) {
+        case fileops::ConfigType::JSON_FILE:
+        case fileops::ConfigType::JSON_STRING:
+            fileops::makeConnectionsJson(this, file);
+            break;
+        case fileops::ConfigType::TOML_FILE:
+        case fileops::ConfigType::TOML_STRING:
+            fileops::makeConnectionsToml(this, file);
+        case fileops::ConfigType::CMD_LINE:
+        case fileops::ConfigType::NONE:
+            // with NONE there are default command line and environment possibilities
+            break;
     }
 }
 

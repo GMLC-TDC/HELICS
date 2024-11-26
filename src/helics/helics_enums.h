@@ -58,7 +58,9 @@ typedef enum { /* NOLINT */
                HELICS_CORE_TYPE_NULL = 66,
                /** an explicit core type exists but does nothing but return empty values or sink
                   calls*/
-               HELICS_CORE_TYPE_EMPTY = 77
+               HELICS_CORE_TYPE_EMPTY = 77,
+               /** core type specification to allow extraction from later arguments or files*/
+               HELICS_CORE_TYPE_EXTRACT = 101
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/

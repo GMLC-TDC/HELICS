@@ -7,12 +7,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerBase.hpp"
 
+#include "../common/configFileHelpers.hpp"
 #include "../common/logging.hpp"
 #include "AsyncTimeCoordinator.hpp"
 #include "ForwardingTimeCoordinator.hpp"
 #include "GlobalTimeCoordinator.hpp"
 #include "LogManager.hpp"
 #include "ProfilerBuffer.hpp"
+#include "core-exceptions.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
@@ -81,7 +83,7 @@ BrokerBase::~BrokerBase()
             joinAllThreads();
         }
         catch (...) {
-            // no exceptions in the destructor
+            ;  // no exceptions in the destructor
         }
     }
 }
@@ -324,11 +326,182 @@ int BrokerBase::parseArgs(std::vector<std::string> args)
 
 int BrokerBase::parseArgs(std::string_view initializationString)
 {
+    auto type = fileops::getConfigType(initializationString);
+
+    switch (type) {
+        case fileops::ConfigType::JSON_FILE:
+            fileInUse = true;
+            loadInfoFromJson(std::string(initializationString));
+            configString = initializationString;
+            return 0;
+        case fileops::ConfigType::JSON_STRING:
+            try {
+                loadInfoFromJson(std::string(initializationString));
+                configString = initializationString;
+                return 0;
+            }
+            catch (const helics::InvalidParameter&) {
+                if (fileops::looksLikeConfigToml(initializationString)) {
+                    try {
+                        loadInfoFromToml(std::string(initializationString));
+                        configString = initializationString;
+                        return 0;
+                    }
+                    catch (const helics::InvalidParameter&) {
+                        if (fileops::looksLikeCommandLine(initializationString)) {
+                            break;
+                        }
+                        throw;
+                    }
+                }
+                throw;
+            }
+            break;
+        case fileops::ConfigType::TOML_FILE:
+            fileInUse = true;
+            loadInfoFromToml(std::string(initializationString));
+            configString = initializationString;
+            return 0;
+        case fileops::ConfigType::TOML_STRING:
+            try {
+                loadInfoFromToml(std::string(initializationString));
+                configString = initializationString;
+                return 0;
+            }
+            catch (const helics::InvalidParameter&) {
+                if (fileops::looksLikeCommandLine(configString)) {
+                    break;
+                }
+                throw;
+            }
+            break;
+        case fileops::ConfigType::CMD_LINE:
+        case fileops::ConfigType::NONE:
+            // with NONE there are default command line and environment possibilities
+            break;
+    }
+
     auto app = generateBaseCLI();
     auto sApp = generateCLI();
     app->add_subcommand(sApp);
     auto res = app->helics_parse(std::string(initializationString));
     return static_cast<int>(res);
+}
+
+void BrokerBase::loadInfoFromJson(const std::string& jsonString, bool runArgParser)
+{
+    nlohmann::json doc;
+    try {
+        doc = fileops::loadJson(jsonString);
+    }
+    catch (const std::invalid_argument& iarg) {
+        throw(helics::InvalidParameter(iarg.what()));
+    }
+    const bool hasHelicsSection = doc.contains("helics");
+    bool hasHelicsSubSection{false};
+    bool hasHelicsBrokerSubSection{false};
+    if (hasHelicsSection) {
+        hasHelicsSubSection = doc["helics"].contains("helics");
+        hasHelicsBrokerSubSection = doc["helics"].contains("broker");
+    }
+    const bool hasBrokerSection = doc.contains("broker");
+
+    if (runArgParser) {
+        auto app = generateBaseCLI();
+        auto sApp = generateCLI();
+        app->add_subcommand(sApp);
+        app->allow_extras();
+        try {
+            if (jsonString.find('{') != std::string::npos) {
+                std::istringstream jstring(jsonString);
+                app->parse_from_stream(jstring);
+                if (hasHelicsSection) {
+                    app->get_config_formatter_base()->section("helics");
+                    std::istringstream jstringHelics(jsonString);
+                    app->parse_from_stream(jstringHelics);
+                    if (hasHelicsSubSection) {
+                        app->get_config_formatter_base()->section("helics.helics");
+                        std::istringstream jstringHelicsSub(jsonString);
+                        app->parse_from_stream(jstringHelicsSub);
+                    }
+                    if (hasHelicsBrokerSubSection) {
+                        app->get_config_formatter_base()->section("helics.broker");
+                        std::istringstream jstringHelicsSub(jsonString);
+                        app->parse_from_stream(jstringHelicsSub);
+                    }
+                }
+                if (hasBrokerSection) {
+                    app->get_config_formatter_base()->section("broker");
+                    std::istringstream jstringBroker(jsonString);
+                    app->parse_from_stream(jstringBroker);
+                }
+            } else {
+                std::ifstream file(jsonString);
+                app->parse_from_stream(file);
+                if (hasHelicsSection) {
+                    file.clear();
+                    file.seekg(0);
+                    app->get_config_formatter_base()->section("helics");
+                    app->parse_from_stream(file);
+                    if (hasHelicsSubSection) {
+                        file.clear();
+                        file.seekg(0);
+                        app->get_config_formatter_base()->section("helics.helics");
+                        app->parse_from_stream(file);
+                    }
+                    if (hasHelicsBrokerSubSection) {
+                        file.clear();
+                        file.seekg(0);
+                        app->get_config_formatter_base()->section("helics.broker");
+                        app->parse_from_stream(file);
+                    }
+                }
+                if (hasBrokerSection) {
+                    file.clear();
+                    file.seekg(0);
+                    app->get_config_formatter_base()->section("broker");
+                    app->parse_from_stream(file);
+                }
+            }
+        }
+        catch (const CLI::Error& clierror) {
+            throw(InvalidIdentifier(clierror.what()));
+        }
+    }
+}
+
+void BrokerBase::loadInfoFromToml(const std::string& tomlString, bool runArgParser)
+{
+    toml::value doc;
+    try {
+        doc = fileops::loadToml(tomlString);
+    }
+    catch (const std::invalid_argument& iarg) {
+        throw(helics::InvalidParameter(iarg.what()));
+    }
+
+    if (runArgParser) {
+        auto app = generateBaseCLI();
+        auto sApp = generateCLI();
+        app->add_subcommand(sApp);
+        app->allow_extras();
+        auto dptr = std::static_pointer_cast<HelicsConfigJSON>(app->get_config_formatter_base());
+        if (dptr) {
+            dptr->skipJson(true);
+        }
+        try {
+            if (tomlString.find('=') != std::string::npos) {
+                std::istringstream tstring(tomlString);
+                app->parse_from_stream(tstring);
+            } else {
+                std::ifstream file(tomlString);
+                app->parse_from_stream(file);
+            }
+        }
+        catch (const CLI::Error& e) {
+            throw(InvalidIdentifier(e.what()));
+        }
+    }
 }
 
 void BrokerBase::configureBase()
@@ -428,6 +601,10 @@ void BrokerBase::writeProfilingData()
             prBuff->writeFile();
         }
         catch (const std::ios_base::failure&) {
+            sendToLogger(parent_broker_id,
+                         LogLevels::ERROR_LEVEL,
+                         identifier,
+                         "Unable to write profiling buffer data");
         }
     }
 }
@@ -669,7 +846,7 @@ static void
                 bbase->addActionMessage(CMD_TICK);
             }
             catch (std::exception& e) {
-                std::cerr << "exception caught from addActionMessage" << e.what() << std::endl;
+                std::cerr << "exception caught from addActionMessage" << e.what() << '\n';
             }
         } else {
             ActionMessage tick(CMD_TICK);

@@ -1,0 +1,7 @@
+{
+  "name": "gbroker_f1",
+  "coretype": "test",
+  "sub_brokers": 2,
+  "federates": 2,
+  "root": true
+}

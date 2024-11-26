@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreBroker.hpp"
 #include "CoreTypes.hpp"
 #include "core-exceptions.hpp"
+#include "coreTypeOperations.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
@@ -109,6 +110,17 @@ std::shared_ptr<Broker> create(CoreType type, std::string_view configureString)
 std::shared_ptr<Broker>
     create(CoreType type, std::string_view brokerName, std::string_view configureString)
 {
+    std::string newName;
+    CoreType newType;
+    if (type == CoreType::EXTRACT || brokerName.empty()) {
+        std::tie(newType, newName) = core::extractCoreType(std::string{configureString});
+        if (brokerName.empty() && !newName.empty()) {
+            brokerName = newName;
+        }
+        if (type == CoreType::EXTRACT) {
+            type = newType;
+        }
+    }
     auto broker = makeBroker(type, brokerName);
     if (!broker) {
         throw(helics::RegistrationFailure("unable to create broker"));
@@ -129,6 +141,17 @@ std::shared_ptr<Broker> create(CoreType type, int argc, char* argv[])
 
 std::shared_ptr<Broker> create(CoreType type, std::string_view brokerName, int argc, char* argv[])
 {
+    std::string newName;
+    CoreType newType;
+    if (type == CoreType::EXTRACT || brokerName.empty()) {
+        std::tie(newType, newName) = core::extractCoreType(argc, argv);
+        if (brokerName.empty() && !newName.empty()) {
+            brokerName = newName;
+        }
+        if (type == CoreType::EXTRACT) {
+            type = newType;
+        }
+    }
     auto broker = makeBroker(type, brokerName);
     broker->configureFromArgs(argc, argv);
     if (!registerBroker(broker, type)) {
@@ -147,6 +170,17 @@ std::shared_ptr<Broker> create(CoreType type, std::vector<std::string> args)
 std::shared_ptr<Broker>
     create(CoreType type, std::string_view brokerName, std::vector<std::string> args)
 {
+    std::string newName;
+    CoreType newType;
+    if (type == CoreType::EXTRACT || brokerName.empty()) {
+        std::tie(newType, newName) = core::extractCoreType(args);
+        if (brokerName.empty() && !newName.empty()) {
+            brokerName = newName;
+        }
+        if (type == CoreType::EXTRACT) {
+            type = newType;
+        }
+    }
     auto broker = makeBroker(type, brokerName);
     broker->configureFromVector(std::move(args));
     if (!registerBroker(broker, type)) {
