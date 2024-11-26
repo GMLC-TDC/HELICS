@@ -15,7 +15,7 @@ include(AddGoogletest)
 add_library(helics_test_base INTERFACE)
 target_link_libraries(helics_test_base INTERFACE gtest gtest_main gmock)
 target_link_libraries(helics_test_base INTERFACE compile_flags_target spdlog::spdlog)
-target_include_directories(helics_test_base INTERFACE ${PROJECT_SOURCE_DIR}/ThirdParty)
+target_include_directories(helics_test_base SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/ThirdParty)
 
 add_subdirectory(core)
 add_subdirectory(network)

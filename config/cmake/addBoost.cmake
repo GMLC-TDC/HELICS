@@ -163,7 +163,7 @@ if(NOT Boost_FOUND)
         if(Boost_VERSION_MINOR GREATER_EQUAL ${BOOST_MINIMUM_VERSION})
             add_library(Boost::headers INTERFACE IMPORTED)
             set_target_properties(
-                Boost::headers PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}"
+                Boost::headers PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR}"
             )
             add_library(Boost::boost INTERFACE IMPORTED)
             set_target_properties(Boost::boost PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)

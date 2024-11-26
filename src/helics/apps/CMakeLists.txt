@@ -190,9 +190,13 @@ if(HELICS_BUILD_APP_LIBRARY)
         target_include_directories(
             helicscpp-apps
             INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/helics_cxx>
-                      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
                       $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
             PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        )
+
+        target_include_directories(
+            helicscpp-apps
+            SYSTEM INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
         )
 
         set_target_properties(
