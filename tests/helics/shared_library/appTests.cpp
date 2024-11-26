@@ -141,7 +141,6 @@ TEST(app_tests, recorder)
     thread1.join();
 
     helicsAppDestroy(rec1);
-
 }
 
 TEST(app_tests, recorder_object_nosan_ci_skip)

@@ -112,8 +112,7 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
         for (const auto& filt : filtArray) {
             if (filt.is_array()) {
                 auto& filtAct = filt.as_array();
-                brk->addSourceFilterToEndpoint(filtAct[0].as_string(),
-                                               filtAct[1].as_string());
+                brk->addSourceFilterToEndpoint(filtAct[0].as_string(), filtAct[1].as_string());
             } else {
                 std::string fname = getOrDefault(filt, "filter", std::string());
                 if (!fname.empty()) {
@@ -136,8 +135,7 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
     if (!globals.is_empty()) {
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
-                brk->setGlobal(val.as_array()[0].as_string(),
-                               val.as_array()[1].as_string());
+                brk->setGlobal(val.as_array()[0].as_string(), val.as_array()[1].as_string());
             }
         } else {
             for (const auto& val : globals.as_table()) {
