@@ -488,13 +488,12 @@ target_include_directories(
     INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
               $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
               $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDE_DIR}>
-              
 )
 # the utilities/gmlc is to account for the transfer of the header to a known location on install
 
 target_include_directories(
-    helics_base 
-    SYSTEM INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
+    helics_base SYSTEM
+    INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities>

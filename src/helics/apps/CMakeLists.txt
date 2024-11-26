@@ -195,8 +195,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
 
         target_include_directories(
-            helicscpp-apps
-            SYSTEM INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+            helicscpp-apps SYSTEM INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
         )
 
         set_target_properties(
