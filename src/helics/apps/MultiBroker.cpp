@@ -90,7 +90,7 @@ MultiBroker::~MultiBroker()
 bool MultiBroker::brokerConnect()
 {
     std::shared_ptr<helicsCLI11App> app;
-    std::string configString = "--config='" + configFile + '\'';
+    std::string localConfigString = "--config='" + configFile + '\'';
     if (!configFile.empty()) {
         app = netInfo.commandLineParser("");
         app->addTypeOption();
@@ -102,7 +102,7 @@ bool MultiBroker::brokerConnect()
         if (type == CoreType::MULTI) {
             app->get_config_formatter_base()->section("master");
             app->setDefaultCoreType(type);
-            app->parse(configString);
+            app->parse(localConfigString);
             type = app->getCoreType();
         }
         if (type != CoreType::MULTI) {
@@ -137,7 +137,7 @@ bool MultiBroker::brokerConnect()
             netInfo = NetworkBrokerData();  // to reset the networkBrokerData
             app->get_config_formatter_base()->section("comms")->index(index);
             app->setDefaultCoreType(CoreType::MULTI);
-            app->parse(configString);
+            app->parse(localConfigString);
             type = app->getCoreType();
             if (type != CoreType::MULTI) {
                 auto comm = CommFactory::create(type);

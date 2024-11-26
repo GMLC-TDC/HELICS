@@ -49,18 +49,15 @@ time, the app will not likely function normally; other query, information calls,
 HELICS_EXPORT HelicsFederate helicsAppGetFederate(HelicsApp app, HelicsError* err);
 
 /**
- * Create a HelicsApp object.
+ * Load a file to an App
  *
- * @details Create a HelicsApp object.
+ * @details load a configuration file for an app
  *
  * @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config
  * file.
- * @param appType The type of app to create.
+ * @param app The app to load a file 
  * @param configFile Configuration file or string to pass into the app, can be NULL or empty.
- * @param fedInfo The federate information to pass into the app, can be NULL.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- *
- * @return An opaque value app object, or nullptr if the object creation failed.
  */
 HELICS_EXPORT void helicsAppLoadFile(HelicsApp app, const char* configFile, HelicsError* err);
 

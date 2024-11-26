@@ -204,8 +204,6 @@ HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, co
 * @param filt The filter to retrieve a value from.
 * @param prop A string containing the property to get.
 *
-* @param[in,out] err A pointer to an error object for catching errors.
-
 */
 HELICS_EXPORT double helicsFilterGetPropertyDouble(HelicsFilter filt, const char* prop);
 
