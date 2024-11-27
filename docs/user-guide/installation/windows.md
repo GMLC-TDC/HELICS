@@ -6,10 +6,10 @@ Windows installers are available with the different [releases](https://github.co
 
 ## Build Requirements
 
-- Microsoft Visual C++ 2019 or newer (MS Build Tools also works; VC++ 2017 may work but is no longer tested by CI builds)
-- CMake 3.14 or newer (CMake should be newer than the Visual Studio and Boost version you are using; if using clang with libc++ use 3.18+)
+- Microsoft Visual C++ 2019 or newer (MS Build Tools also works)
+- CMake 3.22 or newer (CMake should be newer than the Visual Studio and Boost version you are using;)
 - git
-- Boost 1.67 or newer
+- Boost 1.75 or newer
 - MS-MPI v8 or newer (if MPI support is needed)
 
 ## Setup for Visual Studio
@@ -18,16 +18,16 @@ _Note_: Keep in mind that your CMake version should be newer than the boost vers
 
 ### Set up your Environment
 
-**1.** Install Microsoft Visual C++ 2019 or newer (2017 may work, but is no longer tested by CI builds) [MSVC](https://visualstudio.microsoft.com/)
+**1.** Install Microsoft Visual C++ 2019 or newer that supports C++20 [MSVC](https://visualstudio.microsoft.com/)
 
-**2.** Install [Boost](https://dl.bintray.com/boostorg/release/1.74.0/binaries/)
-1.67 or later. For CMake to detect it automatically either
+**2.** Install [Boost](https://dl.bintray.com/boostorg/release/1.84.0/binaries/)
+1.74 or later. For CMake to detect it automatically either
 extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
 environment variable to the install location. The CMake will only automatically find
 Boost 1.67 or newer.
-Building with Visual Studio 2019 will require boost 1.67 or newer and CMake 3.14+
+Building with Visual Studio 2019 will require boost 1.75 or newer and CMake 3.22+
 or newer.
-Boost 1.72 with CMake 3.18+ is the current recommended configuration.
+Boost 1.84 with CMake 3.28+ is the current recommended configuration.
 
 As an (experimental) alternative for installing Boost (and ZeroMQ), you can use [vcpkg](https://github.com/microsoft/vcpkg#getting-started). It is slower
 because it builds all dependencies but handles getting the right install paths to dependencies set correctly.

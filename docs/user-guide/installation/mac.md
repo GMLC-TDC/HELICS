@@ -2,10 +2,11 @@
 
 ## Requirements
 
-- C++17 compiler
-- CMake 3.10 or newer (if using clang with libc++, use 3.18+)
+- C++20 compiler
+- CMake 3.22 or higher
+- XCode 14 or higher
 - git
-- Boost 1.67 or newer
+- Boost 1.75 or newer
 - ZeroMQ 4.2 or newer (if ZeroMQ support is needed)
 - MPI-2 implementation (if MPI support is
   needed)
@@ -44,7 +45,7 @@ To set up your environment:
    environment variable `VCPKG_ROOT=[path to vcpkg]` prior to running `cmake`.
 3. (if needed) Setup a command-line compile environment
 
-   a) Install a C++11 compiler (C++14 preferred). e.g. `clang`
+   a) Install a C++20 compiler. e.g. `clang`
    from the Xcode command line tools. These can be installed
    from the command line in Terminal by typing
    `xcode-select --install` and following the on-screen
@@ -104,78 +105,20 @@ make
 make install
 ```
 
-### Building HELICS with MATLAB support
-
-To install HELICS with MATLAB support, you will need to add run cmake with the `-DHELICS_BUILD_MATLAB_INTERFACE=ON` option.
-
-The important thing to note is that the MATLAB binaries are in the PATH.
-Specifically, `mex` must be available in the PATH.
-
-<div class="admonition note">
-
-Note: To check if `mex` is in the PATH, type `which mex` and see if it returns a PATH to the `mex` compiler.
-
-If it does not, you should install MATLAB and add the path to all the MATLAB binaries to your PATH.
-
-```bash
-export PATH="/Applications/MATLAB_R2017b.app/bin/:$PATH"
-```
-
-</div>
-
-```bash
-git clone https://github.com/GMLC-TDC/HELICS
-cd HELICS
-mkdir build-osx
-cd build-osx
-cmake -DHELICS_BUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-main/ ..
-make -j8
-make install
-```
-
-### Building HELICS MATLAB support manually
-
-If you have changed the C-interface and want to regenerate the SWIG MATLAB bindings, you will need to use a custom version of SWIG to build the MATLAB interface.
-To do that, you can follow the following instructions.
-
-- Install [SWIG with MATLAB](https://github.com/jaeandersson/swig/)
-- `./configure --prefix=$HOME/local/swig_install; make; make install;`
-- Ensure that SWIG and MATLAB are in the PATH
-
-The below generates the MATLAB interface using SWIG.
-
-```bash
-cd ~/GitRepos/GMLC-TDC/HELICS/interfaces/
-mkdir matlab
-swig -I../src/helics/shared_api_library -outdir ./matlab -matlab ./helics.i
-mv helics_wrap.cxx matlab/helicsMEX.cxx
-```
-
-You can copy these files into the respective `HELICS/interfaces/matlab/` folder and run the cmake command above.
-Alternatively, you wish to build the MATLAB interface without using CMake, and you can do the following.
-
-```bash
-cd ~/GitRepos/GMLC-TDC/HELICS/interfaces/
-mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
-mv helicsMEX.* matlab/
-```
-
-You will need HELICS installed correctly before the above can be run successfully.
-
 ### Building HELICS using gcc
 
-Firstly, you'll need gcc. You can `brew install gcc`. Depending on the version of gcc you'll need to modify the following instructions slightly. These instructions are for `gcc-8.2.0`.
+Firstly, you'll need gcc. You can `brew install gcc`. Depending on the version of gcc you'll need to modify the following instructions slightly. 
 
 First you will need to build boost using gcc from source. Download the latest version of boost from the
 boost.org website.
-In the following example we are doing to use [boost v1.69.0](http://www.boost.org/users/history/version_1_69_0.html)
+In the following example we are doing to use [boost v1.84.0](http://www.boost.org/users/history/version_1_84_0.html)
 Keep in mind that your cmake version should be newer than the boost version, so if you have an older cmake you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake as well.
 
-Unzip the folder `boost_1_69_0` to any location, for example Downloads.
+Unzip the folder `boost_1_84_0` to any location, for example Downloads.
 
 ```bash
-$ cd ~/Downloads/boost_1_69_0
-$ ./bootstrap.sh --prefix=/ --prefix=$HOME/local/boost-gcc-1.69.0
+$ cd ~/Downloads/boost_1_84_0
+$ ./bootstrap.sh --prefix=/ --prefix=$HOME/local/boost-gcc-1.84.0
 ```
 
 Open `project-config.jam` and changes the lines as follows:
@@ -201,7 +144,7 @@ $ # OR
 $ ./bjam cxxflags='-fPIC' cflags='-fPIC' -a link=static install # For static linking
 ```
 
-This will install boost in the `~/local/boost-gcc-1.69.0` folder
+This will install boost in the `~/local/boost-gcc-1.84.0` folder
 
 Next, you will need to build HELICS and tell it what the `BOOST_ROOT` is.
 

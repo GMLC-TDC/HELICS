@@ -40,7 +40,7 @@ toml::value loadToml(const std::string& tomlString)
             return loadTomlStr(tomlString);
         }
         catch (const std::invalid_argument&) {
-            // just pass through this was an assumption
+            ;// just pass through this was an assumption
         }
     }
     std::ifstream file(tomlString, std::ios_base::binary);
@@ -60,8 +60,8 @@ toml::value loadTomlStr(const std::string& tomlString)
 {
     try {
         std::istringstream tstring(tomlString);
-        toml::value pr = toml::parse(tstring);
-        return pr;
+        toml::value doc = toml::parse(tstring);
+        return doc;
     }
     catch (const toml::exception& se) {
         throw(std::invalid_argument(se.what()));
