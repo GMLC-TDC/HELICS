@@ -131,8 +131,9 @@ std::vector<std::pair<double, int>>
     std::vector<std::future<std::pair<double, int>>> futures;
     for (decltype(fedCount) ii = 0; ii < fedCount; ++ii) {
         auto vFed = fedVec[ii].get();
-        futures.push_back(std::async(std::launch::async,
-                                     [vFed, ii, fedCount]() { return runInitIterations(vFed, ii, fedCount); }));
+        futures.push_back(std::async(std::launch::async, [vFed, ii, fedCount]() {
+            return runInitIterations(vFed, ii, fedCount);
+        }));
     }
     std::vector<std::pair<double, int>> results(fedCount);
     for (decltype(fedCount) ii = 0; ii < fedCount; ++ii) {
@@ -181,7 +182,7 @@ INSTANTIATE_TEST_SUITE_P(iteration, iteration_type, ::testing::ValuesIn(CoreType
 
 TEST_F(iteration, execution_iteration_loop3)
 {
-    int fedCount{ 5 };
+    int fedCount{5};
     SetupTest<helics::ValueFederate>("test", fedCount);
     std::vector<std::shared_ptr<helics::ValueFederate>> vfeds(fedCount);
     for (int ii = 0; ii < fedCount; ++ii) {
@@ -549,7 +550,8 @@ TEST_F(iteration, iteration_counter)
         if (iterationCount1 <= 10) {
             EXPECT_TRUE(res.state == helics::IterationResult::ITERATING);
             EXPECT_EQ(res.grantedTime, 0.0);
-            EXPECT_EQ(vFed1->getIntegerProperty(HELICS_PROPERTY_INT_CURRENT_ITERATION), iterationCount1);
+            EXPECT_EQ(vFed1->getIntegerProperty(HELICS_PROPERTY_INT_CURRENT_ITERATION),
+                      iterationCount1);
         } else {
             EXPECT_TRUE(res.state == helics::IterationResult::NEXT_STEP);
             EXPECT_EQ(res.grantedTime, 1.0);
