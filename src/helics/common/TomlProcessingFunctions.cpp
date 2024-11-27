@@ -40,7 +40,7 @@ toml::value loadToml(const std::string& tomlString)
             return loadTomlStr(tomlString);
         }
         catch (const std::invalid_argument&) {
-            ;// just pass through this was an assumption
+            ;  // just pass through this was an assumption
         }
     }
     std::ifstream file(tomlString, std::ios_base::binary);

@@ -107,7 +107,7 @@ make install
 
 ### Building HELICS using gcc
 
-Firstly, you'll need gcc. You can `brew install gcc`. Depending on the version of gcc you'll need to modify the following instructions slightly. 
+Firstly, you'll need gcc. You can `brew install gcc`. Depending on the version of gcc you'll need to modify the following instructions slightly.
 
 First you will need to build boost using gcc from source. Download the latest version of boost from the
 boost.org website.

@@ -110,8 +110,9 @@ bool MultiBroker::brokerConnect()
                 CoreBroker::setAsRoot();
             }
             masterComm = CommFactory::create(type);
-            masterComm->setCallback(
-                [this](ActionMessage&& message) { BrokerBase::addActionMessage(std::move(message)); });
+            masterComm->setCallback([this](ActionMessage&& message) {
+                BrokerBase::addActionMessage(std::move(message));
+            });
             masterComm->setLoggingCallback(BrokerBase::getLoggingCallback());
             masterComm->setName(getIdentifier());
             masterComm->loadNetworkInfo(netInfo);
