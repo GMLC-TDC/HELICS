@@ -275,7 +275,7 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/units)
     endif()
 
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/toml/value.hpp")
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/include/toml11/value.hpp")
         submod_update(ThirdParty/toml)
     endif()
 
@@ -328,6 +328,7 @@ if(NOT TARGET toml11::toml11)
         add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
     endif()
     hide_variable(TOML11_USE_UNRELEASED_TOML_FEATURES)
+    hide_variable(TOML11_PRECOMPILE)
 endif()
 
 # -------------------------------------------------------------
