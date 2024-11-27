@@ -1,5 +1,5 @@
 {
-"potential_interfaces": {
+  "potential_interfaces": {
     "publication_templates": [
       {
         "name": "${field1}/${field2}",

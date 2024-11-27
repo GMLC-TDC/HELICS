@@ -485,7 +485,6 @@ TEST(connector_potential_interfaces, input_pub_template_alias)
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
-
 TEST(connector_potential_interfaces, input_pub_template_potential_match)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -526,20 +525,20 @@ TEST(connector_potential_interfaces, input_pub_template_potential_match)
 
     const double testValue = 3452.5625;
     pub1_1.publish(testValue);
-    pub1_2.publish(testValue+1.0);
-    pub2_1.publish(testValue+2.0);
-    pub2_2.publish(testValue+3.0);
+    pub1_2.publish(testValue + 1.0);
+    pub2_1.publish(testValue + 2.0);
+    pub2_2.publish(testValue + 3.0);
     vfed2.requestTimeAsync(5);
     auto retTime = vfed1.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
-    retTime=vfed2.requestTimeComplete();
+    retTime = vfed2.requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1_1.getDouble();
-    EXPECT_EQ(val, testValue+2.0);
+    EXPECT_EQ(val, testValue + 2.0);
     val = inp1_2.getDouble();
-    EXPECT_EQ(val, testValue+3.0);
+    EXPECT_EQ(val, testValue + 3.0);
     val = inp2_1.getDouble();
-    EXPECT_EQ(val, testValue+1.0);
+    EXPECT_EQ(val, testValue + 1.0);
     val = inp2_2.getDouble();
     EXPECT_EQ(val, testValue);
 
