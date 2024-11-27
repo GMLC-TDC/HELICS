@@ -111,7 +111,7 @@ jobs:
           imageName: "windows-2019"
           langArch: "x64"
           vsArch: "x64"
-          extraFlags: ""
+          extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
         VS2022-64bit:
           imageName: "windows-2022"
           langArch: "x64"
@@ -169,7 +169,7 @@ jobs:
       # -----------------------
       # Build HELICS
       # -----------------------
-      - bash: cmake --build . --config Release
+      - bash: cmake --build . --parallel 4 --config Release
         displayName: "Build HELICS"
         workingDirectory: build
 

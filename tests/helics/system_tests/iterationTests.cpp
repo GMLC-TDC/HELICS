@@ -946,7 +946,7 @@ TEST_F(iteration, iteration_high_count_nocov_ci_skip_nosan)
         vFed1->requestTimeIterativeComplete();
     }
 
-    EXPECT_GE(itCount, 200000);
+    EXPECT_GE(itCount, 200000U);
     vFed2->finalize();
     vFed1->finalize();
 }

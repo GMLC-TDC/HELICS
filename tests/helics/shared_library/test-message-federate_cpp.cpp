@@ -400,7 +400,7 @@ TEST(dataBuffer, bufferMemory)
     std::string v1;
     v1.resize(1024, '\0');
     helicscpp::DataBuffer buf1(v1.data(), 0, static_cast<int>(v1.size()));
-    EXPECT_EQ(buf1.capacity(), v1.size());
+    EXPECT_EQ(buf1.capacity(), static_cast<int>(v1.size()));
     EXPECT_EQ(buf1.size(), 0);
     buf1.fill(std::vector<double>{34.673, 19.1514, 1e-45});
     helicscpp::DataBuffer buf2(v1.data(),

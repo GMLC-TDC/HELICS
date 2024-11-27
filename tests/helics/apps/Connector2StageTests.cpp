@@ -327,7 +327,7 @@ TEST(connector_2stage, simple_connector_struct)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1U);
     EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -724,7 +724,7 @@ TEST(connector_2stage, three_fed_input_regex)
     fut.get();
     fut2.get();
     EXPECT_TRUE(cfed1.hasReceivedCommand());
-    EXPECT_GE(data.size(), 1);
+    EXPECT_GE(data.size(), 1U);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 
