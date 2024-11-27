@@ -551,6 +551,9 @@ void Federate::enterExecutingModeAsync(IterationRequest iterate)
     switch (currentMode) {
         case Modes::STARTUP: {
             auto eExecFunc = [this, iterate]() {
+                if (hasPotentialInterfaces) {
+                    potentialInterfacesStartupSequence();
+                }
                 coreObject->enterInitializingMode(fedID);
                 mCurrentTime = coreObject->getCurrentTime(fedID);
                 startupToInitializeStateTransition();
