@@ -122,11 +122,11 @@ TEST_F(mfed_tests, Message)
     mFed2->enterExecutingMode();
     mFed1->enterExecutingModeComplete();
 
-    auto m1 = epid.createMessage();
+    auto message = epid.createMessage();
     std::string data(500, 'a');
-    m1.data(data).time(0.0).destination("ep2");
-    epid.sendMessage(m1);
-    epid.sendMessageZeroCopy(m1);
+    message.data(data).time(0.0).destination("ep2");
+    epid.sendMessage(message);
+    epid.sendMessageZeroCopy(message);
 
     mFed1->requestTimeAsync(2.0);
     HelicsTime time = mFed2->requestTime(1.0);
