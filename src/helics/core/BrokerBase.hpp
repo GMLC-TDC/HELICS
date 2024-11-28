@@ -148,7 +148,8 @@ class BrokerBase {
     bool allowRemoteControl{true};  //!< if true allows some remote operation
     /// error if there are unmatched connections on init
     bool errorOnUnmatchedConnections{false};
-    bool globalDisconnect{false}; //!< if true specify that federates should stay connected until a global disconnect operation
+    bool globalDisconnect{false};  //!< if true specify that federates should stay connected until a
+                                   //!< global disconnect operation
     /// time when the error condition started; related to the errorDelay
     decltype(std::chrono::steady_clock::now()) errorTimeStart;
     /// time when the disconnect started
