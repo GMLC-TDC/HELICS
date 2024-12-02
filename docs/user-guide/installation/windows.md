@@ -9,7 +9,7 @@ Windows installers are available with the different [releases](https://github.co
 - Microsoft Visual C++ 2019 or newer (MS Build Tools also works)
 - CMake 3.22 or newer (CMake should be newer than the Visual Studio and Boost version you are using;)
 - git
-- Boost 1.75 or newer
+- Boost 1.75 or newer (needs to have boost cmake configuration)- 1.73 and 1.74 may work with older versions of Cmake
 - MS-MPI v8 or newer (if MPI support is needed)
 
 ## Setup for Visual Studio
@@ -21,7 +21,7 @@ _Note_: Keep in mind that your CMake version should be newer than the boost vers
 **1.** Install Microsoft Visual C++ 2019 or newer that supports C++20 [MSVC](https://visualstudio.microsoft.com/)
 
 **2.** Install [Boost](https://dl.bintray.com/boostorg/release/1.84.0/binaries/)
-1.74 or later. For CMake to detect it automatically either
+1.75 or later. For CMake to detect it automatically either
 extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
 environment variable to the install location. The CMake will only automatically find
 Boost 1.67 or newer.

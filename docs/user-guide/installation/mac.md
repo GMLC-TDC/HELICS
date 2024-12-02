@@ -6,7 +6,7 @@
 - CMake 3.22 or higher
 - XCode 14 or higher
 - git
-- Boost 1.75 or newer
+- Boost 1.73 or newer
 - ZeroMQ 4.2 or newer (if ZeroMQ support is needed)
 - MPI-2 implementation (if MPI support is
   needed)
