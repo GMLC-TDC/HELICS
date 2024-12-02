@@ -1603,7 +1603,7 @@ static void
                 const toml::value uVal;
                 const auto& propval = toml::find_or(prop, "value", uVal);
 
-                if ((propname.empty()) || (propval.is_uninitialized())) {
+                if ((propname.empty()) || (propval.is_empty())) {
                     if (strict) {
                         fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 
@@ -1624,7 +1624,7 @@ static void
             const toml::value uVal;
             const auto& propval = toml::find_or(props, "value", uVal);
 
-            if ((propname.empty()) || (propval.is_uninitialized())) {
+            if ((propname.empty()) || (propval.is_empty())) {
                 if (strict) {
                     fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 

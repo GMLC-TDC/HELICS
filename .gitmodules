@@ -20,10 +20,6 @@
 [submodule "ThirdParty/spdlog"]
     path = ThirdParty/spdlog
     url = ../../gabime/spdlog.git
-[submodule "ThirdParty/json_cpp"]
-    path = ThirdParty/json_cpp
-    url = ../../open-source-parsers/jsoncpp.git
-    branch = master
 [submodule "ThirdParty/toml"]
 	path = ThirdParty/toml
 	url = ../../ToruNiina/toml11

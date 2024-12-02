@@ -193,7 +193,7 @@ jobs:
 
   arm64:
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2404:current
     resource_class: arm.medium
     environment:
       CMAKE_FLAGS: "-DHELICS_BUILD_CXX_SHARED_LIB=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_BOOST=ON"

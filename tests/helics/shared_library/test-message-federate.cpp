@@ -37,6 +37,7 @@ TEST_P(mfed_simple_type_tests, initialize_tests)
 
     CE(mFed1State = helicsFederateGetState(mFed1, &err));
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
+    helicsCleanupLibrary();
 }
 
 TEST_P(mfed_simple_type_tests, endpoint_registration)
@@ -77,6 +78,7 @@ TEST_P(mfed_simple_type_tests, endpoint_registration)
 
     CE(mFed1State = helicsFederateGetState(mFed1, &err));
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
+    helicsCleanupLibrary();
 }
 
 TEST_P(mfed_simple_type_tests, send_receive)
@@ -107,10 +109,10 @@ TEST_P(mfed_simple_type_tests, send_receive)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M = helicsEndpointGetMessage(epid2);
-    // ASSERT_TRUE (M);
-    ASSERT_EQ(helicsMessageGetByteCount(M), 500);
-    char* dptr = reinterpret_cast<char*>(helicsMessageGetBytesPointer(M));
+    auto message = helicsEndpointGetMessage(epid2);
+    // ASSERT_TRUE (message);
+    ASSERT_EQ(helicsMessageGetByteCount(message), 500);
+    char* dptr = reinterpret_cast<char*>(helicsMessageGetBytesPointer(message));
     if (dptr != nullptr) {
         EXPECT_EQ(dptr[245], 'a');
     } else {
@@ -120,6 +122,7 @@ TEST_P(mfed_simple_type_tests, send_receive)
 
     CE(mFed1State = helicsFederateGetState(mFed1, &err));
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
+    helicsCleanupLibrary();
 }
 
 TEST_F(mfed_tests, send_receive_string)
@@ -150,10 +153,10 @@ TEST_F(mfed_tests, send_receive_string)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M = helicsEndpointGetMessage(epid2);
-    // ASSERT_TRUE (M);
-    ASSERT_EQ(helicsMessageGetByteCount(M), 500);
-    char* dptr = reinterpret_cast<char*>(helicsMessageGetBytesPointer(M));
+    auto message = helicsEndpointGetMessage(epid2);
+    // ASSERT_TRUE (message);
+    ASSERT_EQ(helicsMessageGetByteCount(message), 500);
+    char* dptr = reinterpret_cast<char*>(helicsMessageGetBytesPointer(message));
     if (dptr != nullptr) {
         EXPECT_EQ(dptr[245], 'a');
     } else {
@@ -163,6 +166,7 @@ TEST_F(mfed_tests, send_receive_string)
 
     CE(mFed1State = helicsFederateGetState(mFed1, &err));
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
+    helicsCleanupLibrary();
 }
 
 TEST_P(mfed_simple_type_tests, send_receive_mobj)
@@ -193,11 +197,11 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M = helicsEndpointGetMessage(epid2);
-    // ASSERT_TRUE (M);
-    ASSERT_EQ(helicsMessageGetByteCount(M), 500);
+    auto message = helicsEndpointGetMessage(epid2);
+    // ASSERT_TRUE (message);
+    ASSERT_EQ(helicsMessageGetByteCount(message), 500);
 
-    char* rdata = static_cast<char*>(helicsMessageGetBytesPointer(M));
+    char* rdata = static_cast<char*>(helicsMessageGetBytesPointer(message));
     if (rdata != nullptr) {
         EXPECT_EQ(rdata[245], 'a');
     } else {
@@ -207,6 +211,7 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
 
     CE(mFed1State = helicsFederateGetState(mFed1, &err));
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
+    helicsCleanupLibrary();
 }
 
 TEST_F(mfed_tests, message_object)
@@ -225,13 +230,13 @@ TEST_F(mfed_tests, message_object)
     EXPECT_TRUE(mFed1State == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
 
-    auto M = helicsFederateCreateMessage(mFed1, nullptr);
-    helicsMessageSetDestination(M, "ep2", nullptr);
-    EXPECT_STREQ(helicsMessageGetDestination(M), "ep2");
-    helicsMessageSetData(M, data.data(), 500, &err);
-    helicsMessageSetTime(M, 0.0, &err);
+    auto message = helicsFederateCreateMessage(mFed1, nullptr);
+    helicsMessageSetDestination(message, "ep2", nullptr);
+    EXPECT_STREQ(helicsMessageGetDestination(message), "ep2");
+    helicsMessageSetData(message, data.data(), 500, &err);
+    helicsMessageSetTime(message, 0.0, &err);
 
-    CE(helicsEndpointSendMessage(epid, M, &err));
+    CE(helicsEndpointSendMessage(epid, message, &err));
     HelicsTime time;
     CE(time = helicsFederateRequestTime(mFed1, 1.0, &err));
     EXPECT_EQ(time, 1.0);
@@ -243,11 +248,11 @@ TEST_F(mfed_tests, message_object)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    M = helicsEndpointGetMessage(epid2);
-    // ASSERT_TRUE (M);
-    ASSERT_EQ(helicsMessageGetByteCount(M), 500);
+    message = helicsEndpointGetMessage(epid2);
+    // ASSERT_TRUE (message);
+    ASSERT_EQ(helicsMessageGetByteCount(message), 500);
 
-    char* rdata = static_cast<char*>(helicsMessageGetBytesPointer(M));
+    char* rdata = static_cast<char*>(helicsMessageGetBytesPointer(message));
     EXPECT_NE(rdata, nullptr);
     if (rdata != nullptr) {
         EXPECT_EQ(rdata[245], 'a');
@@ -258,10 +263,11 @@ TEST_F(mfed_tests, message_object)
     CE(mFed1State = helicsFederateGetState(mFed1, &err));
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 
-    helicsMessageSetFlagOption(M, 7, HELICS_TRUE, &err);
-    EXPECT_TRUE(helicsMessageGetFlagOption(M, 7) == HELICS_TRUE);
-    helicsMessageClearFlags(M);
-    EXPECT_TRUE(helicsMessageGetFlagOption(M, 7) == HELICS_FALSE);
+    helicsMessageSetFlagOption(message, 7, HELICS_TRUE, &err);
+    EXPECT_TRUE(helicsMessageGetFlagOption(message, 7) == HELICS_TRUE);
+    helicsMessageClearFlags(message);
+    EXPECT_TRUE(helicsMessageGetFlagOption(message, 7) == HELICS_FALSE);
+    helicsCleanupLibrary();
 }
 
 TEST_P(mfed_type_tests, send_receive_2fed)
@@ -319,19 +325,19 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = helicsEndpointGetMessage(epid);
-    // ASSERT_TRUE(M1);
-    EXPECT_EQ(helicsMessageGetByteCount(M1), 400);
-    auto dptr = static_cast<char*>(helicsMessageGetBytesPointer(M1));
+    auto message1 = helicsEndpointGetMessage(epid);
+    // ASSERT_TRUE(message1);
+    EXPECT_EQ(helicsMessageGetByteCount(message1), 400);
+    auto dptr = static_cast<char*>(helicsMessageGetBytesPointer(message1));
     EXPECT_NE(dptr, nullptr);
     if (dptr != nullptr) {
         EXPECT_EQ(dptr[245], 'b');
     }
 
-    auto M2 = helicsEndpointGetMessage(epid2);
-    // ASSERT_TRUE(M2);
-    EXPECT_EQ(helicsMessageGetByteCount(M2), 500);
-    dptr = static_cast<char*>(helicsMessageGetBytesPointer(M2));
+    auto message2 = helicsEndpointGetMessage(epid2);
+    // ASSERT_TRUE(message2);
+    EXPECT_EQ(helicsMessageGetByteCount(message2), 500);
+    dptr = static_cast<char*>(helicsMessageGetBytesPointer(message2));
     EXPECT_NE(dptr, nullptr);
     if (dptr != nullptr) {
         EXPECT_EQ(dptr[245], 'a');
@@ -343,6 +349,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
     CE(mFed2State = helicsFederateGetState(mFed2, &err));
     EXPECT_TRUE(mFed2State == HelicsFederateState::HELICS_STATE_FINALIZE);
+    helicsCleanupLibrary();
 }
 
 TEST_P(mfed_type_tests, send_receive_2fed_multisend)
@@ -402,6 +409,7 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
     CE(mFed2State = helicsFederateGetState(mFed2, &err));
     EXPECT_TRUE(mFed2State == HelicsFederateState::HELICS_STATE_FINALIZE);
+    helicsCleanupLibrary();
 }
 
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
@@ -420,82 +428,84 @@ TEST(message_object, test1_nosan)
 
     auto fed2 = helicsCreateCombinationFederate("fed2", fedInfo, nullptr);
 
-    auto m1 = helicsFederateCreateMessage(fed, nullptr);
-    EXPECT_NE(m1, nullptr);
+    auto message1 = helicsFederateCreateMessage(fed, nullptr);
+    EXPECT_NE(message1, nullptr);
 
-    auto m2 = helicsFederateCreateMessage(fed2, nullptr);
-    EXPECT_NE(m2, nullptr);
+    auto message2 = helicsFederateCreateMessage(fed2, nullptr);
+    EXPECT_NE(message2, nullptr);
 
-    helicsMessageSetOriginalDestination(m1, "a happy place", nullptr);
-    EXPECT_STREQ(helicsMessageGetOriginalDestination(m1), "a happy place");
+    helicsMessageSetOriginalDestination(message1, "a happy place", nullptr);
+    EXPECT_STREQ(helicsMessageGetOriginalDestination(message1), "a happy place");
 
-    helicsMessageSetOriginalSource(m1, "osource", nullptr);
-    EXPECT_STREQ(helicsMessageGetOriginalSource(m1), "osource");
+    helicsMessageSetOriginalSource(message1, "osource", nullptr);
+    EXPECT_STREQ(helicsMessageGetOriginalSource(message1), "osource");
 
-    helicsMessageSetMessageID(m1, 10, nullptr);
-    EXPECT_EQ(helicsMessageGetMessageID(m1), 10);
+    helicsMessageSetMessageID(message1, 10, nullptr);
+    EXPECT_EQ(helicsMessageGetMessageID(message1), 10);
 
     // 89 is an invalid flag
-    EXPECT_EQ(helicsMessageGetFlagOption(m1, 89), HELICS_FALSE);
+    EXPECT_EQ(helicsMessageGetFlagOption(message1, 89), HELICS_FALSE);
 
-    helicsMessageSetString(m2, "raw data", nullptr);
-    EXPECT_STREQ(helicsMessageGetString(m2), "raw data");
+    helicsMessageSetString(message2, "raw data", nullptr);
+    EXPECT_STREQ(helicsMessageGetString(message2), "raw data");
 
     auto err = helicsErrorInitialize();
 
     char data[20];
     int actSize = 10;
-    helicsMessageGetBytes(m2, nullptr, 0, &actSize, &err);
+    helicsMessageGetBytes(message2, nullptr, 0, &actSize, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(actSize, 0);
     helicsErrorClear(&err);
 
     EXPECT_EQ(helicsMessageGetBytesPointer(nullptr), nullptr);
 
-    helicsMessageGetBytes(m2, data, 20, &actSize, &err);
+    helicsMessageGetBytes(message2, data, 20, &actSize, &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 8);
     EXPECT_EQ(std::string(data, data + actSize), "raw data");
 
-    EXPECT_EQ(helicsMessageIsValid(m2), HELICS_TRUE);
+    EXPECT_EQ(helicsMessageIsValid(message2), HELICS_TRUE);
 
-    helicsMessageSetSource(m1, "source", nullptr);
-    EXPECT_STREQ(helicsMessageGetSource(m1), "source");
+    helicsMessageSetSource(message1, "source", nullptr);
+    EXPECT_STREQ(helicsMessageGetSource(message1), "source");
 
-    helicsMessageSetFlagOption(m1, 4, HELICS_TRUE, nullptr);
-    EXPECT_EQ(helicsMessageGetFlagOption(m1, 4), HELICS_TRUE);
+    helicsMessageSetFlagOption(message1, 4, HELICS_TRUE, nullptr);
+    EXPECT_EQ(helicsMessageGetFlagOption(message1, 4), HELICS_TRUE);
 
-    helicsMessageSetFlagOption(m1, 4, HELICS_FALSE, nullptr);
-    EXPECT_EQ(helicsMessageGetFlagOption(m1, 4), HELICS_FALSE);
+    helicsMessageSetFlagOption(message1, 4, HELICS_FALSE, nullptr);
+    EXPECT_EQ(helicsMessageGetFlagOption(message1, 4), HELICS_FALSE);
 
-    helicsMessageSetFlagOption(m1, 22, HELICS_TRUE, &err);
-    EXPECT_EQ(helicsMessageGetFlagOption(m1, 22), HELICS_FALSE);
+    helicsMessageSetFlagOption(message1, 22, HELICS_TRUE, &err);
+    EXPECT_EQ(helicsMessageGetFlagOption(message1, 22), HELICS_FALSE);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    helicsMessageResize(m2, 500, nullptr);
-    auto s2 = helicsMessageGetByteCount(m2);
-    EXPECT_EQ(s2, 500);
+    helicsMessageResize(message2, 500, nullptr);
+    auto messageSize = helicsMessageGetByteCount(message2);
+    EXPECT_EQ(messageSize, 500);
 
-    helicsMessageReserve(m2, 2000, nullptr);
+    helicsMessageReserve(message2, 2000, nullptr);
 
-    helicsMessageAppendData(m2, " more data", 8, nullptr);
+    helicsMessageAppendData(message2, " more data", 8, nullptr);
 
-    s2 = helicsMessageGetByteCount(m2);
-    EXPECT_EQ(s2, 508);
+    messageSize = helicsMessageGetByteCount(message2);
+    EXPECT_EQ(messageSize, 508);
 
     // this should generate an out of memory exception
-    helicsMessageResize(m2, -8, &err);
+    helicsMessageResize(message2, -8, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     // this should generate an out of memory exception
-    helicsMessageReserve(m2, -2, &err);
+    helicsMessageReserve(message2, -2, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     helicsFederateInfoFree(fedInfo);
     helicsFederateFinalize(fed, nullptr);
     helicsFederateFinalize(fed2, nullptr);
     helicsBrokerDisconnect(brk, nullptr);
+
+    helicsCleanupLibrary();
 }
 
 TEST(message_object, copy)
@@ -510,62 +520,63 @@ TEST(message_object, copy)
     auto fed = helicsCreateMessageFederate("fed1", fedInfo, nullptr);
 
     helicsFederateInfoFree(fedInfo);
-    auto m1 = helicsFederateCreateMessage(fed, nullptr);
-    EXPECT_NE(m1, nullptr);
+    auto message1 = helicsFederateCreateMessage(fed, nullptr);
+    EXPECT_NE(message1, nullptr);
 
-    auto m2 = helicsFederateCreateMessage(fed, nullptr);
-    EXPECT_NE(m2, nullptr);
+    auto message2 = helicsFederateCreateMessage(fed, nullptr);
+    EXPECT_NE(message2, nullptr);
 
-    helicsMessageSetDestination(m1, "a small town", nullptr);
-    helicsMessageSetSource(m1, "toledo", nullptr);
+    helicsMessageSetDestination(message1, "a small town", nullptr);
+    helicsMessageSetSource(message1, "toledo", nullptr);
 
-    helicsMessageSetOriginalDestination(m1, "a happy place", nullptr);
-    helicsMessageSetOriginalSource(m1, "osource", nullptr);
-    helicsMessageSetMessageID(m1, 10, nullptr);
-    helicsMessageSetFlagOption(m1, 4, HELICS_TRUE, nullptr);
-    helicsMessageSetString(m1, "raw data", nullptr);
-    helicsMessageSetTime(m1, 3.65, nullptr);
+    helicsMessageSetOriginalDestination(message1, "a happy place", nullptr);
+    helicsMessageSetOriginalSource(message1, "osource", nullptr);
+    helicsMessageSetMessageID(message1, 10, nullptr);
+    helicsMessageSetFlagOption(message1, 4, HELICS_TRUE, nullptr);
+    helicsMessageSetString(message1, "raw data", nullptr);
+    helicsMessageSetTime(message1, 3.65, nullptr);
     auto err = helicsErrorInitialize();
 
-    helicsMessageCopy(m1, m2, &err);
+    helicsMessageCopy(message1, message2, &err);
     EXPECT_EQ(err.error_code, 0);
 
-    helicsMessageCopy(m1, nullptr, &err);
+    helicsMessageCopy(message1, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    EXPECT_STREQ(helicsMessageGetString(m2), "raw data");
-    EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "osource");
-    EXPECT_STREQ(helicsMessageGetSource(m2), "toledo");
-    EXPECT_STREQ(helicsMessageGetDestination(m2), "a small town");
-    EXPECT_EQ(helicsMessageGetMessageID(m2), 10);
-    EXPECT_DOUBLE_EQ(helicsMessageGetTime(m2), 3.65);
+    EXPECT_STREQ(helicsMessageGetString(message2), "raw data");
+    EXPECT_STREQ(helicsMessageGetOriginalSource(message2), "osource");
+    EXPECT_STREQ(helicsMessageGetSource(message2), "toledo");
+    EXPECT_STREQ(helicsMessageGetDestination(message2), "a small town");
+    EXPECT_EQ(helicsMessageGetMessageID(message2), 10);
+    EXPECT_DOUBLE_EQ(helicsMessageGetTime(message2), 3.65);
 
-    EXPECT_STREQ(helicsMessageGetOriginalDestination(m2), "a happy place");
+    EXPECT_STREQ(helicsMessageGetOriginalDestination(message2), "a happy place");
 
     char data[20];
     int actSize = 10;
 
-    helicsMessageGetBytes(m2, data, 20, &actSize, &err);
+    helicsMessageGetBytes(message2, data, 20, &actSize, &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 8);
     EXPECT_EQ(std::string(data, data + actSize), "raw data");
 
-    EXPECT_EQ(helicsMessageIsValid(m2), HELICS_TRUE);
+    EXPECT_EQ(helicsMessageIsValid(message2), HELICS_TRUE);
 
-    EXPECT_EQ(helicsMessageGetFlagOption(m2, 4), HELICS_TRUE);
+    EXPECT_EQ(helicsMessageGetFlagOption(message2, 4), HELICS_TRUE);
 
-    helicsMessageClear(m2, &err);
+    helicsMessageClear(message2, &err);
 
-    EXPECT_EQ(helicsMessageIsValid(m2), HELICS_FALSE);
+    EXPECT_EQ(helicsMessageIsValid(message2), HELICS_FALSE);
 
-    EXPECT_EQ(helicsMessageGetFlagOption(m2, 4), HELICS_FALSE);
+    EXPECT_EQ(helicsMessageGetFlagOption(message2, 4), HELICS_FALSE);
 
-    EXPECT_EQ(helicsMessageGetByteCount(m2), 0);
+    EXPECT_EQ(helicsMessageGetByteCount(message2), 0);
 
     helicsFederateEnterExecutingMode(fed, nullptr);
     helicsFederateFinalize(fed, nullptr);
     helicsBrokerDisconnect(brk, nullptr);
+    helicsCleanupLibrary();
 }
 
 TEST(message_object, dataBuffer)
@@ -580,33 +591,34 @@ TEST(message_object, dataBuffer)
 
     auto fed = helicsCreateMessageFederate("fed1", fedInfo, nullptr);
     helicsFederateInfoFree(fedInfo);
-    auto m1 = helicsFederateCreateMessage(fed, nullptr);
-    EXPECT_NE(m1, nullptr);
+    auto message1 = helicsFederateCreateMessage(fed, nullptr);
+    EXPECT_NE(message1, nullptr);
 
-    auto m2 = helicsFederateCreateMessage(fed, nullptr);
-    EXPECT_NE(m2, nullptr);
+    auto message2 = helicsFederateCreateMessage(fed, nullptr);
+    EXPECT_NE(message2, nullptr);
 
-    helicsMessageSetString(m1, "raw data", nullptr);
+    helicsMessageSetString(message1, "raw data", nullptr);
 
     auto err = helicsErrorInitialize();
 
-    EXPECT_EQ(helicsDataBufferIsValid(m1), HELICS_TRUE);
+    EXPECT_EQ(helicsDataBufferIsValid(message1), HELICS_TRUE);
 
     char data[20];
     int actSize{10};
 
-    EXPECT_EQ(helicsDataBufferSize(m1), 8);
-    helicsDataBufferToRawString(m1, data, 20, &actSize);
+    EXPECT_EQ(helicsDataBufferSize(message1), 8);
+    helicsDataBufferToRawString(message1, data, 20, &actSize);
     EXPECT_EQ(actSize, 8);
     EXPECT_EQ(std::string(data, data + actSize), "raw data");
 
-    helicsMessageClear(m2, &err);
+    helicsMessageClear(message2, &err);
     // test the connection between the buffer and message
-    EXPECT_EQ(helicsDataBufferSize(m2), 0);
-    EXPECT_EQ(helicsMessageIsValid(m2), HELICS_FALSE);
-    EXPECT_EQ(helicsDataBufferIsValid(m2), HELICS_TRUE);
+    EXPECT_EQ(helicsDataBufferSize(message2), 0);
+    EXPECT_EQ(helicsMessageIsValid(message2), HELICS_FALSE);
+    EXPECT_EQ(helicsDataBufferIsValid(message2), HELICS_TRUE);
 
     helicsFederateEnterExecutingMode(fed, nullptr);
     helicsFederateFinalize(fed, nullptr);
     helicsBrokerDisconnect(brk, nullptr);
+    helicsCleanupLibrary();
 }

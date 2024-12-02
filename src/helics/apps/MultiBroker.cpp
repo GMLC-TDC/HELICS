@@ -90,7 +90,7 @@ MultiBroker::~MultiBroker()
 bool MultiBroker::brokerConnect()
 {
     std::shared_ptr<helicsCLI11App> app;
-    std::string configString = "--config='" + configFile + '\'';
+    const std::string localConfigString = "--config='" + configFile + '\'';
     if (!configFile.empty()) {
         app = netInfo.commandLineParser("");
         app->addTypeOption();
@@ -102,7 +102,7 @@ bool MultiBroker::brokerConnect()
         if (type == CoreType::MULTI) {
             app->get_config_formatter_base()->section("master");
             app->setDefaultCoreType(type);
-            app->parse(configString);
+            app->parse(localConfigString);
             type = app->getCoreType();
         }
         if (type != CoreType::MULTI) {
@@ -110,15 +110,15 @@ bool MultiBroker::brokerConnect()
                 CoreBroker::setAsRoot();
             }
             masterComm = CommFactory::create(type);
-            masterComm->setCallback(
-                [this](ActionMessage&& M) { BrokerBase::addActionMessage(std::move(M)); });
+            masterComm->setCallback([this](ActionMessage&& message) {
+                BrokerBase::addActionMessage(std::move(message));
+            });
             masterComm->setLoggingCallback(BrokerBase::getLoggingCallback());
             masterComm->setName(getIdentifier());
             masterComm->loadNetworkInfo(netInfo);
             masterComm->setTimeout(networkTimeout.to_ms());
 
-            bool res = masterComm->connect();
-            if (!res) {
+            if (!masterComm->connect()) {
                 return false;
             }
             BrokerFactory::addAssociatedBrokerType(getIdentifier(), type);
@@ -137,22 +137,22 @@ bool MultiBroker::brokerConnect()
             netInfo = NetworkBrokerData();  // to reset the networkBrokerData
             app->get_config_formatter_base()->section("comms")->index(index);
             app->setDefaultCoreType(CoreType::MULTI);
-            app->parse(configString);
+            app->parse(localConfigString);
             type = app->getCoreType();
             if (type != CoreType::MULTI) {
                 auto comm = CommFactory::create(type);
-                comm->setCallback([this, index](ActionMessage&& M) {
-                    if (M.action() == CMD_REG_BROKER) {
-                        M.setExtraData(index + 1);
+                comm->setCallback([this, index](ActionMessage&& message) {
+                    if (message.action() == CMD_REG_BROKER) {
+                        message.setExtraData(index + 1);
                     }
-                    BrokerBase::addActionMessage(std::move(M));
+                    BrokerBase::addActionMessage(std::move(message));
                 });
                 comm->setLoggingCallback(BrokerBase::getLoggingCallback());
                 comm->setName(getIdentifier());
                 comm->loadNetworkInfo(netInfo);
                 comm->setTimeout(networkTimeout.to_ms());
 
-                bool res = comm->connect();
+                const bool res = comm->connect();
                 comms.push_back(std::move(comm));
                 if (!res) {
                     brokerDisconnect();
@@ -166,9 +166,9 @@ bool MultiBroker::brokerConnect()
         }
     }
     catch (const CLI::Error& e) {
-        std::ostringstream ss;
-        app->exit(e, ss, ss);
-        sendToLogger(parent_broker_id, HELICS_LOG_LEVEL_ERROR, getIdentifier(), ss.str());
+        std::ostringstream oss;
+        app->exit(e, oss, oss);
+        sendToLogger(parent_broker_id, HELICS_LOG_LEVEL_ERROR, getIdentifier(), oss.str());
         brokerDisconnect();
         return false;
     }
@@ -202,7 +202,7 @@ std::shared_ptr<helicsCLI11App> MultiBroker::generateCLI()
 {
     auto app = CoreBroker::generateCLI();
     CLI::App_p netApp = netInfo.commandLineParser("127.0.0.1", false);
-    app->add_subcommand(netApp);
+    app->add_subcommand(std::move(netApp));
     app->addTypeOption();
     app->setDefaultCoreType(type);
     // this is a null flag option for forcing the callback to run

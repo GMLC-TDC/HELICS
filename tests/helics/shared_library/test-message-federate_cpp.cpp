@@ -92,12 +92,11 @@ TEST_P(mfed_type_tests, message_federate_send_receive)
     res = epid2.hasMessage();
     EXPECT_TRUE(res);
 
-    auto M = epid2.getMessage();
-    // BOOST_REQUIRE (M);
-    ASSERT_EQ(M.size(), 500);
-    EXPECT_NE(M.data(), nullptr);
-    if (M.data() != nullptr) {
-        EXPECT_EQ(M.c_str()[245], 'a');
+    auto message = epid2.getMessage();
+    ASSERT_EQ(message.size(), 500);
+    EXPECT_NE(message.data(), nullptr);
+    if (message.data() != nullptr) {
+        EXPECT_EQ(message.c_str()[245], 'a');
     }
     mFed1->finalize();
 
@@ -123,11 +122,11 @@ TEST_F(mfed_tests, Message)
     mFed2->enterExecutingMode();
     mFed1->enterExecutingModeComplete();
 
-    auto m1 = epid.createMessage();
+    auto message = epid.createMessage();
     std::string data(500, 'a');
-    m1.data(data).time(0.0).destination("ep2");
-    epid.sendMessage(m1);
-    epid.sendMessageZeroCopy(m1);
+    message.data(data).time(0.0).destination("ep2");
+    epid.sendMessage(message);
+    epid.sendMessageZeroCopy(message);
 
     mFed1->requestTimeAsync(2.0);
     HelicsTime time = mFed2->requestTime(1.0);
@@ -137,32 +136,32 @@ TEST_F(mfed_tests, Message)
     auto cnt = epid2.pendingMessageCount();
     EXPECT_EQ(cnt, 2U);
 
-    auto M1 = epid2.getMessage();
-    auto M2 = epid2.getMessage();
+    auto message1 = epid2.getMessage();
+    auto message2 = epid2.getMessage();
 
-    std::string M1d(M1.c_str(), M1.size());
-    std::string M2d(M2.c_str(), M2.size());
+    std::string M1d(message1.c_str(), message1.size());
+    std::string M2d(message2.c_str(), message2.size());
     EXPECT_EQ(M1d, M2d);
 
-    M2.destination(M1.source()).messageID(45);
-    epid2.sendMessage(std::move(M2));
+    message2.destination(message1.source()).messageID(45);
+    epid2.sendMessage(std::move(message2));
     mFed2->finalize();
 
     time = mFed1->requestTimeComplete();
     EXPECT_DOUBLE_EQ(time, 1.0);
     EXPECT_EQ(epid.pendingMessageCount(), 1U);
-    auto M3 = epid.getMessage();
-    EXPECT_EQ(M3.messageID(), 45);
+    auto message3 = epid.getMessage();
+    EXPECT_EQ(message3.messageID(), 45);
 
-    helicscpp::Message M4(M3);
-    EXPECT_EQ(M4.messageID(), M3.messageID());
-    EXPECT_STREQ(M4.source(), M3.source());
+    helicscpp::Message message4(message3);
+    EXPECT_EQ(message4.messageID(), message3.messageID());
+    EXPECT_STREQ(message4.source(), message3.source());
 
-    helicscpp::Message M5(std::move(M3));
+    helicscpp::Message message5(std::move(message3));
 
-    EXPECT_EQ(M5.messageID(), M4.messageID());
-    EXPECT_STREQ(M5.source(), M4.source());
-    EXPECT_FALSE(M3.isValid());  // NOLINT
+    EXPECT_EQ(message5.messageID(), message4.messageID());
+    EXPECT_STREQ(message5.source(), message4.source());
+    EXPECT_FALSE(message3.isValid());  // NOLINT
     mFed1->finalize();
 }
 
@@ -195,12 +194,11 @@ TEST_F(mfed_tests, message_create_from_fed)
     res = epid2.hasMessage();
     EXPECT_TRUE(res);
 
-    auto M = epid2.getMessage();
-    // BOOST_REQUIRE (M);
-    ASSERT_EQ(M.size(), 500);
-    EXPECT_NE(M.data(), nullptr);
-    if (M.data() != nullptr) {
-        EXPECT_EQ(M.c_str()[245], 'a');
+    auto message = epid2.getMessage();
+    ASSERT_EQ(message.size(), 500);
+    EXPECT_NE(message.data(), nullptr);
+    if (message.data() != nullptr) {
+        EXPECT_EQ(message.c_str()[245], 'a');
     }
     mFed1->finalize();
 
@@ -237,12 +235,11 @@ TEST_F(mfed_tests, message_create_from_ept)
     res = epid2.hasMessage();
     EXPECT_TRUE(res);
 
-    auto M = epid2.getMessage();
-    // BOOST_REQUIRE (M);
-    ASSERT_EQ(M.size(), 500);
-    EXPECT_NE(M.data(), nullptr);
-    if (M.data() != nullptr) {
-        EXPECT_EQ(M.c_str()[245], 'a');
+    auto message = epid2.getMessage();
+    ASSERT_EQ(message.size(), 500);
+    EXPECT_NE(message.data(), nullptr);
+    if (message.data() != nullptr) {
+        EXPECT_EQ(message.c_str()[245], 'a');
     }
     mFed1->finalize();
 
@@ -280,12 +277,11 @@ TEST_F(mfed_tests, message_create_from_fed_after)
     res = epid2.hasMessage();
     EXPECT_TRUE(res);
 
-    auto M = epid2.getMessage();
-    // BOOST_REQUIRE (M);
-    ASSERT_EQ(M.size(), 500);
-    EXPECT_NE(M.data(), nullptr);
-    if (M.data() != nullptr) {
-        EXPECT_EQ(M.c_str()[245], 'a');
+    auto message = epid2.getMessage();
+    ASSERT_EQ(message.size(), 500);
+    EXPECT_NE(message.data(), nullptr);
+    if (message.data() != nullptr) {
+        EXPECT_EQ(message.c_str()[245], 'a');
     }
     mFed1->finalize();
 
@@ -322,12 +318,11 @@ TEST_F(mfed_tests, message_create_from_ept_after)
     res = epid2.hasMessage();
     EXPECT_TRUE(res);
 
-    auto M = epid2.getMessage();
-    // BOOST_REQUIRE (M);
-    ASSERT_EQ(M.size(), 500);
-    EXPECT_NE(M.data(), nullptr);
-    if (M.data() != nullptr) {
-        EXPECT_EQ(M.c_str()[245], 'a');
+    auto message = epid2.getMessage();
+    ASSERT_EQ(message.size(), 500);
+    EXPECT_NE(message.data(), nullptr);
+    if (message.data() != nullptr) {
+        EXPECT_EQ(message.c_str()[245], 'a');
     }
     mFed1->finalize();
 
@@ -340,19 +335,19 @@ TEST_F(mfed_tests, dataBuffer)
     SetupTest<helicscpp::MessageFederate>("test", 1, 1.0);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate>(0);
 
-    auto m1 = helicscpp::Message(*mFed1);
+    auto message1 = helicscpp::Message(*mFed1);
 
-    auto m2 = helicscpp::Message(*mFed1);
-    m1.data("raw data");
+    auto message2 = helicscpp::Message(*mFed1);
+    message1.data("raw data");
 
-    EXPECT_EQ(m1.size(), 8);
-    EXPECT_TRUE(m1.isValid());
-    EXPECT_STREQ(m1.c_str(), "raw data");
+    EXPECT_EQ(message1.size(), 8);
+    EXPECT_TRUE(message1.isValid());
+    EXPECT_STREQ(message1.c_str(), "raw data");
 
     // test the connection between the buffer and message
-    EXPECT_EQ(m2.size(), 0);
-    EXPECT_FALSE(m2.isValid());
-    auto buffer = m2.dataBuffer();
+    EXPECT_EQ(message2.size(), 0);
+    EXPECT_FALSE(message2.isValid());
+    auto buffer = message2.dataBuffer();
 
     EXPECT_TRUE(buffer.isValid());
 
@@ -397,15 +392,15 @@ TEST(dataBuffer, buffer)
 
 TEST(dataBuffer, bufferMemory)
 {
-    std::string v1;
-    v1.resize(1024, '\0');
-    helicscpp::DataBuffer buf1(v1.data(), 0, static_cast<int>(v1.size()));
-    EXPECT_EQ(buf1.capacity(), v1.size());
+    std::string value;
+    value.resize(1024, '\0');
+    helicscpp::DataBuffer buf1(value.data(), 0, static_cast<int>(value.size()));
+    EXPECT_EQ(buf1.capacity(), static_cast<int>(value.size()));
     EXPECT_EQ(buf1.size(), 0);
     buf1.fill(std::vector<double>{34.673, 19.1514, 1e-45});
-    helicscpp::DataBuffer buf2(v1.data(),
+    helicscpp::DataBuffer buf2(value.data(),
                                static_cast<int>(buf1.size()),
-                               static_cast<int>(v1.capacity()));
+                               static_cast<int>(value.capacity()));
 
     EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_VECTOR);
 

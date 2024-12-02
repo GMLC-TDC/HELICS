@@ -21,7 +21,7 @@ bool addTargets(const toml::value& section, std::string targetName, Callable cal
     toml::value uval;
     // There should probably be a static_assert here but there isn't a nice type trait to check that
     auto targets = toml::find_or(section, targetName, uval);
-    if (!targets.is_uninitialized()) {
+    if (!targets.is_empty()) {
         if (targets.is_array()) {
             auto& targetArray = targets.as_array();
             for (const auto& target : targetArray) {
