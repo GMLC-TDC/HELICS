@@ -1,0 +1,28 @@
+{
+  "potential_interfaces": {
+    "publication_templates": [
+      {
+        "name": "${field1}/${field2}",
+        "field1": ["obj1", "obj2", "obj3"],
+        "field2": [
+          ["type1", "double"],
+          ["type2", "int"],
+          ["type3", "double"]
+        ],
+        "template": { "global": true }
+      }
+    ],
+    "input_templates": [
+      {
+        "name": "${field1}/${field2}",
+        "field1": ["objA", "objB", "objC"],
+        "field2": [
+          ["typeA", "double"],
+          ["typeB", "int"],
+          ["typeC", "double"]
+        ],
+        "template": { "global": true }
+      }
+    ]
+  }
+}
