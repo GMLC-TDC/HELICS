@@ -141,8 +141,27 @@ TEST(app_tests, recorder)
     thread1.join();
 
     helicsAppDestroy(rec1);
+}
 
-    EXPECT_EQ(helicsAppIsActive(rec1), HELICS_FALSE);
+TEST(app_tests, recorder_object_nosan_ci_skip)
+{
+    // this test would trigger address sanitizer errors
+    if (helicsAppEnabled() != HELICS_TRUE) {
+        EXPECT_TRUE(true);
+        return;
+    }
+    auto err = helicsErrorInitialize();
+    HelicsFederateInfo fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_TEST, &err);
+    helicsFederateInfoSetCoreName(fedInfo, "rcoret2", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "-f1 --brokername=rec_brokerb --autobroker", &err);
+
+    auto recc1 = helicsCreateApp("recc1", "recorder", NULL, fedInfo, &err);
+    EXPECT_TRUE(helicsAppIsActive(recc1) == HELICS_TRUE);
+
+    helicsAppDestroy(recc1);
+
+    EXPECT_EQ(helicsAppIsActive(recc1), HELICS_FALSE);
 }
 
 TEST(app_tests, connector)

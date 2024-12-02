@@ -127,15 +127,16 @@ std::pair<double, int> runInitIterations(helics::ValueFederate* vfed, int index,
 std::vector<std::pair<double, int>>
     run_iteration_round_robin(std::vector<std::shared_ptr<helics::ValueFederate>>& fedVec)
 {
-    auto N = static_cast<int>(fedVec.size());
+    auto fedCount = static_cast<int>(fedVec.size());
     std::vector<std::future<std::pair<double, int>>> futures;
-    for (decltype(N) ii = 0; ii < N; ++ii) {
+    for (decltype(fedCount) ii = 0; ii < fedCount; ++ii) {
         auto vFed = fedVec[ii].get();
-        futures.push_back(std::async(std::launch::async,
-                                     [vFed, ii, N]() { return runInitIterations(vFed, ii, N); }));
+        futures.push_back(std::async(std::launch::async, [vFed, ii, fedCount]() {
+            return runInitIterations(vFed, ii, fedCount);
+        }));
     }
-    std::vector<std::pair<double, int>> results(N);
-    for (decltype(N) ii = 0; ii < N; ++ii) {
+    std::vector<std::pair<double, int>> results(fedCount);
+    for (decltype(fedCount) ii = 0; ii < fedCount; ++ii) {
         results[ii] = futures[ii].get();
     }
     return results;
@@ -172,7 +173,7 @@ TEST_P(iteration_type, execution_iteration_round_robin_ci_skip)
         helics::cleanupHelicsLibrary();
     }
     catch (...) {
-        std::cerr << "unable to run for " << GetParam() << std::endl;
+        std::cerr << "unable to run for " << GetParam() << '\n';
         return;
     }
 }
@@ -181,15 +182,15 @@ INSTANTIATE_TEST_SUITE_P(iteration, iteration_type, ::testing::ValuesIn(CoreType
 
 TEST_F(iteration, execution_iteration_loop3)
 {
-    int N = 5;
-    SetupTest<helics::ValueFederate>("test", N);
-    std::vector<std::shared_ptr<helics::ValueFederate>> vfeds(N);
-    for (int ii = 0; ii < N; ++ii) {
+    int fedCount{5};
+    SetupTest<helics::ValueFederate>("test", fedCount);
+    std::vector<std::shared_ptr<helics::ValueFederate>> vfeds(fedCount);
+    for (int ii = 0; ii < fedCount; ++ii) {
         vfeds[ii] = GetFederateAs<helics::ValueFederate>(ii);
         vfeds[ii]->setFlagOption(helics::defs::RESTRICTIVE_TIME_POLICY);
     }
     auto results = run_iteration_round_robin(vfeds);
-    for (int ii = 1; ii < N; ++ii) {
+    for (int ii = 1; ii < fedCount; ++ii) {
         if (results[ii].second < 50) {
             EXPECT_NEAR(results[ii].first, results[0].first, 0.1);
         }
@@ -488,45 +489,45 @@ TEST_F(iteration, iteration_counter)
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
-    std::atomic<int64_t> cc{0};
-    int64_t c1 = 0;
-    int64_t c2 = 0;
-    pub1.publish(c1);
-    pub2.publish(c2);
+    std::atomic<int64_t> counter{0};
+    int64_t iterationCount1 = 0;
+    int64_t iterationCount2 = 0;
+    pub1.publish(iterationCount1);
+    pub2.publish(iterationCount2);
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
     helics::iteration_time res;
     std::thread deadlock([&] {
-        int64_t cb{0};
+        int64_t deadlockCount{0};
         while (true) {
             std::this_thread::sleep_for(std::chrono::seconds(2));
-            auto nc1 = cc.load();
+            auto nc1 = counter.load();
             if (nc1 > 10) {
                 return;
             }
-            if (nc1 == cb) {
+            if (nc1 == deadlockCount) {
                 auto qres = vFed1->query("root", "global_time_debugging");
-                std::cout << qres << std::endl;
+                std::cout << qres << '\n';
                 return;
             }
-            cb = nc1;
+            deadlockCount = nc1;
         }
     });
 
-    while (c1 <= 10) {
-        EXPECT_EQ(sub1.getValue<int64_t>(), c1);
-        EXPECT_EQ(sub2.getValue<int64_t>(), c2);
-        ++c1;
-        ++c2;
+    while (iterationCount1 <= 10) {
+        EXPECT_EQ(sub1.getValue<int64_t>(), iterationCount1);
+        EXPECT_EQ(sub2.getValue<int64_t>(), iterationCount2);
+        ++iterationCount1;
+        ++iterationCount2;
 
-        if (c1 <= 10) {
-            pub1.publish(c1);
-            pub2.publish(c2);
+        if (iterationCount1 <= 10) {
+            pub1.publish(iterationCount1);
+            pub2.publish(iterationCount2);
         }
-        // std::cout << "iteration " << c1 << std::endl;
+        // std::cout << "iteration " << iterationCount1 << std::endl;
         vFed1->requestTimeIterativeAsync(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
-        if (c1 <= 10) {
+        if (iterationCount1 <= 10) {
             res = vFed2->requestTimeIterative(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
         } else {
             vFed2->requestTimeIterativeAsync(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
@@ -536,7 +537,7 @@ TEST_F(iteration, iteration_counter)
             res = vFed2->requestTimeIterativeComplete();
         }
 
-        if (c1 <= 10) {
+        if (iterationCount1 <= 10) {
             EXPECT_TRUE(res.state == helics::IterationResult::ITERATING);
             EXPECT_EQ(res.grantedTime, 0.0);
         } else {
@@ -544,12 +545,13 @@ TEST_F(iteration, iteration_counter)
             EXPECT_EQ(res.grantedTime, 1.0);
         }
         res = vFed1->requestTimeIterativeComplete();
-        ++cc;
-        // std::cout << "iteration granted " << c1 << std::endl;
-        if (c1 <= 10) {
+        ++counter;
+        // std::cout << "iteration granted " << iterationCount1 << std::endl;
+        if (iterationCount1 <= 10) {
             EXPECT_TRUE(res.state == helics::IterationResult::ITERATING);
             EXPECT_EQ(res.grantedTime, 0.0);
-            EXPECT_EQ(vFed1->getIntegerProperty(HELICS_PROPERTY_INT_CURRENT_ITERATION), c1);
+            EXPECT_EQ(vFed1->getIntegerProperty(HELICS_PROPERTY_INT_CURRENT_ITERATION),
+                      iterationCount1);
         } else {
             EXPECT_TRUE(res.state == helics::IterationResult::NEXT_STEP);
             EXPECT_EQ(res.grantedTime, 1.0);
@@ -681,31 +683,31 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec)
     vFed2->enterInitializingModeComplete();
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     for (int ii = 0; ii < 10; ++ii) {
-        auto it = vFed2->enterExecutingModeComplete();
-        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        auto iterating = vFed2->enterExecutingModeComplete();
+        EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
         EXPECT_EQ(sub2_1.getValue<int>(), ii + 4);
         pub2_1.publish(ii + 27);
         vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
-        it = vFed1->enterExecutingModeComplete();
-        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        iterating = vFed1->enterExecutingModeComplete();
+        EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
         EXPECT_EQ(sub1_1.getValue<int>(), ii + 27);
         pub1_1.publish(ii + 5);
         vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     }
-    auto it = vFed2->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::ITERATING);
+    auto iterating = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
     EXPECT_EQ(sub2_1.getValue<int>(), 14);
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
-    it = vFed1->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    iterating = vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::NEXT_STEP);
     EXPECT_EQ(sub1_1.getValue<int>(), 36);
     vFed1->requestTimeAsync(1.0);
-    it = vFed2->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    iterating = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::NEXT_STEP);
 
     vFed2->finalize();
-    auto tm = vFed1->requestTimeComplete();
-    EXPECT_EQ(tm, 1.0);
+    auto time = vFed1->requestTimeComplete();
+    EXPECT_EQ(time, 1.0);
     broker.reset();
     vFed1->finalize();
 }
@@ -734,8 +736,8 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint)
     vFed2->enterInitializingModeComplete();
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     for (int ii = 0; ii < 10; ++ii) {
-        auto it = vFed2->enterExecutingModeComplete();
-        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        auto iterating = vFed2->enterExecutingModeComplete();
+        EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
         EXPECT_TRUE(epid2.hasMessage());
         if (epid2.hasMessage()) {
             EXPECT_EQ(epid2.getMessage()->data.to_string(), "test_" + std::to_string(ii + 5));
@@ -744,8 +746,8 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint)
         epid2.sendTo("test_" + std::to_string(ii + 27), "ep1");
 
         vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
-        it = vFed1->enterExecutingModeComplete();
-        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        iterating = vFed1->enterExecutingModeComplete();
+        EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
         EXPECT_TRUE(epid1.hasMessage());
         if (epid1.hasMessage()) {
             EXPECT_EQ(epid1.getMessage()->data.to_string(), "test_" + std::to_string(ii + 27));
@@ -754,24 +756,24 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint)
         epid1.sendTo("test_" + std::to_string(ii + 6), "ep2");
         vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     }
-    auto it = vFed2->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::ITERATING);
+    auto iterating = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
     EXPECT_TRUE(epid2.hasMessage());
     if (epid2.hasMessage()) {
         EXPECT_EQ(epid2.getMessage()->data.to_string(), "test_15");
     }
 
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
-    it = vFed1->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    iterating = vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::NEXT_STEP);
     EXPECT_FALSE(epid1.hasMessage());
     vFed1->requestTimeAsync(1.0);
-    it = vFed2->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    iterating = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::NEXT_STEP);
 
     vFed2->finalize();
-    auto tm = vFed1->requestTimeComplete();
-    EXPECT_EQ(tm, 1.0);
+    auto time = vFed1->requestTimeComplete();
+    EXPECT_EQ(time, 1.0);
     broker.reset();
     vFed1->finalize();
 }
@@ -800,8 +802,8 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint_iterating_
     vFed2->enterInitializingModeComplete();
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     for (int ii = 0; ii < 5; ++ii) {
-        auto it = vFed2->enterExecutingModeComplete();
-        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        auto iterating = vFed2->enterExecutingModeComplete();
+        EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
         EXPECT_TRUE(epid2.hasMessage());
         if (epid2.hasMessage()) {
             EXPECT_EQ(epid2.getMessage()->data.to_string(), "test_" + std::to_string(ii + 5));
@@ -810,8 +812,8 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint_iterating_
         epid2.sendTo("test_" + std::to_string(ii + 27), "ep1");
 
         vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
-        it = vFed1->enterExecutingModeComplete();
-        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        iterating = vFed1->enterExecutingModeComplete();
+        EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
         EXPECT_TRUE(epid1.hasMessage());
         if (epid1.hasMessage()) {
             EXPECT_EQ(epid1.getMessage()->data.to_string(), "test_" + std::to_string(ii + 27));
@@ -820,25 +822,25 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint_iterating_
         epid1.sendTo("test_" + std::to_string(ii + 6), "ep2");
         vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     }
-    auto it = vFed2->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::ITERATING);
+    auto iterating = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
     EXPECT_TRUE(epid2.hasMessage());
     if (epid2.hasMessage()) {
         EXPECT_EQ(epid2.getMessage()->data.to_string(), "test_10");
     }
 
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
-    it = vFed1->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    iterating = vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::NEXT_STEP);
     EXPECT_FALSE(epid1.hasMessage());
     vFed1->requestTimeIterativeAsync(1.0, ITERATE_IF_NEEDED);
-    it = vFed2->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    iterating = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::NEXT_STEP);
 
     vFed2->finalize();
-    auto tmi = vFed1->requestTimeIterativeComplete();
-    EXPECT_EQ(tmi.grantedTime, 1.0);
-    EXPECT_EQ(tmi.state, helics::IterationResult::NEXT_STEP);
+    auto time = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(time.grantedTime, 1.0);
+    EXPECT_EQ(time.state, helics::IterationResult::NEXT_STEP);
     broker.reset();
     vFed1->finalize();
 }
@@ -871,32 +873,32 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_iterating_time_requ
     vFed2->enterInitializingModeComplete();
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     for (int ii = 0; ii < 5; ++ii) {
-        auto it = vFed2->enterExecutingModeComplete();
-        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        auto iterating = vFed2->enterExecutingModeComplete();
+        EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
         EXPECT_EQ(sub2_1.getValue<int>(), ii + 4);
         pub2_1.publish(ii + 27);
         vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
-        it = vFed1->enterExecutingModeComplete();
-        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        iterating = vFed1->enterExecutingModeComplete();
+        EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
         EXPECT_EQ(sub1_1.getValue<int>(), ii + 27);
         pub1_1.publish(ii + 5);
         vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     }
-    auto it = vFed2->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::ITERATING);
+    auto iterating = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::ITERATING);
     EXPECT_EQ(sub2_1.getValue<int>(), 9);
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
-    it = vFed1->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    iterating = vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::NEXT_STEP);
     EXPECT_EQ(sub1_1.getValue<int>(), 31);
     vFed1->requestTimeIterativeAsync(1.0, ITERATE_IF_NEEDED);
-    it = vFed2->enterExecutingModeComplete();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    iterating = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(iterating, helics::IterationResult::NEXT_STEP);
 
     vFed2->finalize();
-    auto tm = vFed1->requestTimeIterativeComplete();
-    EXPECT_EQ(tm.grantedTime, 1.0);
-    EXPECT_EQ(tm.state, helics::IterationResult::NEXT_STEP);
+    auto time = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(time.grantedTime, 1.0);
+    EXPECT_EQ(time.state, helics::IterationResult::NEXT_STEP);
     broker.reset();
     vFed1->finalize();
 }
@@ -946,7 +948,7 @@ TEST_F(iteration, iteration_high_count_nocov_ci_skip_nosan)
         vFed1->requestTimeIterativeComplete();
     }
 
-    EXPECT_GE(itCount, 200000);
+    EXPECT_GE(itCount, 200000U);
     vFed2->finalize();
     vFed1->finalize();
 }

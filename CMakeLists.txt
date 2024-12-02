@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.22...3.30)
+cmake_minimum_required(VERSION 3.22...3.31)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -25,7 +25,7 @@ project(HELICS VERSION 3.6.0)
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2024-10-08")
+set(HELICS_DATE "2024-11-26")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -275,7 +275,7 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/units)
     endif()
 
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/toml/value.hpp")
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/include/toml11/value.hpp")
         submod_update(ThirdParty/toml)
     endif()
 
@@ -328,6 +328,7 @@ if(NOT TARGET toml11::toml11)
         add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
     endif()
     hide_variable(TOML11_USE_UNRELEASED_TOML_FEATURES)
+    hide_variable(TOML11_PRECOMPILE)
 endif()
 
 # -------------------------------------------------------------
