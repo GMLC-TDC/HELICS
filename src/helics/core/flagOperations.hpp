@@ -118,6 +118,8 @@ enum ConnectionFlags : uint16_t {
 enum MessageFlags : uint16_t {
     /// flag indicating that the message requires processing for filters yet
     filter_processing_required_flag = 7,
+    /// flag indicating the message uses an overflow buffer
+    message_overflow_flag = 8,
     /// custom message flag 1
     user_custom_message_flag1 = 10,
     /// flag indicating the message is for destination processing
