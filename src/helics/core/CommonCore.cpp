@@ -3265,6 +3265,9 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                         asyncTime = true;
                     }
                 }
+                if (checkActionFlag(command, global_disconnect_flag)) {
+                    globalDisconnect = true;
+                }
                 timeoutMon->reset();
                 if (delayInitCounter < 0 && minFederateCount == 0 && minChildCount == 0) {
                     if (allInitReady()) {
@@ -4869,8 +4872,9 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     if ((!checkAndProcessDisconnect()) || (cstate < BrokerState::OPERATING)) {
                         cmd.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, cmd);
-                        if (minFederateState() != OperatingState::DISCONNECTED ||
-                            filterFed != nullptr || translatorFed != nullptr) {
+                        if ((minFederateState() != OperatingState::DISCONNECTED ||
+                             filterFed != nullptr || translatorFed != nullptr) &&
+                            !globalDisconnect) {
                             cmd.setAction(CMD_DISCONNECT_FED_ACK);
                             cmd.dest_id = cmd.source_id;
                             cmd.source_id = parent_broker_id;

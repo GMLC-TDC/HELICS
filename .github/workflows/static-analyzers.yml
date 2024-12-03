@@ -24,6 +24,7 @@ jobs:
   clang-tidy:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     container: helics/buildenv:clang-extra-tools
 
     steps:

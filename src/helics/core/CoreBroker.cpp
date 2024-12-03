@@ -435,6 +435,9 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
                 setActionFlag(brokerReply, async_timing_flag);
             }
         }
+        if (globalDisconnect) {
+            setActionFlag(brokerReply, global_disconnect_flag);
+        }
         transmit(route, brokerReply);
         LOG_CONNECTIONS(global_broker_id_local,
                         getIdentifier(),
@@ -598,6 +601,9 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
                 timeCoord->setAsChild(global_fedid);
             }
         }
+        if (globalDisconnect) {
+            setActionFlag(fedReply, global_disconnect_flag);
+        }
         transmit(route_id, fedReply);
         LOG_CONNECTIONS(global_broker_id_local,
                         getIdentifier(),
@@ -704,6 +710,12 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 global_broker_id_local = command.dest_id;
                 global_id.store(global_broker_id_local);
                 higher_broker_id = command.source_id;
+                if (checkActionFlag(command, global_timing_flag)) {
+                    globalTime = true;
+                    if (checkActionFlag(command, async_timing_flag)) {
+                        asyncTime = true;
+                    }
+                }
                 timeCoord->setSourceId(global_broker_id_local);
                 transmitDelayedMessages();
                 mBrokers.apply([localid = global_broker_id_local](auto& brk) {
@@ -717,6 +729,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     timeoutMon->disableParentPing();
                 }
                 timeoutMon->reset();
+                if (checkActionFlag(command, global_disconnect_flag)) {
+                    globalDisconnect = true;
+                }
                 return;
             }
             auto broker = mBrokers.find(command.name());
@@ -3297,6 +3312,35 @@ void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo
             transmit(parent_route_id, dis);
         } else {
             if ((brk != nullptr) && (!brk->_nonLocal)) {
+                if (globalDisconnect) {
+                    mBrokers.apply([this](auto& brk) {
+                        if (!brk._sent_disconnect_ack) {
+                            ActionMessage dis((brk._core) ? CMD_DISCONNECT_CORE_ACK :
+                                                            CMD_DISCONNECT_BROKER_ACK);
+                            dis.source_id = global_broker_id_local;
+                            dis.dest_id = brk.global_id;
+                            this->transmit(brk.route, dis);
+                            brk._sent_disconnect_ack = true;
+                            this->removeRoute(brk.route);
+                        }
+                    });
+                } else {
+                    if (!checkActionFlag(command, error_flag)) {
+                        ActionMessage dis((brk->_core) ? CMD_DISCONNECT_CORE_ACK :
+                                                         CMD_DISCONNECT_BROKER_ACK);
+                        dis.source_id = global_broker_id_local;
+                        dis.dest_id = brk->global_id;
+                        transmit(brk->route, dis);
+                    }
+                    brk->_sent_disconnect_ack = true;
+                    removeRoute(brk->route);
+                }
+            }
+            addActionMessage(CMD_STOP);
+        }
+    } else {
+        if ((brk != nullptr) && (!brk->_nonLocal)) {
+            if (!globalDisconnect) {
                 if (!checkActionFlag(command, error_flag)) {
                     ActionMessage dis((brk->_core) ? CMD_DISCONNECT_CORE_ACK :
                                                      CMD_DISCONNECT_BROKER_ACK);
@@ -3305,25 +3349,14 @@ void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo
                     transmit(brk->route, dis);
                 }
                 brk->_sent_disconnect_ack = true;
-                removeRoute(brk->route);
             }
-            addActionMessage(CMD_STOP);
-        }
-    } else {
-        if ((brk != nullptr) && (!brk->_nonLocal)) {
-            if (!checkActionFlag(command, error_flag)) {
-                ActionMessage dis((brk->_core) ? CMD_DISCONNECT_CORE_ACK :
-                                                 CMD_DISCONNECT_BROKER_ACK);
-                dis.source_id = global_broker_id_local;
-                dis.dest_id = brk->global_id;
-                transmit(brk->route, dis);
-            }
-            brk->_sent_disconnect_ack = true;
             if ((!isRootc) && (getBrokerState() < BrokerState::OPERATING)) {
                 command.setAction((brk->_core) ? CMD_DISCONNECT_CORE : CMD_DISCONNECT_BROKER);
                 transmit(parent_route_id, command);
             }
-            removeRoute(brk->route);
+            if (!globalDisconnect) {
+                removeRoute(brk->route);
+            }
         } else {
             if ((!isRootc) && (getBrokerState() < BrokerState::OPERATING)) {
                 if (brk != nullptr) {
