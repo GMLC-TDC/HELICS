@@ -181,25 +181,20 @@ static constexpr std::size_t action_message_base_size =
 int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
 {
     static const uint8_t littleEndian = isLittleEndian();
-    auto bflags=flags;
+    static constexpr std::size_t maxPayloadSize{0x00FFFFFFUL};
     // put the main string size in the first 4 bytes;
     std::uint32_t ssize{ 0UL };
     if (messageAction != CMD_TIME_REQUEST)
     {
-        if (payload.size() > 0x00FFFFFFUL) {
-            ssize = 0x00FFFFFFUL;
-            if (payload.size() > ssize)
-            {
-                bflags |= (static_cast<decltype(flags)>((1U) << (static_cast<uint16_t>((message_overflow_flag)))));
-            }
+        if (payload.size() >= maxPayloadSize) {
+            ssize = maxPayloadSize;
         } else {
             ssize = static_cast<uint32_t>(payload.size());
         }
-        static_cast<uint32_t>(payload.size() & 0x00FFFFFFUL);
     }
         
 
-    if ((data == nullptr) || (buffer_size == 0) || buffer_size < action_message_base_size + payload.size()) {
+    if ((data == nullptr) || (buffer_size == 0) || buffer_size < action_message_base_size + ssize) {
         return -1;
     }
 
@@ -226,7 +221,7 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
     data += sizeof(int32_t);  // 24
     *reinterpret_cast<uint16_t*>(data) = counter;
     data += sizeof(uint16_t);  // 26
-    *reinterpret_cast<uint16_t*>(data) = bflags;
+    *reinterpret_cast<uint16_t*>(data) = flags;
     data += sizeof(uint16_t);  // 28
     *reinterpret_cast<int32_t*>(data) = sequenceID;
     data += sizeof(int32_t);  // 32
@@ -253,8 +248,7 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
         std::memcpy(data, payload.data(), ssize);
         data += ssize;
     }
-    auto payloadsize=ssize;
-    if (payload.size() > ssize)
+    if (payload.size() >= maxPayloadSize)
     {
         *data = static_cast<std::byte>(stringData.size()+1);
     }
@@ -264,10 +258,10 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
     }
     
     ++data;
-    ssize += action_message_base_size;
+    ssize += action_message_base_size+1;
     for (const auto& str : stringData) {
         auto strsize = static_cast<uint32_t>(str.size());
-        if (buffer_size < ssize) {
+        if (buffer_size < ssize+strsize+4) {
             return -1;
         }
 
@@ -275,13 +269,17 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
         data += sizeof(uint32_t);
         std::memcpy(data, str.data(), str.size());
         data += str.size();
+        ssize+=strsize+4;
     }
-    if (payload.size() > ssize) {
-        if (buffer_size < ssize + payload.size() - payloadsize) {
+    if (payload.size() > maxPayloadSize) {
+        if (buffer_size < ssize + payload.size() - maxPayloadSize+4) {
             return -1;
         }
-        std::memcpy(data, payload.data() + payloadsize, payload.size() - payloadsize);
-        data += payload.size() - payloadsize;
+        auto strsize=static_cast<uint32_t>(payload.size()-maxPayloadSize);
+        std::memcpy(data, &strsize, sizeof(uint32_t));
+        data += sizeof(uint32_t);
+        std::memcpy(data, payload.data() + maxPayloadSize, payload.size() - maxPayloadSize);
+        data += payload.size() - maxPayloadSize;
     }
     //   }
     auto actSize = static_cast<int>(data - dataStart);
@@ -299,12 +297,18 @@ int ActionMessage::serializedByteCount() const
     }
     size += static_cast<int>(payload.size());
     // add additional string data
-    //   if (!stringData.empty()) {
+    if (!stringData.empty() || payload.size() > 0x00FFFFFF)
+    {
+        size+=1;
+    }
     for (const auto& str : stringData) {
         // 4(to store the length)+length of the string
         size += static_cast<int>(sizeof(uint32_t) + str.size());
     }
-    // }
+    if (payload.size() > 0x00FFFFFF)
+    {
+        size+=4;
+    }
     return size;
 }
 
@@ -576,6 +580,11 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
             swap_bytes<sizeof(Time::baseType)>(reinterpret_cast<std::uint8_t*>(&timecode));
             Tso.setBaseTimeCode(timecode);
         }
+    }
+    if (size == 0x00FFFFFFUL)
+    {
+        payload.append(stringData.back());
+        stringData.pop_back();
     }
     return tsize;
 }
