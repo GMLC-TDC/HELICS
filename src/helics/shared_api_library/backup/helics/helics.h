@@ -84,7 +84,9 @@ typedef enum { /* NOLINT */
                HELICS_CORE_TYPE_NULL = 66,
                /** an explicit core type exists but does nothing but return empty values or sink
                   calls*/
-               HELICS_CORE_TYPE_EMPTY = 77
+               HELICS_CORE_TYPE_EMPTY = 77,
+               /** core type specification to allow extraction from later arguments or files*/
+               HELICS_CORE_TYPE_EXTRACT = 101
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/
@@ -895,7 +897,8 @@ HELICS_EXPORT HelicsBool helicsIsCoreTypeAvailable(const char* type);
  * @param type The type of the core to create.
  * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
  * @param initString An initialization string to send to the core. The format is similar to command line arguments.
- *                   Typical options include a broker name, the broker address, the number of federates, etc.
+ *                   Typical options include a broker name, the broker address, the number of federates, etc.  Can also be a
+ *                   file (toml, ini, json) or json object containing the core configuration.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
@@ -951,6 +954,7 @@ HELICS_EXPORT HelicsBool helicsCoreIsValid(HelicsCore core);
  * @param name The name of the broker. It can be a nullptr or empty string to have a name automatically assigned.
  * @param initString An initialization string to send to the core-the format is similar to command line arguments.
  *                   Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates,
+ *                    or it can also be a json or toml file with broker configuration.
  * or the address.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
@@ -2645,18 +2649,15 @@ time, the app will not likely function normally; other query, information calls,
 HELICS_EXPORT HelicsFederate helicsAppGetFederate(HelicsApp app, HelicsError* err);
 
 /**
- * Create a HelicsApp object.
+ * Load a file to an App.
  *
- * @details Create a HelicsApp object.
+ * @details Loads a configuration file for an app.
  *
  * @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config
  * file.
- * @param appType The type of app to create.
+ * @param app The app to load a file.
  * @param configFile Configuration file or string to pass into the app, can be NULL or empty.
- * @param fedInfo The federate information to pass into the app, can be NULL.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- *
- * @return An opaque value app object, or nullptr if the object creation failed.
  */
 HELICS_EXPORT void helicsAppLoadFile(HelicsApp app, const char* configFile, HelicsError* err);
 
@@ -4785,14 +4786,12 @@ HELICS_EXPORT void helicsFilterSet(HelicsFilter filt, const char* prop, double v
 HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val, HelicsError* err);
 
 /**
-* Get a double property from a filter.
-*
-* @param filt The filter to retrieve a value from.
-* @param prop A string containing the property to get.
-*
-* @param[in,out] err A pointer to an error object for catching errors.
-
-*/
+ * Get a double property from a filter.
+ *
+ * @param filt The filter to retrieve a value from.
+ * @param prop A string containing the property to get.
+ *
+ */
 HELICS_EXPORT double helicsFilterGetPropertyDouble(HelicsFilter filt, const char* prop);
 
 /**
