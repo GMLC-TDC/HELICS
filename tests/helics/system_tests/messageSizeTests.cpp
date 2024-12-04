@@ -1,3 +1,10 @@
+/*
+Copyright (c) 2017-2024,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+*/
+
 #include "../application_api/testFixtures.hpp"
 
 #include "gtest/gtest.h"
@@ -74,17 +81,17 @@ TEST_P(mfed_type_tests, big_message_10MB)
     res = mFed2->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = mFed1->getMessage(epid);
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = mFed1->getMessage(epid);
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[245], data2[245]);
+    EXPECT_EQ(message1->data[245], data2[245]);
 
-    auto M2 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(message2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[245], data[245]);
+    EXPECT_EQ(message2->data[245], data[245]);
     mFed1->finalize();
     mFed2->finalize();
 }
@@ -136,22 +143,22 @@ TEST_P(mfed_type_tests, big_message_50MB)
     res = mFed2->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = mFed1->getMessage(epid);
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = mFed1->getMessage(epid);
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[245], data2[245]);
+    EXPECT_EQ(message1->data[245], data2[245]);
 
-    auto M2 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(message2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[245], data[245]);
+    EXPECT_EQ(message2->data[245], data[245]);
     mFed1->finalize();
     mFed2->finalize();
 }
 
-TEST_P(mfed_type_tests, big_message_200MB_skip_ci_nosan)
+TEST_P(mfed_type_tests, big_message_200MB_ci_skip_nosan)
 {
     if (std::string_view{GetParam()}.compare(0, 3, "ipc") == 0) {
         return;
@@ -198,22 +205,22 @@ TEST_P(mfed_type_tests, big_message_200MB_skip_ci_nosan)
     res = mFed2->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = mFed1->getMessage(epid);
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = mFed1->getMessage(epid);
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[24500], data2[24500]);
+    EXPECT_EQ(message1->data[24500], data2[24500]);
 
-    auto M2 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(message2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[24500], data[24500]);
+    EXPECT_EQ(message2->data[24500], data[24500]);
     mFed1->finalize();
     mFed2->finalize();
 }
 
-TEST_P(mfed_type_tests, big_message_1500MB_skip_ci_nosan)
+TEST_P(mfed_type_tests, big_message_1500MB_ci_skip__nosan)
 {
     if (std::string_view{GetParam()}.compare(0, 3, "ipc") == 0) {
         return;
@@ -260,17 +267,17 @@ TEST_P(mfed_type_tests, big_message_1500MB_skip_ci_nosan)
     res = mFed2->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = mFed1->getMessage(epid);
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = mFed1->getMessage(epid);
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[24500], data2[24500]);
+    EXPECT_EQ(message1->data[24500], data2[24500]);
 
-    auto M2 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(message2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[24500], data[24500]);
+    EXPECT_EQ(message2->data[24500], data[24500]);
     mFed1->finalize();
     mFed2->finalize();
 }
