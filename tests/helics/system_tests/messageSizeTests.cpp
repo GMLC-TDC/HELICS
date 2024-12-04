@@ -5,7 +5,7 @@
 #include <complex>
 
 /** these test cases test out the value converters
-*/
+ */
 #include "helics/helics.hpp"
 
 #include <future>
@@ -27,16 +27,15 @@ static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& pa
     return std::string(parameter.param);
 };
 
-
 TEST_P(mfed_type_tests, big_message_10MB)
 {
-    if (std::string_view{ GetParam() }.compare(0,3,"ipc") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "ipc") == 0) {
         return;
     }
-    if (std::string_view{ GetParam() }.compare(0,3,"tcp") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "tcp") == 0) {
         return;
     }
-    if (std::string_view{ GetParam() }.compare(0,3,"udp") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "udp") == 0) {
         return;
     }
     SetupTest<helics::MessageFederate>(GetParam(), 2);
@@ -55,7 +54,7 @@ TEST_P(mfed_type_tests, big_message_10MB)
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
-    constexpr std::size_t dataSize=10'000'000;
+    constexpr std::size_t dataSize = 10'000'000;
     helics::SmallBuffer data(dataSize, 'a');
     helics::SmallBuffer data2(dataSize, 'b');
 
@@ -88,20 +87,17 @@ TEST_P(mfed_type_tests, big_message_10MB)
     EXPECT_EQ(M2->data[245], data[245]);
     mFed1->finalize();
     mFed2->finalize();
-
 }
-
-
 
 TEST_P(mfed_type_tests, big_message_50MB)
 {
-    if (std::string_view{ GetParam() }.compare(0,3,"ipc") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "ipc") == 0) {
         return;
     }
-    if (std::string_view{ GetParam() }.compare(0,3,"tcp") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "tcp") == 0) {
         return;
     }
-    if (std::string_view{ GetParam() }.compare(0,3,"udp") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "udp") == 0) {
         return;
     }
     SetupTest<helics::MessageFederate>(GetParam(), 2);
@@ -120,7 +116,7 @@ TEST_P(mfed_type_tests, big_message_50MB)
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
-    constexpr std::size_t dataSize=20'000'000;
+    constexpr std::size_t dataSize = 20'000'000;
     helics::SmallBuffer data(dataSize, 'a');
     helics::SmallBuffer data2(dataSize, 'b');
 
@@ -153,20 +149,17 @@ TEST_P(mfed_type_tests, big_message_50MB)
     EXPECT_EQ(M2->data[245], data[245]);
     mFed1->finalize();
     mFed2->finalize();
-
 }
-
-
 
 TEST_P(mfed_type_tests, big_message_200MB_skip_ci_nosan)
 {
-    if (std::string_view{ GetParam() }.compare(0,3,"ipc") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "ipc") == 0) {
         return;
     }
-    if (std::string_view{ GetParam() }.compare(0,3,"tcp") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "tcp") == 0) {
         return;
     }
-    if (std::string_view{ GetParam() }.compare(0,3,"udp") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "udp") == 0) {
         return;
     }
     SetupTest<helics::MessageFederate>(GetParam(), 2);
@@ -185,7 +178,7 @@ TEST_P(mfed_type_tests, big_message_200MB_skip_ci_nosan)
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
-    constexpr std::size_t dataSize=200'000'000;
+    constexpr std::size_t dataSize = 200'000'000;
     helics::SmallBuffer data(dataSize, 'a');
     helics::SmallBuffer data2(dataSize, 'b');
 
@@ -218,19 +211,17 @@ TEST_P(mfed_type_tests, big_message_200MB_skip_ci_nosan)
     EXPECT_EQ(M2->data[24500], data[24500]);
     mFed1->finalize();
     mFed2->finalize();
-
 }
-
 
 TEST_P(mfed_type_tests, big_message_1500MB_skip_ci_nosan)
 {
-    if (std::string_view{ GetParam() }.compare(0,3,"ipc") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "ipc") == 0) {
         return;
     }
-    if (std::string_view{ GetParam() }.compare(0,3,"tcp") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "tcp") == 0) {
         return;
     }
-    if (std::string_view{ GetParam() }.compare(0,3,"udp") == 0) {
+    if (std::string_view{GetParam()}.compare(0, 3, "udp") == 0) {
         return;
     }
     SetupTest<helics::MessageFederate>(GetParam(), 2);
@@ -249,7 +240,7 @@ TEST_P(mfed_type_tests, big_message_1500MB_skip_ci_nosan)
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
-    constexpr std::size_t dataSize=1'500'000'000;
+    constexpr std::size_t dataSize = 1'500'000'000;
     helics::SmallBuffer data(dataSize, 'a');
     helics::SmallBuffer data2(dataSize, 'b');
 
@@ -282,7 +273,6 @@ TEST_P(mfed_type_tests, big_message_1500MB_skip_ci_nosan)
     EXPECT_EQ(M2->data[24500], data[24500]);
     mFed1->finalize();
     mFed2->finalize();
-
 }
 
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes_2), testNamer);
