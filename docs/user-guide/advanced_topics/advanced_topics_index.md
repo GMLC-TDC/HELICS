@@ -11,6 +11,7 @@
     callbacks
     CallbackFederate
     commandInterface
+    connector_fed
     CoreTypes
     dynamic_federations
     encrypted_communication
@@ -27,13 +28,7 @@
     simultaneous_cosimulations
     targeted_endpoints
     timeouts
-    commandInterface
-    iteration
-    aliases
-    callbacks
-    CallbackFederate
-    networking
-    encrypted_communication
+    timingOptimization
 ```
 
 Whereas the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) provided a broad overview of co-simulation and a good step-by-step introduction to setting up a HELICS co-simulation, the
@@ -54,6 +49,7 @@ The Advanced Topics will cover:
 - [**Callbacks**](./callbacks.md) - Over time a number of callbacks have been added for various operations and stages of the life cycle of a federate. This document describes the different callbacks available.
 - [**Callback Federates**](./CallbackFederate.md) - HELICS 3.3 introduced a beta test for callback federates which allow a federate to operate purely inline with a core based solely on callbacks. This can allow a much higher number of federates on a given system than was previously possible.
 - [**Command Interface**](./commandInterface.md) - HELICS v3 introduced the command interface as a method of asynchronously communicating between federates.
+- [**helics_connector**](./commandInterface.md) - App that creates connections between federates as a separate process from the declaration of said interfaces.
 - [**Cores**](./CoreTypes.md) - Discussion of the different types of message-passing buses and their implementation as HELICS cores.
 - [**Dynamic Federations**](./dynamic_federations.md) - Sometimes it is useful to have a federate that is not ready at the beginning of co-simulation. This is a dynamic federation. There are various levels of this (not all are available yet) and this document discusses some aspects of dynamic co-simulation.
 - [**Encrypted Communication**](./encrypted_communication.md) - How to encrypt communication between HELICS brokers/federates.
@@ -70,12 +66,6 @@ The Advanced Topics will cover:
 - [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system.
 - [**Targeted Endpoints**](./targeted_endpoints.md) - details on the new targeted endpoints in HELICS 3.
 - [**Timeouts**](./timeouts.md) - HELICS includes a number of timeouts to prevent failed operations from continuing indefinitely, the various timeout options are discussed in this document.
-- [**Command Interface**](./commandInterface.md) - HELICS v3 introduced the command interface as a method of asynchronously communicating between federates.
-- [**Aliases**](./aliases.md) - HELICS 3.3 introduced the notion of aliases. Aliases allow a mapping of an interface key to a different string.
-- [**Callbacks**](./callbacks.md) - Over time a number of callbacks have been added for various operations and stages of the life cycle of a federate. This document describes the different callbacks available.
-- [**Callback Federates**](./CallbackFederate.md) - HELICS 3.3 introduced a beta test for callback federates which allow a federate to operate purely inline with a core based solely on callbacks. This can allow a much higher number of federates on a given system than was previously possible.
-- [**Networking**](./CallbackFederate.md) - HELICS provides several ways of working in more restrictive networking environments.
-- [**Encrypted Communication**](./encrypted_communication.md) - How to encrypt communication between HELICS brokers/federates.
 - [**Timing Optimization**](./timingOptimization.md) - Guidance and recommendation on how to configure and set-up timing to optimize federation performance.
 - [**Translators**](./translators.md) - Translators provide a means of HELICS message interfaces to communicate with HELICS value interfaces and vice versa.
 - [**Webserver API**](./webserver.md) - How to interact with a running co-simulation using a REST-based web API.
