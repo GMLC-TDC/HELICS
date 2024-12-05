@@ -179,6 +179,7 @@ void CoreBroker::makeConnections(const std::string& file)
         case fileops::ConfigType::TOML_FILE:
         case fileops::ConfigType::TOML_STRING:
             fileops::makeConnectionsToml(this, file);
+            break;
         case fileops::ConfigType::CMD_LINE:
         case fileops::ConfigType::NONE:
             // with NONE there are default command line and environment possibilities

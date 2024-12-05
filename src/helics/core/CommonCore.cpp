@@ -2030,6 +2030,7 @@ void CommonCore::makeConnections(const std::string& file)
         case fileops::ConfigType::TOML_FILE:
         case fileops::ConfigType::TOML_STRING:
             fileops::makeConnectionsToml(this, file);
+            break;
         case fileops::ConfigType::CMD_LINE:
         case fileops::ConfigType::NONE:
             // with NONE there are default command line and environment possibilities
@@ -4622,7 +4623,7 @@ void CommonCore::processTimingTick(ActionMessage& cmd)
                         " disconnect Timer expired forcing disconnect");
             ActionMessage bye(CMD_DISCONNECT_FED_ACK);
             bye.source_id = parent_broker_id;
-            for (auto fed : loopFederates) {
+            for (FedInfo fed : loopFederates) {
                 if (fed->getState() != FederateStates::FINISHED) {
                     bye.dest_id = fed->global_id.load();
                     fed->addAction(bye);
