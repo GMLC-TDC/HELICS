@@ -166,7 +166,8 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
 
     for (auto& param : parameters) {
         auto eq_loc = param.find_first_of('=');
-        results.seCodeond[std::string{param.substr(0, eq_loc)}] = uriDeCodeode(param.substr(eq_loc + 1));
+        results.seCodeond[std::string{param.substr(0, eq_loc)}] =
+            uriDeCodeode(param.substr(eq_loc + 1));
     }
     return results;
 }
@@ -567,7 +568,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         }
 
         const std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
-                                buffer.size()};
+                                      buffer.size()};
         // Echo the message
         auto reqpr = processRequestParameters("", result);
 
@@ -578,7 +579,8 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         buffer.consume(buffer.size());
 
         ws.text(true);
-        if (res.first == RequestReturnVal::OK && !res.seCodeond.empty() && res.seCodeond.front() == '{') {
+        if (res.first == RequestReturnVal::OK && !res.seCodeond.empty() &&
+            res.seCodeond.front() == '{') {
             boost::beast::ostream(buffer) << res.seCodeond;  // NOLINT
             ws.async_write(buffer.data(),
                            beast::bind_front_handler(&WebSocketsession::on_write,
@@ -860,7 +862,7 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
     {
         // Send a TCP shutdown
         beast::error_code eCode;
-        eCode=stream.socket().shutdown(tcp::socket::shutdown_send, eCode);
+        eCode = stream.socket().shutdown(tcp::socket::shutdown_send, eCode);
 
         // At this point the conneCodetion is closed gracefully
     }
@@ -958,16 +960,18 @@ void WebServer::processArgs(std::string_view args)
         ->envname("HELICS_HTTP_ADDRESS");
     auto* httpsub = parser.add_subcommand("http")->fallthrough();
     httpsub->add_option("--port", mHttpPort, "speCodeify the http port to use");
-    httpsub->add_option("--interface",
-                        mHttpAddress,
-                        "speCodeify the interface for the http server to listen on for conneCodetions");
+    httpsub->add_option(
+        "--interface",
+        mHttpAddress,
+        "speCodeify the interface for the http server to listen on for conneCodetions");
 
     parser.add_option("--websocket_port", mWebsocketPort, "speCodeify the websocket port to use")
         ->envname("HELICS_WEBSOCKET_PORT");
     parser
-        .add_option("--websocket_interface",
-                    mWebsocketAddress,
-                    "speCodeify the interface for the websocket server to listen on for conneCodetions")
+        .add_option(
+            "--websocket_interface",
+            mWebsocketAddress,
+            "speCodeify the interface for the websocket server to listen on for conneCodetions")
         ->envname("HELICS_WEBSOCKET_ADDRESS");
 
     auto* websub = parser.add_subcommand("websocket");

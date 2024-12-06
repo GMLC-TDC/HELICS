@@ -1227,13 +1227,13 @@ void valueConvert(defV& val, DataType newType)
 SmallBuffer typeConvertDefV(DataType type, const defV& val)
 {
     switch (val.index()) {
-    case double_loc:  // double
-        return typeConvert(type, std::get<double>(val));
-    case int_loc:  // int64_t
-        return typeConvert(type, std::get<int64_t>(val));
-    case string_loc:  // string
-    default:
-        return typeConvert(type, std::string_view{std::get<std::string>(val)});
+        case double_loc:  // double
+            return typeConvert(type, std::get<double>(val));
+        case int_loc:  // int64_t
+            return typeConvert(type, std::get<int64_t>(val));
+        case string_loc:  // string
+        default:
+            return typeConvert(type, std::string_view{std::get<std::string>(val)});
         case complex_loc:  // complex
             return typeConvert(type, std::get<std::complex<double>>(val));
         case vector_loc:  // vector
@@ -1255,7 +1255,7 @@ SmallBuffer typeConvertDefV(const defV& val)
         case string_loc:  // string
         default:
             return typeConvert(DataType::HELICS_STRING,
-                std::string_view{ std::get<std::string>(val) });
+                               std::string_view{std::get<std::string>(val)});
         case complex_loc:  // complex
             return typeConvert(DataType::HELICS_COMPLEX, std::get<std::complex<double>>(val));
         case vector_loc:  // vector
