@@ -603,7 +603,7 @@ TEST(messageFederate, constructor1)
 
     EXPECT_FALSE(mf2.getMessage());
 
-    auto ept1 = mf2.registerEndpoint();
+    auto &ept1 = mf2.registerEndpoint();
     EXPECT_FALSE(mf2.hasMessage(ept1));
     EXPECT_EQ(mf2.pendingMessageCount(ept1), 0);
     auto message = mf2.getMessage(ept1);
@@ -1181,7 +1181,7 @@ TEST_F(mfed_tests, reentrant_fed_endpoint)
         EXPECT_EQ(message->to_string(), "test_from1");
     }
     // close and reconnect federate
-    auto mFed2Name = mFed2->getName();
+    std::string mFed2Name = mFed2->getName();
     mFed2->disconnect();
     tres = mFed1->requestTime(helics::timeZero);
     EXPECT_LE(tres, 3.0);

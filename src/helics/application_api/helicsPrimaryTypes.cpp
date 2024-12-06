@@ -261,7 +261,7 @@ void valueExtract(const defV& data, std::vector<double>& val)
             break;
         case complex_loc:  // complex
         {
-            auto cval = std::get<std::complex<double>>(data);
+            std::complex<double> cval = std::get<std::complex<double>>(data);
             val.push_back(cval.real());
             if (cval.imag() != 0.0) {
                 val.push_back(cval.imag());
@@ -436,7 +436,7 @@ void valueExtract(const defV& data, Time& val)
             break;
         }
         case named_point_loc:
-            auto point = std::get<NamedPoint>(data);
+            auto &point = std::get<NamedPoint>(data);
             if (std::isnan(point.value)) {
                 if (point.name.find(".[eE") == std::string::npos) {
                     std::int64_t v = getIntFromString(point.name);
@@ -565,7 +565,7 @@ defV readJsonValue(const data_view& data)
             } break;
             case DataType::HELICS_COMPLEX_VECTOR: {
                 std::vector<std::complex<double>> res;
-                auto ca = json["value"];
+                auto &ca = json["value"];
                 for (std::size_t ii = 0; ii < ca.size() - 1; ii += 2) {
                     res.emplace_back(ca[ii].get<double>(), ca[ii + 1].get<double>());
                 }

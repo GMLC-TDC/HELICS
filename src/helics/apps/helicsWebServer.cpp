@@ -237,7 +237,7 @@ std::pair<RequestReturnVal, std::string>
     static const std::string emptyString;
     if (command == RestCommand::UNKNOWN) {
         if (fields.find("command") != fields.end()) {
-            auto cmdstr = fields.at("command");
+            auto& cmdstr = fields.at("command");
             if (cmdstr == "query" || cmdstr == "search" || cmdstr == "get") {
                 command = RestCommand::QUERY;
             }
@@ -1079,7 +1079,7 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
     if (mWebsocketEnabled) {
         auto websocketInterfaceNetwork = mInterfaceNetwork;
         if (config->contains("websocket")) {
-            auto V = (*config)["websocket"];
+            auto& V = (*config)["websocket"];
             helics::fileops::replaceIfMember(V, "interface", mWebsocketAddress);
             helics::fileops::replaceIfMember(V, "port", mWebsocketPort);
 

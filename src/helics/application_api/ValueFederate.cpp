@@ -262,7 +262,7 @@ void ValueFederate::registerValueInterfacesJsonDetail(const fileops::JsonBuffer&
     const nlohmann::json& iface = (json.contains("interfaces")) ? json["interfaces"] : json;
 
     if (iface.contains("publications")) {
-        auto pubs = iface["publications"];
+        auto& pubs = iface["publications"];
         for (const auto& pub : pubs) {
             auto name = fileops::getName(pub);
 
@@ -320,7 +320,7 @@ void ValueFederate::registerValueInterfacesJsonDetail(const fileops::JsonBuffer&
         }
     }
     if (iface.contains("inputs")) {
-        auto ipts = iface["inputs"];
+        auto& ipts = iface["inputs"];
         for (const auto& ipt : ipts) {
             auto name = fileops::getName(ipt);
 
@@ -438,7 +438,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         }
     }
     if (isMember(doc, "inputs")) {
-        auto ipts = toml::find(doc, "inputs");
+        auto& ipts = toml::find(doc, "inputs");
         if (!ipts.is_array()) {
             throw(helics::InvalidParameter(
                 "inputs section in toml file must be an array"));  // LCOV_EXCL_LINE
