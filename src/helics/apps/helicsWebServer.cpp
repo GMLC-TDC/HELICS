@@ -216,6 +216,63 @@ static std::string getBrokerList()
     }
     return helics::fileops::generateJsonString(base);
 }
+/** create a broker from the fields*/
+static std::tuple<std::shared_ptr<helics::Broker>,std::string,bool,std::string> createBroker(std::string &brokerName,
+    const boost::container::flat_map<std::string, std::string>& fields)
+{
+    std::string start_args;
+    std::string type;
+    if (fields.find("args") != fields.end()) {
+        start_args = fields.at("args");
+    }
+    if (fields.find("type") != fields.end()) {
+        type = fields.at("type");
+    } else if (fields.find("CoreType") != fields.end()) {
+        type = fields.at("CoreType");
+    } else if (fields.find("core_type") != fields.end()) {
+        type = fields.at("core_type");
+    }
+    helics::CoreType ctype{helics::CoreType::DEFAULT};
+    if (!type.empty()) {
+        ctype = helics::core::coreTypeFromString(type);
+        if (!helics::core::isCoreTypeAvailable(ctype)) {
+            // return send(bad_request(type + " is not available"));
+            return {nullptr, type + " is not available",false,""};
+        }
+    }
+    if (fields.find("num_feds") != fields.end()) {
+        start_args += " -f " + fields.at("num_feds");
+    }
+    if (fields.find("num_brokers") != fields.end()) {
+        start_args += " --minbrokers=" + fields.at("num_brokers");
+    }
+    if (fields.find("port") != fields.end()) {
+        start_args += " --port=" + fields.at("port");
+    }
+    if (fields.find("host") != fields.end()) {
+        start_args += " --interface=" + fields.at("host");
+    }
+    if (fields.find("log_level") != fields.end()) {
+        start_args += " --loglevel=" + fields.at("log_level");
+    }
+    bool useUuid{false};
+    if (brokerName.empty()) {
+        boost::uuids::random_generator generator;
+
+        const boost::uuids::uuid uuid1 = generator();
+        std::ostringstream ss1;
+        ss1 << uuid1;
+        brokerName = ss1.str();
+        useUuid = true;
+    }
+    try {
+        return { helics::BrokerFactory::create(ctype, brokerName, start_args),"",useUuid,type};
+    }
+    catch (const std::exception& exc)
+    {
+        return {nullptr,exc.what(),false,""};
+    }
+}
 
 enum class RequestReturnVal : std::int32_t {
     OK = 0,
@@ -226,6 +283,20 @@ enum class RequestReturnVal : std::int32_t {
 
 // set of possible commands that the web server can implement
 enum class RestCommand { QUERY, CREATE, REMOVE, BARRIER, CLEAR_BARRIER, COMMAND, UNKNOWN };
+
+static const std::unordered_map<std::string_view, RestCommand> commandMap{
+    {"query",RestCommand::QUERY},
+    {"search",RestCommand::QUERY},
+    {"get",RestCommand::QUERY},
+    {"status",RestCommand::QUERY},
+    {"create",RestCommand::CREATE},
+    {"barrier",RestCommand::BARRIER},
+    {"command",RestCommand::COMMAND},
+    {"clearbarrier",RestCommand::CLEAR_BARRIER},
+    {"clear_barrier",RestCommand::CLEAR_BARRIER},
+    {"delete",RestCommand::REMOVE},
+    {"clear",RestCommand::REMOVE},
+};
 
 static std::pair<RequestReturnVal, std::string>
     generateResults(RestCommand command,
@@ -238,28 +309,13 @@ static std::pair<RequestReturnVal, std::string>
     if (command == RestCommand::UNKNOWN) {
         if (fields.find("command") != fields.end()) {
             const auto& cmdstr = fields.at("command");
-            if (cmdstr == "query" || cmdstr == "search" || cmdstr == "get") {
-                command = RestCommand::QUERY;
-            }
-            if (cmdstr == "status") {
-                command = RestCommand::QUERY;
-                query = "status";
-            }
-            if (cmdstr == "create") {
-                command = RestCommand::CREATE;
-            }
-
-            if (cmdstr == "barrier") {
-                command = RestCommand::BARRIER;
-            }
-            if (cmdstr == "command") {
-                command = RestCommand::COMMAND;
-            }
-            if (cmdstr == "clearbarrier") {
-                command = RestCommand::CLEAR_BARRIER;
-            }
-            if (cmdstr == "delete" || cmdstr == "remove") {
-                command = RestCommand::REMOVE;
+            if (commandMap.find(cmdstr) != commandMap.end())
+            {
+                command=commandMap.at(cmdstr);
+                if (cmdstr == "status")
+                {
+                    query = "status";
+                }
             }
         }
     }
@@ -340,62 +396,20 @@ static std::pair<RequestReturnVal, std::string>
             if (brkr) {
                 return {RequestReturnVal::BAD_REQUEST, brokerName + " already exists"};
             }
-            std::string start_args;
-            std::string type;
-            if (fields.find("args") != fields.end()) {
-                start_args = fields.at("args");
-            }
-            if (fields.find("type") != fields.end()) {
-                type = fields.at("type");
-            } else if (fields.find("CoreType") != fields.end()) {
-                type = fields.at("CoreType");
-            } else if (fields.find("core_type") != fields.end()) {
-                type = fields.at("core_type");
-            }
-            helics::CoreType ctype{helics::CoreType::DEFAULT};
-            if (!type.empty()) {
-                ctype = helics::core::coreTypeFromString(type);
-                if (!helics::core::isCoreTypeAvailable(ctype)) {
-                    // return send(bad_request(type + " is not available"));
-                    return {RequestReturnVal::BAD_REQUEST, type + " is not available"};
-                }
-            }
-            if (fields.find("num_feds") != fields.end()) {
-                start_args += " -f " + fields.at("num_feds");
-            }
-            if (fields.find("num_brokers") != fields.end()) {
-                start_args += " --minbrokers=" + fields.at("num_brokers");
-            }
-            if (fields.find("port") != fields.end()) {
-                start_args += " --port=" + fields.at("port");
-            }
-            if (fields.find("host") != fields.end()) {
-                start_args += " --interface=" + fields.at("host");
-            }
-            if (fields.find("log_level") != fields.end()) {
-                start_args += " --loglevel=" + fields.at("log_level");
-            }
+            std::string errorMessage;
             bool useUuid{false};
-            if (brokerName.empty()) {
-                boost::uuids::random_generator generator;
-
-                const boost::uuids::uuid uuid1 = generator();
-                std::ostringstream ss1;
-                ss1 << uuid1;
-                brokerName = ss1.str();
-                useUuid = true;
-            }
-            brkr = helics::BrokerFactory::create(ctype, brokerName, start_args);
+            std::string type;
+            std::tie(brkr,errorMessage,useUuid,type)=createBroker(brokerName,fields);
+            
             if (!brkr) {
-                return {RequestReturnVal::BAD_REQUEST, "unable to create broker"};
-                // return send(bad_request("unable to create broker"));
+                return {RequestReturnVal::BAD_REQUEST, errorMessage};
             }
             nlohmann::json retJson;
             retJson["broker"] = brokerName;
             if (useUuid) {
                 retJson["broker_uuid"] = brokerName;
             }
-            retJson["type"] = helics::core::to_string(ctype);
+            retJson["type"] = type;
             return {RequestReturnVal::OK, helics::fileops::generateJsonString(retJson)};
         }
         case RestCommand::REMOVE:
