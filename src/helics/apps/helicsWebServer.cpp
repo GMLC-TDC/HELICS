@@ -217,8 +217,9 @@ static std::string getBrokerList()
     return helics::fileops::generateJsonString(base);
 }
 /** create a broker from the fields*/
-static std::tuple<std::shared_ptr<helics::Broker>,std::string,bool,std::string> createBroker(std::string &brokerName,
-    const boost::container::flat_map<std::string, std::string>& fields)
+static std::tuple<std::shared_ptr<helics::Broker>, std::string, bool, std::string>
+    createBroker(std::string& brokerName,
+                 const boost::container::flat_map<std::string, std::string>& fields)
 {
     std::string start_args;
     std::string type;
@@ -237,7 +238,7 @@ static std::tuple<std::shared_ptr<helics::Broker>,std::string,bool,std::string> 
         ctype = helics::core::coreTypeFromString(type);
         if (!helics::core::isCoreTypeAvailable(ctype)) {
             // return send(bad_request(type + " is not available"));
-            return {nullptr, type + " is not available",false,""};
+            return {nullptr, type + " is not available", false, ""};
         }
     }
     if (fields.find("num_feds") != fields.end()) {
@@ -266,11 +267,10 @@ static std::tuple<std::shared_ptr<helics::Broker>,std::string,bool,std::string> 
         useUuid = true;
     }
     try {
-        return { helics::BrokerFactory::create(ctype, brokerName, start_args),"",useUuid,type};
+        return {helics::BrokerFactory::create(ctype, brokerName, start_args), "", useUuid, type};
     }
-    catch (const std::exception& exc)
-    {
-        return {nullptr,exc.what(),false,""};
+    catch (const std::exception& exc) {
+        return {nullptr, exc.what(), false, ""};
     }
 }
 
@@ -285,17 +285,17 @@ enum class RequestReturnVal : std::int32_t {
 enum class RestCommand { QUERY, CREATE, REMOVE, BARRIER, CLEAR_BARRIER, COMMAND, UNKNOWN };
 
 static const std::unordered_map<std::string_view, RestCommand> commandMap{
-    {"query",RestCommand::QUERY},
-    {"search",RestCommand::QUERY},
-    {"get",RestCommand::QUERY},
-    {"status",RestCommand::QUERY},
-    {"create",RestCommand::CREATE},
-    {"barrier",RestCommand::BARRIER},
-    {"command",RestCommand::COMMAND},
-    {"clearbarrier",RestCommand::CLEAR_BARRIER},
-    {"clear_barrier",RestCommand::CLEAR_BARRIER},
-    {"delete",RestCommand::REMOVE},
-    {"clear",RestCommand::REMOVE},
+    {"query", RestCommand::QUERY},
+    {"search", RestCommand::QUERY},
+    {"get", RestCommand::QUERY},
+    {"status", RestCommand::QUERY},
+    {"create", RestCommand::CREATE},
+    {"barrier", RestCommand::BARRIER},
+    {"command", RestCommand::COMMAND},
+    {"clearbarrier", RestCommand::CLEAR_BARRIER},
+    {"clear_barrier", RestCommand::CLEAR_BARRIER},
+    {"delete", RestCommand::REMOVE},
+    {"clear", RestCommand::REMOVE},
 };
 
 static std::pair<RequestReturnVal, std::string>
@@ -309,11 +309,9 @@ static std::pair<RequestReturnVal, std::string>
     if (command == RestCommand::UNKNOWN) {
         if (fields.find("command") != fields.end()) {
             const auto& cmdstr = fields.at("command");
-            if (commandMap.find(cmdstr) != commandMap.end())
-            {
-                command=commandMap.at(cmdstr);
-                if (cmdstr == "status")
-                {
+            if (commandMap.find(cmdstr) != commandMap.end()) {
+                command = commandMap.at(cmdstr);
+                if (cmdstr == "status") {
                     query = "status";
                 }
             }
@@ -399,8 +397,8 @@ static std::pair<RequestReturnVal, std::string>
             std::string errorMessage;
             bool useUuid{false};
             std::string type;
-            std::tie(brkr,errorMessage,useUuid,type)=createBroker(brokerName,fields);
-            
+            std::tie(brkr, errorMessage, useUuid, type) = createBroker(brokerName, fields);
+
             if (!brkr) {
                 return {RequestReturnVal::BAD_REQUEST, errorMessage};
             }
