@@ -290,14 +290,12 @@ int ActionMessage::serializedByteCount() const
     }
     size += static_cast<int>(payload.size());
     // add additional string data
-    if (!stringData.empty() || payload.size() > 0x00FFFFFF) {
-        size += 1;
-    }
+    size += 1;
     for (const auto& str : stringData) {
         // 4(to store the length)+length of the string
         size += static_cast<int>(sizeof(uint32_t) + str.size());
     }
-    if (payload.size() > 0x00FFFFFF) {
+    if (payload.size() >= 0x00FFFFFF) {
         size += 4;
     }
     return size;
