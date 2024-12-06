@@ -55,8 +55,7 @@ namespace mpi {
 
     void MpiComms::queue_rx_function()
     {
-        auto scopeExit = [this]()
-        {
+        auto scopeExit = [this]() {
             logMessage(fmt::format("Shutdown RX Loop for {}", localTargetAddress));
             shutdown = true;
             setRxStatus(ConnectionStatus::TERMINATED);
