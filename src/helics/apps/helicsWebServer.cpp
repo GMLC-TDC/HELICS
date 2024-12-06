@@ -320,47 +320,47 @@ static std::pair<RequestReturnVal, std::string>
         }
     }
     switch (command) {
-    case RestCommand::UNKNOWN:
-        return {RequestReturnVal::NOT_IMPLEMENTED, "command not recognized"};
-    case RestCommand::CREATE:
+        case RestCommand::UNKNOWN:
+            return {RequestReturnVal::NOT_IMPLEMENTED, "command not recognized"};
+        case RestCommand::CREATE:
             if (brokerName == "create") {
-            brokerName.clear();
-            break;
-        }
+                brokerName.clear();
+                break;
+            }
             if (brokerName == "barrier") {
-            brokerName.clear();
+                brokerName.clear();
                 command = RestCommand::BARRIER;
-            break;
-        }
+                break;
+            }
             if (target == "barrier") {
                 command = RestCommand::BARRIER;
-        }
-        break;
-    case RestCommand::REMOVE:
+            }
+            break;
+        case RestCommand::REMOVE:
             if (brokerName == "delete" || brokerName == "remove") {
-            brokerName.clear();
-            break;
-        }
+                brokerName.clear();
+                break;
+            }
             if (brokerName == "barrier") {
-            brokerName.clear();
-            command = RestCommand::CLEAR_BARRIER;
-            break;
-        }
+                brokerName.clear();
+                command = RestCommand::CLEAR_BARRIER;
+                break;
+            }
             if (target == "barrier") {
-            command = RestCommand::CLEAR_BARRIER;
-        }
-        break;
-    case RestCommand::QUERY:
+                command = RestCommand::CLEAR_BARRIER;
+            }
+            break;
+        case RestCommand::QUERY:
             if (brokerName == "query" || brokerName == "search") {
-            brokerName.clear();
-        }
-        break;
-    default:
-        break;
+                brokerName.clear();
+            }
+            break;
+        default:
+            break;
     }
 
     if (query.empty() && fields.find("query") != fields.end()) {
-         query = fields.at("query");
+        query = fields.at("query");
     }
     if (target.empty() && fields.find("target") != fields.end()) {
         target = fields.at("target");
@@ -374,7 +374,8 @@ static std::pair<RequestReturnVal, std::string>
             brokerName = fields.at("uuid");
         }
     }
-    if ((brokerName.empty() && (target == "brokers"||query == "brokers"))||brokerName == "brokers") {
+    if ((brokerName.empty() && (target == "brokers" || query == "brokers")) ||
+        brokerName == "brokers") {
         return {RequestReturnVal::OK, getBrokerList()};
     }
 
@@ -452,10 +453,9 @@ static std::pair<RequestReturnVal, std::string>
                 }
             }
             if (fields.find("command_str") != fields.end()) {
-                brkr->sendCommand(target,
-                                  fields.at("command_str"));
+                brkr->sendCommand(target, fields.at("command_str"));
             } else if (!query.empty()) {
-                brkr->sendCommand(target,query);
+                brkr->sendCommand(target, query);
             } else {
                 return {RequestReturnVal::BAD_REQUEST, "no valid command string"};
             }
