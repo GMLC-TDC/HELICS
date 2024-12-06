@@ -144,11 +144,11 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
     if (!body.empty()) {
         if (body.front() == '{') {
             nlohmann::json val = helics::fileops::loadJsonStr(body);
-            for (const auto& vb : val.items()) {
-                if (vb.value().is_string()) {
-                    results.second[vb.key()] = vb.value().get<std::string>();
+            for (const auto& value : val.items()) {
+                if (value.value().is_string()) {
+                    results.second[value.key()] = value.value().get<std::string>();
                 } else {
-                    results.second[vb.key()] = helics::fileops::generateJsonString(vb.value());
+                    results.second[value.key()] = helics::fileops::generateJsonString(value.value());
                 }
             }
         } else {
@@ -571,7 +571,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         // Echo the message
         auto reqpr = processRequestParameters("", result);
 
-        RestCommand command{RestCommand::UNKNOWN};
+        const RestCommand command{RestCommand::UNKNOWN};
 
         auto res = generateResults(command, {}, "", "", reqpr.second);
         // Clear the buffer
@@ -1041,7 +1041,7 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
     if (mHttpEnabled) {
         auto httpInterfaceNetwork = mInterfaceNetwork;
         if (config->contains("http")) {
-            auto& httpConfig = (*config)["http"];
+            const auto& httpConfig = (*config)["http"];
             helics::fileops::replaceIfMember(httpConfig, "interface", mHttpAddress);
             helics::fileops::replaceIfMember(httpConfig, "port", mHttpPort);
             const bool ipv4 = helics::fileops::getOrDefault(httpConfig, "ipv4", false);
@@ -1078,7 +1078,7 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
     if (mWebsocketEnabled) {
         auto websocketInterfaceNetwork = mInterfaceNetwork;
         if (config->contains("websocket")) {
-            auto& webConfig = (*config)["websocket"];
+            const auto& webConfig = (*config)["websocket"];
             helics::fileops::replaceIfMember(webConfig, "interface", mWebsocketAddress);
             helics::fileops::replaceIfMember(webConfig, "port", mWebsocketPort);
 

@@ -30,7 +30,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Brian Kelley](https://github.com/bmkelley)
 - [Hoa Ngo](https://github.com/hgngo) (Now SVB)
 - [Ai Enkoji](https://github.com/aenkoji1)
-- [Nan Duan](https://github.com/nan-duan)++++++++++
+- [Nan Duan](https://github.com/nan-duan)
 - [Nathan Yee](https://github.com/yee29) (Now Accenture)
 
 ### National Renewable Energy Lab
