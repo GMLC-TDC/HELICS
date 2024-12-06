@@ -9,8 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "internal/api_objects.h"
 
 static constexpr const char* invalidAppString = "app object is not valid";
-static constexpr const char* notLoadedString =
-    "helics apps not compiled into library, enable apps when building" helics::apps::App * getApp(HelicsApp app, HelicsError* err)
+static constexpr const char* notLoadedString = "helics apps not compiled into library, enable apps when building";
+
+helics::apps::App* getApp(HelicsApp app, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (app == nullptr) {

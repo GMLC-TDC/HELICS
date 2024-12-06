@@ -4,14 +4,17 @@ The Federate Message + Communication Configuration Example extends the Base Exam
 
 This tutorial is organized as follows:
 
-- [Example files](#example-files)
-- [Federate Communication with Endpoints](#federate-communication-with-endpoints)
-  - [When to use pub/subs vs endpoints](#when-to-use-pubsubs-vs-endpoints)
-  - [Translation from pub/sub to endpoints](#translation-from-pubsub-to-endpoints)
-    - [Config Files](#config-files)
-    - [Simulators](#simulators)
-  - [Co-simulation Execution](#co-simulation-execution)
-- [Questions and Help](#questions-and-help)
+- [Endpoint Federates](#endpoint-federates)
+  - [Example files](#example-files)
+  - [Federate Communication with Endpoints](#federate-communication-with-endpoints)
+    - [When to use pub/subs vs endpoints](#when-to-use-pubsubs-vs-endpoints)
+    - [Translation from pub/sub to endpoints](#translation-from-pubsub-to-endpoints)
+      - [Config Files](#config-files)
+      - [Simulators](#simulators)
+        - [Battery](#battery)
+        - [Charger](#charger)
+    - [Co-simulation execution](#co-simulation-execution)
+  - [Questions and Help](#questions-and-help)
 
 ## Example files
 
@@ -124,7 +127,7 @@ As with the Base Example, configuration can be done with JSON files. The first c
 ```json
 "endpoints":[
   {
-    "key":"Battery/EV1_current",
+    "name":"Battery/EV1_current",
     "destination":"Charger/EV1_voltage",
     "global": true
   },
@@ -136,7 +139,7 @@ As with the Base Example, configuration can be done with JSON files. The first c
 ```json
 "endpoints":[
   {
-    "key":"Charger/EV1_voltage",
+    "name":"Charger/EV1_voltage",
     "destination":"Battery/EV1_current",
     "global": true
   },
