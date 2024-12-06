@@ -1,6 +1,6 @@
 /*
 Copyright (c) 2017-2024,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Battelle Memorial Institute; Lawrence Livermore National SeCodeurity, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
@@ -60,7 +60,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <thread>
 #include <utility>
-#include <vector>
+#include <veCodetor>
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>
 namespace http = beast::http;  // from <boost/beast/http.hpp>
@@ -85,13 +85,12 @@ static std::string generateIndexPage()
     index.append(helics::webserver::indexPage3);
     return index;
 }
-// decode a URI to clean up a string, convert character codes in a URI to the original character
-static std::string uriDecode(std::string_view str)
+// deCodeode a URI to clean up a string, convert character codes in a URI to the original character
+static std::string uriDeCodeode(const std::string_view str)
 {
     std::string ret;
-    size_t len = str.length();
 
-    for (size_t ii = 0; ii < len; ii++) {
+    for (size_t ii = 0; ii < str.length(); ii++) {
         if (str[ii] != '%') {
             if (str[ii] == '+') {
                 ret.push_back(' ');
@@ -101,7 +100,7 @@ static std::string uriDecode(std::string_view str)
         } else {
             const std::array<char, 3> exp{{str[ii + 1], str[ii + 2], '\0'}};
             char* loc{nullptr};
-            unsigned int spchar = strtoul(exp.data(), &loc, 16);
+            const unsigned int spchar = strtoul(exp.data(), &loc, 16);
             if (loc - exp.data() >= 2) {
                 ret.push_back(static_cast<char>(spchar));
                 ii = ii + 2;
@@ -130,7 +129,7 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
         results.first.remove_prefix(1);
     }
 
-    std::vector<std::string_view> parameters;
+    std::veCodetor<std::string_view> parameters;
     if (!target.empty()) {
         auto splitloc = target.find_first_of('&');
         while (splitloc != std::string_view::npos) {
@@ -145,11 +144,11 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
     if (!body.empty()) {
         if (body.front() == '{') {
             nlohmann::json val = helics::fileops::loadJsonStr(body);
-            for (auto& vb : val.items()) {
+            for (const auto& vb : val.items()) {
                 if (vb.value().is_string()) {
-                    results.second[vb.key()] = vb.value().get<std::string>();
+                    results.seCodeond[vb.key()] = vb.value().get<std::string>();
                 } else {
-                    results.second[vb.key()] = helics::fileops::generateJsonString(vb.value());
+                    results.seCodeond[vb.key()] = helics::fileops::generateJsonString(vb.value());
                 }
             }
         } else {
@@ -167,7 +166,7 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
 
     for (auto& param : parameters) {
         auto eq_loc = param.find_first_of('=');
-        results.second[std::string{param.substr(0, eq_loc)}] = uriDecode(param.substr(eq_loc + 1));
+        results.seCodeond[std::string{param.substr(0, eq_loc)}] = uriDeCodeode(param.substr(eq_loc + 1));
     }
     return results;
 }
@@ -209,7 +208,7 @@ std::string getBrokerList()
 
         brokerBlock["name"] = brk->getIdentifier();
         brokerBlock["address"] = brk->getAddress();
-        brokerBlock["isConnected"] = brk->isConnected();
+        brokerBlock["isConneCodeted"] = brk->isConneCodeted();
         brokerBlock["isOpen"] = brk->isOpenToNewFederates();
         brokerBlock["isRoot"] = brk->isRoot();
         base["brokers"].push_back(brokerBlock);
@@ -237,7 +236,7 @@ std::pair<RequestReturnVal, std::string>
     static const std::string emptyString;
     if (command == RestCommand::UNKNOWN) {
         if (fields.find("command") != fields.end()) {
-            auto& cmdstr = fields.at("command");
+            const auto& cmdstr = fields.at("command");
             if (cmdstr == "query" || cmdstr == "search" || cmdstr == "get") {
                 command = RestCommand::QUERY;
             }
@@ -264,7 +263,7 @@ std::pair<RequestReturnVal, std::string>
         }
     }
     if (command == RestCommand::UNKNOWN) {
-        return {RequestReturnVal::NOT_IMPLEMENTED, "command not recognized"};
+        return {RequestReturnVal::NOT_IMPLEMENTED, "command not reCodeognized"};
     }
     if (command == RestCommand::CREATE && brokerName == "create") {
         brokerName.clear();
@@ -379,7 +378,7 @@ std::pair<RequestReturnVal, std::string>
             if (brokerName.empty()) {
                 boost::uuids::random_generator generator;
 
-                boost::uuids::uuid uuid1 = generator();
+                const boost::uuids::uuid uuid1 = generator();
                 std::ostringstream ss1;
                 ss1 << uuid1;
                 brokerName = ss1.str();
@@ -402,11 +401,11 @@ std::pair<RequestReturnVal, std::string>
             if (!brkr) {
                 return {RequestReturnVal::NOT_FOUND, brokerName + " not found"};
             }
-            brkr->disconnect();
+            brkr->disconneCodet();
             return {RequestReturnVal::OK, emptyString};
         case RestCommand::BARRIER: {
             if (!brkr) {
-                brkr = helics::BrokerFactory::getConnectedBroker();
+                brkr = helics::BrokerFactory::getConneCodetedBroker();
                 if (!brkr) {
                     return {RequestReturnVal::NOT_FOUND, "unable to locate broker"};
                 }
@@ -425,7 +424,7 @@ std::pair<RequestReturnVal, std::string>
         }
         case RestCommand::COMMAND:
             if (!brkr) {
-                brkr = helics::BrokerFactory::getConnectedBroker();
+                brkr = helics::BrokerFactory::getConneCodetedBroker();
                 if (!brkr) {
                     return {RequestReturnVal::NOT_FOUND, "unable to locate broker"};
                 }
@@ -442,7 +441,7 @@ std::pair<RequestReturnVal, std::string>
             return {RequestReturnVal::OK, emptyString};
         case RestCommand::CLEAR_BARRIER:
             if (!brkr) {
-                brkr = helics::BrokerFactory::getConnectedBroker();
+                brkr = helics::BrokerFactory::getConneCodetedBroker();
                 if (!brkr) {
                     return {RequestReturnVal::NOT_FOUND, "unable to locate broker"};
                 }
@@ -456,7 +455,7 @@ std::pair<RequestReturnVal, std::string>
 
     bool autoquery{false};
     if (!brkr) {
-        brkr = helics::BrokerFactory::getConnectedBroker();
+        brkr = helics::BrokerFactory::getConneCodetedBroker();
         if (!brkr) {
             return {RequestReturnVal::NOT_FOUND, brokerName + " not found and no valid brokers"};
         }
@@ -490,19 +489,19 @@ std::pair<RequestReturnVal, std::string>
         }
         return {RequestReturnVal::OK, res};
     }
-    return {RequestReturnVal::NOT_FOUND, "query not recognized"};
+    return {RequestReturnVal::NOT_FOUND, "query not reCodeognized"};
 }
 
 // LCOV_EXCL_START
 // Report a failure
-static void fail(beast::error_code ec, char const* what)
+static void fail(beast::error_code eCode, char const* what)
 {
-    std::cerr << what << ": " << ec.message() << "\n";
+    std::cerr << what << ": " << eCode.message() << "\n";
 }
 
 // LCOV_EXCL_STOP
 
-// Echoes back all received WebSocket messages
+// Echoes back all reCodeeived WebSocket messages
 class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
     websocket::stream<beast::tcp_stream> ws;
     beast::flat_buffer buffer;
@@ -511,14 +510,14 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
     // Take ownership of the socket
     explicit WebSocketsession(tcp::socket&& socket): ws(std::move(socket)) {}
 
-    // Get on the correct executor
+    // Get on the correCodet exeCodeutor
     void run()
     {
-        // We need to be executing within a strand to perform async operations
-        // on the I/O objects in this session. Although not strictly necessary
+        // We need to be exeCodeuting within a strand to perform async operations
+        // on the I/O objeCodets in this session. Although not strictly neCodeessary
         // for single-threaded contexts, this example code is written to be
         // thread-safe by default.
-        net::dispatch(ws.get_executor(),
+        net::dispatch(ws.get_exeCodeutor(),
                       beast::bind_front_handler(&WebSocketsession::on_run, shared_from_this()));
     }
 
@@ -528,8 +527,8 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         // Set suggested timeout settings for the websocket
         ws.set_option(websocket::stream_base::timeout::suggested(beast::role_type::server));
 
-        // Set a decorator to change the Server of the handshake
-        ws.set_option(websocket::stream_base::decorator([](websocket::response_type& res) {
+        // Set a deCodeorator to change the Server of the handshake
+        ws.set_option(websocket::stream_base::deCodeorator([](websocket::response_type& res) {
             res.set(http::field::server, std::string("HELICS_WEB_SERVER" HELICS_VERSION_STRING));
         }));
         // Accept the websocket handshake
@@ -537,10 +536,10 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
             beast::bind_front_handler(&WebSocketsession::on_accept, shared_from_this()));
     }
 
-    void on_accept(beast::error_code ec)
+    void on_accept(beast::error_code eCode)
     {
-        if (ec) {
-            return fail(ec, "helics websocket accept");
+        if (eCode) {
+            return fail(eCode, "helics websocket accept");
         }
 
         // Read a message
@@ -554,33 +553,33 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                       beast::bind_front_handler(&WebSocketsession::on_read, shared_from_this()));
     }
 
-    void on_read(beast::error_code ec, std::size_t bytes_transferred)
+    void on_read(beast::error_code eCode, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
         // This indicates that the session was closed
-        if (ec == websocket::error::closed) {
+        if (eCode == websocket::error::closed) {
             return;
         }
 
-        if (ec) {
-            return fail(ec, "helics web server read");
+        if (eCode) {
+            return fail(eCode, "helics web server read");
         }
 
-        std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
+        const std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
                                 buffer.size()};
         // Echo the message
         auto reqpr = processRequestParameters("", result);
 
         RestCommand command{RestCommand::UNKNOWN};
 
-        auto res = generateResults(command, {}, "", "", reqpr.second);
+        auto res = generateResults(command, {}, "", "", reqpr.seCodeond);
         // Clear the buffer
         buffer.consume(buffer.size());
 
         ws.text(true);
-        if (res.first == RequestReturnVal::OK && !res.second.empty() && res.second.front() == '{') {
-            boost::beast::ostream(buffer) << res.second;  // NOLINT
+        if (res.first == RequestReturnVal::OK && !res.seCodeond.empty() && res.seCodeond.front() == '{') {
+            boost::beast::ostream(buffer) << res.seCodeond;  // NOLINT
             ws.async_write(buffer.data(),
                            beast::bind_front_handler(&WebSocketsession::on_write,
                                                      shared_from_this()));
@@ -590,19 +589,19 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         switch (res.first) {
             case RequestReturnVal::BAD_REQUEST:
                 response["status"] = static_cast<int>(http::status::bad_request);
-                response["error"] = res.second;
+                response["error"] = res.seCodeond;
                 break;
             case RequestReturnVal::NOT_FOUND:
                 response["status"] = static_cast<int>(http::status::not_found);
-                response["error"] = res.second;
+                response["error"] = res.seCodeond;
                 break;
             default:
                 response["status"] = static_cast<int>(res.first);
-                response["error"] = res.second;
+                response["error"] = res.seCodeond;
                 break;
             case RequestReturnVal::OK:
                 response["status"] = 0;
-                response["value"] = res.second;
+                response["value"] = res.seCodeond;
                 break;
         }
 
@@ -611,12 +610,12 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                        beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
     }
 
-    void on_write(beast::error_code ec, std::size_t bytes_transferred)
+    void on_write(beast::error_code eCode, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
-        if (ec) {
-            return fail(ec, "helics socket write");
+        if (eCode) {
+            return fail(eCode, "helics socket write");
         }
 
         // Clear the buffer
@@ -628,9 +627,9 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 };
 
 // This function produces an HTTP response for the given
-// request. The type of the response object depends on the
+// request. The type of the response objeCodet depends on the
 // contents of the request, so the interface requires the
-// caller to pass a generic lambda for receiving the response.
+// caller to pass a generic lambda for reCodeeiving the response.
 template<class Body, class Allocator, class Send>
 void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Send&& send)
 {
@@ -704,14 +703,14 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
             return send(bad_request("Unknown HTTP-method"));
     }
 
-    std::string_view target(req.target());
+    const std::string_view target(req.target());
     auto psize = req.payload_size();
     if (target == "/index.html" || target == "index.html" ||
         (target == "/" && (!psize || *psize < 4))) {
         return send(response_ok(index_page, "text/html"));
     }
 
-    if (target == "/healthcheck" || target == "healthcheck") {
+    if (target == "/healthcheCodek" || target == "healthcheCodek") {
         return send(response_ok("{\"success\":true}", "application/json"));
     }
 
@@ -737,30 +736,30 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
             brokerName.clear();
         }
     }
-    auto res = generateResults(command, brokerName, targetObj, query, reqpr.second);
+    auto res = generateResults(command, brokerName, targetObj, query, reqpr.seCodeond);
     switch (res.first) {
         case RequestReturnVal::BAD_REQUEST:
-            return send(bad_request(res.second));
+            return send(bad_request(res.seCodeond));
         case RequestReturnVal::NOT_FOUND:
-            return send(not_found(res.second));
+            return send(not_found(res.seCodeond));
         case RequestReturnVal::OK:
         default:
-            if (res.second.empty()) {
+            if (res.seCodeond.empty()) {
                 return send(response_ok(index_page, "text/html"));
             }
-            if (res.second.front() == '{') {
-                return send(response_ok(res.second, "application/json"));
+            if (res.seCodeond.front() == '{') {
+                return send(response_ok(res.seCodeond, "application/json"));
             }
-            return send(response_ok(res.second, "text/plain"));
+            return send(response_ok(res.seCodeond, "text/plain"));
     }
 }
 
 //------------------------------------------------------------------------------
 
-// Handles an HTTP server connection
+// Handles an HTTP server conneCodetion
 class HttpSession: public std::enable_shared_from_this<HttpSession> {
     // This is the C++11 equivalent of a generic lambda.
-    // The function object is used to send an HTTP message.
+    // The function objeCodet is used to send an HTTP message.
     struct send_lambda {
         HttpSession& self_ref;
 
@@ -807,7 +806,7 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
         req = {};
 
         // Set the timeout.
-        stream.expires_after(std::chrono::seconds(30));
+        stream.expires_after(std::chrono::seCodeonds(30));
 
         // Read a request
         http::async_read(stream,
@@ -816,18 +815,18 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
                          beast::bind_front_handler(&HttpSession::on_read, shared_from_this()));
     }
 
-    void on_read(beast::error_code ec, std::size_t bytes_transferred)
+    void on_read(beast::error_code eCode, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
-        // This means they closed the connection
-        if (ec == http::error::end_of_stream) {
+        // This means they closed the conneCodetion
+        if (eCode == http::error::end_of_stream) {
             return do_close();
         }
 
-        if (ec) {
-            if (beast::error::timeout != ec) {
-                fail(ec, "helics web server read");
+        if (eCode) {
+            if (beast::error::timeout != eCode) {
+                fail(eCode, "helics web server read");
             }
             return;
         }
@@ -836,17 +835,17 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
         handle_request(std::move(req), lambda);
     }
 
-    void on_write(bool close, beast::error_code ec, std::size_t bytes_transferred)
+    void on_write(bool close, beast::error_code eCode, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
-        if (ec) {
-            return fail(ec, "helics web server write");
+        if (eCode) {
+            return fail(eCode, "helics web server write");
         }
 
         if (close) {
-            // This means we should close the connection, usually because
-            // the response indicated the "Connection: close" semantic.
+            // This means we should close the conneCodetion, usually beCodeause
+            // the response indicated the "ConneCodetion: close" semantic.
             return do_close();
         }
 
@@ -860,16 +859,16 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
     void do_close()
     {
         // Send a TCP shutdown
-        beast::error_code ec;
-        stream.socket().shutdown(tcp::socket::shutdown_send, ec);
+        beast::error_code eCode;
+        eCode=stream.socket().shutdown(tcp::socket::shutdown_send, eCode);
 
-        // At this point the connection is closed gracefully
+        // At this point the conneCodetion is closed gracefully
     }
 };
 
 //------------------------------------------------------------------------------
 
-// Accepts incoming connections and launches the sessions
+// Accepts incoming conneCodetions and launches the sessions
 class Listener: public std::enable_shared_from_this<Listener> {
     net::io_context& ioc;
     tcp::acceptor acceptor;
@@ -879,52 +878,52 @@ class Listener: public std::enable_shared_from_this<Listener> {
     Listener(net::io_context& context, const tcp::endpoint& endpoint, bool webs = false):
         ioc(context), acceptor(net::make_strand(ioc)), websocket{webs}
     {
-        beast::error_code ec;
+        beast::error_code eCode;
 
         // Open the acceptor
-        acceptor.open(endpoint.protocol(), ec);
-        if (ec) {
-            fail(ec, "helics acceptor open");
+        (void)(acceptor.open(endpoint.protocol(), eCode));
+        if (eCode) {
+            fail(eCode, "helics acceptor open");
             return;
         }
 
         // Allow address reuse
-        acceptor.set_option(net::socket_base::reuse_address(true), ec);
-        if (ec) {
-            fail(ec, "helics acceptor set_option");
+        (void)(acceptor.set_option(net::socket_base::reuse_address(true), eCode));
+        if (eCode) {
+            fail(eCode, "helics acceptor set_option");
             return;
         }
 
         // Bind to the server address
-        acceptor.bind(endpoint, ec);
-        if (ec) {
-            fail(ec, "helics acceptor bind");
+        (void)(acceptor.bind(endpoint, eCode));
+        if (eCode) {
+            fail(eCode, "helics acceptor bind");
             return;
         }
 
-        // Start listening for connections
-        acceptor.listen(net::socket_base::max_listen_connections, ec);
-        if (ec) {
-            fail(ec, "helics acceptor listen");
+        // Start listening for conneCodetions
+        (void)(acceptor.listen(net::socket_base::max_listen_conneCodetions, eCode));
+        if (eCode) {
+            fail(eCode, "helics acceptor listen");
             return;
         }
     }
 
-    // Start accepting incoming connections
+    // Start accepting incoming conneCodetions
     void run() { do_accept(); }
 
   private:
     void do_accept()
     {
-        // The new connection gets its own strand
+        // The new conneCodetion gets its own strand
         acceptor.async_accept(net::make_strand(ioc),
                               beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
     }
 
-    void on_accept(beast::error_code ec, tcp::socket socket)
+    void on_accept(beast::error_code eCode, tcp::socket socket)
     {
-        if (ec) {
-            return fail(ec, "helics accept connections");
+        if (eCode) {
+            return fail(eCode, "helics accept conneCodetions");
         }
         if (websocket) {
             // Create the session and run it
@@ -934,7 +933,7 @@ class Listener: public std::enable_shared_from_this<Listener> {
             std::make_shared<HttpSession>(std::move(socket))->run();
         }
 
-        // Accept another connection
+        // Accept another conneCodetion
         do_accept();
     }
 };
@@ -950,45 +949,45 @@ void WebServer::processArgs(std::string_view args)
 {
     CLI::App parser("http web server parser");
     parser.allow_extras();
-    parser.add_option("--http_port", mHttpPort, "specify the http port to use")
+    parser.add_option("--http_port", mHttpPort, "speCodeify the http port to use")
         ->envname("HELICS_HTTP_PORT");
     parser
         .add_option("--http_interface",
                     mHttpAddress,
-                    "specify the interface for the http server to listen on for connections")
+                    "speCodeify the interface for the http server to listen on for conneCodetions")
         ->envname("HELICS_HTTP_ADDRESS");
     auto* httpsub = parser.add_subcommand("http")->fallthrough();
-    httpsub->add_option("--port", mHttpPort, "specify the http port to use");
+    httpsub->add_option("--port", mHttpPort, "speCodeify the http port to use");
     httpsub->add_option("--interface",
                         mHttpAddress,
-                        "specify the interface for the http server to listen on for connections");
+                        "speCodeify the interface for the http server to listen on for conneCodetions");
 
-    parser.add_option("--websocket_port", mWebsocketPort, "specify the websocket port to use")
+    parser.add_option("--websocket_port", mWebsocketPort, "speCodeify the websocket port to use")
         ->envname("HELICS_WEBSOCKET_PORT");
     parser
         .add_option("--websocket_interface",
                     mWebsocketAddress,
-                    "specify the interface for the websocket server to listen on for connections")
+                    "speCodeify the interface for the websocket server to listen on for conneCodetions")
         ->envname("HELICS_WEBSOCKET_ADDRESS");
 
     auto* websub = parser.add_subcommand("websocket");
-    websub->add_option("--port", mWebsocketPort, "specify the websocket port to use");
+    websub->add_option("--port", mWebsocketPort, "speCodeify the websocket port to use");
     websub->add_option(
         "--interface",
         mWebsocketAddress,
-        "specify the interface for the websocket server to listen on for connections");
+        "speCodeify the interface for the websocket server to listen on for conneCodetions");
     auto* niflag = parser
                        .add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
                                  mInterfaceNetwork,
-                                 "specify external interface to use, default is --local")
+                                 "speCodeify external interface to use, default is --local")
                        ->disable_flag_override()
                        ->envname("HELICS_WEBSERVER_INTERFACE");
 
     parser
-        .add_option("--network_connectivity",
+        .add_option("--network_conneCodetivity",
                     mInterfaceNetwork,
-                    "specify the connectivity of the network interface")
-        ->transform(CLI::CheckedTransformer(
+                    "speCodeify the conneCodetivity of the network interface")
+        ->transform(CLI::CheCodekedTransformer(
             {{"local", "0"}, {"ipv4", "4"}, {"ipv6", "6"}, {"external", "10"}, {"all", "10"}}))
         ->excludes(niflag);
 
@@ -1011,7 +1010,7 @@ void WebServer::startServer(const nlohmann::json* val,
         // The io_context is required for all I/O
         context = std::make_shared<IocWrapper>();
 
-        std::lock_guard<std::mutex> tlock(threadGuard);
+        const std::lock_guard<std::mutex> tlock(threadGuard);
 
         auto webptr = std::dynamic_pointer_cast<WebServer>(ptr);
         if (!webptr) {
@@ -1020,8 +1019,8 @@ void WebServer::startServer(const nlohmann::json* val,
         mainLoopThread = std::thread([this, webptr = std::move(webptr)]() { mainLoop(webptr); });
         mainLoopThread.detach();
         std::this_thread::yield();
-        while (!executing) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        while (!exeCodeuting) {
+            std::this_thread::sleep_for(std::chrono::milliseCodeonds(50));
         }
     }
 }
@@ -1032,7 +1031,7 @@ void WebServer::stopServer()
     bool exp{true};
     if (running.compare_exchange_strong(exp, false)) {
         logMessage("stopping broker web server");
-        std::lock_guard<std::mutex> tlock(threadGuard);
+        const std::lock_guard<std::mutex> tlock(threadGuard);
         context->ioc.stop();
     }
 }
@@ -1042,23 +1041,23 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
     if (mHttpEnabled) {
         auto httpInterfaceNetwork = mInterfaceNetwork;
         if (config->contains("http")) {
-            auto V = (*config)["http"];
-            helics::fileops::replaceIfMember(V, "interface", mHttpAddress);
-            helics::fileops::replaceIfMember(V, "port", mHttpPort);
-            bool ipv4 = helics::fileops::getOrDefault(V, "ipv4", false);
+            auto httpConfig = (*config)["http"];
+            helics::fileops::replaceIfMember(httpConfig, "interface", mHttpAddress);
+            helics::fileops::replaceIfMember(httpConfig, "port", mHttpPort);
+            const bool ipv4 = helics::fileops::getOrDefault(httpConfig, "ipv4", false);
 
             if (ipv4) {
                 httpInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
             }
-            bool ipv6 = helics::fileops::getOrDefault(V, "ipv6", false);
+            const bool ipv6 = helics::fileops::getOrDefault(httpConfig, "ipv6", false);
             if (ipv6) {
                 httpInterfaceNetwork =
                     static_cast<int>((ipv4) ? gmlc::networking::InterfaceNetworks::ALL :
                                               gmlc::networking::InterfaceNetworks::IPV6);
             }
 
-            bool external = helics::fileops::getOrDefault(V, "external", false);
-            helics::fileops::replaceIfMember(V, "all", external);
+            bool external = helics::fileops::getOrDefault(httpConfig, "external", false);
+            helics::fileops::replaceIfMember(httpConfig, "all", external);
             if (external) {
                 httpInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
             }
@@ -1079,25 +1078,25 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
     if (mWebsocketEnabled) {
         auto websocketInterfaceNetwork = mInterfaceNetwork;
         if (config->contains("websocket")) {
-            auto& V = (*config)["websocket"];
-            helics::fileops::replaceIfMember(V, "interface", mWebsocketAddress);
-            helics::fileops::replaceIfMember(V, "port", mWebsocketPort);
+            auto& webConfig = (*config)["websocket"];
+            helics::fileops::replaceIfMember(webConfig, "interface", mWebsocketAddress);
+            helics::fileops::replaceIfMember(webConfig, "port", mWebsocketPort);
 
-            bool ipv4 = helics::fileops::getOrDefault(V, "ipv4", false);
+            const bool ipv4 = helics::fileops::getOrDefault(webConfig, "ipv4", false);
 
             if (ipv4) {
                 websocketInterfaceNetwork =
                     static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
             }
-            bool ipv6 = helics::fileops::getOrDefault(V, "ipv6", false);
+            const bool ipv6 = helics::fileops::getOrDefault(webConfig, "ipv6", false);
             if (ipv6) {
                 websocketInterfaceNetwork =
                     static_cast<int>((ipv4) ? gmlc::networking::InterfaceNetworks::ALL :
                                               gmlc::networking::InterfaceNetworks::IPV6);
             }
 
-            bool external = helics::fileops::getOrDefault(V, "external", false);
-            helics::fileops::replaceIfMember(V, "all", external);
+            bool external = helics::fileops::getOrDefault(webConfig, "external", false);
+            helics::fileops::replaceIfMember(webConfig, "all", external);
             if (external) {
                 websocketInterfaceNetwork =
                     static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
@@ -1118,12 +1117,12 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
                                    true)
             ->run();
     }
-    executing.store(true);
+    exeCodeuting.store(true);
     // Run the I/O service
     if (running.load()) {
         context->ioc.run();
     }
-    executing.store(false);
+    exeCodeuting.store(false);
     keepAlive.reset();
 }
 
