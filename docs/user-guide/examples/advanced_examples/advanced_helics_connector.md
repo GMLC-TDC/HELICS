@@ -67,7 +67,7 @@ The only difference between the federation as defined in the "advanced default" 
 
 The match-file can be specified either using a plain textfile or JSON. The simplest format specifies the individual connections between federates, one connection per line:
 
-```
+```text
 Charger/EV1_output_voltage Battery/EV1_input_voltage from_to
 Charger/EV2_output_voltage Battery/EV2_input_voltage from_to
 Charger/EV3_output_voltage Battery/EV3_input_voltage from_to
@@ -103,7 +103,7 @@ The "from-to" or "to-from" is used to indicate which side of the connection is u
 
 Alternatively, the match-file can be specified using regular expressions. This can be a convenient way to specify a large number of interface connections if they follow a naming convention. The regular expression format takes advantage of the ability to name terms in the expression, allowing terms in one part of the expression to be used later on in the expression. In the case, the above match-file looks like this:
 
-```
+```text
 # this is a comment
 REGEX:Charger/EV(?<ev_num>\d*)_output_voltage, REGEX:Battery/EV(?<ev_num>)_input_voltage, from_to
 REGEX:Charger/EV(?<ev_num>\d*)_input_current, REGEX:Battery/EV(?<ev_num>)_output_current, from_to
@@ -150,6 +150,7 @@ The function that is called when the query is made. In our example, we called it
 ```python
 @h.ffi.callback("void query(const char *query, int querySize, HelicsQueryBuffer buffer, void *user_data)")
 def query_callback(query_ptr, size:int, query_buffer_ptr, user_data):
+    ...
 ```
 
 The query being sent to this federate is defined in the "query_buffer_ptr" variable but must be decoded into a string by declaring it a HELICS buffer object and then decoding it into a string:
@@ -217,7 +218,7 @@ The example code checks to make sure the interfaces are provided as lists and th
 ```python
 if isinstance(cmd["publications"], list):
   for pub in cmd["publications"]:
-  h.helicsFederateRegisterGlobalPublication(fed, pub, h.HELICS_DATA_TYPE_DOUBLE)
+    h.helicsFederateRegisterGlobalPublication(fed, pub, h.HELICS_DATA_TYPE_DOUBLE)
 if isinstance(cmd["inputs"], list):
   for inp in cmd["inputs"]:
     h.helicsFederateRegisterGlobalInput(fed, inp, h.HELICS_DATA_TYPE_DOUBLE)
@@ -233,13 +234,13 @@ h.helicsFederateEnterInitializingModeIterative(fed)
 # available earlier. Callback responds whenever the query comes in.
 h.helicsFederateEnterInitializingModeIterative(fed)
 command = h.helicsFederateGetCommand(fed)
-  if len(command) == 0:
-      raise TypeError("Empty command.")
-  try:
-      logger.debug(f"command string: {command}")
-      cmd = json.loads(command)
-  except:
-      raise TypeError("Not able to convert command string to JSON.")
+if len(command) == 0:
+    raise TypeError("Empty command.")
+try:
+    logger.debug(f"command string: {command}")
+    cmd = json.loads(command)
+except:
+    raise TypeError("Not able to convert command string to JSON.")
 register_interfaces_from_command(fed, cmd) # custom function
 h.helicsFederateEnterExecutingMode(fed)
 ```
