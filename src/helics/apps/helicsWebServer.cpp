@@ -59,10 +59,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <streambuf>
 #include <string>
 #include <thread>
-#include <utility>
-#include <vector>
 #include <tuple>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>
 namespace http = beast::http;  // from <boost/beast/http.hpp>
@@ -319,54 +319,46 @@ static std::pair<RequestReturnVal, std::string>
             }
         }
     }
-    switch (command)
-    {
-    case RestCommand::UNKNOWN:
-        return {RequestReturnVal::NOT_IMPLEMENTED, "command not recognized"};
-    case RestCommand::CREATE:
-        if (brokerName == "create")
-        {
-            brokerName.clear();
+    switch (command) {
+        case RestCommand::UNKNOWN:
+            return {RequestReturnVal::NOT_IMPLEMENTED, "command not recognized"};
+        case RestCommand::CREATE:
+            if (brokerName == "create") {
+                brokerName.clear();
+                break;
+            }
+            if (brokerName == "barrier") {
+                brokerName.clear();
+                command = RestCommand::BARRIER;
+                break;
+            }
+            if (target == "barrier") {
+                command = RestCommand::BARRIER;
+            }
             break;
-        }
-        if (brokerName == "barrier")
-        {
-            brokerName.clear();
-            command=RestCommand::BARRIER;
+        case RestCommand::REMOVE:
+            if (brokerName == "delete" || brokerName == "remove") {
+                brokerName.clear();
+                break;
+            }
+            if (brokerName == "barrier") {
+                brokerName.clear();
+                command = RestCommand::CLEAR_BARRIER;
+                break;
+            }
+            if (target == "barrier") {
+                command = RestCommand::CLEAR_BARRIER;
+            }
             break;
-        }
-        if (target == "barrier")
-        {
-            command=RestCommand::BARRIER;
-        }
-        break;
-    case RestCommand::REMOVE:
-        if (brokerName == "delete" || brokerName == "remove")
-        {
-            brokerName.clear();
+        case RestCommand::QUERY:
+            if (brokerName == "query" || brokerName == "search") {
+                brokerName.clear();
+            }
             break;
-        }
-        if (brokerName == "barrier")
-        {
-            brokerName.clear();
-            command = RestCommand::CLEAR_BARRIER;
+        default:
             break;
-        }
-        if (target == "barrier")
-        {
-            command = RestCommand::CLEAR_BARRIER;
-        }
-        break;
-    case RestCommand::QUERY:
-        if (brokerName == "query" || brokerName == "search")
-        {
-            brokerName.clear();
-        }
-        break;
-    default:
-        break;
     }
-    
+
     if (query.empty()) {
         if (fields.find("query") != fields.end()) {
             query = fields.at("query");
