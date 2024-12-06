@@ -148,7 +148,8 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
                 if (value.value().is_string()) {
                     results.second[value.key()] = value.value().get<std::string>();
                 } else {
-                    results.second[value.key()] = helics::fileops::generateJsonString(value.value());
+                    results.second[value.key()] =
+                        helics::fileops::generateJsonString(value.value());
                 }
             }
         } else {
