@@ -9,6 +9,41 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [3.6.0][] - 2024-12-09
+
+Major release including app support in the C library, bug fixes and an update to the minimum build requirement for HELICS moving to a default of C++20.   The 3.7 release will make C++20 the minimum compile standard.   This release also changes out the json interpreter to use Json++ instead of json_cpp.   
+
+### Fixed
+
+- Fixed issue with maximum message size for the ZMQ and ZMQ_SS core types.   Now block sizes up to 4 GB are supported on these core types. (subject to memory limitations)  This change is not backwards compatible in that previous versions will still not work with these sizes but it will still be recognized and perform equivalent or better then previous on older versions of HELICS.   To support these sizes all federates must be updated to HELICS 3.6 and higher.
+- Fixed release builder to use new minimum build standards
+- Fixed issue where in certain cases the potential interfaces were not getting established and used by the connector
+- Fixes for sanitizer builds and other clang-tidy and compiler warnings
+
+### Changed
+
+- Test with Boost 1.86 and CMake 3.31
+- Changed default C++ standard to C++20.  Eventual 3.7 release will make this a minimum.  
+- Minimum build to   
+  - GCC 11
+  - clang 15
+  - CMake 3.22
+  - MSVC 16.10
+  - XCode 14
+  - boost 1.73
+- Updated third party libraries (toml, asio,fmt,spdlog, units)
+- Replaced usage of json_cpp with nlohman::json
+
+### Added
+
+- Added C shared library interface to the helics app library
+- Added ability to send files directly to brokers and cores for configuration
+- Added a global sync disconnect so all federates stay active until the federation is completed
+
+### Removed
+
+- removed octave interface build from the HELICS repo now supported via matHELICS
+  
 ## [3.5.3][] - 2024-07-08
 
 Patch release with fixes for potential interface definitions and some compiler warnings
