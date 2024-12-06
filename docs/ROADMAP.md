@@ -4,7 +4,7 @@ This document contains tentative plans for changes and improvements of note in u
 
 ## \[3.7\] ~ Feb/Mar 2025
 
-- Make C++20 the minimum compiler standard and utilize C++20 features.  
+- Make C++20 the minimum compiler standard and utilize C++20 features.
 
 ## Nearer term features
 

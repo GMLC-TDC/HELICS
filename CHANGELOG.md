@@ -11,11 +11,11 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.6.0][] - 2024-12-09
 
-Major release including app support in the C library, bug fixes and an update to the minimum build requirement for HELICS moving to a default of C++20.   The 3.7 release will make C++20 the minimum compile standard.   This release also changes out the json interpreter to use Json++ instead of json_cpp.   
+Major release including app support in the C library, bug fixes and an update to the minimum build requirement for HELICS moving to a default of C++20. The 3.7 release will make C++20 the minimum compile standard. This release also changes out the json interpreter to use Json++ instead of json_cpp.
 
 ### Fixed
 
-- Fixed issue with maximum message size for the ZMQ and ZMQ_SS core types.   Now block sizes up to 4 GB are supported on these core types. (subject to memory limitations)  This change is not backwards compatible in that previous versions will still not work with these sizes but it will still be recognized and perform equivalent or better then previous on older versions of HELICS.   To support these sizes all federates must be updated to HELICS 3.6 and higher.
+- Fixed issue with maximum message size for the ZMQ and ZMQ_SS core types. Now block sizes up to 4 GB are supported on these core types. (subject to memory limitations) This change is not backwards compatible in that previous versions will still not work with these sizes but it will still be recognized and perform equivalent or better then previous on older versions of HELICS. To support these sizes all federates must be updated to HELICS 3.6 and higher.
 - Fixed release builder to use new minimum build standards
 - Fixed issue where in certain cases the potential interfaces were not getting established and used by the connector
 - Fixes for sanitizer builds and other clang-tidy and compiler warnings
@@ -23,8 +23,8 @@ Major release including app support in the C library, bug fixes and an update to
 ### Changed
 
 - Test with Boost 1.86 and CMake 3.31
-- Changed default C++ standard to C++20.  Eventual 3.7 release will make this a minimum.  
-- Minimum build to   
+- Changed default C++ standard to C++20. Eventual 3.7 release will make this a minimum.
+- Minimum build to
   - GCC 11
   - clang 15
   - CMake 3.22
@@ -43,7 +43,7 @@ Major release including app support in the C library, bug fixes and an update to
 ### Removed
 
 - removed octave interface build from the HELICS repo now supported via matHELICS
-  
+
 ## [3.5.3][] - 2024-07-08
 
 Patch release with fixes for potential interface definitions and some compiler warnings

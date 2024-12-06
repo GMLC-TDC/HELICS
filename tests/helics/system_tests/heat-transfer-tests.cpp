@@ -31,7 +31,7 @@ class HeatUnitBlock {
     helics::Time deltaTime = 5.0;  // sampling rate
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
-    helics::Publication* pub{ nullptr };
+    helics::Publication* pub{nullptr};
     helics::Input* sub[4];
     bool initialized = false;
 

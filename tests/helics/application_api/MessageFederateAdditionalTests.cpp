@@ -603,7 +603,7 @@ TEST(messageFederate, constructor1)
 
     EXPECT_FALSE(mf2.getMessage());
 
-    auto &ept1 = mf2.registerEndpoint();
+    auto& ept1 = mf2.registerEndpoint();
     EXPECT_FALSE(mf2.hasMessage(ept1));
     EXPECT_EQ(mf2.pendingMessageCount(ept1), 0);
     auto message = mf2.getMessage(ept1);

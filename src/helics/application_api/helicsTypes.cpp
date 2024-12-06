@@ -125,7 +125,7 @@ double vectorNorm(const std::vector<std::complex<double>>& vec)
                                         std::plus<>(),
                                         [](const auto& avec, const auto& bvec) {
                                             return (avec * std::conj(bvec)).real();
-        }));
+                                        }));
 }
 
 std::string helicsComplexString(double real, double imag)
