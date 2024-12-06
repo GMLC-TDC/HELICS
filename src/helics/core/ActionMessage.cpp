@@ -182,7 +182,7 @@ static constexpr std::size_t action_message_base_size =
 int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
 {
     static const uint8_t littleEndian = isLittleEndian();
-    
+
     // put the main string size in the first 4 bytes;
     std::uint32_t ssize{0UL};
     if (messageAction != CMD_TIME_REQUEST) {
