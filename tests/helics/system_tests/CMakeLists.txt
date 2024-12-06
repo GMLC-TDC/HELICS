@@ -21,6 +21,7 @@ set(system_test_sources
     commandInterfaceTests.cpp
     profilingTests.cpp
     dynamicFederationTests.cpp
+    messageSizeTests.cpp
     ../application_api/testFixtures.cpp
     ../application_api/testFixtures.hpp
     ../apps/exeTestHelper.cpp
