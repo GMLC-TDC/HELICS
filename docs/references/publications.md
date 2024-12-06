@@ -37,7 +37,7 @@ Y. Liu, R. Huang, W. Du, A. Singhal and Z. Huang, "High-Performance Transmission
 Narayanan, Anantha, and Hardy, Trevor. "Synthetic Data Generation for Machine Learning Model Training for Energy Theft Scenarios Ssing Cosimulation". United Kingdom: N. p., 2022. Web. doi:10.1049/gtd2.12619, available at [https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/gtd2.12619](https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/gtd2.12619).
 
 Jing Wang, Prateek Munankarmi, Jeff Maguire, Chengnan Shi, Wangda Zuo, David Roberts, Xin Jin. "Carbon emission responsive building control: A case study with an all-electric residential community in a cold climate". Applied Energy, Volume 314,2022, 118910,
-doi: 10.1016/j.apenergy.2022.118910, available at (https://www.sciencedirect.com/science/article/pii/S0306261922003336)[https://www.sciencedirect.com/science/article/pii/S0306261922003336].
+doi: 10.1016/j.apenergy.2022.118910, available at [https://www.sciencedirect.com/science/article/pii/S0306261922003336](https://www.sciencedirect.com/science/article/pii/S0306261922003336).
 
 A. Singhal, T. L. Vu and W. Du, "Consensus Control for Coordinating Grid-Forming and Grid-Following Inverters in Microgrids," in IEEE Transactions on Smart Grid, vol. 13, no. 5, pp. 4123-4133, Sept. 2022, doi: 10.1109/TSG.2022.3158254, available at [https://ieeexplore.ieee.org/document/9732444](https://ieeexplore.ieee.org/document/9732444).
 
