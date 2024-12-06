@@ -172,9 +172,9 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
 }
 
 static void partitionTarget(std::string_view target,
-                     std::string& brokerName,
-                     std::string& query,
-                     std::string& targetObj)
+                            std::string& brokerName,
+                            std::string& query,
+                            std::string& targetObj)
 {
     if (!target.empty() && target.back() == '/') {
         target.remove_suffix(1);
@@ -567,7 +567,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         }
 
         const std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
-                                buffer.size()};
+                                      buffer.size()};
         // Echo the message
         auto reqpr = processRequestParameters("", result);
 
@@ -881,7 +881,7 @@ class Listener: public std::enable_shared_from_this<Listener> {
         beast::error_code eCode;
 
         // Open the acceptor
-        eCode=acceptor.open(endpoint.protocol(), eCode);
+        eCode = acceptor.open(endpoint.protocol(), eCode);
         if (eCode) {
             fail(eCode, "helics acceptor open");
             return;
@@ -958,16 +958,14 @@ void WebServer::processArgs(std::string_view args)
         ->envname("HELICS_HTTP_ADDRESS");
     auto* httpsub = parser.add_subcommand("http")->fallthrough();
     httpsub->add_option("--port", mHttpPort, "specify the http port to use");
-    httpsub->add_option(
-        "--interface",
+    httpsub->add_option("--interface",
                         mHttpAddress,
                         "specify the interface for the http server to listen on for connections");
 
     parser.add_option("--websocket_port", mWebsocketPort, "specify the websocket port to use")
         ->envname("HELICS_WEBSOCKET_PORT");
     parser
-        .add_option(
-            "--websocket_interface",
+        .add_option("--websocket_interface",
                     mWebsocketAddress,
                     "specify the interface for the websocket server to listen on for connections")
         ->envname("HELICS_WEBSOCKET_ADDRESS");
@@ -1043,7 +1041,7 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
     if (mHttpEnabled) {
         auto httpInterfaceNetwork = mInterfaceNetwork;
         if (config->contains("http")) {
-            auto &httpConfig = (*config)["http"];
+            auto& httpConfig = (*config)["http"];
             helics::fileops::replaceIfMember(httpConfig, "interface", mHttpAddress);
             helics::fileops::replaceIfMember(httpConfig, "port", mHttpPort);
             const bool ipv4 = helics::fileops::getOrDefault(httpConfig, "ipv4", false);
