@@ -569,7 +569,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
             Tso.setBaseTimeCode(timecode);
         }
     }
-    if (size == 0x00FFFFFFUL) {
+    if (size == maxPayloadSize && !stringData.empty()) {
         payload.append(stringData.back());
         stringData.pop_back();
     }
