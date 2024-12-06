@@ -154,11 +154,12 @@ const std::string& ActionMessage::getString(int index) const
     }
     return emptyStr;
 }
+static constexpr std::size_t maxPayloadSize{0x00FFFFFFUL};
 
 void ActionMessage::setString(int index, std::string_view str)
 {
-    if (index >= 256 || index < 0) {
-        throw(std::invalid_argument("index out of specified range (0-255)"));
+    if (index >= 255 || index < 0) {
+        throw(std::invalid_argument("index out of specified range (0-254)"));
     }
     if (index >= static_cast<int>(stringData.size())) {
         stringData.resize(static_cast<size_t>(index) + 1);
@@ -181,7 +182,7 @@ static constexpr std::size_t action_message_base_size =
 int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
 {
     static const uint8_t littleEndian = isLittleEndian();
-    static constexpr std::size_t maxPayloadSize{0x00FFFFFFUL};
+    
     // put the main string size in the first 4 bytes;
     std::uint32_t ssize{0UL};
     if (messageAction != CMD_TIME_REQUEST) {
@@ -251,7 +252,7 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
     }
 
     ++data;
-    ssize += action_message_base_size + 1;
+    ssize += action_message_base_size;
     for (const auto& str : stringData) {
         auto strsize = static_cast<uint32_t>(str.size());
         if (buffer_size < ssize + strsize + 4) {
@@ -289,13 +290,11 @@ int ActionMessage::serializedByteCount() const
         return size;
     }
     size += static_cast<int>(payload.size());
-    // add additional string data
-    size += 1;
     for (const auto& str : stringData) {
         // 4(to store the length)+length of the string
         size += static_cast<int>(sizeof(uint32_t) + str.size());
     }
-    if (payload.size() >= 0x00FFFFFF) {
+    if (payload.size() >= maxPayloadSize) {
         size += 4;
     }
     return size;
