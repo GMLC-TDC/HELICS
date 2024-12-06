@@ -76,6 +76,30 @@ jobs:
       with:
         name: all-submodules-archive
         path: artifact
+
+#####################################
+# Generate API diff
+#####################################
+  generate-api-diff:
+    name: Generate API diff
+    needs: [create-all-submodule-archive]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Generate API diff
+      uses: GMLC-TDC/cheader2json/actions/generate-diff@main
+      with:
+        repository: '${{ github.repository }}'
+        header-paths: 'src/helics/shared_api_library/backup/helics/helics.h'
+
+#    - name: Upload API diff to release
+#      if: github.event_name != 'workflow_dispatch'
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        UPLOAD_URL: ${{ github.event.release.upload_url }}
+#      run: ./.github/actions/upload-release-asset.sh "api_diff.json"
         
 #####################################
 # Build MSVC archives
