@@ -312,7 +312,7 @@ TEST_F(httpTest, post)
     auto result = sendCommand(http::verb::post, "brk3", init);
     auto val = loadJson(result);
     EXPECT_EQ(val["broker"], "brk3");
-    EXPECT_EQ(val["type"], helics::core::to_string(helics::core::coreTypeFromString(CORE2)));
+    EXPECT_EQ(val["type"], CORE2);
     result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     val = loadJson(result);

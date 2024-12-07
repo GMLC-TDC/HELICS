@@ -29,6 +29,8 @@
     targeted_endpoints
     timeouts
     timingOptimization
+    translators
+    webserver
 ```
 
 Whereas the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) provided a broad overview of co-simulation and a good step-by-step introduction to setting up a HELICS co-simulation, the

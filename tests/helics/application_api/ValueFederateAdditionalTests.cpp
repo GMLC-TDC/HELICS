@@ -602,7 +602,7 @@ TEST_P(valuefed_add_configfile_tests, file_load)
     EXPECT_EQ(vFed.getPublicationCount(), 2);
     auto& inp1 = vFed.getInput("pubshortcut");
 
-    auto key = vFed.getTarget(inp1);
+    auto& key = vFed.getTarget(inp1);
     EXPECT_EQ(key, "fedName/pub2");
 
     EXPECT_EQ(inp1.getInfo(), "this is an information string for use by the application");

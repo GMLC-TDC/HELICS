@@ -262,7 +262,7 @@ void ValueFederate::registerValueInterfacesJsonDetail(const fileops::JsonBuffer&
     const nlohmann::json& iface = (json.contains("interfaces")) ? json["interfaces"] : json;
 
     if (iface.contains("publications")) {
-        auto pubs = iface["publications"];
+        const auto& pubs = iface["publications"];
         for (const auto& pub : pubs) {
             auto name = fileops::getName(pub);
 
@@ -288,7 +288,7 @@ void ValueFederate::registerValueInterfacesJsonDetail(const fileops::JsonBuffer&
         }
     }
     if (iface.contains("subscriptions")) {
-        auto& subs = iface["subscriptions"];
+        const auto& subs = iface["subscriptions"];
         for (const auto& sub : subs) {
             bool skipNameTarget{false};
             auto name = fileops::getName(sub);
@@ -320,7 +320,7 @@ void ValueFederate::registerValueInterfacesJsonDetail(const fileops::JsonBuffer&
         }
     }
     if (iface.contains("inputs")) {
-        auto ipts = iface["inputs"];
+        const auto& ipts = iface["inputs"];
         for (const auto& ipt : ipts) {
             auto name = fileops::getName(ipt);
 
@@ -438,7 +438,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         }
     }
     if (isMember(doc, "inputs")) {
-        auto ipts = toml::find(doc, "inputs");
+        auto& ipts = toml::find(doc, "inputs");
         if (!ipts.is_array()) {
             throw(helics::InvalidParameter(
                 "inputs section in toml file must be an array"));  // LCOV_EXCL_LINE
@@ -498,8 +498,8 @@ static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
                          char separator,
                          const nlohmann::json& val)
 {
-    for (auto& item : val.items()) {
-        auto& field = item.value();
+    for (const auto& item : val.items()) {
+        const auto& field = item.value();
         if (field.is_object()) {
             generateData(vpairs, prefix + item.key() + separator, separator, field);
         } else {

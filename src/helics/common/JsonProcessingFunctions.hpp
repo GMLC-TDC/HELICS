@@ -41,7 +41,7 @@ class JsonStorage {
     const nlohmann::json& json() const { return jStorage; }
 
   private:
-    nlohmann::json jStorage;
+    nlohmann::json jStorage{};
 };
 
 /** check if the file has a valid JSON extension*/
@@ -97,11 +97,11 @@ inline bool callIfMember(const nlohmann::json& element,
                          const std::string& key,
                          const std::function<void(const std::string&, helics::Time)>& call)
 {
-    if (element.contains(key)) {
+    bool isMember = element.contains(key);
+    if (isMember) {
         call(key, loadJsonTime(element[key]));
-        return true;
     }
-    return false;
+    return isMember;
 }
 
 inline bool callIfMember(const nlohmann::json& element,

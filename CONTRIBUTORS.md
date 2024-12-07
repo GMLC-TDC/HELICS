@@ -41,6 +41,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Bryan Richardson](https://github.com/activeshadow)
 - [Matt Irish](https://github.com/mattirish)
 - [Slava Barsuk](https://github.com/vbarsuk)
+- [Joseph McKinsey](https://github.com/josephmckinsey)
 
 ### Argonne National Lab
 
@@ -54,6 +55,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Nitin Barthwal](https://github.com/nitin-barthwal)
 - [Parth Bansal](https://github.com/parthb83)
 - [Gaurav Kumar](https://github.com/slashgk)
+- [Mehdi Chinoune](https://github.com/MehdiChinoune)
 
 ## Used Libraries or Code
 
@@ -133,7 +135,7 @@ A list of optional component that are not included in HELICS but are optionally 
 
 ### [BOOST](https://www.boost.org)
 
-Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast from Boost 1.72 or higher. Boost is licensed under the Boost Software License. Boost can be removed entirely from the source code with the use of a [cmake](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) flag.
+Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast. Boost is licensed under the Boost Software License. Boost can be removed entirely from the source code with the use of a [cmake](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) flag.
 
 #### [zmq](http://www.zeromq.org)
 

@@ -59,6 +59,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <streambuf>
 #include <string>
 #include <thread>
+#include <tuple>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -86,12 +88,11 @@ static std::string generateIndexPage()
     return index;
 }
 // decode a URI to clean up a string, convert character codes in a URI to the original character
-static std::string uriDecode(std::string_view str)
+static std::string uriDecode(const std::string_view str)
 {
     std::string ret;
-    size_t len = str.length();
 
-    for (size_t ii = 0; ii < len; ii++) {
+    for (size_t ii = 0; ii < str.length(); ii++) {
         if (str[ii] != '%') {
             if (str[ii] == '+') {
                 ret.push_back(' ');
@@ -101,7 +102,7 @@ static std::string uriDecode(std::string_view str)
         } else {
             const std::array<char, 3> exp{{str[ii + 1], str[ii + 2], '\0'}};
             char* loc{nullptr};
-            unsigned int spchar = strtoul(exp.data(), &loc, 16);
+            const unsigned int spchar = strtoul(exp.data(), &loc, 16);
             if (loc - exp.data() >= 2) {
                 ret.push_back(static_cast<char>(spchar));
                 ii = ii + 2;
@@ -145,11 +146,12 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
     if (!body.empty()) {
         if (body.front() == '{') {
             nlohmann::json val = helics::fileops::loadJsonStr(body);
-            for (auto& vb : val.items()) {
-                if (vb.value().is_string()) {
-                    results.second[vb.key()] = vb.value().get<std::string>();
+            for (const auto& value : val.items()) {
+                if (value.value().is_string()) {
+                    results.second[value.key()] = value.value().get<std::string>();
                 } else {
-                    results.second[vb.key()] = helics::fileops::generateJsonString(vb.value());
+                    results.second[value.key()] =
+                        helics::fileops::generateJsonString(value.value());
                 }
             }
         } else {
@@ -172,10 +174,10 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
     return results;
 }
 
-void partitionTarget(std::string_view target,
-                     std::string& brokerName,
-                     std::string& query,
-                     std::string& targetObj)
+static void partitionTarget(std::string_view target,
+                            std::string& brokerName,
+                            std::string& query,
+                            std::string& targetObj)
 {
     if (!target.empty() && target.back() == '/') {
         target.remove_suffix(1);
@@ -199,7 +201,7 @@ void partitionTarget(std::string_view target,
     query = tstr.substr(slashLoc + 1);
 }
 
-std::string getBrokerList()
+static std::string getBrokerList()
 {
     auto brks = helics::BrokerFactory::getAllBrokers();
     nlohmann::json base;
@@ -216,6 +218,63 @@ std::string getBrokerList()
     }
     return helics::fileops::generateJsonString(base);
 }
+/** create a broker from the fields*/
+static std::tuple<std::shared_ptr<helics::Broker>, std::string, bool, std::string>
+    createBroker(std::string& brokerName,
+                 const boost::container::flat_map<std::string, std::string>& fields)
+{
+    std::string start_args;
+    std::string type;
+    if (fields.find("args") != fields.end()) {
+        start_args = fields.at("args");
+    }
+    if (fields.find("type") != fields.end()) {
+        type = fields.at("type");
+    } else if (fields.find("CoreType") != fields.end()) {
+        type = fields.at("CoreType");
+    } else if (fields.find("core_type") != fields.end()) {
+        type = fields.at("core_type");
+    }
+    helics::CoreType ctype{helics::CoreType::DEFAULT};
+    if (!type.empty()) {
+        ctype = helics::core::coreTypeFromString(type);
+        if (!helics::core::isCoreTypeAvailable(ctype)) {
+            // return send(bad_request(type + " is not available"));
+            return {nullptr, type + " is not available", false, ""};
+        }
+    }
+    if (fields.find("num_feds") != fields.end()) {
+        start_args += " -f " + fields.at("num_feds");
+    }
+    if (fields.find("num_brokers") != fields.end()) {
+        start_args += " --minbrokers=" + fields.at("num_brokers");
+    }
+    if (fields.find("port") != fields.end()) {
+        start_args += " --port=" + fields.at("port");
+    }
+    if (fields.find("host") != fields.end()) {
+        start_args += " --interface=" + fields.at("host");
+    }
+    if (fields.find("log_level") != fields.end()) {
+        start_args += " --loglevel=" + fields.at("log_level");
+    }
+    bool useUuid{false};
+    if (brokerName.empty()) {
+        boost::uuids::random_generator generator;
+
+        const boost::uuids::uuid uuid1 = generator();
+        std::ostringstream ss1;
+        ss1 << uuid1;
+        brokerName = ss1.str();
+        useUuid = true;
+    }
+    try {
+        return {helics::BrokerFactory::create(ctype, brokerName, start_args), "", useUuid, type};
+    }
+    catch (const std::exception& exc) {
+        return {nullptr, exc.what(), false, ""};
+    }
+}
 
 enum class RequestReturnVal : std::int32_t {
     OK = 0,
@@ -227,7 +286,21 @@ enum class RequestReturnVal : std::int32_t {
 // set of possible commands that the web server can implement
 enum class RestCommand { QUERY, CREATE, REMOVE, BARRIER, CLEAR_BARRIER, COMMAND, UNKNOWN };
 
-std::pair<RequestReturnVal, std::string>
+static const std::unordered_map<std::string_view, RestCommand> commandMap{
+    {"query", RestCommand::QUERY},
+    {"search", RestCommand::QUERY},
+    {"get", RestCommand::QUERY},
+    {"status", RestCommand::QUERY},
+    {"create", RestCommand::CREATE},
+    {"barrier", RestCommand::BARRIER},
+    {"command", RestCommand::COMMAND},
+    {"clearbarrier", RestCommand::CLEAR_BARRIER},
+    {"clear_barrier", RestCommand::CLEAR_BARRIER},
+    {"delete", RestCommand::REMOVE},
+    {"clear", RestCommand::REMOVE},
+};
+
+static std::pair<RequestReturnVal, std::string>
     generateResults(RestCommand command,
                     std::string brokerName,
                     std::string_view target,
@@ -237,67 +310,60 @@ std::pair<RequestReturnVal, std::string>
     static const std::string emptyString;
     if (command == RestCommand::UNKNOWN) {
         if (fields.find("command") != fields.end()) {
-            auto cmdstr = fields.at("command");
-            if (cmdstr == "query" || cmdstr == "search" || cmdstr == "get") {
-                command = RestCommand::QUERY;
+            const auto& cmdstr = fields.at("command");
+            if (commandMap.find(cmdstr) != commandMap.end()) {
+                command = commandMap.at(cmdstr);
+                if (cmdstr == "status") {
+                    query = "status";
+                }
             }
-            if (cmdstr == "status") {
-                command = RestCommand::QUERY;
-                query = "status";
+        }
+    }
+    switch (command) {
+        case RestCommand::UNKNOWN:
+            return {RequestReturnVal::NOT_IMPLEMENTED, "command not recognized"};
+        case RestCommand::CREATE:
+            if (brokerName == "create") {
+                brokerName.clear();
+                break;
             }
-            if (cmdstr == "create") {
-                command = RestCommand::CREATE;
+            if (brokerName == "barrier") {
+                brokerName.clear();
+                command = RestCommand::BARRIER;
+                break;
             }
-
-            if (cmdstr == "barrier") {
+            if (target == "barrier") {
                 command = RestCommand::BARRIER;
             }
-            if (cmdstr == "command") {
-                command = RestCommand::COMMAND;
+            break;
+        case RestCommand::REMOVE:
+            if (brokerName == "delete" || brokerName == "remove") {
+                brokerName.clear();
+                break;
             }
-            if (cmdstr == "clearbarrier") {
+            if (brokerName == "barrier") {
+                brokerName.clear();
+                command = RestCommand::CLEAR_BARRIER;
+                break;
+            }
+            if (target == "barrier") {
                 command = RestCommand::CLEAR_BARRIER;
             }
-            if (cmdstr == "delete" || cmdstr == "remove") {
-                command = RestCommand::REMOVE;
+            break;
+        case RestCommand::QUERY:
+            if (brokerName == "query" || brokerName == "search") {
+                brokerName.clear();
             }
-        }
+            break;
+        default:
+            break;
     }
-    if (command == RestCommand::UNKNOWN) {
-        return {RequestReturnVal::NOT_IMPLEMENTED, "command not recognized"};
+
+    if (query.empty() && fields.find("query") != fields.end()) {
+        query = fields.at("query");
     }
-    if (command == RestCommand::CREATE && brokerName == "create") {
-        brokerName.clear();
-    }
-    if (command == RestCommand::CREATE && brokerName == "barrier") {
-        brokerName.clear();
-        command = RestCommand::BARRIER;
-    }
-    if (command == RestCommand::CREATE && target == "barrier") {
-        command = RestCommand::BARRIER;
-    }
-    if (command == RestCommand::REMOVE && (brokerName == "delete" || brokerName == "remove")) {
-        brokerName.clear();
-    }
-    if (command == RestCommand::REMOVE && brokerName == "barrier") {
-        brokerName.clear();
-        command = RestCommand::CLEAR_BARRIER;
-    }
-    if (command == RestCommand::REMOVE && target == "barrier") {
-        command = RestCommand::CLEAR_BARRIER;
-    }
-    if (command == RestCommand::QUERY && (brokerName == "query" || brokerName == "search")) {
-        brokerName.clear();
-    }
-    if (query.empty()) {
-        if (fields.find("query") != fields.end()) {
-            query = fields.at("query");
-        }
-    }
-    if (target.empty()) {
-        if (fields.find("target") != fields.end()) {
-            target = fields.at("target");
-        }
+    if (target.empty() && fields.find("target") != fields.end()) {
+        target = fields.at("target");
     }
     if (brokerName.empty()) {
         if (fields.find("broker") != fields.end()) {
@@ -308,10 +374,8 @@ std::pair<RequestReturnVal, std::string>
             brokerName = fields.at("uuid");
         }
     }
-    if (brokerName.empty() && target == "brokers") {
-        brokerName = "brokers";
-    }
-    if (brokerName == "brokers" || (brokerName.empty() && query == "brokers")) {
+    if ((brokerName.empty() && (target == "brokers" || query == "brokers")) ||
+        brokerName == "brokers") {
         return {RequestReturnVal::OK, getBrokerList()};
     }
 
@@ -340,62 +404,20 @@ std::pair<RequestReturnVal, std::string>
             if (brkr) {
                 return {RequestReturnVal::BAD_REQUEST, brokerName + " already exists"};
             }
-            std::string start_args;
-            std::string type;
-            if (fields.find("args") != fields.end()) {
-                start_args = fields.at("args");
-            }
-            if (fields.find("type") != fields.end()) {
-                type = fields.at("type");
-            } else if (fields.find("CoreType") != fields.end()) {
-                type = fields.at("CoreType");
-            } else if (fields.find("core_type") != fields.end()) {
-                type = fields.at("core_type");
-            }
-            helics::CoreType ctype{helics::CoreType::DEFAULT};
-            if (!type.empty()) {
-                ctype = helics::core::coreTypeFromString(type);
-                if (!helics::core::isCoreTypeAvailable(ctype)) {
-                    // return send(bad_request(type + " is not available"));
-                    return {RequestReturnVal::BAD_REQUEST, type + " is not available"};
-                }
-            }
-            if (fields.find("num_feds") != fields.end()) {
-                start_args += " -f " + fields.at("num_feds");
-            }
-            if (fields.find("num_brokers") != fields.end()) {
-                start_args += " --minbrokers=" + fields.at("num_brokers");
-            }
-            if (fields.find("port") != fields.end()) {
-                start_args += " --port=" + fields.at("port");
-            }
-            if (fields.find("host") != fields.end()) {
-                start_args += " --interface=" + fields.at("host");
-            }
-            if (fields.find("log_level") != fields.end()) {
-                start_args += " --loglevel=" + fields.at("log_level");
-            }
+            std::string errorMessage;
             bool useUuid{false};
-            if (brokerName.empty()) {
-                boost::uuids::random_generator generator;
+            std::string type;
+            std::tie(brkr, errorMessage, useUuid, type) = createBroker(brokerName, fields);
 
-                boost::uuids::uuid uuid1 = generator();
-                std::ostringstream ss1;
-                ss1 << uuid1;
-                brokerName = ss1.str();
-                useUuid = true;
-            }
-            brkr = helics::BrokerFactory::create(ctype, brokerName, start_args);
             if (!brkr) {
-                return {RequestReturnVal::BAD_REQUEST, "unable to create broker"};
-                // return send(bad_request("unable to create broker"));
+                return {RequestReturnVal::BAD_REQUEST, errorMessage};
             }
             nlohmann::json retJson;
             retJson["broker"] = brokerName;
             if (useUuid) {
                 retJson["broker_uuid"] = brokerName;
             }
-            retJson["type"] = helics::core::to_string(ctype);
+            retJson["type"] = type;
             return {RequestReturnVal::OK, helics::fileops::generateJsonString(retJson)};
         }
         case RestCommand::REMOVE:
@@ -431,11 +453,9 @@ std::pair<RequestReturnVal, std::string>
                 }
             }
             if (fields.find("command_str") != fields.end()) {
-                brkr->sendCommand(std::string_view(target.data(), target.size()),
-                                  fields.at("command_str"));
+                brkr->sendCommand(target, fields.at("command_str"));
             } else if (!query.empty()) {
-                brkr->sendCommand(std::string_view(target.data(), target.size()),
-                                  std::string_view(query.data(), query.size()));
+                brkr->sendCommand(target, query);
             } else {
                 return {RequestReturnVal::BAD_REQUEST, "no valid command string"};
             }
@@ -495,9 +515,9 @@ std::pair<RequestReturnVal, std::string>
 
 // LCOV_EXCL_START
 // Report a failure
-static void fail(beast::error_code ec, char const* what)
+static void fail(beast::error_code eCode, char const* what)
 {
-    std::cerr << what << ": " << ec.message() << "\n";
+    std::cerr << what << ": " << eCode.message() << "\n";
 }
 
 // LCOV_EXCL_STOP
@@ -537,10 +557,10 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
             beast::bind_front_handler(&WebSocketsession::on_accept, shared_from_this()));
     }
 
-    void on_accept(beast::error_code ec)
+    void on_accept(beast::error_code eCode)
     {
-        if (ec) {
-            return fail(ec, "helics websocket accept");
+        if (eCode) {
+            return fail(eCode, "helics websocket accept");
         }
 
         // Read a message
@@ -554,25 +574,25 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                       beast::bind_front_handler(&WebSocketsession::on_read, shared_from_this()));
     }
 
-    void on_read(beast::error_code ec, std::size_t bytes_transferred)
+    void on_read(beast::error_code eCode, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
         // This indicates that the session was closed
-        if (ec == websocket::error::closed) {
+        if (eCode == websocket::error::closed) {
             return;
         }
 
-        if (ec) {
-            return fail(ec, "helics web server read");
+        if (eCode) {
+            return fail(eCode, "helics web server read");
         }
 
-        std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
-                                buffer.size()};
+        const std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
+                                      buffer.size()};
         // Echo the message
         auto reqpr = processRequestParameters("", result);
 
-        RestCommand command{RestCommand::UNKNOWN};
+        const RestCommand command{RestCommand::UNKNOWN};
 
         auto res = generateResults(command, {}, "", "", reqpr.second);
         // Clear the buffer
@@ -611,12 +631,12 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                        beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
     }
 
-    void on_write(beast::error_code ec, std::size_t bytes_transferred)
+    void on_write(beast::error_code eCode, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
-        if (ec) {
-            return fail(ec, "helics socket write");
+        if (eCode) {
+            return fail(eCode, "helics socket write");
         }
 
         // Clear the buffer
@@ -704,7 +724,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
             return send(bad_request("Unknown HTTP-method"));
     }
 
-    std::string_view target(req.target());
+    const std::string_view target(req.target());
     auto psize = req.payload_size();
     if (target == "/index.html" || target == "index.html" ||
         (target == "/" && (!psize || *psize < 4))) {
@@ -772,18 +792,18 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
             // The lifetime of the message has to extend
             // for the duration of the async operation so
             // we use a shared_ptr to manage it.
-            auto sp = std::make_shared<http::message<isRequest, Body, Fields>>(std::move(msg));
+            auto message = std::make_shared<http::message<isRequest, Body, Fields>>(std::move(msg));
 
             // Store a type-erased version of the shared
             // pointer in the class to keep it alive.
-            self_ref.res = sp;
+            self_ref.res = message;
 
             // Write the response
             http::async_write(self_ref.stream,
-                              *sp,
+                              *message,
                               beast::bind_front_handler(&HttpSession::on_write,
                                                         self_ref.shared_from_this(),
-                                                        sp->need_eof()));
+                                                        message->need_eof()));
         }
     };
 
@@ -816,18 +836,18 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
                          beast::bind_front_handler(&HttpSession::on_read, shared_from_this()));
     }
 
-    void on_read(beast::error_code ec, std::size_t bytes_transferred)
+    void on_read(beast::error_code eCode, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream) {
+        if (eCode == http::error::end_of_stream) {
             return do_close();
         }
 
-        if (ec) {
-            if (beast::error::timeout != ec) {
-                fail(ec, "helics web server read");
+        if (eCode) {
+            if (beast::error::timeout != eCode) {
+                fail(eCode, "helics web server read");
             }
             return;
         }
@@ -836,12 +856,12 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
         handle_request(std::move(req), lambda);
     }
 
-    void on_write(bool close, beast::error_code ec, std::size_t bytes_transferred)
+    void on_write(bool close, beast::error_code eCode, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
-        if (ec) {
-            return fail(ec, "helics web server write");
+        if (eCode) {
+            return fail(eCode, "helics web server write");
         }
 
         if (close) {
@@ -860,8 +880,8 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
     void do_close()
     {
         // Send a TCP shutdown
-        beast::error_code ec;
-        stream.socket().shutdown(tcp::socket::shutdown_send, ec);
+        beast::error_code eCode;
+        eCode = stream.socket().shutdown(tcp::socket::shutdown_send, eCode);
 
         // At this point the connection is closed gracefully
     }
@@ -879,33 +899,33 @@ class Listener: public std::enable_shared_from_this<Listener> {
     Listener(net::io_context& context, const tcp::endpoint& endpoint, bool webs = false):
         ioc(context), acceptor(net::make_strand(ioc)), websocket{webs}
     {
-        beast::error_code ec;
+        beast::error_code eCode;
 
         // Open the acceptor
-        acceptor.open(endpoint.protocol(), ec);
-        if (ec) {
-            fail(ec, "helics acceptor open");
+        eCode = acceptor.open(endpoint.protocol(), eCode);
+        if (eCode) {
+            fail(eCode, "helics acceptor open");
             return;
         }
 
         // Allow address reuse
-        acceptor.set_option(net::socket_base::reuse_address(true), ec);
-        if (ec) {
-            fail(ec, "helics acceptor set_option");
+        (void)(acceptor.set_option(net::socket_base::reuse_address(true), eCode));
+        if (eCode) {
+            fail(eCode, "helics acceptor set_option");
             return;
         }
 
         // Bind to the server address
-        acceptor.bind(endpoint, ec);
-        if (ec) {
-            fail(ec, "helics acceptor bind");
+        (void)(acceptor.bind(endpoint, eCode));
+        if (eCode) {
+            fail(eCode, "helics acceptor bind");
             return;
         }
 
         // Start listening for connections
-        acceptor.listen(net::socket_base::max_listen_connections, ec);
-        if (ec) {
-            fail(ec, "helics acceptor listen");
+        (void)(acceptor.listen(net::socket_base::max_listen_connections, eCode));
+        if (eCode) {
+            fail(eCode, "helics acceptor listen");
             return;
         }
     }
@@ -921,10 +941,10 @@ class Listener: public std::enable_shared_from_this<Listener> {
                               beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
     }
 
-    void on_accept(beast::error_code ec, tcp::socket socket)
+    void on_accept(beast::error_code eCode, tcp::socket socket)
     {
-        if (ec) {
-            return fail(ec, "helics accept connections");
+        if (eCode) {
+            return fail(eCode, "helics accept connections");
         }
         if (websocket) {
             // Create the session and run it
@@ -1011,7 +1031,7 @@ void WebServer::startServer(const nlohmann::json* val,
         // The io_context is required for all I/O
         context = std::make_shared<IocWrapper>();
 
-        std::lock_guard<std::mutex> tlock(threadGuard);
+        const std::lock_guard<std::mutex> tlock(threadGuard);
 
         auto webptr = std::dynamic_pointer_cast<WebServer>(ptr);
         if (!webptr) {
@@ -1032,7 +1052,7 @@ void WebServer::stopServer()
     bool exp{true};
     if (running.compare_exchange_strong(exp, false)) {
         logMessage("stopping broker web server");
-        std::lock_guard<std::mutex> tlock(threadGuard);
+        const std::lock_guard<std::mutex> tlock(threadGuard);
         context->ioc.stop();
     }
 }
@@ -1042,23 +1062,23 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
     if (mHttpEnabled) {
         auto httpInterfaceNetwork = mInterfaceNetwork;
         if (config->contains("http")) {
-            auto V = (*config)["http"];
-            helics::fileops::replaceIfMember(V, "interface", mHttpAddress);
-            helics::fileops::replaceIfMember(V, "port", mHttpPort);
-            bool ipv4 = helics::fileops::getOrDefault(V, "ipv4", false);
+            const auto& httpConfig = (*config)["http"];
+            helics::fileops::replaceIfMember(httpConfig, "interface", mHttpAddress);
+            helics::fileops::replaceIfMember(httpConfig, "port", mHttpPort);
+            const bool ipv4 = helics::fileops::getOrDefault(httpConfig, "ipv4", false);
 
             if (ipv4) {
                 httpInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
             }
-            bool ipv6 = helics::fileops::getOrDefault(V, "ipv6", false);
+            const bool ipv6 = helics::fileops::getOrDefault(httpConfig, "ipv6", false);
             if (ipv6) {
                 httpInterfaceNetwork =
                     static_cast<int>((ipv4) ? gmlc::networking::InterfaceNetworks::ALL :
                                               gmlc::networking::InterfaceNetworks::IPV6);
             }
 
-            bool external = helics::fileops::getOrDefault(V, "external", false);
-            helics::fileops::replaceIfMember(V, "all", external);
+            bool external = helics::fileops::getOrDefault(httpConfig, "external", false);
+            helics::fileops::replaceIfMember(httpConfig, "all", external);
             if (external) {
                 httpInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
             }
@@ -1079,25 +1099,25 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
     if (mWebsocketEnabled) {
         auto websocketInterfaceNetwork = mInterfaceNetwork;
         if (config->contains("websocket")) {
-            auto V = (*config)["websocket"];
-            helics::fileops::replaceIfMember(V, "interface", mWebsocketAddress);
-            helics::fileops::replaceIfMember(V, "port", mWebsocketPort);
+            const auto& webConfig = (*config)["websocket"];
+            helics::fileops::replaceIfMember(webConfig, "interface", mWebsocketAddress);
+            helics::fileops::replaceIfMember(webConfig, "port", mWebsocketPort);
 
-            bool ipv4 = helics::fileops::getOrDefault(V, "ipv4", false);
+            const bool ipv4 = helics::fileops::getOrDefault(webConfig, "ipv4", false);
 
             if (ipv4) {
                 websocketInterfaceNetwork =
                     static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
             }
-            bool ipv6 = helics::fileops::getOrDefault(V, "ipv6", false);
+            const bool ipv6 = helics::fileops::getOrDefault(webConfig, "ipv6", false);
             if (ipv6) {
                 websocketInterfaceNetwork =
                     static_cast<int>((ipv4) ? gmlc::networking::InterfaceNetworks::ALL :
                                               gmlc::networking::InterfaceNetworks::IPV6);
             }
 
-            bool external = helics::fileops::getOrDefault(V, "external", false);
-            helics::fileops::replaceIfMember(V, "all", external);
+            bool external = helics::fileops::getOrDefault(webConfig, "external", false);
+            helics::fileops::replaceIfMember(webConfig, "all", external);
             if (external) {
                 websocketInterfaceNetwork =
                     static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
