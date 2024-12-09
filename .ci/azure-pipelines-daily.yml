@@ -12,10 +12,10 @@ jobs:
     strategy:
       matrix:
         all-tests:
-          containerImage: "helics/buildenv:ubuntu20.04-default-builder"
+          containerImage: "helics/buildenv:ubuntu22.04-default-builder"
           test_config: "daily"
         zmq-subproject:
-          containerImage: "helics/buildenv:ubuntu20.04-default-builder"
+          containerImage: "helics/buildenv:ubuntu22.04-default-builder"
           test_config: "ci"
           zmq_subproject: true
     pool:
