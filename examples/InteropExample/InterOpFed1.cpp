@@ -8,15 +8,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/CombinationFederate.hpp"
 
 #include <iostream>
+#include <memory>
+#include <string>
 #include <thread>
 
 int main(int argc, char* argv[])  // NOLINT
 {
-    helics::FederateInfo fi(argc, argv);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    helics::BrokerApp brk(fi.coreType, fi.brokerInitString + " -f 2");
+    helics::FederateInfo fedInfo(argc, argv);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::BrokerApp brk(fedInfo.coreType, fedInfo.brokerInitString + " -f 2");
 
-    auto cFed = std::make_unique<helics::CombinationFederate>("ioFed1", fi);
+    auto cFed = std::make_unique<helics::CombinationFederate>("ioFed1", fedInfo);
 
     helics::SmallBuffer mbuf(256, 0);
     for (int ii = 0; ii < 256; ++ii) {

@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <future>
 #include <iostream>
+#include <string>
 
 /** these test cases test out the value converters and some of the other functions
  */
@@ -28,7 +29,7 @@ class cfed_type_tests:
 //
 TEST_F(cfed_tests, test_file_load)
 {
-    // fi = helicsCreateFederateInfo();
+    // fedInfo = helicsCreateFederateInfo();
     // path of the JSON file is hardcoded for now
     helicscpp::CombinationFederate cFed(TEST_DIR "/combo_config.json");
     ASSERT_TRUE(cFed.baseObject() != nullptr);

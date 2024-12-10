@@ -326,18 +326,18 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     return issues;
 }
 
-void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
+void InterfaceInfo::getUnconnectedInterfaces(nlohmann::json& base) const
 {
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
-        base["unconnected_inputs"] = Json::arrayValue;
-        base["connected_inputs"] = Json::arrayValue;
+        base["unconnected_inputs"] = nlohmann::json::array();
+        base["connected_inputs"] = nlohmann::json::array();
         for (const auto& ipt : ihandle) {
             if (!ipt->key.empty()) {
                 if (!ipt->has_target) {
-                    base["unconnected_inputs"].append(ipt->key);
+                    base["unconnected_inputs"].push_back(ipt->key);
                 } else {
-                    base["connected_inputs"].append(ipt->key);
+                    base["connected_inputs"].push_back(ipt->key);
                 }
             }
         }
@@ -345,14 +345,14 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
     ihandle.unlock();
     auto phandle = publications.lock();
     if (phandle->size() > 0) {
-        base["unconnected_publications"] = Json::arrayValue;
-        base["connected_publications"] = Json::arrayValue;
+        base["unconnected_publications"] = nlohmann::json::array();
+        base["connected_publications"] = nlohmann::json::array();
         for (const auto& pub : phandle) {
             if (!pub->key.empty()) {
                 if (pub->subscribers.empty()) {
-                    base["unconnected_publications"].append(pub->key);
+                    base["unconnected_publications"].push_back(pub->key);
                 } else {
-                    base["connected_publications"].append(pub->key);
+                    base["connected_publications"].push_back(pub->key);
                 }
             }
         }
@@ -361,23 +361,23 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
 
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
-        base["unconnected_source_endpoints"] = Json::arrayValue;
-        base["unconnected_destination_endpoints"] = Json::arrayValue;
-        base["connected_endpoints"] = Json::arrayValue;
+        base["unconnected_source_endpoints"] = nlohmann::json::array();
+        base["unconnected_destination_endpoints"] = nlohmann::json::array();
+        base["connected_endpoints"] = nlohmann::json::array();
         for (const auto& ept : ehandle) {
             if (!ept->key.empty()) {
                 if (ept->targetedEndpoint) {
                     if (!ept->hasSource()) {
-                        base["unconnected_target_endpoints"].append(ept->key);
+                        base["unconnected_target_endpoints"].push_back(ept->key);
                     }
                     if (!ept->hasTarget()) {
-                        base["unconnected_source_endpoints"].append(ept->key);
+                        base["unconnected_source_endpoints"].push_back(ept->key);
                     }
                     if (ept->hasConnection()) {
-                        base["connected_endpoints"].append(ept->key);
+                        base["connected_endpoints"].push_back(ept->key);
                     }
                 } else {
-                    base["connected_endpoints"].append(ept->key);
+                    base["connected_endpoints"].push_back(ept->key);
                 }
             }
         }
@@ -385,14 +385,14 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
     ehandle.unlock();
 }
 
-void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
+void InterfaceInfo::generateInferfaceConfig(nlohmann::json& base) const
 {
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
-        base["inputs"] = Json::arrayValue;
+        base["inputs"] = nlohmann::json::array();
         for (const auto& ipt : ihandle) {
             if (!ipt->key.empty()) {
-                Json::Value ibase;
+                nlohmann::json ibase;
                 ibase["key"] = ipt->key;
                 if (!ipt->type.empty()) {
                     ibase["type"] = ipt->type;
@@ -400,17 +400,17 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
                 if (!ipt->units.empty()) {
                     ibase["units"] = ipt->units;
                 }
-                base["inputs"].append(std::move(ibase));
+                base["inputs"].push_back(std::move(ibase));
             }
         }
     }
     ihandle.unlock();
     auto phandle = publications.lock();
     if (phandle->size() > 0) {
-        base["publications"] = Json::arrayValue;
+        base["publications"] = nlohmann::json::array();
         for (const auto& pub : phandle) {
             if (!pub->key.empty()) {
-                Json::Value pbase;
+                nlohmann::json pbase;
                 pbase["key"] = pub->key;
                 if (!pub->type.empty()) {
                     pbase["type"] = pub->type;
@@ -418,7 +418,7 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
                 if (!pub->units.empty()) {
                     pbase["units"] = pub->units;
                 }
-                base["publications"].append(std::move(pbase));
+                base["publications"].push_back(std::move(pbase));
             }
         }
     }
@@ -426,15 +426,15 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
 
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
-        base["endpoints"] = Json::arrayValue;
+        base["endpoints"] = nlohmann::json::array();
         for (const auto& ept : ehandle) {
             if (!ept->key.empty()) {
-                Json::Value ebase;
+                nlohmann::json ebase;
                 ebase["key"] = ept->key;
                 if (!ept->type.empty()) {
                     ebase["type"] = ept->type;
                 }
-                base["endpoints"].append(std::move(ebase));
+                base["endpoints"].push_back(std::move(ebase));
             }
         }
     }
@@ -442,69 +442,69 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
     base["extra"] = "configuration";
 }
 
-void InterfaceInfo::generateDataFlowGraph(Json::Value& base) const
+void InterfaceInfo::generateDataFlowGraph(nlohmann::json& base) const
 {
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
         for (const auto& ipt : ihandle) {
-            Json::Value ibase;
+            nlohmann::json ibase;
             if (!ipt->key.empty()) {
                 ibase["key"] = ipt->key;
             }
             ibase["federate"] = ipt->id.fed_id.baseValue();
             ibase["handle"] = ipt->id.handle.baseValue();
             if (!ipt->input_sources.empty()) {
-                ibase["sources"] = Json::arrayValue;
+                ibase["sources"] = nlohmann::json::array();
                 for (auto& source : ipt->input_sources) {
-                    Json::Value sid;
+                    nlohmann::json sid;
                     sid["federate"] = source.fed_id.baseValue();
                     sid["handle"] = source.handle.baseValue();
 
-                    ibase["sources"].append(sid);
+                    ibase["sources"].push_back(sid);
                 }
             }
-            base["inputs"].append(std::move(ibase));
+            base["inputs"].push_back(std::move(ibase));
         }
     }
     ihandle.unlock();
     auto phandle = publications.lock();
     if (phandle->size() > 0) {
-        base["publications"] = Json::arrayValue;
+        base["publications"] = nlohmann::json::array();
         for (const auto& pub : phandle) {
-            Json::Value pbase;
+            nlohmann::json pbase;
             if (!pub->key.empty()) {
                 pbase["key"] = pub->key;
             }
             pbase["federate"] = pub->id.fed_id.baseValue();
             pbase["handle"] = pub->id.handle.baseValue();
             if (!pub->subscribers.empty()) {
-                pbase["targets"] = Json::arrayValue;
+                pbase["targets"] = nlohmann::json::array();
                 for (auto& target : pub->subscribers) {
-                    Json::Value sid;
+                    nlohmann::json sid;
                     sid["federate"] = target.id.fed_id.baseValue();
                     sid["handle"] = target.id.handle.baseValue();
                     if (!target.key.empty()) {
                         sid["key"] = target.key;
                     }
-                    pbase["targets"].append(sid);
+                    pbase["targets"].push_back(sid);
                 }
             }
-            base["publications"].append(std::move(pbase));
+            base["publications"].push_back(std::move(pbase));
         }
     }
     phandle.unlock();
 
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
-        base["endpoints"] = Json::arrayValue;
+        base["endpoints"] = nlohmann::json::array();
         for (const auto& ept : ehandle) {
-            Json::Value ebase;
+            nlohmann::json ebase;
             ebase["federate"] = ept->id.fed_id.baseValue();
             ebase["handle"] = ept->id.handle.baseValue();
             if (!ept->key.empty()) {
                 ebase["key"] = ept->key;
             }
-            base["endpoints"].append(std::move(ebase));
+            base["endpoints"].push_back(std::move(ebase));
         }
     }
     ehandle.unlock();

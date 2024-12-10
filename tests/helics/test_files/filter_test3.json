@@ -1,0 +1,32 @@
+{
+  "name": "filt_test1",
+  "coretype": "test",
+  "coreinitstring": "--autobroker",
+  "defaultglobal": true,
+  "period": 1.0,
+
+  "endpoints": [
+    {
+      "name": "ept1",
+      "destinationtargets": "ept2",
+      "targeted": true
+    },
+    {
+      "name": "ept2",
+      "targeted": true
+    },
+    {
+      "name": "ept3"
+    }
+  ],
+  "filters": [
+    {
+      "operation": "reroute",
+      "sourcetargets": "ept1",
+      "properties": {
+        "value": "ept3",
+        "name": "newdestination"
+      }
+    }
+  ]
+}

@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/frozen_map.h"
 
 #include <complex>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace helics::detail {
@@ -315,9 +317,9 @@ namespace helics {
 void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::string>& val,
                                                        SmallBuffer& store)
 {
-    Json::Value json(Json::arrayValue);
+    nlohmann::json json(nlohmann::json::array());
     for (const auto& str : val) {
-        json.append(str);
+        json.push_back(str);
     }
     auto strgen = fileops::generateJsonString(json);
     return ValueConverter<std::string_view>::convert(strgen, store);
@@ -330,11 +332,11 @@ void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
     val.clear();
     auto str = ValueConverter<std::string_view>::interpret(block);
     try {
-        const Json::Value json = fileops::loadJsonStr(str);
-        if (json.isArray()) {
+        const nlohmann::json json = fileops::loadJsonStr(str);
+        if (json.is_array()) {
             val.reserve(json.size());
             for (const auto& arrayVal : json) {
-                val.emplace_back(arrayVal.asString());
+                val.emplace_back(arrayVal.get<std::string>());
             }
         } else {
             val.emplace_back(str);

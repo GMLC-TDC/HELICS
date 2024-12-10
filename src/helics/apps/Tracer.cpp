@@ -105,46 +105,46 @@ void Tracer::loadJsonFile(const std::string& jsonString, bool enableFederateInte
     auto doc = fileops::loadJson(jsonString);
 
     auto tags = doc["tag"];
-    if (tags.isArray()) {
+    if (tags.is_array()) {
         for (const auto& tag : tags) {
-            addSubscription(tag.asString());
+            addSubscription(tag.get<std::string>());
         }
-    } else if (tags.isString()) {
-        addSubscription(tags.asString());
+    } else if (tags.is_string()) {
+        addSubscription(tags.get<std::string>());
     }
     auto sourceClone = doc["sourceclone"];
-    if (sourceClone.isArray()) {
+    if (sourceClone.is_array()) {
         for (const auto& clone : sourceClone) {
-            addSourceEndpointClone(clone.asString());
+            addSourceEndpointClone(clone.get<std::string>());
         }
-    } else if (sourceClone.isString()) {
-        addSourceEndpointClone(sourceClone.asString());
+    } else if (sourceClone.is_string()) {
+        addSourceEndpointClone(sourceClone.get<std::string>());
     }
     auto destClone = doc["destclone"];
-    if (destClone.isArray()) {
+    if (destClone.is_array()) {
         for (const auto& clone : destClone) {
-            addDestEndpointClone(clone.asString());
+            addDestEndpointClone(clone.get<std::string>());
         }
-    } else if (destClone.isString()) {
-        addDestEndpointClone(destClone.asString());
+    } else if (destClone.is_string()) {
+        addDestEndpointClone(destClone.get<std::string>());
     }
     auto clones = doc["clone"];
-    if (clones.isArray()) {
+    if (clones.is_array()) {
         for (const auto& clone : clones) {
-            addSourceEndpointClone(clone.asString());
-            addDestEndpointClone(clone.asString());
+            addSourceEndpointClone(clone.get<std::string>());
+            addDestEndpointClone(clone.get<std::string>());
         }
-    } else if (clones.isString()) {
-        addSourceEndpointClone(clones.asString());
-        addDestEndpointClone(clones.asString());
+    } else if (clones.is_string()) {
+        addSourceEndpointClone(clones.get<std::string>());
+        addDestEndpointClone(clones.get<std::string>());
     }
     auto captures = doc["capture"];
-    if (captures.isArray()) {
+    if (captures.is_array()) {
         for (const auto& capture : captures) {
-            addCapture(capture.asString());
+            addCapture(capture.get<std::string>());
         }
-    } else if (captures.isString()) {
-        addCapture(captures.asString());
+    } else if (captures.is_string()) {
+        addCapture(captures.get<std::string>());
     }
 }
 

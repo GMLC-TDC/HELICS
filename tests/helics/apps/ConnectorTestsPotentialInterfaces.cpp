@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/CoreApp.hpp"
 
 #include <future>
+#include <string>
 #include <thread>
 
 static constexpr std::string_view testdir = TEST_DIR "/connector/";
@@ -379,7 +380,7 @@ TEST(connector_potential_interfaces, pub_input_template)
     auto& pub1 = vfed.getPublication(0);
     auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
-    EXPECT_EQ(pub1.getDestinationTargetCount(), 1);
+    EXPECT_EQ(pub1.getDestinationTargetCount(), 1U);
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -410,7 +411,7 @@ TEST(connector_potential_interfaces, pub_input_template3)
     auto& pub1 = vfed.getPublication(0);
     auto& inp1 = vfed.getInput(0);
     const double testValue = 3452.562;
-    EXPECT_EQ(pub1.getDestinationTargetCount(), 1);
+    EXPECT_EQ(pub1.getDestinationTargetCount(), 1U);
     pub1.publish(testValue);
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
@@ -482,6 +483,69 @@ TEST(connector_potential_interfaces, input_pub_template_alias)
     vfed.finalize();
     fut.get();
     EXPECT_EQ(conn1.madeConnections(), 1);
+}
+
+TEST(connector_potential_interfaces, input_pub_template_potential_match)
+{
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    using helics::apps::InterfaceDirection;
+
+    fedInfo.coreName = newCoreName("ccore_template");
+    fedInfo.coreInitString = "-f2 --autobroker";
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    helics::apps::Connector conn1("connector1", fedInfo);
+    conn1.addConnection("pub1", "objA/typeC", InterfaceDirection::FROM_TO);
+    conn1.addConnection("obj1/type1", "inp1", InterfaceDirection::FROM_TO);
+    conn1.addConnection("inp2", "obj2/type3", InterfaceDirection::FROM_TO);
+    conn1.addConnection("objB/typeA", "pub2", InterfaceDirection::FROM_TO);
+    helics::ValueFederate vfed1("c1", fedInfo);
+    helics::ValueFederate vfed2("c2", fedInfo);
+    vfed1.registerInterfaces(std::string(testdir) + "template_interface_test1.json");
+    vfed2.registerInterfaces(std::string(testdir) + "potential_interface_test1.json");
+
+    auto fut = std::async(std::launch::async, [&conn1]() { conn1.run(); });
+    vfed2.enterExecutingModeAsync();
+    vfed1.enterExecutingMode();
+    vfed2.enterExecutingModeComplete();
+
+    EXPECT_EQ(vfed1.getPublicationCount(), 2);
+    EXPECT_EQ(vfed1.getInputCount(), 2);
+    EXPECT_EQ(vfed2.getPublicationCount(), 2);
+    EXPECT_EQ(vfed2.getInputCount(), 2);
+
+    auto& pub1_1 = vfed1.getPublication(0);
+    auto& pub1_2 = vfed1.getPublication(1);
+    auto& inp1_1 = vfed1.getInput(0);
+    auto& inp1_2 = vfed1.getInput(1);
+
+    auto& pub2_1 = vfed2.getPublication(0);
+    auto& pub2_2 = vfed2.getPublication(1);
+    auto& inp2_1 = vfed2.getInput(0);
+    auto& inp2_2 = vfed2.getInput(1);
+
+    const double testValue = 3452.5625;
+    pub1_1.publish(testValue);
+    pub1_2.publish(testValue + 1.0);
+    pub2_1.publish(testValue + 2.0);
+    pub2_2.publish(testValue + 3.0);
+    vfed2.requestTimeAsync(5);
+    auto retTime = vfed1.requestTime(5);
+    EXPECT_EQ(retTime, 1.0);
+    retTime = vfed2.requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+    auto val = inp1_1.getDouble();
+    EXPECT_EQ(val, testValue + 2.0);
+    val = inp1_2.getDouble();
+    EXPECT_EQ(val, testValue + 3.0);
+    val = inp2_1.getDouble();
+    EXPECT_EQ(val, testValue + 1.0);
+    val = inp2_2.getDouble();
+    EXPECT_EQ(val, testValue);
+
+    vfed1.finalize();
+    vfed2.finalize();
+    fut.get();
+    EXPECT_EQ(conn1.madeConnections(), 4);
 }
 
 TEST(connector_potential_interfaces, input_pub_template_with_units)

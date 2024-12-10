@@ -14,7 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/Player.hpp"
 
 #include <future>
+#include <iostream>
+#include <string>
 #include <thread>
+#include <vector>
 
 TEST(player_tests, simple_player)
 {
@@ -334,12 +337,12 @@ TEST(player_tests, testfile)
 
     vfed.finalize();
     fut.get();
-    EXPECT_GE(results[0].size(), 120);
-    EXPECT_EQ(results[1].size(), 2);
-    EXPECT_EQ(results[2].size(), 2);
-    EXPECT_EQ(results[3].size(), 2);
-    EXPECT_EQ(results[4].size(), 2);
-    EXPECT_EQ(results[5].size(), 2);
+    EXPECT_GE(results[0].size(), 120U);
+    EXPECT_EQ(results[1].size(), 2U);
+    EXPECT_EQ(results[2].size(), 2U);
+    EXPECT_EQ(results[3].size(), 2U);
+    EXPECT_EQ(results[4].size(), 2U);
+    EXPECT_EQ(results[5].size(), 2U);
     EXPECT_EQ(results[2][1], 63.0);
 }
 

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <helics/cpp98/ValueFederate.hpp>
 #include <helics/cpp98/helics.hpp>  // helicsVersionString
 #include <iostream>
+#include <string>
 #ifdef _MSC_VER
 #    include <windows.h>
 #else
@@ -38,17 +39,17 @@ int main(int /*argc*/, char** /*argv*/)
     /* Create Federate Info object that describes the federate properties
      * Set federate name and core type from string
      */
-    helicscpp::FederateInfo fi("zmq");
+    helicscpp::FederateInfo fedInfo("zmq");
 
     /* Federate init string */
-    fi.setCoreInit(fedinitstring);
-    fi.setProperty(HELICS_PROPERTY_TIME_DELTA, deltat);
-    fi.setProperty(HELICS_PROPERTY_INT_MAX_ITERATIONS, 100);
+    fedInfo.setCoreInit(fedinitstring);
+    fedInfo.setProperty(HELICS_PROPERTY_TIME_DELTA, deltat);
+    fedInfo.setProperty(HELICS_PROPERTY_INT_MAX_ITERATIONS, 100);
 
-    // fi.setLoggingLevel(5);
+    // fedInfo.setLoggingLevel(5);
 
     /* Create value federate */
-    helicscpp::ValueFederate* vfed = new helicscpp::ValueFederate("TestA Federate", fi);
+    helicscpp::ValueFederate* vfed = new helicscpp::ValueFederate("TestA Federate", fedInfo);
     std::cout << " Value federate created\n";
 
     /* Register the publication */

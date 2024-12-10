@@ -101,6 +101,8 @@ enum ConnectionFlags : uint16_t {
     dynamic_join_flag = 9,
     /// flag indicating that the connection may be reentrant
     reentrant_flag = 10,
+    /// flag indicating that global disconnect synchronize is in use
+    global_disconnect_flag = 11,
     /// flag indicating that a broker/federate is disconnected
     disconnected_flag = 12,
     /// flag indicating this is a test connection

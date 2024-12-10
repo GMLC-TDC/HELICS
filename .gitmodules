@@ -20,10 +20,6 @@
 [submodule "ThirdParty/spdlog"]
     path = ThirdParty/spdlog
     url = ../../gabime/spdlog.git
-[submodule "ThirdParty/json_cpp"]
-    path = ThirdParty/json_cpp
-    url = ../../open-source-parsers/jsoncpp.git
-    branch = master
 [submodule "ThirdParty/toml"]
 	path = ThirdParty/toml
 	url = ../../ToruNiina/toml11
@@ -31,3 +27,12 @@
 	path = ThirdParty/networking
 	url = ../../GMLC-TDC/networking.git
 	branch = main
+[submodule "ThirdParty/libzmq"]
+	path = ThirdParty/libzmq
+	url = https://github.com/zeromq/libzmq.git
+[submodule "ThirdParty/googletest"]
+	path = ThirdParty/googletest
+	url = https://github.com/google/googletest.git
+[submodule "ThirdParty/benchmark"]
+	path = ThirdParty/benchmark
+	url = https://github.com/google/benchmark.git

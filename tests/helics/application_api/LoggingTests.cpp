@@ -18,6 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
 #include <gtest/gtest.h>
+#include <iostream>
+#include <memory>
+#include <string>
 #include <thread>
 
 /** these test cases test out user-directed logging functionality
@@ -27,11 +30,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(logging, basic_logging)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
@@ -62,10 +65,10 @@ TEST(logging, file_logging)
         }
         EXPECT_TRUE(res);
     }
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --logfile logfile.txt --fileloglevel=timing";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --logfile logfile.txt --fileloglevel=timing";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     Fed->enterExecutingMode();
     Fed->finalize();
@@ -97,10 +100,10 @@ TEST(logging, file_logging_p2)
         }
         EXPECT_TRUE(res);
     }
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --fileloglevel=timing";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker --fileloglevel=timing";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
     auto cr = Fed->getCorePointer();
 
     cr->setLogFile(lfilename);
@@ -118,11 +121,11 @@ TEST(logging, file_logging_p2)
 
 TEST(logging, check_log_message)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
@@ -147,11 +150,11 @@ TEST(logging, check_log_message)
 
 TEST(logging, check_log_message_command)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
@@ -176,11 +179,11 @@ TEST(logging, check_log_message_command)
 
 TEST(logging, check_log_message_functions)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TRACE);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TRACE);
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
@@ -224,11 +227,11 @@ TEST(logging, check_log_message_functions)
 
 TEST(logging, check_log_message_levels)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
@@ -258,11 +261,11 @@ TEST(logging, check_log_message_levels)
 
 TEST(logging, check_log_message_levels_high)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TRACE + 2);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TRACE + 2);
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
@@ -292,11 +295,11 @@ TEST(logging, check_log_message_levels_high)
 
 TEST(logging, dumplog)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_NO_PRINT);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_NO_PRINT);
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
     auto cr = Fed->getCorePointer();
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     cr->setLoggingCallback(helics::gLocalCoreId,
@@ -336,10 +339,10 @@ TEST(logging, timeMonitorFederate1)
     broker->setLoggingLevel(HELICS_LOG_LEVEL_SUMMARY);
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "monbroker1";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "monbroker1";
 
-    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
+    auto Fed = std::make_shared<helics::Federate>("monitor", fedInfo);
 
     Fed->enterExecutingMode();
 
@@ -389,10 +392,10 @@ TEST(logging, timeMonitorFederate2)
     broker->setLoggingLevel(HELICS_LOG_LEVEL_SUMMARY);
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "monbroker2";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "monbroker2";
 
-    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
+    auto Fed = std::make_shared<helics::Federate>("monitor", fedInfo);
 
     Fed->enterExecutingMode();
 
@@ -431,10 +434,10 @@ TEST(logging, timeMonitorFederate_command)
     broker->sendCommand("root", "monitor monitor");
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "monbroker3";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "monbroker3";
 
-    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
+    auto Fed = std::make_shared<helics::Federate>("monitor", fedInfo);
 
     Fed->enterExecutingMode();
 
@@ -473,10 +476,10 @@ TEST(logging, timeMonitorFederate_command2)
     broker->sendCommand("root", "monitor monitor 2 sec");
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "monbroker4";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "monbroker4";
 
-    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
+    auto Fed = std::make_shared<helics::Federate>("monitor", fedInfo);
 
     Fed->enterExecutingMode();
 
@@ -515,11 +518,11 @@ TEST(logging, timeMonitorFederate_swap)
     broker->sendCommand("root", "monitor monitor 2 sec");
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "monbroker4";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "monbroker4";
 
-    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
-    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+    auto Fed = std::make_shared<helics::Federate>("monitor", fedInfo);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fedInfo);
     Fed2->enterExecutingModeAsync();
     Fed->enterExecutingMode();
     Fed2->enterExecutingModeComplete();
@@ -599,11 +602,11 @@ TEST(logging, log_buffer_broker)
     broker->setLoggingLevel(HELICS_LOG_LEVEL_TRACE);
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "logbroker1";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "logbroker1";
 
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
-    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fedInfo);
 
     Fed2->enterExecutingModeAsync();
     Fed1->enterExecutingMode();
@@ -639,11 +642,11 @@ TEST(logging, log_buffer_broker2)
     broker->setLoggingLevel(HELICS_LOG_LEVEL_TRACE);
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "logbroker2";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "logbroker2";
 
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
-    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fedInfo);
 
     Fed2->enterExecutingModeAsync();
     Fed1->enterExecutingMode();
@@ -673,11 +676,11 @@ TEST(logging, log_buffer_broker3)
     broker->sendCommand("broker", "logbuffer");
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "logbroker3";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "logbroker3";
 
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
-    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fedInfo);
 
     Fed2->enterExecutingModeAsync();
     Fed1->enterExecutingMode();
@@ -707,11 +710,11 @@ TEST(logging, log_buffer_broker4)
     broker->sendCommand("broker", "logbuffer 7");
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "logbroker4";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "logbroker4";
 
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
-    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fedInfo);
 
     Fed2->enterExecutingModeAsync();
     Fed1->enterExecutingMode();
@@ -727,7 +730,7 @@ TEST(logging, log_buffer_broker4)
     broker.reset();
 
     auto js = helics::fileops::loadJsonStr(str);
-    ASSERT_TRUE(js["logs"].isArray());
+    ASSERT_TRUE(js["logs"].is_array());
     EXPECT_EQ(js["logs"].size(), 7U);
 }
 
@@ -737,10 +740,10 @@ TEST(logging, log_buffer_fed)
 
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "logbroker5";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "logbroker5";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
     Fed1->setLoggingCallback(
         [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
             // this is mainly so it doesn't overload the console output
@@ -770,11 +773,11 @@ TEST(logging, log_buffer_fed2)
 
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "logbroker6";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
-    fi.setProperty(helics::defs::Properties::LOG_BUFFER, 3);
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "logbroker6";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
+    fedInfo.setProperty(helics::defs::Properties::LOG_BUFFER, 3);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
     Fed1->setLoggingCallback(
         [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
             // this is mainly so it doesn't overload the console output
@@ -801,11 +804,11 @@ TEST(logging, log_buffer_core)
 
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "logbroker7";
-    fi.coreName = "logcore1";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "logbroker7";
+    fedInfo.coreName = "logcore1";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
     Fed1->getCorePointer()->setLoggingCallback(helics::gLocalCoreId,
                                                [](int /*level*/,
                                                   std::string_view /*unused*/,
@@ -835,11 +838,11 @@ TEST(logging, log_buffer_core2)
 
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "logbroker8";
-    fi.coreName = "logcore2";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "logbroker8";
+    fedInfo.coreName = "logcore2";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
     auto cr = Fed1->getCorePointer();
     cr->setLoggingCallback(helics::gLocalCoreId,
                            [](int /*level*/,
@@ -885,11 +888,11 @@ TEST(logging, remote_log_broker)
         });
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "broker_rlog";
-    fi.forceNewCore = true;
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "broker_rlog";
+    fedInfo.forceNewCore = true;
 
-    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
+    auto Fed = std::make_shared<helics::Federate>("monitor", fedInfo);
     std::cout << "send command" << std::endl;
     broker->sendCommand("monitor", "remotelog timing");
     std::cout << "send flush query" << std::endl;
@@ -923,10 +926,10 @@ TEST(logging, remote_log_fed)
 
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "broker9";
-    fi.forceNewCore = true;
-    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "broker9";
+    fedInfo.forceNewCore = true;
+    auto Fed = std::make_shared<helics::Federate>("monitor", fedInfo);
     Fed->setLoggingCallback([&mlog](int level, std::string_view source, std::string_view message) {
         mlog.lock()->emplace_back(level, source, message);
     });
@@ -959,10 +962,10 @@ TEST(logging, remote_log_core)
 
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "broker10";
-    fi.coreName = "core10";
-    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "broker10";
+    fedInfo.coreName = "core10";
+    auto Fed = std::make_shared<helics::Federate>("monitor", fedInfo);
     Fed->getCorePointer()->setLoggingCallback(helics::gLocalCoreId,
                                               [&mlog](int level,
                                                       std::string_view source,
@@ -1004,11 +1007,11 @@ TEST(logging, remote_log_multifed)
         });
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "broker12";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "broker12";
 
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
-    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fedInfo);
     broker->sendCommand("monitor1", "remotelog timing");
     broker->sendCommand("monitor2", "remotelog timing");
 
@@ -1052,17 +1055,17 @@ TEST(logging, remote_log_multiObjects)
         });
     broker->connect();
 
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "broker13";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "broker13";
 
-    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
     gmlc::libguarded::guarded<std::vector<std::tuple<int, std::string, std::string>>> mlogFed;
     Fed1->setLoggingCallback(
         [&mlogFed](int level, std::string_view source, std::string_view message) {
             mlogFed.lock()->emplace_back(level, source, message);
         });
 
-    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fedInfo);
     broker->sendCommand("monitor1", "remotelog timing");
     broker->sendCommand("monitor2", "remotelog timing");
 

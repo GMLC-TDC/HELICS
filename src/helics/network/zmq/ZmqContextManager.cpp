@@ -22,7 +22,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <map>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <utility>
 
 /** a storage system for the available core objects allowing references by name to the core

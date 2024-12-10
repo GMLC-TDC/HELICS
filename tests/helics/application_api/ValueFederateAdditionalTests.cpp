@@ -18,8 +18,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <future>
 #include <gtest/gtest.h>
+#include <memory>
 #include <numeric>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 /** these test cases test out the value federates with some additional tests
  */
@@ -598,7 +602,7 @@ TEST_P(valuefed_add_configfile_tests, file_load)
     EXPECT_EQ(vFed.getPublicationCount(), 2);
     auto& inp1 = vFed.getInput("pubshortcut");
 
-    auto key = vFed.getTarget(inp1);
+    auto& key = vFed.getTarget(inp1);
     EXPECT_EQ(key, "fedName/pub2");
 
     EXPECT_EQ(inp1.getInfo(), "this is an information string for use by the application");

@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 #include <gtest/gtest.h>
+#include <string>
 #ifndef HELICS_SHARED_LIBRARY
 #    include "testFixtures.hpp"
 #else
@@ -141,7 +142,7 @@ TEST_F(multiInput, priority)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, max)
+TEST_F(multiInput, max_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -179,7 +180,7 @@ TEST_F(multiInput, max)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, min)
+TEST_F(multiInput, min_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -217,7 +218,7 @@ TEST_F(multiInput, min)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, and)
+TEST_F(multiInput, and_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -255,7 +256,7 @@ TEST_F(multiInput, and)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, or)
+TEST_F(multiInput, or_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -301,7 +302,7 @@ TEST_F(multiInput, or)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, sum)
+TEST_F(multiInput, sum_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -339,7 +340,7 @@ TEST_F(multiInput, sum)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, average)
+TEST_F(multiInput, average_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -377,7 +378,7 @@ TEST_F(multiInput, average)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, diff)
+TEST_F(multiInput, diff_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -411,7 +412,7 @@ TEST_F(multiInput, diff)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, vectorize)
+TEST_F(multiInput, vectorize_operation)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
@@ -470,18 +471,18 @@ TEST_F(multiInput, vectorize_string)
     pub1.publish("test1");
     vFed1->requestNextStep();
     auto val = in1.getValue<std::string>();
-    EXPECT_EQ(val, "[ \"test1\" ]");
+    EXPECT_NE(val.find("\"test1\""), std::string::npos);
     pub3.publish("test3");
     pub2.publish("test2");
 
     vFed1->requestNextStep();
     val = in1.getValue<std::string>();
-    auto jv = fileops::loadJsonStr(val);
+    auto json = fileops::loadJsonStr(val);
 
-    EXPECT_EQ(jv.size(), 3U);
-    EXPECT_STREQ(jv[0].asCString(), "test1");
-    EXPECT_STREQ(jv[1].asCString(), "test2");
-    EXPECT_STREQ(jv[2].asCString(), "test3");
+    EXPECT_EQ(json.size(), 3U);
+    EXPECT_EQ(json[0].get<std::string>(), "test1");
+    EXPECT_EQ(json[1].get<std::string>(), "test2");
+    EXPECT_EQ(json[2].get<std::string>(), "test3");
 
     vFed1->finalize();
 }
@@ -566,22 +567,22 @@ TEST_F(multiInput, file_config_json)
 {
     helics::ValueFederate vFed(std::string(TEST_DIR) + "multi_input_config.json");
 
-    auto& p1 = vFed.getPublication(0);
-    auto& p2 = vFed.getPublication(1);
-    auto& i1 = vFed.getInput(0);
+    auto& pub1 = vFed.getPublication(0);
+    auto& pub2 = vFed.getPublication(1);
+    auto& inp1 = vFed.getInput(0);
     vFed.enterExecutingMode();
-    auto res = i1.getOption(helics::defs::Options::CONNECTIONS);
+    auto res = inp1.getOption(helics::defs::Options::CONNECTIONS);
     EXPECT_EQ(res, 2);
-    res = i1.getOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD);
+    res = inp1.getOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD);
 
     EXPECT_EQ(res, HELICS_MULTI_INPUT_AVERAGE_OPERATION);
 
-    p1.publish(11.3);
-    p2.publish(14.7);
+    pub1.publish(11.3);
+    pub2.publish(14.7);
 
     vFed.requestNextStep();
 
-    double val = i1.getValue<double>();
+    double val = inp1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 13.0);
 
     vFed.finalize();
@@ -591,22 +592,22 @@ TEST_F(multiInput, file_config_toml)
 {
     helics::ValueFederate vFed(std::string(TEST_DIR) + "multi_input_config.toml");
 
-    auto& p1 = vFed.getPublication(0);
-    auto& p2 = vFed.getPublication(1);
-    auto& i1 = vFed.getInput(0);
+    auto& pub1 = vFed.getPublication(0);
+    auto& pub2 = vFed.getPublication(1);
+    auto& inp1 = vFed.getInput(0);
     vFed.enterExecutingMode();
-    auto res = i1.getOption(helics::defs::Options::CONNECTIONS);
+    auto res = inp1.getOption(helics::defs::Options::CONNECTIONS);
     EXPECT_EQ(res, 2);
-    res = i1.getOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD);
+    res = inp1.getOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD);
 
     EXPECT_EQ(res, HELICS_MULTI_INPUT_AVERAGE_OPERATION);
 
-    p1.publish(11.3);
-    p2.publish(14.7);
+    pub1.publish(11.3);
+    pub2.publish(14.7);
 
     vFed.requestNextStep();
 
-    double val = i1.getValue<double>();
+    double val = inp1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 13.0);
 
     vFed.finalize();

@@ -14,7 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <gtest/gtest.h>
 #include <helics/core/Broker.hpp>
+#include <memory>
+#include <string>
 #include <thread>
+
 /** these test cases test out the message federates
  */
 
@@ -43,9 +46,9 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
     fFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
     mFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
-    auto& p3 = mFed->registerGlobalEndpoint("port3");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
+    auto& port3 = mFed->registerGlobalEndpoint("port3");
 
     auto& Filt = helics::make_filter(helics::FilterTypes::REROUTE, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
@@ -57,7 +60,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
-    p1.sendTo(data, "port2");
+    port1.sendTo(data, "port2");
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -68,15 +71,15 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
     // auto res2 = broker->query("root", "global_time_debugging");
     mFed->requestTimeComplete();
 
-    EXPECT_TRUE(!mFed->hasMessage(p2));
-    EXPECT_TRUE(mFed->hasMessage(p3));
+    EXPECT_TRUE(!mFed->hasMessage(port2));
+    EXPECT_TRUE(mFed->hasMessage(port3));
 
-    auto m2 = mFed->getMessage(p3);
-    if (m2) {
-        EXPECT_EQ(m2->source, "port1");
-        EXPECT_EQ(m2->original_dest, "port2");
-        EXPECT_EQ(m2->dest, "port3");
-        EXPECT_EQ(m2->data.size(), data.size());
+    auto message2 = mFed->getMessage(port3);
+    if (message2) {
+        EXPECT_EQ(message2->source, "port1");
+        EXPECT_EQ(message2->original_dest, "port2");
+        EXPECT_EQ(message2->dest, "port3");
+        EXPECT_EQ(message2->data.size(), data.size());
     }
 
     fFed->requestTimeAsync(2.0);
@@ -99,9 +102,9 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
-    auto& p3 = mFed->registerGlobalEndpoint("port3");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
+    auto& port3 = mFed->registerGlobalEndpoint("port3");
 
     auto& Filt = helics::make_filter(helics::FilterTypes::REROUTE, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
@@ -113,36 +116,36 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
-    p1.sendTo(data, "port2");
+    port1.sendTo(data, "port2");
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
     mFed->requestTimeComplete();
 
-    EXPECT_TRUE(!mFed->hasMessage(p2));
-    ASSERT_TRUE(mFed->hasMessage(p3));
+    EXPECT_TRUE(!mFed->hasMessage(port2));
+    ASSERT_TRUE(mFed->hasMessage(port3));
 
-    auto m2 = mFed->getMessage(p3);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_dest, "port2");
-    EXPECT_EQ(m2->dest, "port3");
-    EXPECT_EQ(m2->data.size(), data.size());
+    auto message2 = mFed->getMessage(port3);
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->original_dest, "port2");
+    EXPECT_EQ(message2->dest, "port3");
+    EXPECT_EQ(message2->data.size(), data.size());
 
     Filt.close();
-    p1.sendTo(data, "port2");
+    port1.sendTo(data, "port2");
 
     fFed->requestTimeAsync(2.0);
     mFed->requestTime(2.0);
     fFed->requestTimeComplete();
 
-    EXPECT_TRUE(mFed->hasMessage(p2));
-    EXPECT_TRUE(!mFed->hasMessage(p3));
+    EXPECT_TRUE(mFed->hasMessage(port2));
+    EXPECT_TRUE(!mFed->hasMessage(port3));
 
-    m2 = mFed->getMessage(p2);
-    EXPECT_TRUE(m2);
-    if (m2) {
-        EXPECT_EQ(m2->dest, "port2");
-        EXPECT_EQ(m2->data.size(), data.size());
+    message2 = mFed->getMessage(port2);
+    EXPECT_TRUE(message2);
+    if (message2) {
+        EXPECT_EQ(message2->dest, "port2");
+        EXPECT_EQ(message2->data.size(), data.size());
     }
 
     mFed->finalize();
@@ -168,18 +171,19 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
     // for debugging spurious timeouts;
     fFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.5);
     mFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.5);
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("endpt2");
-    auto& p3 = mFed->registerGlobalEndpoint("port3");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("endpt2");
+    auto& port3 = mFed->registerGlobalEndpoint("port3");
 
-    auto& f1 = fFed->registerFilter("filter1");
-    f1.addSourceTarget("port1");
+    auto& filter1 = fFed->registerFilter("filter1");
+    filter1.addSourceTarget("port1");
     auto filter_op = std::make_shared<helics::RerouteFilterOperation>();
     filter_op->setString("newdestination", "port3");
     filter_op->setString("condition",
                          "end");  // match all messages with a destination endpoint stating with
     // "end"
-    fFed->setFilterOperator(f1, filter_op->getOperator());
+
+    filter1.setOperator(filter_op->getOperator());
 
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
@@ -187,18 +191,18 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
-    p1.sendTo(data, "endpt2");
+    port1.sendTo(data, "endpt2");
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
     mFed->requestTimeComplete();
-    EXPECT_TRUE(!mFed->hasMessage(p2));
-    ASSERT_TRUE(mFed->hasMessage(p3));
-    auto m2 = mFed->getMessage(p3);
+    EXPECT_TRUE(!mFed->hasMessage(port2));
+    ASSERT_TRUE(mFed->hasMessage(port3));
+    auto message2 = mFed->getMessage(port3);
 
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->dest, "port3");
-    EXPECT_EQ(m2->data.size(), data.size());
+    EXPECT_EQ(message2->source, "port1");
+    EXPECT_EQ(message2->dest, "port3");
+    EXPECT_EQ(message2->data.size(), data.size());
 
     fFed->requestTimeAsync(2.0);
     mFed->requestTime(2.0);
@@ -226,47 +230,48 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
-    auto& p3 = mFed->registerGlobalEndpoint("port3");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
+    auto& port3 = mFed->registerGlobalEndpoint("port3");
 
-    auto& f1 = fFed->registerFilter("filter1");
-    f1.addSourceTarget("port1");
+    auto& filter1 = fFed->registerFilter("filter1");
+    filter1.addSourceTarget("port1");
     auto filter_op = std::make_shared<helics::RerouteFilterOperation>();
     filter_op->setString("newdestination", "port3");
     filter_op->setString(
         "condition",
         "test");  // match all messages with a destination endpoint starting with "test"
 
-    fFed->setFilterOperator(f1, filter_op->getOperator());
-
+    EXPECT_EQ(filter_op->getString("condition"), "test");
+    filter1.setOperator(filter_op->getOperator());
+    EXPECT_TRUE(filter1.getString("unknown").empty());
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
-    p1.sendTo(data, "port2");
+    port1.sendTo(data, "port2");
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
     mFed->requestTimeComplete();
     // this one was delivered to the original destination
-    ASSERT_TRUE(mFed->hasMessage(p2));
+    ASSERT_TRUE(mFed->hasMessage(port2));
 
     // this message should be delivered to the rerouted destination
-    p1.sendTo(data, "test324525");
+    port1.sendTo(data, "test324525");
 
     mFed->requestTimeAsync(2.0);
     fFed->requestTime(2.0);
     mFed->requestTimeComplete();
-    if (!mFed->hasMessage(p3)) {
-        EXPECT_TRUE(mFed->hasMessage(p3));
+    if (!mFed->hasMessage(port3)) {
+        EXPECT_TRUE(mFed->hasMessage(port3));
     } else {
-        auto m2 = mFed->getMessage(p3);
-        EXPECT_EQ(m2->source, "port1");
-        EXPECT_EQ(m2->dest, "port3");
-        EXPECT_EQ(m2->data.size(), data.size());
+        auto message2 = mFed->getMessage(port3);
+        EXPECT_EQ(message2->source, "port1");
+        EXPECT_EQ(message2->dest, "port3");
+        EXPECT_EQ(message2->data.size(), data.size());
     }
 
     mFed->finalizeAsync();
@@ -290,14 +295,15 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
 
     auto& Filt = helics::make_filter(helics::FilterTypes::RANDOM_DROP, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
     double drop_prob = 0.75;
     Filt.set("dropprob", drop_prob);
-
+    EXPECT_DOUBLE_EQ(Filt.getProperty("dropprob"), 0.75);
+    EXPECT_DOUBLE_EQ(Filt.getProperty("who_cares"), helics::invalidDouble);
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
@@ -309,14 +315,14 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     int max_iterations = 200;
     int dropped = 0;
     for (int i = 0; i < max_iterations; i++) {
-        p1.sendTo(data, "port2");
+        port1.sendTo(data, "port2");
         timestep += 1.0;
         mFed->requestTime(timestep);
         // Check if message is received
-        if (!mFed->hasMessage(p2)) {
+        if (!mFed->hasMessage(port2)) {
             dropped++;
         } else {
-            mFed->getMessage(p2);
+            mFed->getMessage(port2);
         }
     }
     auto iterations = static_cast<double>(max_iterations);
@@ -347,16 +353,16 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& f1 = fFed->registerFilter("filter1");
-    f1.addSourceTarget("port1");
-    auto op = std::make_shared<helics::RandomDropFilterOperation>();
+    auto& filter1 = fFed->registerFilter("filter1");
+    filter1.addSourceTarget("port1");
+    auto randomOp = std::make_shared<helics::RandomDropFilterOperation>();
     double prob = 0.45;
-    op->set("prob", prob);
-    fFed->setFilterOperator(f1, op->getOperator());
-
+    randomOp->set("prob", prob);
+    EXPECT_DOUBLE_EQ(randomOp->getProperty("prob"), prob);
+    filter1.setOperator(randomOp->getOperator());
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
@@ -368,13 +374,13 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
     int max_iterations = 150;
     int count = 0;
     for (int i = 0; i < max_iterations; i++) {
-        p1.sendTo(data, "port2");
+        port1.sendTo(data, "port2");
         timestep += 1.0;
         mFed->requestTime(timestep);
         // Check if message is received
-        if (mFed->hasMessage(p2)) {
+        if (mFed->hasMessage(port2)) {
             count++;
-            mFed->getMessage(p2);
+            mFed->getMessage(port2);
         }
     }
     auto iterations = static_cast<double>(max_iterations);
@@ -405,8 +411,8 @@ TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
 
     auto& Filt = helics::make_filter(helics::FilterTypes::RANDOM_DROP, fFed.get(), "filter1");
     Filt.addDestinationTarget("port2");
@@ -424,15 +430,15 @@ TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
     int max_iterations = 150;
     int dropped = 0;
     for (int i = 0; i < max_iterations; i++) {
-        p1.sendTo(data, "port2");
+        port1.sendTo(data, "port2");
         timestep += 1.0;
         mFed->requestTime(timestep);
         // Check if message is received
-        if (!mFed->hasMessage(p2)) {
+        if (!mFed->hasMessage(port2)) {
             dropped++;
         } else {
             // purposely dropping the messages
-            mFed->getMessage(p2);
+            mFed->getMessage(port2);
         }
     }
 
@@ -463,16 +469,15 @@ TEST_P(filter_type_tests, message_random_drop_dest_object1_ci_skip)
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& f1 = fFed->registerFilter("filter1");
-    f1.addDestinationTarget("port2");
-    auto op = std::make_shared<helics::RandomDropFilterOperation>();
+    auto& filter1 = fFed->registerFilter("filter1");
+    filter1.addDestinationTarget("port2");
+    auto filterOp = std::make_shared<helics::RandomDropFilterOperation>();
     double prob = 0.1;
-    op->set("prob", prob);
-    fFed->setFilterOperator(f1, op->getOperator());
-
+    filterOp->set("prob", prob);
+    filter1.setOperator(filterOp->getOperator());
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
@@ -483,13 +488,13 @@ TEST_P(filter_type_tests, message_random_drop_dest_object1_ci_skip)
     double timestep = 0.0;  // 1 second
     int max_iterations = 150;
     int count = 0;
-    for (int i = 0; i < max_iterations; i++) {
-        p1.sendTo(data, "port2");
+    for (int ii = 0; ii < max_iterations; ii++) {
+        port1.sendTo(data, "port2");
         timestep++;
         mFed->requestTime(timestep);
-        if (mFed->hasMessage(p2)) {
+        if (mFed->hasMessage(port2)) {
             count++;
-            mFed->getMessage(p2);
+            mFed->getMessage(port2);
         }
     }
     auto iterations = static_cast<double>(max_iterations);
@@ -519,8 +524,8 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
 
     auto& Filt = helics::make_filter(helics::FilterTypes::RANDOM_DELAY, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
@@ -529,13 +534,16 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     Filt.set("param1", 4);  // max_delay=4
     Filt.set("param2", 0.5);  // prob
 
+    EXPECT_EQ(Filt.getString("param1"), "4.000000");
+    EXPECT_DOUBLE_EQ(Filt.getProperty("param2"), 0.5);  // prob
+
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(100, 'a');
-    p1.sendTo(data, "port2");
+    port1.sendTo(data, "port2");
 
     double timestep = 0.0;  // 1 second
     int max_iterations = 6;
@@ -546,12 +554,12 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
         timestep += 1.0;
         mFed->requestTime(timestep);
         // Check if message is received
-        if (mFed->hasMessage(p2)) {
-            auto m2 = mFed->getMessage(p2);
-            EXPECT_EQ(m2->source, "port1");
-            EXPECT_EQ(m2->dest, "port2");
-            EXPECT_EQ(m2->data.size(), data.size());
-            actual_delay = m2->time;
+        if (mFed->hasMessage(port2)) {
+            auto message2 = mFed->getMessage(port2);
+            EXPECT_EQ(message2->source, "port1");
+            EXPECT_EQ(message2->dest, "port2");
+            EXPECT_EQ(message2->data.size(), data.size());
+            actual_delay = message2->time;
             count++;
         }
     }
@@ -576,39 +584,39 @@ TEST_P(filter_type_tests, test_filter_info_field_ci_skip_nocov)
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
 
-    p1.setInfo("p1_info");
-    p2.setInfo("p2_info");
+    port1.setInfo("p1_info");
+    port2.setInfo("p2_info");
 
-    auto& f1 = fFed->registerFilter("filter1");
-    f1.addSourceTarget("port1");
-    f1.setInfo("f1_info");
-    auto& f2 = fFed->registerFilter("filter2");
-    f2.addDestinationTarget("port2");
-    f2.setInfo("f2_info");
+    auto& filter1 = fFed->registerFilter("filter1");
+    filter1.addSourceTarget("port1");
+    filter1.setInfo("f1_info");
+    auto& filter2 = fFed->registerFilter("filter2");
+    filter2.addDestinationTarget("port2");
+    filter2.setInfo("f2_info");
     auto& ep1 = fFed->registerEndpoint("fout");
     ep1.setInfo("ep1_info");
-    auto& f3 = fFed->registerFilter();
-    f3.addSourceTarget("filter0/fout");
-    f3.setInfo("f3_info");
+    auto& filter3 = fFed->registerFilter();
+    filter3.addSourceTarget("filter0/fout");
+    filter3.setInfo("f3_info");
 
     // Test Endpoint info field
-    EXPECT_EQ("p1_info", p1.getInfo());
-    EXPECT_EQ("p2_info", p2.getInfo());
+    EXPECT_EQ("p1_info", port1.getInfo());
+    EXPECT_EQ("p2_info", port2.getInfo());
     EXPECT_EQ("ep1_info", ep1.getInfo());
-    EXPECT_EQ("p1_info", p1.getInfo());
-    EXPECT_EQ("p2_info", p2.getInfo());
+    EXPECT_EQ("p1_info", port1.getInfo());
+    EXPECT_EQ("p2_info", port2.getInfo());
     EXPECT_EQ("ep1_info", ep1.getInfo());
 
     // Test Filter info field
-    EXPECT_EQ("f1_info", f1.getInfo());
-    EXPECT_EQ("f2_info", f2.getInfo());
-    EXPECT_EQ("f3_info", f3.getInfo());
-    EXPECT_EQ("f1_info", f1.getInfo());
-    EXPECT_EQ("f2_info", f2.getInfo());
-    EXPECT_EQ("f3_info", f3.getInfo());
+    EXPECT_EQ("f1_info", filter1.getInfo());
+    EXPECT_EQ("f2_info", filter2.getInfo());
+    EXPECT_EQ("f3_info", filter3.getInfo());
+    EXPECT_EQ("f1_info", filter1.getInfo());
+    EXPECT_EQ("f2_info", filter2.getInfo());
+    EXPECT_EQ("f3_info", filter3.getInfo());
 
     mFed->finalizeAsync();
     fFed->finalize();

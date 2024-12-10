@@ -9,11 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ActionMessage.hpp"
 #include "flagOperations.hpp"
+#include "nlohmann/json.hpp"
 
-#include "json/json.h"
 #include <algorithm>
 #include <cassert>
 #include <string>
+#include <utility>
 
 namespace helics {
 
@@ -257,13 +258,13 @@ static std::string_view timeStateString(TimeState state)
     }
 }
 
-void addTimeState(Json::Value& output, const TimeState state)
+void addTimeState(nlohmann::json& output, const TimeState state)
 {
     auto sstring = timeStateString(state);
-    output["state"] = Json::Value(sstring.data(), sstring.data() + sstring.size());
+    output["state"] = sstring;
 }
 
-void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool includeAggregates)
+void generateJsonOutputTimeData(nlohmann::json& output, const TimeData& dep, bool includeAggregates)
 {
     output["next"] = static_cast<double>(dep.next);
     output["te"] = static_cast<double>(dep.Te);
@@ -282,7 +283,7 @@ void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool i
     }
 }
 
-void generateJsonOutputDependency(Json::Value& output, const DependencyInfo& dep)
+void generateJsonOutputDependency(nlohmann::json& output, const DependencyInfo& dep)
 {
     output["id"] = dep.fedID.baseValue();
     generateJsonOutputTimeData(output, dep, false);
@@ -840,7 +841,9 @@ const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependenci
                                               ConnectionType ignoreType,
                                               GlobalFederateId ignore)
 {
-    static const DependencyInfo maxDep{Time::maxVal(), TimeState::initialized, 50U};
+    static const DependencyInfo maxDep{Time::maxVal(),
+                                       TimeState::initialized,
+                                       static_cast<std::uint8_t>(50U)};
 
     const DependencyInfo* minDep = &maxDep;
 

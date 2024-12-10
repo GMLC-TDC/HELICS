@@ -18,6 +18,7 @@ and some common methods used cores and brokers
 #include <atomic>
 #include <limits>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <thread>
 #include <utility>
@@ -25,10 +26,6 @@ and some common methods used cores and brokers
 
 namespace spdlog {
 class logger;
-}
-/** forward declare Json::Value*/
-namespace Json {
-class Value;
 }
 
 namespace helics {
@@ -151,12 +148,17 @@ class BrokerBase {
     bool allowRemoteControl{true};  //!< if true allows some remote operation
     /// error if there are unmatched connections on init
     bool errorOnUnmatchedConnections{false};
+    bool globalDisconnect{false};  //!< if true specify that federates should stay connected until a
+                                   //!< global disconnect operation
     /// time when the error condition started; related to the errorDelay
     decltype(std::chrono::steady_clock::now()) errorTimeStart;
     /// time when the disconnect started
     decltype(std::chrono::steady_clock::now()) disconnectTime;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
+    std::string configString;  //!< storage for a config file location
+    bool fileInUse{false};
+
   private:
     /// buffer for profiling messages
     std::shared_ptr<ProfilerBuffer> prBuff;
@@ -173,6 +175,17 @@ class BrokerBase {
     explicit BrokerBase(std::string_view broker_name, bool DisableQueue = false);
 
     virtual ~BrokerBase();
+
+    /** load broker information object from a toml string either a file or toml string
+    @param toml a string containing the name of the toml file or toml contents
+    */
+    void loadInfoFromToml(const std::string& toml, bool runArgParser = true);
+
+    /** load broker information from a JSON string either a file or JSON string
+    @param json a string containing the name of the JSON file or JSON contents
+    */
+    void loadInfoFromJson(const std::string& json, bool runArgParser = true);
+
     /** parse configuration information from command line arguments
     @return 0 for OK, positive numbers for expected information calls and negative number for error
     */
@@ -288,7 +301,7 @@ class BrokerBase {
     /** process some common commands that can be processed by the broker base */
     std::pair<bool, std::vector<std::string_view>> processBaseCommands(ActionMessage& command);
     /** add some base information to a json structure */
-    void addBaseInformation(Json::Value& base, bool hasParent) const;
+    void addBaseInformation(nlohmann::json& base, bool hasParent) const;
 
   public:
     /** generate a callback function for the logging purposes*/

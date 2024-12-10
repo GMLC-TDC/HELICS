@@ -13,9 +13,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <fmt/format.h>
 #include <iostream>
-#include <json/json.h>
+#include <nlohmann/json.hpp>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace helics {
@@ -162,7 +163,7 @@ TimeProcessingResult GlobalTimeCoordinator::processTimeMessage(const ActionMessa
     return res;
 }
 
-void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
+void GlobalTimeCoordinator::generateDebuggingTimeInfo(nlohmann::json& base) const
 {
     base["type"] = "global";
     base["nextEvent"] = static_cast<double>(nextEvent);

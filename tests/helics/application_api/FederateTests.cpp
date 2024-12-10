@@ -20,7 +20,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmock/gmock.h"
 #include <future>
 #include <gtest/gtest.h>
+#include <memory>
+#include <string>
 #include <thread>
+
 /** these test cases test out the value converters
  */
 
@@ -367,8 +370,8 @@ TEST(federate, index_groups)
 
     auto qres = fed1->query("root", "federate_map");
     auto val = helics::fileops::loadJsonStr(qres);
-    EXPECT_GT(val["cores"][0]["federates"][0]["attributes"]["id"].asInt64(),
-              val["cores"][0]["federates"][1]["attributes"]["id"].asInt64());
+    EXPECT_GT(val["cores"][0]["federates"][0]["attributes"]["id"].get<int64_t>(),
+              val["cores"][0]["federates"][1]["attributes"]["id"].get<int64_t>());
     fed1->finalize();
     fed2->finalize();
 }
@@ -1391,7 +1394,7 @@ TEST(federate, error_after_disconnect)
     EXPECT_NO_THROW(Fed1->addDependency("otherFed"));
 
     EXPECT_THROW(filt1.addDestinationTarget("ept"), helics::InvalidFunctionCall);
-    EXPECT_NO_THROW(Fed1->setFilterOperator(filt1, {}));
+    EXPECT_NO_THROW(filt1.setOperator({}));
 
     EXPECT_THROW(Fed1->localError(99), helics::FederateError);
     EXPECT_THROW(Fed1->globalError(99), helics::FederateError);
@@ -1413,6 +1416,39 @@ TEST_P(FederateGlobalFiles, global_file_ci_skip)
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
     fedInfo.coreName = "core_global1";
     fedInfo.coreInitString = "-f 2";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
+
+    auto Fed2 = std::make_shared<helics::Federate>("fed2", fedInfo);
+
+    Fed1->enterInitializingModeAsync();
+    Fed2->enterInitializingMode();
+
+    Fed1->enterInitializingModeComplete();
+
+    auto str1 = Fed1->query("global_value", "global1");
+    EXPECT_EQ(str1, "this is a global1 value");
+    str1 = Fed2->query("global_value", "global1");
+    EXPECT_EQ(str1, "this is a global1 value");
+
+    str1 = Fed1->query("global_value", "global2");
+    EXPECT_EQ(str1, "this is another global value");
+    str1 = Fed2->query("global_value", "global2");
+    EXPECT_EQ(str1, "this is another global value");
+    Fed1->finalize();
+    Fed2->finalize();
+    brk->waitForDisconnect();
+}
+
+TEST(federate, broker_global_file_ci_skip)
+{
+    auto testFile = std::string(TEST_DIR) + "example_global_broker.json";
+    auto brk = helics::BrokerFactory::create(helics::CoreType::EXTRACT, "", testFile);
+    brk->connect();
+
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "core_globalc";
+    fedInfo.coreInitString = "-f 2 --broker=brk_globalb";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
 

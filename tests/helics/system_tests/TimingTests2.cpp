@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.hpp"
 
 #include <future>
+#include <string>
 #include <thread>
 
 struct timing2: public FederateTestFixture, public ::testing::Test {};
@@ -910,4 +911,115 @@ TEST_F(timing2, value_to_endpoint_timing)
     EXPECT_TRUE(ept2.hasMessage());
     vFed1->finalize();
     vFed2->finalize();
+}
+
+TEST_F(timing2, global_disconnect1)
+{
+    extraBrokerArgs = "--global_disconnect";
+
+    SetupTest<helics::CombinationFederate>("test_2", 3);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+    auto vFed3 = GetFederateAs<helics::CombinationFederate>(2);
+    /** no connections between federates*/
+
+    vFed1->enterExecutingModeAsync();
+    vFed3->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed3->enterExecutingModeComplete();
+    auto retTime = vFed2->requestTime(3.0);
+    EXPECT_EQ(retTime, 3.0);
+    retTime = vFed3->requestTime(34.67);
+    EXPECT_EQ(retTime, 34.67);
+
+    vFed1->finalizeAsync();
+    vFed2->finalizeAsync();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    retTime = vFed3->requestTime(216526.62);
+    EXPECT_EQ(retTime, 216526.62);
+    vFed3->finalize();
+    std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    if (!vFed1->isAsyncOperationCompleted()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
+    if (!vFed2->isAsyncOperationCompleted()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+    vFed1->finalizeComplete();
+    vFed2->finalizeComplete();
+}
+
+TEST_F(timing2, global_disconnect_with_connections)
+{
+    extraBrokerArgs = "--global_disconnect";
+
+    SetupTest<helics::CombinationFederate>("test_2", 3);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+    auto vFed3 = GetFederateAs<helics::CombinationFederate>(2);
+
+    vFed1->registerGlobalPublication<double>("pub1");
+    vFed1->registerSubscription("pub2");
+    vFed1->registerSubscription("pub3");
+
+    vFed2->registerGlobalPublication<double>("pub2");
+    vFed2->registerSubscription("pub1");
+    vFed2->registerSubscription("pub3");
+
+    vFed3->registerGlobalPublication<double>("pub3");
+    vFed3->registerSubscription("pub1");
+    vFed3->registerSubscription("pub2");
+
+    /** no connections between federates*/
+
+    vFed1->enterExecutingModeAsync();
+    vFed3->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed3->enterExecutingModeComplete();
+    vFed2->requestTimeAsync(3.0);
+    vFed1->requestTimeAsync(3.0);
+
+    auto retTime = vFed3->requestTime(2.5);
+    EXPECT_EQ(retTime, 2.5);
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    retTime = vFed3->requestTime(3.0);
+    EXPECT_EQ(retTime, 3.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    if (!vFed1->isAsyncOperationCompleted()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
+    if (!vFed2->isAsyncOperationCompleted()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+
+    vFed1->finalizeAsync();
+    vFed2->finalizeAsync();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    retTime = vFed3->requestTime(216526.62);
+    EXPECT_EQ(retTime, 216526.62);
+    vFed3->finalize();
+    std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    if (!vFed1->isAsyncOperationCompleted()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
+    if (!vFed2->isAsyncOperationCompleted()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+    vFed1->finalizeComplete();
+    vFed2->finalizeComplete();
 }

@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.h"
 
 #include <gtest/gtest.h>
+#include <string>
 
 class QueryTests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 

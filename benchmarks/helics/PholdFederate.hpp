@@ -77,7 +77,7 @@ class PholdFederate: public BenchmarkFederate {
         addResult("EVENT COUNT", "EvCount", std::to_string(evCount));
     }
 
-    void doParamInit(helics::FederateInfo& /*fi*/) override
+    void doParamInit(helics::FederateInfo& /*fedInfo*/) override
     {
         if (app->get_option("--set_rand_seed")->count() == 0) {
             std::mt19937 random_engine(0x600d5eed);  // NOLINT

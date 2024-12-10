@@ -1,7 +1,10 @@
 *helicsBroker*
 *helicsFederate*
+*helicsApp*
 *helicsCallbackFederate*
 *helicsCore*
+*helicsWrapData*
+*helicsData*
 *helicsPublication*
 *helicsInput*
 *helicsEndpoint*

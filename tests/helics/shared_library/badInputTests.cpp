@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ctestFixtures.hpp"
 
 #include <gtest/gtest.h>
+#include <string>
 
 struct bad_input_nosan: public FederateTestFixture, public ::testing::Test {};
 
@@ -46,18 +47,18 @@ TEST_F(bad_input_nosan, test_mistaken_free)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
-    auto fi = helicsCreateFederateInfo();
-    CE(helicsFederateInfoSetBroker(fi, "broker test", &err));
+    auto fedInfo = helicsCreateFederateInfo();
+    CE(helicsFederateInfoSetBroker(fedInfo, "broker test", &err));
     CE(helicsFederateEnterInitializingMode(vFed1, &err));
     CE(helicsFederateFinalize(vFed1, &err));
 
     helicsFederateInfoFree(vFed1);  // this is totally wrong but we are testing it
-    helicsFederateFree(fi);  // this is also backwards
+    helicsFederateFree(fedInfo);  // this is also backwards
 
-    helicsQueryFree(fi);  // also bad
+    helicsQueryFree(fedInfo);  // also bad
     helicsQueryFree(vFed1);
 
-    helicsFederateInfoFree(fi);  // now do the correct frees
+    helicsFederateInfoFree(fedInfo);  // now do the correct frees
     helicsFederateFree(vFed1);
 }
 
@@ -66,20 +67,20 @@ TEST_F(bad_input_nosan, test_mistaken_finalize)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
-    auto fi = helicsCreateFederateInfo();
-    CE(helicsFederateInfoSetBroker(fi, "broker test", &err));
+    auto fedInfo = helicsCreateFederateInfo();
+    CE(helicsFederateInfoSetBroker(fedInfo, "broker test", &err));
     CE(helicsFederateEnterInitializingMode(vFed1, &err));
-    helicsFederateFinalize(fi, &err);
+    helicsFederateFinalize(fedInfo, &err);
 
     EXPECT_NE(err.error_code, 0);
 
     helicsFederateInfoFree(vFed1);  // this is totally wrong but we are testing it
-    helicsFederateFree(fi);  // this is also backwards
+    helicsFederateFree(fedInfo);  // this is also backwards
 
-    helicsQueryFree(fi);  // also bad
+    helicsQueryFree(fedInfo);  // also bad
     helicsQueryFree(vFed1);
 
-    helicsFederateInfoFree(fi);  // now do the correct frees
+    helicsFederateInfoFree(fedInfo);  // now do the correct frees
     helicsFederateFree(vFed1);
 }
 
@@ -928,6 +929,37 @@ TEST_F(function_nosan, messageFed_event)
     helicsFederateFinalize(mFed1, nullptr);
     //  can't send an event after the federate is finalized
     helicsEndpointSendBytesAt(ept1, data, 4, 0.0, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST_F(function_nosan, messageFed_string_event)
+{
+    SetupTest(helicsCreateMessageFederate, "test", 1);
+    auto mFed1 = GetFederateAt(0);
+
+    auto ept1 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", nullptr);
+    EXPECT_NE(ept1, nullptr);
+    auto ept2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(ept2, nullptr);
+    helicsErrorClear(&err);
+    // send events without destinations
+    helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
+    helicsFederateEnterExecutingMode(mFed1, nullptr);
+
+    helicsEndpointSendStringAt(ept1, nullptr, 0.0, &err);
+
+    helicsEndpointSendStringToAt(ept1, "ept1", nullptr, 0.0, &err);
+
+    char data[5] = "test";
+    helicsEndpointSendStringAt(ept1, data, 0.0, &err);
+    helicsFederateRequestNextStep(mFed1, nullptr);
+    auto cnt = helicsEndpointPendingMessageCount(ept1);
+    EXPECT_EQ(cnt, 3);
+
+    helicsFederateFinalize(mFed1, nullptr);
+    //  can't send an event after the federate is finalized
+    helicsEndpointSendStringAt(ept1, data, 0.0, &err);
     EXPECT_NE(err.error_code, 0);
 }
 

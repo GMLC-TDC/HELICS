@@ -15,19 +15,22 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <utility>
 #include <vector>
 
+namespace {
 /** random integer for validation purposes of inputs */
-static constexpr int InputValidationIdentifier = 0x3456'E052;
+constexpr int InputValidationIdentifier = 0x3456'E052;
 
 /** random integer for validation purposes of publications */
-static constexpr int PublicationValidationIdentifier = 0x97B1'00A5;
+constexpr int PublicationValidationIdentifier = 0x97B1'00A5;
 
-static constexpr char invalidInputString[] = "The given input object does not point to a valid object";
+constexpr char invalidInputString[] = "The given input object does not point to a valid object";
 
-static constexpr char invalidPublicationString[] = "The given publication object does not point to a valid object";
+constexpr char invalidPublicationString[] = "The given publication object does not point to a valid object";
 
-static helics::InputObject* verifyInput(HelicsInput inp, HelicsError* err)
+helics::InputObject* verifyInput(HelicsInput inp, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (inp == nullptr) {
@@ -42,7 +45,7 @@ static helics::InputObject* verifyInput(HelicsInput inp, HelicsError* err)
     return inpObj;
 }
 
-static helics::PublicationObject* verifyPublication(HelicsPublication pub, HelicsError* err)
+helics::PublicationObject* verifyPublication(HelicsPublication pub, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (pub == nullptr) {
@@ -57,9 +60,9 @@ static helics::PublicationObject* verifyPublication(HelicsPublication pub, Helic
     return pubObj;
 }
 
-static auto inputSearch = [](const helics::InterfaceHandle& hnd, const auto& testInput) { return hnd < testInput->inputPtr->getHandle(); };
+auto inputSearch = [](const helics::InterfaceHandle& hnd, const auto& testInput) { return hnd < testInput->inputPtr->getHandle(); };
 
-static inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::InputObject> inp)
+inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::InputObject> inp)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     inp->valid = InputValidationIdentifier;
@@ -73,7 +76,7 @@ static inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::I
     return hinp;
 }
 
-static HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input& input)
+HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input& input)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     const auto handle = input.getHandle();
@@ -88,9 +91,9 @@ static HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input& input)
     return addInput(fed, std::move(inp));
 }
 
-static auto pubSearch = [](const helics::InterfaceHandle& hnd, const auto& testPub) { return hnd < testPub->pubPtr->getHandle(); };
+auto pubSearch = [](const helics::InterfaceHandle& hnd, const auto& testPub) { return hnd < testPub->pubPtr->getHandle(); };
 
-static inline HelicsPublication addPublication(HelicsFederate fed, std::unique_ptr<helics::PublicationObject> pub)
+HelicsPublication addPublication(HelicsFederate fed, std::unique_ptr<helics::PublicationObject> pub)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     pub->valid = PublicationValidationIdentifier;
@@ -105,7 +108,7 @@ static inline HelicsPublication addPublication(HelicsFederate fed, std::unique_p
     return hpub;
 }
 
-static HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Publication& pub)
+HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Publication& pub)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     const auto handle = pub.getHandle();
@@ -119,7 +122,7 @@ static HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Pub
     pubObj->fedptr = getValueFedSharedPtr(fed, nullptr);
     return addPublication(fed, std::move(pubObj));
 }
-
+}  // namespace
 /* input/pub registration */
 HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* key, const char* units, HelicsError* err)
 {
@@ -432,12 +435,12 @@ HelicsInput helicsFederateGetInput(HelicsFederate fed, const char* key, HelicsEr
     }
     CHECK_NULL_STRING(key, nullptr);
     try {
-        auto& id = fedObj->getInput(key);
-        if (!id.isValid()) {
+        auto& input = fedObj->getInput(key);
+        if (!input.isValid()) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInputName);
             return nullptr;
         }
-        return findOrCreateInput(fed, id);
+        return findOrCreateInput(fed, input);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -454,12 +457,12 @@ HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int index, HelicsE
         return nullptr;
     }
     try {
-        auto& id = fedObj->getInput(index);
-        if (!id.isValid()) {
+        auto& input = fedObj->getInput(index);
+        if (!input.isValid()) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInputIndex);
             return nullptr;
         }
-        return findOrCreateInput(fed, id);
+        return findOrCreateInput(fed, input);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -484,12 +487,12 @@ HelicsInput helicsFederateGetInputByTarget(HelicsFederate fed, const char* targe
     }
     CHECK_NULL_STRING(target, nullptr);
     try {
-        auto& id = fedObj->getInputByTarget(target);
-        if (!id.isValid()) {
+        auto& input = fedObj->getInputByTarget(target);
+        if (!input.isValid()) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidTargetKey);
             return nullptr;
         }
-        return findOrCreateInput(fed, id);
+        return findOrCreateInput(fed, input);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -510,6 +513,7 @@ void helicsFederateClearUpdates(HelicsFederate fed)
     }
     // LCOV_EXCL_START
     catch (...) {
+        ;
     }
     // LCOV_EXCL_STOP
 }
@@ -592,7 +596,7 @@ void helicsPublicationPublishTime(HelicsPublication pub, HelicsTime val, HelicsE
         return;
     }
     try {
-        helics::Time tval(val);
+        const helics::Time tval(val);
         pubObj->pubPtr->publish(tval);
     }
     catch (...) {
@@ -767,8 +771,8 @@ HelicsDataBuffer helicsInputGetDataBuffer(HelicsInput inp, HelicsError* err)
     if (inpObj == nullptr) {
         return (nullptr);
     }
-    helics::data_view dv = inpObj->inputPtr->getBytes();
-    auto* ptr = new helics::SmallBuffer(dv.string_view());
+    const helics::data_view bytes = inpObj->inputPtr->getBytes();
+    auto* ptr = new helics::SmallBuffer(bytes.string_view());
     return createAPIDataBuffer(*ptr);
 }
 
@@ -785,15 +789,15 @@ void helicsInputGetBytes(HelicsInput inp, void* data, int maxDatalen, int* actua
         return;
     }
     try {
-        auto dv = inpObj->inputPtr->getBytes();
-        if (maxDatalen > static_cast<int>(dv.size())) {
-            memcpy(data, dv.data(), dv.size());
+        auto bytes = inpObj->inputPtr->getBytes();
+        if (maxDatalen > static_cast<int>(bytes.size())) {
+            memcpy(data, bytes.data(), bytes.size());
             if (actualSize != nullptr) {
-                *actualSize = static_cast<int>(dv.size());
+                *actualSize = static_cast<int>(bytes.size());
             }
             return;
         }
-        memcpy(data, dv.data(), maxDatalen);
+        memcpy(data, bytes.data(), maxDatalen);
         if (actualSize != nullptr) {
             *actualSize = maxDatalen;
         }
@@ -820,7 +824,7 @@ void helicsInputGetString(HelicsInput inp, char* outputString, int maxStringLen,
         return;
     }
     try {
-        int length = inpObj->inputPtr->getValue(outputString, maxStringLen);
+        const int length = inpObj->inputPtr->getValue(outputString, maxStringLen);
         if (actualLength != nullptr) {  // for initialization
             *actualLength = length;
         }
@@ -854,7 +858,7 @@ HelicsBool helicsInputGetBoolean(HelicsInput inp, HelicsError* err)
         return HELICS_FALSE;
     }
     try {
-        bool boolval = inpObj->inputPtr->getValue<bool>();
+        const bool boolval = inpObj->inputPtr->getValue<bool>();
         return (boolval) ? HELICS_TRUE : HELICS_FALSE;
     }
     // LCOV_EXCL_START
@@ -869,14 +873,14 @@ double helicsInputGetDouble(HelicsInput inp, HelicsError* err)
 {
     auto* inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {
-        return HELICS_TIME_INVALID;
+        return HELICS_INVALID_DOUBLE;
     }
     try {
         return inpObj->inputPtr->getValue<double>();
     }
     catch (...) {
         helicsErrorHandler(err);
-        return HELICS_TIME_INVALID;
+        return HELICS_INVALID_DOUBLE;
     }
 }
 
@@ -887,8 +891,8 @@ HelicsTime helicsInputGetTime(HelicsInput inp, HelicsError* err)
         return HELICS_TIME_INVALID;
     }
     try {
-        auto T = inpObj->inputPtr->getValue<helics::Time>();
-        return static_cast<HelicsTime>(T);
+        auto time = inpObj->inputPtr->getValue<helics::Time>();
+        return static_cast<HelicsTime>(time);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1005,7 +1009,7 @@ void helicsInputGetVector(HelicsInput inp, double data[], int maxlen, int* actua
         return;
     }
     try {
-        int length = inpObj->inputPtr->getValue(data, maxlen);
+        const int length = inpObj->inputPtr->getValue(data, maxlen);
         if (actualSize != nullptr) {
             *actualSize = length;
         }
@@ -1032,7 +1036,7 @@ void helicsInputGetComplexVector(HelicsInput inp, double data[], int maxlen, int
         return;
     }
     try {
-        int length = inpObj->inputPtr->getComplexValue(data, maxlen);
+        const int length = inpObj->inputPtr->getComplexValue(data, maxlen);
         if (actualSize != nullptr) {
             *actualSize = length;
         }
@@ -1055,10 +1059,10 @@ void helicsInputGetNamedPoint(HelicsInput inp, char* outputString, int maxString
     }
 
     try {
-        helics::NamedPoint np = inpObj->inputPtr->getValue<helics::NamedPoint>();
+        helics::NamedPoint npoint = inpObj->inputPtr->getValue<helics::NamedPoint>();
         if (outputString != nullptr && maxStringLen > 0) {
-            int length = std::min(static_cast<int>(np.name.size()), maxStringLen);
-            memcpy(outputString, np.name.data(), length);
+            const int length = std::min(static_cast<int>(npoint.name.size()), maxStringLen);
+            memcpy(outputString, npoint.name.data(), length);
 
             if (length == maxStringLen) {
                 outputString[maxStringLen - 1] = '\0';
@@ -1073,7 +1077,7 @@ void helicsInputGetNamedPoint(HelicsInput inp, char* outputString, int maxString
             }
         }
         if (val != nullptr) {
-            *val = np.value;
+            *val = npoint.value;
         }
 
         return;
@@ -1155,7 +1159,7 @@ void helicsInputSetDefaultTime(HelicsInput inp, HelicsTime val, HelicsError* err
         return;
     }
 
-    helics::Time tval(val);
+    const helics::Time tval(val);
     inpObj->inputPtr->setDefault(tval);
 }
 
@@ -1208,12 +1212,12 @@ void helicsInputSetDefaultComplexVector(HelicsInput inp, const double* vectorInp
         if ((vectorInput == nullptr) || (vectorLength <= 0)) {
             inpObj->inputPtr->setDefault(std::vector<std::complex<double>>{});
         } else {
-            std::vector<std::complex<double>> CV;
-            CV.reserve(vectorLength);
-            for (int ii = 0; ii < vectorLength; ++ii) {
-                CV.emplace_back(vectorInput[2 * ii], vectorInput[2 * ii + 1]);
+            std::vector<std::complex<double>> cvec;
+            cvec.reserve(vectorLength);
+            for (std::ptrdiff_t ii = 0; ii < vectorLength; ++ii) {
+                cvec.emplace_back(vectorInput[2 * ii], vectorInput[2 * ii + 1]);
             }
-            inpObj->inputPtr->setDefault(std::move(CV));
+            inpObj->inputPtr->setDefault(std::move(cvec));
         }
     }
     // LCOV_EXCL_START
@@ -1658,6 +1662,7 @@ void helicsInputClearUpdate(HelicsInput inp)
     }
     // LCOV_EXCL_START
     catch (...) {
+        ;
     }
     // LCOV_EXCL_STOP
 }

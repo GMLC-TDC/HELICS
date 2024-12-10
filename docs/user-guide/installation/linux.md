@@ -4,11 +4,11 @@
 
 ### Requirements
 
-- Ubuntu 18 or newer
-- C++17 compiler (GCC 7.4 or newer -- GCC 7.3.1 has a bug and won't work)
-- CMake 3.10 or newer (if using clang with libc++, use 3.18+)
+- Ubuntu 22.04 or newer
+- C++20 compiler (GCC 11 or clang 15 or higher)
+- CMake 3.22 or newer
 - git
-- Boost 1.67 or newer
+- Boost 1.73 or newer
 - ZeroMQ 4.2 or newer (generally recommended but technically not essential)
 - MPI-2 implementation (if MPI support is needed)
 

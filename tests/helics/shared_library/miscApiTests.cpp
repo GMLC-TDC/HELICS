@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <complex>
 #include <gtest/gtest.h>
+#include <string>
 #include <thread>
 #include <vector>
 // misc test copying some of the JAVA/Python tests

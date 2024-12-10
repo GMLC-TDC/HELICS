@@ -7,9 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "LogBuffer.hpp"
 
-#include "json/json.h"
+#include "nlohmann/json.hpp"
+
+#include <string>
+#include <utility>
 
 namespace helics {
+
 void LogBuffer::resize(std::size_t newSize)
 {
     if (newSize < mMaxSize) {
@@ -57,15 +61,15 @@ void LogBuffer::process(
     }
 }
 
-void bufferToJson(const LogBuffer& buffer, Json::Value& base)
+void bufferToJson(const LogBuffer& buffer, nlohmann::json& base)
 {
-    base["logs"] = Json::arrayValue;
+    base["logs"] = nlohmann::json::array();
     buffer.process([&base](int level, std::string_view header, std::string_view message) {
-        Json::Value logBlock;
+        nlohmann::json logBlock;
         logBlock["level"] = level;
         logBlock["header"] = std::string(header);
         logBlock["message"] = std::string(message);
-        base["logs"].append(logBlock);
+        base["logs"].push_back(std::move(logBlock));
     });
 }
 

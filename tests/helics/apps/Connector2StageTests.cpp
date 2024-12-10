@@ -18,7 +18,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <atomic>
 #include <future>
+#include <memory>
+#include <string>
 #include <thread>
+#include <vector>
 
 static std::string newCoreName(std::string_view baseName)
 {
@@ -49,12 +52,12 @@ class CheckFed {
             if (hasCommand) {
                 receivedCommand = true;
                 auto json = helics::fileops::loadJsonStr(cmd.first);
-                if (json.isMember("command")) {
+                if (json.contains("command")) {
                     if (json["command"] == "register_interfaces") {
                         receivedCommand = true;
-                        if (json.isMember("publications")) {
+                        if (json.contains("publications")) {
                             for (const auto& pub : json["publications"]) {
-                                const std::string pubName = pub.asString();
+                                const std::string pubName = pub.get<std::string>();
                                 if (std::find(potentialPubs.begin(),
                                               potentialPubs.end(),
                                               pubName) != potentialPubs.end()) {
@@ -62,9 +65,9 @@ class CheckFed {
                                 }
                             }
                         }
-                        if (json.isMember("inputs")) {
+                        if (json.contains("inputs")) {
                             for (const auto& input : json["inputs"]) {
-                                const std::string inputName = input.asString();
+                                const std::string inputName = input.get<std::string>();
                                 if (std::find(potentialInputs.begin(),
                                               potentialInputs.end(),
                                               inputName) != potentialInputs.end()) {
@@ -73,9 +76,9 @@ class CheckFed {
                                 }
                             }
                         }
-                        if (json.isMember("endpoints")) {
+                        if (json.contains("endpoints")) {
                             for (const auto& endpoint : json["endpoints"]) {
-                                const std::string endpointName = endpoint.asString();
+                                const std::string endpointName = endpoint.get<std::string>();
                                 if (std::find(potentialEndpoints.begin(),
                                               potentialEndpoints.end(),
                                               endpointName) != potentialEndpoints.end()) {
@@ -130,65 +133,65 @@ class CheckFed {
         ResponseType type = responseType.load();
 
         if (query == "potential_interfaces") {
-            Json::Value interfaces;
+            nlohmann::json interfaces;
             switch (type) {
                 case ResponseType::EVIL: {
-                    Json::Value istruct = Json::objectValue;
+                    nlohmann::json istruct = nlohmann::json::object();
                     istruct["key"] = "test";
                     istruct["global"] = false;
                     istruct["target"] = "bullseye";
 
-                    interfaces["inputs"].append(istruct);
-                    interfaces["inputs"].append(istruct);
+                    interfaces["inputs"].push_back(istruct);
+                    interfaces["inputs"].push_back(istruct);
                     interfaces["publications"] = false;
                     interfaces["endpoints"] = "this should be fun";
                 } break;
                 case ResponseType::LIST: {
                     if (!potentialInputs.empty()) {
-                        interfaces["inputs"] = Json::arrayValue;
+                        interfaces["inputs"] = nlohmann::json::array();
                         for (const auto& pInput : potentialInputs) {
-                            interfaces["inputs"].append(pInput);
+                            interfaces["inputs"].push_back(pInput);
                         }
                     }
                     if (!potentialPubs.empty()) {
-                        interfaces["publications"] = Json::arrayValue;
+                        interfaces["publications"] = nlohmann::json::array();
                         for (const auto& pPub : potentialPubs) {
-                            interfaces["publications"].append(pPub);
+                            interfaces["publications"].push_back(pPub);
                         }
                     }
                     if (!potentialEndpoints.empty()) {
-                        interfaces["endpoints"] = Json::arrayValue;
+                        interfaces["endpoints"] = nlohmann::json::array();
                         for (const auto& pEpt : potentialEndpoints) {
-                            interfaces["endpoints"].append(pEpt);
+                            interfaces["endpoints"].push_back(pEpt);
                         }
                     }
                 } break;
                 case ResponseType::STRUCTURE: {
                     if (!potentialInputs.empty()) {
-                        interfaces["inputs"] = Json::arrayValue;
+                        interfaces["inputs"] = nlohmann::json::array();
                         for (const auto& pInput : potentialInputs) {
-                            Json::Value Obj = Json::objectValue;
+                            nlohmann::json Obj = nlohmann::json::object();
                             Obj["key"] = pInput;
                             Obj["units"] = "V";
-                            interfaces["inputs"].append(Obj);
+                            interfaces["inputs"].push_back(Obj);
                         }
                     }
                     if (!potentialPubs.empty()) {
-                        interfaces["publications"] = Json::arrayValue;
+                        interfaces["publications"] = nlohmann::json::array();
                         for (const auto& pPub : potentialPubs) {
-                            Json::Value Obj = Json::objectValue;
+                            nlohmann::json Obj = nlohmann::json::object();
                             Obj["key"] = pPub;
                             Obj["units"] = "V";
-                            interfaces["publications"].append(Obj);
+                            interfaces["publications"].push_back(Obj);
                         }
                     }
                     if (!potentialEndpoints.empty()) {
-                        interfaces["endpoints"] = Json::arrayValue;
+                        interfaces["endpoints"] = nlohmann::json::array();
                         for (const auto& pEpt : potentialEndpoints) {
-                            Json::Value Obj = Json::objectValue;
+                            nlohmann::json Obj = nlohmann::json::object();
                             Obj["key"] = pEpt;
                             Obj["type"] = "type1";
-                            interfaces["endpoints"].append(Obj);
+                            interfaces["endpoints"].push_back(Obj);
                         }
                     }
                 } break;
@@ -297,7 +300,7 @@ TEST(connector_2stage, simple_connector)
     cfed1.finalize();
     EXPECT_TRUE(cfed1.hasReceivedCommand());
     fut.get();
-    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1U);
     EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_EQ(cfed1.getValueNames(), std::vector<std::string>{"inp1"});
@@ -324,7 +327,7 @@ TEST(connector_2stage, simple_connector_struct)
     cfed1.run(5);
     cfed1.finalize();
     fut.get();
-    ASSERT_EQ(cfed1.getValueNames().size(), 1);
+    ASSERT_EQ(cfed1.getValueNames().size(), 1U);
     EXPECT_TRUE(cfed1.isInput("inp1"));
     EXPECT_FALSE(cfed1.getValues("inp1").empty());
     EXPECT_EQ(conn1.madeConnections(), 1);
@@ -674,8 +677,8 @@ TEST(connector_2stage, three_fed_input)
     vFed2.disconnect();
     fut.get();
     fut2.get();
-    EXPECT_GE(data.size(), 1);
-    EXPECT_EQ(conn1.madeConnections(), 1);
+    EXPECT_GE(data.size(), 1U);
+    EXPECT_EQ(conn1.madeConnections(), 1U);
     EXPECT_TRUE(cfed1.hasReceivedCommand());
 }
 
@@ -721,7 +724,7 @@ TEST(connector_2stage, three_fed_input_regex)
     fut.get();
     fut2.get();
     EXPECT_TRUE(cfed1.hasReceivedCommand());
-    EXPECT_GE(data.size(), 1);
+    EXPECT_GE(data.size(), 1U);
     EXPECT_EQ(conn1.madeConnections(), 1);
 }
 

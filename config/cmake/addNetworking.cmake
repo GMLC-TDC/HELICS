@@ -12,6 +12,7 @@ if(NOT TARGET gmlc::networking)
     set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include)
     set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
     set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO} CACHE INTERNAL "")
+    set(GMLC_NETWORKING_JSON_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty)
 
     # hide some of the JSON in the networking library
     set(JSON_CI OFF CACHE INTERNAL "")
@@ -28,7 +29,11 @@ if(NOT TARGET gmlc::networking)
         set(GMLC_NETWORKING_ENABLE_ENCRYPTION OFF CACHE INTERNAL "")
     endif()
 
-    add_subdirectory(ThirdParty/networking)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+        add_subdirectory(ThirdParty/networking EXCLUDE_FROM_ALL SYSTEM)
+    else()
+        add_subdirectory(ThirdParty/networking EXCLUDE_FROM_ALL)
+    endif()
 
     hide_variable(GMLC_NETWORKING_GENERATE_DOXYGEN_DOC)
     hide_variable(GMLC_NETWORKING_INCLUDE_BOOST)

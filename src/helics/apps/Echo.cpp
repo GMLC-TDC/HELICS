@@ -54,18 +54,20 @@ namespace apps {
         }
     }
 
-    Echo::Echo(std::string_view name, const FederateInfo& fi): App(name, fi)
+    Echo::Echo(std::string_view name, const FederateInfo& fedInfo): App(name, fedInfo)
     {
         initialSetup();
     }
 
-    Echo::Echo(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi):
-        App(name, core, fi)
+    Echo::Echo(std::string_view name,
+               const std::shared_ptr<Core>& core,
+               const FederateInfo& fedInfo): App(name, core, fedInfo)
     {
         initialSetup();
     }
 
-    Echo::Echo(std::string_view name, CoreApp& core, const FederateInfo& fi): App(name, core, fi)
+    Echo::Echo(std::string_view name, CoreApp& core, const FederateInfo& fedInfo):
+        App(name, core, fedInfo)
     {
         initialSetup();
     }
@@ -144,10 +146,10 @@ namespace apps {
 
         auto doc = fileops::loadJson(jsonFile);
 
-        if (doc.isMember("echo")) {
+        if (doc.contains("echo")) {
             auto echoConfig = doc["echo"];
 
-            if (echoConfig.isMember("delay")) {
+            if (echoConfig.contains("delay")) {
                 std::lock_guard<std::mutex> lock(delayTimeLock);
                 delayTime = fileops::loadJsonTime(echoConfig["delay"]);
             }

@@ -13,6 +13,7 @@ Livermore National Laboratory, operated by Lawrence Livermore National Security,
 #include "../src/helics/cpp98/Broker.hpp"
 
 #include <cctype>
+#include <memory>
 #include <string>
 
 static bool hasIndexCode(const std::string& type_name)

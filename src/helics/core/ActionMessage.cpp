@@ -22,7 +22,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/format.h>
 #include <frozen/string.h>
 #include <frozen/unordered_map.h>
+#include <memory>
 #include <ostream>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -152,11 +154,12 @@ const std::string& ActionMessage::getString(int index) const
     }
     return emptyStr;
 }
+static constexpr std::size_t maxPayloadSize{0x00FFFFFFUL};
 
 void ActionMessage::setString(int index, std::string_view str)
 {
-    if (index >= 256 || index < 0) {
-        throw(std::invalid_argument("index out of specified range (0-255)"));
+    if (index >= 255 || index < 0) {
+        throw(std::invalid_argument("index out of specified range (0-254)"));
     }
     if (index >= static_cast<int>(stringData.size())) {
         stringData.resize(static_cast<size_t>(index) + 1);
@@ -179,10 +182,16 @@ static constexpr std::size_t action_message_base_size =
 int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
 {
     static const uint8_t littleEndian = isLittleEndian();
+
     // put the main string size in the first 4 bytes;
-    std::uint32_t ssize = (messageAction != CMD_TIME_REQUEST) ?
-        static_cast<uint32_t>(payload.size() & 0x00FFFFFFUL) :
-        0UL;
+    std::uint32_t ssize{0UL};
+    if (messageAction != CMD_TIME_REQUEST) {
+        if (payload.size() >= maxPayloadSize) {
+            ssize = maxPayloadSize;
+        } else {
+            ssize = static_cast<uint32_t>(payload.size());
+        }
+    }
 
     if ((data == nullptr) || (buffer_size == 0) || buffer_size < action_message_base_size + ssize) {
         return -1;
@@ -236,17 +245,17 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
         std::memcpy(data, payload.data(), ssize);
         data += ssize;
     }
+    if (payload.size() >= maxPayloadSize) {
+        *data = static_cast<std::byte>(stringData.size() + 1);
+    } else {
+        *data = static_cast<std::byte>(stringData.size());
+    }
 
-    //  if (stringData.empty()) {
-    //      *data = 0;
-    //     ++data;
-    // } else {
-    *data = static_cast<std::byte>(stringData.size());
     ++data;
     ssize += action_message_base_size;
     for (const auto& str : stringData) {
         auto strsize = static_cast<uint32_t>(str.size());
-        if (buffer_size < ssize) {
+        if (buffer_size < ssize + strsize + 4) {
             return -1;
         }
 
@@ -254,6 +263,17 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
         data += sizeof(uint32_t);
         std::memcpy(data, str.data(), str.size());
         data += str.size();
+        ssize += strsize + 4;
+    }
+    if (payload.size() > maxPayloadSize) {
+        if (buffer_size < ssize + payload.size() - maxPayloadSize + 4) {
+            return -1;
+        }
+        auto strsize = static_cast<uint32_t>(payload.size() - maxPayloadSize);
+        std::memcpy(data, &strsize, sizeof(uint32_t));
+        data += sizeof(uint32_t);
+        std::memcpy(data, payload.data() + maxPayloadSize, payload.size() - maxPayloadSize);
+        data += payload.size() - maxPayloadSize;
     }
     //   }
     auto actSize = static_cast<int>(data - dataStart);
@@ -270,13 +290,13 @@ int ActionMessage::serializedByteCount() const
         return size;
     }
     size += static_cast<int>(payload.size());
-    // add additional string data
-    //   if (!stringData.empty()) {
     for (const auto& str : stringData) {
         // 4(to store the length)+length of the string
         size += static_cast<int>(sizeof(uint32_t) + str.size());
     }
-    // }
+    if (payload.size() >= maxPayloadSize) {
+        size += 4;
+    }
     return size;
 }
 
@@ -295,7 +315,7 @@ std::string ActionMessage::to_string() const
 
 std::string ActionMessage::to_json_string() const
 {
-    Json::Value packet;
+    nlohmann::json packet;
     packet["version"] =
         HELICS_VERSION_MAJOR * 10000 + HELICS_VERSION_MINOR * 100 + HELICS_VERSION_PATCH;
     packet["command"] = static_cast<int>(messageAction);
@@ -313,16 +333,30 @@ std::string ActionMessage::to_json_string() const
         packet["Tdemin"] = Tdemin.getBaseTimeCode();
         packet["Tso"] = Tso.getBaseTimeCode();
     }
-    packet["payload"] = std::string(payload.to_string());
+    packet["payload"] = payload.to_string();
     packet["stringCount"] = static_cast<std::uint32_t>(stringData.size());
     if (!stringData.empty()) {
-        Json::Value sdata = Json::arrayValue;
+        nlohmann::json sdata = nlohmann::json::array();
         for (const auto& str : stringData) {
-            sdata.append(str);
+            sdata.push_back(str);
         }
         packet["strings"] = std::move(sdata);
     }
-    return fileops::generateJsonString(packet);
+    try {
+        return fileops::generateJsonString(packet, false);
+    }
+    catch (const nlohmann::json::type_error&) {
+        packet["encoding"] = "base64";
+        packet["payload"] = gmlc::utilities::base64_encode(payload.data(), payload.size());
+        if (!stringData.empty()) {
+            nlohmann::json sdata = nlohmann::json::array();
+            for (const auto& str : stringData) {
+                sdata.push_back(gmlc::utilities::base64_encode(str.data(), str.size()));
+            }
+            packet["strings"] = std::move(sdata);
+        }
+        return fileops::generateJsonString(packet);
+    }
 }
 
 constexpr auto LEADING_CHAR = '\xF3';
@@ -460,7 +494,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
     data += sizeof(Time::baseType);
 
     if (messageAction == CMD_TIME_REQUEST) {
-        tsize += static_cast<int>(3 * sizeof(Time::baseType));
+        tsize += 3 * sizeof(Time::baseType);
         if (buffer_size < tsize) {
             messageAction = CMD_INVALID;
             return (0);
@@ -535,6 +569,10 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
             Tso.setBaseTimeCode(timecode);
         }
     }
+    if (size == maxPayloadSize && !stringData.empty()) {
+        payload.append(stringData.back());
+        stringData.pop_back();
+    }
     return tsize;
 }
 
@@ -588,27 +626,36 @@ bool ActionMessage::from_json_string(std::string_view data)
     try {
         auto val = fileops::loadJsonStr(data);
         // auto version = val["version"].asFloat();
-        messageAction = static_cast<action_message_def::action_t>(val["command"].asInt());
-        messageID = val["messageId"].asInt();
-        source_id = GlobalFederateId(val["sourceId"].asInt());
-        dest_id = GlobalFederateId(val["destId"].asInt());
-        source_handle = InterfaceHandle(val["sourceHandle"].asInt());
-        dest_handle = InterfaceHandle(val["destHandle"].asInt());
-        counter = static_cast<uint16_t>(val["counter"].asUInt());
-        flags = static_cast<uint16_t>(val["flags"].asUInt());
-        sequenceID = val["sequenceId"].asUInt();
-        actionTime.setBaseTimeCode(val["actionTime"].asInt64());
+        messageAction = static_cast<action_message_def::action_t>(val["command"].get<int32_t>());
+        messageID = val["messageId"].get<int32_t>();
+        source_id = GlobalFederateId(val["sourceId"].get<int32_t>());
+        dest_id = GlobalFederateId(val["destId"].get<int32_t>());
+        source_handle = InterfaceHandle(val["sourceHandle"].get<int32_t>());
+        dest_handle = InterfaceHandle(val["destHandle"].get<int32_t>());
+        counter = val["counter"].get<uint16_t>();
+        flags = val["flags"].get<uint16_t>();
+        sequenceID = val["sequenceId"].get<uint32_t>();
+        actionTime.setBaseTimeCode(val["actionTime"].get<int64_t>());
         if (messageAction == CMD_TIME_REQUEST) {
-            Te.setBaseTimeCode(val["Te"].asInt64());
-            Tdemin.setBaseTimeCode(val["Tdemin"].asInt64());
-            Tso.setBaseTimeCode(val["Tso"].asInt64());
+            Te.setBaseTimeCode(val["Te"].get<int64_t>());
+            Tdemin.setBaseTimeCode(val["Tdemin"].get<int64_t>());
+            Tso.setBaseTimeCode(val["Tso"].get<int64_t>());
         }
-
-        payload = val["payload"].asString();
-        auto stringCount = val["stringCount"].asUInt();
+        payload = val["payload"].get<std::string>();
+        auto stringCount = val["stringCount"].get<int>();
         stringData.resize(stringCount);
-        for (Json::ArrayIndex ii = 0; ii < stringCount; ++ii) {
-            setString(ii, val["strings"][ii].asString());
+        for (int ii = 0; ii < stringCount; ++ii) {
+            setString(ii, val["strings"][ii].get<std::string>());
+        }
+        bool base64_encoding{false};
+        if (val.contains("encoding") && val["encoding"].is_string()) {
+            base64_encoding = val["encoding"].get<std::string>() == "base64";
+        }
+        if (base64_encoding) {
+            payload = gmlc::utilities::base64_decode_to_string(payload.to_string());
+            for (auto& stringd : stringData) {
+                stringd = gmlc::utilities::base64_decode_to_string(stringd);
+            }
         }
     }
     catch (...) {

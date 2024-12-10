@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/Filters.hpp"
 #include "../application_api/queryFunctions.hpp"
+#include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
@@ -21,12 +22,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <regex>
 #include <set>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -128,46 +131,46 @@ void Recorder::loadJsonFile(const std::string& jsonString, bool enableFederateIn
     auto doc = fileops::loadJson(jsonString);
 
     auto tags = doc["tag"];
-    if (tags.isArray()) {
+    if (tags.is_array()) {
         for (const auto& tag : tags) {
-            addSubscription(tag.asString());
+            addSubscription(tag.get<std::string>());
         }
-    } else if (tags.isString()) {
-        addSubscription(tags.asString());
+    } else if (tags.is_string()) {
+        addSubscription(tags.get<std::string>());
     }
     auto sourceClone = doc["sourceclone"];
-    if (sourceClone.isArray()) {
+    if (sourceClone.is_array()) {
         for (const auto& clone : sourceClone) {
-            addSourceEndpointClone(clone.asString());
+            addSourceEndpointClone(clone.get<std::string>());
         }
-    } else if (sourceClone.isString()) {
-        addSourceEndpointClone(sourceClone.asString());
+    } else if (sourceClone.is_string()) {
+        addSourceEndpointClone(sourceClone.get<std::string>());
     }
     auto destClone = doc["destclone"];
-    if (destClone.isArray()) {
+    if (destClone.is_array()) {
         for (const auto& clone : destClone) {
-            addDestEndpointClone(clone.asString());
+            addDestEndpointClone(clone.get<std::string>());
         }
-    } else if (destClone.isString()) {
-        addDestEndpointClone(destClone.asString());
+    } else if (destClone.is_string()) {
+        addDestEndpointClone(destClone.get<std::string>());
     }
     auto clones = doc["clone"];
-    if (clones.isArray()) {
+    if (clones.is_array()) {
         for (const auto& clone : clones) {
-            addSourceEndpointClone(clone.asString());
-            addDestEndpointClone(clone.asString());
+            addSourceEndpointClone(clone.get<std::string>());
+            addDestEndpointClone(clone.get<std::string>());
         }
-    } else if (clones.isString()) {
-        addSourceEndpointClone(clones.asString());
-        addDestEndpointClone(clones.asString());
+    } else if (clones.is_string()) {
+        addSourceEndpointClone(clones.get<std::string>());
+        addDestEndpointClone(clones.get<std::string>());
     }
     auto captures = doc["capture"];
-    if (captures.isArray()) {
+    if (captures.is_array()) {
         for (const auto& capture : captures) {
-            addCapture(capture.asString());
+            addCapture(capture.get<std::string>());
         }
-    } else if (captures.isString()) {
-        addCapture(captures.asString());
+    } else if (captures.is_string()) {
+        addCapture(captures.get<std::string>());
     }
 }
 
@@ -235,11 +238,11 @@ void Recorder::loadTextFile(const std::string& textFile)
 
 void Recorder::writeJsonFile(const std::string& filename)
 {
-    Json::Value doc;
+    nlohmann::json doc;
     if (!points.empty()) {
-        doc["points"] = Json::Value(Json::arrayValue);
+        doc["points"] = nlohmann::json(nlohmann::json::array());
         for (auto& point : points) {
-            Json::Value pointData;
+            nlohmann::json pointData;
             pointData["key"] = subscriptions[point.index].getTarget();
             pointData["value"] = point.value;
             pointData["time"] = static_cast<double>(point.time);
@@ -249,14 +252,14 @@ void Recorder::writeJsonFile(const std::string& filename)
             if (point.first) {
                 pointData["type"] = subscriptions[point.index].getPublicationType();
             }
-            doc["points"].append(pointData);
+            doc["points"].push_back(pointData);
         }
     }
 
     if (!messages.empty()) {
-        doc["messages"] = Json::Value(Json::arrayValue);
+        doc["messages"] = nlohmann::json(nlohmann::json::array());
         for (auto& mess : messages) {
-            Json::Value message;
+            nlohmann::json message;
             message["time"] = static_cast<double>(mess->time);
             message["src"] = mess->source;
             if ((!mess->original_source.empty()) && (mess->original_source != mess->source)) {
@@ -280,7 +283,7 @@ void Recorder::writeJsonFile(const std::string& filename)
             } else {
                 message["message"] = std::string(mess->data.to_string());
             }
-            doc["messages"].append(message);
+            doc["messages"].push_back(message);
         }
     }
 
@@ -299,16 +302,16 @@ void Recorder::writeTextFile(const std::string& filename)
             outFile << static_cast<double>(point.time) << "\t\t"
                     << subscriptions[point.index].getTarget() << '\t'
                     << subscriptions[point.index].getPublicationType() << '\t'
-                    << Json::valueToQuotedString(point.value.c_str()) << '\n';
+                    << generateJsonQuotedString(point.value) << '\n';
         } else {
             if (point.iteration > 0) {
                 outFile << static_cast<double>(point.time) << ':' << point.iteration << "\t\t"
                         << subscriptions[point.index].getTarget() << '\t'
-                        << Json::valueToQuotedString(point.value.c_str()) << '\n';
+                        << generateJsonQuotedString(point.value) << '\n';
             } else {
                 outFile << static_cast<double>(point.time) << "\t\t"
                         << subscriptions[point.index].getTarget() << '\t'
-                        << Json::valueToQuotedString(point.value.c_str()) << '\n';
+                        << generateJsonQuotedString(point.value) << '\n';
             }
         }
     }
@@ -325,8 +328,7 @@ void Recorder::writeTextFile(const std::string& filename)
         }
         if (isBinaryData(mess->data)) {
             if (isEscapableData(mess->data)) {
-                outFile << "\t"
-                        << Json::valueToQuotedString(std::string(mess->data.to_string()).c_str())
+                outFile << "\t" << generateJsonQuotedString(std::string(mess->data.to_string()))
                         << "\n";
             } else {
                 outFile << "\t\"" << encode(mess->data.to_string()) << "\"\n";

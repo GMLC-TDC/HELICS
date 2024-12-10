@@ -19,33 +19,6 @@ else()
     set(zmq_shared_build ON)
 endif()
 
-set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.5)
-
-string(TOLOWER "libzmq" lcName)
-
-include(FetchContent)
-
-mark_as_advanced(FETCHCONTENT_BASE_DIR)
-mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
-mark_as_advanced(FETCHCONTENT_QUIET)
-mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
-
-fetchcontent_declare(
-    libzmq GIT_REPOSITORY https://github.com/zeromq/libzmq.git
-    GIT_TAG ${${PROJECT_NAME}_LIBZMQ_VERSION}
-)
-
-fetchcontent_getproperties(libzmq)
-
-if(NOT ${lcName}_POPULATED)
-    # Fetch the content using previously declared details
-    fetchcontent_populate(libzmq)
-
-endif()
-
-hide_variable(FETCHCONTENT_SOURCE_DIR_LIBZMQ)
-hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_LIBZMQ)
-
 # Set custom variables, policies, etc. ...
 
 set(ZMQ_BUILD_TESTS OFF CACHE INTERNAL "")
@@ -89,7 +62,15 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     )
 endif()
 
-add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR} EXCLUDE_FROM_ALL)
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/libzmq/CMakeLists.txt")
+    submod_update(ThirdParty/libzmq)
+endif()
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/ThirdParty/libzmq EXCLUDE_FROM_ALL SYSTEM)
+else()
+    add_subdirectory(${PROJECT_SOURCE_DIR}/ThirdParty/libzmq EXCLUDE_FROM_ALL)
+endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS ${OLDCMAKE_CXX_FLAGS})
@@ -138,24 +119,14 @@ if(${PROJECT_NAME}_BUILD_CXX_SHARED_LIB OR NOT ${PROJECT_NAME}_DISABLE_C_SHARED_
 
     if(NOT ${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY AND NOT ${PROJECT_NAME}_SKIP_ZMQ_INSTALL)
         set_target_properties(${zmq_target_output} PROPERTIES PUBLIC_HEADER "")
-        if(NOT CMAKE_VERSION VERSION_LESS "3.13")
-            install(
-                TARGETS ${zmq_target_output}
-                RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                FRAMEWORK DESTINATION "Library/Frameworks"
-            )
-        elseif(WIN32)
-            install(FILES $<TARGET_FILE:${zmq_target_output}> DESTINATION ${CMAKE_INSTALL_BINDIR}
-                    COMPONENT libs
-            )
-        else()
-            message(
-                WARNING
-                    "Update to CMake 3.13+ or enable the ${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY CMake option to install when using ZMQ as a subproject"
-            )
-        endif()
+        install(
+            TARGETS ${zmq_target_output}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            FRAMEWORK DESTINATION "Library/Frameworks"
+        )
+
         if(MSVC AND NOT EMBEDDED_DEBUG_INFO AND NOT ${PROJECT_NAME}_BINARY_ONLY_INSTALL)
             install(
                 FILES $<TARGET_PDB_FILE:${zmq_target_output}>

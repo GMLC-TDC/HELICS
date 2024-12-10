@@ -18,10 +18,6 @@ if(hasParent)
             add_subdirectory(java)
         endif()
 
-        if(HELICS_BUILD_OCTAVE_INTERFACE)
-            add_subdirectory(octave)
-        endif()
-
         if(HELICS_BUILD_CSHARP_INTERFACE)
             # add_subdirectory(csharp)
         endif()
@@ -29,7 +25,7 @@ if(hasParent)
     endif(NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
 else()
-    cmake_minimum_required(VERSION 3.11...3.25)
+    cmake_minimum_required(VERSION 3.22...3.31)
 
     set(HELICS_BUILD_TESTS ON CACHE INTERNAL "")
     set(HELICS_BUILD_JAVA_INTERFACE OFF CACHE INTERNAL "")

@@ -17,6 +17,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "queryHelpers.hpp"
 
 #include <cassert>
+#include <memory>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 namespace helics {
 
@@ -850,18 +855,18 @@ void FilterFederate::processFilterInfo(ActionMessage& command)
 void FilterFederate::organizeFilterOperations()
 {
     for (auto& fc : filterCoord) {
-        auto* fi = fc.second.get();
+        auto* fedInfo = fc.second.get();
         const auto* handle = mHandles->getHandleInfo(fc.first);
         if (handle == nullptr) {
             continue;
         }
         std::string endpointType = handle->type;
 
-        if (!fi->allSourceFilters.empty()) {
-            fi->sourceFilters.clear();
-            fi->sourceFilters.reserve(fi->allSourceFilters.size());
+        if (!fedInfo->allSourceFilters.empty()) {
+            fedInfo->sourceFilters.clear();
+            fedInfo->sourceFilters.reserve(fedInfo->allSourceFilters.size());
             // Now we have to do some intelligent ordering with types
-            std::vector<bool> used(fi->allSourceFilters.size(), false);
+            std::vector<bool> used(fedInfo->allSourceFilters.size(), false);
             bool someUnused = true;
             bool usedMore = true;
             bool firstPass = true;
@@ -869,13 +874,13 @@ void FilterFederate::organizeFilterOperations()
             while (someUnused && usedMore) {
                 someUnused = false;
                 usedMore = false;
-                for (size_t ii = 0; ii < fi->allSourceFilters.size(); ++ii) {
+                for (size_t ii = 0; ii < fedInfo->allSourceFilters.size(); ++ii) {
                     if (used[ii]) {
                         continue;
                     }
                     if (firstPass) {
-                        if (fi->allSourceFilters[ii]->cloning) {
-                            fi->sourceFilters.push_back(fi->allSourceFilters[ii]);
+                        if (fedInfo->allSourceFilters[ii]->cloning) {
+                            fedInfo->sourceFilters.push_back(fedInfo->allSourceFilters[ii]);
                             used[ii] = true;
                             usedMore = true;
                         } else {
@@ -884,11 +889,12 @@ void FilterFederate::organizeFilterOperations()
                     } else {
                         // TODO(PT): this will need some work to finish sorting out but should work
                         // for initial tests
-                        if (core::matchingTypes(fi->allSourceFilters[ii]->inputType, currentType)) {
+                        if (core::matchingTypes(fedInfo->allSourceFilters[ii]->inputType,
+                                                currentType)) {
                             used[ii] = true;
                             usedMore = true;
-                            fi->sourceFilters.push_back(fi->allSourceFilters[ii]);
-                            currentType = fi->allSourceFilters[ii]->outputType;
+                            fedInfo->sourceFilters.push_back(fedInfo->allSourceFilters[ii]);
+                            currentType = fedInfo->allSourceFilters[ii]->outputType;
                         } else {
                             someUnused = true;
                         }
@@ -899,28 +905,28 @@ void FilterFederate::organizeFilterOperations()
                     usedMore = true;
                 }
             }
-            for (size_t ii = 0; ii < fi->allSourceFilters.size(); ++ii) {
+            for (size_t ii = 0; ii < fedInfo->allSourceFilters.size(); ++ii) {
                 if (used[ii]) {
                     continue;
                 }
                 mLogger(HELICS_LOG_LEVEL_WARNING,
-                        fi->allSourceFilters[ii]->key,
+                        fedInfo->allSourceFilters[ii]->key,
                         "unable to match types on some filters");
             }
         }
     }
 }
 
-void FilterFederate::addFilteredEndpoint(Json::Value& block, GlobalFederateId fed) const
+void FilterFederate::addFilteredEndpoint(nlohmann::json& block, GlobalFederateId fed) const
 {
-    block["endpoints"] = Json::arrayValue;
+    block["endpoints"] = nlohmann::json::array();
     for (const auto& filt : filterCoord) {
         auto* fc = filt.second.get();
         const auto* ep = mHandles->getInterfaceHandle(filt.first, InterfaceType::ENDPOINT);
         if (ep->getFederateId() != fed) {
             continue;
         }
-        Json::Value eptBlock;
+        nlohmann::json eptBlock;
 
         eptBlock["name"] = ep->key;
         eptBlock["id"] = ep->handle.handle.baseValue();
@@ -971,7 +977,7 @@ void FilterFederate::addFilteredEndpoint(Json::Value& block, GlobalFederateId fe
                 eptBlock["cloningdestFilter"] = dcloningFilter;
             }
         }
-        block["endpoints"].append(eptBlock);
+        block["endpoints"].push_back(std::move(eptBlock));
     }
 }
 
@@ -1007,8 +1013,8 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return mCoord.printTimeStatus();
     }
     if (queryStr == "current_state") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -1020,8 +1026,8 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_state") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -1029,8 +1035,8 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_time_debugging") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -1041,12 +1047,12 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "timeconfig") {
-        Json::Value base;
+        nlohmann::json base;
         mCoord.generateConfig(base);
         return fileops::generateJsonString(base);
     }
     if (queryStr == "config") {
-        Json::Value base;
+        nlohmann::json base;
         mCoord.generateConfig(base);
         return fileops::generateJsonString(base);
     }
@@ -1055,15 +1061,15 @@ std::string FilterFederate::query(std::string_view queryStr) const
                                     [](auto& dep) { return std::to_string(dep.baseValue()); });
     }
     if (queryStr == "data_flow_graph") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
         if (filters.size() > 0) {
-            base["filters"] = Json::arrayValue;
+            base["filters"] = nlohmann::json::array();
             for (const auto& filt : filters) {
-                Json::Value filter;
+                nlohmann::json filter;
                 filter["id"] = filt->handle.baseValue();
                 filter["name"] = filt->key;
                 filter["cloning"] = filt->cloning;
@@ -1075,14 +1081,14 @@ std::string FilterFederate::query(std::string_view queryStr) const
                     return std::to_string(dep.fed_id.baseValue()) +
                         "::" + std::to_string(dep.handle.baseValue());
                 });
-                base["filters"].append(std::move(filter));
+                base["filters"].push_back(std::move(filter));
             }
         }
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_time") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
@@ -1091,18 +1097,18 @@ std::string FilterFederate::query(std::string_view queryStr) const
         return fileops::generateJsonString(base);
     }
     if (queryStr == "dependency_graph") {
-        Json::Value base;
-        base["attributes"] = Json::objectValue;
+        nlohmann::json base;
+        base["attributes"] = nlohmann::json::object();
         base["attributes"]["name"] = mName;
         base["attributes"]["id"] = mFedID.baseValue();
         base["attributes"]["parent"] = mCoreID.baseValue();
-        base["dependents"] = Json::arrayValue;
+        base["dependents"] = nlohmann::json::array();
         for (auto& dep : mCoord.getDependents()) {
-            base["dependents"].append(dep.baseValue());
+            base["dependents"].push_back(dep.baseValue());
         }
-        base["dependencies"] = Json::arrayValue;
+        base["dependencies"] = nlohmann::json::array();
         for (auto& dep : mCoord.getDependencies()) {
-            base["dependencies"].append(dep.baseValue());
+            base["dependencies"].push_back(dep.baseValue());
         }
         return fileops::generateJsonString(base);
     }

@@ -148,7 +148,12 @@ class FederateState {
     Time time_granted{startupTime};  //!< the most recent granted time;
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
     Time minimumReceiveTime{startupTime};  //!< minimum receive time for messages
+
+#if __cplusplus >= 201703L
+    mutable std::atomic_flag processing{};  //!< the federate is processing
+#else
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
+#endif
 
     /** a callback for additional queries */
     std::vector<std::function<std::string(std::string_view)>> queryCallbacks;
@@ -168,7 +173,7 @@ class FederateState {
     /** add a federate to the delayed list*/
     void addFederateToDelay(GlobalFederateId gid);
     /** generate a component of json config string*/
-    void generateConfig(Json::Value& base) const;
+    void generateConfig(nlohmann::json& base) const;
 
   public:
     /** reset the federate to created state*/

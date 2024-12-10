@@ -13,11 +13,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <map>
 #include <memory>
+#include <string>
 #include <utility>
 
 namespace helics {
 static const std::map<std::string_view, FilterTypes> filterTypes{
     {"clone", FilterTypes::CLONE},
+    {"cloning", FilterTypes::CLONE},
     {"delay", FilterTypes::DELAY},
     {"randomdelay", FilterTypes::RANDOM_DELAY},
     {"random_delay", FilterTypes::RANDOM_DELAY},
@@ -137,6 +139,22 @@ void Filter::setString(std::string_view property, std::string_view val)
     if (filtOp) {
         filtOp->setString(property, val);
     }
+}
+
+double Filter::getProperty(std::string_view property)
+{
+    if (filtOp) {
+        return filtOp->getProperty(property);
+    }
+    return invalidDouble;
+}
+
+std::string Filter::getString(std::string_view property)
+{
+    if (filtOp) {
+        return filtOp->getString(property);
+    }
+    return {};
 }
 
 CloningFilter::CloningFilter(Core* core, std::string_view filtName):

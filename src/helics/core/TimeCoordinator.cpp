@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
-#include "json/json.h"
 #include <algorithm>
 #include <fmt/format.h>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <set>
 #include <string>
 #include <utility>
@@ -241,7 +241,7 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime, bool allowRequestSen
     }
 }
 
-void TimeCoordinator::generateConfig(Json::Value& base) const
+void TimeCoordinator::generateConfig(nlohmann::json& base) const
 {
     base["uninterruptible"] = info.uninterruptible;
     base["wait_for_current_time_updates"] = info.wait_for_current_time_updates;
@@ -266,7 +266,7 @@ void TimeCoordinator::generateConfig(Json::Value& base) const
     }
 }
 
-void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
+void TimeCoordinator::generateDebuggingTimeInfo(nlohmann::json& base) const
 {
     generateConfig(base);
     base["granted"] = static_cast<double>(time_granted);
@@ -277,27 +277,27 @@ void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     base["message"] = static_cast<double>(time_message);
     base["minde"] = static_cast<double>(time_minDe);
     base["minminde"] = static_cast<double>(time_minminDe);
-    Json::Value upBlock;
+    nlohmann::json upBlock;
     generateJsonOutputTimeData(upBlock, upstream);
 
     base["upstream"] = upBlock;
-    Json::Value tblock;
+    nlohmann::json tblock;
     generateJsonOutputTimeData(tblock, total);
 
     base["total"] = tblock;
 
-    Json::Value sent;
+    nlohmann::json sent;
     generateJsonOutputTimeData(sent, lastSend);
 
     base["last_send"] = sent;
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
     // now add any time blocks that may be present
-    base["blocks"] = Json::arrayValue;
+    base["blocks"] = nlohmann::json::array();
     for (const auto& blk : timeBlocks) {
-        Json::Value timeblock;
+        nlohmann::json timeblock;
         timeblock["time"] = static_cast<double>(blk.first);
         timeblock["id"] = blk.second;
-        base["blocks"].append(timeblock);
+        base["blocks"].push_back(std::move(timeblock));
     }
 }
 

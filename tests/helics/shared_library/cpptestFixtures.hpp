@@ -70,21 +70,21 @@ struct FederateTestFixture_cpp {
             initString.append(extraCoreArgs);
         }
 
-        helicscpp::FederateInfo fi;
+        helicscpp::FederateInfo fedInfo;
 
-        fi.setCoreType(CoreType_name);
-        fi.setProperty(HELICS_PROPERTY_TIME_DELTA, time_delta);
+        fedInfo.setCoreType(CoreType_name);
+        fedInfo.setProperty(HELICS_PROPERTY_TIME_DELTA, time_delta);
         switch (setup) {
             case 1:
             default: {
                 auto init = initString + " --federates " + std::to_string(count);
                 helicscpp::Core core(CoreType_name, std::string(), init);
-                fi.setCoreName(core.getIdentifier());
+                fedInfo.setCoreName(core.getIdentifier());
                 size_t offset = federates.size();
                 federates.resize(count + offset);
                 for (int ii = 0; ii < count; ++ii) {
                     auto name = name_prefix + std::to_string(ii + offset);
-                    auto fed = std::make_shared<FedType>(name, fi);
+                    auto fed = std::make_shared<FedType>(name, fedInfo);
                     federates[ii + offset] = fed;
                 }
             } break;
@@ -94,10 +94,10 @@ struct FederateTestFixture_cpp {
                 for (int ii = 0; ii < count; ++ii) {
                     auto init = initString + " --federates 1";
                     helicscpp::Core core(CoreType_name, std::string(), init);
-                    fi.setCoreName(core.getIdentifier());
+                    fedInfo.setCoreName(core.getIdentifier());
 
                     auto name = name_prefix + std::to_string(ii + offset);
-                    auto fed = std::make_shared<FedType>(name, fi);
+                    auto fed = std::make_shared<FedType>(name, fedInfo);
                     federates[ii + offset] = fed;
                 }
             } break;

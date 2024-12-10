@@ -15,16 +15,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "units/units/units.hpp"
 
 #include <future>
+#include <memory>
+#include <string>
+#include <vector>
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
 TEST(subscriptionObject, tests)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
 
-    fi.coreInitString = "--autobroker";
+    fedInfo.coreInitString = "--autobroker";
 
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
+    auto vFed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
     // register the publications
     auto& pubObj = vFed->registerGlobalPublication<std::string>("pub1");
     auto& subObj = vFed->registerSubscription("pub1");
@@ -58,10 +61,10 @@ TEST(subscriptionObject, tests)
 template<class TX, class RX>
 void runPubSubTypeTests(const TX& valtx, const RX& valrx)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
+    auto vFed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
     // register the publications
     auto& pubObj = vFed->registerGlobalPublication<TX>("pub1");
 
@@ -83,10 +86,10 @@ void runPubSubTypeTests(const TX& valtx, const RX& valrx)
 template<class IX, class TX, class RX>
 void runPubSubThroughTypeTests(const TX& valtx, const RX& valrx)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
+    auto vFed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
     // register the publications
     auto& pubObj = vFed->registerGlobalPublication<IX>("pub1");
 
@@ -280,10 +283,10 @@ TEST(subscriptionObject, complex_vector_tests_ci_skip)
 
 TEST(subscriptionObject, ChangeDetection_tests)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
+    auto vFed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
     // register the publications
     auto& pubObj = vFed->registerGlobalPublication<std::string>("pub1");
     auto& subObj1 = vFed->registerSubscription("pub1");
@@ -321,11 +324,11 @@ TEST(subscriptionObject, ChangeDetection_tests)
 
 TEST(subscriptionObject, Size_tests)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
 
-    fi.coreInitString = "--autobroker";
+    fedInfo.coreInitString = "--autobroker";
 
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
+    auto vFed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
     // register the publications
     auto& pubObj = vFed->registerGlobalPublication<std::string>("pub1");
 
@@ -351,10 +354,10 @@ TEST(subscriptionObject, Size_tests)
 
 TEST(subscriptionObject, VectorSize_tests)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
+    auto vFed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
     // register the publications
     auto& pubObj = vFed->registerGlobalPublication<std::vector<double>>("pub1");
 
@@ -380,10 +383,10 @@ TEST(subscriptionObject, VectorSize_tests)
 
 TEST(subscriptionObject, Defaults_test)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
+    auto vFed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
     vFed->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
     // register the publications
     auto& subObj1 = vFed->registerSubscription("pub1");
@@ -419,10 +422,10 @@ TEST(subscriptionObject, Defaults_test)
 
 TEST(inputObject, test)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
+    auto vFed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
 
     // register the publications
     auto& subObj1 = vFed->registerSubscription("pub1");
@@ -471,10 +474,10 @@ TEST(inputObject, test)
 
 TEST(inputObject, units)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
 
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
+    auto vFed = std::make_shared<helics::ValueFederate>("test1", fedInfo);
 
     // register the publications
     auto& subObj1 = vFed->registerSubscription("pub1", "km");

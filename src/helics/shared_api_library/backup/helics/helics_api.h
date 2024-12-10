@@ -25,7 +25,8 @@ typedef enum {
     HELICS_CORE_TYPE_WEBSOCKET = 14,
     HELICS_CORE_TYPE_INPROC = 18,
     HELICS_CORE_TYPE_NULL = 66,
-    HELICS_CORE_TYPE_EMPTY = 77
+    HELICS_CORE_TYPE_EMPTY = 77,
+    HELICS_CORE_TYPE_EXTRACT = 101
 } HelicsCoreTypes;
 
 typedef enum {
@@ -217,6 +218,8 @@ typedef enum {
 
 #define HELICS_BIG_NUMBER 9223372036.854774
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
+
+#define HELICS_INVALID_DOUBLE (-1E49)
 typedef void* HelicsInput;
 
 typedef void* HelicsPublication;
@@ -232,6 +235,8 @@ typedef void* HelicsCore;
 typedef void* HelicsBroker;
 
 typedef void* HelicsFederate;
+
+typedef void* HelicsApp;
 
 typedef void* HelicsFederateInfo;
 
@@ -505,6 +510,17 @@ void helicsQuerySetQueryString(HelicsQuery query, const char* queryString, Helic
 void helicsQuerySetOrdering(HelicsQuery query, int32_t mode, HelicsError* err);
 void helicsQueryFree(HelicsQuery query);
 void helicsCleanupLibrary(void);
+HelicsBool helicsAppEnabled();
+HelicsApp helicsCreateApp(const char* appName, const char* appType, const char* configFile, HelicsFederateInfo fedInfo, HelicsError* err);
+HelicsFederate helicsAppGetFederate(HelicsApp app, HelicsError* err);
+void helicsAppLoadFile(HelicsApp app, const char* configFile, HelicsError* err);
+void helicsAppInitialize(HelicsApp app, HelicsError* err);
+void helicsAppRun(HelicsApp app, HelicsError* err);
+void helicsAppRunTo(HelicsApp app, HelicsTime stopTime, HelicsError* err);
+void helicsAppFinalize(HelicsApp app, HelicsError* err);
+void helicsAppFree(HelicsApp app);
+void helicsAppDestroy(HelicsApp app);
+HelicsBool helicsAppIsActive(HelicsApp app);
 HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* key, const char* units, HelicsError* err);
 HelicsPublication
     helicsFederateRegisterPublication(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
@@ -615,6 +631,10 @@ HelicsEndpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, H
 HelicsBool helicsEndpointIsValid(HelicsEndpoint endpoint);
 void helicsEndpointSetDefaultDestination(HelicsEndpoint endpoint, const char* dst, HelicsError* err);
 const char* helicsEndpointGetDefaultDestination(HelicsEndpoint endpoint);
+void helicsEndpointSendString(HelicsEndpoint endpoint, const char* message, HelicsError* err);
+void helicsEndpointSendStringTo(HelicsEndpoint endpoint, const char* message, const char* dst, HelicsError* err);
+void helicsEndpointSendStringToAt(HelicsEndpoint endpoint, const char* message, const char* dst, HelicsTime time, HelicsError* err);
+void helicsEndpointSendStringAt(HelicsEndpoint endpoint, const char* message, HelicsTime time, HelicsError* err);
 void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inputDataLength, HelicsError* err);
 void helicsEndpointSendBytesTo(HelicsEndpoint endpoint, const void* data, int inputDataLength, const char* dst, HelicsError* err);
 void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
@@ -695,6 +715,8 @@ HelicsBool helicsFilterIsValid(HelicsFilter filt);
 const char* helicsFilterGetName(HelicsFilter filt);
 void helicsFilterSet(HelicsFilter filt, const char* prop, double val, HelicsError* err);
 void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val, HelicsError* err);
+double helicsFilterGetPropertyDouble(HelicsFilter filt, const char* prop);
+const char* helicsFilterGetPropertyString(HelicsFilter filt, const char* prop);
 void helicsFilterAddDestinationTarget(HelicsFilter filt, const char* dst, HelicsError* err);
 void helicsFilterAddSourceTarget(HelicsFilter filt, const char* source, HelicsError* err);
 void helicsFilterAddDeliveryEndpoint(HelicsFilter filt, const char* deliveryEndpoint, HelicsError* err);

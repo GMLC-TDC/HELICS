@@ -16,16 +16,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstring>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <utility>
 #include <vector>
 
+namespace {
 // random integer for validation purposes of endpoints
-static constexpr int EndpointValidationIdentifier = 0xB453'94C2;
+constexpr int EndpointValidationIdentifier = 0xB453'94C2;
 
-static auto endpointSearch = [](const helics::InterfaceHandle& hnd, const auto& testEndpoint) {
-    return hnd < testEndpoint->endPtr->getHandle();
-};
+auto endpointSearch = [](const helics::InterfaceHandle& hnd, const auto& testEndpoint) { return hnd < testEndpoint->endPtr->getHandle(); };
 
-static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<helics::EndpointObject> ept)
+inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<helics::EndpointObject> ept)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     ept->valid = EndpointValidationIdentifier;
@@ -41,7 +42,7 @@ static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<hel
     return hept;
 }
 
-static HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint& endp)
+HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint& endp)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     const auto handle = endp.getHandle();
@@ -56,11 +57,11 @@ static HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint&
     return addEndpoint(fed, std::move(end));
 }
 
-static constexpr char nullcstr[] = "";
+constexpr char nullcstr[] = "";
 
-static constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
+constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
 
-static helics::EndpointObject* verifyEndpoint(HelicsEndpoint ept, HelicsError* err)
+helics::EndpointObject* verifyEndpoint(HelicsEndpoint ept, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
     auto* endObj = reinterpret_cast<helics::EndpointObject*>(ept);
@@ -70,6 +71,7 @@ static helics::EndpointObject* verifyEndpoint(HelicsEndpoint ept, HelicsError* e
     }
     return endObj;
 }
+}  // namespace
 
 HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err)
 {
@@ -164,12 +166,12 @@ HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, H
     }
     CHECK_NULL_STRING(name, nullptr);
     try {
-        auto& id = fedObj->getEndpoint(name);
-        if (!id.isValid()) {
+        auto& ept = fedObj->getEndpoint(name);
+        if (!ept.isValid()) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidEndName);
             return nullptr;
         }
-        return findOrCreateEndpoint(fed, id);
+        return findOrCreateEndpoint(fed, ept);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -186,12 +188,12 @@ HelicsEndpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, H
         return nullptr;
     }
     try {
-        auto& id = fedObj->getEndpoint(index);
-        if (!id.isValid()) {
+        auto& ept = fedObj->getEndpoint(index);
+        if (!ept.isValid()) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidEndIndex);
             return nullptr;
         }
-        return findOrCreateEndpoint(fed, id);
+        return findOrCreateEndpoint(fed, ept);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -235,6 +237,66 @@ const char* helicsEndpointGetDefaultDestination(HelicsEndpoint endpoint)
     }
     const auto& str = endObj->endPtr->getDefaultDestination();
     return str.c_str();
+}
+
+void helicsEndpointSendString(HelicsEndpoint endpoint, const char* message, HelicsError* err)
+{
+    auto* endObj = verifyEndpoint(endpoint, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        if (message == nullptr) {
+            endObj->endPtr->send(gHelicsEmptyStr);
+        } else {
+            endObj->endPtr->send(message);
+        }
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
+void helicsEndpointSendStringTo(HelicsEndpoint endpoint, const char* message, const char* dest, HelicsError* err)
+{
+    auto* endObj = verifyEndpoint(endpoint, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        endObj->endPtr->sendTo(AS_STRING_VIEW(message), AS_STRING_VIEW(dest));
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
+void helicsEndpointSendStringAt(HelicsEndpoint endpoint, const char* message, HelicsTime time, HelicsError* err)
+{
+    auto* endObj = verifyEndpoint(endpoint, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        endObj->endPtr->sendAt(AS_STRING_VIEW(message), time);
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
+void helicsEndpointSendStringToAt(HelicsEndpoint endpoint, const char* message, const char* dest, HelicsTime time, HelicsError* err)
+{
+    auto* endObj = verifyEndpoint(endpoint, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        endObj->endPtr->sendToAt(AS_STRING_VIEW(message), AS_STRING_VIEW(dest), time);
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
 }
 
 void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inputDataLength, HelicsError* err)
@@ -415,7 +477,7 @@ Message* MessageHolder::addMessage(std::unique_ptr<helics::Message>& mess)
     if (!mess) {
         return nullptr;
     }
-    Message* m = mess.get();
+    Message* message = mess.get();
     mess->backReference = static_cast<void*>(this);
     if (!freeMessageSlots.empty()) {
         auto index = freeMessageSlots.back();
@@ -426,27 +488,27 @@ Message* MessageHolder::addMessage(std::unique_ptr<helics::Message>& mess)
         mess->counter = static_cast<int32_t>(messages.size());
         messages.push_back(std::move(mess));
     }
-    return m;
+    return message;
 }
 Message* MessageHolder::newMessage()
 {
-    Message* m{nullptr};
+    Message* message{nullptr};
     if (!freeMessageSlots.empty()) {
         auto index = freeMessageSlots.back();
         freeMessageSlots.pop_back();
         messages[index] = std::make_unique<Message>();
-        m = messages[index].get();
-        m->counter = index;
+        message = messages[index].get();
+        message->counter = index;
 
     } else {
         messages.push_back(std::make_unique<Message>());
-        m = messages.back().get();
-        m->counter = static_cast<int32_t>(messages.size()) - 1;
+        message = messages.back().get();
+        message->counter = static_cast<int32_t>(messages.size()) - 1;
     }
 
-    m->messageValidation = messageKeyCode;
-    m->backReference = static_cast<void*>(this);
-    return m;
+    message->messageValidation = messageKeyCode;
+    message->backReference = static_cast<void*>(this);
+    return message;
 }
 
 std::unique_ptr<Message> MessageHolder::extractMessage(int index)
@@ -477,10 +539,10 @@ void MessageHolder::freeMessage(int index)
 void MessageHolder::clear()
 {
     freeMessageSlots.clear();
-    for (auto& m : messages) {
-        if (m) {
-            m->backReference = nullptr;
-            m->messageValidation = 0;
+    for (auto& message : messages) {
+        if (message) {
+            message->backReference = nullptr;
+            message->messageValidation = 0;
         }
     }
     messages.clear();

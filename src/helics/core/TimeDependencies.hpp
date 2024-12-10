@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "basic_CoreTypes.hpp"
+#include "nlohmann/json_fwd.hpp"
 
-#include "json/forwards.h"
 #include <string>
 #include <utility>
 #include <vector>
@@ -245,11 +245,11 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               GlobalFederateId ignore,
                               std::int32_t responseCode);
 
-void generateJsonOutputTimeData(Json::Value& output,
+void generateJsonOutputTimeData(nlohmann::json& output,
                                 const TimeData& dep,
                                 bool includeAggregates = true);
 
-void addTimeState(Json::Value& output, const TimeState state);
+void addTimeState(nlohmann::json& output, const TimeState state);
 
-void generateJsonOutputDependency(Json::Value& output, const DependencyInfo& dep);
+void generateJsonOutputDependency(nlohmann::json& output, const DependencyInfo& dep);
 }  // namespace helics

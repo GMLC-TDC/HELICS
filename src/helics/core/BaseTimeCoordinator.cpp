@@ -9,13 +9,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
+#include "nlohmann/json.hpp"
 
-#include "json/json.h"
 #include <algorithm>
 #include <fmt/format.h>
 #include <iostream>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace helics {
@@ -121,37 +122,37 @@ void BaseTimeCoordinator::disconnect()
     disconnected = true;
 }
 
-void BaseTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
+void BaseTimeCoordinator::generateDebuggingTimeInfo(nlohmann::json& base) const
 {
-    base["dependencies"] = Json::arrayValue;
+    base["dependencies"] = nlohmann::json::array();
     base["federatesonly"] = federatesOnly;
     base["sequenceCounter"] = sequenceCounter;
     base["id"] = mSourceId.baseValue();
     for (const auto& dep : dependencies) {
         if (dep.dependency) {
-            Json::Value depblock;
+            nlohmann::json depblock;
             generateJsonOutputDependency(depblock, dep);
-            base["dependencies"].append(depblock);
+            base["dependencies"].push_back(depblock);
         }
         if (dep.dependent) {
-            base["dependents"].append(dep.fedID.baseValue());
+            base["dependents"].push_back(dep.fedID.baseValue());
         }
     }
 }
 
-Json::Value BaseTimeCoordinator::grantTimeoutCheck(const ActionMessage& cmd)
+nlohmann::json BaseTimeCoordinator::grantTimeoutCheck(const ActionMessage& cmd)
 {
     for (auto& dep : dependencies) {
         if (dep.fedID == cmd.source_id) {
             dep.timeoutCount = cmd.counter;
             if (cmd.counter == 6) {
-                Json::Value base;
+                nlohmann::json base;
                 generateDebuggingTimeInfo(base);
                 return base;
             }
         }
     }
-    return Json::nullValue;
+    return nlohmann::json::object();
 }
 
 bool BaseTimeCoordinator::isDependency(GlobalFederateId ofed) const

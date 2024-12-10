@@ -110,7 +110,8 @@ HELICS_EXPORT HelicsBool helicsIsCoreTypeAvailable(const char* type);
  * @param type The type of the core to create.
  * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
  * @param initString An initialization string to send to the core. The format is similar to command line arguments.
- *                   Typical options include a broker name, the broker address, the number of federates, etc.
+ *                   Typical options include a broker name, the broker address, the number of federates, etc.  Can also be a
+ *                   file (toml, ini, json) or json object containing the core configuration.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
@@ -166,6 +167,7 @@ HELICS_EXPORT HelicsBool helicsCoreIsValid(HelicsCore core);
  * @param name The name of the broker. It can be a nullptr or empty string to have a name automatically assigned.
  * @param initString An initialization string to send to the core-the format is similar to command line arguments.
  *                   Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates,
+ *                    or it can also be a json or toml file with broker configuration.
  * or the address.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
@@ -561,7 +563,7 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName
  * @details Combination federates are both value federates and message federates, objects can be used in all functions
  *          that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument
  *
- * @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
+ * @param configFile A JSON file or a JSON string,TOML file, or command line arguments that contains setup and configuration information.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 

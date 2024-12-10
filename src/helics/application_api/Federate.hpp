@@ -692,10 +692,13 @@ received
     @details
     The FilterOperator gets called when there is a message to filter, There is no order or state to
     this messages can come in any order.
+    The function is deprecated in favor of the corresponding call on a filter object
+    equivalent to filt.setOperator(filtOp)
     @param filt the filter object to set the operation on
     @param filtOp a shared_ptr to a \ref FilterOperator
     */
-    void setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> filtOp);
+    [[deprecated]] static void setFilterOperator(Filter& filt,
+                                                 std::shared_ptr<FilterOperator> filtOp);
 
     /** get the number of filters registered through this federate*/
     int getFilterCount() const;
@@ -729,11 +732,13 @@ received
     @details
     The TranslatorOperator gets called when there is a message or value to translate, there is no
     order or state to this as messages can come in any order.
+    The function is deprecated in favor of the corresponding call on a translator object
+    equivalent to trans.setOperator(transop)
     @param trans the translator object to set the operation on
     @param transOp a shared_ptr to a \ref TranslatorOperator
     */
-    void setTranslatorOperator(const Translator& trans,
-                               std::shared_ptr<TranslatorOperator> transOp);
+    [[deprecated]] static void setTranslatorOperator(Translator& trans,
+                                                     std::shared_ptr<TranslatorOperator> transOp);
 
     /** get the number of translators registered through this federate*/
     int getTranslatorCount() const;
@@ -866,7 +871,7 @@ received
     void registerConnectorInterfacesToml(const std::string& tomlString);
     /** check if a filter type and operation is valid
      */
-    void registerConnectorInterfacesJsonDetail(Json::Value& json);
+    void registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& json);
     bool
         checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation) const;
 };

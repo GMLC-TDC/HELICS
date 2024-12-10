@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 #include "helics/core/core-exceptions.hpp"
 
+#include <memory>
 #include <utility>
 
 namespace helics {

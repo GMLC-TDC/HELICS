@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "InputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "gmlc/containers/DualMappedPointerVector.hpp"
+#include "nlohmann/json_fwd.hpp"
 
-#include "json/forwards.h"
 #include <atomic>
 #include <string>
 #include <utility>
@@ -81,11 +81,11 @@ class InterfaceInfo {
     /** check the interfaces for specific issues*/
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues();
     /** generate a configuration script for the interfaces*/
-    void generateInferfaceConfig(Json::Value& base) const;
+    void generateInferfaceConfig(nlohmann::json& base) const;
     /** load a dependency graph for the interfaces*/
-    void generateDataFlowGraph(Json::Value& base) const;
+    void generateDataFlowGraph(nlohmann::json& base) const;
     /** generate a list of unconnected interfaces*/
-    void getUnconnectedInterfaces(Json::Value& base) const;
+    void getUnconnectedInterfaces(nlohmann::json& base) const;
     /** reset the interfaceInfo to a new state*/
     void reset();
     /** disconnect a federate from communications */

@@ -154,35 +154,36 @@ std::vector<int> AppTextParser::preParseFile(const std::vector<char>& klines)
         if (str.empty()) {
             continue;
         }
-        auto fc = str.find_first_not_of(" \t\n\r\0");
-        if (fc == std::string::npos) {
+        auto firstChar = str.find_first_not_of(" \t\n\r\0");
+        if (firstChar == std::string::npos) {
             continue;
         }
         if (inMline) {
-            if (fc + 2 < str.size()) {
-                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']')) {
+            if (firstChar + 2 < str.size()) {
+                if ((str[firstChar] == '#') && (str[firstChar + 1] == '#') &&
+                    (str[firstChar + 2] == ']')) {
                     inMline = false;
                 }
             }
             continue;
         }
-        if (str[fc] == '#') {
-            if (fc + 2 < str.size()) {
-                if ((str[fc + 1] == '#') && (str[fc + 2] == '[')) {
+        if (str[firstChar] == '#') {
+            if (firstChar + 2 < str.size()) {
+                if ((str[firstChar + 1] == '#') && (str[firstChar + 2] == '[')) {
                     inMline = true;
                 }
             }
             continue;
         }
-        if (str[fc] == '!') {
-            configStr += str.substr(fc + 1);
+        if (str[firstChar] == '!') {
+            configStr += str.substr(firstChar + 1);
             configStr.push_back('\n');
             continue;
         }
 
         ++counts[0];
         for (std::size_t ii = 0; ii < klines.size(); ++ii) {
-            if (str[fc] == klines[ii]) {
+            if (str[firstChar] == klines[ii]) {
                 ++counts[ii + 1];
             }
         }
@@ -276,35 +277,36 @@ void App::loadJsonFileConfiguration(const std::string& appName,
     }
     auto doc = fileops::loadJson(jsonString);
 
-    if (doc.isMember("app")) {
-        auto appConfig = doc["app"];
+    if (doc.contains("app")) {
+        auto& appConfig = doc["app"];
         loadConfigOptions(appConfig);
     }
-    if (doc.isMember("config")) {
-        auto appConfig = doc["config"];
+    if (doc.contains("config")) {
+        auto& appConfig = doc["config"];
         loadConfigOptions(appConfig);
     }
-    if (doc.isMember(appName)) {
-        auto appConfig = doc[appName];
+    if (doc.contains(appName)) {
+        auto& appConfig = doc[appName];
         loadConfigOptions(appConfig);
     }
 }
 
-void App::loadConfigOptions(const Json::Value& element)
+void App::loadConfigOptions(const fileops::JsonBuffer& elementBuff)
 {
-    if (element.isMember("stop")) {
+    const auto& element = elementBuff.json();
+    if (element.contains("stop")) {
         stopTime = fileops::loadJsonTime(element["stop"]);
     }
-    if (element.isMember("local")) {
-        useLocal = element["local"].asBool();
+    if (element.contains("local")) {
+        useLocal = element["local"].get<bool>();
     }
-    if (element.isMember("file")) {
-        if (element["file"].isArray()) {
+    if (element.contains("file")) {
+        if (element["file"].is_array()) {
             for (decltype(element.size()) ii = 0; ii < element.size(); ++ii) {
-                loadFile(element["file"][ii].asString());
+                loadFile(element["file"][ii].get<std::string>());
             }
         } else {
-            loadFile(element["file"].asString());
+            loadFile(element["file"].get<std::string>());
         }
     }
 }

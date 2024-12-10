@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "gmlc/libguarded/shared_guarded.hpp"
+#include "nlohmann/json_fwd.hpp"
 
 #include <atomic>
 #include <deque>
@@ -15,15 +16,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string_view>
 #include <tuple>
 
-namespace Json {
-class Value;
-}
-
 namespace helics {
+
 /** a threadsafe small buffer for log messages that will store a maximum of mMaxSize messages*/
 class LogBuffer {
   private:
-    gmlc::libguarded::shared_guarded<std::deque<std::tuple<int, std::string, std::string>>> mBuffer;
+    gmlc::libguarded::shared_guarded<std::deque<std::tuple<int, std::string, std::string>>>
+        mBuffer{};
     std::atomic<std::size_t> mMaxSize{0};
 
   public:
@@ -42,6 +41,6 @@ class LogBuffer {
 };
 
 /** helper function to write a log buffer to a json object*/
-void bufferToJson(const LogBuffer& buffer, Json::Value& base);
+void bufferToJson(const LogBuffer& buffer, nlohmann::json& base);
 
 }  // namespace helics

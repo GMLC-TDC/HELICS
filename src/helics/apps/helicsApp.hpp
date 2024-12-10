@@ -17,10 +17,10 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace CLI {
 class App;
 }  // namespace CLI
-namespace Json {
-class Value;
-}  // namespace Json
 
+namespace helics::fileops {
+class JsonBuffer;
+}
 namespace helics::apps {
 
 class AppTextParser;
@@ -111,6 +111,9 @@ necessary
     /** get a const reference to the federate*/
     const CombinationFederate& accessUnderlyingFederate() const { return *fed; }
 
+    /** get a copy of the federate pointer (this can be dangerous if misused) */
+    std::shared_ptr<CombinationFederate> getUnderlyingFederatePointer() { return fed; }
+
   protected:
     /** load from a jsonString
 @param jsonString either a JSON filename or a string containing JSON
@@ -133,7 +136,7 @@ configuration
     void loadConfigOptions(AppTextParser& aparser);
 
   private:
-    void loadConfigOptions(const Json::Value& element);
+    void loadConfigOptions(const fileops::JsonBuffer& element);
     /** generate the command line parser*/
     std::unique_ptr<helicsCLI11App> generateParser();
     /** process the command line arguments */

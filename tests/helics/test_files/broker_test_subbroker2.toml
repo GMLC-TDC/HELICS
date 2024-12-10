@@ -1,0 +1,4 @@
+name="gbf2"
+coretype="test"
+sub_brokers=2
+broker="gbroker_f1"

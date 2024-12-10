@@ -42,7 +42,7 @@ class httpTest: public ::testing::Test {
         helics::loadCores();
         webs = std::make_shared<helics::apps::WebServer>();
         webs->enableHttpServer(true);
-        config["http"] = Json::objectValue;
+        config["http"] = nlohmann::json::object();
         config["http"]["port"] = 26242;
 
         webs->startServer(&config, webs);
@@ -111,21 +111,21 @@ class httpTest: public ::testing::Test {
     static std::vector<std::shared_ptr<helics::Broker>> brks;
     static std::vector<std::shared_ptr<helics::Core>> cores;
 
-    static Json::Value config;
+    static nlohmann::json config;
 };
 
 std::shared_ptr<helics::apps::WebServer> httpTest::webs;
 std::vector<std::shared_ptr<helics::Broker>> httpTest::brks;
 std::vector<std::shared_ptr<helics::Core>> httpTest::cores;
 helics::apps::RestApiConnection httpTest::connection(localhost);
-Json::Value httpTest::config;
+nlohmann::json httpTest::config;
 
 TEST_F(httpTest, test1)
 {
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 0U);
 }
 
@@ -157,9 +157,9 @@ TEST_F(httpTest, single)
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 1U);
-    EXPECT_STREQ(val["brokers"][0]["name"].asCString(), "brk1");
+    EXPECT_EQ(val["brokers"][0]["name"].get<std::string>(), "brk1");
 }
 
 TEST_F(httpTest, pair)
@@ -168,10 +168,10 @@ TEST_F(httpTest, pair)
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 2U);
-    EXPECT_STREQ(val["brokers"][0]["name"].asCString(), "brk1");
-    EXPECT_STREQ(val["brokers"][1]["name"].asCString(), "brk2");
+    EXPECT_EQ(val["brokers"][0]["name"].get<std::string>(), "brk1");
+    EXPECT_EQ(val["brokers"][1]["name"].get<std::string>(), "brk2");
 }
 
 TEST_F(httpTest, single_info)
@@ -179,12 +179,12 @@ TEST_F(httpTest, single_info)
     auto result = sendGet("brk1");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 0U);
     EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["federates"].size(), 0U);
-    EXPECT_STREQ(val["attributes"]["name"].asCString(), "brk1");
-    EXPECT_STREQ(val["state"].asCString(), "connected");
+    EXPECT_EQ(val["attributes"]["name"].get<std::string>(), "brk1");
+    EXPECT_EQ(val["state"].get<std::string>(), "connected");
 }
 
 TEST_F(httpTest, get_global_time)
@@ -193,7 +193,7 @@ TEST_F(httpTest, get_global_time)
     auto result = sendGet("global_time");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 0U);
 }
 
@@ -241,14 +241,14 @@ TEST_F(httpTest, core)
         val = loadJson(result);
     }
     ASSERT_EQ(val["cores"].size(), 1U);
-    EXPECT_STREQ(val["cores"][0]["attributes"]["name"].asCString(), "cr1");
+    EXPECT_EQ(val["cores"][0]["attributes"]["name"].get<std::string>(), "cr1");
 
     auto result2 = sendCommand(http::verb::search, "/search/brk2", "query=current_state");
     EXPECT_EQ(result, result2);
 
     result = sendGet("brk2/cr1");
     val = loadJson(result);
-    EXPECT_STREQ(val["attributes"]["name"].asCString(), "cr1");
+    EXPECT_EQ(val["attributes"]["name"].get<std::string>(), "cr1");
 
     result2 = sendGet("brk2/cr1/current_state");
     EXPECT_EQ(result, result2);
@@ -312,13 +312,13 @@ TEST_F(httpTest, post)
     auto result = sendCommand(http::verb::post, "brk3", init);
     auto val = loadJson(result);
     EXPECT_EQ(val["broker"], "brk3");
-    EXPECT_EQ(val["type"], helics::core::to_string(helics::core::coreTypeFromString(CORE2)));
+    EXPECT_EQ(val["type"], CORE2);
     result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 3U);
-    EXPECT_STREQ(val["brokers"][2]["name"].asCString(), "brk3");
+    EXPECT_EQ(val["brokers"][2]["name"].get<std::string>(), "brk3");
 }
 
 TEST_F(httpTest, deleteBroker)
@@ -327,13 +327,13 @@ TEST_F(httpTest, deleteBroker)
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 2U);
     sendCommand(http::verb::delete_, "/delete", "broker=brk1");
     result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 1U);
 }
 
@@ -342,23 +342,23 @@ TEST_F(httpTest, createBrokerUUID)
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     auto brksize = val["brokers"].size();
     std::string init = "core_type=" CORE1 "&num_feds=2";
     result = sendCommand(http::verb::post, "/", init);
     val = loadJson(result);
-    EXPECT_TRUE(val["broker_uuid"].isString());
-    auto uuid = val["broker_uuid"].asString();
+    EXPECT_TRUE(val["broker_uuid"].is_string());
+    auto uuid = val["broker_uuid"].get<std::string>();
     result = sendGet(std::string("/?uuid=") + uuid);
     val = loadJson(result);
-    EXPECT_TRUE(val["status"].asBool());
+    EXPECT_TRUE(val["status"].get<bool>());
 
     sendCommand(http::verb::delete_, "/", std::string("broker_uuid=") + uuid);
 
     result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), brksize);
 }
 
@@ -366,7 +366,7 @@ TEST_F(httpTest, coreJson)
 {
     auto result = sendGet("brk2/cr1");
 
-    Json::Value v1;
+    nlohmann::json v1;
     v1["query"] = "current_state";
     auto result2 = sendCommand(http::verb::search, "brk2/cr1", generateJsonString(v1));
     EXPECT_EQ(result, result2);
@@ -388,13 +388,13 @@ TEST_F(httpTest, coreJson)
 
 TEST_F(httpTest, deleteJson)
 {
-    Json::Value v1;
+    nlohmann::json v1;
     v1["broker"] = "brk2";
     sendCommand(http::verb::post, "delete", generateJsonString(v1));
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 0U);
 }
 
@@ -434,7 +434,7 @@ TEST_F(httpTest, timeBlock)
     brk.reset();
 
     vFed.finalize();
-    Json::Value v1;
+    nlohmann::json v1;
     v1["broker"] = "brk_timer";
     sendCommand(http::verb::post, "delete", generateJsonString(v1));
 }
@@ -444,5 +444,5 @@ TEST_F(httpTest, healthcheck)
     auto result = sendGet("healthcheck");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_TRUE(val["success"].asBool());
+    EXPECT_TRUE(val["success"].get<bool>());
 }

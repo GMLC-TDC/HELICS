@@ -8,28 +8,28 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.h"
 
 #include <gtest/gtest.h>
-
+#include <string>
 /**
  tests of evil inputs for all HELICS API function calls*/
 
 TEST(evil_general_test, helicsErrorInitialize)
 {
     // HelicsError helicsErrorInitialize(void);
-    auto E = helicsErrorInitialize();
-    EXPECT_EQ(E.error_code, 0);
-    EXPECT_TRUE(std::string(E.message).empty());
+    auto err = helicsErrorInitialize();
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_TRUE(std::string(err.message).empty());
 }
 
 TEST(evil_general_test, helicsErrorClear)
 {
     // void helicsErrorClear(HelicsError* err);
-    auto E = helicsErrorInitialize();
-    E.error_code = 55;
-    E.message = "this is a test";
+    auto err = helicsErrorInitialize();
+    err.error_code = 55;
+    err.message = "this is a test";
 
-    helicsErrorClear(&E);
-    EXPECT_EQ(E.error_code, 0);
-    EXPECT_TRUE(std::string(E.message).empty());
+    helicsErrorClear(&err);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_TRUE(std::string(err.message).empty());
 }
 
 TEST(evil_general_test, helicsIsCoreTypeAvailable)
@@ -159,9 +159,9 @@ TEST(evil_creation_test, helicsCreateBrokerFromArgs)
 
 TEST(evil_creation_test, helicsCreateValueFederate)
 {
-    // HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fi,
+    // HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fedInfo,
     // HelicsError* err); HelicsFederate helicsCreateValueFederate(const char* fedName,
-    // HelicsFederateInfo fi, HelicsError* err);
+    // HelicsFederateInfo fedInfo, HelicsError* err);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateValueFederate("billy", nullptr, &err);
@@ -169,13 +169,14 @@ TEST(evil_creation_test, helicsCreateValueFederate)
     EXPECT_EQ(helicsFederateIsValid(res1), HELICS_FALSE);
     helicsErrorClear(&err);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_NNG, nullptr);
-    auto res2 = helicsCreateValueFederate("billy", fi, &err);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_NNG, nullptr);
+    auto res2 = helicsCreateValueFederate("billy", fedInfo, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(helicsFederateIsValid(res2), HELICS_FALSE);
     helicsErrorClear(&err);
-    // auto res2=helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fi, nullptr);
+    // auto res2=helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fedInfo,
+    // nullptr);
 
     char rdata[256];
     auto evil_fi = reinterpret_cast<HelicsFederateInfo>(rdata);
@@ -202,7 +203,8 @@ TEST(evil_creation_test, helicsCreateValueFederateFromConfig)
 
 TEST(evil_creation_test, helicsCreateMessageFederate)
 {
-    // auto res2=helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fi, nullptr);
+    // auto res2=helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fedInfo,
+    // nullptr);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateMessageFederate("billy", nullptr, &err);
@@ -210,9 +212,9 @@ TEST(evil_creation_test, helicsCreateMessageFederate)
     EXPECT_EQ(helicsFederateIsValid(res1), HELICS_FALSE);
     helicsErrorClear(&err);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_NNG, nullptr);
-    auto res2 = helicsCreateMessageFederate("billy", fi, &err);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_NNG, nullptr);
+    auto res2 = helicsCreateMessageFederate("billy", fedInfo, &err);
     EXPECT_EQ(helicsFederateIsValid(res2), HELICS_FALSE);
     helicsErrorClear(&err);
     char rdata[256];
@@ -240,8 +242,8 @@ TEST(evil_creation_test, helicsCreateMessageFederateFromConfig)
 
 TEST(evil_creation_test, helicsCreateCombinationFederate)
 {
-    // HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fi,
-    // HelicsError* err);
+    // HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo
+    // fedInfo, HelicsError* err);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateCombinationFederate("billy", nullptr, &err);
@@ -249,9 +251,9 @@ TEST(evil_creation_test, helicsCreateCombinationFederate)
     EXPECT_EQ(helicsFederateIsValid(res1), HELICS_FALSE);
     helicsErrorClear(&err);
 
-    auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_NNG, nullptr);
-    auto res2 = helicsCreateCombinationFederate("billy", fi, &err);
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_NNG, nullptr);
+    auto res2 = helicsCreateCombinationFederate("billy", fedInfo, &err);
     EXPECT_EQ(helicsFederateIsValid(res2), HELICS_FALSE);
     helicsErrorClear(&err);
     char rdata[256];
@@ -280,15 +282,15 @@ TEST(evil_creation_test, helicsCreateCombinationFederateFromConfig)
 TEST(evil_creation_test, helicsCreateFederateInfo)
 {
     // HelicsFederateInfo helicsCreateFederateInfo(void);
-    auto fi = helicsCreateFederateInfo();
-    EXPECT_NE(fi, nullptr);
+    auto fedInfo = helicsCreateFederateInfo();
+    EXPECT_NE(fedInfo, nullptr);
 }
 
 TEST(evil_creation_test, helicsCreateQuery)
 {
     // HelicsQuery helicsCreateQuery(const char* target, const char* query);
-    auto q = helicsCreateQuery(nullptr, nullptr);
-    EXPECT_NE(q, nullptr);
+    auto query = helicsCreateQuery(nullptr, nullptr);
+    EXPECT_NE(query, nullptr);
 }
 
 // section Core Functions
@@ -892,9 +894,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerInitString)
     helicsErrorClear(&err);
     helicsFederateInfoSetBrokerInitString(evil_fi, "", &err);
     EXPECT_NE(err.error_code, 0);
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetBrokerInitString(fi, nullptr, &err);
+    helicsFederateInfoSetBrokerInitString(fedInfo, nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -922,12 +924,12 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreTypeFromString)
     helicsErrorClear(&err);
     helicsFederateInfoSetCoreTypeFromString(evil_fi, "nullcore", &err);
     EXPECT_NE(err.error_code, 0);
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetCoreTypeFromString(fi, nullptr, &err);
+    helicsFederateInfoSetCoreTypeFromString(fedInfo, nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
 
-    helicsFederateInfoSetCoreTypeFromString(fi, "evil_core", &err);
+    helicsFederateInfoSetCoreTypeFromString(fedInfo, "evil_core", &err);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -956,9 +958,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerKey)
     helicsFederateInfoSetBrokerKey(evil_fi, "broker_key", &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetBrokerKey(fi, nullptr, &err);
+    helicsFederateInfoSetBrokerKey(fedInfo, nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -977,9 +979,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerPort)
     helicsFederateInfoSetBrokerPort(evil_fi, 9999, &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetBrokerPort(fi, 9999, &err);
+    helicsFederateInfoSetBrokerPort(fedInfo, 9999, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -998,9 +1000,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetLocalPort)
     helicsFederateInfoSetLocalPort(evil_fi, "9999", &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetLocalPort(fi, nullptr, &err);
+    helicsFederateInfoSetLocalPort(fedInfo, nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -1016,9 +1018,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetFlagOption)
     helicsFederateInfoSetFlagOption(evil_fi, 9, HELICS_FALSE, &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetFlagOption(fi, 0, HELICS_FALSE, &err);
+    helicsFederateInfoSetFlagOption(fedInfo, 0, HELICS_FALSE, &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -1034,9 +1036,9 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetSeparator)
     helicsFederateInfoSetSeparator(evil_fi, '-', &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto fi = helicsCreateFederateInfo();
+    auto fedInfo = helicsCreateFederateInfo();
     helicsErrorClear(&err);
-    helicsFederateInfoSetSeparator(fi, '&', &err);
+    helicsFederateInfoSetSeparator(fedInfo, '&', &err);
     EXPECT_EQ(err.error_code, 0);
 }
 
@@ -2643,12 +2645,12 @@ TEST(evil_input_test, helicsInputGetDouble)
     err.error_code = 45;
     auto res1 = helicsInputGetDouble(nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
-    EXPECT_EQ(res1, HELICS_TIME_INVALID);
+    EXPECT_EQ(res1, HELICS_INVALID_DOUBLE);
     helicsErrorClear(&err);
     auto res2 = helicsInputGetDouble(nullptr, nullptr);
-    EXPECT_EQ(res2, HELICS_TIME_INVALID);
+    EXPECT_EQ(res2, HELICS_INVALID_DOUBLE);
     auto res3 = helicsInputGetDouble(evil_input, &err);
-    EXPECT_EQ(res3, HELICS_TIME_INVALID);
+    EXPECT_EQ(res3, HELICS_INVALID_DOUBLE);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -2679,13 +2681,13 @@ TEST(evil_input_test, helicsInputGetChar)
     err.error_code = 45;
     char res1 = helicsInputGetChar(nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
-    char tc = '\x15';
-    EXPECT_TRUE(res1 == tc);
+    char testChar = '\x15';
+    EXPECT_TRUE(res1 == testChar);
     helicsErrorClear(&err);
     char res2 = helicsInputGetChar(nullptr, nullptr);
-    EXPECT_TRUE(res2 == tc);
+    EXPECT_TRUE(res2 == testChar);
     char res3 = helicsInputGetChar(evil_input, &err);
-    EXPECT_TRUE(res3 == tc);
+    EXPECT_TRUE(res3 == testChar);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -2717,12 +2719,12 @@ TEST(evil_input_test, helicsInputGetComplex)
     helicsInputGetComplex(nullptr, nullptr, nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
-    double v1 = 19.4;
-    double v2 = 18.3;
+    double value1 = 19.4;
+    double value2 = 18.3;
     // auto res2=helicsInputGetComplex(HelicsInput ipt, double* real, double* imag, nullptr);
-    helicsInputGetComplex(evil_input, &v1, &v2, &err);
-    EXPECT_DOUBLE_EQ(v1, 19.4);
-    EXPECT_DOUBLE_EQ(v2, 18.3);
+    helicsInputGetComplex(evil_input, &value1, &value2, &err);
+    EXPECT_DOUBLE_EQ(value1, 19.4);
+    EXPECT_DOUBLE_EQ(value2, 18.3);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -3706,6 +3708,56 @@ TEST(evil_endpoint_test, helicsEndpointSendBytesAt)
     helicsEndpointSendBytesAt(evil_ept, rdata, 56, 3.5, &err);
     EXPECT_NE(err.error_code, 0);
 }
+
+// send string
+
+TEST(evil_endpoint_test, helicsEndpointSendStringTo)
+{
+    // void helicsEndpointSendMessage(HelicsEndpoint endpoint, const char* dest, const void*
+    // data, int inputDataLength, HelicsError* err);
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointSendStringTo(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    // auto res2=helicsEndpointSendMessage(nullptr, nullptr, nullptr, int inputDataLength,
+    // nullptr);
+    helicsEndpointSendStringTo(evil_ept, rdata, "dest", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointSendStringToAt)
+{
+    // void helicsEndpointStringToAt(HelicsEndpoint endpoint, const char* dest, const void*
+    // data, int inputDataLength, HelicsError* err);
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointSendStringToAt(nullptr, nullptr, nullptr, 0.0, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointSendStringToAt(evil_ept, rdata, "dest", -15.7, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointSendStringAt)
+{
+    // void helicsEndpointSendStringAt(     HelicsEndpoint endpoint,     const char* dest, const
+    // void* data,     int inputDataLength,     HelicsTime time,     HelicsError* err);
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointSendStringAt(nullptr, nullptr, 3.5, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointSendStringAt(evil_ept, rdata, 3.5, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+//
 
 TEST(evil_endpoint_test, helicsEndpointSendMessageObject)
 {

@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <complex>
 #include <future>
+#include <memory>
+#include <string>
 #include <thread>
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
@@ -20,12 +22,12 @@ struct error_tests: public FederateTestFixture, public ::testing::Test {};
 
 TEST_F(error_tests, duplicate_federate_names)
 {
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "-f 1 --autobroker";
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "-f 1 --autobroker";
 
-    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
-    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("test1", fi),
+    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("test1", fedInfo),
                  helics::RegistrationFailure);
     Fed->finalize();
 }
@@ -38,9 +40,9 @@ TEST_F(error_tests, duplicate_federate_names2)
 
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
-    helics::FederateInfo fi;
+    helics::FederateInfo fedInfo;
     // get the core pointer from fed2 and using the name of fed1 should be an error
-    EXPECT_THROW(helics::ValueFederate fed3(fed1->getName(), fed2->getCorePointer(), fi),
+    EXPECT_THROW(helics::ValueFederate fed3(fed1->getName(), fed2->getCorePointer(), fedInfo),
                  helics::RegistrationFailure);
     broker->disconnect();
 }
@@ -52,9 +54,9 @@ TEST_F(error_tests, already_init_broker)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
 
     fed1->enterInitializingMode();
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreInitString = std::string("--timeout=1s --broker=") + broker->getIdentifier();
-    EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreInitString = std::string("--timeout=1s --broker=") + broker->getIdentifier();
+    EXPECT_THROW(helics::ValueFederate fed3("fed222", fedInfo), helics::RegistrationFailure);
     broker->disconnect();
 }
 
@@ -62,10 +64,10 @@ TEST_F(error_tests, mismatch_broker_key)
 {
     auto broker = AddBroker("test", 1);
 
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreInitString =
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
-    EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
+    EXPECT_THROW(helics::ValueFederate fed3("fed222", fedInfo), helics::RegistrationFailure);
     broker->disconnect();
     auto core = helics::CoreFactory::findJoinableCoreOfType(helics::CoreType::TEST);
     if (core) {
@@ -78,10 +80,10 @@ TEST_F(error_tests, mismatch_broker_key2)
 {
     auto broker = AddBroker("test", "-f 1 --broker_key=tkey2");
 
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreInitString =
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
-    EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
+    EXPECT_THROW(helics::ValueFederate fed3("fed222", fedInfo), helics::RegistrationFailure);
     broker->disconnect();
     auto core = helics::CoreFactory::findJoinableCoreOfType(helics::CoreType::TEST);
     if (core) {
@@ -94,10 +96,10 @@ TEST_F(error_tests, mismatch_broker_key_success)
 {
     auto broker = AddBroker("test", "--broker_key=tkey");
 
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreInitString =
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
-    helics::ValueFederate fed3("fed2b", fi);
+    helics::ValueFederate fed3("fed2b", fedInfo);
     fed3.enterExecutingMode();
     fed3.finalize();
     broker->waitForDisconnect();
@@ -108,10 +110,10 @@ TEST_F(error_tests, mismatch_broker_key_success_universal_key)
 {
     auto broker = AddBroker("test", "--broker_key=**");
 
-    helics::FederateInfo fi(helics::CoreType::TEST);
-    fi.coreInitString =
+    helics::FederateInfo fedInfo(helics::CoreType::TEST);
+    fedInfo.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
-    helics::ValueFederate fed3("fed2b", fi);
+    helics::ValueFederate fed3("fed2b", fedInfo);
     fed3.enterExecutingMode();
     fed3.finalize();
     broker->waitForDisconnect();
@@ -145,8 +147,8 @@ TEST_F(error_tests, single_thread_fed)
 
     EXPECT_THROW(fed1->requestTimeAsync(3.2), helics::InvalidFunctionCall);
     EXPECT_THROW(fed1->requestTimeComplete(), helics::InvalidFunctionCall);
-    auto t1 = fed1->requestTime(2.0);
-    EXPECT_EQ(t1, 2.0);
+    auto time = fed1->requestTime(2.0);
+    EXPECT_EQ(time, 2.0);
 
     EXPECT_THROW(fed1->requestTimeIterativeAsync(3.2, helics::IterationRequest::FORCE_ITERATION),
                  helics::InvalidFunctionCall);
@@ -481,8 +483,8 @@ TEST_F(error_tests, missing_required_pub)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
     fed1->registerGlobalPublication("t1", "");
-    auto& i2 = fed2->registerSubscription("abcd", "");
-    i2.setOption(helics::defs::Options::CONNECTION_REQUIRED);
+    auto& sub1 = fed2->registerSubscription("abcd", "");
+    sub1.setOption(helics::defs::Options::CONNECTION_REQUIRED);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -582,8 +584,8 @@ TEST_F(error_tests, missing_required_ept)
     auto fed2 = GetFederateAs<helics::MessageFederate>(1);
 
     fed1->registerGlobalTargetedEndpoint("t1", "");
-    auto& e2 = fed2->registerGlobalTargetedEndpoint("abcd", "");
-    e2.setOption(helics::defs::Options::CONNECTION_REQUIRED);
+    auto& ept1 = fed2->registerGlobalTargetedEndpoint("abcd", "");
+    ept1.setOption(helics::defs::Options::CONNECTION_REQUIRED);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -595,11 +597,13 @@ TEST_F(error_tests, missing_required_ept)
 class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 /** test simple creation and destruction*/
-TEST_P(error_tests_type, test_duplicate_broker_name)
+TEST_P(error_tests_type, duplicate_broker_name)
 {
-    auto broker = AddBroker(GetParam(), "--name=brk1");
+    std::string bname = std::string("brk_dup_") + GetParam();
+    auto broker = AddBroker(GetParam(), std::string("--name=") + bname);
     EXPECT_TRUE(broker->isConnected());
-    EXPECT_THROW(AddBroker(GetParam(), "--name=brk1 --timeout=500"), helics::RegistrationFailure);
+    EXPECT_THROW(AddBroker(GetParam(), std::string("--name=") + bname + " --timeout=500"),
+                 helics::RegistrationFailure);
     broker->disconnect();
     helics::cleanupHelicsLibrary();
 }

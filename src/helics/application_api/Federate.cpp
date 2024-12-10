@@ -19,16 +19,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "AsyncFedCallInfo.hpp"
 #include "ConnectorFederateManager.hpp"
 #include "CoreApp.hpp"
+#include "FederateInfo.hpp"
 #include "Filters.hpp"
 #include "PotentialInterfacesManager.hpp"
 #include "Translator.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
 
-#include <cassert>
 #include <fmt/format.h>
 #include <iostream>
+#include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 
@@ -549,6 +551,9 @@ void Federate::enterExecutingModeAsync(IterationRequest iterate)
     switch (currentMode) {
         case Modes::STARTUP: {
             auto eExecFunc = [this, iterate]() {
+                if (hasPotentialInterfaces) {
+                    potentialInterfacesStartupSequence();
+                }
                 coreObject->enterInitializingMode(fedID);
                 mCurrentTime = coreObject->getCurrentTime(fedID);
                 startupToInitializeStateTransition();
@@ -1251,12 +1256,10 @@ static Translator& generateTranslator(Federate* fed,
     }
     return trans;
 }
-
-static Filter& generateFilter(Federate* fed,
+static Filter& registerFilter(Federate* fed,
                               bool global,
                               bool cloning,
                               std::string_view name,
-                              FilterTypes operation,
                               std::string_view inputType,
                               std::string_view outputType)
 {
@@ -1270,14 +1273,20 @@ static Filter& generateFilter(Federate* fed,
                           fed->registerFilter(name, inputType, outputType);
     }
     if (cloning) {
-        Filter& filt =
-            (global) ? fed->registerGlobalCloningFilter(name) : fed->registerCloningFilter(name);
-        if (operation != FilterTypes::CUSTOM) {
-            filt.setFilterType(static_cast<std::int32_t>(operation));
-        }
-        return filt;
+        return (global) ? fed->registerGlobalCloningFilter(name) : fed->registerCloningFilter(name);
     }
-    Filter& filt = (global) ? fed->registerCloningFilter(name) : fed->registerFilter(name);
+    return (global) ? fed->registerGlobalFilter(name) : fed->registerFilter(name);
+}
+
+static Filter& generateFilter(Federate* fed,
+                              bool global,
+                              bool cloning,
+                              std::string_view name,
+                              FilterTypes operation,
+                              std::string_view inputType,
+                              std::string_view outputType)
+{
+    auto& filt = registerFilter(fed, global, cloning, name, inputType, outputType);
     if (operation != FilterTypes::CUSTOM) {
         filt.setFilterType(static_cast<std::int32_t>(operation));
     }
@@ -1320,19 +1329,18 @@ static void loadOptions(Federate* fed, const Inp& data, INTERFACE& iface)
     });
 }
 
-static void arrayPairProcess(Json::Value doc,
+static void arrayPairProcess(nlohmann::json doc,
                              const std::string& key,
                              const std::function<void(std::string_view, std::string_view)>& pairOp)
 {
-    if (doc.isMember(key)) {
-        if (doc[key].isArray()) {
-            for (auto& val : doc[key]) {
-                pairOp(val[0].asString(), val[1].asString());
+    if (doc.contains(key)) {
+        if (doc[key].is_array()) {
+            for (const auto& val : doc[key]) {
+                pairOp(val[0].get<std::string>(), val[1].get<std::string>());
             }
         } else {
-            auto members = doc[key].getMemberNames();
-            for (auto& val : members) {
-                pairOp(val, doc[key][val].asString());
+            for (const auto& val : doc[key].items()) {
+                pairOp(val.key(), val.value().get<std::string>());
             }
         }
     }
@@ -1372,15 +1380,15 @@ bool Federate::checkValidFilterType(bool useTypes,
 
 template<class INTERFACE>
 static void
-    loadPropertiesJson(Federate* fed, INTERFACE& iface, const Json::Value& json, bool strict)
+    loadPropertiesJson(Federate* fed, INTERFACE& iface, const nlohmann::json& json, bool strict)
 {
     static constexpr std::string_view errorMessage =
         R"(interface properties require "name" and "value" fields)";
-    if (json.isMember("properties")) {
+    if (json.contains("properties")) {
         const auto& props = json["properties"];
-        if (props.isArray()) {
+        if (props.is_array()) {
             for (const auto& prop : props) {
-                if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
+                if ((!prop.contains("name")) || (!prop.contains("value"))) {
                     if (strict) {
                         fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 
@@ -1389,14 +1397,15 @@ static void
                     fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
                     continue;
                 }
-                if (prop["value"].isDouble()) {
-                    iface.set(prop["name"].asString(), prop["value"].asDouble());
+                if (prop["value"].is_number()) {
+                    iface.set(prop["name"].get<std::string>(), prop["value"].get<double>());
                 } else {
-                    iface.setString(prop["name"].asString(), prop["value"].asString());
+                    iface.setString(prop["name"].get<std::string>(),
+                                    prop["value"].get<std::string>());
                 }
             }
         } else {
-            if ((!props.isMember("name")) || (!props.isMember("value"))) {
+            if ((!props.contains("name")) || (!props.contains("value"))) {
                 if (strict) {
                     fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 
@@ -1404,10 +1413,11 @@ static void
                 }
                 fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
             } else {
-                if (props["value"].isDouble()) {
-                    iface.set(props["name"].asString(), props["value"].asDouble());
+                if (props["value"].is_number()) {
+                    iface.set(props["name"].get<std::string>(), props["value"].get<double>());
                 } else {
-                    iface.setString(props["name"].asString(), props["value"].asString());
+                    iface.setString(props["name"].get<std::string>(),
+                                    props["value"].get<std::string>());
                 }
             }
         }
@@ -1417,33 +1427,37 @@ static void
 void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 {
     auto doc = fileops::loadJson(jsonString);
-    registerConnectorInterfacesJsonDetail(doc);
+    registerConnectorInterfacesJsonDetail(fileops::JsonBuffer(doc));
 }
 
-void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
+void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& jsonBuffer)
 {
     using fileops::getOrDefault;
+    const auto& json = jsonBuffer.json();
     bool defaultGlobal = false;
     fileops::replaceIfMember(json, "defaultglobal", defaultGlobal);
 
-    Json::Value& iface = (json.isMember("interfaces")) ? json["interfaces"] : json;
+    const nlohmann::json& iface = (json.contains("interfaces")) ? json["interfaces"] : json;
 
-    if (iface.isMember("filters")) {
+    if (iface.contains("filters")) {
         for (const auto& filt : iface["filters"]) {
             const std::string key = getOrDefault(filt, "name", emptyStr);
             const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
-            const bool cloningflag = getOrDefault(filt, "cloning", false);
+            const bool cloningFlag = getOrDefault(filt, "cloning", false);
             const bool useTypes = !((inputType.empty()) && (outputType.empty()));
             const bool global = fileops::getOrDefault(filt, "global", defaultGlobal);
-            const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
+            const std::string operation =
+                getOrDefault(filt,
+                             "operation",
+                             (cloningFlag) ? std::string("clone") : std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
             if (!checkValidFilterType(useTypes, opType, operation)) {
                 continue;
             }
             auto& filter =
-                generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
+                generateFilter(this, global, cloningFlag, key, opType, inputType, outputType);
             loadOptions(this, filt, filter);
 
             addTargetVariations(filt, "source", "endpoints", [&filter](const std::string& target) {
@@ -1456,7 +1470,7 @@ void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
                                     filter.addDestinationTarget(target);
                                 });
 
-            if (cloningflag) {
+            if (cloningFlag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
                 });
@@ -1465,7 +1479,7 @@ void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
             loadPropertiesJson(this, filter, filt, strictConfigChecking);
         }
     }
-    if (iface.isMember("translators")) {
+    if (iface.contains("translators")) {
         for (const auto& trans : iface["translators"]) {
             const std::string key = getOrDefault(trans, "name", emptyStr);
 
@@ -1540,11 +1554,11 @@ void Federate::registerConnectorInterfacesJsonDetail(Json::Value& json)
     loadTags(json, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
     });
-    if (json.isMember("helics")) {
-        registerConnectorInterfacesJsonDetail(json["helics"]);
+    if (json.contains("helics")) {
+        registerConnectorInterfacesJsonDetail(fileops::JsonBuffer(json["helics"]));
     }
 
-    if (json.isMember("potential_interfaces") || json.isMember("potential_interface_templates")) {
+    if (json.contains("potential_interfaces") || json.contains("potential_interface_templates")) {
         if (!potManager) {
             potManager = std::make_unique<PotentialInterfacesManager>(coreObject.get(), this);
         }
@@ -1589,7 +1603,7 @@ static void
                 const toml::value uVal;
                 const auto& propval = toml::find_or(prop, "value", uVal);
 
-                if ((propname.empty()) || (propval.is_uninitialized())) {
+                if ((propname.empty()) || (propval.is_empty())) {
                     if (strict) {
                         fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 
@@ -1608,9 +1622,9 @@ static void
             std::string propname;
             propname = toml::find_or(props, "name", propname);
             const toml::value uVal;
-            auto propval = toml::find_or(props, "value", uVal);
+            const auto& propval = toml::find_or(props, "value", uVal);
 
-            if ((propname.empty()) || (propval.is_uninitialized())) {
+            if ((propname.empty()) || (propval.is_empty())) {
                 if (strict) {
                     fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 
@@ -2023,9 +2037,9 @@ int Federate::getFilterCount() const
     return cManager->getFilterCount();
 }
 
-void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> filtOp)
+void Federate::setFilterOperator(Filter& filt, std::shared_ptr<FilterOperator> filtOp)
 {
-    coreObject->setFilterOperator(filt.getHandle(), std::move(filtOp));
+    filt.setOperator(std::move(filtOp));
 }
 
 const Translator& Federate::getTranslator(std::string_view translatorName) const
@@ -2046,10 +2060,10 @@ Translator& Federate::getTranslator(std::string_view translatorName)
     return trans;
 }
 
-void Federate::setTranslatorOperator(const Translator& trans,
+void Federate::setTranslatorOperator(Translator& trans,
                                      std::shared_ptr<TranslatorOperator> transOps)
 {
-    coreObject->setTranslatorOperator(trans.getHandle(), std::move(transOps));
+    trans.setOperator(std::move(transOps));
 }
 
 int Federate::getTranslatorCount() const
@@ -2176,8 +2190,8 @@ std::size_t Interface::getSourceTargetCount() const
         return 0;
     }
     try {
-        const Json::Value tvalues = fileops::loadJsonStr(targets);
-        return (tvalues.isArray()) ? tvalues.size() : 1;
+        const nlohmann::json tvalues = fileops::loadJsonStr(targets);
+        return (tvalues.is_array()) ? tvalues.size() : 1;
     }
     catch (...) {
         return 1;
@@ -2190,8 +2204,8 @@ std::size_t Interface::getDestinationTargetCount() const
         return 0;
     }
     try {
-        const Json::Value tvalues = fileops::loadJsonStr(targets);
-        return (tvalues.isArray()) ? tvalues.size() : 1;
+        const nlohmann::json tvalues = fileops::loadJsonStr(targets);
+        return (tvalues.is_array()) ? tvalues.size() : 1;
     }
     catch (...) {
         return 1;

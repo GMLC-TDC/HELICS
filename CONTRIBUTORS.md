@@ -41,6 +41,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Bryan Richardson](https://github.com/activeshadow)
 - [Matt Irish](https://github.com/mattirish)
 - [Slava Barsuk](https://github.com/vbarsuk)
+- [Joseph McKinsey](https://github.com/josephmckinsey)
 
 ### Argonne National Lab
 
@@ -54,6 +55,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Nitin Barthwal](https://github.com/nitin-barthwal)
 - [Parth Bansal](https://github.com/parthb83)
 - [Gaurav Kumar](https://github.com/slashgk)
+- [Mehdi Chinoune](https://github.com/MehdiChinoune)
 
 ## Used Libraries or Code
 
@@ -65,9 +67,9 @@ Asio is used for TCP and UDP communication, as well as resolving IP addresses. T
 
 The header only bindings for the ZeroMQ library are used to interact with the ZeroMQ library. The header files are modified to include some string operations and are included in the HELICS source. cppzmq is licensed under the [MIT](https://github.com/zeromq/cppzmq/blob/master/LICENSE) license.
 
-### [JsonCpp](https://github.com/open-source-parsers/jsoncpp)
+### [JSON for Modern C++](https://github.com/nlohmann/json)
 
-JsonCpp is used for parsing json files. It is included as a submodule JsonCpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE).
+JSON for Modern C++ is used for parsing json files. The single file header and forward declarations is included in this repo [LICENSE](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT).
 
 ### [CLI11](https://github.com/CLIUtils/CLI11)
 
@@ -122,7 +124,6 @@ A networking library with helper functions around Asio and other network interfa
 Several CMake scripts came from other sources and were either used or modified for use in HELICS.
 
 - Lars Bilke [CodeCoverage.cmake](https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake)
-- NATIONAL HEART, LUNG, AND BLOOD INSTITUTE FindOctave.cmake
 - clang-format, clang-tidy scripts were created using tips from [Emmanuel Fleury](http://www.labri.fr/perso/fleury/posts/programming/using-clang-tidy-and-clang-format.html)
 - Viktor Kirilov, useful CMake macros [ucm](https://github.com/onqtam/ucm) particularly for the set_runtime macro to use static runtime libraries
 - scripts for cloning get repositories are included from [tschuchortdev/cmake_git_clone](https://github.com/tschuchortdev/cmake_git_clone) used with [MIT](https://github.com/tschuchortdev/cmake_git_clone/blob/master/LICENSE.TXT) License
@@ -134,7 +135,7 @@ A list of optional component that are not included in HELICS but are optionally 
 
 ### [BOOST](https://www.boost.org)
 
-Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast from Boost 1.70 or higher. Boost is licensed under the Boost Software License. Boost can be removed entirely from the source code with the use of a [cmake](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) flag.
+Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast. Boost is licensed under the Boost Software License. Boost can be removed entirely from the source code with the use of a [cmake](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) flag.
 
 #### [zmq](http://www.zeromq.org)
 

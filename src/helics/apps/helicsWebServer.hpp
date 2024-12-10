@@ -30,7 +30,7 @@ class WebServer: public TypedBrokerServer {
     WebServer() = default;
     explicit WebServer(std::string_view server_name): mName(server_name) {}
     /** start the server*/
-    virtual void startServer(const Json::Value* val,
+    virtual void startServer(const nlohmann::json* val,
                              const std::shared_ptr<TypedBrokerServer>& ptr) override;
     /** stop the server*/
     virtual void stopServer() override;
@@ -48,7 +48,7 @@ class WebServer: public TypedBrokerServer {
     std::thread mainLoopThread;
     std::mutex threadGuard;
 
-    const Json::Value* config{nullptr};
+    const nlohmann::json* config{nullptr};
     const std::string mName;
     std::string mArgs;
     std::string mHttpAddress;

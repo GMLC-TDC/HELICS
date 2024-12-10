@@ -140,7 +140,7 @@ namespace apps {
         std::string ext_interface = "0.0.0.0";
         int tcpport = getDefaultPort(HELICS_CORE_TYPE_TCP);
         // std::chrono::milliseconds timeout(20000);
-        if (config_->isMember("tcp")) {
+        if (config_->contains("tcp")) {
             const auto& V = (*config_)["tcp"];
             helics::fileops::replaceIfMember(V, "interface", ext_interface);
             helics::fileops::replaceIfMember(V, "port", tcpport);
@@ -191,7 +191,7 @@ namespace apps {
         std::string ext_interface = "0.0.0.0";
         int udpport = getDefaultPort(HELICS_CORE_TYPE_UDP);
         // std::chrono::milliseconds timeout(20000);
-        if (config_->isMember("udp")) {
+        if (config_->contains("udp")) {
             auto V = (*config_)["udp"];
             helics::fileops::replaceIfMember(V, "interface", ext_interface);
             helics::fileops::replaceIfMember(V, "port", udpport);
@@ -235,9 +235,9 @@ namespace apps {
          */
     }
 
-    static const Json::Value null;
+    static const nlohmann::json null;
 
-    void AsioBrokerServer::startServer(const Json::Value* val,
+    void AsioBrokerServer::startServer(const nlohmann::json* val,
                                        const std::shared_ptr<TypedBrokerServer>& /*ptr*/)
     {
         config_ = (val != nullptr) ? val : &null;

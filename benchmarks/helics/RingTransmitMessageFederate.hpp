@@ -36,9 +36,9 @@ class RingTransmitMessage: public BenchmarkFederate {
         opt_max_index->required();
     }
 
-    void doParamInit(helics::FederateInfo& fi) override
+    void doParamInit(helics::FederateInfo& fedInfo) override
     {
-        fi.setFlagOption(HELICS_FLAG_RESTRICTIVE_TIME_POLICY);
+        fedInfo.setFlagOption(HELICS_FLAG_RESTRICTIVE_TIME_POLICY);
     }
 
     void doFedInit() override

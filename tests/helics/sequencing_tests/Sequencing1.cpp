@@ -14,10 +14,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "sequencingHelpers.hpp"
 
+#include <cstdio>
 #include <future>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <memory>
 #include <thread>
+#include <vector>
+
 /** these test cases test out the message federates
  */
 
@@ -29,12 +33,12 @@ TEST_P(sequencing1, send_receive_2fed_multisend)
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
 
-    auto epid = mFed1->registerEndpoint("ep1");
-    auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
+    auto& ep1 = mFed1->registerEndpoint("ep1");
+    auto& ep2 = mFed2->registerGlobalEndpoint("ep2", "random");
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    epid.setDefaultDestination("ep2");
+    ep1.setDefaultDestination("ep2");
 
     auto delay = helics::delayMessages(mFed1.get(), GetParam(), 500);
 
@@ -47,7 +51,7 @@ TEST_P(sequencing1, send_receive_2fed_multisend)
 
     helics::SmallBuffer data1(500, 'a');
 
-    epid.send(data1);
+    ep1.send(data1);
     // move the time to 1.0
     mFed1->requestTimeAsync(1.0);
     auto gtime = mFed2->requestTime(1.0);
@@ -57,17 +61,17 @@ TEST_P(sequencing1, send_receive_2fed_multisend)
 
     EXPECT_TRUE(!mFed1->hasMessage());
 
-    EXPECT_TRUE(!mFed1->hasMessage(epid));
-    auto cnt = mFed2->pendingMessageCount(epid2);
+    EXPECT_TRUE(!mFed1->hasMessage(ep1));
+    auto cnt = mFed2->pendingMessageCount(ep2);
     EXPECT_EQ(cnt, 1);
 
-    auto M1 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data1.size());
+    auto message1 = mFed2->getMessage(ep2);
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data1.size());
 
-    EXPECT_EQ(M1->data[245], data1[245]);
+    EXPECT_EQ(message1->data[245], data1[245]);
 
-    EXPECT_EQ(M1->time, 0.0);
+    EXPECT_EQ(message1->time, 0.0);
     mFed1->finalizeAsync();
     mFed2->finalize();
     mFed1->finalizeComplete();
@@ -87,20 +91,20 @@ INSTANTIATE_TEST_SUITE_P(sequencing_tests,
 
 class sequencing2: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
-static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed,
-                                  std::shared_ptr<helics::MessageFederate>& fFed1,
-                                  std::shared_ptr<helics::MessageFederate>& fFed2,
-                                  helics::Endpoint& p1,
-                                  helics::Endpoint& p2,
-                                  helics::Filter& f1,
-                                  helics::Filter& f2)
+static bool twoStageFilterTest(std::shared_ptr<helics::MessageFederate>& mFed,
+                               std::shared_ptr<helics::MessageFederate>& fFed1,
+                               std::shared_ptr<helics::MessageFederate>& fFed2,
+                               helics::Endpoint& port1,
+                               helics::Endpoint& port2,
+                               helics::Filter& filter1,
+                               helics::Filter& filter2)
 {
     bool correct = true;
 
     auto timeOperator = std::make_shared<helics::MessageTimeOperator>();
     timeOperator->setTimeFunction([](helics::Time time_in) { return time_in + 1.25; });
-    fFed1->setFilterOperator(f1, timeOperator);
-    fFed2->setFilterOperator(f2, timeOperator);
+    filter1.setOperator(timeOperator);
+    filter2.setOperator(timeOperator);
 
     fFed1->enterExecutingModeAsync();
     fFed2->enterExecutingModeAsync();
@@ -108,10 +112,10 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
     fFed1->enterExecutingModeComplete();
     fFed2->enterExecutingModeComplete();
 
-    auto& p2Name = p2.getName();
+    auto& p2Name = port2.getName();
     EXPECT_TRUE(fFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
-    p1.sendTo(data, p2Name);
+    port1.sendTo(data, p2Name);
 
     mFed->requestTimeAsync(1.0);
     fFed1->requestTimeAsync(1.0);
@@ -129,28 +133,28 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
     fFed1->requestTime(2.0);
     mFed->requestTimeComplete();
     fFed2->requestTimeComplete();
-    if (mFed->hasMessage(p2)) {
+    if (mFed->hasMessage(port2)) {
         correct = false;
     }
 
     fFed1->requestTimeAsync(3.0);
     fFed2->requestTimeAsync(3.0);
     /*auto retTime = */ mFed->requestTime(3.0);
-    if (!mFed->hasMessage(p2)) {
+    if (!mFed->hasMessage(port2)) {
         printf("missing message\n");
         correct = false;
     }
-    if (mFed->hasMessage(p2)) {
-        auto m2 = mFed->getMessage(p2);
-        const auto& ept1Name = p1.getName();
+    if (mFed->hasMessage(port2)) {
+        auto message2 = mFed->getMessage(port2);
+        const auto& ept1Name = port1.getName();
         if (ept1Name.size() > 1) {
-            EXPECT_EQ(m2->source, p1.getName());
-            EXPECT_EQ(m2->original_source, p1.getName());
+            EXPECT_EQ(message2->source, port1.getName());
+            EXPECT_EQ(message2->original_source, port1.getName());
         }
 
-        EXPECT_EQ(m2->dest, p2Name);
-        EXPECT_EQ(m2->data.size(), data.size());
-        EXPECT_EQ(m2->time, 2.5);
+        EXPECT_EQ(message2->dest, p2Name);
+        EXPECT_EQ(message2->data.size(), data.size());
+        EXPECT_EQ(message2->time, 2.5);
     }
 
     fFed1->requestTimeComplete();
@@ -188,22 +192,22 @@ TEST_P(sequencing2, message_filter_function_two_stage)
     auto fFed2 = GetFederateAs<helics::MessageFederate>(1);
     auto mFed = GetFederateAs<helics::MessageFederate>(2);
 
-    auto& p1 = mFed->registerGlobalEndpoint("port1");
-    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    auto& port1 = mFed->registerGlobalEndpoint("port1");
+    auto& port2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& f1 = fFed->registerFilter("filter1");
-    f1.addSourceTarget("port1");
-    EXPECT_TRUE(f1.getHandle().isValid());
+    auto& filter1 = fFed->registerFilter("filter1");
+    filter1.addSourceTarget("port1");
+    EXPECT_TRUE(filter1.getHandle().isValid());
 
-    auto& f2 = fFed2->registerFilter("filter2");
-    f2.addSourceTarget("port1");
-    EXPECT_TRUE(f2.getHandle().isValid());
+    auto& filter2 = fFed2->registerFilter("filter2");
+    filter2.addSourceTarget("port1");
+    EXPECT_TRUE(filter2.getHandle().isValid());
 
     fFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
     fFed2->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
     mFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
     auto delay = helics::delayMessages(fFed2.get(), GetParam(), 500);
-    bool res = two_stage_filter_test(mFed, fFed, fFed2, p1, p2, f1, f2);
+    bool res = twoStageFilterTest(mFed, fFed, fFed2, port1, port2, filter1, filter2);
     EXPECT_TRUE(res);
     delay.wait();
 }
@@ -227,63 +231,63 @@ TEST_P(sequencing3, reroute_separate2)
     auto rec = GetFederateAs<helics::MessageFederate>(1);
     auto filt = GetFederateAs<helics::MessageFederate>(2);
 
-    auto& p1 = send->registerGlobalEndpoint("send");
-    auto& p2 = rec->registerGlobalEndpoint("rec");
-    p1.setDefaultDestination("rec");
-    auto& p3 = filt->registerGlobalEndpoint("reroute");
+    auto& sendEpt = send->registerGlobalEndpoint("send");
+    auto& recEpt = rec->registerGlobalEndpoint("rec");
+    sendEpt.setDefaultDestination("rec");
+    auto& rrEpt = filt->registerGlobalEndpoint("reroute");
 
-    auto& f1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
+    auto& rrfilt = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
-    f1.addSourceTarget("send");
-    f1.setString("newdestination", "reroute");
+    rrfilt.addSourceTarget("send");
+    rrfilt.setString("newdestination", "reroute");
     auto delay = helics::delayMessages(filt.get(), GetParam(), 900);
-    std::vector<helics::Time> tm;
-    auto act1 = [&p1, &send, &tm]() {
+    std::vector<helics::Time> times;
+    auto act1 = [&sendEpt, &send, &times]() {
         send->enterExecutingMode();
-        helics::Time tr = helics::timeZero;
-        while (tr < 10.0) {
-            p1.send("this is a message");
-            tr = send->requestTimeAdvance(1.0);
-            tm.emplace_back(tr);
+        helics::Time time = helics::timeZero;
+        while (time < 10.0) {
+            sendEpt.send("this is a message");
+            time = send->requestTimeAdvance(1.0);
+            times.emplace_back(time);
         }
         send->finalize();
     };
 
     auto act2 = [&rec]() {
         rec->enterExecutingMode();
-        helics::Time tr = helics::timeZero;
-        while (tr < 10.0) {
-            tr = rec->requestTimeAdvance(1.0);
+        helics::Time time = helics::timeZero;
+        while (time < 10.0) {
+            time = rec->requestTimeAdvance(1.0);
         }
         rec->finalize();
     };
 
     int cnt{0};
     std::vector<std::pair<helics::Time, int>> res;
-    auto act3 = [&filt, &cnt, &res, &p3]() {
+    auto act3 = [&filt, &cnt, &res, &rrEpt]() {
         filt->enterExecutingMode();
-        helics::Time tr = helics::timeZero;
-        while (tr < 20.0) {
-            tr = filt->requestTime(helics::Time::maxVal());
+        helics::Time time = helics::timeZero;
+        while (time < 20.0) {
+            time = filt->requestTime(helics::Time::maxVal());
             ++cnt;
-            res.emplace_back(tr, p3.pendingMessageCount());
+            res.emplace_back(time, rrEpt.pendingMessageCount());
         }
     };
 
-    auto t1 = std::thread(act1);
-    auto t2 = std::thread(act2);
-    auto t3 = std::thread(act3);
+    auto thread1 = std::thread(act1);
+    auto thread2 = std::thread(act2);
+    auto thread3 = std::thread(act3);
 
-    t1.join();
-    t2.join();
+    thread1.join();
+    thread2.join();
 
     // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     // auto res = broker->query("root", "global_time_debugging");
-    t3.join();
+    thread3.join();
     filt->finalize();
-    EXPECT_EQ(p2.pendingMessageCount(), 0U);
-    EXPECT_EQ(p3.pendingMessageCount(), 10U);
+    EXPECT_EQ(recEpt.pendingMessageCount(), 0U);
+    EXPECT_EQ(rrEpt.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 11);
     // auto res2 = broker->query("root", "global_time_debugging");
     broker->waitForDisconnect();

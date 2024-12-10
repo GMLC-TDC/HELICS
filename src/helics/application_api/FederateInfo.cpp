@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "FederateInfo.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/addTargets.hpp"
 #include "../common/configFileHelpers.hpp"
 #include "../core/core-exceptions.hpp"
@@ -19,9 +20,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <charconv>
 #include <iostream>
+#include <memory>
 #include <set>
+#include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace frozen {
 template<>
@@ -864,7 +868,7 @@ int FederateInfo::checkIntProperty(int propId, int defVal) const
 
 void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgParser)
 {
-    Json::Value doc;
+    nlohmann::json doc;
     try {
         doc = fileops::loadJson(jsonString);
     }
@@ -872,10 +876,10 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         throw(helics::InvalidParameter(iarg.what()));
     }
     loadJsonConfig(doc);
-    const bool hasHelicsSection = doc.isMember("helics");
+    const bool hasHelicsSection = doc.contains("helics");
     bool hasHelicsSubSection{false};
     if (hasHelicsSection) {
-        hasHelicsSubSection = doc["helics"].isMember("helics");
+        hasHelicsSubSection = doc["helics"].contains("helics");
     }
     if (runArgParser) {
         auto app = makeCLIApp();
@@ -917,8 +921,9 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
     }
 }
 
-void FederateInfo::loadJsonConfig(Json::Value& json)
+void FederateInfo::loadJsonConfig(const fileops::JsonBuffer& jsonBuf)
 {
+    const auto& json = jsonBuf.json();
     const std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
                                                                           Time arg) {
         setProperty(propStringsTranslations.at(fname), arg);
@@ -937,7 +942,7 @@ void FederateInfo::loadJsonConfig(Json::Value& json)
         [](const std::string& value) { return getOptionValue(value); },
         [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
 
-    if (json.isMember("broker")) {
+    if (json.contains("broker")) {
         const auto& jbroker = json["broker"];
         fileops::replaceIfMember(jbroker, "name", broker);
         fileops::replaceIfMember(jbroker, "host", broker);
@@ -947,7 +952,7 @@ void FederateInfo::loadJsonConfig(Json::Value& json)
         fileops::replaceIfMember(jbroker, "port", brokerPort);
     }
 
-    if (json.isMember("helics")) {
+    if (json.contains("helics")) {
         loadJsonConfig(json["helics"]);
     }
 }

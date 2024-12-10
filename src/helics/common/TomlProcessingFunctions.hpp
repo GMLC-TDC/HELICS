@@ -99,7 +99,7 @@ inline bool callIfMember(const toml::value& element,
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
 
-    if (!val.is_uninitialized()) {
+    if (!val.is_empty()) {
         call(key, loadTomlTime(val));
         return true;
     }
@@ -114,7 +114,7 @@ inline bool callIfMember(const toml::value& element,
 {
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
-    if (!val.is_uninitialized()) {
+    if (!val.is_empty()) {
         call(key, toml::get<X>(val));
         return true;
     }
@@ -127,7 +127,7 @@ inline void
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
 
-    if (!val.is_uninitialized()) {
+    if (!val.is_empty()) {
         timeVal = loadTomlTime(val);
     }
 }
@@ -137,7 +137,7 @@ inline void replaceIfMember(const toml::value& element, const std::string& key, 
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
 
-    if (!val.is_uninitialized()) {
+    if (!val.is_empty()) {
         loc = tomlAsString(val);
     }
 }
@@ -148,7 +148,7 @@ inline void replaceIfMember(const toml::value& element, const std::string& key, 
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
 
-    if (!val.is_uninitialized()) {
+    if (!val.is_empty()) {
         loc = toml::get<X>(val);
     }
 }
@@ -159,7 +159,7 @@ inline bool isMember(const toml::value& element, const std::string& key)
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
 
-    return (!val.is_uninitialized());
+    return (!val.is_empty());
 }
 
 }  // namespace helics::fileops

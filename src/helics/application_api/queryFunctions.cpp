@@ -11,8 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/string_viewOps.h"
 
 #include <algorithm>
+#include <string>
 #include <thread>
 #include <utility>
+#include <vector>
 
 namespace helics {
 
@@ -26,16 +28,16 @@ std::vector<std::string> vectorizeQueryResult(std::string_view queryres)
         try {
             auto v = fileops::loadJsonStr(queryres);
             std::vector<std::string> strs;
-            if (v.isArray()) {
+            if (v.is_array()) {
                 for (auto& str : v) {
-                    if (str.isString()) {
-                        strs.emplace_back(str.asCString());
+                    if (str.is_string()) {
+                        strs.emplace_back(str.get<std::string>());
                     } else {
                         strs.emplace_back(fileops::generateJsonString(str));
                     }
                 }
-            } else if (v.isString()) {
-                strs.emplace_back(v.asCString());
+            } else if (v.is_string()) {
+                strs.emplace_back(v.get<std::string>());
             } else {
                 strs.emplace_back(fileops::generateJsonString(v));
             }
@@ -59,22 +61,22 @@ std::vector<int> vectorizeIndexQuery(std::string_view queryres)
     if (queryres.front() == '[') {
         try {
             auto v = fileops::loadJsonStr(queryres);
-            if (v.isArray()) {
+            if (v.is_array()) {
                 for (auto& val : v) {
-                    if (val.isInt()) {
-                        result.push_back(val.asInt());
-                    } else if (val.isDouble()) {
-                        result.push_back(val.asDouble());
+                    if (val.is_number_integer()) {
+                        result.push_back(val.get<int>());
+                    } else if (val.is_number()) {
+                        result.push_back(val.get<double>());
                     } else {
                         continue;
                     }
                 }
-            } else if (v.isInt()) {
-                result.push_back(v.asInt());
-            } else if (v.isDouble()) {
-                result.push_back(v.asDouble());
-            } else if (v.isString()) {
-                result.push_back(std::stoi(v.asString()));
+            } else if (v.is_number_integer()) {
+                result.push_back(v.get<int>());
+            } else if (v.is_number()) {
+                result.push_back(v.get<double>());
+            } else if (v.is_string()) {
+                result.push_back(std::stoi(v.get<std::string>()));
             } else {
                 result.push_back(std::stoi(std::string(queryres)));
             }

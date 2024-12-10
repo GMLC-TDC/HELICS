@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace helics {
 const std::vector<std::shared_ptr<const SmallBuffer>>& InputInfo::getAllData() const

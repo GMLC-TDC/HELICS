@@ -15,7 +15,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 #include "zmqBrokerServer.hpp"
 
+#include <iostream>
+#include <memory>
+#include <string>
 #include <utility>
+
 #ifdef HELICS_ENABLE_WEBSERVER
 #    include "helicsWebServer.hpp"
 #endif
@@ -53,9 +57,9 @@ BrokerServer::~BrokerServer()
 void BrokerServer::startServers()
 {
     if (!configFile_.empty()) {
-        config_ = std::make_unique<Json::Value>(fileops::loadJson(configFile_));
+        config_ = std::make_unique<fileops::JsonStorage>(fileops::loadJson(configFile_));
     } else {
-        config_ = std::make_unique<Json::Value>();
+        config_ = std::make_unique<fileops::JsonStorage>(nlohmann::json());
     }
     if (zmq_server || zmq_ss_server) {
         auto zmqs = std::make_shared<zmqBrokerServer>(server_name_);
@@ -121,7 +125,7 @@ void BrokerServer::startServers()
 #endif
     }
     for (auto& server : servers) {
-        server->startServer(config_.get(), server);
+        server->startServer(&config_->json(), server);
     }
 }
 

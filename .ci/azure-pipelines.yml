@@ -12,22 +12,22 @@ jobs:
     strategy:
       matrix:
         ubuntuDefault:
-          containerImage: "helics/buildenv:ubuntu20.04-default-builder"
+          containerImage: "helics/buildenv:ubuntu22.04-default-builder"
           test_config: "ci"
           use_mpi: "true"
           encrypted: "true"
-        gcc8:
-          containerImage: "helics/buildenv:gcc8-builder"
+        gcc11:
+          containerImage: "helics/buildenv:gcc11-builder"
           test_config: "ci"
           use_mpi: "true"
           encrypted: "true"
-        clang13:
-          containerImage: "helics/buildenv:clang13-builder"
+        clang15:
+          containerImage: "helics/buildenv:clang15-builder"
           test_config: "ci"
           use_mpi: ""
           encrypted: ""
-        clang7:
-          containerImage: "helics/buildenv:clang7-builder"
+        clang18:
+          containerImage: "helics/buildenv:clang18-builder"
           test_config: "ci"
           use_mpi: ""
           encrypted: ""
@@ -64,11 +64,11 @@ jobs:
       matrix:
         XCode-latest:
           test_config: "ci"
-          vmImage: "macOS-13"
+          vmImage: "macOS-14"
         XCode-oldest:
           test_config: "ci"
-          vmImage: "macOS-12"
-          xcode_path: "/Applications/Xcode_13.2.1.app"
+          vmImage: "macOS-13"
+          xcode_path: "/Applications/Xcode_14.1.app"
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 60
@@ -111,7 +111,7 @@ jobs:
           imageName: "windows-2019"
           langArch: "x64"
           vsArch: "x64"
-          extraFlags: ""
+          extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
         VS2022-64bit:
           imageName: "windows-2022"
           langArch: "x64"
@@ -169,7 +169,7 @@ jobs:
       # -----------------------
       # Build HELICS
       # -----------------------
-      - bash: cmake --build . --config Release
+      - bash: cmake --build . --parallel 4 --config Release
         displayName: "Build HELICS"
         workingDirectory: build
 

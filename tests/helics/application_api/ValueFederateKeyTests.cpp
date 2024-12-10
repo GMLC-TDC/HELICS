@@ -23,7 +23,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "testFixtures_shared.hpp"
 #endif
 #include <fstream>
+#include <memory>
 #include <streambuf>
+#include <string>
+#include <vector>
 
 /** these test cases test out the value federates
  */
@@ -426,6 +429,23 @@ TEST_P(valuefed_all_type_tests, dual_transfer_inputs)
     EXPECT_TRUE(res);
 }
 
+TEST_F(valuefed, dual_transfer_inputs_odd_name)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    // register the publications
+    std::string oddName(45, static_cast<unsigned char>(201));
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>(oddName);
+
+    auto& inpid = vFed2->registerInput<std::string>("inp1");
+
+    vFed2->addTarget(inpid, oddName);
+    bool res = dualTransfer(vFed1, vFed2, pub1, inpid);
+    EXPECT_TRUE(res);
+}
+
 TEST_P(valuefed_all_type_tests, dual_transfer_pubtarget)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 2);
@@ -528,8 +548,8 @@ TEST_F(valuefed, dual_transfer_coreApp_link)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    helics::CoreApp cr(vFed1->getCorePointer());
-    cr.dataLink("pub1", "inp1");
+    helics::CoreApp core(vFed1->getCorePointer());
+    core.dataLink("pub1", "inp1");
     // register the publications
     auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
@@ -840,9 +860,9 @@ TEST_F(valuefed, all_callback)
     helics::SmallBuffer buffer(547, ';');
     helics::InterfaceHandle lastId;
     helics::Time lastTime;
-    vFed1->setInputNotificationCallback([&](const helics::Input& sub1, helics::Time callTime) {
+    vFed1->setInputNotificationCallback([&](const helics::Input& input, helics::Time callTime) {
         lastTime = callTime;
-        lastId = sub1.getHandle();
+        lastId = input.getHandle();
     });
     vFed1->enterExecutingMode();
     vFed1->publishBytes(pub3, buffer);
@@ -904,9 +924,9 @@ TEST_F(valuefed, time_update_callback)
     helics::InterfaceHandle lastId;
     helics::Time lastTime{helics::Time::minVal()};
     int validCount{0};
-    vFed1->setInputNotificationCallback([&](const helics::Input& sub1, helics::Time callTime) {
+    vFed1->setInputNotificationCallback([&](const helics::Input& input, helics::Time callTime) {
         lastTime = callTime;
-        lastId = sub1.getHandle();
+        lastId = input.getHandle();
     });
     vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
         if (newTime > lastTime && !iterating) {
@@ -963,9 +983,9 @@ TEST_F(valuefed, time_update_callback_single_thread)
     helics::InterfaceHandle lastId;
     helics::Time lastTime{helics::Time::minVal()};
     int validCount{0};
-    vFed1->setInputNotificationCallback([&](const helics::Input& sub1, helics::Time callTime) {
+    vFed1->setInputNotificationCallback([&](const helics::Input& input, helics::Time callTime) {
         lastTime = callTime;
-        lastId = sub1.getHandle();
+        lastId = input.getHandle();
     });
     vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
         if (newTime > lastTime && !iterating) {
@@ -1030,9 +1050,9 @@ TEST_P(valuefed_single_type, transfer_close)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto sub1 = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -1074,9 +1094,9 @@ TEST_P(valuefed_single_type, transfer_remove_target)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
-    auto pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
 
-    auto sub1 = vFed1->registerSubscription("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;

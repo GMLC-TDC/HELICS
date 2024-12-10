@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 #include <gtest/gtest.h>
+#include <string>
 
 /** these test cases test out the value federates
  */

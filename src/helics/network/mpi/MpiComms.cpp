@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/ActionMessage.hpp"
 #include "MpiService.h"
 
-#include <boost/scope_exit.hpp>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <string>
 #include <utility>
 
 namespace helics {
@@ -55,12 +55,15 @@ namespace mpi {
 
     void MpiComms::queue_rx_function()
     {
-        BOOST_SCOPE_EXIT_ALL(this)
-        {
+        auto scopeExit = [this](void* /*ptr*/) {
             logMessage(fmt::format("Shutdown RX Loop for {}", localTargetAddress));
             shutdown = true;
             setRxStatus(ConnectionStatus::TERMINATED);
         };
+
+        // Ensure the lambda is called when the scope exits
+        std::unique_ptr<void, decltype(scopeExit)> scopeExitGuard(nullptr, scopeExit);
+
         setRxStatus(ConnectionStatus::CONNECTED);
 
         while (true) {

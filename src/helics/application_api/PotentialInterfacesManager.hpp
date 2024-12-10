@@ -9,15 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <deque>
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-namespace Json {
-class Value;
-}
 
 namespace helics {
 class Core;
@@ -27,7 +24,7 @@ class PotentialInterfacesManager {
   public:
     PotentialInterfacesManager(Core* core, Federate* fed);
     /** get a listing of potential interfaces from a json object*/
-    void loadPotentialInterfaces(Json::Value& json);
+    void loadPotentialInterfaces(const nlohmann::json& json);
     /** generate a query response for potential interfaces*/
     std::string generateQueryResponse(std::string_view query);
     /** process a command to generate the interfaces*/
@@ -44,7 +41,7 @@ class PotentialInterfacesManager {
     Core* corePtr{nullptr};
     Federate* fedPtr{nullptr};
     std::atomic<bool> respondedToCommand{false};
-    using iMap = std::unordered_map<std::string, Json::Value>;
+    using iMap = std::unordered_map<std::string, nlohmann::json>;
     std::map<std::string, iMap> potInterfaces;
     std::map<std::string, iMap> potInterfaceTemplates;
     /// @brief  storage for unrelated commands that come through

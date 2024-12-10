@@ -21,12 +21,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <regex>
 #include <set>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -114,22 +116,22 @@ void Clone::saveFile(const std::string& filename)
         }
         return;
     }
-    Json::Value doc = fileops::loadJsonStr(fedConfig);
+    nlohmann::json doc = fileops::loadJsonStr(fedConfig);
     doc["defaultglobal"] = true;
     if (!cloneSubscriptionNames.empty()) {
         doc["optional"] = true;
 
-        doc["subscriptions"] = Json::Value(Json::arrayValue);
+        doc["subscriptions"] = nlohmann::json(nlohmann::json::array());
         for (auto& sub : cloneSubscriptionNames) {
-            Json::Value subsc;
+            nlohmann::json subsc;
             subsc["key"] = sub;
-            doc["subscriptions"].append(subsc);
+            doc["subscriptions"].push_back(subsc);
         }
     }
     if (!points.empty()) {
-        doc["points"] = Json::Value(Json::arrayValue);
+        doc["points"] = nlohmann::json(nlohmann::json::array());
         for (auto& point : points) {
-            Json::Value pointData;
+            nlohmann::json pointData;
             pointData["key"] = subscriptions[point.index].getTarget();
             pointData["value"] = point.value;
             pointData["time"] = static_cast<double>(point.time);
@@ -139,14 +141,14 @@ void Clone::saveFile(const std::string& filename)
             if (point.first) {
                 pointData["type"] = subscriptions[point.index].getPublicationType();
             }
-            doc["points"].append(pointData);
+            doc["points"].push_back(pointData);
         }
     }
 
     if (!messages.empty()) {
-        doc["messages"] = Json::Value(Json::arrayValue);
+        doc["messages"] = nlohmann::json(nlohmann::json::array());
         for (auto& mess : messages) {
-            Json::Value message;
+            nlohmann::json message;
             message["time"] = static_cast<double>(mess->time);
             message["src"] = mess->source;
             if ((!mess->original_source.empty()) && (mess->original_source != mess->source)) {
@@ -170,7 +172,7 @@ void Clone::saveFile(const std::string& filename)
             } else {
                 message["message"] = std::string(mess->data.to_string());
             }
-            doc["messages"].append(message);
+            doc["messages"].push_back(message);
         }
     }
 

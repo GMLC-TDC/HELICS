@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.11...3.28)
+cmake_minimum_required(VERSION 3.22...3.31)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -17,14 +17,15 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.5.3)
+message(STATUS "Generating with CMAKE version ${CMAKE_VERSION}")
+project(HELICS VERSION 3.6.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2024-07-08")
+set(HELICS_DATE "2024-12-09")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -82,17 +83,15 @@ include(CMakeDependentOption)
 include(copy_key_files)
 include(CTest)
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.12)
-    option(
-        HELICS_ENABLE_PYTHON_BUILD_SCRIPTS
-        "HELICS build systems can use python to automatically generate some files.  This is not required but may be useful if you are a developer and frequently modifying some files"
-        OFF
-    )
-    mark_as_advanced(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
+option(
+    HELICS_ENABLE_PYTHON_BUILD_SCRIPTS
+    "HELICS build systems can use python to automatically generate some files.  This is not required but may be useful if you are a developer and frequently modifying some files"
+    OFF
+)
+mark_as_advanced(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
 
-    if(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
-        find_package(Python COMPONENTS Interpreter)
-    endif()
+if(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
+    find_package(Python COMPONENTS Interpreter)
 endif()
 
 # allow BOOST library inclusion to be turned off completely; this option will disable the IPC core
@@ -256,10 +255,6 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         endif()
     endif()
 
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/json_cpp/CMakeLists.txt")
-        submod_update(ThirdParty/json_cpp)
-    endif()
-
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/gmlc/containers/BlockingQueue.hpp")
         submod_update(ThirdParty/containers)
     endif()
@@ -280,14 +275,32 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/units)
     endif()
 
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/toml/value.hpp")
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/include/toml11/value.hpp")
         submod_update(ThirdParty/toml)
     endif()
 
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/spdlog/CMakeLists.txt")
         submod_update(ThirdParty/spdlog)
     endif()
-    check_submodule_status()
+
+    set(IGNORE_MODULES libzmq)
+    if(HELICS_BUILD_TESTS)
+        if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/CMakeLists.txt")
+            submod_update(ThirdParty/googletest)
+        endif()
+    else()
+        list(APPEND IGNORE_MODULES googletest)
+    endif()
+
+    if(HELICS_BUILD_BENCHMARKS)
+        if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/benchmark/CMakeLists.txt")
+            submod_update(ThirdParty/benchmark)
+        endif()
+    else()
+        list(APPEND IGNORE_MODULES benchmark)
+    endif()
+
+    check_submodule_status(IGNORE_MODULES)
 
 endif() # NOT HELICS_DISABLE_GIT_OPERATIONS
 include(GNUInstallDirs)
@@ -308,8 +321,14 @@ if(NOT TARGET toml11::toml11)
     set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
     set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
     set(toml11_INSTALL OFF CACHE INTERNAL "")
-    add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
+
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+        add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL SYSTEM)
+    else()
+        add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
+    endif()
     hide_variable(TOML11_USE_UNRELEASED_TOML_FEATURES)
+    hide_variable(TOML11_PRECOMPILE)
 endif()
 
 # -------------------------------------------------------------
@@ -409,10 +428,12 @@ if(MSYS OR CYGWIN)
         set(ENABLE_IPC_CORE FALSE)
     endif()
     # setting to windows 10 for all compilation
-    if(WIN32_WINNT)
-        add_compile_definitions("_WIN32_WINNT=${WIN32_WINNT}")
-    else()
-        add_compile_definitions(_WIN32_WINNT=0x0A00)
+    if(NOT HELICS_SKIP_WINNT_DEFINITION)
+        if(WIN32_WINNT)
+            add_compile_definitions("_WIN32_WINNT=${WIN32_WINNT}")
+        else()
+            add_compile_definitions(_WIN32_WINNT=0x0A00)
+        endif()
     endif()
 endif()
 
@@ -468,15 +489,16 @@ target_include_directories(
     INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
               $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
               $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDE_DIR}>
-              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
-              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
-              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
-              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities>
 )
 # the utilities/gmlc is to account for the transfer of the header to a known location on install
 
 target_include_directories(
-    helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+    helics_base SYSTEM
+    INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
 )
 
 target_link_libraries(helics_base INTERFACE toml11::toml11)
@@ -521,11 +543,6 @@ endif()
 # create the fmt target
 # -----------------------------------------------------------------------------
 include(addfmt)
-
-# --------------------------------------------------------------
-# Create the target for jsoncpp
-# -----------------------------------------------------------
-include(addJsoncpp)
 
 # --------------------------------------------------------------
 # Create the target for spdlog
@@ -690,8 +707,6 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE"
     "units"
     "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
-    "JsonCpp"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/json_cpp/LICENSE"
     "toml11"
     "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
     "GMLC Utilities"
@@ -701,17 +716,17 @@ set(LICENSE_LIST
 )
 
 if(HELICS_BUILD_TESTS)
-    list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest-src/LICENSE")
+    list(APPEND LICENSE_LIST "Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE")
 endif()
 
 if(HELICS_BUILD_BENCHMARKS)
     list(APPEND LICENSE_LIST "Google Benchmark"
-         "${PROJECT_BINARY_DIR}/_deps/gbenchmark-src/LICENSE"
+         "${PROJECT_SOURCE_DIR}/ThirdParty/benchmark/LICENSE"
     )
 endif()
 
 if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
-    list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/LICENSE")
+    list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_SOURCE_DIR}/ThirdParty/libzmq/LICENSE")
 endif()
 
 if(NOT HELICS_DISABLE_ASIO)
@@ -797,16 +812,6 @@ cmake_dependent_option(
 
 if(HELICS_ENABLE_PACKAGE_BUILD)
 
-    if(CMAKE_VERSION VERSION_LESS 3.13)
-        if(HELICS_ZMQ_SUBPROJECT OR HELICS_ZMQ_FORCE_SUBPROJECT)
-            if(ENABLE_ZMQ_CORE)
-                message(
-                    FATAL_ERROR
-                        "CMAKE 3.13 or higher is required to package a subproject of ZeroMQ with HELICS"
-                )
-            endif()
-        endif()
-    endif()
     # cmake-format: off
     set(CPACK_PACKAGE_NAME "Helics")
     set(CPACK_PACKAGE_VENDOR "GMLC")
@@ -827,7 +832,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         libs
         swig
         java
-        octave
         csharp
         benchmarks
     )
@@ -846,14 +850,12 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_BENCHMARKS_DISPLAY_NAME "Benchmarks")
     set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
     set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
-    set(CPACK_COMPONENT_OCTAVE_DISPLAY_NAME "Octave")
     set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
 
     set(CPACK_COMPONENT_GROUP_INTERFACES_DISPLAY_NAME "Interfaces")
     set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "Additional language interfaces for HELICS")
     set(CPACK_COMPONENT_SWIG_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
-    set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
 
     set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DISPLAY_NAME "Development")
@@ -873,7 +875,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         "SWIG files needed for building 3rd party language interfaces (requires Development Headers)"
     )
     set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
-    set(CPACK_COMPONENT_OCTAVE_DESCRIPTION "Octave language interface")
     set(CPACK_COMPONENT_CSHARP_DESCRIPTION "C# language interface")
 
     set(CPACK_COMPONENT_SWIG_DEPENDS headers)
@@ -891,6 +892,8 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         "Helics Recorder"
         "helics_player"
         "Helics Player"
+        "helics_connector"
+        "Helics Connector"
     )
 
     if(INSTALL_SYSTEM_LIBRARIES)

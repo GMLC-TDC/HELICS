@@ -33,12 +33,12 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
     }
 
     auto conns = toml::find_or(doc, "connections", uVal);
-    if (!conns.is_uninitialized()) {
+    if (!conns.is_empty()) {
         auto& connArray = conns.as_array();
         for (const auto& conn : connArray) {
             if (conn.is_array()) {
                 auto& connAct = conn.as_array();
-                brk->dataLink(connAct[0].as_string().str, connAct[1].as_string().str);
+                brk->dataLink(connAct[0].as_string(), connAct[1].as_string());
             } else {
                 std::string pub = getOrDefault(conn, "publication", std::string());
                 if (!pub.empty()) {
@@ -70,12 +70,12 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
         }
     }
     auto lnks = toml::find_or(doc, "links", uVal);
-    if (!lnks.is_uninitialized()) {
+    if (!lnks.is_empty()) {
         auto& connArray = lnks.as_array();
         for (const auto& conn : connArray) {
             if (conn.is_array()) {
                 auto& connAct = conn.as_array();
-                brk->linkEndpoints(connAct[0].as_string().str, connAct[1].as_string().str);
+                brk->linkEndpoints(connAct[0].as_string(), connAct[1].as_string());
             } else {
                 std::string pub = getOrDefault(conn, "publication", std::string());
                 if (!pub.empty()) {
@@ -107,13 +107,12 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
         }
     }
     auto filts = toml::find_or(doc, "filters", uVal);
-    if (!filts.is_uninitialized()) {
+    if (!filts.is_empty()) {
         auto& filtArray = filts.as_array();
         for (const auto& filt : filtArray) {
             if (filt.is_array()) {
                 auto& filtAct = filt.as_array();
-                brk->addSourceFilterToEndpoint(filtAct[0].as_string().str,
-                                               filtAct[1].as_string().str);
+                brk->addSourceFilterToEndpoint(filtAct[0].as_string(), filtAct[1].as_string());
             } else {
                 std::string fname = getOrDefault(filt, "filter", std::string());
                 if (!fname.empty()) {
@@ -133,27 +132,26 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
         }
     }
     auto globals = toml::find_or(doc, "globals", uVal);
-    if (!globals.is_uninitialized()) {
+    if (!globals.is_empty()) {
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
-                brk->setGlobal(val.as_array()[0].as_string().str,
-                               val.as_array()[1].as_string().str);
+                brk->setGlobal(val.as_array()[0].as_string(), val.as_array()[1].as_string());
             }
         } else {
             for (const auto& val : globals.as_table()) {
-                brk->setGlobal(val.first, val.second.as_string().str);
+                brk->setGlobal(val.first, val.second.as_string());
             }
         }
     }
     auto aliases = toml::find_or(doc, "aliases", uVal);
-    if (!aliases.is_uninitialized()) {
+    if (!aliases.is_empty()) {
         if (aliases.is_array()) {
             for (auto& val : aliases.as_array()) {
-                brk->addAlias(val.as_array()[0].as_string().str, val.as_array()[1].as_string().str);
+                brk->addAlias(val.as_array()[0].as_string(), val.as_array()[1].as_string());
             }
         } else {
             for (const auto& val : aliases.as_table()) {
-                brk->addAlias(val.first, val.second.as_string().str);
+                brk->addAlias(val.first, val.second.as_string());
             }
         }
     }
@@ -164,7 +162,7 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
 {
     static_assert(std::is_base_of<Broker, brkX>::value || std::is_base_of<Core, brkX>::value,
                   "input must be Core or Broker");
-    Json::Value doc;
+    nlohmann::json doc;
     try {
         doc = loadJson(file);
     }
@@ -172,10 +170,10 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
         throw(helics::InvalidParameter(ia.what()));
     }
 
-    if (doc.isMember("connections")) {
+    if (doc.contains("connections")) {
         for (const auto& conn : doc["connections"]) {
-            if (conn.isArray() && conn.size() >= 2) {
-                brk->dataLink(conn[0].asString(), conn[1].asString());
+            if (conn.is_array() && conn.size() >= 2) {
+                brk->dataLink(conn[0].get<std::string>(), conn[1].get<std::string>());
             } else {
                 std::string pub = fileops::getOrDefault(conn, "publication", std::string_view());
                 if (!pub.empty()) {
@@ -207,10 +205,10 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
             }
         }
     }
-    if (doc.isMember("links")) {
+    if (doc.contains("links")) {
         for (const auto& conn : doc["links"]) {
-            if (conn.isArray() && conn.size() >= 2) {
-                brk->linkEndpoints(conn[0].asString(), conn[1].asString());
+            if (conn.is_array() && conn.size() >= 2) {
+                brk->linkEndpoints(conn[0].get<std::string>(), conn[1].get<std::string>());
             } else {
                 std::string pub = fileops::getOrDefault(conn, "publication", std::string_view());
                 if (!pub.empty()) {
@@ -241,10 +239,11 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
             }
         }
     }
-    if (doc.isMember("filters")) {
+    if (doc.contains("filters")) {
         for (const auto& filt : doc["filters"]) {
-            if (filt.isArray()) {
-                brk->addSourceFilterToEndpoint(filt[0].asString(), filt[1].asString());
+            if (filt.is_array()) {
+                brk->addSourceFilterToEndpoint(filt[0].get<std::string>(),
+                                               filt[1].get<std::string>());
             } else {
                 std::string fname = fileops::getOrDefault(filt, "filter", std::string_view());
                 if (!fname.empty()) {
@@ -263,28 +262,26 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
             }
         }
     }
-    if (doc.isMember("globals")) {
-        if (doc["globals"].isArray()) {
-            for (auto& val : doc["globals"]) {
-                brk->setGlobal(val[0].asString(), val[1].asString());
+    if (doc.contains("globals")) {
+        if (doc["globals"].is_array()) {
+            for (const auto& val : doc["globals"]) {
+                brk->setGlobal(val[0].get<std::string>(), val[1].get<std::string>());
             }
         } else {
-            auto members = doc["globals"].getMemberNames();
-            for (auto& val : members) {
-                brk->setGlobal(val, doc["globals"][val].asString());
+            for (const auto& member : doc["globals"].items()) {
+                brk->setGlobal(member.key(), member.value().get<std::string>());
             }
         }
     }
 
-    if (doc.isMember("aliases")) {
-        if (doc["aliases"].isArray()) {
-            for (auto& val : doc["aliases"]) {
-                brk->addAlias(val[0].asString(), val[1].asString());
+    if (doc.contains("aliases")) {
+        if (doc["aliases"].is_array()) {
+            for (const auto& val : doc["aliases"]) {
+                brk->addAlias(val[0].get<std::string>(), val[1].get<std::string>());
             }
         } else {
-            auto members = doc["aliases"].getMemberNames();
-            for (auto& val : members) {
-                brk->addAlias(val, doc["aliases"][val].asString());
+            for (const auto& member : doc["aliases"].items()) {
+                brk->addAlias(member.key(), member.value().get<std::string>());
             }
         }
     }

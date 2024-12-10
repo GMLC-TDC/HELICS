@@ -15,5 +15,4 @@
    ../Public_API
    ../ROADMAP
    typeConversions
-   Notes
 ```
