@@ -587,8 +587,10 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
             return fail(eCode, "helics web server read");
         }
 
-        const std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
-                                      buffer.size()};
+        //const std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
+         //                             buffer.size()};
+        const std::string_view result{reinterpret_cast<const char *>(buffer.data().data()),
+            buffer.size()};
         // Echo the message
         auto reqpr = processRequestParameters("", result);
 

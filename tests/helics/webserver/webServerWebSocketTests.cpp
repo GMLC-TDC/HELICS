@@ -97,7 +97,7 @@ class webTest: public ::testing::Test {
         buffer.consume(buffer.size());
 
         stream->read(buffer);
-        std::string result{boost::asio::buffer_cast<const char*>(buffer.data()), buffer.size()};
+        std::string result{reinterpret_cast<const char*>(buffer.data().data()), buffer.size()};
         if (result.empty()) {
             return "#invalid";
         }
