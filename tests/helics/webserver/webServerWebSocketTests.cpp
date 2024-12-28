@@ -116,11 +116,11 @@ class webTest: public ::testing::Test {
 
     static std::shared_ptr<helics::Core> addCore(helics::CoreType ctype, const std::string& init)
     {
-        auto cr = helics::CoreFactory::create(ctype, init);
-        if (cr) {
-            cores.push_back(cr);
+        auto core = helics::CoreFactory::create(ctype, init);
+        if (core) {
+            cores.push_back(core);
         }
-        return cr;
+        return core;
     }
     static void clearBrokers()
     {
@@ -261,8 +261,8 @@ TEST_F(webTest, singleNonJson)
 
 TEST_F(webTest, core)
 {
-    auto cr = addCore(helics::CoreType::TEST, "--name=cr1 -f2");
-    EXPECT_TRUE(cr->connect());
+    auto core = addCore(helics::CoreType::TEST, "--name=cr1 -f2");
+    EXPECT_TRUE(core->connect());
 
     nlohmann::json query;
     query["command"] = "query";
