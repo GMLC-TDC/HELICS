@@ -27,6 +27,7 @@ if(WIN32 AND NOT UNIX_LIKE)
         endif()
     endif()
     set(boost_versions
+        boost_1_87_0
         boost_1_86_0
         boost_1_85_0
         boost_1_84_0
@@ -84,6 +85,7 @@ if(WIN32 AND NOT UNIX_LIKE)
                 NAMES BoostConfig.cmake
                 PATHS ${BOOST_TEST_PATH}/${BOOST_MSVC_LIB_PATH}/cmake
                 PATH_SUFFIXES
+                    Boost-1.87.0
                     Boost-1.86.0
                     Boost-1.85.0
                     Boost-1.84.0
