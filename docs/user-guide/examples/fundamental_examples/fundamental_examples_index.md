@@ -7,8 +7,9 @@ The Fundamental Examples teach three concepts to build on a default setup:
     :maxdepth: 1
 
     fundamental_default
-    fundamental_fedintegration
     fundamental_communication
+    fundamental_fedintegration
+    
 
 ```
 
