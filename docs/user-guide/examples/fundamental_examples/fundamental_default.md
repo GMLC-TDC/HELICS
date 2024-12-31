@@ -4,12 +4,13 @@ The Base Example walks through a simple HELICS co-simulation between two python 
 
 The Base Example tutorial is organized as follows:
 
-- [Example files](#example-files)
-- [Default Setup](#default-setup)
-  - [Messages + Communication: pub sub](#messages-and-communication-pubsub)
-  - [Simulator Integration: External JSON](#simulator-integration-external-json)
-  - [Co-simulation Execution:](#co-simulation-execution)
-- [Questions and Help](#questions-and-help)
+- [Base Example Co-Simulation](#base-example-co-simulation)
+  - [Example files](#example-files)
+  - [Default Setup](#default-setup)
+    - [Messages and Communication: pub/sub](#messages-and-communication-pubsub)
+    - [Simulator Integration: External JSON](#simulator-integration-external-json)
+    - [Co-simulation Execution](#co-simulation-execution)
+  - [Questions and Help](#questions-and-help)
 
 ## Example files
 
@@ -138,11 +139,10 @@ The runner JSON for the Base Example is called `fundamental_default_runner.json`
 }
 ```
 
-This runner tells `helics_broker` that there are three federates and to take a specific action for each federate:
+This runner tells `helics_broker` that there are two federates and to take a specific action for each federate:
 
-1. Launch `helics_broker` in the current directory: `helics_broker -f 2 --loglevel=7`
-2. Launch the `Charger.py` federate in the current directory: `python -u Charger.py 1`
-3. Launch the `Battery.py` federate in the current directory: `python -u Battery.py 1`
+1. Launch the `Charger.py` federate in the current directory: `python -u Charger.py 1`
+2. Launch the `Battery.py` federate in the current directory: `python -u Battery.py 1`
 
 The final step is to launch our Base Example with the HELICS runner from the command line (making sure you've [installed the HELICS cli extension](../../installation/index.md)):
 
