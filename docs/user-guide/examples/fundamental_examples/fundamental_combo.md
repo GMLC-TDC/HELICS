@@ -4,10 +4,16 @@ The Federate Message + Communication Configuration Example extends the Base Exam
 
 This tutorial is organized as follows:
 
-- [Example files](#example-files)
-- [Combination Federates](#combination-federates)
-  - [Co-simulation Execution](#co-simulation-execution)
-- [Questions and Help](#questions-and-help)
+- [Combination Federation](#combination-federation)
+  - [Example files](#example-files)
+  - [Combination Federates](#combination-federates)
+    - [Redistribution of Federate Roles](#redistribution-of-federate-roles)
+      - [Battery](#battery)
+      - [Charger](#charger)
+      - [Controller](#controller)
+    - [Co-simulation execution](#co-simulation-execution)
+    - [Alternative implementation - Multi-Agent](#alternative-implementation---multi-agent)
+  - [Questions and Help](#questions-and-help)
 
 ## Example files
 
@@ -221,6 +227,19 @@ Note that we have made a number of simplifying assumptions in this analysis:
 - The equipment which ferries the messages between the Charger and the Controller never fails -- we haven't incorporated [Filters](./fundamental_native_filter.md).
 
 How would you model an unknown demand for vehicle charging? How would you model idle charging ports? What other simplifications do you see that can be addressed?
+
+### Alternative implementation - Multi-Agent
+As a point of comparison, an alternative implementation of the same functionality: the five chargers and five batteries in Battery.py and Charger.py (respectively) are disaggregated into unique federates of their own. This creates a co-simulation with five battery federates, five charger federates, and one controller federate. The resulting message-passing topology looks like this:
+
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_combo_multi_agent_topology.png)
+
+You can run this example just like the integrated example from the ("multi_agent")[https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/multi_agent] folder:
+
+```shell
+helics run --path=fundamental_multi_agent_runner.json
+```
+
+The example takes longer to run but produces identical results to the integrated example. The longer runtime demonstrates the common performance cost of co-simulation: passing information via the HELICS (where most HELICS cores use the network stack) is MUCH slower than passing values in memory. We use HELICS and co-simulation in general to integrate models that otherwise would not be possible to integrate. 
 
 ## [Questions and Help](../../support.md)
 
