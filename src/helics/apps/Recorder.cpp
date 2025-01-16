@@ -104,9 +104,8 @@ void Recorder::initialSetup()
 {
     if (!deactivated) {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
-        if (outFileName.empty())
-        {
-            outFileName="out.txt";
+        if (outFileName.empty()) {
+            outFileName = "out.txt";
         }
         loadInputFiles();
     }

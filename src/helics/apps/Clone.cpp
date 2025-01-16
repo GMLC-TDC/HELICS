@@ -104,9 +104,8 @@ void Clone::initialSetup()
 {
     if (!deactivated) {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
-        if (outFileName.empty())
-        {
-            outFileName="clone.json";
+        if (outFileName.empty()) {
+            outFileName = "clone.json";
         }
         loadInputFiles();
     }
@@ -378,10 +377,12 @@ std::shared_ptr<helicsCLI11App> Clone::buildArgParserApp()
     app->add_flag("--allow_iteration", allow_iteration, "allow iteration on values")
         ->ignore_underscore();
 
-    app->add_option("--capture,capture", captureFederate,
-            "clone all the interfaces of a particular federate federate capture=\"fed1;fed2\"  "
-            "supports multiple arguments or a semicolon/comma separated list");
-        
+    app->add_option(
+        "--capture,capture",
+        captureFederate,
+        "clone all the interfaces of a particular federate federate capture=\"fed1;fed2\"  "
+        "supports multiple arguments or a semicolon/comma separated list");
+
     return app;
 }
 
