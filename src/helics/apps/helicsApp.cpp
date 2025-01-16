@@ -122,6 +122,8 @@ std::unique_ptr<helicsCLI11App> App::generateParser()
                     inputFileName,
                     "The primary input file containing app configuration")
         ->check(CLI::ExistingFile);
+    app->add_option("--output,-o", outFileName, "the output file for recording the data")
+        ->capture_default_str();
     app->allow_extras()->validate_positionals();
     return app;
 }

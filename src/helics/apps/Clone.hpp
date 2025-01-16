@@ -147,7 +147,6 @@ namespace apps {
         std::map<std::string_view, int> eptNames;  //!< translate endpoint name to index
         std::string captureFederate;  //!< storage for the name of the federate to clone
         std::string fedConfig;  //!< storage for the federateConfiguration
-        std::string outFileName{"clone.json"};  //!< the final output file
         std::vector<int> pubPointCount;  //!< a    vector containing the counts of each publication
     };
 
