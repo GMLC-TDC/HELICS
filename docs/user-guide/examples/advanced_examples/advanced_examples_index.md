@@ -18,6 +18,7 @@
     advanced_async_time_request
     advanced_single_core
     advanced_helics_connector
+    advanced_dynamic_federation
 
 ```
 
