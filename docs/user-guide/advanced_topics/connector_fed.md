@@ -6,7 +6,7 @@ To support this HELICS comes with a connector application called "helics_connect
 
 ## "helics_connector" Federate
 
-The role of the "helics_connector" federate is to evaluate a mapping of the connections between federate interfaces and create the connections between these interfaces. Under the hood, it's using public APIs that allow the sources ("targets") for inputs and endpoints to be defined and destinations ("targets") to be added to publications. (Which is to say, if the stock "helics_connector" federate doesn't work the way you would like, you could actually make your own.) The documentation of the "helics_connector" app can be found on its [dedicated documentation page](TODO) but I'll summarize the highlights here:
+The role of the "helics_connector" federate is to evaluate a mapping of the connections between federate interfaces and create the connections between these interfaces. Under the hood, it's using public APIs that allow the sources ("targets") for inputs and endpoints to be defined and destinations ("targets") to be added to publications. (Which is to say, if the stock "helics_connector" federate doesn't work the way you would like, you could actually make your own.) The documentation of the "helics_connector" app can be found on its [dedicated documentation page](../../references/apps/Connector.md) but I'll summarize the highlights here:
 
 - Matches are defined in a plain text or JSON structured text file.
 - Matches can be defined as one-to-one connections or use regular expressions to match many interfaces in one succinct line.
@@ -15,7 +15,7 @@ The role of the "helics_connector" federate is to evaluate a mapping of the conn
 
 ## Callback Complications
 
-The "query-and-command" form of operation is the most complex, largely because it requires the implementation of callback functions. Unless you're using the C API directly, implementing the callback functions takes a little bit of extra effort to get the C-based libraries under the hood working. Since most of the User Guide examples are in Python and most of our users are using Python, we've [documented callbacks in PyHELICS](TODO). Take a look at that page for further details to get a slightly better understanding why C-based callbacks are more complicated in Python.
+The "query-and-command" form of operation is the most complex, largely because it requires the implementation of callback functions. Unless you're using the C API directly, implementing the callback functions takes a little bit of extra effort to get the C-based libraries under the hood working. Since most of the User Guide examples are in Python and most of our users are using Python, we've [documented callbacks in PyHELICS](https://python.helics.org/callbacks/), have a [general page discussing the supported callbacks](./callbacks.md) in the C API (which is used to provide all our supported languages such as Pyhton, Matlab, and Julia) and utilized them in [this example](../examples/advanced_examples/advanced_iteration.md). Take a look at these pages for further details to get a slightly better understanding why C-based callbacks are more complicated in Python.
 
 ## "helics_connector" Interface creation
 

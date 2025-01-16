@@ -2,7 +2,7 @@
 
 This example demonstrates the use of the "helics_connector" app to create interface connection between federates outside of the configuration JSON or API calls.
 
-- [helics_connector](#helics_connector)
+- [helics\_connector](#helics_connector)
   - [Where is the code?](#where-is-the-code)
   - [What is this co-simulation doing?](#what-is-this-co-simulation-doing)
     - [Differences compared to the Advanced Default example](#differences-compared-to-the-advanced-default-example)
@@ -10,7 +10,7 @@ This example demonstrates the use of the "helics_connector" app to create interf
     - [HELICS components](#helics-components)
       - [Configuration by match-file](#configuration-by-match-file)
       - [Match-file specification](#match-file-specification)
-      - [Configuration by interface creation](#condfiguration-by-interface-creation)
+      - [Configuration by interface creation](#configuration-by-interface-creation)
         - [Query callback](#query-callback)
         - [Configuration command response](#configuration-command-response)
         - [Interface creation timing](#interface-creation-timing)

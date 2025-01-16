@@ -66,10 +66,10 @@ As of v3.5.1 reentrant federates are allowed. They must be specified with the re
 
 ## Example
 
-An example of dynamic federation operation is under development though HELICS makes it very easy to support a dynamic federation. Simply add `--dynamic` to the broker initialization string for the root broker (if you are employing a [broker hierarchy](./broker_hierarchies.md)). For example, in a federation with four federates (one of which will be joining late), the call to start the broker is
+An example of dynamic federation can be [found here](../examples/advanced_examples/advanced_dynamic_federation.md), though its not complicated. All it takes is adding  `--dynamic` to the broker initialization string for the root broker (if you are employing a [broker hierarchy](./broker_hierarchies.md)). For example, in a federation with four federates (one of which will be joining late), the call to start the broker is
 
 ```shell
 $ helics_broker -f3 --dynamic
 ```
 
-In this example, three federates must be in the federation in order to enter initialization and then executing mode and the broker is ready if more join later.
+In this case, three federates must be in the federation in order to enter initialization and then executing mode and the broker is ready if more join later.

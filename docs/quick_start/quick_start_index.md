@@ -41,7 +41,7 @@ The `helics run` command provides an easy way to launch a co-simulation based on
 
 ## Next Steps
 
-- Look through the code of ["Battery.py"](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/fundamental/fundamental_default/Battery.py) and/or ["Charger.py"](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/fundamental/fundamental_default/Charger.py) to see how they work.
-- If you're a little confused, look at the [documentation on the Fundamental Default example](../user-guide/examples/fundamental/fundamental_default.md)
+- Look through the code of ["Battery.py"](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/fundamental_examples/fundamental_default/Battery.py) and/or ["Charger.py"](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/fundamental/fundamental_default/Charger.py) to see how they work.
+- If you're a little confused, look at the [documentation on the Fundamental Default example](../user-guide/examples/fundamental_examples/fundamental_default.md)
 - If you're still a little confused, start from [the beginning of the User Guide](../user-guide/index.md) to better understand HELICS principles and concepts.
-- If this is all making sense now, [try running another example](../user-guide/examples/supported_language_examples_index.md) to better understand some of the other features of HELICS.
+- If this is all making sense now, [try running another example](../user-guide/examples/supported_languages_examples/supported_languages_examples_index.md) to better understand some of the other features of HELICS.
