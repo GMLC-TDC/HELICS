@@ -201,10 +201,10 @@ class player_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(player_file_tests, files)
 {
-    static char indx = 'a';
+    static char index = 'a';
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.coreName = std::string("pcore5") + GetParam();
-    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreName.push_back(index++);
     fedInfo.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fedInfo);
 
@@ -348,10 +348,10 @@ TEST(player_tests, testfile)
 
 TEST(player_tests, simple_player_mlinecomment)
 {
-    static char indx = 'a';
+    static char index = 'a';
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.coreName = "pcore6-mline";
-    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreName.push_back(index++);
     fedInfo.coreInitString = " -f 2 --autobroker";
     helics::apps::Player play1("player1", fedInfo);
     play1.loadFile(std::string(TEST_DIR) + "/example_comments.player");
@@ -695,10 +695,10 @@ class player_message_file_tests: public ::testing::TestWithParam<const char*> {}
 
 TEST_P(player_message_file_tests, message_test_files)
 {
-    static char indx = 'a';
+    static char index = 'a';
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.coreName = std::string("pcore11") + GetParam();
-    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreName.push_back(index++);
     fedInfo.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fedInfo);
 

@@ -59,7 +59,7 @@ Michael Blonsky, Jeff Maguire, Killian McKenna, Dylan Cutler, Sivasathya Pradha 
 
 Prateek Munankarmi, Jeff Maguire, Sivasathya Pradha Balamurugan, Michael Blonsky, David Roberts, Xin Jin. "Community-scale interaction of energy efficiency and demand flexibility in residential buildings". Applied Energy, Volume 298, 2021, 117149, doi: 10.1016/j.apenergy.2021.117149, available at [https://www.sciencedirect.com/science/article/pii/S0306261921005754](https://www.sciencedirect.com/science/article/pii/S0306261921005754).
 
-N. Duan, N. Yee, B. Salazar, J. -Y. Joo, E. Stewart and E. Cortez, "Cybersecurity Analysis of Distribution Grid Operation with Distributed Energy Resources via Co-Simulation," 2020 IEEE Power & Energy Society General Meeting (PESGM), Montreal, QC, Canada, 2020, pp. 1-5, doi: 10.1109/PESGM41954.2020.9281757, available at [https://ieeexplore.ieee.org/document/9281757](https://ieeexplore.ieee.org/document/9281757).
+N. Duan, N. Yee, B. Salazar, J. -Y. You, E. Stewart and E. Cortez, "Cybersecurity Analysis of Distribution Grid Operation with Distributed Energy Resources via Co-Simulation," 2020 IEEE Power & Energy Society General Meeting (PESGM), Montreal, QC, Canada, 2020, pp. 1-5, doi: 10.1109/PESGM41954.2020.9281757, available at [https://ieeexplore.ieee.org/document/9281757](https://ieeexplore.ieee.org/document/9281757).
 
 W. Wang, X. Fang and A. Florita, "Impact of DER Communication Delay in AGC: Cyber-Physical Dynamic Co-simulation," 2021 IEEE 48th Photovoltaic Specialists Conference (PVSC), Fort Lauderdale, FL, USA, 2021, pp. 2616-2620, doi: 10.1109/PVSC43889.2021.9518779, available at [https://ieeexplore.ieee.org/document/9518779](https://ieeexplore.ieee.org/document/9518779).
 

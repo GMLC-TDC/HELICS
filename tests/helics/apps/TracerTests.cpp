@@ -152,10 +152,10 @@ class tracer_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(tracer_file_tests, simple_tracer_files)
 {
-    static char indx = 'a';
+    static char index = 'a';
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.coreName = std::string("tcore1") + GetParam();
-    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreName.push_back(index++);
     fedInfo.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1("trace1", fedInfo);
 
@@ -213,10 +213,10 @@ class tracer_message_file_tests: public ::testing::TestWithParam<const char*> {}
 
 TEST_P(tracer_message_file_tests, message_files)
 {
-    static char indx = 'a';
+    static char index = 'a';
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.coreName = std::string("tcore1b") + GetParam();
-    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreName.push_back(index++);
     fedInfo.coreInitString = " -f 2 --autobroker";
     helics::apps::Tracer trace1("trace1", fedInfo);
 
@@ -582,12 +582,12 @@ class tracer_clone_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(tracer_clone_file_tests, simple_clone_file)
 {
-    static char indx = 'a';
+    static char index = 'a';
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.coreName = std::string("tcore4") + GetParam();
-    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreName.push_back(index++);
     fedInfo.coreInitString = "-f3 --autobroker";
     helics::apps::Tracer trace1("trace1", fedInfo);
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
