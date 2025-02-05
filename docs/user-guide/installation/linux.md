@@ -112,4 +112,4 @@ The HELICS build supports a few specialized platforms, more will be added as nee
 
 ### Raspberry PI
 
-To build on Raspberry PI system using Raspbian use `HELICS_BUILD_CONFIGURATION=PI` This will add a few required libraries to the build so it works without other configuration. Otherwise it is also possible to build using `-DCMAKE_CXX_FLAGS=-latomic`
+Prior to HELICS 3.6.1, to build on Raspberry PI system using Raspbian required using `HELICS_BUILD_CONFIGURATION=PI`. This added a few required libraries to the build so it works without other configuration. Otherwise it is also possible to build using `-DCMAKE_CXX_FLAGS=-latomic`.

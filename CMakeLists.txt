@@ -372,10 +372,6 @@ show_variable(
 )
 mark_as_advanced(HELICS_BUILD_CONFIGURATION)
 
-if(HELICS_BUILD_CONFIGURATION STREQUAL "PI")
-    target_link_libraries(helics_base INTERFACE atomic)
-endif()
-
 # Add to list of enabled vcpkg features based on core type
 if(HELICS_ENABLE_ZMQ_CORE)
     list(APPEND VCPKG_MANIFEST_FEATURES "zeromq")
@@ -385,6 +381,29 @@ if(HELICS_ENABLE_IPC_CORE)
 endif()
 if(HELICS_ENABLE_MPI_CORE)
     list(APPEND VCPKG_MANIFEST_FEATURES "mpi")
+endif()
+
+# -------------------------------------------------------------
+# check if atomic needs linking
+# -------------------------------------------------------------
+
+include(CheckCXXSourceCompiles)
+
+check_cxx_source_compiles(
+    "
+        #include <atomic>
+        #include <cstdint>
+            std::atomic<uint16_t> value {0};
+        int main() {
+            value.store(42, std::memory_order_relaxed);
+            return value.load(std::memory_order_relaxed);
+        }
+    "
+    ATOMIC_WORKS_WITHOUT_LINKING
+)
+
+if(NOT ATOMIC_WORKS_WITHOUT_LINKING)
+    target_link_libraries(helics_base INTERFACE atomic)
 endif()
 
 # -------------------------------------------------------------
