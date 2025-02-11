@@ -15,11 +15,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreTypes.hpp"
 #include "helicsTime.hpp"
 
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
-#include <filesystem>
 
 #if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
 #    include "../application_api/timeOperations.hpp"
@@ -156,12 +156,15 @@ class helicsCLI11App: public CLI::App {
     }
     void add_config_validation()
     {
-        auto *opt=get_option("--config");
-        if (opt != nullptr)
-        {
+        auto* opt = get_option("--config");
+        if (opt != nullptr) {
             validate_positionals();
             opt->check(CLI::IsMember(
-                {".ini",".toml",".json"},[](const std::string &fname){return std::filesystem::path(fname).extension().string();}, CLI::ignore_case));
+                {".ini", ".toml", ".json"},
+                [](const std::string& fname) {
+                    return std::filesystem::path(fname).extension().string();
+                },
+                CLI::ignore_case));
         }
     }
     void addTypeOption(bool includeEnvironmentVariable = true)
