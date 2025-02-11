@@ -494,6 +494,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->set_config("--config-file,--config,config",
                     "helicsConfig.ini",
                     "specify a configuration file");
+
+    app->get_validate_positionals();
+
     auto* fmtr = addJsonConfig(app.get());
     fmtr->maxLayers(0);
     fmtr->promoteSection("helics");
