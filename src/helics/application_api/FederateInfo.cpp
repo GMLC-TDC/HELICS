@@ -377,10 +377,10 @@ static void loadFlags(FederateInfo& fedInfo, const std::string& flags)
             if (ec == std::errc()) {
                 fedInfo.setFlagOption(std::abs(val), (val > 0));
             } else if (ec == std::errc::invalid_argument) {
-                std::cerr << "unrecognized flag " << std::quoted(flg) << std::endl;
+                std::cerr << "unrecognized flag " << std::quoted(flg) << '\n';
             } else if (ec == std::errc::result_out_of_range) {
                 std::cerr << "unrecognized flag numerical value out of range " << std::quoted(flg)
-                          << std::endl;
+                          << '\n';
             }
         }
     }
@@ -494,8 +494,6 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->set_config("--config-file,--config,config",
                     "helicsConfig.ini",
                     "specify a configuration file");
-
-    app->get_validate_positionals();
 
     auto* fmtr = addJsonConfig(app.get());
     fmtr->maxLayers(0);

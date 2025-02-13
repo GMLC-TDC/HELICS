@@ -97,6 +97,8 @@ Clone::~Clone()
         }
     }
     catch (...) {
+        //destructors should not throw
+        ;
     }
 }
 
@@ -180,7 +182,7 @@ void Clone::saveFile(const std::string& filename)
     }
 
     std::ofstream outfile(filename);
-    outfile << doc << std::endl;
+    outfile << doc << '\n';
     fileSaved = true;
 }
 
@@ -320,6 +322,7 @@ void Clone::runTo(Time runToTime)
         }
     }
     catch (...) {
+        std::cerr << "error generate on run\n";
     }
 }
 /** add a subscription to record*/

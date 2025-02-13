@@ -1,5 +1,5 @@
 {
-    "autobroker":True,
+    "autobroker":true,
     "coretype":"test",
   "subscriptions": [
     {
