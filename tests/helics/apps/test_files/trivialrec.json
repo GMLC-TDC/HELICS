@@ -1,6 +1,6 @@
 {
-    "autobroker":true,
-    "coretype":"test",
+  "autobroker": true,
+  "coretype": "test",
   "subscriptions": [
     {
       "key": "pub1",

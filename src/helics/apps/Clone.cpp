@@ -97,7 +97,7 @@ Clone::~Clone()
         }
     }
     catch (...) {
-        //destructors should not throw
+        // destructors should not throw
         ;
     }
 }

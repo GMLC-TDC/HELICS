@@ -97,7 +97,7 @@ Recorder::~Recorder()
         saveFile(outFileName);
     }
     catch (...) {
-        //destructor should not throw
+        // destructor should not throw
         ;
     }
 }
