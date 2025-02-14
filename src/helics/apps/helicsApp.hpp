@@ -149,7 +149,7 @@ configuration
     Time stopTime = Time::maxVal();  //!< the time the App should stop
     std::string configFileName;  //!< name of the config file used for constructing the federate
     std::string inputFileName;  //!< the name of the app input file
-    std::string outFileName;  //!< the name of any outputfile
+    std::string outFileName;  //!< the name of any output file
     bool useLocal{false};
     bool fileLoaded{false};
     bool deactivated{false};
