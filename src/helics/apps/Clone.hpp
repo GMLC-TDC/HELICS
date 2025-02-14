@@ -59,9 +59,9 @@ namespace apps {
 
         /**constructor taking a file with the required information
     @param appName the name of the app
-    @param jsonString a file or json string defining the federate information in JSON or text
+    @param configString a file or json string defining the federate information in JSON or text
     */
-        Clone(std::string_view appName, const std::string& jsonString);
+        Clone(std::string_view appName, const std::string& configString);
         /** move construction*/
         Clone(Clone&& other_recorder) = default;
         /** move assignment*/

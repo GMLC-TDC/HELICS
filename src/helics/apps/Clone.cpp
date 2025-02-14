@@ -83,7 +83,7 @@ Clone::Clone(std::string_view appName, CoreApp& core, const FederateInfo& fedInf
     initialSetup();
 }
 
-Clone::Clone(std::string_view appName, const std::string& jsonString): App(appName, jsonString)
+Clone::Clone(std::string_view appName, const std::string& configString): App(appName, configString)
 {
     processArgs();
     initialSetup();
@@ -121,7 +121,7 @@ void Clone::saveFile(const std::string& filename)
         }
         return;
     }
-    nlohmann::json doc = fileops::loadJsonStr(fedConfig);
+    nlohmann::json doc = fedConfig.empty()?nlohmann::json() : fileops::loadJsonStr(fedConfig);
     doc["defaultglobal"] = true;
     if (!cloneSubscriptionNames.empty()) {
         doc["optional"] = true;

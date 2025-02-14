@@ -52,6 +52,15 @@ App::App(std::string_view defaultAppName, int argc, char* argv[])
     processArgs(app, fedInfo, defaultAppName);
 }
 
+App::App(std::string_view appName, const std::string& configString)
+{
+    auto app = generateParser();
+    FederateInfo fedInfo;
+    fedInfo.injectParser(app.get());
+    app->helics_parse(configString);
+    processArgs(app, fedInfo, appName);
+}
+
 void App::processArgs(std::unique_ptr<helicsCLI11App>& app,
                       FederateInfo& fedInfo,
                       std::string_view defaultAppName)
@@ -100,11 +109,7 @@ App::App(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
     configFileName = fed->getConfigFile();
 }
 
-App::App(std::string_view appName, const std::string& configString):
-    fed(std::make_shared<CombinationFederate>(appName, configString))
-{
-    configFileName = fed->getConfigFile();
-}
+
 
 App::~App() = default;
 
