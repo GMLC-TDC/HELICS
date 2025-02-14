@@ -109,8 +109,6 @@ App::App(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
     configFileName = fed->getConfigFile();
 }
 
-
-
 App::~App() = default;
 
 std::unique_ptr<helicsCLI11App> App::generateParser()

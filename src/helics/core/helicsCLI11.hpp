@@ -159,16 +159,15 @@ class helicsCLI11App: public CLI::App {
         auto* opt = get_option("--config");
         if (opt != nullptr) {
             validate_positionals();
-            opt->check(
-                [](const std::string& fname) {
-                    static const std::set<std::string> validExt={".ini",".toml",".json",".INI",".JSON",".TOML"};
-                    auto ext= std::filesystem::path(fname).extension().string();
-                    if (validExt.find(ext) == validExt.end())
-                    {
-                        return fname+" does not have a valid extension";
-                    }
-                    return std::string{};
-                });
+            opt->check([](const std::string& fname) {
+                static const std::set<std::string> validExt = {
+                    ".ini", ".toml", ".json", ".INI", ".JSON", ".TOML"};
+                auto ext = std::filesystem::path(fname).extension().string();
+                if (validExt.find(ext) == validExt.end()) {
+                    return fname + " does not have a valid extension";
+                }
+                return std::string{};
+            });
         }
     }
     void addTypeOption(bool includeEnvironmentVariable = true)

@@ -121,7 +121,7 @@ void Clone::saveFile(const std::string& filename)
         }
         return;
     }
-    nlohmann::json doc = fedConfig.empty()?nlohmann::json() : fileops::loadJsonStr(fedConfig);
+    nlohmann::json doc = fedConfig.empty() ? nlohmann::json() : fileops::loadJsonStr(fedConfig);
     doc["defaultglobal"] = true;
     if (!cloneSubscriptionNames.empty()) {
         doc["optional"] = true;

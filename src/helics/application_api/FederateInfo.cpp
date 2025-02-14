@@ -472,7 +472,7 @@ int getOptionValue(std::string val)
 void FederateInfo::injectParser(CLI::App* app)
 {
     auto lparser = makeCLIApp();
-    //extras need to go up into the parent app
+    // extras need to go up into the parent app
     lparser->allow_extras(false);
     lparser->add_config_validation();
     lparser->final_callback([app, this]() { config_additional(app); });

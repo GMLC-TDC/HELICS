@@ -58,9 +58,9 @@ TEST(clone_tests, simple_clone_test_pub_arg)
 
     helics::ValueFederate vfed("block1", "--coretype=test --corename=clone_core1");
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
-        &vfed,
-        "pub1",
-        helics::DataType::HELICS_DOUBLE);
+                             &vfed,
+                             "pub1",
+                             helics::DataType::HELICS_DOUBLE);
     auto fut = std::async(std::launch::async, [&c1]() { c1.runTo(4); });
     vfed.enterExecutingMode();
     auto retTime = vfed.requestTime(1);
