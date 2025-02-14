@@ -201,8 +201,8 @@ void Clone::initialize()
 
 void Clone::generateInterfaces()
 {
-    auto res = waitForInit(fed.get(), captureFederate);
-    if (res) {
+    fed->enterInitializingModeIterative();
+
         fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
         auto pubs = vectorizeQueryResult(
             fed->query(captureFederate, "publications", HELICS_SEQUENCING_MODE_ORDERED));
@@ -229,7 +229,6 @@ void Clone::generateInterfaces()
                                      cloneSubscriptionNames.end());
 
         fedConfig = fed->query(captureFederate, "config", HELICS_SEQUENCING_MODE_ORDERED);
-    }
 }
 
 void Clone::captureForCurrentTime(Time currentTime, int iteration)

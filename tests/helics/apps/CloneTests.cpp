@@ -81,6 +81,36 @@ TEST(clone_tests, simple_clone_test_pub_arg)
     EXPECT_EQ(cnt, 2U);
 }
 
+TEST(clone_tests, simple_clone_test_pub_arg2)
+{
+    std::string coreInitString = "-f 2 --autobroker --capture=block1 --coretype=test --corename=clone_core1";
+    helics::apps::Clone cloner("c1", coreInitString);
+
+    helics::ValueFederate vfed("block1", "--coretype=test --corename=clone_core1");
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
+        &vfed,
+        "pub1",
+        helics::DataType::HELICS_DOUBLE);
+    auto fut = std::async(std::launch::async, [&cloner]() { cloner.runTo(4); });
+    vfed.enterExecutingMode();
+    auto retTime = vfed.requestTime(1);
+    EXPECT_EQ(retTime, 1.0);
+    pub1.publish(3.4);
+
+    retTime = vfed.requestTime(2.0);
+    EXPECT_EQ(retTime, 2.0);
+    pub1.publish(4.7);
+
+    retTime = vfed.requestTime(5);
+    EXPECT_EQ(retTime, 5.0);
+
+    vfed.finalize();
+    fut.get();
+    cloner.finalize();
+    auto cnt = cloner.pointCount();
+    EXPECT_EQ(cnt, 2U);
+}
+
 TEST(clone_tests, simple_clone_test_pub2)
 {
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
