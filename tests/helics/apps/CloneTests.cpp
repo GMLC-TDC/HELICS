@@ -83,14 +83,15 @@ TEST(clone_tests, simple_clone_test_pub_arg)
 
 TEST(clone_tests, simple_clone_test_pub_arg2)
 {
-    std::string coreInitString = "-f 2 --autobroker --capture=block1 --coretype=test --corename=clone_core1";
+    std::string coreInitString =
+        "-f 2 --autobroker --capture=block1 --coretype=test --corename=clone_core1";
     helics::apps::Clone cloner("c1", coreInitString);
 
     helics::ValueFederate vfed("block1", "--coretype=test --corename=clone_core1");
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
-        &vfed,
-        "pub1",
-        helics::DataType::HELICS_DOUBLE);
+                             &vfed,
+                             "pub1",
+                             helics::DataType::HELICS_DOUBLE);
     auto fut = std::async(std::launch::async, [&cloner]() { cloner.runTo(4); });
     vfed.enterExecutingMode();
     auto retTime = vfed.requestTime(1);

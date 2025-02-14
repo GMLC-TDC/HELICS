@@ -203,32 +203,32 @@ void Clone::generateInterfaces()
 {
     fed->enterInitializingModeIterative();
 
-        fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
-        auto pubs = vectorizeQueryResult(
-            fed->query(captureFederate, "publications", HELICS_SEQUENCING_MODE_ORDERED));
-        for (auto& pub : pubs) {
-            if (pub.empty()) {
-                continue;
-            }
-            addSubscription(pub);
+    fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
+    auto pubs = vectorizeQueryResult(
+        fed->query(captureFederate, "publications", HELICS_SEQUENCING_MODE_ORDERED));
+    for (auto& pub : pubs) {
+        if (pub.empty()) {
+            continue;
         }
-        auto epts = vectorizeQueryResult(
-            fed->query(captureFederate, "endpoints", HELICS_SEQUENCING_MODE_ORDERED));
-        for (auto& ept : epts) {
-            if (ept.empty()) {
-                continue;
-            }
-            addSourceEndpointClone(ept);
+        addSubscription(pub);
+    }
+    auto epts = vectorizeQueryResult(
+        fed->query(captureFederate, "endpoints", HELICS_SEQUENCING_MODE_ORDERED));
+    for (auto& ept : epts) {
+        if (ept.empty()) {
+            continue;
         }
-        cloneSubscriptionNames =
-            vectorizeQueryResult(queryFederateSubscriptions(fed.get(), captureFederate));
-        // get rid of any empty strings that may have come to be
-        cloneSubscriptionNames.erase(std::remove(cloneSubscriptionNames.begin(),
-                                                 cloneSubscriptionNames.end(),
-                                                 std::string{}),
-                                     cloneSubscriptionNames.end());
+        addSourceEndpointClone(ept);
+    }
+    cloneSubscriptionNames =
+        vectorizeQueryResult(queryFederateSubscriptions(fed.get(), captureFederate));
+    // get rid of any empty strings that may have come to be
+    cloneSubscriptionNames.erase(std::remove(cloneSubscriptionNames.begin(),
+                                             cloneSubscriptionNames.end(),
+                                             std::string{}),
+                                 cloneSubscriptionNames.end());
 
-        fedConfig = fed->query(captureFederate, "config", HELICS_SEQUENCING_MODE_ORDERED);
+    fedConfig = fed->query(captureFederate, "config", HELICS_SEQUENCING_MODE_ORDERED);
 }
 
 void Clone::captureForCurrentTime(Time currentTime, int iteration)
