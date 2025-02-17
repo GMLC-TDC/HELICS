@@ -119,7 +119,8 @@ necessary
     void allowMultipleConnections(bool value = true) { matchMultiple = value; }
     void matchEndpointTargets(bool value = true) { matchTargetEndpoints = value; }
 
-    using ConnectionsType=std::unordered_multimap<std::string_view, Connection>;
+    using ConnectionsType = std::unordered_multimap<std::string_view, Connection>;
+
   private:
     std::unique_ptr<helicsCLI11App> generateParser();
     /** process remaining command line arguments*/

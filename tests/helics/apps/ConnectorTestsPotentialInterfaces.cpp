@@ -604,7 +604,7 @@ TEST(connector_potential_interfaces, input_pub_template_potential_match_targets)
     vfed1.finalize();
     vfed2.finalize();
     fut.get();
-    //all the connections are made through the targets on the potential interface publications
+    // all the connections are made through the targets on the potential interface publications
     EXPECT_EQ(conn1.madeConnections(), 0);
 }
 
