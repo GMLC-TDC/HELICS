@@ -99,7 +99,15 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
         for (const auto& iType : potInterfaces) {
             interfaces[iType.first] = nlohmann::json::array();
             for (const auto& ispec : iType.second) {
-                interfaces[iType.first].push_back(ispec.first);
+                if (hasPotentialTargetting)
+                {
+                    interfaces[iType.first].push_back(ispec.second);
+                }
+                else
+                {
+                    interfaces[iType.first].push_back(ispec.first);
+                }
+                
             }
         }
         for (const auto& iType : potInterfaceTemplates) {

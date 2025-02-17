@@ -41,6 +41,7 @@ class PotentialInterfacesManager {
     Core* corePtr{nullptr};
     Federate* fedPtr{nullptr};
     std::atomic<bool> respondedToCommand{false};
+    bool hasPotentialTargetting{true};
     using iMap = std::unordered_map<std::string, nlohmann::json>;
     std::map<std::string, iMap> potInterfaces;
     std::map<std::string, iMap> potInterfaceTemplates;
