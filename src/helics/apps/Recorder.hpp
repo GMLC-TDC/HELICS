@@ -165,7 +165,6 @@ namespace apps {
         std::vector<ValueStats> vStat;  //!< storage for statistics capture
         std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
         std::string mapfile;  //!< file name for the on-line file updater
-        std::string outFileName{"out.txt"};  //!< the final output file
     };
 
 }  // namespace apps
