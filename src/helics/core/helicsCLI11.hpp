@@ -15,7 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreTypes.hpp"
 #include "helicsTime.hpp"
 
+#include <filesystem>
 #include <iostream>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -153,7 +155,22 @@ class helicsCLI11App: public CLI::App {
             },
             "display system information details");
     }
-
+    void add_config_validation()
+    {
+        auto* opt = get_option("--config");
+        if (opt != nullptr) {
+            validate_positionals();
+            opt->check([](const std::string& fname) {
+                static const std::set<std::string> validExt = {
+                    ".ini", ".toml", ".json", ".INI", ".JSON", ".TOML"};
+                auto ext = std::filesystem::path(fname).extension().string();
+                if (validExt.find(ext) == validExt.end()) {
+                    return fname + " does not have a valid extension";
+                }
+                return std::string{};
+            });
+        }
+    }
     void addTypeOption(bool includeEnvironmentVariable = true)
     {
         auto* og = add_option_group("network type")->immediate_callback();

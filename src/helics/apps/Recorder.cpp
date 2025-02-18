@@ -97,6 +97,8 @@ Recorder::~Recorder()
         saveFile(outFileName);
     }
     catch (...) {
+        // destructor should not throw
+        ;
     }
 }
 
@@ -104,6 +106,9 @@ void Recorder::initialSetup()
 {
     if (!deactivated) {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
+        if (outFileName.empty()) {
+            outFileName = "out.txt";
+        }
         loadInputFiles();
     }
 }
@@ -288,7 +293,7 @@ void Recorder::writeJsonFile(const std::string& filename)
     }
 
     std::ofstream out(filename);
-    out << doc << std::endl;
+    out << doc << '\n';
 }
 
 void Recorder::writeTextFile(const std::string& filename)
@@ -526,6 +531,7 @@ void Recorder::runTo(Time runToTime)
         }
     }
     catch (...) {
+        std::cerr << "error generate on run\n";
     }
 }
 /** add a subscription to record*/
