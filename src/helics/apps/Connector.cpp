@@ -369,7 +369,8 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const nlohma
                 addPotentialTargetVariations(connections, name, "source", "publications", input);
                 addPotentialTargetVariations(connections, name, "source", "targets", input);
                 if (input.contains("alias")) {
-                    const std::string_view inputAlias = connections.interfaces.emplace_back(input["alias"].get<std::string>());
+                    const std::string_view inputAlias =
+                        connections.interfaces.emplace_back(input["alias"].get<std::string>());
                     connections.potentialInputs.emplace(
                         inputAlias, PotentialConnections{federateName, input1, false});
                     connections.aliases.emplace(inputAlias, input1);
@@ -396,7 +397,8 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const nlohma
                 addPotentialTargetVariations(connections, name, "destination", "inputs", pub);
                 addPotentialTargetVariations(connections, name, "destination", "targets", pub);
                 if (pub.contains("alias")) {
-                    const std::string_view pubAlias = connections.interfaces.emplace_back(pub["alias"].get<std::string>());
+                    const std::string_view pubAlias =
+                        connections.interfaces.emplace_back(pub["alias"].get<std::string>());
                     connections.potentialPubs.emplace(
                         pubAlias, PotentialConnections{federateName, pub1, false});
                     connections.aliases.emplace(pubAlias, pub1);
@@ -428,7 +430,8 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const nlohma
                     connections, name, "destination", "endpoints", endpoint);
                 addPotentialTargetVariations(connections, name, "destination", "targets", endpoint);
                 if (endpoint.contains("alias")) {
-                    const std::string_view eptAlias = connections.interfaces.emplace_back(endpoint["alias"].get<std::string>());
+                    const std::string_view eptAlias =
+                        connections.interfaces.emplace_back(endpoint["alias"].get<std::string>());
                     connections.potentialEndpoints.emplace(
                         eptAlias, PotentialConnections{federateName, endpoint1, false});
                     connections.aliases.emplace(eptAlias, endpoint1);
