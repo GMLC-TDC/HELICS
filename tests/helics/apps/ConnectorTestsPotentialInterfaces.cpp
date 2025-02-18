@@ -643,8 +643,8 @@ TEST(connector_potential_interfaces, input_pub_template_potential_match_alias)
 
     auto& pub2_1 = vfed2.getPublication(0);
     auto& pub2_2 = vfed2.getPublication(1);
-    auto& inp2_1 = vfed2.getInput(0);
-    auto& inp2_2 = vfed2.getInput(1);
+    auto& inp2_1 = vfed2.getInput("inp2");
+    auto& inp2_2 = vfed2.getInput("inp1");
 
     const double testValue = 3452.5625;
     pub1_1.publish(testValue);
