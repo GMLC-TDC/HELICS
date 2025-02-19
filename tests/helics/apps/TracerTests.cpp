@@ -31,10 +31,10 @@ TEST(tracer_tests, simple_tracer)
 {
     std::atomic<double> lastVal{-1e49};
     std::atomic<double> lastTime{0.0};
-    auto callback = [&lastVal, &lastTime](helics::Time tm,
+    auto callback = [&lastVal, &lastTime](helics::Time time,
                                           std::string_view /*unused*/,
                                           std::string_view newval) {
-        lastTime = static_cast<double>(tm);
+        lastTime = static_cast<double>(time);
         lastVal = std::stod(std::string(newval));
     };
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
@@ -86,11 +86,11 @@ TEST(tracer_tests, tracer_message)
     fedInfo.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1("trace1", fedInfo);
 
-    auto callback = [&mguard, &lastTime](helics::Time tm,
-                                         std::string_view /*unused*/,
-                                         std::unique_ptr<helics::Message> mess) {
+    auto callback = [&mguard, &lastTime](helics::Time time,
+                                   std::string_view /*unused*/,
+                                   std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
-        lastTime = static_cast<double>(tm);
+        lastTime = static_cast<double>(time);
     };
 
     helics::MessageFederate mfed("block1", fedInfo);
@@ -162,8 +162,8 @@ TEST_P(tracer_file_tests, simple_tracer_files)
 
     std::atomic<int> counter{0};
     auto callback = [&counter](helics::Time /*unused*/,
-                               std::string_view /*unused*/,
-                               std::string_view /*unused*/) { ++counter; };
+                         std::string_view /*unused*/,
+                         std::string_view /*unused*/) { ++counter; };
     trace1.setValueCallback(callback);
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
 
@@ -225,8 +225,8 @@ TEST_P(tracer_message_file_tests, message_files)
 
     std::atomic<int> counter{0};
     auto callback = [&counter](helics::Time /*unused*/,
-                               std::string_view /*unused*/,
-                               std::string_view /*unused*/) { ++counter; };
+                         std::string_view /*unused*/,
+                         std::string_view /*unused*/) { ++counter; };
     trace1.setValueCallback(callback);
 
     std::atomic<int> mcounter{0};
@@ -293,8 +293,8 @@ TEST_P(tracer_message_file_tests, message_files_cmd)
     helics::apps::Tracer trace1(4, argv);
     std::atomic<int> counter{0};
     auto callback = [&counter](helics::Time /*unused*/,
-                               std::string_view /*unused*/,
-                               std::string_view /*unused*/) { ++counter; };
+                         std::string_view /*unused*/,
+                         std::string_view /*unused*/) { ++counter; };
     trace1.setValueCallback(callback);
 
     helics::FederateInfo fedInfo;
@@ -357,9 +357,9 @@ TEST(tracer_tests, tracer_destendpoint_clone)
     helics::apps::Tracer trace1("trace1", fedInfo);
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    auto callback = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto callback = [&mguard, &lastTime](helics::Time time, std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
-        lastTime = static_cast<double>(tm);
+        lastTime = static_cast<double>(time);
     };
     trace1.setClonedMessageCallback(callback);
     helics::MessageFederate mfed("block1", fedInfo);
@@ -432,9 +432,9 @@ TEST(tracer_tests, srcendpoint_clone)
     fedInfo.coreName = "tcoresrc";
     fedInfo.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1("trace1", fedInfo);
-    auto callback = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto callback = [&mguard, &lastTime](helics::Time time, std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
-        lastTime = static_cast<double>(tm);
+        lastTime = static_cast<double>(time);
     };
     trace1.setClonedMessageCallback(callback);
 
@@ -504,9 +504,9 @@ TEST(tracer_tests, tracer_endpoint_clone)
     fedInfo.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1("trace1", fedInfo);
 
-    auto callback = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto callback = [&mguard, &lastTime](helics::Time time, std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
-        lastTime = static_cast<double>(tm);
+        lastTime = static_cast<double>(time);
     };
     trace1.setClonedMessageCallback(callback);
 
@@ -601,11 +601,11 @@ TEST_P(tracer_clone_file_tests, simple_clone_file)
 
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
     std::atomic<int> mcount{0};
-    auto callback = [&mguard, &lastTime, &mcount](helics::Time tm,
-                                                  std::unique_ptr<helics::Message> mess) {
+    auto callback = [&mguard, &lastTime, &mcount](helics::Time time,
+                                            std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
-        lastTime = static_cast<double>(tm);
-        if (tm == helics::Time::maxVal()) {
+        lastTime = static_cast<double>(time);
+        if (time == helics::Time::maxVal()) {
             lastTime = helics::Time::minVal();
         }
         ++mcount;
