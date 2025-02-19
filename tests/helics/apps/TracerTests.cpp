@@ -31,7 +31,7 @@ TEST(tracer_tests, simple_tracer)
 {
     std::atomic<double> lastVal{-1e49};
     std::atomic<double> lastTime{0.0};
-    auto cb = [&lastVal,
+    auto callback = [&lastVal,
                &lastTime](helics::Time tm, std::string_view /*unused*/, std::string_view newval) {
         lastTime = static_cast<double>(tm);
         lastVal = std::stod(std::string(newval));
@@ -42,7 +42,7 @@ TEST(tracer_tests, simple_tracer)
     helics::apps::Tracer trace1("trace1", fedInfo);
 
     trace1.addSubscription("pub1");
-    trace1.setValueCallback(cb);
+    trace1.setValueCallback(callback);
     helics::ValueFederate vfed("block1", fedInfo);
     helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
                              &vfed,
@@ -85,7 +85,7 @@ TEST(tracer_tests, tracer_message)
     fedInfo.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1("trace1", fedInfo);
 
-    auto cb = [&mguard, &lastTime](helics::Time tm,
+    auto callback = [&mguard, &lastTime](helics::Time tm,
                                    std::string_view /*unused*/,
                                    std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
@@ -93,15 +93,15 @@ TEST(tracer_tests, tracer_message)
     };
 
     helics::MessageFederate mfed("block1", fedInfo);
-    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint ept1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
 
     trace1.addEndpoint("src1");
-    trace1.setEndpointMessageCallback(cb);
+    trace1.setEndpointMessageCallback(callback);
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5.0); });
     mfed.enterExecutingMode();
 
     auto retTime = mfed.requestTime(1.0);
-    e1.sendTo("this is a test message", "src1");
+    ept1.sendTo("this is a test message", "src1");
     EXPECT_EQ(retTime, 1.0);
     retTime = mfed.requestTime(2.0);
     int cnt = 0;
@@ -119,7 +119,7 @@ TEST(tracer_tests, tracer_message)
         EXPECT_EQ((*mhandle)->source, "d1");
         EXPECT_EQ((*mhandle)->dest, "src1");
     }
-    e1.sendTo("this is a test message2", "src1");
+    ept1.sendTo("this is a test message2", "src1");
     EXPECT_EQ(retTime, 2.0);
     mfed.finalize();
     cnt = 0;
@@ -160,10 +160,10 @@ TEST_P(tracer_file_tests, simple_tracer_files)
     helics::apps::Tracer trace1("trace1", fedInfo);
 
     std::atomic<int> counter{0};
-    auto cb = [&counter](helics::Time /*unused*/,
+    auto callback = [&counter](helics::Time /*unused*/,
                          std::string_view /*unused*/,
                          std::string_view /*unused*/) { ++counter; };
-    trace1.setValueCallback(cb);
+    trace1.setValueCallback(callback);
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
 
     helics::ValueFederate vfed("block1", fedInfo);
@@ -223,10 +223,10 @@ TEST_P(tracer_message_file_tests, message_files)
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
 
     std::atomic<int> counter{0};
-    auto cb = [&counter](helics::Time /*unused*/,
+    auto callback = [&counter](helics::Time /*unused*/,
                          std::string_view /*unused*/,
                          std::string_view /*unused*/) { ++counter; };
-    trace1.setValueCallback(cb);
+    trace1.setValueCallback(callback);
 
     std::atomic<int> mcounter{0};
     auto cbm = [&mcounter](helics::Time /*unused*/,
@@ -243,14 +243,14 @@ TEST_P(tracer_message_file_tests, message_files)
                              &cfed,
                              "pub2",
                              helics::DataType::HELICS_DOUBLE);
-    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &cfed, "d1");
+    helics::Endpoint ept1(helics::InterfaceVisibility::GLOBAL, &cfed, "d1");
 
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5); });
     cfed.enterExecutingMode();
     auto retTime = cfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
     pub1.publish(3.4);
-    e1.sendTo("this is a test message", "src1");
+    ept1.sendTo("this is a test message", "src1");
 
     retTime = cfed.requestTime(1.5);
     EXPECT_EQ(retTime, 1.5);
@@ -258,7 +258,7 @@ TEST_P(tracer_message_file_tests, message_files)
 
     retTime = cfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    e1.sendTo("this is a test message2", "src1");
+    ept1.sendTo("this is a test message2", "src1");
     pub1.publish(4.7);
 
     retTime = cfed.requestTime(3.0);
@@ -284,17 +284,17 @@ TEST_P(tracer_message_file_tests, message_files_cmd)
     std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", "--input=" + exampleFile};
 
     char* argv[4];
-    argv[0] = &(args[0][0]);
-    argv[1] = &(args[1][0]);
-    argv[2] = &(args[2][0]);
-    argv[3] = &(args[3][0]);
+    argv[0] = args[0].data();
+    argv[1] = args[1].data();
+    argv[2] = args[2].data();
+    argv[3] = args[3].data();
 
     helics::apps::Tracer trace1(4, argv);
     std::atomic<int> counter{0};
-    auto cb = [&counter](helics::Time /*unused*/,
+    auto callback = [&counter](helics::Time /*unused*/,
                          std::string_view /*unused*/,
                          std::string_view /*unused*/) { ++counter; };
-    trace1.setValueCallback(cb);
+    trace1.setValueCallback(callback);
 
     helics::FederateInfo fedInfo;
     fedInfo.coreType = helics::CoreType::IPC;
@@ -309,14 +309,14 @@ TEST_P(tracer_message_file_tests, message_files_cmd)
                              &cfed,
                              "pub2",
                              helics::DataType::HELICS_DOUBLE);
-    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &cfed, "d1");
+    helics::Endpoint ept1(helics::InterfaceVisibility::GLOBAL, &cfed, "d1");
 
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5); });
     cfed.enterExecutingMode();
     auto retTime = cfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
     pub1.publish(3.4);
-    e1.sendTo("this is a test message", "src1");
+    ept1.sendTo("this is a test message", "src1");
 
     retTime = cfed.requestTime(1.5);
     EXPECT_EQ(retTime, 1.5);
@@ -324,7 +324,7 @@ TEST_P(tracer_message_file_tests, message_files_cmd)
 
     retTime = cfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    e1.sendTo("this is a test message2", "src1");
+    ept1.sendTo("this is a test message2", "src1");
     pub1.publish(4.7);
 
     retTime = cfed.requestTime(3.0);
@@ -356,16 +356,16 @@ TEST(tracer_tests, tracer_destendpoint_clone)
     helics::apps::Tracer trace1("trace1", fedInfo);
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
-    auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto callback = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
         lastTime = static_cast<double>(tm);
     };
-    trace1.setClonedMessageCallback(cb);
+    trace1.setClonedMessageCallback(callback);
     helics::MessageFederate mfed("block1", fedInfo);
 
     helics::MessageFederate mfed2("block2", fedInfo);
-    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
+    helics::Endpoint ept1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint ept2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     trace1.addDestEndpointClone("d1");
     trace1.addDestEndpointClone("d2");
@@ -379,7 +379,7 @@ TEST(tracer_tests, tracer_destendpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("this is a test message", "d2");
+    ept1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
     mfed2.requestTimeAsync(2.0);
@@ -402,7 +402,7 @@ TEST(tracer_tests, tracer_destendpoint_clone)
         EXPECT_EQ((*mhandle)->source, "d1");
         EXPECT_EQ((*mhandle)->original_dest, "d2");
     }
-    e2.sendTo("this is a test message2", "d1");
+    ept2.sendTo("this is a test message2", "d1");
     mfed.finalize();
     mfed2.finalize();
     cnt = 0;
@@ -431,19 +431,19 @@ TEST(tracer_tests, srcendpoint_clone)
     fedInfo.coreName = "tcoresrc";
     fedInfo.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1("trace1", fedInfo);
-    auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto callback = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
         lastTime = static_cast<double>(tm);
     };
-    trace1.setClonedMessageCallback(cb);
+    trace1.setClonedMessageCallback(callback);
 
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fedInfo);
 
     helics::MessageFederate mfed2("block2", fedInfo);
-    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
+    helics::Endpoint ept1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint ept2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     trace1.addSourceEndpointClone("d1");
     trace1.addSourceEndpointClone("d2");
@@ -457,7 +457,7 @@ TEST(tracer_tests, srcendpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("this is a test message", "d2");
+    ept1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
     mfed2.requestTimeAsync(2.0);
@@ -479,7 +479,7 @@ TEST(tracer_tests, srcendpoint_clone)
         EXPECT_EQ((*mhandle)->source, "d1");
         EXPECT_EQ((*mhandle)->original_dest, "d2");
     }
-    e2.sendTo("this is a test message2", "d1");
+    ept2.sendTo("this is a test message2", "d1");
 
     mfed.finalize();
     mfed2.finalize();
@@ -503,19 +503,19 @@ TEST(tracer_tests, tracer_endpoint_clone)
     fedInfo.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1("trace1", fedInfo);
 
-    auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto callback = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
         lastTime = static_cast<double>(tm);
     };
-    trace1.setClonedMessageCallback(cb);
+    trace1.setClonedMessageCallback(callback);
 
     fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fedInfo);
 
     helics::MessageFederate mfed2("block2", fedInfo);
-    helics::Endpoint& e1 = mfed.registerGlobalEndpoint("d1");
-    helics::Endpoint& e2 = mfed2.registerGlobalEndpoint("d2");
+    helics::Endpoint& ept1 = mfed.registerGlobalEndpoint("d1");
+    helics::Endpoint& ept2 = mfed2.registerGlobalEndpoint("d2");
 
     trace1.addDestEndpointClone("d1");
     trace1.addSourceEndpointClone("d1");
@@ -529,7 +529,7 @@ TEST(tracer_tests, tracer_endpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("this is a test message", "d2");
+    ept1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
     mfed2.requestTimeAsync(2.0);
@@ -551,7 +551,7 @@ TEST(tracer_tests, tracer_endpoint_clone)
         EXPECT_EQ((*mhandle)->source, "d1");
         EXPECT_EQ((*mhandle)->original_dest, "d2");
     }
-    e2.sendTo("this is a test message2", "d1");
+    ept2.sendTo("this is a test message2", "d1");
     mfed2.requestTimeAsync(3.0);
     retTime = mfed.requestTime(3.0);
     EXPECT_EQ(retTime, 3.0);
@@ -595,12 +595,12 @@ TEST_P(tracer_clone_file_tests, simple_clone_file)
     helics::MessageFederate mfed("block1", fedInfo);
 
     helics::MessageFederate mfed2("block2", fedInfo);
-    helics::Endpoint& e1 = mfed.registerGlobalEndpoint("d1");
-    helics::Endpoint& e2 = mfed2.registerGlobalEndpoint("d2");
+    helics::Endpoint& ept1 = mfed.registerGlobalEndpoint("d1");
+    helics::Endpoint& ept2 = mfed2.registerGlobalEndpoint("d2");
 
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
     std::atomic<int> mcount{0};
-    auto cb = [&mguard, &lastTime, &mcount](helics::Time tm,
+    auto callback = [&mguard, &lastTime, &mcount](helics::Time tm,
                                             std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
         lastTime = static_cast<double>(tm);
@@ -609,7 +609,7 @@ TEST_P(tracer_clone_file_tests, simple_clone_file)
         }
         ++mcount;
     };
-    trace1.setClonedMessageCallback(cb);
+    trace1.setClonedMessageCallback(callback);
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5.0); });
     mfed2.enterExecutingModeAsync();
     mfed.enterExecutingMode();
@@ -619,7 +619,7 @@ TEST_P(tracer_clone_file_tests, simple_clone_file)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("this is a test message", "d2");
+    ept1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
     mfed2.requestTimeAsync(2.0);
@@ -643,7 +643,7 @@ TEST_P(tracer_clone_file_tests, simple_clone_file)
         EXPECT_EQ((*mhandle)->original_dest, "d2");
     }
 
-    e2.sendTo("this is a test message2", "d1");
+    ept2.sendTo("this is a test message2", "d1");
     mfed2.requestTimeAsync(3.0);
     retTime = mfed.requestTime(3.0);
     mfed2.requestTimeComplete();
@@ -681,7 +681,7 @@ TEST_P(tracer_message_file_tests, message_files_exe)
                        exampleFile);
     exeTestRunner tracerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_app");
     ASSERT_TRUE(tracerExe.isActive());
-    auto out = tracerExe.runCaptureOutputAsync(std::string("tracer " + cmdArg));
+    auto out = tracerExe.runCaptureOutputAsync("tracer " + cmdArg);
     helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
     fedInfo.coreInitString = "";
 
@@ -694,13 +694,13 @@ TEST_P(tracer_message_file_tests, message_files_exe)
                              &cfed,
                              "pub2",
                              helics::DataType::HELICS_DOUBLE);
-    helics::Endpoint& e1 = cfed.registerGlobalEndpoint("d1");
+    helics::Endpoint& ept2 = cfed.registerGlobalEndpoint("d1");
 
     cfed.enterExecutingMode();
     auto retTime = cfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
     pub1.publish(3.4);
-    e1.sendTo("this is a test message", "src1");
+    ept2.sendTo("this is a test message", "src1");
 
     retTime = cfed.requestTime(1.5);
     EXPECT_EQ(retTime, 1.5);
@@ -708,7 +708,7 @@ TEST_P(tracer_message_file_tests, message_files_exe)
 
     retTime = cfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    e1.sendTo("this is a test message2", "src1");
+    ept2.sendTo("this is a test message2", "src1");
     pub1.publish(4.7);
 
     retTime = cfed.requestTime(3.0);

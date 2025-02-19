@@ -49,7 +49,7 @@ J. Wang, J. Simpson, R. Yang, B. Palmintier, S. Tiwari and Y. Zhang, "Performanc
 
 H. M. Mustafa et al., "Cyber-Power Co-Simulation for End-to-End Synchrophasor Network Analysis and Applications," 2021 IEEE International Conference on Communications, Control, and Computing Technologies for Smart Grids (SmartGridComm), Aachen, Germany, 2021, pp. 164-169, doi: 10.1109/SmartGridComm51999.2021.9632286, available at [https://ieeexplore.ieee.org/document/9632286](https://ieeexplore.ieee.org/document/9632286).
 
-Tuffner, Francis K., Undrill, John, Scoffield, Don, Eto, Joseph H., Kosterev, Dmitry, and Quint, Ryan D. 2021. "Distribution-Level Impacts of Plug-in Electric Vehicle Charging on the Transmission System during Fault Conditions". United States. doi: 10.2172/1832905, avialble at [https://www.osti.gov/servlets/purl/1832905](https://www.osti.gov/servlets/purl/1832905).
+Francis K. Tuffner, John Undrill, Don Scoffield, Joseph H. Eto, Dmitry Kosterev, and Ryan D. Quint,  2021. "Distribution-Level Impacts of Plug-in Electric Vehicle Charging on the Transmission System during Fault Conditions". United States. doi: 10.2172/1832905, avialble at [https://www.osti.gov/servlets/purl/1832905](https://www.osti.gov/servlets/purl/1832905).
 
 M. Mukherjee, T. Hardy, J. Fuller and A. Bose, "Transactive Implementation of Decentralized Electricity Market for Grid-Edge Systems," 2021 IEEE Power & Energy Society General Meeting (PESGM), Washington, DC, USA, 2021, pp. 1-5, doi: 10.1109/PESGM46819.2021.9638098, available at [https://ieeexplore.ieee.org/document/9638098](https://ieeexplore.ieee.org/document/9638098).
 
