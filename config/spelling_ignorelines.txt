@@ -1,1 +1,2 @@
 - [Parth Bansal](https://github.com/parthb83)
+Francis K. Tuffner, John Undrill, Don Scoffield, Joseph H. Eto, Dmitry Kosterev, and Ryan D. Quint, 2021. "Distribution-Level Impacts of Plug-in Electric Vehicle Charging on the Transmission System during Fault Conditions". United States. doi: 10.2172/1832905, avialble at [https://www.osti.gov/servlets/purl/1832905](https://www.osti.gov/servlets/purl/1832905).
