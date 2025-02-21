@@ -9,6 +9,27 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [3.6.1][] - 2025-02-21
+
+Minor release with updates for connector to allow targets and updates to the command line operations for the helics apps
+
+### Fixed
+
+- Fixed issue with apps with positional arguments on the command line, which interacted poorly in some cases with the config file used in Federate definition
+- Automatic linking with lib atomic for required systems
+
+### Changed
+
+- clone app now uses initialization iteration to resolve some timing issues
+- Updated third party libraries (toml, fmt, spdlog, benchmark, googletest)
+- Update copyright dates to 2025
+- updated Code to work with Boost 1.87
+
+### Added
+
+- Added ability for the connector operations to handle targets specified in potential interfaces
+- Added check for exported symbols list on macos to improve portability
+
 ## [3.6.0][] - 2024-12-09
 
 Major release including app support in the C library, bug fixes, and an update to the minimum build requirement for HELICS moving to a default of C++20. The 3.7 release will make C++20 the minimum compile standard. This release also changes out the json interpreter to use nlohmann::json instead of json_cpp.

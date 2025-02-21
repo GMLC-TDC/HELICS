@@ -24,6 +24,7 @@ Positionals:
 Options:
   --allow_iteration           allow iteration on values
   -o,--output TEXT=clone.json the output file for recording the data
+  --capture TEXT                name of the federate to clone
 
 Options:
   -h,-?,--help                Print this help message and exit
