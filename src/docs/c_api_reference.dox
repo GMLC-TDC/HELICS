@@ -9,11 +9,14 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsGetVersion
  - \ref helicsGetBuildFlags
  - \ref helicsGetCompilerVersion
+ - \ref helicsGetSystemInfo
  - \ref helicsErrorInitialize
  - \ref helicsErrorClear
  - \ref helicsLoadSignalHandler
+ - \ref helicsLoadThreadedSignalHandler
  - \ref helicsClearSignalHandler
  - \ref helicsLoadSignalHandlerCallback
+ - \ref helicsLoadSignalHandlerCallbackNoExit
  - \ref helicsAbort
  - \ref helicsIsCoreTypeAvailable
  - \ref helicsGetFederateByName
@@ -21,8 +24,13 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsGetFlagIndex
  - \ref helicsGetOptionIndex
  - \ref helicsGetOptionValue
+ - \ref helicsGetDataType
  - \ref helicsCloseLibrary
  - \ref helicsCleanupLibrary
+ - \ref helicsCallbackFederateNextTimeCallback
+ - \ref helicsCallbackFederateNextTimeIterativeCallback
+ - \ref helicsCallbackFederateInitializeCallback
+ - \ref helicsWrapDataInBuffer
 
  \section create Creation Function Functions to create the different objects in the library
  - \ref helicsCreateCore
@@ -35,8 +43,12 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsCreateMessageFederateFromConfig
  - \ref helicsCreateCombinationFederate
  - \ref helicsCreateCombinationFederateFromConfig
+ - \ref helicsCreateCallbackFederate
+ - \ref helicsCreateCallbackFederateFromConfig
  - \ref helicsCreateFederateInfo
  - \ref helicsCreateQuery
+ - \ref helicsCreateApp
+ - \ref helicsCreateDataBuffer
 
  \section core Core Functions
 functions applying to a \ref HelicsCore object
@@ -56,12 +68,15 @@ functions applying to a \ref HelicsCore object
  - \ref helicsCoreDestroy
  - \ref helicsCoreFree
  - \ref helicsCoreSetGlobal
+ - \ref helicsCoreAddAlias
  - \ref helicsCoreSendCommand
+ - \ref helicsCoreSendOrderedCommand
  - \ref helicsCoreSetLogFile
  - \ref helicsCoreGlobalError
  - \ref helicsCoreSetLoggingCallback
  - \ref helicsCoreRegisterFilter
  - \ref helicsCoreRegisterCloningFilter
+ - \ref helicsCoreRegisterTranslator
 
  \section broker Broker Functions
 Functions applying to a \ref HelicsBroker object
@@ -79,17 +94,33 @@ Functions applying to a \ref HelicsBroker object
  - \ref helicsBrokerDestroy
  - \ref helicsBrokerFree
  - \ref helicsBrokerSetGlobal
+ - \ref helicsBrokerAddAlias
  - \ref helicsBrokerSendCommand
+ - \ref helicsBrokerSendOrderedCommand
  - \ref helicsBrokerSetLogFile
  - \ref helicsBrokerSetTimeBarrier
  - \ref helicsBrokerClearTimeBarrier
  - \ref helicsBrokerGlobalError
  - \ref helicsBrokerSetLoggingCallback
 
+ \section app App Functions
+Functions applying to a \ref HelicsApp object
+ - \ref helicsAppEnabled
+ - \ref helicsAppGetFederate
+ - \ref helicsAppLoadFile
+ - \ref helicsAppInitialize
+ - \ref helicsAppRun
+ - \ref helicsAppRunTo
+ - \ref helicsAppFinalize
+ - \ref helicsAppFree
+ - \ref helicsAppDestroy
+ - \ref helicsAppIsActive
+
  \section fedinfo Federate Info Functions
 Functions applying to a \ref HelicsFederateInfo object
  - \ref helicsFederateInfoClone
  - \ref helicsFederateInfoLoadFromArgs
+ - \ref helicsFederateInfoLoadFromString
  - \ref helicsFederateInfoFree
  - \ref helicsFederateInfoSetCoreName
  - \ref helicsFederateInfoSetCoreInitString
@@ -109,6 +140,9 @@ Functions applying to a \ref HelicsFederateInfo object
 Functions applying to all \ref HelicsFederate objects
  - \ref helicsFederateDestroy
  - \ref helicsFederateClone
+ - \ref helicsFederateProtect
+ - \ref helicsFederateUnProtect
+ - \ref helicsFederateIsProtected
  - \ref helicsFederateIsValid
  - \ref helicsFederateRegisterInterfaces
  - \ref helicsFederateGlobalError
@@ -122,8 +156,11 @@ Functions applying to all \ref HelicsFederate objects
  - \ref helicsFederateFree
  - \ref helicsFederateEnterInitializingMode
  - \ref helicsFederateEnterInitializingModeAsync
- - \ref helicsFederateIsAsyncOperationCompleted
  - \ref helicsFederateEnterInitializingModeComplete
+ - \ref helicsFederateEnterInitializingModeIterative
+ - \ref helicsFederateEnterInitializingModeIterativeAsync
+ - \ref helicsFederateEnterInitializingModeIterativeComplete
+ - \ref helicsFederateIsAsyncOperationCompleted
  - \ref helicsFederateEnterExecutingMode
  - \ref helicsFederateEnterExecutingModeAsync
  - \ref helicsFederateEnterExecutingModeComplete
@@ -140,6 +177,7 @@ Functions applying to all \ref HelicsFederate objects
  - \ref helicsFederateRequestTimeComplete
  - \ref helicsFederateRequestTimeIterativeAsync
  - \ref helicsFederateRequestTimeIterativeComplete
+ - \ref helicsFederateProcessCommunications
  - \ref helicsFederateGetName
  - \ref helicsFederateSetTimeProperty
  - \ref helicsFederateSetFlagOption
@@ -149,6 +187,7 @@ Functions applying to all \ref HelicsFederate objects
  - \ref helicsFederateGetFlagOption
  - \ref helicsFederateGetIntegerProperty
  - \ref helicsFederateGetCurrentTime
+ - \ref helicsFederateAddAlias
  - \ref helicsFederateSetGlobal
  - \ref helicsFederateSetTag
  - \ref helicsFederateGetTag
@@ -165,6 +204,19 @@ Functions applying to all \ref HelicsFederate objects
  - \ref helicsFederateWaitCommand
  - \ref helicsFederateSetLoggingCallback
  - \ref helicsFederateSetQueryCallback
+ - \ref helicsFederateSetTimeRequestEntryCallback
+ - \ref helicsFederateSetTimeUpdateCallback
+ - \ref helicsFederateSetStateChangeCallback
+ - \ref helicsFederateSetTimeRequestReturnCallback
+ - \ref helicsFederateInitializingEntryCallback
+ - \ref helicsFederateExecutingEntryCallback
+ - \ref helicsFederateCosimulationTerminationCallback
+ - \ref helicsFederateErrorHandlerCallback
+ - \ref helicsFederateRegisterTranslator
+ - \ref helicsFederateRegisterGlobalTranslator
+ - \ref helicsFederateGetTranslatorCount
+ - \ref helicsFederateGetTranslator
+ - \ref helicsFederateGetTranslatorByIndex
 
  \section vfederate Value Federate Functions
 functions applying to federates created as a value or combination federate \ref HelicsFederate objects
@@ -181,7 +233,7 @@ functions applying to federates created as a value or combination federate \ref 
  - \ref helicsFederateGetPublicationByIndex
  - \ref helicsFederateGetInput
  - \ref helicsFederateGetInputByIndex
- - \ref helicsFederateGetSubscription
+ - \ref helicsFederateGetInputByTarget
  - \ref helicsFederateClearUpdates
  - \ref helicsFederateRegisterFromPublicationJSON
  - \ref helicsFederatePublishJSON
@@ -200,7 +252,9 @@ functions applying to a \ref HelicsPublication object
  - \ref helicsPublicationPublishChar
  - \ref helicsPublicationPublishComplex
  - \ref helicsPublicationPublishVector
+ - \ref helicsPublicationPublishComplexVector
  - \ref helicsPublicationPublishNamedPoint
+ - \ref helicsPublicationPublishDataBuffer
  - \ref helicsPublicationAddTarget
  - \ref helicsPublicationGetType
  - \ref helicsPublicationGetName
@@ -219,6 +273,7 @@ functions applying to a \ref HelicsInput object
  - \ref helicsInputAddTarget
  - \ref helicsInputGetByteCount
  - \ref helicsInputGetBytes
+ - \ref helicsInputGetDataBuffer
  - \ref helicsInputGetStringSize
  - \ref helicsInputGetString
  - \ref helicsInputGetInteger
@@ -230,6 +285,7 @@ functions applying to a \ref HelicsInput object
  - \ref helicsInputGetComplex
  - \ref helicsInputGetVectorSize
  - \ref helicsInputGetVector
+ - \ref helicsInputGetComplexVector
  - \ref helicsInputGetNamedPoint
  - \ref helicsInputSetDefaultBytes
  - \ref helicsInputSetDefaultString
@@ -240,11 +296,13 @@ functions applying to a \ref HelicsInput object
  - \ref helicsInputSetDefaultDouble
  - \ref helicsInputSetDefaultComplex
  - \ref helicsInputSetDefaultVector
+ - \ref helicsInputSetDefaultComplexVector
  - \ref helicsInputSetDefaultNamedPoint
  - \ref helicsInputGetType
  - \ref helicsInputGetPublicationType
+ - \ref helicsInputGetPublicationDataType
  - \ref helicsInputGetName
- - \ref helicsSubscriptionGetTarget
+ - \ref helicsInputGetTarget
  - \ref helicsInputGetUnits
  - \ref helicsInputGetInjectionUnits
  - \ref helicsInputGetExtractionUnits
@@ -286,6 +344,7 @@ functions applying to a \ref HelicsMessage
  - \ref helicsMessageGetFlagOption
  - \ref helicsMessageGetByteCount
  - \ref helicsMessageGetBytes
+ - \ref helicsMessageDataBuffer
  - \ref helicsMessageIsValid
  - \ref helicsMessageSetSource
  - \ref helicsMessageSetDestination
@@ -299,17 +358,59 @@ functions applying to a \ref HelicsMessage
  - \ref helicsMessageSetFlagOption
  - \ref helicsMessageSetString
  - \ref helicsMessageSetData
+ - \ref helicsMessageSetDataBuffer
  - \ref helicsMessageAppendData
  - \ref helicsMessageCopy
  - \ref helicsMessageClone
  - \ref helicsMessageFree
  - \ref helicsMessageClear
 
+ \section data object Functions
+functions applying to a \ref HelicsData buffer
+ - \ref helicsDataBufferIsValid
+ - \ref helicsDataBufferFree
+ - \ref helicsDataBufferSize
+ - \ref helicsDataBufferCapacity
+ - \ref helicsDataBufferReserve
+ - \ref helicsDataBufferClone
+ - \ref helicsDataBufferFillFromInteger
+ - \ref helicsDataBufferFillFromDouble
+ - \ref helicsDataBufferFillFromString
+ - \ref helicsDataBufferFillFromRawString
+ - \ref helicsDataBufferFillFromBoolean
+ - \ref helicsDataBufferFillFromChar
+ - \ref helicsDataBufferFillFromTime
+ - \ref helicsDataBufferFillFromComplex
+ - \ref helicsDataBufferFillFromComplexObject
+ - \ref helicsDataBufferFillFromVector
+ - \ref helicsDataBufferFillFromNamedPoint
+ - \ref helicsDataBufferFillFromComplexVector
+ - \ref helicsDataBufferType
+ - \ref helicsDataBufferToInteger
+ - \ref helicsDataBufferToDouble
+ - \ref helicsDataBufferToBoolean
+ - \ref helicsDataBufferToChar
+ - \ref helicsDataBufferStringSize
+ - \ref helicsDataBufferToString
+ - \ref helicsDataBufferToRawString
+ - \ref helicsDataBufferToTime
+ - \ref helicsDataBufferToComplexObject
+ - \ref helicsDataBufferToComplex
+ - \ref helicsDataBufferVectorSize
+ - \ref helicsDataBufferToVector
+ - \ref helicsDataBufferToComplexVector
+ - \ref helicsDataBufferToNamedPoint
+ - \ref helicsDataBufferConvertToType
+
  \section endpoint Endpoint interface Functions
 functions applying to a \ref HelicsEndpoint object
  - \ref helicsEndpointIsValid
  - \ref helicsEndpointSetDefaultDestination
  - \ref helicsEndpointGetDefaultDestination
+ - \ref helicsEndpointSendString
+ - \ref helicsEndpointSendStringTo
+ - \ref helicsEndpointSendStringToAt
+ - \ref helicsEndpointSendStringAt
  - \ref helicsEndpointSendBytes
  - \ref helicsEndpointSendBytesTo
  - \ref helicsEndpointSendBytesToAt
@@ -321,6 +422,7 @@ functions applying to a \ref HelicsEndpoint object
  - \ref helicsEndpointPendingMessageCount
  - \ref helicsEndpointGetMessage
  - \ref helicsEndpointCreateMessage
+ - \ref helicsEndpointClearMessages
  - \ref helicsEndpointGetType
  - \ref helicsEndpointGetName
  - \ref helicsEndpointGetInfo
@@ -352,6 +454,8 @@ Functions applying to a \ref HelicsFilter object
  - \ref helicsFilterGetName
  - \ref helicsFilterSet
  - \ref helicsFilterSetString
+ - \ref helicsFilterGetPropertyDouble
+ - \ref helicsFilterGetPropertyString
  - \ref helicsFilterAddDestinationTarget
  - \ref helicsFilterAddSourceTarget
  - \ref helicsFilterAddDeliveryEndpoint
@@ -363,6 +467,25 @@ Functions applying to a \ref HelicsFilter object
  - \ref helicsFilterSetTag
  - \ref helicsFilterSetOption
  - \ref helicsFilterGetOption
+
+ \section translator Translator interface Functions
+Functions applying to a \ref HelicsTranslator object
+ - \ref helicsTranslatorSetCustomCallback
+ - \ref helicsTranslatorIsValid
+ - \ref helicsTranslatorGetName
+ - \ref helicsTranslatorSet
+ - \ref helicsTranslatorSetString
+ - \ref helicsTranslatorAddInputTarget
+ - \ref helicsTranslatorAddPublicationTarget
+ - \ref helicsTranslatorAddSourceEndpoint
+ - \ref helicsTranslatorAddDestinationEndpoint
+ - \ref helicsTranslatorRemoveTarget
+ - \ref helicsTranslatorGetInfo
+ - \ref helicsTranslatorSetInfo
+ - \ref helicsTranslatorGetTag
+ - \ref helicsTranslatorSetTag
+ - \ref helicsTranslatorSetOption
+ - \ref helicsTranslatorGetOption
 
  \section query Query Functions
 functions applying to a \ref HelicsQuery object
