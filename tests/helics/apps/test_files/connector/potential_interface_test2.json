@@ -1,0 +1,32 @@
+{
+  "potential_interfaces": {
+    "publications": [
+      {
+        "name": "pub1",
+        "global": true,
+        "type": "double",
+        "target": "objA/typeC"
+      },
+      {
+        "name": "pub2",
+        "global": true,
+        "type": "double",
+        "targets": "objB/typeA"
+      }
+    ],
+    "inputs": [
+      {
+        "name": "inp2",
+        "global": true,
+        "type": "double",
+        "target": "obj2/type3"
+      },
+      {
+        "name": "inp1",
+        "global": true,
+        "type": "double",
+        "targets": ["obj1/type1", "pub1"]
+      }
+    ]
+  }
+}

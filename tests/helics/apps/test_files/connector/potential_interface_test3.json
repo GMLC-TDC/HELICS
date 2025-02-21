@@ -1,0 +1,22 @@
+{
+  "potential_interfaces": {
+    "publications": [
+      { "name": "pub1", "global": true, "type": "double", "alias": "pubbyA" },
+      { "name": "pub2", "global": true, "type": "double", "alias": "pubbyB" }
+    ],
+    "inputs": [
+      {
+        "name": "inp2",
+        "global": true,
+        "type": "double",
+        "alias": "destinationB"
+      },
+      {
+        "name": "inp1",
+        "global": true,
+        "type": "double",
+        "alias": "destinationA"
+      }
+    ]
+  }
+}
