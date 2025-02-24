@@ -7,7 +7,7 @@ This document contains tentative plans for changes and improvements of note in u
 - Make C++20 the minimum compiler standard and utilize C++20 features.
 - Update IPC core
 - Observer App
-  
+
 ## Nearer term features (Maybe Summer 2025)
 
 - Full xSDK compatibility

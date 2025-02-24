@@ -3317,7 +3317,7 @@ void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo
                     mBrokers.apply([this](auto& broker) {
                         if (!broker._sent_disconnect_ack) {
                             ActionMessage dis((broker._core) ? CMD_DISCONNECT_CORE_ACK :
-                                                            CMD_DISCONNECT_BROKER_ACK);
+                                                               CMD_DISCONNECT_BROKER_ACK);
                             dis.source_id = global_broker_id_local;
                             dis.dest_id = broker.global_id;
                             this->transmit(broker.route, dis);
