@@ -307,8 +307,18 @@ or
       { "name": "pub2", "global": true, "type": "double" }
     ],
     "inputs": [
-      { "name": "inp2", "global": true, "type": "double" },
-      { "name": "inp1", "global": true, "type": "double" }
+      {
+        "name": "inp2",
+        "global": true,
+        "type": "double",
+        "target": "publicationB"
+      },
+      {
+        "name": "inp1",
+        "global": true,
+        "type": "double",
+        "target": "publicationA"
+      }
     ],
     "publication_templates": [
       {
@@ -339,3 +349,5 @@ or
 ```
 
 The connector will evaluate all possibilities for the template for possible connections. The field name in `${fieldName}` is searched for in the json file. They may be duplicated, but are treated as independent for evaluation purposes as in the first example. The first template example defines over 175,000 different possible interfaces. The type of the interface can be defined as part of the template name, with the particular name as the key.
+
+For potential interfaces if they specify a targeting field, such as "target","targets", "input_target(s)", or other valid targeting fields the potential interface will be created if the target exists or is itself a potential interface or template. The connections will then be made at the creation of the interface.
