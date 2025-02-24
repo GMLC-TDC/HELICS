@@ -38,7 +38,7 @@ namespace helics {
 
 constexpr char universalKey[] = "**";
 
-const std::string& stateString(ConnectionState state)
+static const std::string& stateString(ConnectionState state)
 {
     static const std::string connected{"connected"};
     static const std::string init{"init_requested"};
@@ -396,7 +396,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
     } else {
         mBrokers.back().route = getRoute(command.source_id);
         if (mBrokers.back().route == parent_route_id) {
-            std::cout << " invalid route to parent broker or reg broker" << std::endl;
+            std::cout << " invalid route to parent broker or reg broker\n";
         }
         mBrokers.back().parent = command.source_id;
         mBrokers.back()._nonLocal = true;
@@ -1675,6 +1675,7 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
                     catch (const std::bad_any_cast&) {
                         // This shouldn't really happen unless someone is being malicious so just
                         // ignore it for now.
+                        ;
                     }
                 }
             }
@@ -2557,7 +2558,7 @@ void CoreBroker::disconnect()
             addActionMessage(CMD_USER_DISCONNECT);
         }
         if (cnt % 13 == 0) {
-            std::cerr << "waiting on disconnect " << std::endl;
+            std::cerr << "waiting on disconnect \n";
         }
     }
 }
