@@ -2558,7 +2558,7 @@ void CoreBroker::disconnect()
             addActionMessage(CMD_USER_DISCONNECT);
         }
         if (cnt % 13 == 0) {
-            std::cerr << "waiting on disconnect \n";
+            std::cerr << "waiting on disconnect\n";
         }
     }
 }

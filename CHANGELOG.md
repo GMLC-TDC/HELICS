@@ -22,8 +22,8 @@ Minor release with updates for connector to allow targets and updates to the com
 
 - clone app now uses initialization iteration to resolve some timing issues
 - Updated third party libraries (toml, fmt, spdlog, benchmark, googletest)
-- Update copyright dates to 2025
-- updated Code to work with Boost 1.87
+- Updated copyright dates to 2025
+- Updated code to work with Boost 1.87
 
 ### Added
 
