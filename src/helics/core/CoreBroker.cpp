@@ -3314,15 +3314,15 @@ void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo
         } else {
             if ((brk != nullptr) && (!brk->_nonLocal)) {
                 if (globalDisconnect) {
-                    mBrokers.apply([this](auto& brk) {
-                        if (!brk._sent_disconnect_ack) {
-                            ActionMessage dis((brk._core) ? CMD_DISCONNECT_CORE_ACK :
+                    mBrokers.apply([this](auto& broker) {
+                        if (!broker._sent_disconnect_ack) {
+                            ActionMessage dis((broker._core) ? CMD_DISCONNECT_CORE_ACK :
                                                             CMD_DISCONNECT_BROKER_ACK);
                             dis.source_id = global_broker_id_local;
-                            dis.dest_id = brk.global_id;
-                            this->transmit(brk.route, dis);
-                            brk._sent_disconnect_ack = true;
-                            this->removeRoute(brk.route);
+                            dis.dest_id = broker.global_id;
+                            this->transmit(broker.route, dis);
+                            broker._sent_disconnect_ack = true;
+                            this->removeRoute(broker.route);
                         }
                     });
                 } else {

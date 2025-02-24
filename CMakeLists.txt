@@ -18,14 +18,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
 endif()
 
 message(STATUS "Generating with CMAKE version ${CMAKE_VERSION}")
-project(HELICS VERSION 3.6.0)
+project(HELICS VERSION 3.6.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2024-12-09")
+set(HELICS_DATE "2025-02-24")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"

@@ -5,15 +5,15 @@ This document contains tentative plans for changes and improvements of note in u
 ## \[3.7\] ~ Spring-Early Summer 2025
 
 - Make C++20 the minimum compiler standard and utilize C++20 features.
-
-## Nearer term features
+- Update IPC core
+- Observer App
+  
+## Nearer term features (Maybe Summer 2025)
 
 - Full xSDK compatibility
 - Separate Java Interface
-- Observer App
 - Tag based subscriptions
 - Single thread cores
-- Update IPC core
 
 ## Further in the future
 
