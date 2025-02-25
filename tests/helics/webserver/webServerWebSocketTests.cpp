@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -97,7 +97,7 @@ class webTest: public ::testing::Test {
         buffer.consume(buffer.size());
 
         stream->read(buffer);
-        std::string result{boost::asio::buffer_cast<const char*>(buffer.data()), buffer.size()};
+        std::string result{reinterpret_cast<const char*>(buffer.data().data()), buffer.size()};
         if (result.empty()) {
             return "#invalid";
         }
@@ -116,11 +116,11 @@ class webTest: public ::testing::Test {
 
     static std::shared_ptr<helics::Core> addCore(helics::CoreType ctype, const std::string& init)
     {
-        auto cr = helics::CoreFactory::create(ctype, init);
-        if (cr) {
-            cores.push_back(cr);
+        auto core = helics::CoreFactory::create(ctype, init);
+        if (core) {
+            cores.push_back(core);
         }
-        return cr;
+        return core;
     }
     static void clearBrokers()
     {
@@ -261,8 +261,8 @@ TEST_F(webTest, singleNonJson)
 
 TEST_F(webTest, core)
 {
-    auto cr = addCore(helics::CoreType::TEST, "--name=cr1 -f2");
-    EXPECT_TRUE(cr->connect());
+    auto core = addCore(helics::CoreType::TEST, "--name=cr1 -f2");
+    EXPECT_TRUE(core->connect());
 
     nlohmann::json query;
     query["command"] = "query";
@@ -326,22 +326,22 @@ TEST_F(webTest, create)
 
 TEST_F(webTest, deleteBroker)
 {
-    nlohmann::json v1;
-    v1["command"] = "delete";
-    v1["broker"] = "brk2";
-    sendText(helics::fileops::generateJsonString(v1));
+    nlohmann::json cmd1;
+    cmd1["command"] = "delete";
+    cmd1["broker"] = "brk2";
+    sendText(helics::fileops::generateJsonString(cmd1));
 
-    nlohmann::json v2;
-    v2["command"] = "query";
-    v2["query"] = "brokers";
-    auto result = sendText(generateJsonString(v2));
+    nlohmann::json cmd2;
+    cmd2["command"] = "query";
+    cmd2["query"] = "brokers";
+    auto result = sendText(generateJsonString(cmd2));
     EXPECT_FALSE(result.empty());
     auto val = helics::fileops::loadJson(result);
     EXPECT_TRUE(val["brokers"].is_array());
     EXPECT_EQ(val["brokers"].size(), 2U);
-    v1["broker"] = "brk1";
-    sendText(generateJsonString(v1));
-    result = sendText(generateJsonString(v2));
+    cmd1["broker"] = "brk1";
+    sendText(generateJsonString(cmd1));
+    result = sendText(generateJsonString(cmd2));
     EXPECT_FALSE(result.empty());
     val = helics::fileops::loadJson(result);
     EXPECT_TRUE(val["brokers"].is_array());
@@ -350,40 +350,40 @@ TEST_F(webTest, deleteBroker)
 
 TEST_F(webTest, createBrokerUUID)
 {
-    nlohmann::json v4;
-    v4["command"] = "query";
-    v4["query"] = "brokers";
+    nlohmann::json cmd1;
+    cmd1["command"] = "query";
+    cmd1["query"] = "brokers";
 
-    auto result = sendText(generateJsonString(v4));
+    auto result = sendText(generateJsonString(cmd1));
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
     EXPECT_TRUE(val["brokers"].is_array());
     auto brksize = val["brokers"].size();
 
-    nlohmann::json v1;
-    v1["command"] = "create";
-    v1["core_type"] = CORE1;
-    v1["num_feds"] = 3;
-    result = sendText(generateJsonString(v1));
+    nlohmann::json cmd2;
+    cmd2["command"] = "create";
+    cmd2["core_type"] = CORE1;
+    cmd2["num_feds"] = 3;
+    result = sendText(generateJsonString(cmd2));
     val = loadJson(result);
     EXPECT_TRUE(val["broker_uuid"].is_string());
     auto uuid = val["broker_uuid"].get<std::string>();
 
-    nlohmann::json v2;
-    v2["command"] = "get";
-    v2["uuid"] = uuid;
+    nlohmann::json cmd3;
+    cmd3["command"] = "get";
+    cmd3["uuid"] = uuid;
 
-    result = sendText(generateJsonString(v2));
+    result = sendText(generateJsonString(cmd3));
     val = loadJson(result);
     EXPECT_TRUE(val["status"].get<bool>());
 
-    nlohmann::json v3;
-    v3["command"] = "delete";
-    v3["broker_uuid"] = uuid;
+    nlohmann::json cmd4;
+    cmd4["command"] = "delete";
+    cmd4["broker_uuid"] = uuid;
 
-    sendText(generateJsonString(v3));
+    sendText(generateJsonString(cmd4));
 
-    result = sendText(generateJsonString(v4));
+    result = sendText(generateJsonString(cmd1));
     EXPECT_FALSE(result.empty());
     val = loadJson(result);
     EXPECT_TRUE(val["brokers"].is_array());
@@ -392,15 +392,15 @@ TEST_F(webTest, createBrokerUUID)
 
 TEST_F(webTest, deleteJson)
 {
-    nlohmann::json v1;
-    v1["command"] = "delete";
-    v1["broker"] = "brk3";
-    sendText(generateJsonString(v1));
+    nlohmann::json cmd1;
+    cmd1["command"] = "delete";
+    cmd1["broker"] = "brk3";
+    sendText(generateJsonString(cmd1));
 
-    nlohmann::json v2;
-    v2["command"] = "query";
-    v2["query"] = "brokers";
-    auto result = sendText(generateJsonString(v2));
+    nlohmann::json cmd2;
+    cmd2["command"] = "query";
+    cmd2["query"] = "brokers";
+    auto result = sendText(generateJsonString(cmd2));
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
     EXPECT_TRUE(val["brokers"].is_array());
@@ -415,10 +415,10 @@ TEST_F(webTest, timeBlock)
     create["core_type"] = CORE1;
     create["num_feds"] = 1;
     sendText(generateJsonString(create));
-    auto cr = addCore(tCore, "--name=c_timer -f1 --broker=brk_timerws");
-    EXPECT_TRUE(cr->connect());
+    auto core = addCore(tCore, "--name=c_timer -f1 --broker=brk_timerws");
+    EXPECT_TRUE(core->connect());
 
-    helics::ValueFederate vFed("fed1", cr);
+    helics::ValueFederate vFed("fed1", core);
 
     nlohmann::json barrier;
     barrier["broker"] = "brk_timerws";
@@ -446,8 +446,8 @@ TEST_F(webTest, timeBlock)
     EXPECT_EQ(rtime, 6.0);
 
     vFed.finalize();
-    nlohmann::json v1;
-    v1["command"] = "delete";
-    v1["broker"] = "brk_timerws";
-    sendText(generateJsonString(v1));
+    nlohmann::json json;
+    json["command"] = "delete";
+    json["broker"] = "brk_timerws";
+    sendText(generateJsonString(json));
 }

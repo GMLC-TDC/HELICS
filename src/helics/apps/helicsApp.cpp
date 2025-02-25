@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -52,6 +52,15 @@ App::App(std::string_view defaultAppName, int argc, char* argv[])
     processArgs(app, fedInfo, defaultAppName);
 }
 
+App::App(std::string_view appName, const std::string& configString)
+{
+    auto app = generateParser();
+    FederateInfo fedInfo;
+    fedInfo.injectParser(app.get());
+    app->helics_parse(configString);
+    processArgs(app, fedInfo, appName);
+}
+
 void App::processArgs(std::unique_ptr<helicsCLI11App>& app,
                       FederateInfo& fedInfo,
                       std::string_view defaultAppName)
@@ -100,19 +109,13 @@ App::App(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
     configFileName = fed->getConfigFile();
 }
 
-App::App(std::string_view appName, const std::string& configString):
-    fed(std::make_shared<CombinationFederate>(appName, configString))
-{
-    configFileName = fed->getConfigFile();
-}
-
 App::~App() = default;
 
 std::unique_ptr<helicsCLI11App> App::generateParser()
 {
     auto app =
         std::make_unique<helicsCLI11App>("Common options for all Helics Apps", "[HELICS_APP]");
-
+    app->add_config_validation();
     app->add_flag("--local",
                   useLocal,
                   "Specify otherwise unspecified endpoints and publications as local "
@@ -122,6 +125,8 @@ std::unique_ptr<helicsCLI11App> App::generateParser()
                     inputFileName,
                     "The primary input file containing app configuration")
         ->check(CLI::ExistingFile);
+    app->add_option("--output,-o", outFileName, "the output file for recording the data")
+        ->capture_default_str();
     app->allow_extras()->validate_positionals();
     return app;
 }

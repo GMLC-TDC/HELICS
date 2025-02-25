@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2024, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2025, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -18,14 +18,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
 endif()
 
 message(STATUS "Generating with CMAKE version ${CMAKE_VERSION}")
-project(HELICS VERSION 3.6.0)
+project(HELICS VERSION 3.6.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2024-12-09")
+set(HELICS_DATE "2025-02-24")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -372,10 +372,6 @@ show_variable(
 )
 mark_as_advanced(HELICS_BUILD_CONFIGURATION)
 
-if(HELICS_BUILD_CONFIGURATION STREQUAL "PI")
-    target_link_libraries(helics_base INTERFACE atomic)
-endif()
-
 # Add to list of enabled vcpkg features based on core type
 if(HELICS_ENABLE_ZMQ_CORE)
     list(APPEND VCPKG_MANIFEST_FEATURES "zeromq")
@@ -385,6 +381,29 @@ if(HELICS_ENABLE_IPC_CORE)
 endif()
 if(HELICS_ENABLE_MPI_CORE)
     list(APPEND VCPKG_MANIFEST_FEATURES "mpi")
+endif()
+
+# -------------------------------------------------------------
+# check if atomic needs linking
+# -------------------------------------------------------------
+
+include(CheckCXXSourceCompiles)
+
+check_cxx_source_compiles(
+    "
+        #include <atomic>
+        #include <cstdint>
+            std::atomic<uint16_t> value {0};
+        int main() {
+            value.store(42, std::memory_order_relaxed);
+            return value.load(std::memory_order_relaxed);
+        }
+    "
+    ATOMIC_WORKS_WITHOUT_LINKING
+)
+
+if(NOT ATOMIC_WORKS_WITHOUT_LINKING)
+    target_link_libraries(helics_base INTERFACE atomic)
 endif()
 
 # -------------------------------------------------------------

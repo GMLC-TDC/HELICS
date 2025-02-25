@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -2653,8 +2653,6 @@ HELICS_EXPORT HelicsFederate helicsAppGetFederate(HelicsApp app, HelicsError* er
  *
  * @details Loads a configuration file for an app.
  *
- * @param appName A string with the name of the app, can be NULL or an empty string to pull the default name from fedInfo or the config
- * file.
  * @param app The app to load a file.
  * @param configFile Configuration file or string to pass into the app, can be NULL or empty.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.

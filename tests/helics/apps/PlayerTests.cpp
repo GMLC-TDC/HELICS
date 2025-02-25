@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -201,10 +201,10 @@ class player_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(player_file_tests, files)
 {
-    static char indx = 'a';
+    static char index = 'a';
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.coreName = std::string("pcore5") + GetParam();
-    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreName.push_back(index++);
     fedInfo.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fedInfo);
 
@@ -348,10 +348,10 @@ TEST(player_tests, testfile)
 
 TEST(player_tests, simple_player_mlinecomment)
 {
-    static char indx = 'a';
+    static char index = 'a';
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.coreName = "pcore6-mline";
-    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreName.push_back(index++);
     fedInfo.coreInitString = " -f 2 --autobroker";
     helics::apps::Player play1("player1", fedInfo);
     play1.loadFile(std::string(TEST_DIR) + "/example_comments.player");
@@ -404,11 +404,11 @@ TEST_P(player_file_tests, test_files_cmd)
     std::vector<std::string> args{
         "", "--name=player", "--broker=ipc_broker", "--coretype=ipc", "--input=" + exampleFile};
     char* argv[5];
-    argv[0] = &(args[0][0]);
-    argv[1] = &(args[1][0]);
-    argv[2] = &(args[2][0]);
-    argv[3] = &(args[3][0]);
-    argv[4] = &(args[4][0]);
+    argv[0] = args[0].data();
+    argv[1] = args[1].data();
+    argv[2] = args[2].data();
+    argv[3] = args[3].data();
+    argv[4] = args[4].data();
 
     helics::apps::Player play1(5, argv);
 
@@ -465,7 +465,7 @@ TEST_P(player_file_tests, test_files_exe)
     ASSERT_TRUE(playerExe.isActive());
     if (!brokerExe.isActive()) {
         std::cout << " unable to locate helics_broker in " << HELICS_INSTALL_LOC << " or "
-                  << HELICS_BUILD_LOC << std::endl;
+                  << HELICS_BUILD_LOC << '\n';
     }
     ASSERT_TRUE(brokerExe.isActive());
     auto res = brokerExe.runAsync("-f 2 --coretype=zmq --name=zmq_broker");
@@ -566,7 +566,7 @@ TEST(player_tests, player_test_message)
     helics::apps::Player play1("player1", fedInfo);
 
     helics::MessageFederate mfed("block1", fedInfo);
-    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
+    helics::Endpoint ept1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
 
     play1.addMessage(1.0, "src", "dest", "this is a message");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
@@ -574,7 +574,7 @@ TEST(player_tests, player_test_message)
 
     auto retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
-    auto mess = e1.getMessage();
+    auto mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");
@@ -594,7 +594,7 @@ TEST(player_tests, player_test_message2)
     helics::apps::Player play1("player1", fedInfo);
 
     helics::MessageFederate mfed("block1", fedInfo);
-    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
+    helics::Endpoint ept1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
 
     play1.addMessage(1.0, "src", "dest", "this is a test message");
     play1.addMessage(2.0, "src", "dest", "this is test message2");
@@ -605,7 +605,7 @@ TEST(player_tests, player_test_message2)
 
     auto retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
-    auto mess = e1.getMessage();
+    auto mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");
@@ -615,7 +615,7 @@ TEST(player_tests, player_test_message2)
 
     retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 2.0);
-    mess = e1.getMessage();
+    mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");
@@ -625,7 +625,7 @@ TEST(player_tests, player_test_message2)
 
     retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 3.0);
-    mess = e1.getMessage();
+    mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");
@@ -644,7 +644,7 @@ TEST(player_tests, player_test_message3)
     helics::apps::Player play1("player1", fedInfo);
 
     helics::MessageFederate mfed("block1", fedInfo);
-    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
+    helics::Endpoint ept1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
 
     play1.addMessage(1.0, "src", "dest", "this is a test message");
     play1.addMessage(1.0, 2.0, "src", "dest", "this is test message2");
@@ -656,7 +656,7 @@ TEST(player_tests, player_test_message3)
 
     auto retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
-    auto mess = e1.getMessage();
+    auto mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");
@@ -666,7 +666,7 @@ TEST(player_tests, player_test_message3)
 
     retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 2.0);
-    mess = e1.getMessage();
+    mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");
@@ -676,7 +676,7 @@ TEST(player_tests, player_test_message3)
 
     retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 3.0);
-    mess = e1.getMessage();
+    mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");
@@ -695,22 +695,22 @@ class player_message_file_tests: public ::testing::TestWithParam<const char*> {}
 
 TEST_P(player_message_file_tests, message_test_files)
 {
-    static char indx = 'a';
+    static char index = 'a';
     helics::FederateInfo fedInfo(helics::CoreType::TEST);
     fedInfo.coreName = std::string("pcore11") + GetParam();
-    fedInfo.coreName.push_back(indx++);
+    fedInfo.coreName.push_back(index++);
     fedInfo.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fedInfo);
 
     helics::MessageFederate mfed("block1", fedInfo);
-    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
+    helics::Endpoint ept1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
     play1.loadFile(std::string(TEST_DIR) + GetParam());
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
     mfed.enterExecutingMode();
 
     auto retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
-    auto mess = e1.getMessage();
+    auto mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");
@@ -720,7 +720,7 @@ TEST_P(player_message_file_tests, message_test_files)
 
     retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 2.0);
-    mess = e1.getMessage();
+    mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");
@@ -730,7 +730,7 @@ TEST_P(player_message_file_tests, message_test_files)
 
     retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 3.0);
-    mess = e1.getMessage();
+    mess = ept1.getMessage();
     EXPECT_TRUE(mess);
     if (mess) {
         EXPECT_EQ(mess->source, "src");

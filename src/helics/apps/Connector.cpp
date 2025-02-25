@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -29,6 +29,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+using gmlc::utilities::stringOps::default_quote_chars;
+using gmlc::utilities::stringOps::delimiter_compression;
+using gmlc::utilities::stringOps::splitlineQuotes;
 
 namespace helics::apps {
 
@@ -89,6 +93,7 @@ struct ConnectionsList {
     std::vector<TemplateMatcher> potentialPublicationTemplates;
     std::vector<TemplateMatcher> potentialInputTemplates;
     std::vector<TemplateMatcher> potentialEndpointTemplates;
+    std::vector<std::pair<std::string, std::string>> potentialInterfaceConnections;
     bool hasPotentialInterfaces{false};
 };
 
@@ -287,6 +292,63 @@ nlohmann::json TemplateMatcher::usedInterfaceGeneration()
     return generator;
 }
 
+static bool addPotentialTargets(ConnectionsList& connections,
+                                const std::string& interfaceName,
+                                std::string targetFieldName,
+                                const nlohmann::json& interface)
+{
+    bool found{false};
+    // There should probably be a static_assert here but there isn't a nice type trait to check that
+    if (interface.contains(targetFieldName)) {
+        auto targets = interface[targetFieldName];
+        if (targets.is_array()) {
+            for (const auto& target : targets) {
+                connections.potentialInterfaceConnections.emplace_back(interfaceName,
+                                                                       target.get<std::string>());
+            }
+        } else {
+            connections.potentialInterfaceConnections.emplace_back(interfaceName,
+                                                                   targets.get<std::string>());
+        }
+        found = true;
+    }
+    if (targetFieldName.back() == 's') {
+        targetFieldName.pop_back();
+        if (interface.contains(targetFieldName)) {
+            connections.potentialInterfaceConnections.emplace_back(
+                interfaceName, interface[targetFieldName].get<std::string>());
+            found = true;
+        }
+    }
+    return found;
+}
+
+static bool addPotentialTargetVariations(ConnectionsList& connections,
+                                         const std::string& interfaceName,
+                                         const std::string& targetFieldName1,
+                                         std::string targetFieldName2,
+                                         const nlohmann::json& interface)
+{
+    bool found = addPotentialTargets(connections,
+                                     interfaceName,
+                                     targetFieldName1 + "_" + targetFieldName2,
+                                     interface);
+    if (!found) {
+        found = addPotentialTargets(connections,
+                                    interfaceName,
+                                    targetFieldName1 + targetFieldName2,
+                                    interface);
+    }
+    if (!found) {
+        targetFieldName2.front() = std::toupper(targetFieldName2.front());
+        addPotentialTargets(connections,
+                            interfaceName,
+                            targetFieldName1 + targetFieldName2,
+                            interface);
+    }
+    return found;
+}
+
 static void fedPotentialInterfaceList(ConnectionsList& connections, const nlohmann::json& fed)
 {
     connections.hasPotentialInterfaces = true;
@@ -303,6 +365,16 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const nlohma
                 const std::string_view input1 = connections.interfaces.emplace_back(name);
                 connections.potentialInputs.emplace(
                     input1, PotentialConnections{federateName, input1, false});
+                addPotentialTargets(connections, name, "targets", input);
+                addPotentialTargetVariations(connections, name, "source", "publications", input);
+                addPotentialTargetVariations(connections, name, "source", "targets", input);
+                if (input.contains("alias")) {
+                    const std::string_view inputAlias =
+                        connections.interfaces.emplace_back(input["alias"].get<std::string>());
+                    connections.potentialInputs.emplace(
+                        inputAlias, PotentialConnections{federateName, input1, false});
+                    connections.aliases.emplace(inputAlias, input1);
+                }
             } else if (input.is_string()) {
                 const std::string_view input1 =
                     connections.interfaces.emplace_back(input.get<std::string>());
@@ -321,6 +393,16 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const nlohma
                 const std::string_view pub1 = connections.interfaces.emplace_back(name);
                 connections.potentialPubs.emplace(pub1,
                                                   PotentialConnections{federateName, pub1, false});
+                addPotentialTargets(connections, name, "targets", pub);
+                addPotentialTargetVariations(connections, name, "destination", "inputs", pub);
+                addPotentialTargetVariations(connections, name, "destination", "targets", pub);
+                if (pub.contains("alias")) {
+                    const std::string_view pubAlias =
+                        connections.interfaces.emplace_back(pub["alias"].get<std::string>());
+                    connections.potentialPubs.emplace(
+                        pubAlias, PotentialConnections{federateName, pub1, false});
+                    connections.aliases.emplace(pubAlias, pub1);
+                }
             } else if (pub.is_string()) {
                 const std::string_view pub1 =
                     connections.interfaces.emplace_back(pub.get<std::string>());
@@ -339,6 +421,21 @@ static void fedPotentialInterfaceList(ConnectionsList& connections, const nlohma
                 const std::string_view endpoint1 = connections.interfaces.emplace_back(name);
                 connections.potentialEndpoints.emplace(
                     endpoint1, PotentialConnections{federateName, endpoint1, false});
+                addPotentialTargets(connections, name, "targets", endpoint);
+                addPotentialTargets(connections, name, "subscriptions", endpoint);
+                addPotentialTargetVariations(connections, name, "source", "inputs", endpoint);
+                addPotentialTargetVariations(connections, name, "source", "endpoints", endpoint);
+                addPotentialTargetVariations(connections, name, "source", "targets", endpoint);
+                addPotentialTargetVariations(
+                    connections, name, "destination", "endpoints", endpoint);
+                addPotentialTargetVariations(connections, name, "destination", "targets", endpoint);
+                if (endpoint.contains("alias")) {
+                    const std::string_view eptAlias =
+                        connections.interfaces.emplace_back(endpoint["alias"].get<std::string>());
+                    connections.potentialEndpoints.emplace(
+                        eptAlias, PotentialConnections{federateName, endpoint1, false});
+                    connections.aliases.emplace(eptAlias, endpoint1);
+                }
             } else {
                 const std::string_view endpoint1 =
                     connections.interfaces.emplace_back(endpoint.get<std::string>());
@@ -1435,7 +1532,7 @@ static int addUsedPotentialInterfaceToCommand(
     if (!enabledInterfaces.empty()) {
         potentialCommand[type] = nlohmann::json::array();
         for (const auto& iface : enabledInterfaces) {
-            potentialCommand[type].push_back(std::string(iface.first));
+            potentialCommand[type].push_back(std::string(iface.second.key));
             ++interfaceCount;
             if (logLevel >= HELICS_LOG_LEVEL_CONNECTIONS) {
                 fed->logMessage(
@@ -1583,6 +1680,9 @@ void Connector::initialize()
         auto connectionsData =
             generateConnectionsList(fed->query("root", "unconnected_interfaces"));
         if (connectionsData.hasPotentialInterfaces) {
+            for (const auto& conn : connectionsData.potentialInterfaceConnections) {
+                addConnection(conn.first, conn.second);
+            }
             establishPotentialInterfaces(connectionsData);
             fed->enterInitializingModeIterative();
             // need to do this twice to sync enverything

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -119,6 +119,8 @@ necessary
     void allowMultipleConnections(bool value = true) { matchMultiple = value; }
     void matchEndpointTargets(bool value = true) { matchTargetEndpoints = value; }
 
+    using ConnectionsType = std::unordered_multimap<std::string_view, Connection>;
+
   private:
     std::unique_ptr<helicsCLI11App> generateParser();
     /** process remaining command line arguments*/
@@ -185,7 +187,7 @@ necessary
   private:
     CoreApp core;
     /// the connections descriptors
-    std::unordered_multimap<std::string_view, Connection> connections;
+    ConnectionsType connections;
     std::vector<Connection> matchers;
     std::vector<std::shared_ptr<RegexMatcher>> regexMatchers;
     std::unordered_map<std::size_t, std::string> tags;

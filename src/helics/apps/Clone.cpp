@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -83,7 +83,7 @@ Clone::Clone(std::string_view appName, CoreApp& core, const FederateInfo& fedInf
     initialSetup();
 }
 
-Clone::Clone(std::string_view appName, const std::string& jsonString): App(appName, jsonString)
+Clone::Clone(std::string_view appName, const std::string& configString): App(appName, configString)
 {
     processArgs();
     initialSetup();
@@ -97,6 +97,8 @@ Clone::~Clone()
         }
     }
     catch (...) {
+        // destructors should not throw
+        ;
     }
 }
 
@@ -104,6 +106,9 @@ void Clone::initialSetup()
 {
     if (!deactivated) {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
+        if (outFileName.empty()) {
+            outFileName = "clone.json";
+        }
         loadInputFiles();
     }
 }
@@ -116,7 +121,7 @@ void Clone::saveFile(const std::string& filename)
         }
         return;
     }
-    nlohmann::json doc = fileops::loadJsonStr(fedConfig);
+    nlohmann::json doc = fedConfig.empty() ? nlohmann::json() : fileops::loadJsonStr(fedConfig);
     doc["defaultglobal"] = true;
     if (!cloneSubscriptionNames.empty()) {
         doc["optional"] = true;
@@ -177,7 +182,7 @@ void Clone::saveFile(const std::string& filename)
     }
 
     std::ofstream outfile(filename);
-    outfile << doc << std::endl;
+    outfile << doc << '\n';
     fileSaved = true;
 }
 
@@ -196,35 +201,34 @@ void Clone::initialize()
 
 void Clone::generateInterfaces()
 {
-    auto res = waitForInit(fed.get(), captureFederate);
-    if (res) {
-        fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
-        auto pubs = vectorizeQueryResult(
-            fed->query(captureFederate, "publications", HELICS_SEQUENCING_MODE_ORDERED));
-        for (auto& pub : pubs) {
-            if (pub.empty()) {
-                continue;
-            }
-            addSubscription(pub);
-        }
-        auto epts = vectorizeQueryResult(
-            fed->query(captureFederate, "endpoints", HELICS_SEQUENCING_MODE_ORDERED));
-        for (auto& ept : epts) {
-            if (ept.empty()) {
-                continue;
-            }
-            addSourceEndpointClone(ept);
-        }
-        cloneSubscriptionNames =
-            vectorizeQueryResult(queryFederateSubscriptions(fed.get(), captureFederate));
-        // get rid of any empty strings that may have come to be
-        cloneSubscriptionNames.erase(std::remove(cloneSubscriptionNames.begin(),
-                                                 cloneSubscriptionNames.end(),
-                                                 std::string{}),
-                                     cloneSubscriptionNames.end());
+    fed->enterInitializingModeIterative();
 
-        fedConfig = fed->query(captureFederate, "config", HELICS_SEQUENCING_MODE_ORDERED);
+    fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
+    auto pubs = vectorizeQueryResult(
+        fed->query(captureFederate, "publications", HELICS_SEQUENCING_MODE_ORDERED));
+    for (auto& pub : pubs) {
+        if (pub.empty()) {
+            continue;
+        }
+        addSubscription(pub);
     }
+    auto epts = vectorizeQueryResult(
+        fed->query(captureFederate, "endpoints", HELICS_SEQUENCING_MODE_ORDERED));
+    for (auto& ept : epts) {
+        if (ept.empty()) {
+            continue;
+        }
+        addSourceEndpointClone(ept);
+    }
+    cloneSubscriptionNames =
+        vectorizeQueryResult(queryFederateSubscriptions(fed.get(), captureFederate));
+    // get rid of any empty strings that may have come to be
+    cloneSubscriptionNames.erase(std::remove(cloneSubscriptionNames.begin(),
+                                             cloneSubscriptionNames.end(),
+                                             std::string{}),
+                                 cloneSubscriptionNames.end());
+
+    fedConfig = fed->query(captureFederate, "config", HELICS_SEQUENCING_MODE_ORDERED);
 }
 
 void Clone::captureForCurrentTime(Time currentTime, int iteration)
@@ -317,6 +321,7 @@ void Clone::runTo(Time runToTime)
         }
     }
     catch (...) {
+        std::cerr << "error generate on run\n";
     }
 }
 /** add a subscription to record*/
@@ -374,9 +379,11 @@ std::shared_ptr<helicsCLI11App> Clone::buildArgParserApp()
     app->add_flag("--allow_iteration", allow_iteration, "allow iteration on values")
         ->ignore_underscore();
 
-    app->add_option("--output,-o", outFileName, "the output file for recording the data")
-        ->capture_default_str();
-    app->add_option("capture", captureFederate, "name of the federate to clone");
+    app->add_option(
+        "--capture,capture",
+        captureFederate,
+        "clone all the interfaces of a particular federate federate capture=\"fed1;fed2\"  "
+        "supports multiple arguments or a semicolon/comma separated list");
 
     return app;
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -59,9 +59,9 @@ namespace apps {
 
         /**constructor taking a file with the required information
     @param appName the name of the app
-    @param jsonString a file or json string defining the federate information in JSON or text
+    @param configString a file or json string defining the federate information in JSON or text
     */
-        Clone(std::string_view appName, const std::string& jsonString);
+        Clone(std::string_view appName, const std::string& configString);
         /** move construction*/
         Clone(Clone&& other_recorder) = default;
         /** move assignment*/
@@ -147,7 +147,6 @@ namespace apps {
         std::map<std::string_view, int> eptNames;  //!< translate endpoint name to index
         std::string captureFederate;  //!< storage for the name of the federate to clone
         std::string fedConfig;  //!< storage for the federateConfiguration
-        std::string outFileName{"clone.json"};  //!< the final output file
         std::vector<int> pubPointCount;  //!< a    vector containing the counts of each publication
     };
 

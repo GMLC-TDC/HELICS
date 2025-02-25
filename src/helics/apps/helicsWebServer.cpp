@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -587,7 +587,9 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
             return fail(eCode, "helics web server read");
         }
 
-        const std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
+        // const std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
+        //                              buffer.size()};
+        const std::string_view result{reinterpret_cast<const char*>(buffer.data().data()),
                                       buffer.size()};
         // Echo the message
         auto reqpr = processRequestParameters("", result);

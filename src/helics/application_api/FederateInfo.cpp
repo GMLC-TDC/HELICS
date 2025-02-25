@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -377,10 +377,10 @@ static void loadFlags(FederateInfo& fedInfo, const std::string& flags)
             if (ec == std::errc()) {
                 fedInfo.setFlagOption(std::abs(val), (val > 0));
             } else if (ec == std::errc::invalid_argument) {
-                std::cerr << "unrecognized flag " << std::quoted(flg) << std::endl;
+                std::cerr << "unrecognized flag " << std::quoted(flg) << '\n';
             } else if (ec == std::errc::result_out_of_range) {
                 std::cerr << "unrecognized flag numerical value out of range " << std::quoted(flg)
-                          << std::endl;
+                          << '\n';
             }
         }
     }
@@ -472,6 +472,9 @@ int getOptionValue(std::string val)
 void FederateInfo::injectParser(CLI::App* app)
 {
     auto lparser = makeCLIApp();
+    // extras need to go up into the parent app
+    lparser->allow_extras(false);
+    lparser->add_config_validation();
     lparser->final_callback([app, this]() { config_additional(app); });
     app->add_subcommand(std::move(lparser));
     // make sure the injector has json configuration handling capability
@@ -494,6 +497,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->set_config("--config-file,--config,config",
                     "helicsConfig.ini",
                     "specify a configuration file");
+
     auto* fmtr = addJsonConfig(app.get());
     fmtr->maxLayers(0);
     fmtr->promoteSection("helics");

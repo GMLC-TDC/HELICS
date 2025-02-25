@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -99,7 +99,11 @@ std::string PotentialInterfacesManager::generateQueryResponse(std::string_view q
         for (const auto& iType : potInterfaces) {
             interfaces[iType.first] = nlohmann::json::array();
             for (const auto& ispec : iType.second) {
-                interfaces[iType.first].push_back(ispec.first);
+                if (hasPotentialTargetting) {
+                    interfaces[iType.first].push_back(ispec.second);
+                } else {
+                    interfaces[iType.first].push_back(ispec.first);
+                }
             }
         }
         for (const auto& iType : potInterfaceTemplates) {

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2024,
+Copyright (c) 2017-2025,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -38,7 +38,7 @@ namespace helics {
 
 constexpr char universalKey[] = "**";
 
-const std::string& stateString(ConnectionState state)
+static const std::string& stateString(ConnectionState state)
 {
     static const std::string connected{"connected"};
     static const std::string init{"init_requested"};
@@ -396,7 +396,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
     } else {
         mBrokers.back().route = getRoute(command.source_id);
         if (mBrokers.back().route == parent_route_id) {
-            std::cout << " invalid route to parent broker or reg broker" << std::endl;
+            std::cout << " invalid route to parent broker or reg broker\n";
         }
         mBrokers.back().parent = command.source_id;
         mBrokers.back()._nonLocal = true;
@@ -1675,6 +1675,7 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
                     catch (const std::bad_any_cast&) {
                         // This shouldn't really happen unless someone is being malicious so just
                         // ignore it for now.
+                        ;
                     }
                 }
             }
@@ -2557,7 +2558,7 @@ void CoreBroker::disconnect()
             addActionMessage(CMD_USER_DISCONNECT);
         }
         if (cnt % 13 == 0) {
-            std::cerr << "waiting on disconnect " << std::endl;
+            std::cerr << "waiting on disconnect\n";
         }
     }
 }
@@ -3314,15 +3315,15 @@ void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo
         } else {
             if ((brk != nullptr) && (!brk->_nonLocal)) {
                 if (globalDisconnect) {
-                    mBrokers.apply([this](auto& brk) {
-                        if (!brk._sent_disconnect_ack) {
-                            ActionMessage dis((brk._core) ? CMD_DISCONNECT_CORE_ACK :
-                                                            CMD_DISCONNECT_BROKER_ACK);
+                    mBrokers.apply([this](auto& broker) {
+                        if (!broker._sent_disconnect_ack) {
+                            ActionMessage dis((broker._core) ? CMD_DISCONNECT_CORE_ACK :
+                                                               CMD_DISCONNECT_BROKER_ACK);
                             dis.source_id = global_broker_id_local;
-                            dis.dest_id = brk.global_id;
-                            this->transmit(brk.route, dis);
-                            brk._sent_disconnect_ack = true;
-                            this->removeRoute(brk.route);
+                            dis.dest_id = broker.global_id;
+                            this->transmit(broker.route, dis);
+                            broker._sent_disconnect_ack = true;
+                            this->removeRoute(broker.route);
                         }
                     });
                 } else {
