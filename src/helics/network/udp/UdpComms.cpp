@@ -191,9 +191,9 @@ void UdpComms::queue_tx_function()
         }
         try {
             // Setup the control socket for comms with the receiver
-            auto results=resolver.resolve(udpnet(interfaceNetwork),
-                brokerTargetAddress,
-                std::to_string(brokerPort));
+            auto results = resolver.resolve(udpnet(interfaceNetwork),
+                                            brokerTargetAddress,
+                                            std::to_string(brokerPort));
 
             broker_endpoint = *results.begin();
             int retries{0};
@@ -296,9 +296,11 @@ void UdpComms::queue_tx_function()
                             brokerTargetAddress = brkprt.first;
                         }
                         // Setup the control socket for comms with the receiver
-                        broker_endpoint = *resolver.resolve(udpnet(interfaceNetwork),
-                            brokerTargetAddress,
-                            std::to_string(brokerPort)).begin();
+                        broker_endpoint = *resolver
+                                               .resolve(udpnet(interfaceNetwork),
+                                                        brokerTargetAddress,
+                                                        std::to_string(brokerPort))
+                                               .begin();
                         continue;
                     } else if (cmd.messageID == DELAY_CONNECTION) {
                         std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -329,14 +331,14 @@ void UdpComms::queue_tx_function()
     udp::endpoint rxEndpoint;
     if (localTargetAddress.empty() || localTargetAddress == "*" ||
         localTargetAddress == "udp://*") {
-        auto result = resolver.resolve(udpnet(interfaceNetwork),
-            "127.0.0.1",
-            std::to_string(PortNumber));
+        auto result =
+            resolver.resolve(udpnet(interfaceNetwork), "127.0.0.1", std::to_string(PortNumber));
         rxEndpoint = *result.begin();
     } else {
         auto result = resolver.resolve(udpnet(interfaceNetwork),
-            localTargetAddress,
-            std::to_string(PortNumber), error);
+                                       localTargetAddress,
+                                       std::to_string(PortNumber),
+                                       error);
         if (error) {
             logError(fmt::format("Unable to resolve: {}", localTargetAddress));
             setTxStatus(ConnectionStatus::ERRORED);
@@ -365,9 +367,9 @@ void UdpComms::queue_tx_function()
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
 
                             routes.emplace(route_id{cmd.getExtraData()},
-                                           *(resolver.resolve(udpnet(interfaceNetwork),
-                                               interface,
-                                               port).begin()));
+                                           *(resolver
+                                                 .resolve(udpnet(interfaceNetwork), interface, port)
+                                                 .begin()));
                         }
                         catch (const std::exception& err) {
                             logError(fmt::format("unable to resolve new route: {}", err.what()));
@@ -491,15 +493,19 @@ void UdpComms::closeReceiver()
                     localTargetAddress == "udp://*") {
                     // try connecting with the receiver socket
                     udp::resolver resolver(serv->getBaseContext());
-                    rxEndpoint = *resolver.resolve(udpnet(interfaceNetwork),
-                        "127.0.0.1",
-                        std::to_string(PortNumber)).begin();
+                    rxEndpoint = *resolver
+                                      .resolve(udpnet(interfaceNetwork),
+                                               "127.0.0.1",
+                                               std::to_string(PortNumber))
+                                      .begin();
                 } else {
                     // try connecting with the receiver socket
                     udp::resolver resolver(serv->getBaseContext());
-                    rxEndpoint = *resolver.resolve(udpnet(interfaceNetwork),
-                        localTargetAddress,
-                        std::to_string(PortNumber)).begin();
+                    rxEndpoint = *resolver
+                                      .resolve(udpnet(interfaceNetwork),
+                                               localTargetAddress,
+                                               std::to_string(PortNumber))
+                                      .begin();
                 }
 
                 udp::socket transmitter(serv->getBaseContext(),

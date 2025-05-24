@@ -112,7 +112,7 @@ bool MessageTimer::addTimeToTimer(int32_t timerIndex, std::chrono::nanoseconds t
     if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t>(timers.size()))) {
         std::chrono::steady_clock::time_point newTime;
         timers[timerIndex]->expires_at(newTime);
-        newTime+= time;
+        newTime += time;
         timers[timerIndex]->expires_at(newTime);
         auto timerCallback = [ptr = shared_from_this(), timerIndex](const std::error_code& ec) {
             processTimerCallback(ptr, timerIndex, ec);
