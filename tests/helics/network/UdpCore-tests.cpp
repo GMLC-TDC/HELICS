@@ -130,9 +130,7 @@ TEST(UdpCore, udpComms_rx)
     bool connected = comm.connect();
     ASSERT_TRUE(connected);
 
-    udp::resolver::query queryNew(udp::v4(), "localhost", "23903");
-
-    auto txendpoint = *resolver.resolve(queryNew);
+    auto txendpoint = *resolver.resolve(udp::v4(), "localhost", "23903").begin();
 
     helics::ActionMessage cmd(helics::CMD_ACK);
     std::string buffer = cmd.to_string();
