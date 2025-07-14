@@ -222,7 +222,6 @@ Next, the federates _iterate_ using `helicsFederateEnterExecutingModeIterative`.
 The basic structure is:
 
 - Call `helicsFederateEnterExecutingModeIterative`.
-
   - If the result is `NEXT_STEP` then we're done.
 
   ```python
@@ -260,7 +259,6 @@ The basic structure is:
   ```
 
 - check error
-
   - If the error is sufficiently small loop back and **_do not publish_**, otherwise proceed to update and publishing, which will trigger another iteration.
     The function to check the error is `check_error`:
 

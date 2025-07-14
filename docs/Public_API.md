@@ -7,7 +7,6 @@ This API will be backwards code compatible through major version numbers, though
 The public API includes the following
 
 - Application API headers
-
   - CombinationFederate.hpp
   - Publications.hpp
   - Subscriptions.hpp
@@ -33,7 +32,6 @@ The public API includes the following
   - Exceptions: Translators and the global time coordinator option are in Beta and subject to finalization in a later release (they are mostly final and any changes will be highlighted). Vector subscriptions, and vector inputs are subject to change. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries: the data returned via queries is subject to change, though in general queries will not be removed. As determined by the need of HELICS users and applications, the data structure may change at minor revision numbers. We hope to fully document the queries structure at which point they will be stable for at least minor releases and changes will be noted. The callback federate API is considered in Beta and may change.
 
 - Core library headers
-
   - Core.hpp
   - Broker.hpp
   - core-exceptions.hpp
@@ -45,12 +43,10 @@ The public API includes the following
   - NOTE: core headers in the public API are headers that need to be available for the Application API public headers. The core API can be used more directly with static linking but applications are generally recommended to use the application API or other higher level API's
 
 - C shared library headers
-
   - All C library operations are merged into a single header `helics.h`
   - A `helics_api.h` header is available for generating interfaces which strips out import declarations and comments. The C shared library API is the primary driver of versioning and changes to that will be considered in all versioning decisions.
 
 - App Library
-
   - Player.hpp
   - Recorder.hpp
   - Echo.hpp
