@@ -6,7 +6,6 @@ This tutorial is organized as follows:
 
 - [Example files](#example-files)
 - [Filter Federates](#filter-federates)
-
   - [Co-simulation Execution](#co-simulation-execution)
 
 - [Questions and Help](#questions-and-help) talk
