@@ -364,7 +364,6 @@ mark_as_advanced(HELICS_ENABLE_MPI_CORE HELICS_ENABLE_ZMQ_CORE)
 # Some specialized configurations
 # -------------------------------------------------------------
 
-
 # Add to list of enabled vcpkg features based on core type
 if(HELICS_ENABLE_ZMQ_CORE)
     list(APPEND VCPKG_MANIFEST_FEATURES "zeromq")
