@@ -364,13 +364,6 @@ mark_as_advanced(HELICS_ENABLE_MPI_CORE HELICS_ENABLE_ZMQ_CORE)
 # Some specialized configurations
 # -------------------------------------------------------------
 
-show_variable(
-    HELICS_BUILD_CONFIGURATION
-    STRING
-    "specify a build configuration to use for some specialized systems that are not otherwise detectable"
-    ""
-)
-mark_as_advanced(HELICS_BUILD_CONFIGURATION)
 
 # Add to list of enabled vcpkg features based on core type
 if(HELICS_ENABLE_ZMQ_CORE)
@@ -982,7 +975,6 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     if(HELICS_HIDE_CMAKE_VARIABLES)
         hide_variable(HELICS_BINARY_ONLY_INSTALL)
         hide_variable(HELICS_BUILD_APP_LIBRARY)
-        hide_variable(HELICS_BUILD_CONFIGURATION)
         hide_variable(HELICS_BUILD_CXX_SHARED_LIB)
         hide_variable(HELICS_DISABLE_ASIO)
         hide_variable(HELICS_DISABLE_BOOST)

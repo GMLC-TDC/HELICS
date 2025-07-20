@@ -102,8 +102,8 @@ jobs:
   - job: Windows
     strategy:
       matrix:
-        VS2019-32bit:
-          imageName: "windows-2019"
+        VS2020-32bit:
+          imageName: "windows-2022"
           langArch: "x86"
           vsArch: "Win32"
           extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
