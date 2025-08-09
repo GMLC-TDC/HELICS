@@ -437,7 +437,7 @@ typedef enum { /* NOLINT */
 #define HELICS_MAX_TIME_VALUE 9223372036.854774
 #define HELICS_TERMINATION_TIME_VALUE HELICS_MAX_TIME_VALUE / 2.0
 
-const double cHelicsMaxTimeValue=HELICS_MAX_TIME_VALUE;
+const double cHelicsMaxTimeValue = HELICS_MAX_TIME_VALUE;
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
 const double cHelicsTerminateTime = HELICS_TERMINATION_TIME_VALUE;
 
