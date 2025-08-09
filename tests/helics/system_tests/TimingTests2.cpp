@@ -89,8 +89,10 @@ TEST_F(timing2, small_time)
 
 TEST_F(timing2, numbers)
 {
-    EXPECT_EQ(helics::cBigTime, helics::Time{cHelicsBigNumber});
-    EXPECT_EQ(helics::cBigTime, helics::Time::maxVal());
+    EXPECT_DOUBLE_EQ(helics::cBigTime, helics::Time{cHelicsBigNumber});
+    EXPECT_DOUBLE_EQ(helics::cBigTime, helics::Time::maxVal());
+    EXPECT_GT(helics::cBigTime,helics::Time{9000000000.0});
+    EXPECT_GT(helics::cTerminationTime, helics::Time{static_cast<double>(0xFFFFFFFFLL)});
 }
 
 /** based on bug found by Manoj Kumar Cebol Sundarrajan

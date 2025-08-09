@@ -433,8 +433,9 @@ typedef enum { /* NOLINT */
                HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
-#define HELICS_BIG_NUMBER 9223372036.854774
+#define HELICS_BIG_NUMBER 9223372035.854774
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
+const double cHelicsTerminateTime=HELICS_BIG_NUMBER/2.0;
 
 #define HELICS_INVALID_DOUBLE (-1E49)
 

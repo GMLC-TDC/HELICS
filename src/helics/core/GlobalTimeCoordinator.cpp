@@ -63,7 +63,7 @@ void GlobalTimeCoordinator::sendTimeUpdateRequest(Time triggerTime)
     ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
     updateTime.counter = sequenceCounter;
     for (auto& dep : dependencies) {
-        if (dep.next <= triggerTime && dep.next < cBigTime) {
+        if (dep.next <= triggerTime && dep.next < cTerminationTime) {
             updateTime.dest_id = dep.fedID;
             updateTime.setExtraDestData(dep.sequenceCounter);
             dep.updateRequested = true;
@@ -88,18 +88,18 @@ bool GlobalTimeCoordinator::updateTimeFactors()
             currentMinTime = timeStream.next;
             nextEvent = findNextTriggerEvent(dependencies);
             ++sequenceCounter;
-            auto trigTime = (nextEvent < cBigTime) ? nextEvent + Time::epsilon() : nextEvent;
+            auto trigTime = (nextEvent < cTerminationTime) ? nextEvent + Time::epsilon() : nextEvent;
             mNewRequest = false;
             sendTimeUpdateRequest(trigTime);
             return true;
         }
         if (currentTimeState == TimeState::time_requested) {
-            auto trigTime = (nextEvent < cBigTime) ? nextEvent + Time::epsilon() : nextEvent;
+            auto trigTime = (nextEvent < cTerminationTime) ? nextEvent + Time::epsilon() : nextEvent;
             if (dependencies.verifySequenceCounter(trigTime, sequenceCounter)) {
                 auto trig = checkForTriggered(dependencies, trigTime);
                 bool verified{trig.second <= nextEvent};
                 nextEvent = trig.second;
-                trigTime = (nextEvent < cBigTime) ? nextEvent + Time::epsilon() : nextEvent;
+                trigTime = (nextEvent < cTerminationTime) ? nextEvent + Time::epsilon() : nextEvent;
                 if (!verified) {
                     verified = dependencies.verifySequenceCounter(trigTime, sequenceCounter);
                 }
@@ -118,7 +118,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 ++sequenceCounter;
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {
-                    if (dep.next <= trigTime && dep.next < cBigTime) {
+                    if (dep.next <= trigTime && dep.next < cTerminationTime) {
                         updateTime.dest_id = dep.fedID;
                         updateTime.setExtraDestData(dep.sequenceCounter);
                         sendMessageFunction(updateTime);
@@ -132,7 +132,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                     if (dep.updateRequested) {
                         continue;
                     }
-                    if (dep.next <= trigTime && dep.next < cBigTime) {
+                    if (dep.next <= trigTime && dep.next < cTerminationTime) {
                         if (!checkSequenceCounter(dep, trigTime, sequenceCounter)) {
                             std::cerr << "sequence check but no request" << std::endl;
                             /* ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME,

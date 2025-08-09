@@ -292,3 +292,7 @@ class MasterObjectHolder {
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder();
 void clearAllObjects();
+
+double inline timeReturn(HelicsTime val) {
+    return (val < cHelicsTerminateTime) ? static_cast<double>(val) : HELICS_TIME_MAXTIME;
+}

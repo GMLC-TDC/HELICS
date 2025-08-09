@@ -239,8 +239,8 @@ TEST_F(timing_tests, max_time_consistency)
     CE(helicsFederateEnterExecutingMode(vFed, &err));
     HelicsTime gtime;
     CE(gtime = helicsFederateRequestTime(vFed, HELICS_TIME_MAXTIME, &err));
-    EXPECT_GE(gtime, HELICS_TIME_MAXTIME);
+    EXPECT_DOUBLE_EQ(gtime, HELICS_TIME_MAXTIME);
     CE(helicsFederateFinalize(vFed, &err));
     CE(gtime = helicsFederateGetCurrentTime(vFed, &err));
-    EXPECT_GE(gtime, HELICS_TIME_MAXTIME);
+    EXPECT_DOUBLE_EQ(gtime, HELICS_TIME_MAXTIME);
 }
