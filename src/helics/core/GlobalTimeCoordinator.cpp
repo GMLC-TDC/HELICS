@@ -88,13 +88,15 @@ bool GlobalTimeCoordinator::updateTimeFactors()
             currentMinTime = timeStream.next;
             nextEvent = findNextTriggerEvent(dependencies);
             ++sequenceCounter;
-            auto trigTime = (nextEvent < cTerminationTime) ? nextEvent + Time::epsilon() : nextEvent;
+            auto trigTime =
+                (nextEvent < cTerminationTime) ? nextEvent + Time::epsilon() : nextEvent;
             mNewRequest = false;
             sendTimeUpdateRequest(trigTime);
             return true;
         }
         if (currentTimeState == TimeState::time_requested) {
-            auto trigTime = (nextEvent < cTerminationTime) ? nextEvent + Time::epsilon() : nextEvent;
+            auto trigTime =
+                (nextEvent < cTerminationTime) ? nextEvent + Time::epsilon() : nextEvent;
             if (dependencies.verifySequenceCounter(trigTime, sequenceCounter)) {
                 auto trig = checkForTriggered(dependencies, trigTime);
                 bool verified{trig.second <= nextEvent};

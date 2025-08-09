@@ -36,7 +36,7 @@ constexpr Time negEpsilon = -Time::epsilon();
 /** definition of large time beyond the simulation end*/
 constexpr Time cBigTime = Time{HELICS_BIG_NUMBER};
 /** definition of time representing a time that signals a simulation end, half of the big number*/
-constexpr Time cTerminationTime = cBigTime/2.0;
+constexpr Time cTerminationTime = cBigTime / 2.0;
 /** common definition of currentTime in initialization mode*/
 constexpr Time initializationTime = negEpsilon;
 

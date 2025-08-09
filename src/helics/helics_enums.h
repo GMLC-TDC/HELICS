@@ -435,7 +435,7 @@ typedef enum { /* NOLINT */
 
 #define HELICS_BIG_NUMBER 9223372035.854774
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
-const double cHelicsTerminateTime=HELICS_BIG_NUMBER/2.0;
+const double cHelicsTerminateTime = HELICS_BIG_NUMBER / 2.0;
 
 #define HELICS_INVALID_DOUBLE (-1E49)
 
