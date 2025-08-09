@@ -244,3 +244,11 @@ TEST_F(timing_tests, max_time_consistency)
     CE(gtime = helicsFederateGetCurrentTime(vFed, &err));
     EXPECT_DOUBLE_EQ(gtime, HELICS_TIME_MAXTIME);
 }
+
+TEST_F(timing_tests, ordering)
+{
+    EXPECT_LT(HELICS_TIME_BIGTIME, HELICS_TIME_MAXTIME);
+    EXPECT_GT(HELICS_TIME_BIGTIME,  HELICS_TIME_TERMINATION);
+    EXPECT_GT(HELICS_TIME_BIGTIME, 9000000000.0);
+    EXPECT_GT(HELICS_TIME_TERMINATION, static_cast<double>(0xFFFFFFFFLL));
+}
