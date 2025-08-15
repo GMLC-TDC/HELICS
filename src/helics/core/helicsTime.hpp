@@ -33,9 +33,12 @@ constexpr Time timeZero = Time::zeroVal();
 constexpr Time timeEpsilon = Time::epsilon();
 /** definition of the smallest negative increment of time*/
 constexpr Time negEpsilon = -Time::epsilon();
-/** definition of large time representing simulation end*/
-constexpr Time cBigTime = Time{static_cast<int64_t>(HELICS_BIG_NUMBER * 1000000)};
-
+/** definition of large time beyond the simulation end*/
+constexpr Time cBigTime = Time{HELICS_BIG_NUMBER};
+/** definition of time representing a time that signals a simulation end, half of the big number */
+constexpr Time cTerminationTime = Time{HELICS_TERMINATION_TIME_VALUE};
+/** definition of max representable time value */
+constexpr Time cMaxTime = Time{HELICS_MAX_TIME_VALUE};
 /** common definition of currentTime in initialization mode*/
 constexpr Time initializationTime = negEpsilon;
 

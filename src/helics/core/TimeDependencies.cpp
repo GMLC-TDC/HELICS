@@ -364,7 +364,7 @@ bool TimeDependencies::addDependency(GlobalFederateId gid)
         if (dep->fedID == gid) {
             auto rval = dep->dependency;
             dep->dependency = true;
-            if (dep->next == Time::maxVal()) {
+            if (dep->next > cTerminationTime) {
                 dep->next = negEpsilon;
                 dep->lastGrant = timeZero;
                 dep->mTimeState = TimeState::initialized;
@@ -435,7 +435,7 @@ void TimeDependencies::resetDependency(GlobalFederateId gid)
     auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), gid, dependencyCompare);
     if (dep != dependencies.end()) {
         if (dep->fedID == gid) {
-            if (dep->mTimeState == TimeState::time_granted && dep->lastGrant >= cBigTime) {
+            if (dep->mTimeState == TimeState::time_granted && dep->lastGrant >= cTerminationTime) {
                 *dep = DependencyInfo(dep->fedID);
             }
         }
@@ -527,7 +527,7 @@ static bool iteratingTimeGrantCheck(const DependencyInfo& dep,
                                     Time desiredGrantTime,
                                     GrantDelayMode delayMode)
 {
-    if (!dep.dependency || dep.next >= cBigTime) {
+    if (!dep.dependency || dep.next >= cTerminationTime) {
         return true;
     }
     if (dep.connection == ConnectionType::SELF) {
@@ -564,7 +564,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
     switch (delayMode) {
         case GrantDelayMode::NONE:
             for (const auto& dep : dependencies) {
-                if (!dep.dependency || dep.next >= cBigTime) {
+                if (!dep.dependency || dep.next >= cTerminationTime) {
                     continue;
                 }
                 if (dep.connection == ConnectionType::SELF) {
@@ -585,7 +585,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
             break;
         case GrantDelayMode::INTERRUPTED:
             for (const auto& dep : dependencies) {
-                if (!dep.dependency || dep.next >= cBigTime) {
+                if (!dep.dependency || dep.next >= cTerminationTime) {
                     continue;
                 }
                 if (dep.connection == ConnectionType::SELF) {
@@ -611,7 +611,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
             break;
         case GrantDelayMode::WAITING:
             for (const auto& dep : dependencies) {
-                if (!dep.dependency || dep.next >= cBigTime) {
+                if (!dep.dependency || dep.next >= cTerminationTime) {
                     continue;
                 }
                 if (dep.connection == ConnectionType::SELF) {
@@ -630,7 +630,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
 bool TimeDependencies::hasActiveTimeDependencies() const
 {
     return std::any_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cBigTime));
+        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cTerminationTime));
     });
 }
 
@@ -645,7 +645,7 @@ bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sequenceCou
 int TimeDependencies::activeDependencyCount() const
 {
     return std::count_if(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cBigTime));
+        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cTerminationTime));
     });
 }
 /** get a count of the active dependencies*/
@@ -654,7 +654,7 @@ GlobalFederateId TimeDependencies::getMinDependency() const
     GlobalFederateId minID;
     Time minTime(Time::maxVal());
     for (const auto& dep : dependencies) {
-        if (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cBigTime)) {
+        if (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cTerminationTime)) {
             if (dep.next < minTime) {
                 minTime = dep.next;
                 minID = dep.fedID;

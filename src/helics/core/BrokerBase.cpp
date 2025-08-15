@@ -570,7 +570,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         std::string timeString;
 
         const Time currentTime = getSimulationTime();
-        if (currentTime <= mInvalidSimulationTime || currentTime >= cHelicsBigNumber) {
+        if (currentTime <= mInvalidSimulationTime || currentTime >= cHelicsTerminateTime) {
             timeString.push_back('[');
             timeString.append(brokerStateName(getBrokerState()));
             timeString.push_back(']');

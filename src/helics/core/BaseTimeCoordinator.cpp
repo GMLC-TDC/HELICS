@@ -91,7 +91,7 @@ void BaseTimeCoordinator::disconnect()
     bye.source_id = mSourceId;
     if (dependencies.size() == 1) {
         auto& dep = *dependencies.begin();
-        if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
+        if ((dep.dependency && dep.next < cTerminationTime) || dep.dependent) {
             bye.dest_id = dep.fedID;
             if (bye.dest_id == mSourceId) {
                 processTimeMessage(bye);
@@ -104,7 +104,7 @@ void BaseTimeCoordinator::disconnect()
         ActionMessage multi(CMD_MULTI_MESSAGE);
         bool hasLocal{false};
         for (const auto& dep : dependencies) {
-            if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
+            if ((dep.dependency && dep.next < cTerminationTime) || dep.dependent) {
                 if (dep.fedID == mSourceId) {
                     hasLocal = true;
                 } else {

@@ -73,7 +73,7 @@ void TimeCoordinator::localError()
         bye.source_id = mSourceId;
         if (dependencies.size() == 1) {
             auto& dep = *dependencies.begin();
-            if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
+            if ((dep.dependency && dep.next < cTerminationTime) || dep.dependent) {
                 bye.dest_id = dep.fedID;
                 if (bye.dest_id == mSourceId) {
                     processTimeMessage(bye);
@@ -85,7 +85,7 @@ void TimeCoordinator::localError()
         } else {
             ActionMessage multi(CMD_MULTI_MESSAGE);
             for (const auto& dep : dependencies) {
-                if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
+                if ((dep.dependency && dep.next < cTerminationTime) || dep.dependent) {
                     bye.dest_id = dep.fedID;
                     if (dep.fedID == mSourceId) {
                         processTimeMessage(bye);
@@ -152,7 +152,7 @@ bool TimeCoordinator::updateNextExecutionTime()
             time_exec = generateAllowedTime(time_requested);
         } else {
             time_exec = std::min(time_message, time_value);
-            if (time_exec < Time::maxVal()) {
+            if (time_exec < cTerminationTime) {
                 time_exec += info.inputDelay;
             }
             time_exec =
@@ -160,7 +160,7 @@ bool TimeCoordinator::updateNextExecutionTime()
         }
     } else {
         time_exec = std::min(time_message, time_value);
-        if (time_exec < Time::maxVal()) {
+        if (time_exec < cTerminationTime) {
             time_exec += info.inputDelay;
         }
         time_exec = std::min(time_requested, time_exec);
@@ -168,7 +168,7 @@ bool TimeCoordinator::updateNextExecutionTime()
             time_exec = (iterating == IterationRequest::NO_ITERATIONS) ? getNextPossibleTime() :
                                                                          time_granted;
         }
-        if (time_granted < Time::maxVal()) {
+        if (time_granted < cTerminationTime) {
             if (time_exec > time_granted) {
                 time_exec = generateAllowedTime(time_exec);
             }
@@ -189,7 +189,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
         if (iterating == IterationRequest::NO_ITERATIONS) {
             time_next = generateAllowedTime(time_requested) + info.outputDelay;
         } else {
-            if (time_minminDe < Time::maxVal() && !info.restrictive_time_policy) {
+            if (time_minminDe < cTerminationTime && !info.restrictive_time_policy) {
                 if (time_minminDe + info.inputDelay > time_next) {
                     time_next = generateAllowedTime(time_requested);
                 }
@@ -197,7 +197,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
             time_next = std::min(time_next, time_exec) + info.outputDelay;
         }
     } else {
-        if (time_minminDe < Time::maxVal() && !info.restrictive_time_policy) {
+        if (time_minminDe < cTerminationTime && !info.restrictive_time_policy) {
             if (time_minminDe + info.inputDelay > time_next) {
                 time_next = time_minminDe + info.inputDelay;
                 time_next = generateAllowedTime(time_next);
@@ -363,7 +363,7 @@ Time TimeCoordinator::getNextPossibleTime() const
         }
         return retTime;
     }
-    if (time_grantBase >= Time::maxVal() - std::max(info.timeDelta, info.period)) {
+    if (time_grantBase >= cTerminationTime - std::max(info.timeDelta, info.period)) {
         return Time::maxVal();
     }
     return generateAllowedTime(time_grantBase + std::max(info.timeDelta, info.period));
@@ -372,7 +372,7 @@ Time TimeCoordinator::getNextPossibleTime() const
 Time TimeCoordinator::generateAllowedTime(Time testTime) const
 {
     if (info.period > timeEpsilon) {
-        if (testTime == Time::maxVal()) {
+        if (testTime >= cTerminationTime) {
             return testTime;
         }
         auto timeBase = time_grantBase;
@@ -443,7 +443,7 @@ bool TimeCoordinator::updateTimeFactors()
         upstream.minFed = GlobalFederateId{};
     }
 
-    maxTime = Time::maxVal() - info.outputDelay - (std::max)(info.period, info.timeDelta);
+    maxTime = cTerminationTime - info.outputDelay - (std::max)(info.period, info.timeDelta);
     bool update = false;
     time_minminDe = total.minDe;
     Time prev_next = time_next;
@@ -461,7 +461,7 @@ bool TimeCoordinator::updateTimeFactors()
     if (upstream.minDe < maxTime && upstream.minDe > total.minDe) {
         upstream.minDe = generateAllowedTime(upstream.minDe) + info.outputDelay;
     }
-    if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
+    if (!globalTime && (info.event_triggered || time_requested >= cTerminationTime)) {
         if (upstream.Te < maxTime) {
             upstream.Te = generateAllowedTime(upstream.minDe);
         }
@@ -479,15 +479,15 @@ bool TimeCoordinator::updateTimeFactors()
 MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId triggerFed)
 {
     updateTimeFactors();
-    if (time_exec == Time::maxVal()) {
-        if (time_allow == Time::maxVal()) {
+    if (time_exec >= cTerminationTime) {
+        if (time_allow >= cTerminationTime) {
             time_granted = Time::maxVal();
             time_grantBase = Time::maxVal();
             disconnect();
             return MessageProcessingResult::HALTED;
         }
     }
-    if (time_block <= time_exec && time_block < Time::maxVal()) {
+    if (time_block <= time_exec && time_block < cTerminationTime) {
         if (triggerFed.isValid()) {
             if (triggerFed != mSourceId) {
                 sendTimeRequest(triggerFed);
@@ -793,7 +793,7 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
         setActionFlag(upd, interrupted_flag);
     }
     upd.Te = checkAdd(time_exec, info.outputDelay);
-    if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
+    if (!globalTime && (info.event_triggered || time_requested >= cTerminationTime)) {
         upd.Te = std::min(upd.Te, checkAdd(upstream.Te, info.outputDelay));
         if (upd.Te < timeZero) {
             upd.Te = timeZero;
@@ -801,7 +801,7 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
         upd.actionTime = std::min(upd.actionTime, upd.Te);
     }
     upd.Tdemin = std::min(checkAdd(upstream.Te, info.outputDelay), upd.Te);
-    if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
+    if (!globalTime && (info.event_triggered || time_requested >= cTerminationTime)) {
         upd.Tdemin = std::min(upd.Tdemin, checkAdd(upstream.minDe, info.outputDelay));
         if (upd.Tdemin < timeZero) {
             upd.Tdemin = timeZero;
@@ -830,7 +830,7 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
                 upd.dest_id = upstream.minFed;
                 upd.setExtraData(GlobalFederateId{}.baseValue());
                 upd.setExtraDestData(upstream.responseSequenceCounter);
-                if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
+                if (!globalTime && (info.event_triggered || time_requested >= cTerminationTime)) {
                     upd.Te = checkAdd(time_exec, info.outputDelay);
                     upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt, info.outputDelay));
                 }

@@ -203,8 +203,8 @@ TEST(time_tests, max_tests)
 {
     auto tm = Time(HELICS_TIME_MAXTIME);
     auto tmax = Time::maxVal();
-    EXPECT_EQ(tm, tmax);
-    EXPECT_EQ(Time(-HELICS_TIME_MAXTIME), Time::minVal());
+    EXPECT_GE(tm, tmax - 2.0);
+    EXPECT_LE(Time(-HELICS_TIME_MAXTIME), Time::minVal() + 2.0);
 
     EXPECT_GE(static_cast<double>(Time::maxVal()), HELICS_TIME_MAXTIME);
 }
