@@ -10,5 +10,7 @@ package com.java.helics;
 
 public interface helicsConstants {
   public final static double HELICS_BIG_NUMBER = helicsJNI.HELICS_BIG_NUMBER_get();
+  public final static double HELICS_MAX_TIME_VALUE = helicsJNI.HELICS_MAX_TIME_VALUE_get();
+  public final static double HELICS_TERMINATION_TIME_VALUE = helicsJNI.HELICS_TERMINATION_TIME_VALUE_get();
   public final static double HELICS_INVALID_DOUBLE = helicsJNI.HELICS_INVALID_DOUBLE_get();
 }

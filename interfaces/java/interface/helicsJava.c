@@ -2103,7 +2103,43 @@ SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1BIG_1NUMBER_1g
   
   (void)jenv;
   (void)jcls;
+  result = (double)(9223372000.00000);
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1MAX_1TIME_1VALUE_1get(JNIEnv *jenv, jclass jcls) {
+  jdouble jresult = 0 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
   result = (double)(9223372036.854774);
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1TERMINATION_1TIME_1VALUE_1get(JNIEnv *jenv, jclass jcls) {
+  jdouble jresult = 0 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (double)(9223372036.854774/2.0);
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_cHelicsMaxTimeValue_1get(JNIEnv *jenv, jclass jcls) {
+  jdouble jresult = 0 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (double)(double)cHelicsMaxTimeValue;
   jresult = (jdouble)result; 
   return jresult;
 }
@@ -2116,6 +2152,18 @@ SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_cHelicsBigNumber_1get(
   (void)jenv;
   (void)jcls;
   result = (double)(double)cHelicsBigNumber;
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_cHelicsTerminateTime_1get(JNIEnv *jenv, jclass jcls) {
+  jdouble jresult = 0 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (double)(double)cHelicsTerminateTime;
   jresult = (jdouble)result; 
   return jresult;
 }
@@ -2169,6 +2217,18 @@ SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1TIME_1INVALID_
 }
 
 
+SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1TIME_1BIGTIME_1get(JNIEnv *jenv, jclass jcls) {
+  jdouble jresult = 0 ;
+  HelicsTime result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsTime)(HelicsTime)HELICS_TIME_BIGTIME;
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1TIME_1MAXTIME_1get(JNIEnv *jenv, jclass jcls) {
   jdouble jresult = 0 ;
   HelicsTime result;
@@ -2176,6 +2236,18 @@ SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1TIME_1MAXTIME_
   (void)jenv;
   (void)jcls;
   result = (HelicsTime)(HelicsTime)HELICS_TIME_MAXTIME;
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1TIME_1TERMINATION_1get(JNIEnv *jenv, jclass jcls) {
+  jdouble jresult = 0 ;
+  HelicsTime result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsTime)(HelicsTime)HELICS_TIME_TERMINATION;
   jresult = (jdouble)result; 
   return jresult;
 }

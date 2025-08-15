@@ -20,8 +20,16 @@ public class helics implements helicsConstants {
     return helicsJNI.HELICS_INVALID_PROPERTY_VALUE_get();
   }
 
+  public static double getCHelicsMaxTimeValue() {
+    return helicsJNI.cHelicsMaxTimeValue_get();
+  }
+
   public static double getCHelicsBigNumber() {
     return helicsJNI.cHelicsBigNumber_get();
+  }
+
+  public static double getCHelicsTerminateTime() {
+    return helicsJNI.cHelicsTerminateTime_get();
   }
 
   /**
@@ -46,11 +54,24 @@ public class helics implements helicsConstants {
   }
 
   /**
-   *  definition of time signifying the federate has<br>
-   *                                                              terminated or run until the end of the simulation
+   *  definition of a very large time 
+   */
+  public static double getHELICS_TIME_BIGTIME() {
+    return helicsJNI.HELICS_TIME_BIGTIME_get();
+  }
+
+  /**
+   *  definition of the maximum allowed time value
    */
   public static double getHELICS_TIME_MAXTIME() {
     return helicsJNI.HELICS_TIME_MAXTIME_get();
+  }
+
+  /**
+   *  definition of the minimum time level signifying the simulation has ended
+   */
+  public static double getHELICS_TIME_TERMINATION() {
+    return helicsJNI.HELICS_TIME_TERMINATION_get();
   }
 
   /**

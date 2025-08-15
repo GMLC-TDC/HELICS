@@ -165,12 +165,18 @@ public class helicsJNI {
   public final static native int HELICS_SEQUENCING_MODE_ORDERED_get();
   public final static native int HELICS_SEQUENCING_MODE_DEFAULT_get();
   public final static native double HELICS_BIG_NUMBER_get();
+  public final static native double HELICS_MAX_TIME_VALUE_get();
+  public final static native double HELICS_TERMINATION_TIME_VALUE_get();
+  public final static native double cHelicsMaxTimeValue_get();
   public final static native double cHelicsBigNumber_get();
+  public final static native double cHelicsTerminateTime_get();
   public final static native double HELICS_INVALID_DOUBLE_get();
   public final static native double HELICS_TIME_ZERO_get();
   public final static native double HELICS_TIME_EPSILON_get();
   public final static native double HELICS_TIME_INVALID_get();
+  public final static native double HELICS_TIME_BIGTIME_get();
   public final static native double HELICS_TIME_MAXTIME_get();
+  public final static native double HELICS_TIME_TERMINATION_get();
   public final static native int HELICS_TRUE_get();
   public final static native int HELICS_FALSE_get();
   public final static native int HELICS_ITERATION_REQUEST_NO_ITERATION_get();
