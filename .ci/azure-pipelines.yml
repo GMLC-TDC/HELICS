@@ -102,7 +102,7 @@ jobs:
   - job: Windows
     strategy:
       matrix:
-        VS2020-32bit:
+        VS2022-32bit:
           imageName: "windows-2022"
           langArch: "x86"
           vsArch: "Win32"
