@@ -885,9 +885,8 @@ TEST_F(timing, dual_max_time)
         controller->enterExecutingMode();
         helics::Time grantedTime = helics::timeZero;
         helics::Time maxTime = cHelicsBigNumber;
-
         grantedTime = controller->requestTime(maxTime);
-        while (grantedTime < maxTime) {
+        while (grantedTime < cHelicsTerminateTime) {
             double v = subc.getDouble();
             pubc.publish(2.0 * v);
             grantedTime = controller->requestTime(maxTime);
@@ -942,7 +941,7 @@ TEST_F(timing, dual_max_time_endpoint)
         helics::Time maxTime = cHelicsBigNumber;
 
         grantedTime = controller->requestTime(maxTime);
-        while (grantedTime < maxTime) {
+        while (grantedTime < cHelicsTerminateTime) {
             auto m = e1.getMessage();
             m->data.append("a", 1);
             m->dest = "value";

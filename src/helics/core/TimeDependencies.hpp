@@ -218,7 +218,7 @@ class TimeDependencies {
 inline bool checkSequenceCounter(const DependencyInfo& dep, Time tmin, std::int32_t sq)
 {
     return (!dep.dependency || !dep.dependent || dep.timingVersion <= 0 || dep.next > tmin ||
-            dep.next >= cBigTime || dep.responseSequenceCounter == sq);
+            dep.next >= cTerminationTime || dep.responseSequenceCounter == sq);
 }
 
 const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,

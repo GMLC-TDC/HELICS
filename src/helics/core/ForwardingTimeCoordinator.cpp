@@ -48,7 +48,7 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
             downstream.Te = upstream.Te;
         }
     }
-    if (!restrictive_time_policy && upstream.minDe < Time::maxVal()) {
+    if (!restrictive_time_policy && upstream.minDe < cTerminationTime) {
         if (downstream.minDe > downstream.next) {
             //     downstream.next = downstream.minminDe;
         }
@@ -213,7 +213,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
                 continue;
             }
             if (dep.dependency) {
-                if (dep.next > msg.actionTime && dep.next < cBigTime) {
+                if (dep.next > msg.actionTime && dep.next < cTerminationTime) {
                     continue;
                 }
             }

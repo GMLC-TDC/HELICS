@@ -512,7 +512,7 @@ void InterfaceInfo::generateDataFlowGraph(nlohmann::json& base) const
 
 void InterfaceInfo::disconnectFederate(GlobalFederateId fedToDisconnect, Time disconnectTime)
 {
-    if (disconnectTime < cBigTime) {
+    if (disconnectTime < cTerminationTime) {
         auto ihandle = inputs.lock_shared();
         for (auto& ipt : ihandle) {
             ipt->disconnectFederate(fedToDisconnect, disconnectTime);

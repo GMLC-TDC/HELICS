@@ -459,8 +459,13 @@ typedef enum { /* NOLINT */
                HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
-#define HELICS_BIG_NUMBER 9223372036.854774
+#define HELICS_BIG_NUMBER 9223372000.00000
+#define HELICS_MAX_TIME_VALUE 9223372036.854774
+#define HELICS_TERMINATION_TIME_VALUE HELICS_MAX_TIME_VALUE / 2.0
+
+const double cHelicsMaxTimeValue = HELICS_MAX_TIME_VALUE;
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
+const double cHelicsTerminateTime = HELICS_TERMINATION_TIME_VALUE;
 
 #define HELICS_INVALID_DOUBLE (-1E49)
 
@@ -557,8 +562,10 @@ typedef double HelicsTime;
 const HelicsTime HELICS_TIME_ZERO = 0.0; /*!< definition of time zero-the beginning of simulation */
 const HelicsTime HELICS_TIME_EPSILON = 1.0e-9; /*!< definition of the minimum time resolution */
 const HelicsTime HELICS_TIME_INVALID = -1.785e39; /*!< definition of an invalid time that has no meaning */
-const HelicsTime HELICS_TIME_MAXTIME = HELICS_BIG_NUMBER; /*!< definition of time signifying the federate has
-                                                             terminated or run until the end of the simulation*/
+const HelicsTime HELICS_TIME_BIGTIME = HELICS_BIG_NUMBER; /*!< definition of a very large time */
+const HelicsTime HELICS_TIME_MAXTIME = HELICS_MAX_TIME_VALUE; /*!< definition of the maximum allowed time value*/
+const HelicsTime HELICS_TIME_TERMINATION =
+    HELICS_TERMINATION_TIME_VALUE; /*!< definition of the minimum time level signifying the simulation has ended*/
 
 /**
  * defining a boolean type for use in the helics interface

@@ -1069,7 +1069,7 @@ HelicsTime helicsFederateRequestTime(HelicsFederate fed, HelicsTime requestTime,
     }
     try {
         auto timeret = fedObj->requestTime(requestTime);
-        return (timeret < helics::Time::maxVal()) ? static_cast<double>(timeret) : HELICS_TIME_MAXTIME;
+        return timeReturn(timeret);
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -1085,7 +1085,7 @@ HelicsTime helicsFederateRequestTimeAdvance(HelicsFederate fed, HelicsTime timeD
     }
     try {
         auto timeret = fedObj->requestTimeAdvance(timeDelta);
-        return (timeret < helics::Time::maxVal()) ? static_cast<double>(timeret) : HELICS_TIME_MAXTIME;
+        return timeReturn(timeret);
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -1101,7 +1101,7 @@ HelicsTime helicsFederateRequestNextStep(HelicsFederate fed, HelicsError* err)
     }
     try {
         auto timeret = fedObj->requestNextStep();
-        return (timeret < helics::Time::maxVal()) ? static_cast<double>(timeret) : HELICS_TIME_MAXTIME;
+        return timeReturn(timeret);
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -1127,7 +1127,7 @@ HelicsTime helicsFederateRequestTimeIterative(HelicsFederate fed,
         if (outIteration != nullptr) {
             *outIteration = getIterationStatus(val.state);
         }
-        return (val.grantedTime < helics::Time::maxVal()) ? static_cast<double>(val.grantedTime) : HELICS_TIME_MAXTIME;
+        return timeReturn(val.grantedTime);
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -1160,7 +1160,7 @@ HelicsTime helicsFederateRequestTimeComplete(HelicsFederate fed, HelicsError* er
     }
     try {
         auto timeret = fedObj->requestTimeComplete();
-        return (timeret < helics::Time::maxVal()) ? static_cast<double>(timeret) : HELICS_TIME_MAXTIME;
+        return timeReturn(timeret);
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -1196,7 +1196,7 @@ HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed, Helics
         if (outIteration != nullptr) {
             *outIteration = getIterationStatus(val.state);
         }
-        return (val.grantedTime < helics::Time::maxVal()) ? static_cast<double>(val.grantedTime) : HELICS_TIME_MAXTIME;
+        return timeReturn(val.grantedTime);
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -1539,7 +1539,7 @@ HelicsTime helicsFederateGetTimeProperty(HelicsFederate fed, int timeProperty, H
     try {
         auto timeprop = fedObj->getTimeProperty(timeProperty);
 
-        return (timeprop < helics::Time::maxVal()) ? static_cast<double>(timeprop) : HELICS_TIME_MAXTIME;
+        return timeReturn(timeprop);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1600,7 +1600,7 @@ HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, HelicsError* err)
         return HELICS_TIME_INVALID;
     }
     auto time = fedObj->getCurrentTime();
-    return (time < helics::Time::maxVal()) ? static_cast<double>(time) : HELICS_TIME_MAXTIME;
+    return timeReturn(time);
 }
 
 static constexpr char invalidGlobalString[] = "Global name cannot be null";

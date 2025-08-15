@@ -941,7 +941,7 @@ Time Federate::requestTime(Time nextInternalTimeStep)
                     preTimeRequestOperations(nextInternalTimeStep, false);
                     newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
                     postTimeRequestOperations(newTime, false);
-                } while (retriggerTimeRequest && newTime < Time::maxVal());
+                } while (retriggerTimeRequest && newTime < cTerminationTime);
 
                 return newTime;
             }
@@ -1188,7 +1188,7 @@ void Federate::updateSimulationTime(Time newTime, Time oldTime, bool iterating)
         timeUpdateCallback(newTime, iterating);
     }
     updateTime(newTime, oldTime);
-    if (newTime == Time::maxVal()) {
+    if (newTime >= cTerminationTime) {
         updateFederateMode(Modes::FINISHED);
     }
 }
