@@ -24,7 +24,9 @@ if(NOT TARGET spdlog::spdlog)
         # the spdlog install internally stores whether it was built with this on our vendored copy
         # of spdlog should never use its own fmt
         set(SPDLOG_FMT_EXTERNAL ON CACHE INTERNAL "")
-
+        if(CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
+            set(CMAKE_CXX_EXTENSIONS ON CACHE INTERNAL "")
+        endif()
         # use the vendored SPDLOG library
         if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
             add_subdirectory(ThirdParty/spdlog EXCLUDE_FROM_ALL SYSTEM)
@@ -58,5 +60,8 @@ if(NOT TARGET spdlog::spdlog)
         hide_variable(SPDLOG_USE_STD_FORMAT)
         hide_variable(SPDLOG_SYSTEM_INCLUDES)
         hide_variable(SPDLOG_BUILD_PIC)
+        hide_variable(SPDLOG_FWRITE_UNLOCKED)
+        hide_variable(SPDLOG_MSVC_UTF8)
+        hide_variable(SPDLOG_WCHAR_CONSOLE)
     endif()
 endif()

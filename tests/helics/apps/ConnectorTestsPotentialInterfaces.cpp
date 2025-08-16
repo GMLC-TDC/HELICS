@@ -53,7 +53,7 @@ TEST(connector_potential_interfaces, simple_connector)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -88,7 +88,7 @@ TEST(connector_potential_interfaces, simple_connector_async)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -124,7 +124,7 @@ TEST(connector_potential_interfaces, simple_connector_init_iteration)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -160,7 +160,7 @@ TEST(connector_potential_interfaces, simple_connector_init_iteration2)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -192,7 +192,7 @@ TEST(connector_potential_interfaces, simple_connector2)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -259,7 +259,7 @@ TEST(connector_potential_interfaces, simple_connector_additional_command)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -290,7 +290,7 @@ TEST(connector_potential_interfaces, pub_templates)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -321,7 +321,7 @@ TEST(connector_potential_interfaces, pub_templates_reverse)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -354,7 +354,7 @@ TEST(connector_potential_interfaces, pub_template_alias)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -385,7 +385,7 @@ TEST(connector_potential_interfaces, pub_input_template)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -416,7 +416,7 @@ TEST(connector_potential_interfaces, pub_input_template3)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -446,7 +446,7 @@ TEST(connector_potential_interfaces, input_pub_template)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -478,7 +478,7 @@ TEST(connector_potential_interfaces, input_pub_template_alias)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed.finalize();
     fut.get();
@@ -534,13 +534,13 @@ TEST(connector_potential_interfaces, input_pub_template_potential_match)
     retTime = vfed2.requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1_1.getDouble();
-    EXPECT_EQ(val, testValue + 2.0);
+    EXPECT_DOUBLE_EQ(val, testValue + 2.0);
     val = inp1_2.getDouble();
-    EXPECT_EQ(val, testValue + 3.0);
+    EXPECT_DOUBLE_EQ(val, testValue + 3.0);
     val = inp2_1.getDouble();
-    EXPECT_EQ(val, testValue + 1.0);
+    EXPECT_DOUBLE_EQ(val, testValue + 1.0);
     val = inp2_2.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed1.finalize();
     vfed2.finalize();
@@ -593,13 +593,13 @@ TEST(connector_potential_interfaces, input_pub_template_potential_match_targets)
     retTime = vfed2.requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1_1.getDouble();
-    EXPECT_EQ(val, testValue + 2.0);
+    EXPECT_DOUBLE_EQ(val, testValue + 2.0);
     val = inp1_2.getDouble();
-    EXPECT_EQ(val, testValue + 3.0);
+    EXPECT_DOUBLE_EQ(val, testValue + 3.0);
     val = inp2_1.getDouble();
-    EXPECT_EQ(val, testValue + 1.0);
+    EXPECT_DOUBLE_EQ(val, testValue + 1.0);
     val = inp2_2.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed1.finalize();
     vfed2.finalize();
@@ -657,13 +657,13 @@ TEST(connector_potential_interfaces, input_pub_template_potential_match_alias)
     retTime = vfed2.requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1_1.getDouble();
-    EXPECT_EQ(val, testValue + 2.0);
+    EXPECT_DOUBLE_EQ(val, testValue + 2.0);
     val = inp1_2.getDouble();
-    EXPECT_EQ(val, testValue + 3.0);
+    EXPECT_DOUBLE_EQ(val, testValue + 3.0);
     val = inp2_1.getDouble();
-    EXPECT_EQ(val, testValue + 1.0);
+    EXPECT_DOUBLE_EQ(val, testValue + 1.0);
     val = inp2_2.getDouble();
-    EXPECT_EQ(val, testValue);
+    EXPECT_DOUBLE_EQ(val, testValue);
 
     vfed1.finalize();
     vfed2.finalize();
@@ -699,7 +699,7 @@ TEST(connector_potential_interfaces, input_pub_template_with_units)
     auto retTime = vfed.requestTime(5);
     EXPECT_EQ(retTime, 1.0);
     auto val = inp1.getDouble();
-    EXPECT_EQ(val, testValue * 1000.0);
+    EXPECT_DOUBLE_EQ(val, testValue * 1000.0);
 
     vfed.finalize();
     fut.get();

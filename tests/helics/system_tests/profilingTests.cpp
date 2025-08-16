@@ -30,6 +30,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(profiling_tests, basic)
 {
+    // adding a cleanup
+    helics::cleanupHelicsLibrary();
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
     fedInfo.coreInitString = "--autobroker --profiler=log";
 
@@ -78,6 +80,8 @@ TEST(profiling_tests, basic)
 
 TEST(profiling_tests, broker_basic)
 {
+    // adding a cleanup
+    helics::cleanupHelicsLibrary();
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
     fedInfo.coreInitString =
         "--brokerinitstring=\"--profiler=log --name=prbroker\" --autobroker --broker=prbroker";
