@@ -32,7 +32,6 @@ Thinking about HELICS co-simulation in general and about the nature of the simul
    If you're writing your own simulator then you have a lot more freedom and the language you use may come down to personal preference and/or performance requirements of the federate.
 
    The languages currently supported by HELICS are:
-
    - C++
    - C
    - Python (2 and 3)
