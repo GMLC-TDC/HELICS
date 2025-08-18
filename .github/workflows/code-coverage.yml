@@ -24,13 +24,13 @@ jobs:
       DISABLE_CXX_SHARED: 'true'
       
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: true
         ref: develop
