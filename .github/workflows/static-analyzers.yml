@@ -17,7 +17,7 @@ jobs:
     container: helics/buildenv:cpplint
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Run cpplint
       run: cpplint --counting=detailed --recursive --extensions=cpp,cxx,h,hpp,hxx examples benchmarks src tests
 
@@ -28,7 +28,7 @@ jobs:
     container: helics/buildenv:clang-extra-tools
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Run clang-tidy on changed files
       shell: bash
       run: |
