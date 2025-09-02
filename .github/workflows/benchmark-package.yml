@@ -38,11 +38,11 @@ jobs:
 
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       if: github.event_name != 'schedule'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         ref: develop
       if: github.event_name == 'schedule'
