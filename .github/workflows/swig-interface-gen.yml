@@ -24,7 +24,7 @@ jobs:
     - uses: gmlc-tdc/helics-action/update-swig-interfaces@main
      
     # Run pre-commit docker-clang-format hook
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: '3.12'
     - name: set PY
