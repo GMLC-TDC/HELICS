@@ -1,11 +1,10 @@
 /*
-Copyright (c) 2017-2018,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-
-#include "helics/external/optional.hpp"
 
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
@@ -13,6 +12,7 @@ Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more detail
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <chrono>
+#include <optional>
 #include <utility>
 
 namespace helics {
@@ -58,7 +58,7 @@ most cases.
     @details only available for copy assignable objects
     @return an optional object with an object of type T if available
     */
-        stx::optional<std::pair<unsigned char*, int>> try_peek() const;
+        std::optional<std::pair<unsigned char*, int>> try_peek() const;
 
         /** try to pop an object from the queue
     @return an optional containing the value if successful the optional will be empty if there is no

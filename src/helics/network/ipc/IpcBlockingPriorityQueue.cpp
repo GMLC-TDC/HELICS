@@ -1,16 +1,16 @@
 /*
-Copyright (c) 2017-2018,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "IpcBlockingPriorityQueue.hpp"
-
-#include "helics/external/optional.hpp"
 
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <string>
 #include <type_traits>
@@ -214,7 +214,7 @@ class BlockingPriorityQueue {
     @return an optional object with an object of type T if available
     */
     template<typename = std::enable_if<std::is_copy_assignable<T>::value>>
-    stx::optional<T> try_peek() const
+    std::optional<T> try_peek() const
     {
         std::lock_guard<std::mutex> lock(m_pullLock);
         if (!priorityQueue.empty()) {
@@ -232,7 +232,7 @@ class BlockingPriorityQueue {
     @return an optional containing the value if successful the optional will be empty if there is no
     element in the queue
     */
-    stx::optional<T> try_pop();
+    std::optional<T> try_pop();
 
     /** blocking call to wait on an object from the stack*/
     T pop()
@@ -273,7 +273,7 @@ class BlockingPriorityQueue {
     }
 
     /** blocking call to wait on an object from the stack with timeout*/
-    stx::optional<T> pop(std::chrono::milliseconds timeout)
+    std::optional<T> pop(std::chrono::milliseconds timeout)
     {
         auto val = try_pop();
         while (!val) {
@@ -364,7 +364,7 @@ depending on the number of consumers
 };
 
 template<typename T>
-stx::optional<T> BlockingPriorityQueue<T>::try_pop()
+std::optional<T> BlockingPriorityQueue<T>::try_pop()
 {
     std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
     if (!priorityQueue.empty()) {

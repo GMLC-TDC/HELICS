@@ -20,8 +20,13 @@ set(TESTCORE_SOURCE_FILES test/TestBroker.cpp test/TestCore.cpp test/TestComms.c
 
 set(INPROCCORE_SOURCE_FILES inproc/InprocBroker.cpp inproc/InprocCore.cpp inproc/InprocComms.cpp)
 
-set(IPC_SOURCE_FILES ipc/IpcCore.cpp ipc/IpcBroker.cpp ipc/IpcComms.cpp ipc/IpcQueueHelper.cpp
-                     # ipc/IpcBlockingPriorityQueue.cpp ipc/IpcBlockingPriorityQueueImpl.cpp
+set(IPC_SOURCE_FILES
+    ipc/IpcCore.cpp
+    ipc/IpcBroker.cpp
+    ipc/IpcComms.cpp
+    ipc/IpcQueueHelper.cpp
+    ipc/IpcBlockingPriorityQueue.cpp
+    ipc/IpcBlockingPriorityQueueImpl.cpp
 )
 
 set(MPI_SOURCE_FILES mpi/MpiCore.cpp mpi/MpiBroker.cpp mpi/MpiComms.cpp mpi/MpiService.cpp)
@@ -62,8 +67,13 @@ set(TESTCORE_HEADER_FILES test/TestCore.h test/TestBroker.h test/TestComms.h)
 
 set(INPROCCORE_HEADER_FILES inproc/InprocCore.h inproc/InprocBroker.h inproc/InprocComms.h)
 
-set(IPC_HEADER_FILES ipc/IpcCore.h ipc/IpcBroker.h ipc/IpcComms.h ipc/IpcQueueHelper.h
-                     # ipc/IpcBlockingPriorityQueue.hpp ipc/IpcBlockingPriorityQueueImpl.hpp
+set(IPC_HEADER_FILES
+    ipc/IpcCore.h
+    ipc/IpcBroker.h
+    ipc/IpcComms.h
+    ipc/IpcQueueHelper.h
+    ipc/IpcBlockingPriorityQueue.hpp
+    ipc/IpcBlockingPriorityQueueImpl.hpp
 )
 
 set(ZMQ_HEADER_FILES
