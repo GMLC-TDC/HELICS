@@ -75,7 +75,7 @@ jobs:
        
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ matrix.id }}-benchmarks
         path: artifact
