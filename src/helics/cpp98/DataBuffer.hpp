@@ -47,29 +47,29 @@ class DataBuffer {
     void fill(bool val) { helicsDataBufferFillFromBoolean(buff, val ? HELICS_TRUE : HELICS_FALSE); }
     void fill(char val) { helicsDataBufferFillFromChar(buff, val); }
     /** make a deep copy of the buffer*/
-    DataBuffer clone() { return DataBuffer(helicsDataBufferClone(buff)); }
+    HELICS_NODISCARD DataBuffer clone() { return DataBuffer(helicsDataBufferClone(buff)); }
     /** get the size of the raw value */
-    int size() { return helicsDataBufferSize(buff); }
+    HELICS_NODISCARD int size() { return helicsDataBufferSize(buff); }
 
     /** get the size of the raw value */
-    int capacity() { return helicsDataBufferCapacity(buff); }
+    HELICS_NODISCARD int capacity() { return helicsDataBufferCapacity(buff); }
     /** get a pointer to the raw data*/
-    void* data() { return helicsDataBufferData(buff); }
+    HELICS_NODISCARD void* data() { return helicsDataBufferData(buff); }
     /** reserve a capacity in the buffer*/
     bool reserve(int32_t newCapacity)
     {
         return helicsDataBufferReserve(buff, newCapacity) == HELICS_TRUE;
     }
     /** get the size of the value as a string */
-    int stringSize() { return helicsDataBufferStringSize(buff); }
+    HELICS_NODISCARD int stringSize() { return helicsDataBufferStringSize(buff); }
     /** get the size of the value as a vector */
-    int vectorSize() { return helicsDataBufferVectorSize(buff); }
+    HELICS_NODISCARD int vectorSize() { return helicsDataBufferVectorSize(buff); }
     /** get the type of data contained in the buffer*/
-    int type() const { return helicsDataBufferType(buff); }
+    HELICS_NODISCARD int type() const { return helicsDataBufferType(buff); }
     /** check if the buffer is valid*/
-    bool isValid() const { return (helicsDataBufferIsValid(buff) == HELICS_TRUE); }
+    HELICS_NODISCARD bool isValid() const { return (helicsDataBufferIsValid(buff) == HELICS_TRUE); }
     /** get the current value as a string*/
-    std::string toString()
+    HELICS_NODISCARD std::string toString()
     {
         int size = stringSize();
         std::string result;
@@ -110,17 +110,17 @@ class DataBuffer {
         name.resize(size);
     }
     /** get the current value as a 64 bit integer*/
-    int64_t toInt() { return helicsDataBufferToInteger(buff); }
+    HELICS_NODISCARD int64_t toInt() { return helicsDataBufferToInteger(buff); }
     /** get the value as a boolean*/
-    bool toBoolean()
+    HELICS_NODISCARD bool toBoolean()
     {
         HelicsBool val = helicsDataBufferToBoolean(buff);
         return (val == HELICS_TRUE);
     }
     /** get the value as a double*/
-    double toDouble() { return helicsDataBufferToDouble(buff); }
+    HELICS_NODISCARD double toDouble() { return helicsDataBufferToDouble(buff); }
     /** get the value as a complex number*/
-    std::complex<double> toComplex()
+    HELICS_NODISCARD std::complex<double> toComplex()
     {
         HelicsComplex hc = helicsDataBufferToComplexObject(buff);
         std::complex<double> result(hc.real, hc.imag);
@@ -162,7 +162,7 @@ class DataBuffer {
         return (helicsDataBufferConvertToType(buff, newDataType) == HELICS_TRUE);
     }
     /** get the C API dataobject */
-    HelicsDataBuffer getHelicsDataBuffer() { return buff; }
+    HELICS_NODISCARD HelicsDataBuffer getHelicsDataBuffer() { return buff; }
 
   private:
     HelicsDataBuffer buff;

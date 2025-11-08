@@ -75,33 +75,33 @@ class MessageFederate: public virtual Federate {
     /** get an Endpoint from its name
     @param name the name of the endpoint to retrieve
     @return an Endpoint*/
-    Endpoint getEndpoint(const std::string& name)
+    HELICS_NODISCARD Endpoint getEndpoint(const std::string& name)
     {
         return Endpoint(helicsFederateGetEndpoint(fed, name.c_str(), hThrowOnError()));
     }
     /** get an Endpoint from an index
     @param index the index of the endpoint to retrieve index is 0 based
     @return an Endpoint*/
-    Endpoint getEndpoint(int index)
+    HELICS_NODISCARD Endpoint getEndpoint(int index)
     {
         return Endpoint(helicsFederateGetEndpointByIndex(fed, index, hThrowOnError()));
     }
 
     /** Checks if federate has any messages **/
-    bool hasMessage() const
+    HELICS_NODISCARD bool hasMessage() const
     {
         // returns int, 1 = true, 0 = false
         return (helicsFederateHasMessage(fed) > 0);
     }
 
     /** Returns the number of pending receives for all endpoints. **/
-    int pendingMessageCount() const { return helicsFederatePendingMessageCount(fed); }
+    HELICS_NODISCARD int pendingMessageCount() const { return helicsFederatePendingMessageCount(fed); }
 
     /** Get a packet for any endpoints in the federate **/
     Message getMessage() { return Message(helicsFederateGetMessage(fed)); }
 
     /** create a message object */
-    Message createMessage() { return Message(helicsFederateCreateMessage(fed, hThrowOnError())); }
+    HELICS_NODISCARD Message createMessage() { return Message(helicsFederateCreateMessage(fed, hThrowOnError())); }
     /**get the number of registered endpoints*/
     int getEndpointCount() const { return helicsFederateGetEndpointCount(fed); }
 

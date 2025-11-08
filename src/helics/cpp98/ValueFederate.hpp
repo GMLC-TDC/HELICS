@@ -249,14 +249,14 @@ class ValueFederate: public virtual Federate {
         helicsFederateRegisterFromPublicationJSON(fed, json.c_str(), hThrowOnError());
     }
     /** get  publication by name*/
-    Publication getPublication(const std::string& name)
+    HELICS_NODISCARD Publication getPublication(const std::string& name)
     {
         return Publication(helicsFederateGetPublication(fed, name.c_str(), hThrowOnError()));
     }
     /** get a publication by index
     @param index a 0 based index of the publication to retrieve
     @return a Publication object*/
-    Publication getPublication(int index)
+    HELICS_NODISCARD Publication getPublication(int index)
     {
         return Publication(helicsFederateGetPublicationByIndex(fed, index, hThrowOnError()));
     }
@@ -434,26 +434,26 @@ class ValueFederate: public virtual Federate {
     }
 
     /** get an input by name*/
-    Input getInput(const std::string& name)
+    HELICS_NODISCARD Input getInput(const std::string& name)
     {
         return Input(helicsFederateGetInput(fed, name.c_str(), hThrowOnError()));
     }
 
     /** get an input by target*/
-    Input getInputByTarget(const std::string& target)
+    HELICS_NODISCARD Input getInputByTarget(const std::string& target)
     {
         return Input(helicsFederateGetInputByTarget(fed, target.c_str(), hThrowOnError()));
     }
 
     /** get an input by index*/
-    Input getInput(int index)
+    HELICS_NODISCARD Input getInput(int index)
     {
         return Input(helicsFederateGetInputByIndex(fed, index, hThrowOnError()));
     }
     /** get the number of inputs in this federate*/
-    int getInputCount() const { return helicsFederateGetInputCount(fed); }
+    HELICS_NODISCARD int getInputCount() const { return helicsFederateGetInputCount(fed); }
     /** get the number of publications in this federate*/
-    int getPublicationCount() const { return helicsFederateGetPublicationCount(fed); }
+    HELICS_NODISCARD int getPublicationCount() const { return helicsFederateGetPublicationCount(fed); }
     // TODO(PT): use c api to implement this method... callbacks too?
     /** Get a list of all inputs with updates since the last call **/
     std::vector<HelicsInput> queryUpdates() { return std::vector<HelicsInput>(); }

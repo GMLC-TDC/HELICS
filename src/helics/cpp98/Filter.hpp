@@ -33,7 +33,7 @@ class Filter {
     /** cast operator to get the underlying object*/
     operator HelicsFilter() const { return filt; }
     /** get the underlying HelicsFilter object*/
-    HelicsFilter baseObject() const { return filt; }
+    HELICS_NODISCARD HelicsFilter baseObject() const { return filt; }
     /** check if the filter is valid */
     bool isValid() const { return (helicsFilterIsValid(filt) == HELICS_TRUE); }
     /** get the name for the filter*/
@@ -57,14 +57,14 @@ class Filter {
     /** get the value of a filter property
     @param property the name of the property of the filter to get
     */
-    double getProperty(const std::string& property)
+    HELICS_NODISCARD double getProperty(const std::string& property)
     {
         return helicsFilterGetPropertyDouble(filt, property.c_str());
     }
     /** get a string property on a filter
     @param property the name of the property of the filter to get
     */
-    const char* getString(const std::string& property)
+    HELICS_NODISCARD const char* getString(const std::string& property)
     {
         return helicsFilterGetPropertyString(filt, property.c_str());
     }
@@ -89,14 +89,14 @@ class Filter {
         helicsFilterRemoveTarget(filt, dest.c_str(), hThrowOnError());
     }
     /** get the interface information field of the filter*/
-    const char* getInfo() const { return helicsFilterGetInfo(filt); }
+    HELICS_NODISCARD const char* getInfo() const { return helicsFilterGetInfo(filt); }
     /** set the interface information field of the filter*/
     void setInfo(const std::string& info)
     {
         helicsFilterSetInfo(filt, info.c_str(), HELICS_IGNORE_ERROR);
     }
     /** get the value of a tag for the filter*/
-    const char* getTag(const std::string& tagname) const
+    HELICS_NODISCARD const char* getTag(const std::string& tagname) const
     {
         return helicsFilterGetTag(filt, tagname.c_str());
     }
@@ -109,7 +109,7 @@ class Filter {
     {
         helicsFilterSetOption(filt, option, value, HELICS_IGNORE_ERROR);
     }
-    int32_t getOption(int32_t option) { return helicsFilterGetOption(filt, option); }
+    HELICS_NODISCARD int32_t getOption(int32_t option) { return helicsFilterGetOption(filt, option); }
 
     void setCallback(HelicsMessage (*filtCall)(HelicsMessage message, void* userData),
                      void* userData)

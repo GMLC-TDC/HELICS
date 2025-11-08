@@ -1,0 +1,290 @@
+{
+	"name": "MyFederate",
+	"log_level": "WARNING",
+	"period": 1.0,
+	"endpoints": [
+		{
+			"name": "helics_input",
+			"global": true,
+			"type": "string",
+			"info": "This is the endpoint recieves messages from helics_output endpoint."
+		},
+		{
+			"name": "helics_output",
+			"global": true,
+			"type": "string",
+			"destination": "helics_input",
+			"info": {
+                "49AD8E07-3BF9-A4E2-CB8F-C3722F837B62": {
+                    "611": {
+                        "voltage_C": "29.251894+2663.171088j V"
+                    },
+                    "632": {
+                        "voltage_A": "2237.669679-1288.335097j V",
+                        "voltage_B": "-2208.505806-1256.247678j V",
+                        "voltage_C": "11.104063+2617.658927j V"
+                    },
+                    "633": {
+                        "voltage_A": "2237.669679-1288.335097j V",
+                        "voltage_B": "-2208.505806-1256.247678j V",
+                        "voltage_C": "11.104063+2617.658927j V"
+                    },
+                    "634": {
+                        "voltage_A": "258.192655-148.654050j V",
+                        "voltage_B": "-254.827593-144.951655j V",
+                        "voltage_C": "1.281238+302.037569j V"
+                    },
+                    "634_stmtr": {
+                        "measured_power_A": "0.000000+0.000000j VA",
+                        "measured_power_B": "-0.000000+0.000000j VA",
+                        "measured_power_C": "0.000000+0.000000j VA",
+                        "voltage_A": "258.192655-148.654050j V",
+                        "voltage_B": "-254.827593-144.951655j V",
+                        "voltage_C": "1.281238+302.037569j V"
+                    },
+                    "645": {
+                        "voltage_B": "-2208.505806-1256.247678j V",
+                        "voltage_C": "11.104063+2617.658927j V"
+                    },
+                    "646": {
+                        "voltage_B": "-2208.505806-1256.247678j V",
+                        "voltage_C": "11.104063+2617.658927j V"
+                    },
+                    "650": {
+                        "voltage_A": "2080.027251-1200.908123j V",
+                        "voltage_B": "-2080.029777-1200.901488j V",
+                        "voltage_C": "0.005675+2401.828543j V"
+                    },
+                    "652": {
+                        "voltage_A": "2257.205188-1294.501156j V"
+                    },
+                    "670": {
+                        "voltage_A": "2243.991333-1290.791249j V",
+                        "voltage_B": "-2214.838968-1253.621627j V",
+                        "voltage_C": "14.809053+2630.494844j V"
+                    },
+                    "671": {
+                        "voltage_A": "2256.648758-1295.693855j V",
+                        "voltage_B": "-2227.505388-1248.399393j V",
+                        "voltage_C": "22.184776+2656.174512j V"
+                    },
+                    "675": {
+                        "voltage_A": "2257.470387-1301.404170j V",
+                        "voltage_B": "-2231.980636-1246.547001j V",
+                        "voltage_C": "26.293328+2660.124451j V"
+                    },
+                    "680": {
+                        "voltage_A": "2256.648758-1295.693855j V",
+                        "voltage_B": "-2227.505388-1248.399393j V",
+                        "voltage_C": "22.184776+2656.174512j V"
+                    },
+                    "684": {
+                        "voltage_A": "2257.205782-1294.497384j V",
+                        "voltage_C": "25.716600+2659.674203j V"
+                    },
+                    "692": {
+                        "voltage_A": "2256.636415-1295.697171j V",
+                        "voltage_B": "-2227.501970-1248.387328j V",
+                        "voltage_C": "22.193911+2656.165194j V"
+                    },
+                    "bat_batidle": {
+                        "state_of_charge": 0.5
+                    },
+                    "bat_house": {
+                        "state_of_charge": 0.3704
+                    },
+                    "bat_school": {
+                        "state_of_charge": 0.5
+                    },
+                    "brkr": {
+                        "voltage_A": "2080.014079-1200.911661j V",
+                        "voltage_B": "-2080.026179-1200.888790j V",
+                        "voltage_C": "0.020395+2401.813518j V"
+                    },
+                    "cap_cap1": {
+                        "shunt_A": "0.000000+0.034671j S",
+                        "shunt_B": "0.000000+0.034671j S",
+                        "shunt_C": "0.000000+0.034671j S",
+                        "switchA": "CLOSED",
+                        "switchB": "CLOSED",
+                        "switchC": "CLOSED",
+                        "voltage_A": "2257.470387-1301.404170j V",
+                        "voltage_B": "-2231.980636-1246.547001j V",
+                        "voltage_C": "26.293328+2660.124451j V"
+                    },
+                    "cap_cap2": {
+                        "shunt_C": "0.000000+0.017361j S",
+                        "switchC": "CLOSED",
+                        "voltage_C": "29.251894+2663.171088j V"
+                    },
+                    "globals": {
+                        "clock": 1758142309
+                    },
+                    "house": {
+                        "voltage_1": "-110.732914-62.676377j V",
+                        "voltage_2": "-110.732914-62.676377j V"
+                    },
+                    "house_stmtr": {
+                        "indiv_measured_power_1": "-0.000000+0.000000j VA",
+                        "indiv_measured_power_2": "0.000000+0.000000j VA",
+                        "voltage_1": "-110.732914-62.676377j V",
+                        "voltage_2": "-110.732914-62.676377j V"
+                    },
+                    "ld_611": {
+                        "measured_power_C": "0.000000+0.000000j VA"
+                    },
+                    "ld_634c": {
+                        "measured_power_A": "0.000000+0.000000j VA",
+                        "measured_power_B": "-0.000000+0.000000j VA",
+                        "measured_power_C": "0.000000+0.000000j VA"
+                    },
+                    "ld_645": {
+                        "measured_power_B": "-0.000000+0.000000j VA"
+                    },
+                    "ld_646": {
+                        "measured_power_B": "-0.000000+0.000000j VA"
+                    },
+                    "ld_652": {
+                        "measured_power_A": "0.000000+0.000000j VA"
+                    },
+                    "ld_670a": {
+                        "measured_power_A": "0.000000+0.000000j VA",
+                        "measured_power_B": "-0.000000+0.000000j VA",
+                        "measured_power_C": "0.000000+0.000000j VA"
+                    },
+                    "ld_671": {
+                        "measured_power_A": "0.000000+0.000000j VA",
+                        "measured_power_B": "-0.000000+0.000000j VA",
+                        "measured_power_C": "0.000000+0.000000j VA"
+                    },
+                    "ld_675a": {
+                        "measured_power_A": "0.000000+0.000000j VA",
+                        "measured_power_B": "-0.000000+0.000000j VA",
+                        "measured_power_C": "0.000000+0.000000j VA"
+                    },
+                    "ld_692": {
+                        "measured_power_C": "0.000000+0.000000j VA"
+                    },
+                    "ld_house": {
+                        "indiv_measured_power_1": "-0.000000+0.000000j VA",
+                        "indiv_measured_power_2": "0.000000+0.000000j VA"
+                    },
+                    "line_632633": {
+                        "power_in_A": "-0.000012-0.000005j VA",
+                        "power_in_B": "0.000023-0.000023j VA",
+                        "power_in_C": "-0.000016-0.000003j VA"
+                    },
+                    "line_632645": {
+                        "power_in_B": "-0.000000+0.000000j VA",
+                        "power_in_C": "-0.000000-0.000000j VA"
+                    },
+                    "line_632670": {
+                        "power_in_A": "128.471973-233450.964154j VA",
+                        "power_in_B": "1776.246016-225257.673437j VA",
+                        "power_in_C": "2176.681934-362561.231347j VA"
+                    },
+                    "line_645646": {
+                        "power_in_B": "0.000000-0.000000j VA",
+                        "power_in_C": "-0.000000-0.000000j VA"
+                    },
+                    "line_650632": {
+                        "power_in_A": "-152.234574-231631.991591j VA",
+                        "power_in_B": "3205.071675-224126.507616j VA",
+                        "power_in_C": "3656.863377-357210.942592j VA"
+                    },
+                    "line_670671": {
+                        "power_in_A": "222.360227-234057.864132j VA",
+                        "power_in_B": "1288.750708-225663.289436j VA",
+                        "power_in_C": "1683.681219-364346.192449j VA"
+                    },
+                    "line_671680": {
+                        "power_in_A": "-0.000000-0.000000j VA",
+                        "power_in_B": "0.000000-0.000000j VA",
+                        "power_in_C": "0.000000-0.000000j VA"
+                    },
+                    "line_671684": {
+                        "power_in_A": "-0.046064-91.274962j VA",
+                        "power_in_C": "323.199327-122821.113036j VA"
+                    },
+                    "line_684611": {
+                        "power_in_C": "161.466795-122984.503212j VA"
+                    },
+                    "line_684652": {
+                        "power_in_A": "0.000063-91.271032j VA"
+                    },
+                    "line_692675": {
+                        "power_in_A": "409.128235-235178.605344j VA",
+                        "power_in_B": "336.041490-226417.287112j VA",
+                        "power_in_C": "374.548068-245091.349957j VA"
+                    },
+                    "mid": {
+                        "voltage_A": "2237.657331-1288.338415j V",
+                        "voltage_B": "-2208.502387-1256.235615j V",
+                        "voltage_C": "11.117771+2617.644935j V"
+                    },
+                    "rg60": {
+                        "voltage_A": "2218.677169-1280.980272j V",
+                        "voltage_B": "-2189.505563-1264.085722j V",
+                        "voltage_C": "0.035751+2579.128468j V"
+                    },
+                    "sourcebus": {
+                        "voltage_A": "66395.280957+0.000000j V",
+                        "voltage_B": "-33197.640478-57500.000000j V",
+                        "voltage_C": "-33197.640478+57500.000000j V"
+                    },
+                    "swt_671692": {
+                        "current_in_A": "45.138490+78.299185j A",
+                        "current_in_B": "43.235849-77.415061j A",
+                        "current_in_C": "-92.265011+0.911942j A",
+                        "status": "CLOSED"
+                    },
+                    "swt_brkr1": {
+                        "current_in_A": "48.166336+83.551587j A",
+                        "current_in_B": "45.501646-81.481710j A",
+                        "current_in_C": "-148.725498+1.524604j A",
+                        "status": "CLOSED"
+                    },
+                    "swt_rec1": {
+                        "current_in_A": "45.155940+78.329613j A",
+                        "current_in_B": "43.226564-77.407625j A",
+                        "current_in_C": "-138.500620+1.419788j A",
+                        "status": "CLOSED"
+                    },
+                    "swt_sect1": {
+                        "current_in_C": "-46.235609+0.507845j A",
+                        "status": "CLOSED"
+                    },
+                    "tap": {
+                        "voltage_C": "25.721173+2659.669528j V"
+                    },
+                    "xf1": {
+                        "voltage_A": "2237.669679-1288.335097j V",
+                        "voltage_B": "-2208.505806-1256.247678j V",
+                        "voltage_C": "11.104063+2617.658927j V"
+                    },
+                    "xf_Reg": {
+                        "power_in_A": "-151.417117-231631.991585j VA",
+                        "power_in_B": "3205.857712-224126.507620j VA",
+                        "power_in_C": "3658.781818-357210.942592j VA",
+                        "tap_A": 10,
+                        "tap_B": 8,
+                        "tap_C": 11
+                    },
+                    "xf_sub3": {
+                        "power_in_A": "3695.037109-228846.172084j VA",
+                        "power_in_B": "-34982.819438-290796.200226j VA",
+                        "power_in_C": "38006.406971-293317.192489j VA"
+                    },
+                    "xf_tpoletop": {
+                        "power_in_B": "11.244108+28.110041j VA"
+                    },
+                    "xf_xfm1": {
+                        "power_in_A": "0.000000+0.000000j VA",
+                        "power_in_B": "-0.000000+0.000000j VA",
+                        "power_in_C": "-0.000000-0.000000j VA"
+                    }
+                }
+            }
+		}
+	]
+}
