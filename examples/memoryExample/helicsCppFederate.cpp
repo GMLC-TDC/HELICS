@@ -103,8 +103,9 @@ class HelicsCppFederate {
     std::vector<fedEp> eps;
     void runBroker(void)
     {
-        broker =
-            new helicscpp::Broker(std::string("zmq"), std::string("broker"), std::string("-f 1 --loglevel=ERROR"));
+        broker = new helicscpp::Broker(std::string("zmq"),
+                                       std::string("broker"),
+                                       std::string("-f 1 --loglevel=ERROR"));
         if (!broker->isConnected()) {
             throw std::runtime_error("Creating HELICS Broker failed!");
         }
@@ -270,10 +271,11 @@ class HelicsCppFederate {
                     currentTime = federate->requestTime(currentTime + 1.0);
                     int completionStatus = static_cast<int>(currentTime * 100 / endTime);
                     fedLog->log(LogLevel::INFO,
-                        std::format("Cpp Federate Status: {}% complete.", completionStatus));
+                                std::format("Cpp Federate Status: {}% complete.",
+                                            completionStatus));
                 } else {
                     fedLog->log(LogLevel::INFO,
-                        std::string("Cpp Federate Status: Simulation complete.\n"));
+                                std::string("Cpp Federate Status: Simulation complete.\n"));
                     break;
                 }
             } else {
