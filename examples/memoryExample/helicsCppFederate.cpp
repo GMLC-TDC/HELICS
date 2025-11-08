@@ -1,5 +1,11 @@
+/*
+Copyright (c) 2017-2025,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+*/
+
 #include <ctime>
-#include <format>
 #include <fstream>
 #include <helics/helics98.hpp>
 #include <iostream>
@@ -9,15 +15,14 @@
 #include <vector>
 
 using json = nlohmann::json;
-using namespace std;
 
 enum LogLevel { DEBUG, INFO, WARNING, ERROR };
 
 class Logger {
   private:
-    ofstream logFile;
+    std::ofstream logFile;
 
-    string levelToString(LogLevel level)
+    std::string levelToString(LogLevel level)
     {
         switch (level) {
             case DEBUG:
@@ -34,28 +39,28 @@ class Logger {
     }
 
   public:
-    Logger(const string& fileName)
+    Logger(const std::string& fileName)
     {
-        logFile.open(fileName, ios::app);
+        logFile.open(fileName, std::ios::app);
         if (!logFile.is_open()) {
-            cerr << "Error opening log file: " << fileName << endl;
+            std::cerr << "Error opening log file: " << fileName << std::endl;
         }
     }
 
     ~Logger() { logFile.close(); }
 
-    void log(LogLevel level, const string& message)
+    void log(LogLevel level, const std::string& message)
     {
         time_t now = time(0);
         tm* timeInfo = localtime(&now);
         char timestamp[20];
         strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", timeInfo);
-        ostringstream logEntry;
+        std::ostringstream logEntry;
         logEntry << "[" << timestamp << "]" << levelToString(level) << ":" << message;
-        cout << "\r                                                  \r";
-        cout << logEntry.str();
+        std::cout << "\r                                                  \r";
+        std::cout << logEntry.str();
         if (logFile.is_open()) {
-            logFile << logEntry.str() << endl;
+            logFile << logEntry.str() << std::endl;
         }
     }
 };
@@ -68,14 +73,14 @@ class fedPub {
     {
         pub = p;
         pubVal = json::parse(pub.getInfo());
-    };
+    }
 };
 
 class fedSub {
   public:
     json subVal;
     helicscpp::Input sub;
-    fedSub(helicscpp::Input s) { sub = s; };
+    fedSub(helicscpp::Input s) { sub = s; }
 };
 
 class fedEp {
@@ -83,7 +88,7 @@ class fedEp {
     json epOutVal;
     json epInVal;
     helicscpp::Endpoint ep;
-    fedEp(helicscpp::Endpoint e) { ep = e; };
+    fedEp(helicscpp::Endpoint e) { ep = e; }
 };
 
 class HelicsCppFederate {
@@ -93,24 +98,24 @@ class HelicsCppFederate {
     helicscpp::CombinationFederate* federate = nullptr;
     helicscpp::Broker* broker = nullptr;
     HelicsTime endTime;
-    vector<fedPub> pubs;
-    vector<fedSub> subs;
-    vector<fedEp> eps;
+    std::vector<fedPub> pubs;
+    std::vector<fedSub> subs;
+    std::vector<fedEp> eps;
     void runBroker(void)
     {
         broker =
-            new helicscpp::Broker(string("zmq"), string("broker"), string("-f 1 --loglevel=ERROR"));
+            new helicscpp::Broker(std::string("zmq"), std::string("broker"), std::string("-f 1 --loglevel=ERROR"));
         if (!broker->isConnected()) {
-            throw runtime_error("Creating HELICS Broker failed!");
+            throw std::runtime_error("Creating HELICS Broker failed!");
         }
     }
     void registerWithHelics(void)
     {
-        fedLog->log(LogLevel::INFO, string("Creating HELICS Broker.\n"));
+        fedLog->log(LogLevel::INFO, std::string("Creating HELICS Broker.\n"));
         runBroker();
-        fedLog->log(LogLevel::INFO, string("Registering with HELICS Broker.\n"));
+        fedLog->log(LogLevel::INFO, std::string("Registering with HELICS Broker.\n"));
         federate = new helicscpp::CombinationFederate(helicsFederateCfg.dump());
-        fedLog->log(LogLevel::INFO, string("Successful Registration with HELICS Broker.\n"));
+        fedLog->log(LogLevel::INFO, std::string("Successful Registration with HELICS Broker.\n"));
         int pubCount = federate->getPublicationCount();
         int subCount = federate->getInputCount();
         int epCount = federate->getEndpointCount();
@@ -130,7 +135,7 @@ class HelicsCppFederate {
 
     void disconnectFromHelics(void)
     {
-        fedLog->log(LogLevel::INFO, string("Disconnecting from HELICS Broker.\n"));
+        fedLog->log(LogLevel::INFO, std::string("Disconnecting from HELICS Broker.\n"));
         if (federate->getCurrentMode() != HelicsFederateState::HELICS_STATE_FINALIZE ||
             federate->getCurrentMode() != HelicsFederateState::HELICS_STATE_ERROR) {
             federate->finalize();
@@ -145,9 +150,9 @@ class HelicsCppFederate {
 
     void processInput(fedSub sub)
     {
-        stringstream complexSS;
+        std::stringstream complexSS;
         json helicsPayLoad;
-        string subType(sub.sub.getType());
+        std::string subType(sub.sub.getType());
         sub.subVal.clear();
         sub.subVal = json::parse(sub.sub.getString());
         // fedLog->log(LogLevel::INFO, string("Input Updated!"));
@@ -161,7 +166,7 @@ class HelicsCppFederate {
 
     void processInputMessage(fedEp ep)
     {
-        stringstream complexSS;
+        std::stringstream complexSS;
         json helicsPayLoad;
         ep.epInVal.clear();
         if (ep.ep.hasMessage()) {
@@ -186,11 +191,11 @@ class HelicsCppFederate {
 
     void processPublication(fedPub pub)
     {
-        stringstream complexSS;
-        string pubType(pub.pub.getType());
+        std::stringstream complexSS;
+        std::string pubType(pub.pub.getType());
         json helicsPayLoad;
         int i = 0;
-        string strVal = "a";
+        std::string strVal = "a";
         helicsPayLoad.clear();
         if (pub.pubVal.empty()) {
             pub.pubVal = json::parse(pub.pub.getInfo());
@@ -205,9 +210,9 @@ class HelicsCppFederate {
 
     void processOutputMessage(fedEp ep)
     {
-        string destination = string(ep.ep.getDefaultDestination());
+        std::string destination = std::string(ep.ep.getDefaultDestination());
         if (!destination.empty()) {
-            stringstream complexSS;
+            std::stringstream complexSS;
             json helicsPayLoad;
             helicscpp::Message msg(ep.ep);
             complexSS.clear();
@@ -229,12 +234,12 @@ class HelicsCppFederate {
     }
 
   public:
-    HelicsCppFederate(string federateConfigFile, HelicsTime duration)
+    HelicsCppFederate(std::string federateConfigFile, HelicsTime duration)
     {
         fedLog = new Logger("HelicsCpp98FederateLog.txt");
         helicsFederateCfg.clear();
         federate = nullptr;
-        ifstream fstm(federateConfigFile);
+        std::ifstream fstm(federateConfigFile);
         helicsFederateCfg = json::parse(fstm);
         endTime = duration;
         registerWithHelics();
@@ -244,7 +249,7 @@ class HelicsCppFederate {
     {
         HelicsTime currentTime = 0.0;
         federate->enterExecutingMode();
-        fedLog->log(LogLevel::INFO, string("Entering Execution Mode."));
+        fedLog->log(LogLevel::INFO, std::string("Entering Execution Mode."));
         while (currentTime <= endTime) {
             if (federate->getCurrentMode() == HelicsFederateState::HELICS_STATE_EXECUTION) {
                 for (auto& sub : subs) {
@@ -265,10 +270,10 @@ class HelicsCppFederate {
                     currentTime = federate->requestTime(currentTime + 1.0);
                     int completionStatus = static_cast<int>(currentTime * 100 / endTime);
                     fedLog->log(LogLevel::INFO,
-                                format("Cpp Federate Status: {}% complete.", completionStatus));
+                        std::format("Cpp Federate Status: {}% complete.", completionStatus));
                 } else {
                     fedLog->log(LogLevel::INFO,
-                                string("Cpp Federate Status: Simulation complete.\n"));
+                        std::string("Cpp Federate Status: Simulation complete.\n"));
                     break;
                 }
             } else {
@@ -279,10 +284,10 @@ class HelicsCppFederate {
     }
 };
 
-string usage(string programName)
+std::string usage(std::string programName)
 {
-    stringstream usageStream;
-    string rv;
+    std::stringstream usageStream;
+    std::string rv;
     usageStream.clear();
     usageStream << "Usage: " << programName
                 << " federateConfigFile duration (optional)publishIterations\n";
@@ -291,7 +296,7 @@ string usage(string programName)
     usageStream << "\t\tduration: The run duration for the federate in seconds.\n";
     usageStream
         << "\t\tpublishIterations: An option argument for setting the number of times the federate will publish/send for each publication/endpoint in a single timestep. The default is 1."
-        << endl;
+        << std::endl;
     rv = usageStream.str();
     usageStream.clear();
     return rv;
@@ -299,19 +304,19 @@ string usage(string programName)
 
 int main(int argc, char* argv[])
 {
-    string federateConfigFile;
+    std::string federateConfigFile;
     HelicsTime duration;
     int publishIterations = 1;
     if (argc != 3) {
-        stringstream errMsg;
+        std::stringstream errMsg;
         errMsg.clear();
         errMsg
             << "Incorrect number arguments provided. helicsCppFederate takes 2 positional arguments.\n";
-        errMsg << usage(string(argv[0]));
-        throw runtime_error(errMsg.str());
+        errMsg << usage(std::string(argv[0]));
+        throw std::runtime_error(errMsg.str());
     } else {
-        federateConfigFile = string(argv[1]);
-        duration = static_cast<HelicsTime>(stod(string(argv[2])));
+        federateConfigFile = std::string(argv[1]);
+        duration = static_cast<HelicsTime>(std::stod(std::string(argv[2])));
     }
     HelicsCppFederate federate(federateConfigFile, duration);
     federate.runFederate();
