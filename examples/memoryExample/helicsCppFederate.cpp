@@ -271,11 +271,10 @@ class HelicsCppFederate {
                     currentTime = federate->requestTime(currentTime + 1.0);
                     int completionStatus = static_cast<int>(currentTime * 100 / endTime);
                     fedLog->log(LogLevel::INFO,
-                                std::format("Cpp Federate Status: {}% complete.",
-                                            completionStatus));
+                        std::string("Cpp Federate Status: ")+std::to_string(completionStatus)+"% complete.");
                 } else {
                     fedLog->log(LogLevel::INFO,
-                                std::string("Cpp Federate Status: Simulation complete.\n"));
+                        std::string("Cpp Federate Status: Simulation complete.\n"));
                     break;
                 }
             } else {
