@@ -95,13 +95,19 @@ class MessageFederate: public virtual Federate {
     }
 
     /** Returns the number of pending receives for all endpoints. **/
-    HELICS_NODISCARD int pendingMessageCount() const { return helicsFederatePendingMessageCount(fed); }
+    HELICS_NODISCARD int pendingMessageCount() const
+    {
+        return helicsFederatePendingMessageCount(fed);
+    }
 
     /** Get a packet for any endpoints in the federate **/
     Message getMessage() { return Message(helicsFederateGetMessage(fed)); }
 
     /** create a message object */
-    HELICS_NODISCARD Message createMessage() { return Message(helicsFederateCreateMessage(fed, hThrowOnError())); }
+    HELICS_NODISCARD Message createMessage()
+    {
+        return Message(helicsFederateCreateMessage(fed, hThrowOnError()));
+    }
     /**get the number of registered endpoints*/
     int getEndpointCount() const { return helicsFederateGetEndpointCount(fed); }
 

@@ -40,7 +40,10 @@ class Core {
     /** explicitly get the base HelicsCore object*/
     HELICS_NODISCARD HelicsCore baseObject() const { return core; }
     /** check if the core is connected to the broker*/
-    HELICS_NODISCARD bool isConnected() const { return (helicsCoreIsConnected(core) != HELICS_FALSE); }
+    HELICS_NODISCARD bool isConnected() const
+    {
+        return (helicsCoreIsConnected(core) != HELICS_FALSE);
+    }
     /** copy constructor*/
     Core(const Core& cr) { core = helicsCoreClone(cr.core, hThrowOnError()); }
     /** copy assignment*/

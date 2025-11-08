@@ -35,7 +35,10 @@ class Translator {
     /** get the underlying HelicsTranslator object*/
     HELICS_NODISCARD HelicsTranslator baseObject() const { return translator; }
     /** check if the translator is valid */
-    HELICS_NODISCARD bool isValid() const { return (helicsTranslatorIsValid(translator) == HELICS_TRUE); }
+    HELICS_NODISCARD bool isValid() const
+    {
+        return (helicsTranslatorIsValid(translator) == HELICS_TRUE);
+    }
     /** get the name for the translator*/
     HELICS_NODISCARD const char* getName() const { return helicsTranslatorGetName(translator); }
     /** set a property on a translator

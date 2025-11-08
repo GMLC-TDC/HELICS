@@ -151,7 +151,10 @@ class Publication {
     {
         helicsPublicationSetOption(pub, option, value, HELICS_IGNORE_ERROR);
     }
-    HELICS_NODISCARD int32_t getOption(int32_t option) { return helicsPublicationGetOption(pub, option); }
+    HELICS_NODISCARD int32_t getOption(int32_t option)
+    {
+        return helicsPublicationGetOption(pub, option);
+    }
 
   private:
     HelicsPublication pub;  //!< the reference to the underlying publication

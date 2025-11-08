@@ -156,7 +156,10 @@ class Input {
         name.resize(size);
     }
     /** get the current value as a 64 bit integer*/
-    HELICS_NODISCARD int64_t getInteger() { return helicsInputGetInteger(inp, HELICS_IGNORE_ERROR); }
+    HELICS_NODISCARD int64_t getInteger()
+    {
+        return helicsInputGetInteger(inp, HELICS_IGNORE_ERROR);
+    }
     /** get the value as a boolean*/
     HELICS_NODISCARD bool getBoolean()
     {
@@ -240,9 +243,15 @@ class Input {
     /** get the units associated with a input*/
     HELICS_NODISCARD const char* getUnits() const { return helicsInputGetExtractionUnits(inp); }
     /** get the units associated with an inputs publication*/
-    HELICS_NODISCARD const char* getInjectionUnits() const { return helicsInputGetInjectionUnits(inp); }
+    HELICS_NODISCARD const char* getInjectionUnits() const
+    {
+        return helicsInputGetInjectionUnits(inp);
+    }
     /** get the units associated with a publication of an input*/
-    HELICS_NODISCARD const char* getPublicationType() const { return helicsInputGetPublicationType(inp); }
+    HELICS_NODISCARD const char* getPublicationType() const
+    {
+        return helicsInputGetPublicationType(inp);
+    }
     /** get the type of the input*/
     HELICS_NODISCARD const char* getType() const { return helicsInputGetType(inp); }
     /** get an associated target*/

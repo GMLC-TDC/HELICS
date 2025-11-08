@@ -76,7 +76,10 @@ class Broker {
     @return a HelicsBroker object*/
     HELICS_NODISCARD HelicsBroker baseObject() const { return broker; }
     /** check if the broker is connected*/
-    HELICS_NODISCARD bool isConnected() const { return (helicsBrokerIsConnected(broker) != HELICS_FALSE); }
+    HELICS_NODISCARD bool isConnected() const
+    {
+        return (helicsBrokerIsConnected(broker) != HELICS_FALSE);
+    }
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect (-1) implies no timeout
     @return true if the disconnect was successful false if it timed out

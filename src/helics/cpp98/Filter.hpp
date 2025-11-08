@@ -109,7 +109,10 @@ class Filter {
     {
         helicsFilterSetOption(filt, option, value, HELICS_IGNORE_ERROR);
     }
-    HELICS_NODISCARD int32_t getOption(int32_t option) { return helicsFilterGetOption(filt, option); }
+    HELICS_NODISCARD int32_t getOption(int32_t option)
+    {
+        return helicsFilterGetOption(filt, option);
+    }
 
     void setCallback(HelicsMessage (*filtCall)(HelicsMessage message, void* userData),
                      void* userData)

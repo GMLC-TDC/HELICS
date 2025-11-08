@@ -453,7 +453,10 @@ class ValueFederate: public virtual Federate {
     /** get the number of inputs in this federate*/
     HELICS_NODISCARD int getInputCount() const { return helicsFederateGetInputCount(fed); }
     /** get the number of publications in this federate*/
-    HELICS_NODISCARD int getPublicationCount() const { return helicsFederateGetPublicationCount(fed); }
+    HELICS_NODISCARD int getPublicationCount() const
+    {
+        return helicsFederateGetPublicationCount(fed);
+    }
     // TODO(PT): use c api to implement this method... callbacks too?
     /** Get a list of all inputs with updates since the last call **/
     std::vector<HelicsInput> queryUpdates() { return std::vector<HelicsInput>(); }

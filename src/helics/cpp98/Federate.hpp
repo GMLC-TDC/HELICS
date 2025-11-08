@@ -456,7 +456,10 @@ class Federate {
     /** complete the asynchronous terminate pair*/
     void finalizeComplete() { helicsFederateFinalizeComplete(fed, hThrowOnError()); }
     /** get the current time from a federate */
-    HELICS_NODISCARD HelicsTime getCurrentTime() { return helicsFederateGetCurrentTime(fed, hThrowOnError()); }
+    HELICS_NODISCARD HelicsTime getCurrentTime()
+    {
+        return helicsFederateGetCurrentTime(fed, hThrowOnError());
+    }
     /** request a time advancement
    @param time the next requested time step
    @return the granted time step*/
@@ -608,7 +611,10 @@ class Federate {
      * @return A string with the command for the federate, if the string is empty no command is
      * available.
      */
-    HELICS_NODISCARD const char* getCommand() { return helicsFederateGetCommand(fed, HELICS_IGNORE_ERROR); }
+    HELICS_NODISCARD const char* getCommand()
+    {
+        return helicsFederateGetCommand(fed, HELICS_IGNORE_ERROR);
+    }
 
     /**
      * Get a command sent to the federate. Blocks until a command is received.
@@ -616,7 +622,10 @@ class Federate {
      * @return A string with the command for the federate, if the string is empty no command is
      * available.
      */
-    HELICS_NODISCARD const char* waitCommand() { return helicsFederateWaitCommand(fed, HELICS_IGNORE_ERROR); }
+    HELICS_NODISCARD const char* waitCommand()
+    {
+        return helicsFederateWaitCommand(fed, HELICS_IGNORE_ERROR);
+    }
 
     /**
      * Get the source of the most recently retrieved command sent to the federate.

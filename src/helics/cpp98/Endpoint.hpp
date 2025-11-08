@@ -95,7 +95,10 @@ class Message {
     }
     /** get the original message source which may be different than source if the message was
      * filtered */
-    HELICS_NODISCARD const char* originalSource() const { return helicsMessageGetOriginalSource(mo); }
+    HELICS_NODISCARD const char* originalSource() const
+    {
+        return helicsMessageGetOriginalSource(mo);
+    }
     /** set the original source field*/
     Message& originalSource(const std::string& osrc)
     {
@@ -103,7 +106,10 @@ class Message {
         return *this;
     }
     /** get the original message destination if a filter altered it*/
-    HELICS_NODISCARD const char* originalDestination() const { return helicsMessageGetOriginalDestination(mo); }
+    HELICS_NODISCARD const char* originalDestination() const
+    {
+        return helicsMessageGetOriginalDestination(mo);
+    }
     /** set the original destination field*/
     Message& originalDestination(const std::string& odest)
     {
@@ -185,7 +191,8 @@ class Message {
         return *this;
     }
     /** release a C message_object from the structure
-    @details for use with the C shared library. This does not free the memory, the user must call the C library helicsMessageFree to free the memory now*/
+    @details for use with the C shared library. This does not free the memory, the user must call
+    the C library helicsMessageFree to free the memory now*/
     HELICS_NODISCARD HelicsMessage release()
     {
         HelicsMessage mreturn = mo;
@@ -194,7 +201,10 @@ class Message {
     }
     void clear() { helicsMessageClear(mo, HELICS_IGNORE_ERROR); }
     /** get the data buffer from the message */
-    HELICS_NODISCARD DataBuffer dataBuffer() { return DataBuffer(helicsMessageDataBuffer(mo, HELICS_IGNORE_ERROR)); }
+    HELICS_NODISCARD DataBuffer dataBuffer()
+    {
+        return DataBuffer(helicsMessageDataBuffer(mo, HELICS_IGNORE_ERROR));
+    }
     /** generate a new message in a federate*/
     Message& newMessageObject(const Federate& fed);
 
@@ -238,9 +248,15 @@ class Endpoint {
         helicsEndpointSetDefaultDestination(ep, dest.c_str(), hThrowOnError());
     }
     /** get the default destination for an endpoint*/
-    HELICS_NODISCARD const char* getDefaultDestination() const { return helicsEndpointGetDefaultDestination(ep); }
+    HELICS_NODISCARD const char* getDefaultDestination() const
+    {
+        return helicsEndpointGetDefaultDestination(ep);
+    }
     /** Returns the number of pending receives for endpoint **/
-    HELICS_NODISCARD uint64_t pendingMessageCount() const { return helicsEndpointPendingMessageCount(ep); }
+    HELICS_NODISCARD uint64_t pendingMessageCount() const
+    {
+        return helicsEndpointPendingMessageCount(ep);
+    }
 
     /** Get a packet from an endpoint **/
     Message getMessage() { return Message(helicsEndpointGetMessage(ep)); }
