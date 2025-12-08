@@ -35,9 +35,9 @@ class Input {
     /** cast to HelicsInput object*/
     operator HelicsInput() const { return inp; }
     /** extract the base object*/
-    HelicsInput baseObject() const { return inp; }
+    HELICS_NODISCARD HelicsInput baseObject() const { return inp; }
     /** check if the input is valid */
-    bool isValid() const { return (helicsInputIsValid(inp) == HELICS_TRUE); }
+    HELICS_NODISCARD bool isValid() const { return (helicsInputIsValid(inp) == HELICS_TRUE); }
     /** add a publication target to the input*/
     void addTarget(const std::string& target)
     {
@@ -96,7 +96,7 @@ class Input {
 #endif
     /** Methods to get subscription values **/
     /** get a raw value as a character vector*/
-    int getBytes(std::vector<char>& data)
+    HELICS_NODISCARD int getBytes(std::vector<char>& data)
     {
         int size = helicsInputGetByteCount(inp);
         data.resize(size);
@@ -105,17 +105,17 @@ class Input {
         return size;
     }
     /** get the size of the raw value */
-    int getByteCount() { return helicsInputGetByteCount(inp); }
+    HELICS_NODISCARD int getByteCount() { return helicsInputGetByteCount(inp); }
 
     /** get the size of the value as a string */
-    int getStringSize()
+    HELICS_NODISCARD int getStringSize()
     {
         //-1 is for the null character which needs to be counted in C but not in a C++ string
         return helicsInputGetStringSize(inp) - 1;
     }
 
     /** get the current value as a string*/
-    std::string getString()
+    HELICS_NODISCARD std::string getString()
     {
         int size = helicsInputGetStringSize(inp);
         std::string result;
@@ -156,15 +156,18 @@ class Input {
         name.resize(size);
     }
     /** get the current value as a 64 bit integer*/
-    int64_t getInteger() { return helicsInputGetInteger(inp, HELICS_IGNORE_ERROR); }
+    HELICS_NODISCARD int64_t getInteger()
+    {
+        return helicsInputGetInteger(inp, HELICS_IGNORE_ERROR);
+    }
     /** get the value as a boolean*/
-    bool getBoolean()
+    HELICS_NODISCARD bool getBoolean()
     {
         HelicsBool val = helicsInputGetBoolean(inp, HELICS_IGNORE_ERROR);
         return (val == HELICS_TRUE);
     }
     /** get the value as a double*/
-    double getDouble() { return helicsInputGetDouble(inp, HELICS_IGNORE_ERROR); }
+    HELICS_NODISCARD double getDouble() { return helicsInputGetDouble(inp, HELICS_IGNORE_ERROR); }
     /** get the value as a complex number*/
     std::complex<double> getComplex()
     {
@@ -220,15 +223,15 @@ class Input {
 #    pragma GCC diagnostic pop
 #endif
     /** get a data buffer with the input value*/
-    DataBuffer getDataBuffer()
+    HELICS_NODISCARD DataBuffer getDataBuffer()
     {
         return DataBuffer(helicsInputGetDataBuffer(inp, hThrowOnError()));
     }
     /** Check if an input is updated **/
-    bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }
+    HELICS_NODISCARD bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }
 
     /** Get the last time an input was updated **/
-    HelicsTime getLastUpdateTime() const { return helicsInputLastUpdateTime(inp); }
+    HELICS_NODISCARD HelicsTime getLastUpdateTime() const { return helicsInputLastUpdateTime(inp); }
 
     /** clear the updated flag*/
     void clearUpdate() { helicsInputClearUpdate(inp); }
@@ -236,26 +239,32 @@ class Input {
 
     /** get the Name for the input
    @details the name is full name vs the local one for non-global interfaces*/
-    const char* getName() const { return helicsInputGetName(inp); }
+    HELICS_NODISCARD const char* getName() const { return helicsInputGetName(inp); }
     /** get the units associated with a input*/
-    const char* getUnits() const { return helicsInputGetExtractionUnits(inp); }
+    HELICS_NODISCARD const char* getUnits() const { return helicsInputGetExtractionUnits(inp); }
     /** get the units associated with an inputs publication*/
-    const char* getInjectionUnits() const { return helicsInputGetInjectionUnits(inp); }
+    HELICS_NODISCARD const char* getInjectionUnits() const
+    {
+        return helicsInputGetInjectionUnits(inp);
+    }
     /** get the units associated with a publication of an input*/
-    const char* getPublicationType() const { return helicsInputGetPublicationType(inp); }
+    HELICS_NODISCARD const char* getPublicationType() const
+    {
+        return helicsInputGetPublicationType(inp);
+    }
     /** get the type of the input*/
-    const char* getType() const { return helicsInputGetType(inp); }
+    HELICS_NODISCARD const char* getType() const { return helicsInputGetType(inp); }
     /** get an associated target*/
-    const char* getTarget() const { return helicsInputGetTarget(inp); }
+    HELICS_NODISCARD const char* getTarget() const { return helicsInputGetTarget(inp); }
     /** get the interface information field of the input`*/
-    const char* getInfo() const { return helicsInputGetInfo(inp); }
+    HELICS_NODISCARD const char* getInfo() const { return helicsInputGetInfo(inp); }
     /** set the interface information field of the input*/
     void setInfo(const std::string& info)
     {
         helicsInputSetInfo(inp, info.c_str(), HELICS_IGNORE_ERROR);
     }
     /** get the value of a tag for the input*/
-    const char* getTag(const std::string& tagname) const
+    HELICS_NODISCARD const char* getTag(const std::string& tagname) const
     {
         return helicsInputGetTag(inp, tagname.c_str());
     }
@@ -268,7 +277,7 @@ class Input {
     {
         helicsInputSetOption(inp, option, value, HELICS_IGNORE_ERROR);
     }
-    int32_t getOption(int32_t option) { return helicsInputGetOption(inp, option); }
+    HELICS_NODISCARD int32_t getOption(int32_t option) { return helicsInputGetOption(inp, option); }
 
   private:
     HelicsInput inp;  //!< the reference to the underlying publication

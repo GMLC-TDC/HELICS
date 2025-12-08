@@ -27,7 +27,7 @@ class HelicsException: public std::runtime_error {
     {
     }
     /** get the error code */
-    int errorCode() const { return eCode; }
+    HELICS_NODISCARD int errorCode() const { return eCode; }
 
   private:
     int eCode;  //!< containing the error code value

@@ -36,10 +36,10 @@ class Publication {
     /** cast operator to the underlying HelicsPublication object*/
     operator HelicsPublication() const { return pub; }
     /** return the underlying HelicsPublication object*/
-    HelicsPublication baseObject() const { return pub; }
+    HELICS_NODISCARD HelicsPublication baseObject() const { return pub; }
 
     /** check if the publication is valid */
-    bool isValid() const { return (helicsPublicationIsValid(pub) == HELICS_TRUE); }
+    HELICS_NODISCARD bool isValid() const { return (helicsPublicationIsValid(pub) == HELICS_TRUE); }
 
     /** Methods to publish values **/
 
@@ -124,13 +124,13 @@ class Publication {
         helicsPublicationPublishDataBuffer(pub, buffer.getHelicsDataBuffer(), hThrowOnError());
     }
     /** get the name of the publication*/
-    const char* getName() const { return helicsPublicationGetName(pub); }
+    HELICS_NODISCARD const char* getName() const { return helicsPublicationGetName(pub); }
     /** get the units of the publication*/
-    const char* getUnits() const { return helicsPublicationGetUnits(pub); }
+    HELICS_NODISCARD const char* getUnits() const { return helicsPublicationGetUnits(pub); }
     /** get the type for the publication*/
-    const char* getType() const { return helicsPublicationGetType(pub); }
+    HELICS_NODISCARD const char* getType() const { return helicsPublicationGetType(pub); }
     /** get the interface information field of the publication*/
-    const char* getInfo() const { return helicsPublicationGetInfo(pub); }
+    HELICS_NODISCARD const char* getInfo() const { return helicsPublicationGetInfo(pub); }
 
     /** set the interface information field of the publication*/
     void setInfo(const std::string& info)
@@ -138,7 +138,7 @@ class Publication {
         helicsPublicationSetInfo(pub, info.c_str(), HELICS_IGNORE_ERROR);
     }
     /** get the value of a tag for the publication*/
-    const char* getTag(const std::string& tagname) const
+    HELICS_NODISCARD const char* getTag(const std::string& tagname) const
     {
         return helicsPublicationGetTag(pub, tagname.c_str());
     }
@@ -151,7 +151,10 @@ class Publication {
     {
         helicsPublicationSetOption(pub, option, value, HELICS_IGNORE_ERROR);
     }
-    int32_t getOption(int32_t option) { return helicsPublicationGetOption(pub, option); }
+    HELICS_NODISCARD int32_t getOption(int32_t option)
+    {
+        return helicsPublicationGetOption(pub, option);
+    }
 
   private:
     HelicsPublication pub;  //!< the reference to the underlying publication

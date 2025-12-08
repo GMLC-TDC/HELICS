@@ -20,6 +20,7 @@ endif()
 
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(CppInterface)
+    add_subdirectory(memoryExample)
 endif()
 
 if(HELICS_BUILD_CXX_SHARED_LIB)
