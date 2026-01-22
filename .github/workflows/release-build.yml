@@ -72,7 +72,7 @@ jobs:
       run: ./.github/actions/upload-release-asset.sh "artifact/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-source.tar.gz"
       
     - name: Upload artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: all-submodules-archive
         path: artifact
@@ -143,7 +143,7 @@ jobs:
       
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ matrix.os }}-msvc-installers
         path: artifact
@@ -246,7 +246,7 @@ jobs:
 
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ matrix.id }}-installers
         path: artifact
@@ -344,7 +344,7 @@ jobs:
       
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ matrix.id }}-sharedlib-installers
         path: artifact
