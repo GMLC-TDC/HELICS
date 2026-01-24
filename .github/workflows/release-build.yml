@@ -157,7 +157,7 @@ jobs:
     if: (github.event_name != 'workflow_dispatch') || (contains(github.event.inputs.packages, 'installer') || contains(github.event.inputs.packages, 'everything'))
     strategy:
       matrix:
-        id: [windows-x64, windows-x86, macos-x64, linux-x64]
+        id: [windows-x64, windows-x86, macos-x64, linux-x64, linux-aarch64]
         include:
           - id: windows-x64
             os: windows-2019
@@ -180,6 +180,10 @@ jobs:
             os: ubuntu-latest
             arch: x64
             cpack_gen: TGZ
+          - id: linux-aarch64
+            os: ubuntu-24.04-arm
+            arch: aarch64
+            cpack_gen: TGZ
 
     steps:
     - name: Determine fetch depth
@@ -194,12 +198,14 @@ jobs:
       uses: actions/checkout@v6
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
+        submodules: recursive
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
       uses: actions/checkout@v6
       with:
         ref: develop
+        submodules: recursive
       if: github.event_name == 'schedule'
  
     - name: Checkout shell scripts for workflow
@@ -235,6 +241,8 @@ jobs:
       uses: ./.github/actions/linux-release-builder
       with:
         script: ./.github/actions/release-build/installer-${{ runner.os }}.sh
+        cpack_gen: ${{ matrix.cpack_gen }}
+        arch: ${{ matrix.arch }}
        
     - name: Upload installer to release
       if: github.event.action == 'published'
@@ -260,7 +268,7 @@ jobs:
     name: Build ${{ matrix.os }} ${{ matrix.arch }} Shared Library
     strategy:
       matrix:
-        id: [windows-x86, windows-x64, macos-x64, ubuntu-x64]
+        id: [windows-x86, windows-x64, macos-x64, ubuntu-x64, ubuntu-aarch64]
         include:
           - id: windows-x86
             os: windows-2019
@@ -279,6 +287,9 @@ jobs:
           - id: ubuntu-x64
             os: ubuntu-latest
             arch: x64
+          - id: ubuntu-aarch64
+            os: ubuntu-24.04-arm
+            arch: aarch64
 
     steps:
     - name: Determine fetch depth
@@ -293,12 +304,14 @@ jobs:
       uses: actions/checkout@v6
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
+        submodules: recursive
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
       uses: actions/checkout@v6
       with:
         ref: develop
+        submodules: recursive
       if: github.event_name == 'schedule'
 
     - name: Checkout shell scripts for workflow
@@ -333,6 +346,7 @@ jobs:
       uses: ./.github/actions/linux-release-builder
       with:
         script: ./.github/actions/release-build/shared-library-${{ runner.os }}.sh
+        arch: ${{ matrix.arch }}
 
     - name: Upload installer to release
       if: github.event.action == 'published'
