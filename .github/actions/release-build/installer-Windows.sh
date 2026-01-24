@@ -36,6 +36,10 @@ fi
 mkdir build && cd build || exit
 cmake -G "${BUILD_GEN}" ${CMAKE_ARCH_FLAG} -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_JAVA_INTERFACE=ON -DSTATIC_STANDARD_LIB=static -DHELICS_USE_ZMQ_STATIC_LIBRARY=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_APP_EXECUTABLES=ON -DHELICS_BUILD_APP_LIBRARY=ON -DBUILD_TESTING=OFF ..
 cmake --build . --config Release
+ls
+ls bin
+ls bin/Release
+find . -type d -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
 "${cpack_dir}/cpack" -G "${CPACK_GEN}" -C Release -B "$(pwd)/../artifact"
 cd ../artifact || exit
 rm -rf _CPack_Packages
