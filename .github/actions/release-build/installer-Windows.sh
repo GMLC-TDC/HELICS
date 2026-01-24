@@ -23,9 +23,18 @@ curl -o docs/logos/HELICS.ico https://raw.githubusercontent.com/GMLC-TDC/HELICS/
 cpack_dir="$(command -v cmake)"
 cpack_dir="${cpack_dir%/cmake}"
 
+# Configure architecture flag for CMake
+if [[ "$BUILD_ARCH" == "arm64" ]]; then
+    CMAKE_ARCH_FLAG="-A ARM64"
+elif [[ "$BUILD_ARCH" == "x64" ]]; then
+    CMAKE_ARCH_FLAG="-A x64"
+else
+    CMAKE_ARCH_FLAG="-A Win32"
+fi
+
 # Build
 mkdir build && cd build || exit
-cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_JAVA_INTERFACE=ON -DSTATIC_STANDARD_LIB=static -DHELICS_USE_ZMQ_STATIC_LIBRARY=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_APP_EXECUTABLES=ON -DHELICS_BUILD_APP_LIBRARY=ON -DBUILD_TESTING=OFF ..
+cmake -G "${BUILD_GEN}" ${CMAKE_ARCH_FLAG} -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_JAVA_INTERFACE=ON -DSTATIC_STANDARD_LIB=static -DHELICS_USE_ZMQ_STATIC_LIBRARY=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_APP_EXECUTABLES=ON -DHELICS_BUILD_APP_LIBRARY=ON -DBUILD_TESTING=OFF ..
 cmake --build . --config Release
 "${cpack_dir}/cpack" -G "${CPACK_GEN}" -C Release -B "$(pwd)/../artifact"
 cd ../artifact || exit
