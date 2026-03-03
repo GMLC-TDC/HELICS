@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=1091
 if [[ -n "${INPUT_CPACK_GEN}" ]]; then
     CPACK_GEN="${INPUT_CPACK_GEN}"
     export CPACK_GEN

@@ -51,6 +51,7 @@ repos:
         args: [-s, ./config/.markdownlintrc]
         exclude: "mac.md"
       - id: script-must-have-extension
+        exclude: ^(config/packaging/mingw-w64-helics/PKGBUILD)
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.11.0.1
     hooks:
