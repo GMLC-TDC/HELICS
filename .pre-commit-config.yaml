@@ -89,3 +89,4 @@ repos:
         additional_dependencies: [mvdan.cc/sh/v3/cmd/shfmt@v3.3.1]
         entry: shfmt -w
         types: [shell]
+        exclude: ^(config/packaging/mingw-w64-helics/PKGBUILD)
