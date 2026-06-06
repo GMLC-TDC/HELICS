@@ -132,7 +132,7 @@ extensions = [
 
 try:
     importlib.import_module("sphinxcontrib.redoc")
-except Exception:
+except ImportError:
     pass
 else:
     extensions.append("sphinxcontrib.redoc")
