@@ -769,11 +769,6 @@ HTML_HEADER            =
 
 HTML_FOOTER            =
 
-# If the HTML_TIMESTAMP tag is set to YES then the generated HTML
-# documentation will contain the timesstamp.
-
-HTML_TIMESTAMP         = NO
-
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra
 # images or other source files which should be copied to the HTML output
 # directory.
@@ -1035,10 +1030,6 @@ LATEX_BATCHMODE        = NO
 
 LATEX_HIDE_INDICES     = NO
 
-# If LATEX_SOURCE_CODE is set to YES then doxygen will include source code with syntax highlighting in the LaTeX output. Note that which sources are shown also depends on other settings such as SOURCE_BROWSER.
-
-LATEX_SOURCE_CODE      = NO
-
 #---------------------------------------------------------------------------
 # configuration options related to the RTF output
 #---------------------------------------------------------------------------
@@ -1289,15 +1280,6 @@ EXTERNAL_GROUPS        = YES
 # Configuration options related to the dot tool
 #---------------------------------------------------------------------------
 
-# If the CLASS_DIAGRAMS tag is set to YES (the default) Doxygen will
-# generate a inheritance diagram (in HTML, RTF and LaTeX) for classes with base
-# or super classes. Setting the tag to NO turns the diagrams off. Note that
-# this option is superseded by the HAVE_DOT option below. This is only a
-# fallback. It is recommended to install and use dot, since it yields more
-# powerful graphs.
-
-CLASS_DIAGRAMS         = YES
-
 # If set to YES, the inheritance and collaboration graphs will hide
 # inheritance and usage relations if the target is undocumented
 # or is not a class.
@@ -1311,11 +1293,6 @@ HIDE_UNDOC_RELATIONS   = YES
 
 HAVE_DOT               = NO
 
-# The DOT_FONTSIZE tag can be used to set the size of the font of dot graphs.
-# The default size is 10pt.
-
-DOT_FONTSIZE           = 10
-
 # By default doxygen will tell dot to use the output directory to look for the
 # FreeSans.ttf font (which doxygen will put there itself). If you specify a
 # different font using DOT_FONTNAME you can set the path where dot
@@ -1325,8 +1302,7 @@ DOT_FONTPATH           =
 
 # If the CLASS_GRAPH and HAVE_DOT tags are set to YES then doxygen
 # will generate a graph for each documented class showing the direct and
-# indirect inheritance relations. Setting this tag to YES will force the
-# the CLASS_DIAGRAMS tag to NO.
+# indirect inheritance relations.
 
 CLASS_GRAPH            = YES
 
@@ -1431,14 +1407,6 @@ DOT_GRAPH_MAX_NODES    = 50
 # DOT_GRAPH_MAX_NODES. Using a depth of 0 means no depth restriction.
 
 MAX_DOT_GRAPH_DEPTH    = 0
-
-# Set the DOT_TRANSPARENT tag to YES to generate images with a transparent
-# background. This is disabled by default, because dot on Windows does not
-# seem to support this out of the box. Warning: Depending on the platform used,
-# enabling this option may lead to badly anti-aliased labels on the edges of
-# a graph (i.e. they become hard to read).
-
-DOT_TRANSPARENT        = NO
 
 # Set the DOT_MULTI_TARGETS tag to YES allow dot to generate multiple output
 # files in one run (i.e. multiple -o and -T options on the command line). This
