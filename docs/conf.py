@@ -31,7 +31,7 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 import os
-import importlib.util
+import importlib
 import sphinx_rtd_theme
 import shutil
 import subprocess
@@ -130,7 +130,11 @@ extensions = [
     "sphinxcontrib.mermaid",
 ]
 
-if importlib.util.find_spec("sphinxcontrib.redoc") is not None:
+try:
+    importlib.import_module("sphinxcontrib.redoc")
+except Exception:
+    pass
+else:
     extensions.append("sphinxcontrib.redoc")
 
 myst_enable_extensions = [

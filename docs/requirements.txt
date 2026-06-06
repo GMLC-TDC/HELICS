@@ -7,5 +7,4 @@ ipykernel==7.2.0
 breathe==4.36.0
 sphinxcontrib-svg2pdfconverter==2.0.0
 requests==2.32.5
-gmlc-tdc-sphinxcontrib-redoc==1.6.1a1
 sphinxcontrib-mermaid==2.0.0
