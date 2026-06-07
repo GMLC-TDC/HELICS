@@ -432,19 +432,21 @@ void TcpComms::queue_tx_function()
             if (rid == control_route) {
                 switch (cmd.messageID) {
                     case NEW_ROUTE: {
-                       auto newroute=cmd.payload.to_string();
+                        auto newroute = cmd.payload.to_string();
 
                         try {
                             auto [interface, port] =
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
-                            auto new_connect =
-                                TcpConnection::create(sf, ioctx->getBaseContext(), interface, port?*port:"");
+                            auto new_connect = TcpConnection::create(sf,
+                                                                     ioctx->getBaseContext(),
+                                                                     interface,
+                                                                     port ? *port : "");
 
                             routes.emplace(route_id{cmd.getExtraData()}, std::move(new_connect));
                         }
                         catch (std::exception& e) {
-                            logWarning(std::string("unable to create route ") + std::string(newroute) +
-                                       "::" + e.what());
+                            logWarning(std::string("unable to create route ") +
+                                       std::string(newroute) + "::" + e.what());
                         }
                         processed = true;
                     } break;

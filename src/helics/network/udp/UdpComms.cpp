@@ -363,12 +363,14 @@ void UdpComms::queue_tx_function()
                     case NEW_ROUTE: {
                         try {
                             const std::string newroute(cmd.payload.to_string());
-                            auto  [interface, port] =
+                            auto [interface, port] =
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
 
                             routes.emplace(route_id{cmd.getExtraData()},
                                            *(resolver
-                                                 .resolve(udpnet(interfaceNetwork), interface, port?*port:"")
+                                                 .resolve(udpnet(interfaceNetwork),
+                                                          interface,
+                                                          port ? *port : "")
                                                  .begin()));
                         }
                         catch (const std::exception& err) {
