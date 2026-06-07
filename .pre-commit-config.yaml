@@ -51,11 +51,13 @@ repos:
         args: [-s, ./config/.markdownlintrc]
         exclude: "mac.md"
       - id: script-must-have-extension
+        exclude: ^(config/packaging/mingw-w64-helics/PKGBUILD)
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.11.0.1
     hooks:
       - id: shellcheck
         args: [-x]
+        exclude: ^(config/packaging/mingw-w64-helics/PKGBUILD)
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.13
     hooks:
@@ -87,3 +89,4 @@ repos:
         additional_dependencies: [mvdan.cc/sh/v3/cmd/shfmt@v3.3.1]
         entry: shfmt -w
         types: [shell]
+        exclude: ^(config/packaging/mingw-w64-helics/PKGBUILD)

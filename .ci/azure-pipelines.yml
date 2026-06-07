@@ -64,11 +64,10 @@ jobs:
       matrix:
         XCode-latest:
           test_config: "ci"
-          vmImage: "macOS-14"
+          vmImage: "macOS-15"
         XCode-oldest:
           test_config: "ci"
-          vmImage: "macOS-13"
-          xcode_path: "/Applications/Xcode_14.1.app"
+          vmImage: "macOS-14"
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 60
@@ -108,10 +107,10 @@ jobs:
           vsArch: "Win32"
           extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
         VS2019-64bit:
-          imageName: "windows-2019"
+          imageName: "windows-latest"
           langArch: "x64"
           vsArch: "x64"
-          extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
+          extraFlags: "-DCMAKE_CXX_STANDARD=23"
         VS2022-64bit:
           imageName: "windows-2022"
           langArch: "x64"
