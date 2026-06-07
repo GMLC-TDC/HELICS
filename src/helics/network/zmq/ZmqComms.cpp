@@ -450,7 +450,10 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
                                 makePortAddress(brokerTargetAddress, brokerPort + 1));
                             auto brkprt =
                                 gmlc::networking::extractInterfaceAndPort(rxcmd.getString(0));
-                            brokerPort = brkprt.second;
+                            if (brkprt.second) {
+                                brokerPort = *brkprt.second;
+                            }
+                            
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
                             }
@@ -561,9 +564,15 @@ void ZmqComms::queue_tx_function()
 
                             auto zsock = zmq::socket_t(ctx->getBaseContext(), ZMQ_PUSH);
                             zsock.setsockopt(ZMQ_LINGER, 100);
-                            zsock.connect(
-                                makePortAddress(interfaceAndPort.first, interfaceAndPort.second));
-                            routes.emplace(route_id{cmd.getExtraData()}, std::move(zsock));
+                            if (interfaceAndPort.second) {
+                                zsock.connect(
+                                    makePortAddress(interfaceAndPort.first, *interfaceAndPort.second));
+                                routes.emplace(route_id{ cmd.getExtraData() }, std::move(zsock));
+                            }
+                            else {
+                                logError(std::string("unable to connect route") +
+                                    std::string(cmd.payload.to_string()) + "::no port specified");
+                            }
                         }
                         catch (const zmq::error_t& e) {
                             // TODO(PT): do something???

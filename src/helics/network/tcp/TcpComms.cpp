@@ -342,7 +342,9 @@ bool TcpComms::establishBrokerConnection(
 
                         auto brkprt =
                             gmlc::networking::extractInterfaceAndPort(mess->second.getString(0));
-                        brokerPort = brkprt.second;
+                        if (brkprt.second) {
+                            brokerPort = *brkprt.second;
+                        }
                         if (brkprt.first != "?") {
                             brokerTargetAddress = brkprt.first;
                         }
@@ -430,20 +432,18 @@ void TcpComms::queue_tx_function()
             if (rid == control_route) {
                 switch (cmd.messageID) {
                     case NEW_ROUTE: {
-                        std::string newroute(cmd.payload.to_string());
+                       auto newroute=cmd.payload.to_string();
 
                         try {
-                            std::string interface;
-                            std::string port;
-                            std::tie(interface, port) =
+                            auto [interface, port] =
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
                             auto new_connect =
-                                TcpConnection::create(sf, ioctx->getBaseContext(), interface, port);
+                                TcpConnection::create(sf, ioctx->getBaseContext(), interface, port?*port:"");
 
                             routes.emplace(route_id{cmd.getExtraData()}, std::move(new_connect));
                         }
                         catch (std::exception& e) {
-                            logWarning(std::string("unable to create route ") + newroute +
+                            logWarning(std::string("unable to create route ") + std::string(newroute) +
                                        "::" + e.what());
                         }
                         processed = true;

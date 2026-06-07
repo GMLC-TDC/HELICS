@@ -139,7 +139,9 @@ int ZmqCommsSS::processIncomingMessage(zmq::message_t& msg,
             case NEW_BROKER_INFORMATION: {
                 logMessage("got new broker information");
                 auto brkprt = gmlc::networking::extractInterfaceAndPort(M.getString(0));
-                brokerPort = brkprt.second;
+                if (brkprt.second){
+                    brokerPort = *brkprt.second;
+                }
                 if (brkprt.first != "?") {
                     brokerTargetAddress = brkprt.first;
                 }

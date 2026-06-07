@@ -25,7 +25,7 @@ static ActionMessage generatePortRequestReply(const ActionMessage& /*cmd*/,
     rep.messageID = NEW_BROKER_INFORMATION;
     rep.name(brk->getIdentifier());
     auto brkptr = gmlc::networking::extractInterfaceAndPortString(brk->getAddress());
-    rep.setString(0, std::string("?:") + brkptr.second);
+    rep.setString(0, std::string("?:") + (brkptr.second ? *brkptr.second : std::string("")));
     return rep;
 }
 
