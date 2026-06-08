@@ -462,14 +462,16 @@ void TcpComms::queue_tx_function()
                         try {
                             auto [interface, port] =
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
-                            auto new_connect = TcpConnection::create(
-                                socketFactory, ioctx->getBaseContext(), interface, port ? *port : "");
+                            auto new_connect = TcpConnection::create(socketFactory,
+                                                                     ioctx->getBaseContext(),
+                                                                     interface,
+                                                                     port ? *port : "");
 
                             routes.emplace(route_id{cmd.getExtraData()}, std::move(new_connect));
                         }
                         catch (std::exception& e) {
-                            logWarning(std::string("unable to create route ") + std::string(newroute) +
-                                       "::" + e.what());
+                            logWarning(std::string("unable to create route ") +
+                                       std::string(newroute) + "::" + e.what());
                         }
                         processed = true;
                     } break;
@@ -522,8 +524,8 @@ void TcpComms::queue_tx_function()
                                      cmd,
                                      [this, rid](const std::system_error& se) {
                                          logError(std::string("rt send ") +
-                                                  std::to_string(rid.baseValue()) + "::" +
-                                                  se.what());
+                                                  std::to_string(rid.baseValue()) +
+                                                  "::" + se.what());
                                      });
             } else {
                 if (hasBroker) {
@@ -531,8 +533,8 @@ void TcpComms::queue_tx_function()
                                          cmd,
                                          [this, rid](const std::system_error& se) {
                                              logError(std::string("broker send") +
-                                                      std::to_string(rid.baseValue()) + " ::" +
-                                                      se.what());
+                                                      std::to_string(rid.baseValue()) +
+                                                      " ::" + se.what());
                                          });
                 } else {
                     if (!isDisconnectCommand(cmd)) {
