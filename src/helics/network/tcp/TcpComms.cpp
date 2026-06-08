@@ -25,6 +25,23 @@ using asio::ip::tcp;
 
 using gmlc::networking::TcpConnection;
 
+template<class ErrorMessageGenerator>
+static void sendWithErrorLogging(const TcpConnection::pointer& connection,
+                                 const ActionMessage& cmd,
+                                 ErrorMessageGenerator&& errorMessageGenerator)
+{
+    try {
+        connection->send(cmd.packetize());
+    }
+    catch (const std::system_error& se) {
+        if (se.code() != asio::error::connection_aborted) {
+            if (!isDisconnectCommand(cmd)) {
+                logError(errorMessageGenerator() + se.what());
+            }
+        }
+    }
+}
+
 TcpComms::TcpComms() noexcept: NetworkCommsInterface(gmlc::networking::InterfaceTypes::TCP) {}
 
 int TcpComms::getDefaultBrokerPort() const
@@ -87,28 +104,31 @@ size_t TcpComms::dataReceive(gmlc::networking::TcpConnection* connection,
 {
     size_t used_total = 0;
     while (used_total < bytes_received) {
-        ActionMessage m;
-        auto used = m.depacketize(reinterpret_cast<const std::byte*>(data) + used_total,
-                                  bytes_received - used_total);
+        ActionMessage message;
+        auto used = message.depacketize(reinterpret_cast<const std::byte*>(data) + used_total,
+                                        bytes_received - used_total);
         if (used == 0) {
             break;
         }
-        if (isProtocolCommand(m)) {
+        if (isProtocolCommand(message)) {
             // if the reply is not ignored respond with it otherwise
             // forward the original message on to the receiver to handle
-            auto rep = generateReplyToIncomingMessage(m);
+            auto rep = generateReplyToIncomingMessage(message);
             if (rep.action() != CMD_IGNORE) {
                 try {
                     connection->send(rep.packetize());
                 }
-                catch (const std::system_error&) {
+                catch (const std::system_error& error) {
+                    if (error.code() != asio::error::connection_aborted) {
+                        logWarning(std::string("protocol reply send failed: ") + error.what());
+                    }
                 }
             } else {
-                rxMessageQueue.push(std::move(m));
+                rxMessageQueue.push(std::move(message));
             }
         } else {
             if (ActionCallback) {
-                ActionCallback(std::move(m));
+                ActionCallback(std::move(message));
             }
         }
         used_total += used;
@@ -133,6 +153,8 @@ void TcpComms::queue_rx_function()
                     disconnecting = true;
                     setRxStatus(ConnectionStatus::TERMINATED);
                     return;
+                default:
+                    break;
             }
         }
     }
@@ -141,9 +163,9 @@ void TcpComms::queue_rx_function()
         return;
     }
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
-    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
-                          gmlc::networking::SocketFactory();
-    auto server = gmlc::networking::TcpServer::create(sf,
+    auto socketFactory = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                                     gmlc::networking::SocketFactory();
+    auto server = gmlc::networking::TcpServer::create(socketFactory,
                                                       ioctx->getBaseContext(),
                                                       localTargetAddress,
                                                       static_cast<uint16_t>(PortNumber.load()),
@@ -154,7 +176,7 @@ void TcpComms::queue_rx_function()
                                                 // assigned port number, just try a different port
             server->close();
             ++PortNumber;
-            server = gmlc::networking::TcpServer::create(sf,
+            server = gmlc::networking::TcpServer::create(socketFactory,
                                                          ioctx->getBaseContext(),
                                                          localTargetAddress,
                                                          static_cast<uint16_t>(PortNumber),
@@ -177,10 +199,10 @@ void TcpComms::queue_rx_function()
         [this](const TcpConnection::pointer& connection, const char* data, size_t datasize) {
             return dataReceive(connection.get(), data, datasize);
         });
-    CommsInterface* ci = this;
+    CommsInterface* comms = this;
     server->setErrorCall(
-        [ci](const TcpConnection::pointer& connection, const std::error_code& error) {
-            return commErrorHandler(ci, connection.get(), error);
+        [comms](const TcpConnection::pointer& connection, const std::error_code& error) {
+            return commErrorHandler(comms, connection.get(), error);
         });
     server->start();
     setRxStatus(ConnectionStatus::CONNECTED);
@@ -192,6 +214,8 @@ void TcpComms::queue_rx_function()
                 case CLOSE_RECEIVER:
                 case DISCONNECT:
                     loopRunning = false;
+                    break;
+                default:
                     break;
             }
         }
@@ -206,9 +230,9 @@ void TcpComms::queue_rx_function()
 void TcpComms::txReceive(const char* data, size_t bytes_received, const std::string& errorMessage)
 {
     if (errorMessage.empty()) {
-        ActionMessage m(reinterpret_cast<const std::byte*>(data), bytes_received);
-        if (isProtocolCommand(m)) {
-            txQueue.emplace(control_route, m);
+        const ActionMessage message(reinterpret_cast<const std::byte*>(data), bytes_received);
+        if (isProtocolCommand(message)) {
+            txQueue.emplace(control_route, message);
         }
     } else {
         logError(errorMessage);
@@ -233,10 +257,10 @@ bool TcpComms::establishBrokerConnection(
         brokerPort = getDefaultBrokerPort();
     }
     try {
-        auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
-                              gmlc::networking::SocketFactory();
+        auto socketFactory = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                                         gmlc::networking::SocketFactory();
         try {
-            brokerConnection = gmlc::networking::establishConnection(sf,
+            brokerConnection = gmlc::networking::establishConnection(socketFactory,
                                                                      ioctx->getBaseContext(),
                                                                      brokerTargetAddress,
                                                                      std::to_string(brokerPort),
@@ -270,7 +294,7 @@ bool TcpComms::establishBrokerConnection(
                 return terminate(ConnectionStatus::TERMINATED);
             }
             try {
-                brokerConnection = gmlc::networking::establishConnection(sf,
+                brokerConnection = gmlc::networking::establishConnection(socketFactory,
                                                                          ioctx->getBaseContext(),
                                                                          brokerTargetAddress,
                                                                          std::to_string(brokerPort),
@@ -294,26 +318,27 @@ bool TcpComms::establishBrokerConnection(
             connectionEstablished = true;
         }
         while (!connectionEstablished) {
-            ActionMessage m(CMD_PROTOCOL_PRIORITY);
-            m.messageID = (PortNumber <= 0) ? REQUEST_PORTS : CONNECTION_REQUEST;
+            ActionMessage request(CMD_PROTOCOL_PRIORITY);
+            request.messageID = (PortNumber <= 0) ? REQUEST_PORTS : CONNECTION_REQUEST;
 
-            m.setStringData(brokerName, brokerInitString);
+            request.setStringData(brokerName, brokerInitString);
             try {
-                brokerConnection->send(m.packetize());
+                brokerConnection->send(request.packetize());
             }
             catch (const std::system_error& error) {
                 logError(std::string("error in initial send to broker ") + error.what());
                 return terminate(ConnectionStatus::ERRORED);
             }
-            std::vector<char> rx(512);
-            tcp::endpoint brk;
+            std::vector<char> receivedData(512);
             brokerConnection->async_receive(
-                rx.data(), 128, [this, &rx](const std::error_code& error, size_t bytes) {
+                receivedData.data(),
+                128,
+                [this, &receivedData](const std::error_code& error, size_t bytes) {
                     if (!error) {
-                        txReceive(rx.data(), bytes, std::string());
+                        txReceive(receivedData.data(), bytes, std::string());
                     } else {
                         if (error != asio::error::operation_aborted) {
-                            txReceive(rx.data(), bytes, error.message());
+                            txReceive(receivedData.data(), bytes, error.message());
                         }
                     }
                 });
@@ -350,7 +375,7 @@ bool TcpComms::establishBrokerConnection(
                         }
                         try {
                             brokerConnection =
-                                gmlc::networking::establishConnection(sf,
+                                gmlc::networking::establishConnection(socketFactory,
                                                                       ioctx->getBaseContext(),
                                                                       brokerTargetAddress,
                                                                       std::to_string(brokerPort),
@@ -393,8 +418,8 @@ void TcpComms::queue_tx_function()
 {
     // std::vector<char> buffer;
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
-    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
-                          gmlc::networking::SocketFactory();
+    auto socketFactory = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                                     gmlc::networking::SocketFactory();
     auto contextLoop = ioctx->startContextLoop();
     TcpConnection::pointer brokerConnection;
 
@@ -404,18 +429,18 @@ void TcpComms::queue_tx_function()
     }
     if (hasBroker) {
         if (!establishBrokerConnection(ioctx, brokerConnection)) {
-            ActionMessage m(CMD_PROTOCOL);
-            m.messageID = CLOSE_RECEIVER;
-            rxMessageQueue.push(m);
+            ActionMessage closeMessage(CMD_PROTOCOL);
+            closeMessage.messageID = CLOSE_RECEIVER;
+            rxMessageQueue.push(closeMessage);
             return;
         }
     } else {
         if (PortNumber < 0) {
             PortNumber = getDefaultBrokerPort();
-            ActionMessage m(CMD_PROTOCOL);
-            m.messageID = PORT_DEFINITIONS;
-            m.setExtraData(PortNumber);
-            rxMessageQueue.push(m);
+            ActionMessage portMessage(CMD_PROTOCOL);
+            portMessage.messageID = PORT_DEFINITIONS;
+            portMessage.setExtraData(PortNumber);
+            rxMessageQueue.push(portMessage);
         }
     }
     setTxStatus(ConnectionStatus::CONNECTED);
@@ -437,16 +462,14 @@ void TcpComms::queue_tx_function()
                         try {
                             auto [interface, port] =
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
-                            auto new_connect = TcpConnection::create(sf,
-                                                                     ioctx->getBaseContext(),
-                                                                     interface,
-                                                                     port ? *port : "");
+                            auto new_connect = TcpConnection::create(
+                                socketFactory, ioctx->getBaseContext(), interface, port ? *port : "");
 
                             routes.emplace(route_id{cmd.getExtraData()}, std::move(new_connect));
                         }
                         catch (std::exception& e) {
-                            logWarning(std::string("unable to create route ") +
-                                       std::string(newroute) + "::" + e.what());
+                            logWarning(std::string("unable to create route ") + std::string(newroute) +
+                                       "::" + e.what());
                         }
                         processed = true;
                     } break;
@@ -462,6 +485,10 @@ void TcpComms::queue_tx_function()
                         processing = false;
                         processed = true;
                         break;
+                    default:
+                        logWarning("unexpected message received in transmit queue");
+                        processed = true;
+                        break;
                 }
             }
         }
@@ -471,17 +498,12 @@ void TcpComms::queue_tx_function()
 
         if (rid == parent_route_id) {
             if (hasBroker) {
-                try {
-                    brokerConnection->send(cmd.packetize());
-                }
-                catch (const std::system_error& se) {
-                    if (se.code() != asio::error::connection_aborted) {
-                        if (!isDisconnectCommand(cmd)) {
-                            logError(std::string("broker send 0 ") +
-                                     actionMessageType(cmd.action()) + ':' + se.what());
-                        }
-                    }
-                }
+                sendWithErrorLogging(brokerConnection,
+                                     cmd,
+                                     [&cmd]() {
+                                         return std::string("broker send 0 ") +
+                                             actionMessageType(cmd.action()) + ':';
+                                     });
 
                 // if (error)
                 {
@@ -495,30 +517,20 @@ void TcpComms::queue_tx_function()
             //  txlist.push_back(cmd);
             auto rt_find = routes.find(rid);
             if (rt_find != routes.end()) {
-                try {
-                    rt_find->second->send(cmd.packetize());
-                }
-                catch (const std::system_error& se) {
-                    if (se.code() != asio::error::connection_aborted) {
-                        if (!isDisconnectCommand(cmd)) {
-                            logError(std::string("rt send ") + std::to_string(rid.baseValue()) +
-                                     "::" + se.what());
-                        }
-                    }
-                }
+                sendWithErrorLogging(rt_find->second,
+                                     cmd,
+                                     [rid]() {
+                                         return std::string("rt send ") +
+                                             std::to_string(rid.baseValue()) + "::";
+                                     });
             } else {
                 if (hasBroker) {
-                    try {
-                        brokerConnection->send(cmd.packetize());
-                    }
-                    catch (const std::system_error& se) {
-                        if (se.code() != asio::error::connection_aborted) {
-                            if (!isDisconnectCommand(cmd)) {
-                                logError(std::string("broker send") +
-                                         std::to_string(rid.baseValue()) + " ::" + se.what());
-                            }
-                        }
-                    }
+                    sendWithErrorLogging(brokerConnection,
+                                         cmd,
+                                         [rid]() {
+                                             return std::string("broker send") +
+                                                 std::to_string(rid.baseValue()) + " ::";
+                                         });
                 } else {
                     if (!isDisconnectCommand(cmd)) {
                         logWarning(
@@ -529,8 +541,8 @@ void TcpComms::queue_tx_function()
             }
         }
     }
-    for (auto& rt : routes) {
-        rt.second->close();
+    for (auto& routeEntry : routes) {
+        routeEntry.second->close();
     }
     routes.clear();
     if (getRxStatus() == ConnectionStatus::CONNECTED) {

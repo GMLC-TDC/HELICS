@@ -31,12 +31,12 @@ static ActionMessage generatePortRequestReply(const ActionMessage& /*cmd*/,
 
 /** find an existing broker or start a new one*/
 static std::pair<std::shared_ptr<Broker>, bool>
-    findBroker(const ActionMessage& rx, CoreType ctype, int startPort)
+    findBroker(const ActionMessage& request, CoreType ctype, int startPort)
 {
     std::string brkname;
     std::string brkinit;
     bool newbrk{false};
-    const auto& strs = rx.getStringData();
+    const auto& strs = request.getStringData();
     if (!strs.empty()) {
         brkname = strs[0];
     }
@@ -76,11 +76,11 @@ ActionMessage TypedBrokerServer::generateMessageResponse(const ActionMessage& rx
             switch (rxcmd.messageID) {
                 case REQUEST_PORTS:
                 case CONNECTION_INFORMATION: {
-                    auto pt = getOpenPort(pdata);
-                    if (pt > 0) {
-                        auto nbrk = findBroker(rxcmd, ctype, pt);
+                    auto port = getOpenPort(pdata);
+                    if (port > 0) {
+                        auto nbrk = findBroker(rxcmd, ctype, port);
                         if (nbrk.second) {
-                            assignPort(pdata, pt, nbrk.first);
+                            assignPort(pdata, port, nbrk.first);
                         }
                         return generatePortRequestReply(rxcmd, nbrk.first);
                     }
@@ -88,6 +88,8 @@ ActionMessage TypedBrokerServer::generateMessageResponse(const ActionMessage& rx
                     rep.messageID = DELAY_CONNECTION;
                     return rep;
                 } break;
+                default:
+                    break;
             }
             break;
         default:
@@ -101,14 +103,14 @@ ActionMessage TypedBrokerServer::generateMessageResponse(const ActionMessage& rx
 void TypedBrokerServer::processArgs(std::string_view /*unused*/) {}
 
 /** get an open port for broker to start*/
-int TypedBrokerServer::getOpenPort(portData& pd)
+int TypedBrokerServer::getOpenPort(portData& portDataList)
 {
-    for (auto& pdi : pd) {
+    for (auto& pdi : portDataList) {
         if (!std::get<1>(pdi)) {
             return std::get<0>(pdi);
         }
     }
-    for (auto& pdi : pd) {
+    for (auto& pdi : portDataList) {
         if (!std::get<2>(pdi)->isConnected()) {
             std::get<2>(pdi) = nullptr;
             std::get<1>(pdi) = false;
@@ -118,9 +120,11 @@ int TypedBrokerServer::getOpenPort(portData& pd)
     return -1;
 }
 
-void TypedBrokerServer::assignPort(portData& pd, int pnumber, std::shared_ptr<Broker>& brk)
+void TypedBrokerServer::assignPort(portData& portDataList,
+                                   int pnumber,
+                                   std::shared_ptr<Broker>& brk)
 {
-    for (auto& pdi : pd) {
+    for (auto& pdi : portDataList) {
         if (std::get<0>(pdi) == pnumber) {
             std::get<1>(pdi) = true;
             std::get<2>(pdi) = brk;
