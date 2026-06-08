@@ -25,10 +25,10 @@ using asio::ip::tcp;
 
 using gmlc::networking::TcpConnection;
 
-template<class ErrorMessageGenerator>
+template<class ErrorLogger>
 static void sendWithErrorLogging(const TcpConnection::pointer& connection,
                                  const ActionMessage& cmd,
-                                 ErrorMessageGenerator&& errorMessageGenerator)
+                                 ErrorLogger&& errorLogger)
 {
     try {
         connection->send(cmd.packetize());
@@ -36,7 +36,7 @@ static void sendWithErrorLogging(const TcpConnection::pointer& connection,
     catch (const std::system_error& se) {
         if (se.code() != asio::error::connection_aborted) {
             if (!isDisconnectCommand(cmd)) {
-                logError(errorMessageGenerator() + se.what());
+                errorLogger(se);
             }
         }
     }
@@ -500,9 +500,10 @@ void TcpComms::queue_tx_function()
             if (hasBroker) {
                 sendWithErrorLogging(brokerConnection,
                                      cmd,
-                                     [&cmd]() {
-                                         return std::string("broker send 0 ") +
-                                             actionMessageType(cmd.action()) + ':';
+                                     [this, &cmd](const std::system_error& se) {
+                                         logError(std::string("broker send 0 ") +
+                                                  actionMessageType(cmd.action()) + ':' +
+                                                  se.what());
                                      });
 
                 // if (error)
@@ -519,17 +520,19 @@ void TcpComms::queue_tx_function()
             if (rt_find != routes.end()) {
                 sendWithErrorLogging(rt_find->second,
                                      cmd,
-                                     [rid]() {
-                                         return std::string("rt send ") +
-                                             std::to_string(rid.baseValue()) + "::";
+                                     [this, rid](const std::system_error& se) {
+                                         logError(std::string("rt send ") +
+                                                  std::to_string(rid.baseValue()) + "::" +
+                                                  se.what());
                                      });
             } else {
                 if (hasBroker) {
                     sendWithErrorLogging(brokerConnection,
                                          cmd,
-                                         [rid]() {
-                                             return std::string("broker send") +
-                                                 std::to_string(rid.baseValue()) + " ::";
+                                         [this, rid](const std::system_error& se) {
+                                             logError(std::string("broker send") +
+                                                      std::to_string(rid.baseValue()) + " ::" +
+                                                      se.what());
                                          });
                 } else {
                     if (!isDisconnectCommand(cmd)) {
