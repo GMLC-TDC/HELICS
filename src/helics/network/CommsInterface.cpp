@@ -212,18 +212,18 @@ void CommsInterface::setTxStatus(ConnectionStatus status)
         case ConnectionStatus::CONNECTED:
             if (txStatus == ConnectionStatus::STARTUP) {
                 txStatus = status;
-                txTrigger.activate();
+                (void)txTrigger.activate();
             }
             break;
         case ConnectionStatus::TERMINATED:
         case ConnectionStatus::ERRORED:
             if (txStatus == ConnectionStatus::STARTUP) {
                 txStatus = status;
-                txTrigger.activate();
-                txTrigger.trigger();
+                (void)txTrigger.activate();
+                (void)txTrigger.trigger();
             } else {
                 txStatus = status;
-                txTrigger.trigger();
+                (void)txTrigger.trigger();
             }
             break;
         default:
@@ -240,18 +240,18 @@ void CommsInterface::setRxStatus(ConnectionStatus status)
         case ConnectionStatus::CONNECTED:
             if (rxStatus == ConnectionStatus::STARTUP) {
                 rxStatus = status;
-                rxTrigger.activate();
+                (void)rxTrigger.activate();
             }
             break;
         case ConnectionStatus::TERMINATED:
         case ConnectionStatus::ERRORED:
             if (rxStatus == ConnectionStatus::STARTUP) {
                 rxStatus = status;
-                rxTrigger.activate();
-                rxTrigger.trigger();
+                (void)rxTrigger.activate();
+                (void)rxTrigger.trigger();
             } else {
                 rxStatus = status;
-                rxTrigger.trigger();
+                (void)rxTrigger.trigger();
             }
 
             break;

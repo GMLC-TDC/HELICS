@@ -162,7 +162,12 @@ bool CommonCore::connect()
                 }
                 transmit(parent_route_id, reg);
                 setBrokerState(BrokerState::CONNECTED);
-                disconnection.activate();
+                if (!disconnection.activate())
+                {
+                    if (!disconnection.isActive()){
+                        LOG_WARNING(global_id.load(), getIdentifier(), "disconnect trigger is not active");
+                    }
+                }
                 if (!configString.empty()) {
                     makeConnections(configString);
                 }
@@ -226,7 +231,7 @@ void CommonCore::processDisconnect(bool skipUnregister)
     if (!skipUnregister) {
         unregister();
     }
-    disconnection.trigger();
+    (void)disconnection.trigger();
 }
 
 void CommonCore::disconnect()
@@ -258,8 +263,7 @@ void CommonCore::disconnect()
 bool CommonCore::waitForDisconnect(std::chrono::milliseconds msToWait) const
 {
     if (msToWait <= std::chrono::milliseconds(0)) {
-        disconnection.wait();
-        return true;
+        return disconnection.wait();
     }
     return disconnection.wait_for(msToWait);
 }

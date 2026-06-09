@@ -2411,7 +2411,13 @@ bool CoreBroker::connect()
             timeoutMon->setTimeout(std::chrono::milliseconds(timeout));
             auto res = brokerConnect();
             if (res) {
-                disconnection.activate();
+                if (!disconnection.activate()) {
+                    if (!disconnection.isActive()) {
+                        LOG_WARNING(global_broker_id_local,
+                                    getIdentifier(),
+                                    "disconnection trigger could not be activated");
+                    }
+                }
                 setBrokerState(BrokerState::CONNECTED);
                 addActionMessage(CMD_BROKER_SETUP);
                 if (!_isRoot) {
@@ -2491,8 +2497,7 @@ bool CoreBroker::isConnected() const
 bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
 {
     if (msToWait <= std::chrono::milliseconds(0)) {
-        disconnection.wait();
-        return true;
+        return disconnection.wait();
     }
     return disconnection.wait_for(msToWait);
 }
@@ -2513,7 +2518,7 @@ void CoreBroker::processDisconnect(bool skipUnregister)
     if (!skipUnregister) {
         unregister();
     }
-    disconnection.trigger();
+    (void)disconnection.trigger();
 }
 
 void CoreBroker::unregister()
