@@ -162,10 +162,11 @@ bool CommonCore::connect()
                 }
                 transmit(parent_route_id, reg);
                 setBrokerState(BrokerState::CONNECTED);
-                if (!disconnection.activate())
-                {
-                    if (!disconnection.isActive()){
-                        LOG_WARNING(global_id.load(), getIdentifier(), "disconnect trigger is not active");
+                if (!disconnection.activate()) {
+                    if (!disconnection.isActive()) {
+                        LOG_WARNING(global_id.load(),
+                                    getIdentifier(),
+                                    "disconnect trigger is not active");
                     }
                 }
                 if (!configString.empty()) {
