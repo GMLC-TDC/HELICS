@@ -522,8 +522,8 @@ void TcpComms::queue_tx_function()
                                      cmd,
                                      [this, rid](const std::system_error& sendError) {
                                          logError(std::string("rt send ") +
-                                                  std::to_string(rid.baseValue()) + "::" +
-                                                  sendError.what());
+                                                  std::to_string(rid.baseValue()) +
+                                                  "::" + sendError.what());
                                      });
             } else {
                 if (hasBroker) {
@@ -531,8 +531,8 @@ void TcpComms::queue_tx_function()
                                          cmd,
                                          [this, rid](const std::system_error& sendError) {
                                              logError(std::string("broker send") +
-                                                      std::to_string(rid.baseValue()) + " ::" +
-                                                      sendError.what());
+                                                      std::to_string(rid.baseValue()) +
+                                                      " ::" + sendError.what());
                                          });
                 } else {
                     if (!isDisconnectCommand(cmd)) {

@@ -364,8 +364,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
                 if (useJsonSerialization) {
                     setActionFlag(getPorts, use_json_serialization_flag);
                 }
-                auto str =
-                    useJsonSerialization ? getPorts.to_json_string() : getPorts.to_string();
+                auto str = useJsonSerialization ? getPorts.to_json_string() : getPorts.to_string();
 
                 brokerReq.send(str);
                 poller.socket = static_cast<void*>(brokerReq);
