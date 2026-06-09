@@ -71,19 +71,18 @@ int ZmqComms::getDefaultBrokerPort() const
 int ZmqComms::processIncomingMessage(zmq::message_t& msg)
 {
     if (msg.size() == 5) {
-        std::string str(static_cast<char*>(msg.data()), msg.size());
+        const std::string str(static_cast<char*>(msg.data()), msg.size());
         if (str == "close") {
             return (-1);
         }
     }
-    ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
-    if (!isValidCommand(M)) {
+    ActionMessage message(static_cast<std::byte*>(msg.data()), msg.size());
+    if (!isValidCommand(message)) {
         logError("invalid command received");
-        ActionMessage Q(static_cast<std::byte*>(msg.data()), msg.size());
         return 0;
     }
-    if (isProtocolCommand(M)) {
-        switch (M.messageID) {
+    if (isProtocolCommand(message)) {
+        switch (message.messageID) {
             case CLOSE_RECEIVER:
                 return (-1);
             case RECONNECT_RECEIVER:
@@ -93,28 +92,28 @@ int ZmqComms::processIncomingMessage(zmq::message_t& msg)
                 break;
         }
     }
-    ActionCallback(std::move(M));
+    ActionCallback(std::move(message));
     return 0;
 }
 
 int ZmqComms::replyToIncomingMessage(zmq::message_t& msg, zmq::socket_t& sock)
 {
-    ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
-    bool useJson = checkActionFlag(M, use_json_serialization_flag);
-    if (isProtocolCommand(M)) {
-        if (M.messageID == CLOSE_RECEIVER) {
+    ActionMessage message(static_cast<std::byte*>(msg.data()), msg.size());
+    const bool useJson = checkActionFlag(message, use_json_serialization_flag);
+    if (isProtocolCommand(message)) {
+        if (message.messageID == CLOSE_RECEIVER) {
             return (-1);
         }
-        auto reply = generateReplyToIncomingMessage(M);
-        auto str = (useJson) ? reply.to_json_string() : reply.to_string();
+        auto reply = generateReplyToIncomingMessage(message);
+        auto str = useJson ? reply.to_json_string() : reply.to_string();
 
         sock.send(str);
         return 0;
     }
 
-    ActionCallback(std::move(M));
-    ActionMessage resp(CMD_PRIORITY_ACK);
-    auto str = (useJson) ? resp.to_json_string() : resp.to_string();
+    ActionCallback(std::move(message));
+    const ActionMessage resp(CMD_PRIORITY_ACK);
+    auto str = useJson ? resp.to_json_string() : resp.to_string();
     sock.send(str);
     return 0;
 }
@@ -125,10 +124,10 @@ void ZmqComms::queue_rx_function()
     zmq::socket_t pullSocket(ctx->getBaseContext(), ZMQ_PULL);
     pullSocket.setsockopt(ZMQ_LINGER, 200);
     zmq::socket_t controlSocket(ctx->getBaseContext(), ZMQ_PAIR);
-    std::string controlsockString =
+    const std::string controlSocketString =
         std::string("inproc://") + name + '_' + getRandomID() + "_control";
     try {
-        controlSocket.bind(controlsockString.c_str());
+        controlSocket.bind(controlSocketString.c_str());
     }
     catch (const zmq::error_t& e) {
         logError(std::string("binding error on internal comms socket:") + e.what());
@@ -148,22 +147,22 @@ void ZmqComms::queue_rx_function()
         if (msg.size() < 10) {
             continue;
         }
-        ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
+        const ActionMessage message(static_cast<std::byte*>(msg.data()), msg.size());
 
-        if (isProtocolCommand(M)) {
-            if (M.messageID == PORT_DEFINITIONS) {
-                loadPortDefinitions(M);
-            } else if (M.messageID == NAME_NOT_FOUND) {
+        if (isProtocolCommand(message)) {
+            if (message.messageID == PORT_DEFINITIONS) {
+                loadPortDefinitions(message);
+            } else if (message.messageID == NAME_NOT_FOUND) {
                 logError(std::string("broker name ") + brokerName +
                          " does not match broker connection");
                 disconnecting = true;
                 setRxStatus(ConnectionStatus::ERRORED);
                 return;
-            } else if (M.messageID == DISCONNECT || M.messageID == CLOSE_RECEIVER) {
+            } else if (message.messageID == DISCONNECT || message.messageID == CLOSE_RECEIVER) {
                 disconnecting = true;
                 setRxStatus(ConnectionStatus::TERMINATED);
                 return;
-            } else if (M.messageID == DISCONNECT_ERROR) {
+            } else if (message.messageID == DISCONNECT_ERROR) {
                 disconnecting = true;
                 setRxStatus(ConnectionStatus::ERRORED);
                 return;
@@ -184,14 +183,14 @@ void ZmqComms::queue_rx_function()
                     ActionMessage term(CMD_GLOBAL_ERROR);
                     term.messageID = HELICS_ERROR_TERMINATED;
                     term.payload = "force termination for new broker";
-                    auto str = (useJsonSerialization) ? term.to_json_string() : term.to_string();
+                    auto str = useJsonSerialization ? term.to_json_string() : term.to_string();
 
                     brokerReqTerm.send(str);
                     zmq::pollitem_t poller;
                     poller.socket = static_cast<void*>(brokerReqTerm);
                     poller.events = ZMQ_POLLIN;
-                    int rc = zmq::poll(&poller, 1, connectionTimeout);
-                    if (rc != 0) {
+                    const int pollResult = zmq::poll(&poller, 1, connectionTimeout);
+                    if (pollResult != 0) {
                         zmq::message_t msg;
                         brokerReqTerm.recv(msg);
 
@@ -286,8 +285,8 @@ void ZmqComms::queue_rx_function()
     setRxStatus(ConnectionStatus::CONNECTED);
 
     while (true) {
-        auto rc = zmq::poll(poller, std::chrono::milliseconds(1000));
-        if (rc > 0) {
+        auto pollResult = zmq::poll(poller, std::chrono::milliseconds(1000));
+        if (pollResult > 0) {
             zmq::message_t msg;
             if (zmq::has_message(poller[0])) {
                 controlSocket.recv(msg);
@@ -361,12 +360,12 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
                     controlSocket.send(protocolMessage.to_string());
                     return (-3);
                 }
-                ActionMessage getPorts = generatePortRequest((serverMode) ? 2 : 1);
+                ActionMessage getPorts = generatePortRequest(serverMode ? 2 : 1);
                 if (useJsonSerialization) {
                     setActionFlag(getPorts, use_json_serialization_flag);
                 }
                 auto str =
-                    (useJsonSerialization) ? getPorts.to_json_string() : getPorts.to_string();
+                    useJsonSerialization ? getPorts.to_json_string() : getPorts.to_string();
 
                 brokerReq.send(str);
                 poller.socket = static_cast<void*>(brokerReq);
@@ -485,7 +484,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
             }
         }
     } else {
-        if ((PortNumber < 0)) {
+        if (PortNumber < 0) {
             PortNumber = getDefaultBrokerPort();
             ActionMessage setPorts(CMD_PROTOCOL);
             setPorts.messageID = PORT_DEFINITIONS;

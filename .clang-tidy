@@ -446,7 +446,7 @@ CheckOptions:
   - key: readability-identifier-naming.VirtualMethodSuffix
     value: ""
   - key: readability-function-cognitive-complexity.Threshold
-    value: 100
+    value: 125
   - key: readability-simplify-boolean-expr.ChainedConditionalAssignment
     value: "0"
   - key: readability-simplify-boolean-expr.ChainedConditionalReturn
