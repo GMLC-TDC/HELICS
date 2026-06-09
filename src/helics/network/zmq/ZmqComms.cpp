@@ -672,20 +672,27 @@ void ZmqComms::closeReceiver()
 
         break;
         default:
-            if (!disconnecting) {
+            if (!disconnecting && !isShutdownTripped()) {
                 // try connecting with the receivers push socket
-                auto ctx = ZmqContextManager::getContextPointer();
-                zmq::socket_t pushSocket(ctx->getBaseContext(), ZMQ_PUSH);
-                pushSocket.setsockopt(ZMQ_LINGER, 200);
-                if (localTargetAddress == "tcp://*") {
-                    pushSocket.connect(makePortAddress("tcp://127.0.0.1", PortNumber));
-                } else {
-                    pushSocket.connect(makePortAddress(localTargetAddress, PortNumber));
-                }
+                try {
+                    auto ctx = ZmqContextManager::getContextPointer();
+                    zmq::socket_t pushSocket(ctx->getBaseContext(), ZMQ_PUSH);
+                    pushSocket.setsockopt(ZMQ_LINGER, 200);
+                    if (localTargetAddress == "tcp://*") {
+                        pushSocket.connect(makePortAddress("tcp://127.0.0.1", PortNumber));
+                    } else {
+                        pushSocket.connect(makePortAddress(localTargetAddress, PortNumber));
+                    }
 
-                ActionMessage cmd(CMD_PROTOCOL);
-                cmd.messageID = CLOSE_RECEIVER;
-                pushSocket.send(cmd.to_string());
+                    ActionMessage cmd(CMD_PROTOCOL);
+                    cmd.messageID = CLOSE_RECEIVER;
+                    pushSocket.send(cmd.to_string());
+                }
+                catch (const zmq::error_t& e) {
+                    if (!requestDisconnect.load(std::memory_order_acquire)) {
+                        logWarning(std::string("unable to send ZMQ close signal: ") + e.what());
+                    }
+                }
             }
             break;
     }

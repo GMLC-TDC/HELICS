@@ -405,6 +405,7 @@ void CommsInterface::disconnect()
     if (tripDetector.isTripped()) {
         setRxStatus(ConnectionStatus::TERMINATED);
         setTxStatus(ConnectionStatus::TERMINATED);
+        join_tx_rx_thread();
         return;
     }
     int cnt = 0;
@@ -427,6 +428,7 @@ void CommsInterface::disconnect()
         if (tripDetector.isTripped()) {
             rxStatus = ConnectionStatus::TERMINATED;
             txStatus = ConnectionStatus::TERMINATED;
+            join_tx_rx_thread();
             return;
         }
     }
@@ -450,6 +452,7 @@ void CommsInterface::disconnect()
         if (tripDetector.isTripped()) {
             rxStatus = ConnectionStatus::TERMINATED;
             txStatus = ConnectionStatus::TERMINATED;
+            join_tx_rx_thread();
             return;
         }
     }
