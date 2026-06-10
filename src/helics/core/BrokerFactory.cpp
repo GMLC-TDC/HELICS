@@ -32,26 +32,26 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics::BrokerFactory {
 
 namespace {
-bool debugCleanupEnabled()
-{
-    static const bool enabled = []() {
-        const auto* env = std::getenv("HELICS_DEBUG_CLEANUP");
-        return env != nullptr && env[0] != '\0' && env[0] != '0';
-    }();
-    return enabled;
-}
+    bool debugCleanupEnabled()
+    {
+        static const bool enabled = []() {
+            const auto* env = std::getenv("HELICS_DEBUG_CLEANUP");
+            return env != nullptr && env[0] != '\0' && env[0] != '0';
+        }();
+        return enabled;
+    }
 
-void cleanupTrace(std::string_view stage, std::string_view identifier = {})
-{
-    if (!debugCleanupEnabled()) {
-        return;
+    void cleanupTrace(std::string_view stage, std::string_view identifier = {})
+    {
+        if (!debugCleanupEnabled()) {
+            return;
+        }
+        std::cerr << "[helics-cleanup][broker] " << stage;
+        if (!identifier.empty()) {
+            std::cerr << " id=" << identifier;
+        }
+        std::cerr << " tid=" << std::this_thread::get_id() << '\n';
     }
-    std::cerr << "[helics-cleanup][broker] " << stage;
-    if (!identifier.empty()) {
-        std::cerr << " id=" << identifier;
-    }
-    std::cerr << " tid=" << std::this_thread::get_id() << '\n';
-}
 }  // namespace
 
 /*** class to hold the set of builders

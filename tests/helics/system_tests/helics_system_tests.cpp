@@ -7,10 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include "gtest/gtest.h"
+#include <cstdlib>
 #include <helics/core/BrokerFactory.hpp>
 #include <helics/core/CoreFactory.hpp>
-
-#include <cstdlib>
 #include <iostream>
 #include <thread>
 
@@ -29,8 +28,8 @@ void cleanupTrace(const char* stage)
     if (!debugCleanupEnabled()) {
         return;
     }
-    std::cerr << "[helics-cleanup][system-tests] " << stage
-              << " tid=" << std::this_thread::get_id() << '\n';
+    std::cerr << "[helics-cleanup][system-tests] " << stage << " tid=" << std::this_thread::get_id()
+              << '\n';
 }
 }  // namespace
 

@@ -31,17 +31,13 @@ namespace {
         return enabled;
     }
 
-    void cleanupTrace(std::string_view commName,
-                      std::string_view stage,
-                      int rx,
-                      int tx)
+    void cleanupTrace(std::string_view commName, std::string_view stage, int rx, int tx)
     {
         if (!debugCleanupEnabled()) {
             return;
         }
-        std::cerr << "[helics-cleanup][comms] " << commName << ' ' << stage
-                  << " rx=" << rx << " tx=" << tx << " tid=" << std::this_thread::get_id()
-                  << '\n';
+        std::cerr << "[helics-cleanup][comms] " << commName << ' ' << stage << " rx=" << rx
+                  << " tx=" << tx << " tid=" << std::this_thread::get_id() << '\n';
     }
 
     /*** class to hold the set of builders for comm interfaces
