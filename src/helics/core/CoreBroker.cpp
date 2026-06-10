@@ -39,68 +39,68 @@ namespace helics {
 constexpr char universalKey[] = "**";
 
 namespace {
-const std::set<std::string>& coreBrokerQuerySet()
-{
-    static const auto* querySet = new std::set<std::string>{"isinit",
-                                                            "isconnected",
-                                                            "exists",
-                                                            "name",
-                                                            "identifier",
-                                                            "address",
-                                                            "queries",
-                                                            "address",
-                                                            "counts",
-                                                            "summary",
-                                                            "federates",
-                                                            "brokers",
-                                                            "inputs",
-                                                            "barriers",
-                                                            "input_details",
-                                                            "endpoints",
-                                                            "endpoint_details",
-                                                            "publications",
-                                                            "publication_details",
-                                                            "filters",
-                                                            "filter_details",
-                                                            "interface_details",
-                                                            "version",
-                                                            "version_all",
-                                                            "federate_map",
-                                                            "dependency_graph",
-                                                            "data_flow_graph",
-                                                            "dependencies",
-                                                            "dependson",
-                                                            "logs",
-                                                            "monitor",
-                                                            "dependents",
-                                                            "status",
-                                                            "current_time",
-                                                            "global_time",
-                                                            "global_state",
-                                                            "global_flush",
-                                                            "current_state",
-                                                            "unconnected_interfaces",
-                                                            "logs"};
-    return *querySet;
-}
+    const std::set<std::string>& coreBrokerQuerySet()
+    {
+        static const auto* querySet = new std::set<std::string>{"isinit",
+                                                                "isconnected",
+                                                                "exists",
+                                                                "name",
+                                                                "identifier",
+                                                                "address",
+                                                                "queries",
+                                                                "address",
+                                                                "counts",
+                                                                "summary",
+                                                                "federates",
+                                                                "brokers",
+                                                                "inputs",
+                                                                "barriers",
+                                                                "input_details",
+                                                                "endpoints",
+                                                                "endpoint_details",
+                                                                "publications",
+                                                                "publication_details",
+                                                                "filters",
+                                                                "filter_details",
+                                                                "interface_details",
+                                                                "version",
+                                                                "version_all",
+                                                                "federate_map",
+                                                                "dependency_graph",
+                                                                "data_flow_graph",
+                                                                "dependencies",
+                                                                "dependson",
+                                                                "logs",
+                                                                "monitor",
+                                                                "dependents",
+                                                                "status",
+                                                                "current_time",
+                                                                "global_time",
+                                                                "global_state",
+                                                                "global_flush",
+                                                                "current_state",
+                                                                "unconnected_interfaces",
+                                                                "logs"};
+        return *querySet;
+    }
 
-const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>& coreBrokerMapIndex()
-{
-    static const auto* mapIndex =
-        new std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>{
-            {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
-            {"federate_map", {FEDERATE_MAP, QueryReuse::ENABLED}},
-            {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
-            {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
-            {"version_all", {VERSION_ALL, QueryReuse::ENABLED}},
-            {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
-            {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
-            {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
-            {"barriers", {BARRIERS, QueryReuse::DISABLED}},
-            {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
-            {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
-    return *mapIndex;
-}
+    const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>& coreBrokerMapIndex()
+    {
+        static const auto* mapIndex =
+            new std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>{
+                {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
+                {"federate_map", {FEDERATE_MAP, QueryReuse::ENABLED}},
+                {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
+                {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
+                {"version_all", {VERSION_ALL, QueryReuse::ENABLED}},
+                {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
+                {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
+                {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
+                {"barriers", {BARRIERS, QueryReuse::DISABLED}},
+                {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
+                {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
+        return *mapIndex;
+    }
 }  // namespace
 
 static const std::string& stateString(ConnectionState state)
@@ -3711,9 +3711,8 @@ std::string CoreBroker::quickBrokerQueries(std::string_view request) const
         return "true";
     }
     if ((request == "queries") || (request == "available_queries")) {
-        return generateStringVector(coreBrokerQuerySet(), [](const std::string& data) {
-            return data;
-        });
+        return generateStringVector(coreBrokerQuerySet(),
+                                    [](const std::string& data) { return data; });
     }
     if (request == "address") {
         return std::string{"\""} + getAddress() + '"';
@@ -4180,8 +4179,7 @@ void CoreBroker::processLocalQuery(const ActionMessage& message)
             }
             queryTimeouts.emplace_back(queryRep.messageID, std::chrono::steady_clock::now());
         }
-        std::get<1>(
-            mapBuilders[coreBrokerMapIndex().at(message.payload.to_string()).first])
+        std::get<1>(mapBuilders[coreBrokerMapIndex().at(message.payload.to_string()).first])
             .push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
         activeQueries.setDelayedValue(message.messageID, std::string(queryRep.payload.to_string()));

@@ -54,62 +54,62 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 namespace {
-const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>& commonCoreMapIndex()
-{
-    static const auto* mapIndex =
-        new std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>{
-            {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
-            {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
-            {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
-            {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
-            {"barriers", {BARRIERS, QueryReuse::DISABLED}},
-            {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
-            {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
-            {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
-            {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
-    return *mapIndex;
-}
+    const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>& commonCoreMapIndex()
+    {
+        static const auto* mapIndex =
+            new std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>{
+                {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
+                {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
+                {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
+                {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
+                {"barriers", {BARRIERS, QueryReuse::DISABLED}},
+                {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
+                {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
+                {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
+                {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
+        return *mapIndex;
+    }
 
-const std::set<std::string>& commonCoreQuerySet()
-{
-    static const auto* querySet = new std::set<std::string>{"isinit",
-                                                            "isconnected",
-                                                            "exists",
-                                                            "name",
-                                                            "identifier",
-                                                            "address",
-                                                            "queries",
-                                                            "address",
-                                                            "barriers",
-                                                            "federates",
-                                                            "inputs",
-                                                            "input_details",
-                                                            "endpoints",
-                                                            "endpoint_details",
-                                                            "filtered_endpoints",
-                                                            "publications",
-                                                            "publication_details",
-                                                            "filters",
-                                                            "filter_details",
-                                                            "interface_details",
-                                                            "tags",
-                                                            "version",
-                                                            "version_all",
-                                                            "federate_map",
-                                                            "dependency_graph",
-                                                            "data_flow_graph",
-                                                            "dependencies",
-                                                            "dependson",
-                                                            "dependents",
-                                                            "logs",
-                                                            "current_time",
-                                                            "global_time",
-                                                            "global_state",
-                                                            "global_flush",
-                                                            "current_state",
-                                                            "logs"};
-    return *querySet;
-}
+    const std::set<std::string>& commonCoreQuerySet()
+    {
+        static const auto* querySet = new std::set<std::string>{"isinit",
+                                                                "isconnected",
+                                                                "exists",
+                                                                "name",
+                                                                "identifier",
+                                                                "address",
+                                                                "queries",
+                                                                "address",
+                                                                "barriers",
+                                                                "federates",
+                                                                "inputs",
+                                                                "input_details",
+                                                                "endpoints",
+                                                                "endpoint_details",
+                                                                "filtered_endpoints",
+                                                                "publications",
+                                                                "publication_details",
+                                                                "filters",
+                                                                "filter_details",
+                                                                "interface_details",
+                                                                "tags",
+                                                                "version",
+                                                                "version_all",
+                                                                "federate_map",
+                                                                "dependency_graph",
+                                                                "data_flow_graph",
+                                                                "dependencies",
+                                                                "dependson",
+                                                                "dependents",
+                                                                "logs",
+                                                                "current_time",
+                                                                "global_time",
+                                                                "global_state",
+                                                                "global_flush",
+                                                                "current_state",
+                                                                "logs"};
+        return *querySet;
+    }
 }  // namespace
 
 const std::string& stateString(OperatingState state)
@@ -1002,16 +1002,14 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
             break;
         case FederateStates::FINISHED:
         case FederateStates::TERMINATING:
-            return iteration_time{
-                .grantedTime = Time::maxVal(), .state = IterationResult::HALTED};
+            return iteration_time{.grantedTime = Time::maxVal(), .state = IterationResult::HALTED};
         case FederateStates::CREATED:
         case FederateStates::INITIALIZING:
-            return iteration_time{
-                .grantedTime = timeZero, .state = IterationResult::ERROR_RESULT};
+            return iteration_time{.grantedTime = timeZero, .state = IterationResult::ERROR_RESULT};
         case FederateStates::UNKNOWN:
         case FederateStates::ERRORED:
-            return iteration_time{
-                .grantedTime = Time::maxVal(), .state = IterationResult::ERROR_RESULT};
+            return iteration_time{.grantedTime = Time::maxVal(),
+                                  .state = IterationResult::ERROR_RESULT};
     }
 
     // limit the iterations
@@ -2380,11 +2378,10 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
     } else {
         if (checkActionFlag(*hndl, targeted_flag)) {
             auto targets = fed->getMessageDestinations(sourceHandle);
-            auto res = std::ranges::find_if(
-                targets,
-                [destination = mess.getString(targetStringLoc)](const auto& val) {
-                    return (val.second == destination);
-                });
+            auto res =
+                std::ranges::find_if(targets,
+                                     [destination = mess.getString(targetStringLoc)](
+                                         const auto& val) { return (val.second == destination); });
             if (res == targets.end()) {
                 throw(InvalidParameter("targeted endpoint destination not in target list"));
             }
@@ -2757,9 +2754,8 @@ std::string CommonCore::federateQuery(const FederateState* fed,
 std::string CommonCore::quickCoreQueries(std::string_view queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return generateStringVector(commonCoreQuerySet(), [](const std::string& data) {
-            return data;
-        });
+        return generateStringVector(commonCoreQuerySet(),
+                                    [](const std::string& data) { return data; });
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -5080,8 +5076,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     queryResp.source_id = global_broker_id_local;
                     queryResp.messageID = cmd.messageID;
                     queryResp.counter = cmd.counter;
-                    std::get<1>(
-                        mapBuilders[commonCoreMapIndex().at(cmd.payload.to_string()).first])
+                    std::get<1>(mapBuilders[commonCoreMapIndex().at(cmd.payload.to_string()).first])
                         .push_back(queryResp);
                 }
 

@@ -23,56 +23,55 @@ namespace {
     /*** class to hold the set of builders for comm interfaces
        @details this doesn't work as a global since it tends to get initialized after some of the
        things that call it so it needs to be a static member of function call*/
-class MasterCommBuilder {
-  public:
-    using BuilderData =
-        std::tuple<int, std::string, std::shared_ptr<CommFactory::CommBuilder>>;
+    class MasterCommBuilder {
+      public:
+        using BuilderData = std::tuple<int, std::string, std::shared_ptr<CommFactory::CommBuilder>>;
 
-    static void addBuilder(std::shared_ptr<CommFactory::CommBuilder> builder,
-                           std::string_view name,
-                           int code)
-    {
-        instance()->builders.emplace_back(code, name, std::move(builder));
-    }
-    static const std::shared_ptr<CommFactory::CommBuilder>& getBuilder(int code)
-    {
-        for (auto& builder : instance()->builders) {
-            if (std::get<0>(builder) == code) {
-                return std::get<2>(builder);
+        static void addBuilder(std::shared_ptr<CommFactory::CommBuilder> builder,
+                               std::string_view name,
+                               int code)
+        {
+            instance()->builders.emplace_back(code, name, std::move(builder));
+        }
+        static const std::shared_ptr<CommFactory::CommBuilder>& getBuilder(int code)
+        {
+            for (auto& builder : instance()->builders) {
+                if (std::get<0>(builder) == code) {
+                    return std::get<2>(builder);
+                }
             }
+            throw(HelicsException("comm type is not available"));
         }
-        throw(HelicsException("comm type is not available"));
-    }
 
-    static const std::shared_ptr<CommFactory::CommBuilder>& getBuilder(std::string_view type)
-    {
-        for (auto& builder : instance()->builders) {
-            if (std::get<1>(builder) == type) {
-                return std::get<2>(builder);
+        static const std::shared_ptr<CommFactory::CommBuilder>& getBuilder(std::string_view type)
+        {
+            for (auto& builder : instance()->builders) {
+                if (std::get<1>(builder) == type) {
+                    return std::get<2>(builder);
+                }
             }
+            throw(HelicsException("comm type is not available"));
         }
-        throw(HelicsException("comm type is not available"));
-    }
-    static const std::shared_ptr<CommFactory::CommBuilder>& getIndexedBuilder(std::size_t index)
-    {
-        const auto& blder = instance();
-        if (blder->builders.size() <= index) {
-            throw(HelicsException("comm type index is not available"));
+        static const std::shared_ptr<CommFactory::CommBuilder>& getIndexedBuilder(std::size_t index)
+        {
+            const auto& blder = instance();
+            if (blder->builders.size() <= index) {
+                throw(HelicsException("comm type index is not available"));
+            }
+            return std::get<2>(blder->builders[index]);
         }
-        return std::get<2>(blder->builders[index]);
-    }
-    static const std::shared_ptr<MasterCommBuilder>& instance()
-    {
-        static const std::shared_ptr<MasterCommBuilder> iptr(new MasterCommBuilder());
-        return iptr;
-    }
+        static const std::shared_ptr<MasterCommBuilder>& instance()
+        {
+            static const std::shared_ptr<MasterCommBuilder> iptr(new MasterCommBuilder());
+            return iptr;
+        }
 
-  private:
-    /** private constructor since we only really want one of them
-    accessed through the instance static member*/
-    MasterCommBuilder() = default;
-    std::vector<BuilderData> builders;  //!< container for the different builders
-};
+      private:
+        /** private constructor since we only really want one of them
+        accessed through the instance static member*/
+        MasterCommBuilder() = default;
+        std::vector<BuilderData> builders;  //!< container for the different builders
+    };
 }  // namespace
 
 namespace CommFactory {
