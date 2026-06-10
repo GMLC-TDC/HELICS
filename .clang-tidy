@@ -9,6 +9,7 @@ Checks: "
   -google-build-using-namespace,
   -google-default-arguments,
   modernize*,
+  -modernize-use-ranges,
   -modernize-use-trailing-return-type,
   -modernize-use-override,
   -modernize-avoid-c-arrays,
@@ -22,6 +23,7 @@ Checks: "
   -hicpp-avoid-c-arrays,
   -hicpp-no-array-decay,
   clang-analyzer-*,
+  -clang-analyzer-optin.cplusplus.VirtualCall,
   clang-diagnostic*,
   bugprone-*,
   -bugprone-narrowing-conversions,
@@ -48,6 +50,7 @@ WarningsAsErrors: "
   -google-default-arguments,
   -google-explicit-constructor,
   modernize*,
+  -modernize-use-ranges,
   -modernize-use-trailing-return-type,
   -modernize-use-override,
   -modernize-use-using,
@@ -80,7 +83,7 @@ WarningsAsErrors: "
   -readability-magic-numbers,
   -readability-identifier-naming,
   -readability-identifier-length,
-  performance-*
+  performance-*,
   -performance-unnecessary-value-param
   "
 
