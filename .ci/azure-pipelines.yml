@@ -16,21 +16,25 @@ jobs:
           test_config: "ci"
           use_mpi: "true"
           encrypted: "true"
+          helics_debug_cleanup: ""
         gcc11:
           containerImage: "helics/buildenv:gcc11-builder"
           test_config: "ci"
           use_mpi: "true"
           encrypted: "true"
+          helics_debug_cleanup: ""
         clang15:
           containerImage: "helics/buildenv:clang15-builder"
           test_config: "ci"
           use_mpi: ""
           encrypted: ""
+          helics_debug_cleanup: ""
         clang18:
           containerImage: "helics/buildenv:clang18-builder"
           test_config: "ci"
           use_mpi: ""
           encrypted: ""
+          helics_debug_cleanup: "1"
 
     pool:
       vmImage: "ubuntu-latest"
@@ -56,6 +60,7 @@ jobs:
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
         env:
           TEST_CONFIG: $[variables['test_config']]
+          HELICS_DEBUG_CLEANUP: $[variables['helics_debug_cleanup']]
         workingDirectory: "build"
         displayName: "Test HELICS"
 

@@ -20,11 +20,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include <cassert>
+#include <cstdlib>
 #include <cstring>
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -35,6 +37,29 @@ DECLARE_TRIPLINE()
 namespace helics::CoreFactory {
 
 static constexpr std::string_view gHelicsEmptyString;
+
+namespace {
+bool debugCleanupEnabled()
+{
+    static const bool enabled = []() {
+        const auto* env = std::getenv("HELICS_DEBUG_CLEANUP");
+        return env != nullptr && env[0] != '\0' && env[0] != '0';
+    }();
+    return enabled;
+}
+
+void cleanupTrace(std::string_view stage, std::string_view identifier = {})
+{
+    if (!debugCleanupEnabled()) {
+        return;
+    }
+    std::cerr << "[helics-cleanup][core] " << stage;
+    if (!identifier.empty()) {
+        std::cerr << " id=" << identifier;
+    }
+    std::cerr << " tid=" << std::this_thread::get_id() << '\n';
+}
+}  // namespace
 
 /*** class to hold the set of builders
 @details this doesn't work as a global since it tends to get initialized after some of the things
@@ -301,8 +326,11 @@ std::shared_ptr<Core> FindOrCreate(CoreType type, std::string_view coreName, int
 static auto destroyerCallFirst = [](std::shared_ptr<Core>& core) {
     auto* ccore = dynamic_cast<CommonCore*>(core.get());
     if (ccore != nullptr) {
+        cleanupTrace("destroyer start", ccore->getIdentifier());
         ccore->processDisconnect(true);
+        cleanupTrace("destroyer joining", ccore->getIdentifier());
         ccore->joinAllThreads();
+        cleanupTrace("destroyer complete", ccore->getIdentifier());
     }
 };
 
@@ -366,21 +394,36 @@ bool registerCore(const std::shared_ptr<Core>& core, CoreType type)
 
 size_t cleanUpCores()
 {
-    return delayedDestroyer.destroyObjects();
+    cleanupTrace("cleanUpCores start");
+    auto count = delayedDestroyer.destroyObjects();
+    if (debugCleanupEnabled()) {
+        std::cerr << "[helics-cleanup][core] cleanUpCores complete destroyed=" << count
+                  << " tid=" << std::this_thread::get_id() << '\n';
+    }
+    return count;
 }
 
 size_t cleanUpCores(std::chrono::milliseconds delay)
 {
-    return delayedDestroyer.destroyObjects(delay);
+    cleanupTrace("cleanUpCores delayed start");
+    auto count = delayedDestroyer.destroyObjects(delay);
+    if (debugCleanupEnabled()) {
+        std::cerr << "[helics-cleanup][core] cleanUpCores delayed complete destroyed=" << count
+                  << " tid=" << std::this_thread::get_id() << '\n';
+    }
+    return count;
 }
 
 void terminateAllCores()
 {
+    cleanupTrace("terminateAllCores start");
     auto cores = searchableCores.getObjects();
     for (auto& core : cores) {
+        cleanupTrace("terminateAllCores disconnect", core->getIdentifier());
         core->disconnect();
     }
     cleanUpCores(std::chrono::milliseconds(250));
+    cleanupTrace("terminateAllCores complete");
 }
 
 void abortAllCores(int errorCode, std::string_view errorString)

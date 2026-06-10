@@ -19,15 +19,40 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include <cassert>
+#include <cstdlib>
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
 
 namespace helics::BrokerFactory {
+
+namespace {
+bool debugCleanupEnabled()
+{
+    static const bool enabled = []() {
+        const auto* env = std::getenv("HELICS_DEBUG_CLEANUP");
+        return env != nullptr && env[0] != '\0' && env[0] != '0';
+    }();
+    return enabled;
+}
+
+void cleanupTrace(std::string_view stage, std::string_view identifier = {})
+{
+    if (!debugCleanupEnabled()) {
+        return;
+    }
+    std::cerr << "[helics-cleanup][broker] " << stage;
+    if (!identifier.empty()) {
+        std::cerr << " id=" << identifier;
+    }
+    std::cerr << " tid=" << std::this_thread::get_id() << '\n';
+}
+}  // namespace
 
 /*** class to hold the set of builders
 @details this doesn't work as a global since it tends to get initialized after some of the
@@ -195,9 +220,12 @@ std::shared_ptr<Broker>
 static auto destroyerCallFirst = [](auto& broker) {
     auto tbroker = std::dynamic_pointer_cast<CoreBroker>(broker);
     if (tbroker) {
+        cleanupTrace("destroyer start", tbroker->getIdentifier());
         tbroker->processDisconnect(true);  // use true here as it is possible the
                                            // searchableObjectHolder is deleted already
+        cleanupTrace("destroyer joining", tbroker->getIdentifier());
         tbroker->joinAllThreads();
+        cleanupTrace("destroyer complete", tbroker->getIdentifier());
     }
 };
 /** so the problem this is addressing is that unregister can potentially cause a destructor to
@@ -300,20 +328,35 @@ bool registerBroker(const std::shared_ptr<Broker>& broker, CoreType type)
 
 size_t cleanUpBrokers()
 {
-    return delayedDestroyer.destroyObjects();
+    cleanupTrace("cleanUpBrokers start");
+    auto count = delayedDestroyer.destroyObjects();
+    if (debugCleanupEnabled()) {
+        std::cerr << "[helics-cleanup][broker] cleanUpBrokers complete destroyed=" << count
+                  << " tid=" << std::this_thread::get_id() << '\n';
+    }
+    return count;
 }
 size_t cleanUpBrokers(std::chrono::milliseconds delay)
 {
-    return delayedDestroyer.destroyObjects(delay);
+    cleanupTrace("cleanUpBrokers delayed start");
+    auto count = delayedDestroyer.destroyObjects(delay);
+    if (debugCleanupEnabled()) {
+        std::cerr << "[helics-cleanup][broker] cleanUpBrokers delayed complete destroyed=" << count
+                  << " tid=" << std::this_thread::get_id() << '\n';
+    }
+    return count;
 }
 
 void terminateAllBrokers()
 {
+    cleanupTrace("terminateAllBrokers start");
     auto brokers = getAllBrokers();
     for (auto& brk : brokers) {
+        cleanupTrace("terminateAllBrokers disconnect", brk->getIdentifier());
         brk->disconnect();
     }
     cleanUpBrokers(std::chrono::milliseconds(250));
+    cleanupTrace("terminateAllBrokers complete");
 }
 
 void abortAllBrokers(int errorCode, std::string_view errorString)

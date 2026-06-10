@@ -10,9 +10,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NetworkBrokerData.hpp"
 #include "gmlc/utilities/stringOps.h"
 
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -20,6 +22,28 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 namespace {
+    bool debugCleanupEnabled()
+    {
+        static const bool enabled = []() {
+            const auto* env = std::getenv("HELICS_DEBUG_CLEANUP");
+            return env != nullptr && env[0] != '\0' && env[0] != '0';
+        }();
+        return enabled;
+    }
+
+    void cleanupTrace(std::string_view commName,
+                      std::string_view stage,
+                      int rx,
+                      int tx)
+    {
+        if (!debugCleanupEnabled()) {
+            return;
+        }
+        std::cerr << "[helics-cleanup][comms] " << commName << ' ' << stage
+                  << " rx=" << rx << " tx=" << tx << " tid=" << std::this_thread::get_id()
+                  << '\n';
+    }
+
     /*** class to hold the set of builders for comm interfaces
        @details this doesn't work as a global since it tends to get initialized after some of the
        things that call it so it needs to be a static member of function call*/
@@ -389,12 +413,20 @@ void CommsInterface::setName(const std::string& commName)
 
 void CommsInterface::disconnect()
 {
+    cleanupTrace(name,
+                 "disconnect start",
+                 static_cast<int>(rxStatus.load()),
+                 static_cast<int>(txStatus.load()));
     if (!operating) {
         if (propertyLock()) {
             setRxStatus(ConnectionStatus::TERMINATED);
             setTxStatus(ConnectionStatus::TERMINATED);
             propertyUnLock();
             join_tx_rx_thread();
+            cleanupTrace(name,
+                         "disconnect early return",
+                         static_cast<int>(rxStatus.load()),
+                         static_cast<int>(txStatus.load()));
             return;
         }
     }
@@ -410,6 +442,10 @@ void CommsInterface::disconnect()
         setRxStatus(ConnectionStatus::TERMINATED);
         setTxStatus(ConnectionStatus::TERMINATED);
         join_tx_rx_thread();
+        cleanupTrace(name,
+                     "disconnect trip return",
+                     static_cast<int>(rxStatus.load()),
+                     static_cast<int>(txStatus.load()));
         return;
     }
     int cnt = 0;
@@ -433,6 +469,10 @@ void CommsInterface::disconnect()
             rxStatus = ConnectionStatus::TERMINATED;
             txStatus = ConnectionStatus::TERMINATED;
             join_tx_rx_thread();
+            cleanupTrace(name,
+                         "disconnect rx trip return",
+                         static_cast<int>(rxStatus.load()),
+                         static_cast<int>(txStatus.load()));
             return;
         }
     }
@@ -457,14 +497,26 @@ void CommsInterface::disconnect()
             rxStatus = ConnectionStatus::TERMINATED;
             txStatus = ConnectionStatus::TERMINATED;
             join_tx_rx_thread();
+            cleanupTrace(name,
+                         "disconnect tx trip return",
+                         static_cast<int>(rxStatus.load()),
+                         static_cast<int>(txStatus.load()));
             return;
         }
     }
     join_tx_rx_thread();
+    cleanupTrace(name,
+                 "disconnect complete",
+                 static_cast<int>(rxStatus.load()),
+                 static_cast<int>(txStatus.load()));
 }
 
 void CommsInterface::join_tx_rx_thread()
 {
+    cleanupTrace(name,
+                 "join start",
+                 static_cast<int>(rxStatus.load()),
+                 static_cast<int>(txStatus.load()));
     const std::scoped_lock<std::mutex> syncLock(threadSyncLock);
     if (!singleThread) {
         if (queue_watcher.joinable()) {
@@ -474,6 +526,10 @@ void CommsInterface::join_tx_rx_thread()
     if (queue_transmitter.joinable()) {
         queue_transmitter.join();
     }
+    cleanupTrace(name,
+                 "join complete",
+                 static_cast<int>(rxStatus.load()),
+                 static_cast<int>(txStatus.load()));
 }
 
 bool CommsInterface::reconnect()
