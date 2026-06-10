@@ -70,9 +70,8 @@ namespace {
       public:
         using BuilderData = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
 
-        static void addBuilder(std::shared_ptr<CoreBuilder> builder,
-                               std::string_view name,
-                               int code)
+        static void
+            addBuilder(std::shared_ptr<CoreBuilder> builder, std::string_view name, int code)
         {
             instance()->builders.emplace_back(code, name, std::move(builder));
         }
@@ -468,8 +467,7 @@ size_t getCoreCount()
 }
 bool copyCoreIdentifier(std::string_view copyFromName, std::string_view copyToName)
 {
-    return searchableCoresInstance().copyObject(std::string{copyFromName},
-                                                std::string{copyToName});
+    return searchableCoresInstance().copyObject(std::string{copyFromName}, std::string{copyToName});
 }
 
 void unregisterCore(std::string_view name)
