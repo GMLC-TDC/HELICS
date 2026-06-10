@@ -38,6 +38,71 @@ namespace helics {
 
 constexpr char universalKey[] = "**";
 
+namespace {
+const std::set<std::string>& coreBrokerQuerySet()
+{
+    static const auto* querySet = new std::set<std::string>{"isinit",
+                                                            "isconnected",
+                                                            "exists",
+                                                            "name",
+                                                            "identifier",
+                                                            "address",
+                                                            "queries",
+                                                            "address",
+                                                            "counts",
+                                                            "summary",
+                                                            "federates",
+                                                            "brokers",
+                                                            "inputs",
+                                                            "barriers",
+                                                            "input_details",
+                                                            "endpoints",
+                                                            "endpoint_details",
+                                                            "publications",
+                                                            "publication_details",
+                                                            "filters",
+                                                            "filter_details",
+                                                            "interface_details",
+                                                            "version",
+                                                            "version_all",
+                                                            "federate_map",
+                                                            "dependency_graph",
+                                                            "data_flow_graph",
+                                                            "dependencies",
+                                                            "dependson",
+                                                            "logs",
+                                                            "monitor",
+                                                            "dependents",
+                                                            "status",
+                                                            "current_time",
+                                                            "global_time",
+                                                            "global_state",
+                                                            "global_flush",
+                                                            "current_state",
+                                                            "unconnected_interfaces",
+                                                            "logs"};
+    return *querySet;
+}
+
+const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>& coreBrokerMapIndex()
+{
+    static const auto* mapIndex =
+        new std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>{
+            {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
+            {"federate_map", {FEDERATE_MAP, QueryReuse::ENABLED}},
+            {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
+            {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
+            {"version_all", {VERSION_ALL, QueryReuse::ENABLED}},
+            {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
+            {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
+            {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
+            {"barriers", {BARRIERS, QueryReuse::DISABLED}},
+            {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
+            {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
+    return *mapIndex;
+}
+}  // namespace
+
 static const std::string& stateString(ConnectionState state)
 {
     static const std::string connected{"connected"};
@@ -63,7 +128,7 @@ static const std::string& stateString(ConnectionState state)
 
 CoreBroker::~CoreBroker()
 {
-    const std::lock_guard<std::mutex> lock(name_mutex_);
+    const std::scoped_lock<std::mutex> lock(name_mutex_);
     // make sure everything is synchronized
 }
 
@@ -71,7 +136,7 @@ void CoreBroker::setIdentifier(std::string_view name)
 {
     if (getBrokerState() <= BrokerState::CONNECTING)  // can't be changed after initialization
     {
-        const std::lock_guard<std::mutex> lock(name_mutex_);
+        const std::scoped_lock<std::mutex> lock(name_mutex_);
         identifier.assign(name);
     }
 }
@@ -249,7 +314,7 @@ bool CoreBroker::isOpenToNewFederates() const
     if (cstate > BrokerState::OPERATING) {
         return false;
     }
-    if ((maxFederateCount == (std::numeric_limits<int32_t>::max)() ||
+    if ((maxFederateCount == std::numeric_limits<int32_t>::max() ||
          getCountableFederates() < maxFederateCount) &&
         !haltOperations) {
         if (!dynamicFederation) {
@@ -328,7 +393,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
         }
     }
     // check the max broker count
-    if (static_cast<decltype(maxBrokerCount)>(mBrokers.size()) >= maxBrokerCount) {
+    if (std::cmp_greater_equal(mBrokers.size(), maxBrokerCount)) {
         sendBrokerErrorAck(command, max_broker_count_exceeded);
         return;
     }
@@ -556,7 +621,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             if (command.counter > 0 && command.counter <= 16) {
                 mFederates.back().global_id = GlobalFederateId(
                     static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift +
-                    command.counter * gGlobalPriorityBlockSize);
+                    (command.counter * gGlobalPriorityBlockSize));
             } else {
                 mFederates.back().global_id = GlobalFederateId(
                     static_cast<GlobalFederateId::BaseType>(lookupIndex) + gGlobalFederateIdShift);
@@ -574,9 +639,9 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             delayTransmitQueue.push(command);
         }
     } else {
-        auto route_id = (newFed) ? mFederates.back().route : mFederates.find(fedName)->route;
+        auto route_id = newFed ? mFederates.back().route : mFederates.find(fedName)->route;
         auto global_fedid =
-            (newFed) ? mFederates.back().global_id : mFederates.find(fedName)->global_id;
+            newFed ? mFederates.back().global_id : mFederates.find(fedName)->global_id;
         auto res = routing_table.emplace(global_fedid, route_id);
         if (!res.second && !newFed) {
             res.first->second = route_id;
@@ -1673,9 +1738,9 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
                         setLoggerFunction(std::move(callback));
                     }
                     catch (const std::bad_any_cast&) {
-                        // This shouldn't really happen unless someone is being malicious so just
-                        // ignore it for now.
-                        ;
+                        LOG_WARNING(global_id.load(),
+                                    identifier,
+                                    "invalid logging callback update payload");
                     }
                 }
             }
@@ -2462,7 +2527,8 @@ bool CoreBroker::connect()
 void CoreBroker::setTimeBarrier(Time barrierTime)
 {
     if (barrierTime == Time::maxVal()) {
-        return clearTimeBarrier();
+        clearTimeBarrier();
+        return;
     }
     ActionMessage tbarrier(CMD_TIME_BARRIER_REQUEST);
     tbarrier.source_id = global_id.load();
@@ -3629,60 +3695,6 @@ void CoreBroker::sendCommand(std::string_view target,
     }
 }
 
-static const std::set<std::string> querySet{"isinit",
-                                            "isconnected",
-                                            "exists",
-                                            "name",
-                                            "identifier",
-                                            "address",
-                                            "queries",
-                                            "address",
-                                            "counts",
-                                            "summary",
-                                            "federates",
-                                            "brokers",
-                                            "inputs",
-                                            "barriers",
-                                            "input_details",
-                                            "endpoints",
-                                            "endpoint_details",
-                                            "publications",
-                                            "publication_details",
-                                            "filters",
-                                            "filter_details",
-                                            "interface_details",
-                                            "version",
-                                            "version_all",
-                                            "federate_map",
-                                            "dependency_graph",
-                                            "data_flow_graph",
-                                            "dependencies",
-                                            "dependson",
-                                            "logs",
-                                            "monitor",
-                                            "dependents",
-                                            "status",
-                                            "current_time",
-                                            "global_time",
-                                            "global_state",
-                                            "global_flush",
-                                            "current_state",
-                                            "unconnected_interfaces",
-                                            "logs"};
-
-static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> mapIndex{
-    {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
-    {"federate_map", {FEDERATE_MAP, QueryReuse::ENABLED}},
-    {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
-    {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
-    {"version_all", {VERSION_ALL, QueryReuse::ENABLED}},
-    {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
-    {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
-    {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
-    {"barriers", {BARRIERS, QueryReuse::DISABLED}},
-    {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
-    {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
-
 std::string CoreBroker::quickBrokerQueries(std::string_view request) const
 {
     if (request == "isinit") {
@@ -3699,7 +3711,9 @@ std::string CoreBroker::quickBrokerQueries(std::string_view request) const
         return "true";
     }
     if ((request == "queries") || (request == "available_queries")) {
-        return generateStringVector(querySet, [](const std::string& data) { return data; });
+        return generateStringVector(coreBrokerQuerySet(), [](const std::string& data) {
+            return data;
+        });
     }
     if (request == "address") {
         return std::string{"\""} + getAddress() + '"';
@@ -3832,9 +3846,10 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
             return fileops::generateJsonString(json);
         }
     }
-    if (request.compare(0, 7, "rename:") == 0) {
+    if (request.starts_with("rename:")) {
         return generateRename(request.substr(7));
     }
+    const auto& mapIndex = coreBrokerMapIndex();
     auto mapping = mapIndex.find(request);
     if (mapping != mapIndex.end()) {
         auto index = mapping->second.first;
@@ -4165,7 +4180,8 @@ void CoreBroker::processLocalQuery(const ActionMessage& message)
             }
             queryTimeouts.emplace_back(queryRep.messageID, std::chrono::steady_clock::now());
         }
-        std::get<1>(mapBuilders[mapIndex.at(message.payload.to_string()).first])
+        std::get<1>(
+            mapBuilders[coreBrokerMapIndex().at(message.payload.to_string()).first])
             .push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
         activeQueries.setDelayedValue(message.messageID, std::string(queryRep.payload.to_string()));
@@ -4691,9 +4707,7 @@ ConnectionState CoreBroker::getAllConnectionState() const
             continue;
         }
         ++cnt;
-        if (brk.state < res) {
-            res = brk.state;
-        }
+        res = std::min(brk.state, res);
     }
     return (cnt > 0) ? res : ConnectionState::CONNECTED;
 }
@@ -4712,10 +4726,10 @@ int CoreBroker::getCountableFederates() const
 bool CoreBroker::allInitReady() const
 {
     // the federate count must be greater than the min size
-    if (static_cast<decltype(minFederateCount)>(mFederates.size()) < minFederateCount) {
+    if (std::cmp_less(mFederates.size(), minFederateCount)) {
         return false;
     }
-    if (static_cast<decltype(minBrokerCount)>(mBrokers.size()) < minBrokerCount) {
+    if (std::cmp_less(mBrokers.size(), minBrokerCount)) {
         return false;
     }
     if (minChildCount > 0) {
