@@ -31,8 +31,6 @@ void cleanupTrace(const char* stage)
     std::cerr << "[helics-cleanup][system-tests] " << stage << " tid=" << std::this_thread::get_id()
               << '\n';
 }
-}  // namespace
-
 struct globalTestConfig: public ::testing::Environment {
     virtual void TearDown() override
     {
@@ -43,7 +41,10 @@ struct globalTestConfig: public ::testing::Environment {
         cleanupTrace("after broker cleanup");
     }
 };
+}  // namespace
 
 // register the global setup and teardown structure
+// GTest global environments must be registered before gtest_main runs.
+// NOLINTNEXTLINE(bugprone-throwing-static-initialization)
 ::testing::Environment* const foo_env = ::testing::AddGlobalTestEnvironment(new globalTestConfig);
 //____________________________________________________________________________//
