@@ -390,7 +390,8 @@ void abortAllBrokers(int errorCode, std::string_view errorString)
 }
 bool copyBrokerIdentifier(std::string_view copyFromName, std::string_view copyToName)
 {
-    return searchableBrokers.copyObject(std::string(copyFromName), std::string(copyToName));
+    return searchableBrokersInstance().copyObject(std::string(copyFromName),
+                                                  std::string(copyToName));
 }
 
 void unregisterBroker(std::string_view name)

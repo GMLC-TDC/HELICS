@@ -158,11 +158,6 @@ namespace {
         return MasterCoreBuilder::getBuilder(static_cast<int>(type))->build(name);
     }
 
-    std::shared_ptr<Core> create(std::string_view initializationString)
-    {
-        return create(CoreType::EXTRACT, gHelicsEmptyString, initializationString);
-    }
-
     void destroyCoreFirst(std::shared_ptr<Core>& core)
     {
         auto* ccore = dynamic_cast<CommonCore*>(core.get());
