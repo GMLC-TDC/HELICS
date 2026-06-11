@@ -111,16 +111,19 @@ jobs:
           langArch: "x86"
           vsArch: "Win32"
           extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
+          runPackaging: "true"
         VS2019-64bit:
           imageName: "windows-latest"
           langArch: "x64"
           vsArch: "x64"
           extraFlags: "-DCMAKE_CXX_STANDARD=23"
+          runPackaging: "false"
         VS2022-64bit:
           imageName: "windows-2022"
           langArch: "x64"
           vsArch: "x64"
           extraFlags: "-DCMAKE_CXX_STANDARD=20"
+          runPackaging: "true"
 
     pool:
       vmImage: $(imageName)
@@ -186,17 +189,20 @@ jobs:
           "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
         displayName: "Package HELICS"
         workingDirectory: build
+        condition: eq(variables['runPackaging'], 'true')
 
       - task: CopyFiles@2
         inputs:
           sourceFolder: "$(Build.SourcesDirectory)/build/installer-output"
           contents: "*.exe"
           TargetFolder: "$(Build.ArtifactStagingDirectory)"
+        condition: eq(variables['runPackaging'], 'true')
 
       - task: PublishBuildArtifacts@1
         inputs:
           pathtoPublish: "$(Build.ArtifactStagingDirectory)"
           artifactName: installer
+        condition: eq(variables['runPackaging'], 'true')
 
       # -----------------------
       # Test HELICS
@@ -209,5 +215,6 @@ jobs:
       - bash: ctest --output-on-failure --timeout 200 -C Release -L "PackagingFast"
         displayName: "Test HELICS packaging"
         workingDirectory: build
+        condition: eq(variables['runPackaging'], 'true')
 
       # For debugging, can get build folder contents by adding PublishBuildArtifacts task and set pathtoPublish: '$(Build.SourcesDirectory)/build'
