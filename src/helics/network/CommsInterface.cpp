@@ -10,29 +10,54 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NetworkBrokerData.hpp"
 #include "gmlc/utilities/stringOps.h"
 
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
 
 namespace helics {
 
-namespace CommFactory {
+namespace {
+    bool debugCleanupEnabled()
+    {
+        static const bool enabled = []() {
+            const auto* env = std::getenv("HELICS_DEBUG_CLEANUP");
+            return env != nullptr && env[0] != '\0' && env[0] != '0';
+        }();
+        return enabled;
+    }
+
+    void cleanupTrace(std::string_view commName,
+                      std::string_view stage,
+                      int rxStatusCode,
+                      int txStatusCode)
+    {
+        if (!debugCleanupEnabled()) {
+            return;
+        }
+        std::cerr << "[helics-cleanup][comms] " << commName << ' ' << stage
+                  << " rx=" << rxStatusCode << " tx=" << txStatusCode
+                  << " tid=" << std::this_thread::get_id() << '\n';
+    }
+
     /*** class to hold the set of builders for comm interfaces
        @details this doesn't work as a global since it tends to get initialized after some of the
        things that call it so it needs to be a static member of function call*/
     class MasterCommBuilder {
       public:
-        using BuilderData = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
+        using BuilderData = std::tuple<int, std::string, std::shared_ptr<CommFactory::CommBuilder>>;
 
-        static void
-            addBuilder(std::shared_ptr<CommBuilder> builder, std::string_view name, int code)
+        static void addBuilder(std::shared_ptr<CommFactory::CommBuilder> builder,
+                               std::string_view name,
+                               int code)
         {
             instance()->builders.emplace_back(code, name, std::move(builder));
         }
-        static const std::shared_ptr<CommBuilder>& getBuilder(int code)
+        static const std::shared_ptr<CommFactory::CommBuilder>& getBuilder(int code)
         {
             for (auto& builder : instance()->builders) {
                 if (std::get<0>(builder) == code) {
@@ -42,7 +67,7 @@ namespace CommFactory {
             throw(HelicsException("comm type is not available"));
         }
 
-        static const std::shared_ptr<CommBuilder>& getBuilder(std::string_view type)
+        static const std::shared_ptr<CommFactory::CommBuilder>& getBuilder(std::string_view type)
         {
             for (auto& builder : instance()->builders) {
                 if (std::get<1>(builder) == type) {
@@ -51,7 +76,7 @@ namespace CommFactory {
             }
             throw(HelicsException("comm type is not available"));
         }
-        static const std::shared_ptr<CommBuilder>& getIndexedBuilder(std::size_t index)
+        static const std::shared_ptr<CommFactory::CommBuilder>& getIndexedBuilder(std::size_t index)
         {
             const auto& blder = instance();
             if (blder->builders.size() <= index) {
@@ -71,6 +96,9 @@ namespace CommFactory {
         MasterCommBuilder() = default;
         std::vector<BuilderData> builders;  //!< container for the different builders
     };
+}  // namespace
+
+namespace CommFactory {
 
     void defineCommBuilder(std::shared_ptr<CommBuilder> builder, std::string_view name, int code)
     {
@@ -212,18 +240,18 @@ void CommsInterface::setTxStatus(ConnectionStatus status)
         case ConnectionStatus::CONNECTED:
             if (txStatus == ConnectionStatus::STARTUP) {
                 txStatus = status;
-                txTrigger.activate();
+                (void)txTrigger.activate();
             }
             break;
         case ConnectionStatus::TERMINATED:
         case ConnectionStatus::ERRORED:
             if (txStatus == ConnectionStatus::STARTUP) {
                 txStatus = status;
-                txTrigger.activate();
-                txTrigger.trigger();
+                (void)txTrigger.activate();
+                (void)txTrigger.trigger();
             } else {
                 txStatus = status;
-                txTrigger.trigger();
+                (void)txTrigger.trigger();
             }
             break;
         default:
@@ -240,18 +268,18 @@ void CommsInterface::setRxStatus(ConnectionStatus status)
         case ConnectionStatus::CONNECTED:
             if (rxStatus == ConnectionStatus::STARTUP) {
                 rxStatus = status;
-                rxTrigger.activate();
+                (void)rxTrigger.activate();
             }
             break;
         case ConnectionStatus::TERMINATED:
         case ConnectionStatus::ERRORED:
             if (rxStatus == ConnectionStatus::STARTUP) {
                 rxStatus = status;
-                rxTrigger.activate();
-                rxTrigger.trigger();
+                (void)rxTrigger.activate();
+                (void)rxTrigger.trigger();
             } else {
                 rxStatus = status;
-                rxTrigger.trigger();
+                (void)rxTrigger.trigger();
             }
 
             break;
@@ -385,12 +413,20 @@ void CommsInterface::setName(const std::string& commName)
 
 void CommsInterface::disconnect()
 {
+    cleanupTrace(name,
+                 "disconnect start",
+                 static_cast<int>(rxStatus.load()),
+                 static_cast<int>(txStatus.load()));
     if (!operating) {
         if (propertyLock()) {
             setRxStatus(ConnectionStatus::TERMINATED);
             setTxStatus(ConnectionStatus::TERMINATED);
             propertyUnLock();
             join_tx_rx_thread();
+            cleanupTrace(name,
+                         "disconnect early return",
+                         static_cast<int>(rxStatus.load()),
+                         static_cast<int>(txStatus.load()));
             return;
         }
     }
@@ -405,6 +441,11 @@ void CommsInterface::disconnect()
     if (tripDetector.isTripped()) {
         setRxStatus(ConnectionStatus::TERMINATED);
         setTxStatus(ConnectionStatus::TERMINATED);
+        join_tx_rx_thread();
+        cleanupTrace(name,
+                     "disconnect trip return",
+                     static_cast<int>(rxStatus.load()),
+                     static_cast<int>(txStatus.load()));
         return;
     }
     int cnt = 0;
@@ -427,6 +468,11 @@ void CommsInterface::disconnect()
         if (tripDetector.isTripped()) {
             rxStatus = ConnectionStatus::TERMINATED;
             txStatus = ConnectionStatus::TERMINATED;
+            join_tx_rx_thread();
+            cleanupTrace(name,
+                         "disconnect rx trip return",
+                         static_cast<int>(rxStatus.load()),
+                         static_cast<int>(txStatus.load()));
             return;
         }
     }
@@ -450,15 +496,28 @@ void CommsInterface::disconnect()
         if (tripDetector.isTripped()) {
             rxStatus = ConnectionStatus::TERMINATED;
             txStatus = ConnectionStatus::TERMINATED;
+            join_tx_rx_thread();
+            cleanupTrace(name,
+                         "disconnect tx trip return",
+                         static_cast<int>(rxStatus.load()),
+                         static_cast<int>(txStatus.load()));
             return;
         }
     }
     join_tx_rx_thread();
+    cleanupTrace(name,
+                 "disconnect complete",
+                 static_cast<int>(rxStatus.load()),
+                 static_cast<int>(txStatus.load()));
 }
 
 void CommsInterface::join_tx_rx_thread()
 {
-    const std::lock_guard<std::mutex> syncLock(threadSyncLock);
+    cleanupTrace(name,
+                 "join start",
+                 static_cast<int>(rxStatus.load()),
+                 static_cast<int>(txStatus.load()));
+    const std::scoped_lock<std::mutex> syncLock(threadSyncLock);
     if (!singleThread) {
         if (queue_watcher.joinable()) {
             queue_watcher.join();
@@ -467,6 +526,10 @@ void CommsInterface::join_tx_rx_thread()
     if (queue_transmitter.joinable()) {
         queue_transmitter.join();
     }
+    cleanupTrace(name,
+                 "join complete",
+                 static_cast<int>(rxStatus.load()),
+                 static_cast<int>(txStatus.load()));
 }
 
 bool CommsInterface::reconnect()
@@ -566,7 +629,7 @@ void CommsInterface::logMessage(std::string_view message) const
     if (loggingCallback) {
         loggingCallback(HELICS_LOG_LEVEL_INTERFACES, "commMessage||" + name, message);
     } else {
-        std::cout << "commMessage||" << name << ":" << message << std::endl;
+        std::cout << "commMessage||" << name << ":" << message << '\n';
     }
 }
 
@@ -575,7 +638,7 @@ void CommsInterface::logWarning(std::string_view message) const
     if (loggingCallback) {
         loggingCallback(HELICS_LOG_LEVEL_WARNING, "commWarning||" + name, message);
     } else {
-        std::cerr << "commWarning||" << name << ":" << message << std::endl;
+        std::cerr << "commWarning||" << name << ":" << message << '\n';
     }
 }
 
@@ -584,7 +647,7 @@ void CommsInterface::logError(std::string_view message) const
     if (loggingCallback) {
         loggingCallback(HELICS_LOG_LEVEL_ERROR, "commERROR||" + name, message);
     } else {
-        std::cerr << "commERROR||" << name << ":" << message << std::endl;
+        std::cerr << "commERROR||" << name << ":" << message << '\n';
     }
 }
 

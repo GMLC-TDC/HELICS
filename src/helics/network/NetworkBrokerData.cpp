@@ -48,7 +48,9 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser(std::string
             [this, localAddress](const std::string& addr) {
                 auto brkprt = gmlc::networking::extractInterfaceAndPort(addr);
                 brokerAddress = brkprt.first;
-                brokerPort = brkprt.second;
+                if (brkprt.second) {
+                    brokerPort = *brkprt.second;
+                }
                 checkAndUpdateBrokerAddress(localAddress);
             },
             "location of the broker i.e. network address")
@@ -77,7 +79,9 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser(std::string
             if (brokerAddress.empty()) {
                 auto brkprt = gmlc::networking::extractInterfaceAndPort(addr);
                 brokerAddress = brkprt.first;
-                brokerPort = brkprt.second;
+                if (brkprt.second) {
+                    brokerPort = *brkprt.second;
+                }
                 checkAndUpdateBrokerAddress(localAddress);
             } else {
                 brokerName = addr;
@@ -133,7 +137,9 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser(std::string
             auto localprt = gmlc::networking::extractInterfaceAndPort(addr);
             localInterface = localprt.first;
             // this may get overridden later
-            portNumber = localprt.second;
+            if (localprt.second) {
+                portNumber = *localprt.second;
+            }
         },
         "the local interface to use for the receive ports");
     nbparser->add_option("--port,-p", portNumber, "port number to use")

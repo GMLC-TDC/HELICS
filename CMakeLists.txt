@@ -250,7 +250,7 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
     endif()
 
     if(NOT HELICS_DISABLE_ASIO)
-        if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include/asio.hpp")
+        if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/include/asio.hpp")
             submod_update(ThirdParty/asio)
         endif()
     endif()
@@ -529,7 +529,7 @@ if(NOT HELICS_DISABLE_ASIO)
     target_compile_definitions(helics_base INTERFACE "-DASIO_STANDALONE")
     target_include_directories(
         helics_base SYSTEM
-        INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
+        INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/include>
     )
 endif()
 
@@ -745,7 +745,7 @@ if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
 endif()
 
 if(NOT HELICS_DISABLE_ASIO)
-    list(APPEND LICENSE_LIST "asio" "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt")
+    list(APPEND LICENSE_LIST "asio" "${PROJECT_SOURCE_DIR}/ThirdParty/asio/LICENSE_1_0.txt")
 endif()
 
 combinelicenses(${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES ${LICENSE_LIST})

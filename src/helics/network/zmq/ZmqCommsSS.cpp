@@ -82,23 +82,23 @@ int ZmqCommsSS::processIncomingMessage(zmq::message_t& msg,
 {
     int status = 0;
     if (msg.size() == 5) {
-        std::string str(static_cast<char*>(msg.data()), msg.size());
+        const std::string str(static_cast<char*>(msg.data()), msg.size());
         if (str == "close") {
             return (-1);
         }
     }
-    ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
+    ActionMessage message(static_cast<std::byte*>(msg.data()), msg.size());
 
-    if (!isValidCommand(M)) {
-        std::cerr << "invalid command received" << M.action() << std::endl;
+    if (!isValidCommand(message)) {
+        std::cerr << "invalid command received" << message.action() << '\n';
         return 0;
     }
     bool handled{false};
-    if (isProtocolCommand(M)) {
+    if (isProtocolCommand(message)) {
         handled = true;
-        switch (M.messageID) {
+        switch (message.messageID) {
             case PORT_DEFINITIONS:
-                loadPortDefinitions(M);
+                loadPortDefinitions(message);
                 break;
             case NAME_NOT_FOUND:
                 disconnecting = true;
@@ -127,19 +127,21 @@ int ZmqCommsSS::processIncomingMessage(zmq::message_t& msg,
                 break;
             case CONNECTION_INFORMATION:
                 if (serverMode) {
-                    auto sdata = M.getStringData();
+                    auto sdata = message.getStringData();
                     if (sdata.size() == 3) {
-                        connection_info.emplace(M.name(), sdata[2]);
+                        connection_info.emplace(message.name(), sdata[2]);
                     } else {
-                        connection_info.emplace(M.name(), M.payload.to_string());
+                        connection_info.emplace(message.name(), message.payload.to_string());
                     }
                     status = 3;
                 }
                 break;
             case NEW_BROKER_INFORMATION: {
                 logMessage("got new broker information");
-                auto brkprt = gmlc::networking::extractInterfaceAndPort(M.getString(0));
-                brokerPort = brkprt.second;
+                auto brkprt = gmlc::networking::extractInterfaceAndPort(message.getString(0));
+                if (brkprt.second) {
+                    brokerPort = *brkprt.second;
+                }
                 if (brkprt.first != "?") {
                     brokerTargetAddress = brkprt.first;
                 }
@@ -155,25 +157,25 @@ int ZmqCommsSS::processIncomingMessage(zmq::message_t& msg,
         }
     }
     if (!handled) {
-        ActionCallback(std::move(M));
+        ActionCallback(std::move(message));
     }
     return status;
 }
 
 int ZmqCommsSS::replyToIncomingMessage(zmq::message_t& msg, zmq::socket_t& sock)
 {
-    ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
-    if (isProtocolCommand(M)) {
-        if (M.messageID == CLOSE_RECEIVER) {
+    ActionMessage message(static_cast<std::byte*>(msg.data()), msg.size());
+    if (isProtocolCommand(message)) {
+        if (message.messageID == CLOSE_RECEIVER) {
             return (-1);
         }
-        auto reply = generateReplyToIncomingMessage(M);
+        auto reply = generateReplyToIncomingMessage(message);
         auto str = reply.to_string();
         sock.send(str);
         return 0;
     }
-    ActionCallback(std::move(M));
-    ActionMessage resp(CMD_PRIORITY_ACK);
+    ActionCallback(std::move(message));
+    const ActionMessage resp(CMD_PRIORITY_ACK);
     auto str = resp.to_string();
     sock.send(str);
     return 0;
@@ -253,9 +255,9 @@ bool ZmqCommsSS::processTxControlCmd(const ActionMessage& cmd,
             }
             break;
         case NEW_ROUTE:
-            for (auto& mc : connection_info) {
-                if (mc.second == cmd.payload.to_string()) {
-                    routes.emplace(route_id(cmd.getExtraData()), mc.first);
+            for (auto& connectionEntry : connection_info) {
+                if (connectionEntry.second == cmd.payload.to_string()) {
+                    routes.emplace(route_id(cmd.getExtraData()), connectionEntry.first);
                     break;
                 }
             }
@@ -266,6 +268,8 @@ bool ZmqCommsSS::processTxControlCmd(const ActionMessage& cmd,
         case CLOSE_RECEIVER:
         case DISCONNECT:
             close_tx = true;
+            break;
+        default:
             break;
     }
     return close_tx;
@@ -362,8 +366,8 @@ void ZmqCommsSS::queue_tx_function()
 
         // Handle Tx messages first
         auto tx_msg = txQueue.try_pop();
-        int rc = zmq::poll(poller, 0L);
-        if (!tx_msg || (rc <= 0)) {
+        int pollResult = zmq::poll(poller, 0L);
+        if (!tx_msg || (pollResult <= 0)) {
             std::this_thread::yield();
         }
         int tx_count{0};
@@ -388,7 +392,6 @@ void ZmqCommsSS::queue_tx_function()
                 cmd.to_vector(buffer);
                 if (rid == parent_route_id) {
                     if (hasBroker) {
-                        std::string empty;
                         brokerConnection.send(zmq::const_buffer(buffer.data(), buffer.size()),
                                               zmq::send_flags::dontwait);
                     } else {
@@ -404,8 +407,8 @@ void ZmqCommsSS::queue_tx_function()
                     // If route found send out through the front end socket connection
                     auto rt_find = routes.find(rid);
                     if (rt_find != routes.end()) {
-                        std::string route_name = rt_find->second;
-                        std::string empty;
+                        const std::string route_name = rt_find->second;
+                        const std::string empty;
                         // Need to first send identity and empty string
                         brokerSocket.send(route_name, zmq::send_flags::sndmore);
                         brokerSocket.send(empty, zmq::send_flags::sndmore);
@@ -433,11 +436,11 @@ void ZmqCommsSS::queue_tx_function()
         }
 
         count = 0;
-        rc = 1;
-        while ((rc > 0) && (count < 5)) {
-            rc = zmq::poll(poller, 0L);
+        pollResult = 1;
+        while ((pollResult > 0) && (count < 5)) {
+            pollResult = zmq::poll(poller, 0L);
 
-            if (rc > 0) {
+            if (pollResult > 0) {
                 if (zmq::has_message(poller[0])) {
                     status = processRxMessage(*sockets[0], connection_info);
                 }

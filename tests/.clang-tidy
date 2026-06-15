@@ -54,7 +54,6 @@ WarningsAsErrors: "
 
 HeaderFilterRegex: "*test.*cpp"
 
-AnalyzeTemporaryDtors: false
 CheckOptions:
   - key: cert-dcl59-cpp.HeaderFileExtensions
     value: h,hh,hpp,hxx

@@ -37,9 +37,9 @@ namespace apps {
         static ActionMessage
             generateMessageResponse(const ActionMessage& rxcmd, portData& pdata, CoreType ctype);
         /** get an open port for broker to start*/
-        static int getOpenPort(portData& pd);
+        static int getOpenPort(portData& portDataList);
         /* assign a port in the portData structure*/
-        static void assignPort(portData& pd, int pnumber, std::shared_ptr<Broker>& brk);
+        static void assignPort(portData& portDataList, int pnumber, std::shared_ptr<Broker>& brk);
         /* log a message to the console */
         static void logMessage(std::string_view message);
     };

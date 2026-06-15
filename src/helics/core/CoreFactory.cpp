@@ -20,11 +20,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include <cassert>
+#include <cstdlib>
 #include <cstring>
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -36,59 +38,138 @@ namespace helics::CoreFactory {
 
 static constexpr std::string_view gHelicsEmptyString;
 
-/*** class to hold the set of builders
-@details this doesn't work as a global since it tends to get initialized after some of the things
-that call it so it needs to be a static member of function call*/
-class MasterCoreBuilder {
-  public:
-    using BuilderData = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
-
-    static void addBuilder(std::shared_ptr<CoreBuilder> builder, std::string_view name, int code)
+namespace {
+    bool debugCleanupEnabled()
     {
-        instance()->builders.emplace_back(code, name, std::move(builder));
+        static const bool enabled = []() {
+            const auto* env = std::getenv("HELICS_DEBUG_CLEANUP");
+            return env != nullptr && env[0] != '\0' && env[0] != '0';
+        }();
+        return enabled;
     }
-    static const std::shared_ptr<CoreBuilder>& getBuilder(int code)
+
+    void cleanupTrace(std::string_view stage, std::string_view identifier = {})
     {
-        for (auto& builder : instance()->builders) {
-            if (std::get<0>(builder) == code) {
-                return std::get<2>(builder);
+        if (!debugCleanupEnabled()) {
+            return;
+        }
+        std::cerr << "[helics-cleanup][core] " << stage;
+        if (!identifier.empty()) {
+            std::cerr << " id=" << identifier;
+        }
+        std::cerr << " tid=" << std::this_thread::get_id() << '\n';
+    }
+
+    void destroyCoreFirst(std::shared_ptr<Core>& core);
+    gmlc::concurrency::TripWireTrigger& tripTriggerInstance();
+
+    /*** class to hold the set of builders
+    @details this doesn't work as a global since it tends to get initialized after some of the
+    things that call it so it needs to be a static member of function call*/
+    class MasterCoreBuilder {
+      public:
+        using BuilderData = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
+
+        static void
+            addBuilder(std::shared_ptr<CoreBuilder> builder, std::string_view name, int code)
+        {
+            instance()->builders.emplace_back(code, name, std::move(builder));
+        }
+        static const std::shared_ptr<CoreBuilder>& getBuilder(int code)
+        {
+            for (auto& builder : instance()->builders) {
+                if (std::get<0>(builder) == code) {
+                    return std::get<2>(builder);
+                }
             }
+            throw(HelicsException("core type is not available"));
         }
-        throw(HelicsException("core type is not available"));
-    }
-    static const std::shared_ptr<CoreBuilder>& getIndexedBuilder(std::size_t index)
-    {
-        const auto& blder = instance();
-        if (blder->builders.size() <= index) {
-            throw(HelicsException("core type index is not available"));
+        static const std::shared_ptr<CoreBuilder>& getIndexedBuilder(std::size_t index)
+        {
+            const auto& blder = instance();
+            if (blder->builders.size() <= index) {
+                throw(HelicsException("core type index is not available"));
+            }
+            return std::get<2>(blder->builders[index]);
         }
-        return std::get<2>(blder->builders[index]);
-    }
-    static const std::shared_ptr<MasterCoreBuilder>& instance()
-    {
-        static const std::shared_ptr<MasterCoreBuilder> iptr(new MasterCoreBuilder());
-        return iptr;
-    }
-    static size_t size()
-    {
-        const auto& blder = instance();
-        return blder->builders.size();
-    }
-    static const std::string& getIndexedBuilderName(std::size_t index)
-    {
-        const auto& blder = instance();
-        if (blder->builders.size() <= index) {
-            throw(HelicsException("core type index is not available"));
+        static const std::shared_ptr<MasterCoreBuilder>& instance()
+        {
+            static const std::shared_ptr<MasterCoreBuilder> iptr(new MasterCoreBuilder());
+            return iptr;
         }
-        return std::get<1>(blder->builders[index]);
+        static size_t size()
+        {
+            const auto& blder = instance();
+            return blder->builders.size();
+        }
+        static const std::string& getIndexedBuilderName(std::size_t index)
+        {
+            const auto& blder = instance();
+            if (blder->builders.size() <= index) {
+                throw(HelicsException("core type index is not available"));
+            }
+            return std::get<1>(blder->builders[index]);
+        }
+
+      private:
+        /** private constructor since we only really want one of them
+        accessed through the instance static member*/
+        MasterCoreBuilder() = default;
+        std::vector<BuilderData> builders;  //!< container for the different builders
+    };
+
+    std::shared_ptr<Core>& emptyCoreInstance()
+    {
+        static auto* emptyCore = new std::shared_ptr<Core>(std::make_shared<EmptyCore>());
+        return *emptyCore;
     }
 
-  private:
-    /** private constructor since we only really want one of them
-    accessed through the instance static member*/
-    MasterCoreBuilder() = default;
-    std::vector<BuilderData> builders;  //!< container for the different builders
-};
+    gmlc::concurrency::DelayedDestructor<Core>& delayedDestroyerInstance()
+    {
+        (void)tripTriggerInstance();
+        static auto* destroyer = new gmlc::concurrency::DelayedDestructor<Core>(destroyCoreFirst);
+        return *destroyer;
+    }
+
+    gmlc::concurrency::SearchableObjectHolder<Core, CoreType>& searchableCoresInstance()
+    {
+        static auto* searchableCores =
+            new gmlc::concurrency::SearchableObjectHolder<Core, CoreType>();
+        return *searchableCores;
+    }
+
+    gmlc::concurrency::TripWireTrigger& tripTriggerInstance()
+    {
+        static auto* tripTrigger = new gmlc::concurrency::TripWireTrigger();
+        return *tripTrigger;
+    }
+
+    std::shared_ptr<Core> makeCore(CoreType type, std::string_view name)
+    {
+        if (type == CoreType::NULLCORE) {
+            throw(HelicsException("nullcore is explicitly not available nor will ever be"));
+        }
+        if (type == CoreType::DEFAULT) {
+            return MasterCoreBuilder::getIndexedBuilder(0)->build(name);
+        }
+        if (type == CoreType::EMPTY) {
+            return emptyCoreInstance();
+        }
+        return MasterCoreBuilder::getBuilder(static_cast<int>(type))->build(name);
+    }
+
+    void destroyCoreFirst(std::shared_ptr<Core>& core)
+    {
+        auto* ccore = dynamic_cast<CommonCore*>(core.get());
+        if (ccore != nullptr) {
+            cleanupTrace("destroyer start", ccore->getIdentifier());
+            ccore->processDisconnect(true);
+            cleanupTrace("destroyer joining", ccore->getIdentifier());
+            ccore->joinAllThreads();
+            cleanupTrace("destroyer complete", ccore->getIdentifier());
+        }
+    }
+}  // namespace
 
 void defineCoreBuilder(std::shared_ptr<CoreBuilder> builder, std::string_view name, int code)
 {
@@ -99,42 +180,22 @@ std::vector<std::string> getAvailableCoreTypes()
 {
     std::vector<std::string> availableCores;
     auto builderCount = MasterCoreBuilder::size();
+    availableCores.reserve(builderCount);
     for (size_t ii = 0; ii < builderCount; ++ii) {
         availableCores.push_back(MasterCoreBuilder::getIndexedBuilderName(ii));
     }
     return availableCores;
 }
 
-static std::shared_ptr<Core> emptyCore = std::make_shared<EmptyCore>();
-
-std::shared_ptr<Core> makeCore(CoreType type, std::string_view name)
-{
-    if (type == CoreType::NULLCORE) {
-        throw(HelicsException("nullcore is explicitly not available nor will ever be"));
-    }
-    if (type == CoreType::DEFAULT) {
-        return MasterCoreBuilder::getIndexedBuilder(0)->build(name);
-    }
-    if (type == CoreType::EMPTY) {
-        return emptyCore;
-    }
-    return MasterCoreBuilder::getBuilder(static_cast<int>(type))->build(name);
-}
-
 std::shared_ptr<Core> getEmptyCore()
 {
-    return emptyCore;
+    return emptyCoreInstance();
 }
 
 Core* getEmptyCorePtr()
 {
     static EmptyCore eCore;
     return &eCore;
-}
-
-std::shared_ptr<Core> create(std::string_view initializationString)
-{
-    return create(CoreType::EXTRACT, gHelicsEmptyString, initializationString);
 }
 
 std::shared_ptr<Core> create(CoreType type, std::string_view configureString)
@@ -296,54 +357,36 @@ std::shared_ptr<Core> FindOrCreate(CoreType type, std::string_view coreName, int
     return core;
 }
 
-/** lambda function to join cores before the destruction happens to avoid potential problematic
- * calls in the loops*/
-static auto destroyerCallFirst = [](std::shared_ptr<Core>& core) {
-    auto* ccore = dynamic_cast<CommonCore*>(core.get());
-    if (ccore != nullptr) {
-        ccore->processDisconnect(true);
-        ccore->joinAllThreads();
-    }
-};
-
 /** so the problem this is addressing is that unregister can potentially cause a destructor to
 fire that destructor can delete a thread variable, unfortunately it is possible that a thread stored
 in this variable can do the unregister operation and destroy itself meaning it is unable to join and
 thus will call std::terminate what we do is delay the destruction until it is called in a different
 thread which allows the destructor to fire if need be without issue*/
-static gmlc::concurrency::DelayedDestructor<Core>
-    delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
-
-static gmlc::concurrency::SearchableObjectHolder<Core, CoreType>
-    searchableCores;  //!< the object managing the searchable cores
-
-// this will trip the line when it is destroyed at global destruction time
-static gmlc::concurrency::TripWireTrigger tripTrigger;
-
 std::shared_ptr<Core> findCore(std::string_view name)
 {
-    return searchableCores.findObject(std::string{name});
+    return searchableCoresInstance().findObject(std::string{name});
 }
 
 std::shared_ptr<Core> findJoinableCoreOfType(CoreType type)
 {
-    return searchableCores.findObject([](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
+    return searchableCoresInstance().findObject(
+        [](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
 }
 
 static void addExtraTypes(const std::string& name, CoreType type)
 {
     switch (type) {
         case CoreType::INPROC:
-            searchableCores.addType(name, CoreType::TEST);
+            searchableCoresInstance().addType(name, CoreType::TEST);
             break;
         case CoreType::TEST:
-            searchableCores.addType(name, CoreType::INPROC);
+            searchableCoresInstance().addType(name, CoreType::INPROC);
             break;
         case CoreType::IPC:
-            searchableCores.addType(name, CoreType::INTERPROCESS);
+            searchableCoresInstance().addType(name, CoreType::INTERPROCESS);
             break;
         case CoreType::INTERPROCESS:
-            searchableCores.addType(name, CoreType::IPC);
+            searchableCoresInstance().addType(name, CoreType::IPC);
             break;
         default:
             break;
@@ -353,12 +396,12 @@ static void addExtraTypes(const std::string& name, CoreType type)
 bool registerCore(const std::shared_ptr<Core>& core, CoreType type)
 {
     bool res = false;
-    const std::string& cname = (core) ? core->getIdentifier() : std::string{};
+    const std::string& cname = core ? core->getIdentifier() : std::string{};
     if (core) {
-        res = searchableCores.addObject(cname, core, type);
+        res = searchableCoresInstance().addObject(cname, core, type);
     }
     if (res) {
-        delayedDestroyer.addObjectsToBeDestroyed(core);
+        delayedDestroyerInstance().addObjectsToBeDestroyed(core);
         addExtraTypes(cname, type);
     }
     return res;
@@ -366,26 +409,41 @@ bool registerCore(const std::shared_ptr<Core>& core, CoreType type)
 
 size_t cleanUpCores()
 {
-    return delayedDestroyer.destroyObjects();
+    cleanupTrace("cleanUpCores start");
+    auto count = delayedDestroyerInstance().destroyObjects();
+    if (debugCleanupEnabled()) {
+        std::cerr << "[helics-cleanup][core] cleanUpCores complete destroyed=" << count
+                  << " tid=" << std::this_thread::get_id() << '\n';
+    }
+    return count;
 }
 
 size_t cleanUpCores(std::chrono::milliseconds delay)
 {
-    return delayedDestroyer.destroyObjects(delay);
+    cleanupTrace("cleanUpCores delayed start");
+    auto count = delayedDestroyerInstance().destroyObjects(delay);
+    if (debugCleanupEnabled()) {
+        std::cerr << "[helics-cleanup][core] cleanUpCores delayed complete destroyed=" << count
+                  << " tid=" << std::this_thread::get_id() << '\n';
+    }
+    return count;
 }
 
 void terminateAllCores()
 {
-    auto cores = searchableCores.getObjects();
+    cleanupTrace("terminateAllCores start");
+    auto cores = searchableCoresInstance().getObjects();
     for (auto& core : cores) {
+        cleanupTrace("terminateAllCores disconnect", core->getIdentifier());
         core->disconnect();
     }
     cleanUpCores(std::chrono::milliseconds(250));
+    cleanupTrace("terminateAllCores complete");
 }
 
 void abortAllCores(int errorCode, std::string_view errorString)
 {
-    auto cores = searchableCores.getObjects();
+    auto cores = searchableCoresInstance().getObjects();
     for (auto& core : cores) {
         core->globalError(gLocalCoreId,
                           errorCode,
@@ -400,23 +458,24 @@ void abortAllCores(int errorCode, std::string_view errorString)
 
 size_t getCoreCount()
 {
-    return searchableCores.getObjects().size();
+    return searchableCoresInstance().getObjects().size();
 }
 bool copyCoreIdentifier(std::string_view copyFromName, std::string_view copyToName)
 {
-    return searchableCores.copyObject(std::string{copyFromName}, std::string{copyToName});
+    return searchableCoresInstance().copyObject(std::string{copyFromName}, std::string{copyToName});
 }
 
 void unregisterCore(std::string_view name)
 {
-    if (!searchableCores.removeObject(std::string{name})) {
-        searchableCores.removeObject([&name](auto& obj) { return (obj->getIdentifier() == name); });
+    if (!searchableCoresInstance().removeObject(std::string{name})) {
+        searchableCoresInstance().removeObject(
+            [&name](auto& obj) { return (obj->getIdentifier() == name); });
     }
 }
 
 void addAssociatedCoreType(std::string_view name, CoreType type)
 {
-    searchableCores.addType(std::string{name}, type);
+    searchableCoresInstance().addType(std::string{name}, type);
     addExtraTypes(std::string{name}, type);
 }
 

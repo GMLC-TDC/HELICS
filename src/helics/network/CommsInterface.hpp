@@ -183,6 +183,8 @@ class CommsInterface {
     void join_tx_rx_thread();
     /** get the generated randomID for this comm interface*/
     const std::string& getRandomID() const { return randomID; }
+    /** check if the global shutdown tripwire has been triggered */
+    bool isShutdownTripped() const { return tripDetector.isTripped(); }
 
   private:
     gmlc::concurrency::TripWireDetector

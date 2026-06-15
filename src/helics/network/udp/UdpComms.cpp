@@ -291,7 +291,9 @@ void UdpComms::queue_tx_function()
                     } else if (cmd.messageID == NEW_BROKER_INFORMATION) {
                         logMessage("got new broker information");
                         auto brkprt = gmlc::networking::extractInterfaceAndPort(cmd.getString(0));
-                        brokerPort = brkprt.second;
+                        if (brkprt.second) {
+                            brokerPort = *brkprt.second;
+                        }
                         if (brkprt.first != "?") {
                             brokerTargetAddress = brkprt.first;
                         }
@@ -361,14 +363,14 @@ void UdpComms::queue_tx_function()
                     case NEW_ROUTE: {
                         try {
                             const std::string newroute(cmd.payload.to_string());
-                            std::string interface;
-                            std::string port;
-                            std::tie(interface, port) =
+                            auto [interface, port] =
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
 
                             routes.emplace(route_id{cmd.getExtraData()},
                                            *(resolver
-                                                 .resolve(udpnet(interfaceNetwork), interface, port)
+                                                 .resolve(udpnet(interfaceNetwork),
+                                                          interface,
+                                                          port ? *port : "")
                                                  .begin()));
                         }
                         catch (const std::exception& err) {
