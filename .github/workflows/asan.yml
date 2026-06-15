@@ -1,0 +1,54 @@
+name: Address Sanitizer
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: asan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  asan:
+    name: ASan
+    runs-on: ubuntu-latest
+    container:
+      image: helics/buildenv:sanitizers-22
+    env:
+      ASAN_OPTIONS: alloc_dealloc_mismatch=0
+      LSAN_OPTIONS: suppressions=${{ github.workspace }}/config/sanitizers/leak_suppression.txt
+      UBSAN_OPTIONS: print_stacktrace=1:suppressions=${{ github.workspace }}/config/sanitizers/ubsan_suppression.txt
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+      - name: Configure
+        shell: bash
+        run: >
+          cmake -S . -B build
+          -DCMAKE_C_COMPILER=clang
+          -DCMAKE_CXX_COMPILER=clang++
+          -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -lc++ -lc++abi -fsanitize-address-use-after-scope -fsanitize-ignorelist=${GITHUB_WORKSPACE}/config/sanitizers/asan_suppression.txt -fsanitize-ignorelist=${GITHUB_WORKSPACE}/config/sanitizers/asan_ignorelist.txt -Wno-reserved-macro-identifier -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1"
+          -DBUILD_TESTING=ON
+          -DHELICS_BUILD_TESTS=ON
+          -DHELICS_ZMQ_SUBPROJECT=ON
+          -DHELICS_ZMQ_FORCE_SUBPROJECT=ON
+          -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF
+
+      - name: Build
+        shell: bash
+        run: cmake --build build --parallel 4
+
+      - name: Run ASan tests
+        shell: bash
+        run: bash scripts/run-sanitizer-tests.sh

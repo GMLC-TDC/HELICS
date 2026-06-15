@@ -1,0 +1,72 @@
+name: Thread Sanitizer
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tsan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tsan:
+    name: TSan
+    runs-on: ubuntu-latest
+    container:
+      image: helics/buildenv:sanitizers-22
+    env:
+      TSAN_OPTIONS: second_deadlock_stack=1 suppressions=${{ github.workspace }}/config/sanitizers/tsan_suppression.txt history_size=4
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+      - name: Install TSan runtime dependencies
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y libunwind-dev
+
+      - name: Prepare TSan runtime libraries
+        shell: bash
+        run: |
+          libunwind_path="$(ldconfig -p | awk '/libunwind\.so/ { print $NF; exit }')"
+          if [ -z "${libunwind_path}" ]; then
+            echo "Unable to locate a libunwind shared library"
+            exit 1
+          fi
+          if [ ! -e /root/develop/libcxx_tsan/lib/libunwind.so.1 ]; then
+            ln -s "${libunwind_path}" /root/develop/libcxx_tsan/lib/libunwind.so.1
+          fi
+
+      - name: Configure
+        shell: bash
+        run: >
+          cmake -S . -B build
+          -DCMAKE_C_COMPILER=clang
+          -DCMAKE_CXX_COMPILER=clang++
+          -DCMAKE_CXX_FLAGS="-fsanitize=thread -nostdinc++ -nostdlib++ -L/root/develop/libcxx_tsan/lib -lc++ -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O2 -Wl,-rpath=/root/develop/libcxx_tsan/lib"
+          -DBUILD_TESTING=ON
+          -DHELICS_BUILD_TESTS=ON
+          -DHELICS_ZMQ_SUBPROJECT=ON
+          -DHELICS_ZMQ_FORCE_SUBPROJECT=ON
+          -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF
+
+      - name: Build
+        shell: bash
+        run: cmake --build build --parallel 4
+
+      - name: Run TSan tests
+        shell: bash
+        run: >
+          LD_LIBRARY_PATH="/root/develop/libcxx_tsan/lib:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
+          bash scripts/run-sanitizer-tests.sh
