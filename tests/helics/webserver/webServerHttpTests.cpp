@@ -72,7 +72,10 @@ class httpTest: public ::testing::Test {
     // You can define per-test set-up logic as usual.
     void SetUp() final {}
 
-    static std::string sendGet(const std::string& target) { return getConnection().sendGet(target); }
+    static std::string sendGet(const std::string& target)
+    {
+        return getConnection().sendGet(target);
+    }
 
     static std::string sendCommand(boost::beast::http::verb command,
                                    const std::string& target,
