@@ -20,8 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: helics/buildenv:sanitizers-22
-    env:
-      TSAN_OPTIONS: second_deadlock_stack=1 suppressions=${{ github.workspace }}/config/sanitizers/tsan_suppression.txt history_size=4
 
     steps:
       - uses: actions/checkout@v6
@@ -60,6 +58,7 @@ jobs:
           -DHELICS_BUILD_TESTS=ON
           -DHELICS_ZMQ_SUBPROJECT=ON
           -DHELICS_ZMQ_FORCE_SUBPROJECT=ON
+          -DHELICS_USE_ZMQ_STATIC_LIBRARY=ON
           -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF
 
       - name: Build
@@ -70,4 +69,5 @@ jobs:
         shell: bash
         run: >
           LD_LIBRARY_PATH="/root/develop/libcxx_tsan/lib:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
+          TSAN_OPTIONS="second_deadlock_stack=1 suppressions=${GITHUB_WORKSPACE}/config/sanitizers/tsan_suppression.txt history_size=4"
           bash scripts/run-sanitizer-tests.sh

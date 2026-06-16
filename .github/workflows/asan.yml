@@ -22,8 +22,6 @@ jobs:
       image: helics/buildenv:sanitizers-22
     env:
       ASAN_OPTIONS: alloc_dealloc_mismatch=0
-      LSAN_OPTIONS: suppressions=${{ github.workspace }}/config/sanitizers/leak_suppression.txt
-      UBSAN_OPTIONS: print_stacktrace=1:suppressions=${{ github.workspace }}/config/sanitizers/ubsan_suppression.txt
 
     steps:
       - uses: actions/checkout@v6
@@ -44,6 +42,7 @@ jobs:
           -DHELICS_BUILD_TESTS=ON
           -DHELICS_ZMQ_SUBPROJECT=ON
           -DHELICS_ZMQ_FORCE_SUBPROJECT=ON
+          -DHELICS_USE_ZMQ_STATIC_LIBRARY=ON
           -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF
 
       - name: Build
@@ -52,4 +51,7 @@ jobs:
 
       - name: Run ASan tests
         shell: bash
-        run: bash scripts/run-sanitizer-tests.sh
+        run: >
+          LSAN_OPTIONS="suppressions=${GITHUB_WORKSPACE}/config/sanitizers/leak_suppression.txt"
+          UBSAN_OPTIONS="print_stacktrace=1:suppressions=${GITHUB_WORKSPACE}/config/sanitizers/ubsan_suppression.txt"
+          bash scripts/run-sanitizer-tests.sh
