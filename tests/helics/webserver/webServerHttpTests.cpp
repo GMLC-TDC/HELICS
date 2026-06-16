@@ -55,8 +55,17 @@ class httpTest: public ::testing::Test {
     // Can be omitted if not needed.
     static void TearDownTestSuite()
     {
+        for (auto& core : cores) {
+            if (core) {
+                core->disconnect();
+            }
+        }
+        cores.clear();
+        clearBrokers();
         connection.disconnect();
         webs->stopServer();
+        helics::CoreFactory::cleanUpCores(std::chrono::milliseconds(200));
+        helics::BrokerFactory::cleanUpBrokers(std::chrono::milliseconds(200));
         helics::BrokerFactory::terminateAllBrokers();
     }
 
