@@ -57,8 +57,9 @@ class webTest: public ::testing::Test {
         webs->startServer(&config, webs);
 
         // These objects perform our I/O
-        tcp::resolver resolverObj(ioc);
-        stream = std::make_unique<websocket::stream<tcp::socket>>(ioc);  // NOLINT
+        auto& ioContext = getIoContext();
+        tcp::resolver resolverObj(ioContext);
+        stream = std::make_unique<websocket::stream<tcp::socket>>(ioContext);  // NOLINT
 
         // Look up the domain name
         auto const results = resolverObj.resolve(localhost, "26247");
@@ -147,7 +148,11 @@ class webTest: public ::testing::Test {
   private:
     // Some expensive resource shared by all tests.
     static std::shared_ptr<helics::apps::WebServer> webs;
-    static net::io_context ioc;
+    static net::io_context& getIoContext()
+    {
+        static net::io_context ioContext;
+        return ioContext;
+    }
 
     // These objects perform our I/O
 
@@ -165,7 +170,6 @@ std::vector<std::shared_ptr<helics::Broker>> webTest::brks;
 std::vector<std::shared_ptr<helics::Core>> webTest::cores;
 beast::flat_buffer webTest::buffer;
 std::unique_ptr<websocket::stream<tcp::socket>> webTest::stream;
-net::io_context webTest::ioc;
 nlohmann::json webTest::config;
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
