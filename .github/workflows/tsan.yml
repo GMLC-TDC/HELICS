@@ -21,16 +21,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        if: github.event_name != 'schedule'
         with:
           submodules: recursive
-      if: github.event_name != 'schedule'
 
       - name: Checkout develop branch
+        if: github.event_name == 'schedule'
         uses: actions/checkout@v6
         with:
           submodules: recursive
           ref: develop
-      if: github.event_name == 'schedule'
 
       - name: Mark workspace as safe for git
         run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
