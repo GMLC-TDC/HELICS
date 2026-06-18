@@ -20,8 +20,8 @@ The main tests for pull requests and pushes targeting the main and develop branc
 - XCode 10.2: Test a recent XCode compiler with the Shared API library tests
 - XCode build and test using the newest version of macOS that is available for CI builds
 - XCode build and test using the oldest version of macOS still supported by Apple
-- MSVC2019 32 bit build and test without the webserver component
-- MSVC2019 64 bit build and test
+- MSVC2022 32 bit build and test without the webserver component
+- MSVC2026 64 bit build and test
 - MSVC2022 64 bit build and test using the C++20 standard
 
 There are also a few tests run daily:

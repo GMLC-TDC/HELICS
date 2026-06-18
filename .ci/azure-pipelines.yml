@@ -112,8 +112,8 @@ jobs:
           vsArch: "Win32"
           extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
           runPackaging: "true"
-        VS2019-64bit:
-          imageName: "windows-latest"
+        VS2026-64bit:
+          imageName: "windows-2025-vs2026"
           langArch: "x64"
           vsArch: "x64"
           extraFlags: "-DCMAKE_CXX_STANDARD=23"

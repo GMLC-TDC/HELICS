@@ -52,8 +52,8 @@ Most of the Windows tests run frequently are using MSVC, though MinGW, MSYS, and
 The MINGW/MSYS builds can be triggered by including `mingw`, `msys`, and/or `cygwin` in a commit message or
 branch name.
 
-- MSVC2019 32bit Build and test
-- MSVC2019 64bit Build and test with Java
+- MSVC2022 32bit Build and test
+- MSVC2026 64bit Build and test with Java
 - MSVC2022 64bit Build and test with Java [commit]
 - MinGW [daily]
 - MSYS [daily]
