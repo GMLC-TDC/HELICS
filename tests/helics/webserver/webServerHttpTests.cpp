@@ -47,7 +47,7 @@ class httpTest: public ::testing::Test {
 
         webs->startServer(&config, webs);
 
-        connection.connect(localhost, "26242");
+        getConnection().connect(localhost, "26242");
     }
 
     // Per-test-suite tear-down.
@@ -55,21 +55,33 @@ class httpTest: public ::testing::Test {
     // Can be omitted if not needed.
     static void TearDownTestSuite()
     {
-        connection.disconnect();
+        for (auto& core : cores) {
+            if (core) {
+                core->disconnect();
+            }
+        }
+        cores.clear();
+        clearBrokers();
+        getConnection().disconnect();
         webs->stopServer();
+        helics::CoreFactory::cleanUpCores(std::chrono::milliseconds(200));
+        helics::BrokerFactory::cleanUpBrokers(std::chrono::milliseconds(200));
         helics::BrokerFactory::terminateAllBrokers();
     }
 
     // You can define per-test set-up logic as usual.
     void SetUp() final {}
 
-    static std::string sendGet(const std::string& target) { return connection.sendGet(target); }
+    static std::string sendGet(const std::string& target)
+    {
+        return getConnection().sendGet(target);
+    }
 
     static std::string sendCommand(boost::beast::http::verb command,
                                    const std::string& target,
                                    const std::string& body)
     {
-        return connection.sendCommand(command, target, body);
+        return getConnection().sendCommand(command, target, body);
     }
 
     static std::shared_ptr<helics::Broker> addBroker(helics::CoreType ctype,
@@ -84,11 +96,16 @@ class httpTest: public ::testing::Test {
 
     static std::shared_ptr<helics::Core> addCore(helics::CoreType ctype, const std::string& init)
     {
-        auto cr = helics::CoreFactory::create(ctype, init);
-        if (cr) {
-            cores.push_back(cr);
+        auto core = helics::CoreFactory::create(ctype, init);
+        if (core) {
+            cores.push_back(core);
         }
-        return cr;
+        return core;
+    }
+    static helics::apps::RestApiConnection& getConnection()
+    {
+        static helics::apps::RestApiConnection connection(localhost);
+        return connection;
     }
     static void clearBrokers()
     {
@@ -106,7 +123,6 @@ class httpTest: public ::testing::Test {
   private:
     // Some expensive resource shared by all tests.
     static std::shared_ptr<helics::apps::WebServer> webs;
-    static helics::apps::RestApiConnection connection;
 
     static std::vector<std::shared_ptr<helics::Broker>> brks;
     static std::vector<std::shared_ptr<helics::Core>> cores;
@@ -117,7 +133,6 @@ class httpTest: public ::testing::Test {
 std::shared_ptr<helics::apps::WebServer> httpTest::webs;
 std::vector<std::shared_ptr<helics::Broker>> httpTest::brks;
 std::vector<std::shared_ptr<helics::Core>> httpTest::cores;
-helics::apps::RestApiConnection httpTest::connection(localhost);
 nlohmann::json httpTest::config;
 
 TEST_F(httpTest, test1)
@@ -226,8 +241,8 @@ TEST_F(httpTest, not_found)
 
 TEST_F(httpTest, core)
 {
-    auto cr = addCore(helics::CoreType::TEST, "--name=cr1 -f2");
-    EXPECT_TRUE(cr->connect());
+    auto core = addCore(helics::CoreType::TEST, "--name=cr1 -f2");
+    EXPECT_TRUE(core->connect());
 
     auto result = sendGet("brk2");
     EXPECT_FALSE(result.empty());
@@ -366,31 +381,31 @@ TEST_F(httpTest, coreJson)
 {
     auto result = sendGet("brk2/cr1");
 
-    nlohmann::json v1;
-    v1["query"] = "current_state";
-    auto result2 = sendCommand(http::verb::search, "brk2/cr1", generateJsonString(v1));
+    nlohmann::json queryRequest;
+    queryRequest["query"] = "current_state";
+    auto result2 = sendCommand(http::verb::search, "brk2/cr1", generateJsonString(queryRequest));
     EXPECT_EQ(result, result2);
 
-    v1["target"] = "cr1";
+    queryRequest["target"] = "cr1";
 
-    result2 = sendCommand(http::verb::search, "brk2", generateJsonString(v1));
+    result2 = sendCommand(http::verb::search, "brk2", generateJsonString(queryRequest));
     EXPECT_EQ(result, result2);
-    v1["broker"] = "brk2";
-    result2 = sendCommand(http::verb::search, "/", generateJsonString(v1));
-    EXPECT_EQ(result, result2);
-
-    result2 = sendCommand(http::verb::search, "query", generateJsonString(v1));
+    queryRequest["broker"] = "brk2";
+    result2 = sendCommand(http::verb::search, "/", generateJsonString(queryRequest));
     EXPECT_EQ(result, result2);
 
-    result2 = sendCommand(http::verb::post, "query", generateJsonString(v1));
+    result2 = sendCommand(http::verb::search, "query", generateJsonString(queryRequest));
+    EXPECT_EQ(result, result2);
+
+    result2 = sendCommand(http::verb::post, "query", generateJsonString(queryRequest));
     EXPECT_EQ(result, result2);
 }
 
 TEST_F(httpTest, deleteJson)
 {
-    nlohmann::json v1;
-    v1["broker"] = "brk2";
-    sendCommand(http::verb::post, "delete", generateJsonString(v1));
+    nlohmann::json deleteRequest;
+    deleteRequest["broker"] = "brk2";
+    sendCommand(http::verb::post, "delete", generateJsonString(deleteRequest));
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
@@ -402,10 +417,10 @@ TEST_F(httpTest, timeBlock)
 {
     const std::string init = std::string("type=") + std::string(CORE1) + "&log_level=timing";
     sendCommand(http::verb::post, "brk_timer", init);
-    auto cr = addCore(tCore, "--name=c_timer -f1 --broker=brk_timer");
-    EXPECT_TRUE(cr->connect());
+    auto core = addCore(tCore, "--name=c_timer -f1 --broker=brk_timer");
+    EXPECT_TRUE(core->connect());
 
-    helics::ValueFederate vFed("fed1", cr);
+    helics::ValueFederate vFed("fed1", core);
     sendCommand(http::verb::post, "brk_timer/barrier", "time=2");
 
     vFed.enterExecutingMode();
@@ -434,9 +449,9 @@ TEST_F(httpTest, timeBlock)
     brk.reset();
 
     vFed.finalize();
-    nlohmann::json v1;
-    v1["broker"] = "brk_timer";
-    sendCommand(http::verb::post, "delete", generateJsonString(v1));
+    nlohmann::json deleteRequest;
+    deleteRequest["broker"] = "brk_timer";
+    sendCommand(http::verb::post, "delete", generateJsonString(deleteRequest));
 }
 
 TEST_F(httpTest, healthcheck)

@@ -1,4 +1,0 @@
-# This is a known purposeful leak
-leak:ZmqContextManager
-leak:addFilter
-leak:AsioContextManager

@@ -1,0 +1,78 @@
+name: Memory Sanitizer
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: msan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  msan:
+    name: MSan
+    runs-on: ubuntu-latest
+    container:
+      image: helics/buildenv:sanitizers-22
+
+    steps:
+      - uses: actions/checkout@v6
+        if: github.event_name != 'schedule'
+        with:
+          submodules: recursive
+
+      - name: Checkout develop branch
+        if: github.event_name == 'schedule'
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          ref: develop
+
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+      - name: Install MSan runtime dependencies
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y libunwind-dev
+
+      - name: Prepare MSan runtime libraries
+        shell: bash
+        run: |
+          libunwind_path="$(ldconfig -p | awk '/libunwind\.so/ { print $NF; exit }')"
+          if [ -z "${libunwind_path}" ]; then
+            echo "Unable to locate a libunwind shared library"
+            exit 1
+          fi
+          if [ ! -e /root/develop/libcxx_msan/lib/libunwind.so.1 ]; then
+            ln -s "${libunwind_path}" /root/develop/libcxx_msan/lib/libunwind.so.1
+          fi
+
+      - name: Configure
+        shell: bash
+        run: >
+          cmake -S . -B build
+          -DCMAKE_C_COMPILER=clang
+          -DCMAKE_CXX_COMPILER=clang++
+          -DCMAKE_CXX_FLAGS="-fsanitize=memory -nostdinc++ -nostdlib++ -Wno-reserved-macro-identifier -L/root/develop/libcxx_msan/lib -lc++ -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_msan/lib"
+          -DBUILD_TESTING=ON
+          -DHELICS_BUILD_TESTS=ON
+          -DHELICS_ZMQ_SUBPROJECT=ON
+          -DHELICS_ZMQ_FORCE_SUBPROJECT=ON
+          -DHELICS_USE_ZMQ_STATIC_LIBRARY=ON
+          -DHELICS_ENABLE_EXTRA_COMPILER_WARNINGS=OFF
+
+      - name: Build
+        shell: bash
+        run: cmake --build build --parallel 4
+
+      - name: Run MSan tests
+        shell: bash
+        run: >
+          LD_LIBRARY_PATH="/root/develop/libcxx_msan/lib:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
+          bash scripts/run-sanitizer-tests.sh
