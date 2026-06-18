@@ -130,7 +130,6 @@ jobs:
     variables:
       BOOST_ROOT: $(Pipeline.Workspace)/ci-libs/boost
       BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.74.0/boost_1_74_0.tar.bz2/download
-      BUILD_PARALLEL_LEVEL: $(NUMBER_OF_PROCESSORS)
 
     steps:
       # -----------------------
@@ -161,7 +160,6 @@ jobs:
       - bash: |
           echo "BOOST_ROOT=$BOOST_ROOT"
           echo "NUMBER_OF_PROCESSORS=$NUMBER_OF_PROCESSORS"
-          echo "BUILD_PARALLEL_LEVEL=$BUILD_PARALLEL_LEVEL"
           env
         displayName: Show environment info
       - task: CMake@1
@@ -179,11 +177,11 @@ jobs:
       # -----------------------
       # Build HELICS
       # -----------------------
-      - bash: cmake --build . --parallel "${BUILD_PARALLEL_LEVEL:-8}" --config Release
+      - bash: |
+          export CMAKE_BUILD_PARALLEL_LEVEL="${NUMBER_OF_PROCESSORS:-8}"
+          cmake --build . --parallel "$CMAKE_BUILD_PARALLEL_LEVEL" --config Release
         displayName: "Build HELICS"
         workingDirectory: build
-        env:
-          CMAKE_BUILD_PARALLEL_LEVEL: $(BUILD_PARALLEL_LEVEL)
 
       # -----------------------
       # Package HELICS
