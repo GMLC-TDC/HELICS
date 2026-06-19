@@ -34,6 +34,13 @@ if(NOT TARGET spdlog::spdlog)
             add_subdirectory(ThirdParty/spdlog EXCLUDE_FROM_ALL)
         endif()
 
+        if(CYGWIN)
+            # Cygwin's POSIX stdio symbols used by spdlog are not reliably visible from <cstdio>
+            # under C++20, so force the C stdio declarations into both the library build and users.
+            target_compile_options(spdlog PUBLIC -include stdio.h)
+            target_compile_options(spdlog_header_only INTERFACE -include stdio.h)
+        endif()
+
         set_target_properties(spdlog PROPERTIES FOLDER Extern)
         hide_variable(SPDLOG_BUILD_ALL)
         hide_variable(SPDLOG_BUILD_BENCH)
