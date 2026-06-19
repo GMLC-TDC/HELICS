@@ -36,15 +36,11 @@ if(NOT TARGET spdlog::spdlog)
         endif()
 
         if(CYGWIN)
-            # Match HELICS' Cygwin feature-test setup for vendored spdlog so POSIX stdio APIs
-            # like fileno are visible when spdlog is compiled as its own target.
+            # Match HELICS' Cygwin feature-test setup for vendored spdlog so POSIX stdio APIs like
+            # fileno are visible when spdlog is compiled as its own target.
+            target_compile_definitions(spdlog PUBLIC _XOPEN_SOURCE=500 __USE_W32_SOCKETS)
             target_compile_definitions(
-                spdlog
-                PUBLIC _XOPEN_SOURCE=500 __USE_W32_SOCKETS
-            )
-            target_compile_definitions(
-                spdlog_header_only
-                INTERFACE _XOPEN_SOURCE=500 __USE_W32_SOCKETS
+                spdlog_header_only INTERFACE _XOPEN_SOURCE=500 __USE_W32_SOCKETS
             )
         endif()
 
