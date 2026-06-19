@@ -51,6 +51,8 @@ jobs:
           langArch: "x64"
           vsArch: "x64"
           extraFlags: ""
+          buildExamples: "ON"
+          enablePackageBuild: "ON"
     pool:
       vmImage: $(imageName)
     variables:
@@ -75,9 +77,9 @@ jobs:
           cp -r boost_*/* "$BOOST_ROOT"
         condition: ne(variables.BOOST_CACHE_RESTORED, 'true')
         displayName: Install Boost
-      - bash: choco install swig --yes --limit-output
+      - bash: swig -version
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
-        displayName: Install swig
+        displayName: Show swig version
 
       # -----------------------
       # Configure HELICS
@@ -89,7 +91,7 @@ jobs:
         displayName: Show environment info
       - task: CMake@1
         inputs:
-          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_DISABLE_VCPKG=ON -DHELICS_EMBEDDED_DEBUG_INFO=external $(extraFlags) ..
+          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=$(enablePackageBuild) -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=$(buildExamples) -DHELICS_DISABLE_VCPKG=ON -DHELICS_EMBEDDED_DEBUG_INFO=external $(extraFlags) ..
         displayName: "Configure HELICS"
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
