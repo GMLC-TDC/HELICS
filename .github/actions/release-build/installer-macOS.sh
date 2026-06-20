@@ -5,6 +5,9 @@
 # Unset VCPKG_ROOT for GitHub actions environment
 unset VCPKG_ROOT
 
+# GitHub's macOS runners may come with extra untrusted taps we do not use.
+brew untap aws/tap azure/bicep || true
+
 brew install swig boost
 mkdir build && cd build || exit
 cmake -DCMAKE_BUILD_TYPE=Release -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_JAVA_INTERFACE=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_APP_EXECUTABLES=ON -DHELICS_BUILD_APP_LIBRARY=ON -DBUILD_TESTING=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" ..
