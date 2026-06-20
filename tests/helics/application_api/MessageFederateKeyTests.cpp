@@ -75,11 +75,11 @@ TEST_P(mfed_single_type_tests, send_receive)
     res = mFed1->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M = mFed1->getMessage(epid2);
-    ASSERT_TRUE(M);
-    ASSERT_EQ(M->data.size(), data.size());
+    auto message = mFed1->getMessage(epid2);
+    ASSERT_TRUE(message);
+    ASSERT_EQ(message->data.size(), data.size());
 
-    EXPECT_EQ(M->data[245], data[245]);
+    EXPECT_EQ(message->data[245], data[245]);
     mFed1->finalize();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -113,11 +113,11 @@ TEST_P(mfed_single_type_tests, send_receive_obj)
     res = epid2.hasMessage();
     EXPECT_TRUE(res);
 
-    auto M = epid2.getMessage();
-    ASSERT_TRUE(M);
-    ASSERT_EQ(M->data.size(), data.size());
+    auto message = epid2.getMessage();
+    ASSERT_TRUE(message);
+    ASSERT_EQ(message->data.size(), data.size());
 
-    EXPECT_EQ(M->data[245], data[245]);
+    EXPECT_EQ(message->data[245], data[245]);
     mFed1->finalize();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -161,17 +161,17 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     res = mFed2->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = mFed1->getMessage(epid);
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = mFed1->getMessage(epid);
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[245], data2[245]);
+    EXPECT_EQ(message1->data[245], data2[245]);
 
-    auto M2 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(message2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[245], data[245]);
+    EXPECT_EQ(message2->data[245], data[245]);
     mFed1->finalize();
     mFed2->finalize();
 
@@ -214,17 +214,17 @@ TEST_F(mfed_tests, send_receive_2fed_extra)
     res = mFed2->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = mFed1->getMessage(epid);
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = mFed1->getMessage(epid);
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[245], data2[245]);
+    EXPECT_EQ(message1->data[245], data2[245]);
 
-    auto M2 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(message2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[245], data[245]);
+    EXPECT_EQ(message2->data[245], data[245]);
     mFed1->finalizeAsync();
     mFed2->finalize();
     mFed1->finalizeComplete();
@@ -269,17 +269,17 @@ TEST_F(mfed_tests, send_receive_2fed_extra_alias)
     res = mFed2->hasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = mFed1->getMessage(epid);
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = mFed1->getMessage(epid);
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[245], data2[245]);
+    EXPECT_EQ(message1->data[245], data2[245]);
 
-    auto M2 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(message2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[245], data[245]);
+    EXPECT_EQ(message2->data[245], data[245]);
     mFed1->finalizeAsync();
     mFed2->finalize();
     mFed1->finalizeComplete();
@@ -327,17 +327,17 @@ TEST_P(mfed_type_tests, send_receive_2fed_obj)
     epid2.hasMessage();
     EXPECT_TRUE(res);
 
-    auto M1 = epid.getMessage();
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data2.size());
+    auto message1 = epid.getMessage();
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data2.size());
 
-    EXPECT_EQ(M1->data[245], data2[245]);
+    EXPECT_EQ(message1->data[245], data2[245]);
 
-    auto M2 = epid2.getMessage();
-    ASSERT_TRUE(M2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = epid2.getMessage();
+    ASSERT_TRUE(message2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[245], data[245]);
+    EXPECT_EQ(message2->data[245], data[245]);
     mFed1->finalizeAsync();
     mFed2->finalize();
     mFed1->finalizeComplete();
@@ -388,32 +388,32 @@ TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
     EXPECT_EQ(cnt, 4);
 
     EXPECT_EQ(epid.getDefaultDestination(), "ep2");
-    auto M1 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M1);
-    ASSERT_EQ(M1->data.size(), data1.size());
+    auto message1 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(message1);
+    ASSERT_EQ(message1->data.size(), data1.size());
 
-    EXPECT_EQ(M1->data[245], data1[245]);
+    EXPECT_EQ(message1->data[245], data1[245]);
     // check the count decremented
     cnt = mFed2->pendingMessageCount(epid2);
     EXPECT_EQ(cnt, 3);
-    auto M2 = mFed2->getMessage();
-    ASSERT_TRUE(M2);
-    ASSERT_EQ(M2->data.size(), data2.size());
-    EXPECT_EQ(M2->data[245], data2[245]);
+    auto message2 = mFed2->getMessage();
+    ASSERT_TRUE(message2);
+    ASSERT_EQ(message2->data.size(), data2.size());
+    EXPECT_EQ(message2->data[245], data2[245]);
     cnt = mFed2->pendingMessageCount(epid2);
     EXPECT_EQ(cnt, 2);
 
-    auto M3 = mFed2->getMessage();
-    auto M4 = mFed2->getMessage(epid2);
-    ASSERT_TRUE(M3);
-    ASSERT_TRUE(M4);
-    EXPECT_EQ(M3->data.size(), data3.size());
-    EXPECT_EQ(M4->data.size(), data4.size());
+    auto message3 = mFed2->getMessage();
+    auto message4 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(message3);
+    ASSERT_TRUE(message4);
+    EXPECT_EQ(message3->data.size(), data3.size());
+    EXPECT_EQ(message4->data.size(), data4.size());
 
-    EXPECT_EQ(M4->source, "fed0/ep1");
-    EXPECT_EQ(M4->dest, "ep2");
-    EXPECT_EQ(M4->original_source, "fed0/ep1");
-    EXPECT_EQ(M4->time, 0.0);
+    EXPECT_EQ(message4->source, "fed0/ep1");
+    EXPECT_EQ(message4->dest, "ep2");
+    EXPECT_EQ(message4->original_source, "fed0/ep1");
+    EXPECT_EQ(message4->time, 0.0);
     mFed1->finalizeAsync();
     mFed2->finalize();
     mFed1->finalizeComplete();
@@ -452,21 +452,21 @@ TEST_P(mfed_all_type_tests, time_interruptions)
 
     ASSERT_TRUE(mFed2->hasMessage(epid2));
 
-    auto M2 = mFed2->getMessage(epid2);
-    ASSERT_EQ(M2->data.size(), data.size());
+    auto message2 = mFed2->getMessage(epid2);
+    ASSERT_EQ(message2->data.size(), data.size());
 
-    EXPECT_EQ(M2->data[245], data[245]);
+    EXPECT_EQ(message2->data[245], data[245]);
 
     gtime = mFed2->requestTime(1.0);
     EXPECT_EQ(gtime, 1.0);
 
     EXPECT_EQ(f1time.get(), 1.0);
-    auto M1 = mFed1->getMessage(epid);
-    EXPECT_TRUE(M1);
-    if (M1) {
-        EXPECT_EQ(M1->data.size(), data2.size());
-        if (M1->data.size() > 245) {
-            EXPECT_EQ(M1->data[245], data2[245]);
+    auto message1 = mFed1->getMessage(epid);
+    EXPECT_TRUE(message1);
+    if (message1) {
+        EXPECT_EQ(message1->data.size(), data2.size());
+        if (message1->data.size() > 245) {
+            EXPECT_EQ(message1->data[245], data2[245]);
         }
     }
 
@@ -481,10 +481,10 @@ TEST_P(mfed_all_type_tests, time_interruptions)
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
-static bool dual_transfer_test_message(std::shared_ptr<helics::CombinationFederate>& vFed1,
-                                       std::shared_ptr<helics::CombinationFederate>& vFed2,
-                                       helics::Endpoint& ept1,
-                                       helics::Endpoint& ept2)
+static bool dualTransferTestMessage(std::shared_ptr<helics::CombinationFederate>& vFed1,
+                                    std::shared_ptr<helics::CombinationFederate>& vFed2,
+                                    helics::Endpoint& ept1,
+                                    helics::Endpoint& ept2)
 {
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
@@ -509,11 +509,11 @@ static bool dual_transfer_test_message(std::shared_ptr<helics::CombinationFedera
         correct = false;
     }
     // get the value
-    auto s = ept2.getMessage();
-    if (s) {
+    auto message = ept2.getMessage();
+    if (message) {
         // make sure the string is what we expect
-        EXPECT_EQ(s->to_string(), "string1");
-        if (s->to_string() != "string1") {
+        EXPECT_EQ(message->to_string(), "string1");
+        if (message->to_string() != "string1") {
             correct = false;
         }
     } else {
@@ -523,9 +523,9 @@ static bool dual_transfer_test_message(std::shared_ptr<helics::CombinationFedera
     // publish a second string
     ept1.send("string2");
     // make sure the value is still what we expect
-    s = ept2.getMessage();
-    EXPECT_FALSE(s);
-    if (s) {
+    message = ept2.getMessage();
+    EXPECT_FALSE(message);
+    if (message) {
         correct = false;
     }
     // advance time
@@ -543,10 +543,10 @@ static bool dual_transfer_test_message(std::shared_ptr<helics::CombinationFedera
     }
     // make sure the value was updated
 
-    s = ept2.getMessage();
-    if (s) {
-        EXPECT_EQ(s->to_string(), "string2");
-        if (s->to_string() != "string2") {
+    message = ept2.getMessage();
+    if (message) {
+        EXPECT_EQ(message->to_string(), "string2");
+        if (message->to_string() != "string2") {
             correct = false;
         }
     } else {
@@ -564,14 +564,14 @@ TEST_F(mfed_tests, dual_transfer_message_coreApp_link)
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
     auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
 
-    helics::CoreApp cr(vFed1->getCorePointer());
-    cr.linkEndpoints("ept1", "ept2");
+    helics::CoreApp core(vFed1->getCorePointer());
+    core.linkEndpoints("ept1", "ept2");
     // register the endpoints
 
     auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
 
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -589,7 +589,7 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_broker_link_late)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     broker->linkEndpoints("ept1", "ept2");
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -607,7 +607,7 @@ TEST_P(mfed_all_type_tests, dual_transfer_message_broker_link_direct)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     broker->linkEndpoints("ept1", "ept2");
     broker->query("root", "global_flush");
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -632,7 +632,7 @@ TEST_P(mfed_link_file, dual_transfer_message_broker_link_file)
     broker->makeConnections(testFile);
     // register the publications
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -650,7 +650,7 @@ TEST_F(mfed_tests, dual_transfer_message_broker_link_json_string)
 
     // register the endpoints
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -668,7 +668,7 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_core_link)
     auto& ept1 = vFed1->registerGlobalTargetedEndpoint("ept1");
     auto& ept2 = vFed2->registerGlobalTargetedEndpoint("ept2");
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -687,7 +687,7 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_late)
     core->linkEndpoints("ept1", "ept2");
     core = nullptr;
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -706,7 +706,7 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_late_switch)
     core = nullptr;
     // register the publications
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -724,7 +724,7 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_direct1)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     core->linkEndpoints("ept1", "ept2");
     core = nullptr;
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -742,7 +742,7 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_direct2)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     core->linkEndpoints("ept1", "ept2");
     core = nullptr;
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -764,7 +764,7 @@ TEST_P(mfed_link_file, dual_transfer_message_core_link_file)
     // register the publications
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
     vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 
@@ -785,7 +785,7 @@ TEST_F(mfed_tests, dual_transfer_message_core_link_json_string)
     core = nullptr;
     // register the publications
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
-    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    bool res = dualTransferTestMessage(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
 

@@ -384,7 +384,7 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
         }
     }
     auto iterations = static_cast<double>(max_iterations);
-    double pest = 1.0 - static_cast<double>(count) / iterations;
+    double pest = 1.0 - (static_cast<double>(count) / iterations);
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt(prob * (1.0 - prob) / iterations);
 
@@ -498,7 +498,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object1_ci_skip)
         }
     }
     auto iterations = static_cast<double>(max_iterations);
-    double pest = 1.0 - static_cast<double>(count) / iterations;
+    double pest = 1.0 - (static_cast<double>(count) / iterations);
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt(prob * (1.0 - prob) / iterations);
 
