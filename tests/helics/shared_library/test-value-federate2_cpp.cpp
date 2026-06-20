@@ -136,7 +136,7 @@ TEST_P(VFedTypeTests, test_async_calls)
     vFed2->finalize();
 }
 //
-INSTANTIATE_TEST_SUITE_P(VfedTests, VFedTypeTests, ::testing::ValuesIn(CoreTypes), testNamer);
+INSTANTIATE_TEST_SUITE_P(VfedTests, VFedTypeTests, ::testing::ValuesIn(CoreTypes_ci_B), testNamer);
 
 //
 TEST_F(VfedTests, test_file_load)

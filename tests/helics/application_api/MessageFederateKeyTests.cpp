@@ -793,7 +793,10 @@ INSTANTIATE_TEST_SUITE_P(mfed_tests,
                          mfed_single_type_tests,
                          ::testing::ValuesIn(CoreTypes_single),
                          testNamer);
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes), testNamer);
+INSTANTIATE_TEST_SUITE_P(mfed_tests,
+                         mfed_type_tests,
+                         ::testing::ValuesIn(CoreTypes_ci_A),
+                         testNamer);
 INSTANTIATE_TEST_SUITE_P(mfed_tests,
                          mfed_all_type_tests,
                          ::testing::ValuesIn(CoreTypes_all),

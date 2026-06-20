@@ -483,7 +483,7 @@ INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          testNamer);
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_type_tests,
-                         ::testing::ValuesIn(CoreTypes),
+                         ::testing::ValuesIn(CoreTypes_ci_B),
                          testNamer);
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_all_type_tests,

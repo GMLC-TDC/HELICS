@@ -128,4 +128,4 @@ TEST_F(QueryTestSingle, queries_callback_test)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-INSTANTIATE_TEST_SUITE_P(QueryTests, QueryTests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(QueryTests, QueryTests, ::testing::ValuesIn(CoreTypes_ci_A));

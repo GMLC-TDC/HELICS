@@ -27,8 +27,8 @@ class vfed2_tests: public FederateTestFixture, public ::testing::Test {};
 
 TEST_P(vfed2_type_tests, block_send_receive)
 {
-    std::string s(500, ';');
-    int len = static_cast<int>(s.size());
+    std::string sendBlock(500, ';');
+    int len = static_cast<int>(sendBlock.size());
     char val[600] = "";
     int actualLen = 10;
     FederateTestFixture fixture;
@@ -44,7 +44,7 @@ TEST_P(vfed2_type_tests, block_send_receive)
     CE(helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_DELTA, 1.0, &err));
 
     CE(helicsFederateEnterExecutingMode(vFed1, &err));
-    CE(helicsPublicationPublishBytes(pubid3, s.data(), len, &err));
+    CE(helicsPublicationPublishBytes(pubid3, sendBlock.data(), len, &err));
 
     CE(helicsFederateRequestTime(vFed1, 1.0, &err));
 
@@ -67,11 +67,11 @@ TEST_P(vfed2_type_tests, block_send_receive)
 
 TEST_P(vfed2_simple_type_tests, async_calls)
 {
+    static constexpr int stringLen = 100;
     HelicsTime gtime;
     HelicsTime f1time;
     // HelicsFederateState state;
-#define STRINGLEN 100
-    char s[STRINGLEN] = "";
+    char stringValue[stringLen] = "";
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, GetParam(), 2);
     auto vFed1 = fixture.GetFederateAt(0);
@@ -101,17 +101,17 @@ TEST_P(vfed2_simple_type_tests, async_calls)
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
-    CE(helicsInputGetString(subid, s, STRINGLEN, nullptr, &err));
+    CE(helicsInputGetString(subid, stringValue, stringLen, nullptr, &err));
 
     // make sure the string is what we expect
-    EXPECT_STREQ(s, "string1");
+    EXPECT_STREQ(stringValue, "string1");
 
     // publish a second string
     CE(helicsPublicationPublishString(pubid, "string2", &err));
 
     // make sure the value is still what we expect
-    CE(helicsInputGetString(subid, s, STRINGLEN, nullptr, &err));
-    EXPECT_STREQ(s, "string1");
+    CE(helicsInputGetString(subid, stringValue, stringLen, nullptr, &err));
+    EXPECT_STREQ(stringValue, "string1");
 
     // advance time
     CE(helicsFederateRequestTimeAsync(vFed1, 2.0, &err));
@@ -123,8 +123,8 @@ TEST_P(vfed2_simple_type_tests, async_calls)
     EXPECT_EQ(gtime, 2.0);
 
     // make sure the value was updated
-    CE(helicsInputGetString(subid, s, STRINGLEN, nullptr, &err));
-    EXPECT_STREQ(s, "string2");
+    CE(helicsInputGetString(subid, stringValue, stringLen, nullptr, &err));
+    EXPECT_STREQ(stringValue, "string2");
 
     CE(helicsFederateFinalize(vFed1, &err));
     CE(helicsFederateFinalize(vFed2, &err));
@@ -140,8 +140,8 @@ TEST_F(vfed2_tests, file_load)
     vFed = helicsCreateValueFederateFromConfig(TEST_DIR "/example_value_fed.json", &err);
     EXPECT_EQ(err.error_code, HELICS_OK);
     ASSERT_FALSE(vFed == nullptr);
-    const char* s = helicsFederateGetName(vFed);
-    EXPECT_STREQ(s, "valueFed");
+    const char* federateName = helicsFederateGetName(vFed);
+    EXPECT_STREQ(federateName, "valueFed");
     EXPECT_EQ(helicsFederateGetInputCount(vFed), 3);
     EXPECT_EQ(helicsFederateGetPublicationCount(vFed), 2);
     //     helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
@@ -163,8 +163,8 @@ TEST_F(vfed2_tests, file_load_with_space)
                                                &err);
     EXPECT_EQ(err.error_code, HELICS_OK);
     ASSERT_FALSE(vFed == nullptr);
-    const char* s = helicsFederateGetName(vFed);
-    EXPECT_STREQ(s, "valueFed");
+    const char* federateName = helicsFederateGetName(vFed);
+    EXPECT_STREQ(federateName, "valueFed");
     EXPECT_EQ(helicsFederateGetInputCount(vFed), 3);
     EXPECT_EQ(helicsFederateGetPublicationCount(vFed), 2);
     CE(helicsFederateFinalize(vFed, &err));
@@ -207,12 +207,12 @@ TEST(valuefederate, coreAlias)
                                     HELICS_TRUE,
                                     nullptr);
     auto Fed1 = helicsCreateValueFederate("vfed1", fedInfo, nullptr);
-    auto cr = helicsFederateGetCore(Fed1, nullptr);
+    auto coreRef = helicsFederateGetCore(Fed1, nullptr);
     helicsFederateInfoFree(fedInfo);
     helicsFederateRegisterGlobalPublication(
         Fed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "parsecs", nullptr);
 
-    helicsCoreAddAlias(cr, "pub1", "theBigPub", nullptr);
+    helicsCoreAddAlias(coreRef, "pub1", "theBigPub", nullptr);
 
     helicsFederateRegisterSubscription(Fed1, "theBigPub", nullptr, nullptr);
 
@@ -220,7 +220,7 @@ TEST(valuefederate, coreAlias)
     helicsFederateEnterExecutingMode(Fed1, &err);
     EXPECT_EQ(err.error_code, 0);
     helicsFederateDestroy(Fed1);
-    helicsCoreDestroy(cr);
+    helicsCoreDestroy(coreRef);
 }
 
 TEST(valuefederate, brokerAlias)
@@ -296,40 +296,40 @@ TEST_F(vfed2_tests, json_publish)
     helicsFederateRegisterPublication(vFed1, "group1/pubA", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
     helicsFederateRegisterPublication(vFed1, "group1/pubB", HELICS_DATA_TYPE_STRING, "", nullptr);
 
-    auto s1 = helicsFederateRegisterSubscription(vFed1, "pub1", nullptr, nullptr);
-    auto s2 = helicsFederateRegisterSubscription(vFed1, "fed0/pub2", nullptr, nullptr);
-    auto s3 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubA", nullptr, nullptr);
-    auto s4 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubB", nullptr, nullptr);
+    auto subPub1 = helicsFederateRegisterSubscription(vFed1, "pub1", nullptr, nullptr);
+    auto subPub2 = helicsFederateRegisterSubscription(vFed1, "fed0/pub2", nullptr, nullptr);
+    auto subPubA = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubA", nullptr, nullptr);
+    auto subPubB = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubB", nullptr, nullptr);
     helicsFederateEnterExecutingMode(vFed1, nullptr);
     helicsFederatePublishJSON(vFed1,
                               (std::string(TEST_DIR) + "example_pub_input1.json").c_str(),
                               nullptr);
     helicsFederateRequestTime(vFed1, 1.0, nullptr);
-    EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 99.9);
+    EXPECT_EQ(helicsInputGetDouble(subPub1, nullptr), 99.9);
     char buffer[50];
     int actLen = 0;
-    helicsInputGetString(s2, buffer, 50, &actLen, nullptr);
+    helicsInputGetString(subPub2, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "things");
-    EXPECT_EQ(helicsInputGetDouble(s3, nullptr), 45.7);
-    helicsInputGetString(s4, buffer, 50, &actLen, nullptr);
+    EXPECT_EQ(helicsInputGetDouble(subPubA, nullptr), 45.7);
+    helicsInputGetString(subPubB, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "count");
 
     helicsFederatePublishJSON(vFed1,
                               (std::string(TEST_DIR) + "example_pub_input2.json").c_str(),
                               nullptr);
     helicsFederateRequestTime(vFed1, 2.0, nullptr);
-    EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 88.2);
+    EXPECT_EQ(helicsInputGetDouble(subPub1, nullptr), 88.2);
 
-    helicsInputGetString(s2, buffer, 50, &actLen, nullptr);
+    helicsInputGetString(subPub2, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "items");
-    EXPECT_EQ(helicsInputGetDouble(s3, nullptr), 15.0);
-    helicsInputGetString(s4, buffer, 50, &actLen, nullptr);
+    EXPECT_EQ(helicsInputGetDouble(subPubA, nullptr), 15.0);
+    helicsInputGetString(subPubB, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "count2");
 
     helicsFederatePublishJSON(vFed1, "{\"pub1\": 77.2}", nullptr);
 
     helicsFederateRequestTime(vFed1, 3.0, nullptr);
-    EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 77.2);
+    EXPECT_EQ(helicsInputGetDouble(subPub1, nullptr), 77.2);
 
     CE(helicsFederateFinalize(vFed1, &err));
 }
@@ -344,34 +344,34 @@ TEST_F(vfed2_tests, json_register_publish)
     CE(helicsFederateRegisterFromPublicationJSON(
         vFed1, (std::string(TEST_DIR) + "example_pub_input1.json").c_str(), &err));
 
-    auto s1 = helicsFederateRegisterSubscription(vFed1, "fed0/pub1", nullptr, nullptr);
-    auto s2 = helicsFederateRegisterSubscription(vFed1, "fed0/pub2", nullptr, nullptr);
-    auto s3 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubA", nullptr, nullptr);
-    auto s4 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubB", nullptr, nullptr);
+    auto subPub1 = helicsFederateRegisterSubscription(vFed1, "fed0/pub1", nullptr, nullptr);
+    auto subPub2 = helicsFederateRegisterSubscription(vFed1, "fed0/pub2", nullptr, nullptr);
+    auto subPubA = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubA", nullptr, nullptr);
+    auto subPubB = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubB", nullptr, nullptr);
     helicsFederateEnterExecutingMode(vFed1, nullptr);
     helicsFederatePublishJSON(vFed1,
                               (std::string(TEST_DIR) + "example_pub_input1.json").c_str(),
                               nullptr);
     helicsFederateRequestTime(vFed1, 1.0, nullptr);
-    EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 99.9);
+    EXPECT_EQ(helicsInputGetDouble(subPub1, nullptr), 99.9);
     char buffer[50];
     int actLen = 0;
-    helicsInputGetString(s2, buffer, 50, &actLen, nullptr);
+    helicsInputGetString(subPub2, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "things");
-    EXPECT_EQ(helicsInputGetDouble(s3, nullptr), 45.7);
-    helicsInputGetString(s4, buffer, 50, &actLen, nullptr);
+    EXPECT_EQ(helicsInputGetDouble(subPubA, nullptr), 45.7);
+    helicsInputGetString(subPubB, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "count");
 
     helicsFederatePublishJSON(vFed1,
                               (std::string(TEST_DIR) + "example_pub_input2.json").c_str(),
                               nullptr);
     helicsFederateRequestTime(vFed1, 2.0, nullptr);
-    EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 88.2);
+    EXPECT_EQ(helicsInputGetDouble(subPub1, nullptr), 88.2);
 
-    helicsInputGetString(s2, buffer, 50, &actLen, nullptr);
+    helicsInputGetString(subPub2, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "items");
-    EXPECT_EQ(helicsInputGetDouble(s3, nullptr), 15.0);
-    helicsInputGetString(s4, buffer, 50, &actLen, nullptr);
+    EXPECT_EQ(helicsInputGetDouble(subPubA, nullptr), 15.0);
+    helicsInputGetString(subPubB, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "count2");
 
     CE(helicsFederateFinalize(vFed1, &err));
