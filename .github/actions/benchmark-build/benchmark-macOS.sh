@@ -5,9 +5,12 @@
 # Unset VCPKG_ROOT for GitHub actions environment
 unset VCPKG_ROOT
 
+# GitHub's macOS runners may come with extra untrusted taps we do not use.
+brew untap aws/tap azure/bicep || true
+
 brew install boost
 mkdir build && cd build || exit
-cmake -DCMAKE_BUILD_TYPE=Release -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_APP_EXECUTABLES=ON -DHELICS_BUILD_APP_LIBRARY=OFF -DHELICS_BUILD_BENCHMARKS=ON -DBUILD_TESTING=OFF ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=20 -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_APP_EXECUTABLES=ON -DHELICS_BUILD_APP_LIBRARY=OFF -DHELICS_BUILD_BENCHMARKS=ON -DBUILD_TESTING=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" ..
 cmake --build . --config Release
 cpack_dir="$(command -v cmake)"
 cpack_dir="${cpack_dir%/cmake}"
