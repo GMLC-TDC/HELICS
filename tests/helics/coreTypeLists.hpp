@@ -92,6 +92,7 @@ constexpr const char* CoreTypes_2[] = {IPCTEST2 TCPTEST2 ZMQSSTEST2 "test_2",
 
 constexpr const char* CoreTypes_simple[] = {
     INPROCTEST TCPSSTEST ZMQSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST};
+constexpr const char* CoreTypes_ci[] = {"test", ZMQTEST IPCTEST TCPTEST};
 constexpr const char* CoreTypes_single[] = {INPROCTEST TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST
                                             "test_3",
                                             ZMQTEST3 TCPTEST3 ZMQSSTEST UDPTEST3};

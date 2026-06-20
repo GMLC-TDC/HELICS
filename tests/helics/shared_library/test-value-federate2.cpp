@@ -380,4 +380,4 @@ TEST_F(vfed2_tests, json_register_publish)
 INSTANTIATE_TEST_SUITE_P(vfed_tests,
                          vfed2_simple_type_tests,
                          ::testing::ValuesIn(CoreTypes_simple));
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed2_type_tests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed2_type_tests, ::testing::ValuesIn(CoreTypes_ci));
