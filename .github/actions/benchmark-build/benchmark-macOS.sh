@@ -2,8 +2,18 @@
 # This uses bash variable substitution in a few places
 # 1. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
 
+set -euo pipefail
+
 # Unset VCPKG_ROOT for GitHub actions environment
 unset VCPKG_ROOT
+
+# Mark the workspace and known submodule paths as safe for nested git operations.
+git config --global --add safe.directory "$(pwd)"
+if [ -f .gitmodules ]; then
+    while read -r submodule_path; do
+        git config --global --add safe.directory "$(pwd)/${submodule_path}"
+    done < <(git config --file .gitmodules --get-regexp path | awk '{print $2}')
+fi
 
 # GitHub's macOS runners may come with extra untrusted taps we do not use.
 brew untap aws/tap azure/bicep || true
