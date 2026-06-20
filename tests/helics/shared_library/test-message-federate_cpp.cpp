@@ -398,9 +398,7 @@ TEST(dataBuffer, bufferMemory)
     EXPECT_EQ(buf1.capacity(), static_cast<int>(value.size()));
     EXPECT_EQ(buf1.size(), 0);
     buf1.fill(std::vector<double>{34.673, 19.1514, 1e-45});
-    helicscpp::DataBuffer buf2(value.data(),
-                               buf1.size(),
-                               static_cast<int>(value.capacity()));
+    helicscpp::DataBuffer buf2(value.data(), buf1.size(), static_cast<int>(value.capacity()));
 
     EXPECT_EQ(buf2.type(), HELICS_DATA_TYPE_VECTOR);
 

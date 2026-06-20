@@ -96,10 +96,9 @@ std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<Helics
     std::vector<std::future<std::pair<double, int>>> futures;
     for (decltype(fedCount) ii = 0; ii < fedCount; ++ii) {
         auto vFed = fedVec[ii];
-        futures.push_back(std::async(std::launch::async,
-                                     [vFed, ii, fedCount]() {
-                                         return runInitIterations(vFed, ii, fedCount);
-                                     }));
+        futures.push_back(std::async(std::launch::async, [vFed, ii, fedCount]() {
+            return runInitIterations(vFed, ii, fedCount);
+        }));
     }
     std::vector<std::pair<double, int>> results(fedCount);
     for (decltype(fedCount) ii = 0; ii < fedCount; ++ii) {
