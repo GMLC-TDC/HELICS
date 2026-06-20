@@ -26,12 +26,22 @@ if(NOT TARGET spdlog::spdlog)
         set(SPDLOG_FMT_EXTERNAL ON CACHE INTERNAL "")
         if(CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
             set(CMAKE_CXX_EXTENSIONS ON CACHE INTERNAL "")
+            set(SPDLOG_FWRITE_UNLOCKED OFF CACHE INTERNAL "")
         endif()
         # use the vendored SPDLOG library
         if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
             add_subdirectory(ThirdParty/spdlog EXCLUDE_FROM_ALL SYSTEM)
         else()
             add_subdirectory(ThirdParty/spdlog EXCLUDE_FROM_ALL)
+        endif()
+
+        if(CYGWIN)
+            # Match HELICS' Cygwin feature-test setup for vendored spdlog so POSIX stdio APIs like
+            # fileno are visible when spdlog is compiled as its own target.
+            target_compile_definitions(spdlog PUBLIC _XOPEN_SOURCE=500 __USE_W32_SOCKETS)
+            target_compile_definitions(
+                spdlog_header_only INTERFACE _XOPEN_SOURCE=500 __USE_W32_SOCKETS
+            )
         endif()
 
         set_target_properties(spdlog PROPERTIES FOLDER Extern)
