@@ -7,10 +7,17 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: coverage-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: helics/buildenv:ubuntu22.04-default-builder
+    container: helics/buildenv:ubuntu26.04-default-builder
     defaults:
       run:
         shell: bash
@@ -26,12 +33,14 @@ jobs:
     steps:
     - uses: actions/checkout@v6
       with:
+        fetch-depth: 0
         submodules: true
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
       uses: actions/checkout@v6
       with:
+        fetch-depth: 0
         submodules: true
         ref: develop
       if: github.event_name == 'schedule'
@@ -51,5 +60,21 @@ jobs:
       working-directory: build
       run: ../scripts/run-coverage-tests.sh
 
-    - name: Gather and upload coverage results
-      run: scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov
+    - name: Gather coverage results
+      run: scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL}
+
+    - name: Upload coverage artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        name: coverage-report
+        path: coverage.info.cleaned
+
+    - name: Upload coverage results
+      uses: codecov/codecov-action@v6
+      with:
+        disable_search: true
+        files: coverage.info.cleaned
+        fail_ci_if_error: true
+        name: coverage-ubuntu2604
+        token: ${{ secrets.CODECOV_TOKEN }}
