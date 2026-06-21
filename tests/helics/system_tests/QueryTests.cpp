@@ -118,7 +118,7 @@ TEST_P(query_type, publication_fed_queries)
 
 using helics::fileops::loadJsonStr;
 
-INSTANTIATE_TEST_SUITE_P(query, query_type, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(query, query_type, ::testing::ValuesIn(CoreTypes_ci_A));
 
 TEST_F(query, federate_map)
 {

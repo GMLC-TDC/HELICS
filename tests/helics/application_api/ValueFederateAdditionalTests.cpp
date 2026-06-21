@@ -890,7 +890,9 @@ TEST(valuefed_json_tests, test_json_register_publish_error)
 INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_single_type_tests_ci_skip,
                          ::testing::ValuesIn(CoreTypes_single));
-INSTANTIATE_TEST_SUITE_P(valuefed, valuefed_add_type_tests_ci_skip, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(valuefed,
+                         valuefed_add_type_tests_ci_skip,
+                         ::testing::ValuesIn(CoreTypes_ci_B));
 INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_all_type_tests_ci_skip,
                          ::testing::ValuesIn(CoreTypes_all));
@@ -1345,7 +1347,7 @@ TEST_P(vfedPermutation, value_linking_order_permutations_nosan)
 
     int permutations = GetParam();
     for (int kk = 0; kk < permutations; ++kk) {
-        std::next_permutation(exOrder.begin(), exOrder.end());
+        std::ranges::next_permutation(exOrder);
     }
     exList[0] = [&vFed1]() { vFed1->registerGlobalInput("dest_input", "double"); };
     exList[1] = [&vFed2]() { vFed2->registerGlobalPublication("source_pub", "double"); };

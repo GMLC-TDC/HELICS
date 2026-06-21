@@ -1194,7 +1194,7 @@ INSTANTIATE_TEST_SUITE_P(vfed_tests,
                          vfedSimpleType,
                          ::testing::ValuesIn(CoreTypes_simple),
                          testNamer);
-INSTANTIATE_TEST_SUITE_P(vfed_tests, cfedType, ::testing::ValuesIn(CoreTypes), testNamer);
+INSTANTIATE_TEST_SUITE_P(vfed_tests, cfedType, ::testing::ValuesIn(CoreTypes_ci), testNamer);
 
 TEST_F(vfedSingle, buffer_tests)
 {

@@ -408,7 +408,7 @@ class PingPongFed {
         helics::Time nextTime = 0;
         while (nextTime <= finish) {
             processMessages(nextTime);
-            if (index < static_cast<int>(triggers.size())) {
+            if (std::cmp_less(index, triggers.size())) {
                 while (triggers[index].first <= nextTime) {
 #ifdef ENABLE_OUTPUT
                     std::cout << name << ": send ping to " << triggers[index].second << " at time "
@@ -416,7 +416,7 @@ class PingPongFed {
 #endif
                     ept->sendTo("ping", triggers[index].second);
                     ++index;
-                    if (index >= static_cast<int>(triggers.size())) {
+                    if (std::cmp_greater_equal(index, triggers.size())) {
                         break;
                     }
                 }
@@ -483,7 +483,7 @@ INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          testNamer);
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_type_tests,
-                         ::testing::ValuesIn(CoreTypes),
+                         ::testing::ValuesIn(CoreTypes_ci_B),
                          testNamer);
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_all_type_tests,

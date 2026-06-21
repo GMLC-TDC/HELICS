@@ -293,7 +293,7 @@ INSTANTIATE_TEST_SUITE_P(combofed_tests,
                          testNamer);
 INSTANTIATE_TEST_SUITE_P(combofed_tests,
                          combofed_type_tests,
-                         ::testing::ValuesIn(CoreTypes),
+                         ::testing::ValuesIn(CoreTypes_ci_A),
                          testNamer);
 
 static constexpr const char* combo_config_files[] = {"example_combo_fed.json",
