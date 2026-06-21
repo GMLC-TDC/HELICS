@@ -92,9 +92,9 @@ void MessageTimer::updateTimer(int32_t timerIndex, time_type expirationTime, Act
         expirationTimes[timerIndex] = expirationTime;
         buffers[timerIndex] = std::move(mess);
 
-        auto timerCallback =
-            [ptr = shared_from_this(), timerIndex](const std::error_code& errorCode) {
-                processTimerCallback(ptr, timerIndex, errorCode);
+        auto timerCallback = [ptr = shared_from_this(),
+                              timerIndex](const std::error_code& errorCode) {
+            processTimerCallback(ptr, timerIndex, errorCode);
         };
 
         timers[timerIndex]->async_wait(timerCallback);
@@ -119,9 +119,9 @@ bool MessageTimer::addTimeToTimer(int32_t timerIndex, std::chrono::nanoseconds t
         auto newTime = expirationTimes[timerIndex];
         newTime += time;
         timers[timerIndex]->expires_at(newTime);
-        auto timerCallback =
-            [ptr = shared_from_this(), timerIndex](const std::error_code& errorCode) {
-                processTimerCallback(ptr, timerIndex, errorCode);
+        auto timerCallback = [ptr = shared_from_this(),
+                              timerIndex](const std::error_code& errorCode) {
+            processTimerCallback(ptr, timerIndex, errorCode);
         };
         expirationTimes[timerIndex] = newTime;
         timers[timerIndex]->async_wait(timerCallback);
@@ -135,9 +135,9 @@ bool MessageTimer::updateTimer(int32_t timerIndex, time_type expirationTime)
     const std::scoped_lock lock(timerLock);
     if ((timerIndex >= 0) && std::cmp_less(timerIndex, timers.size())) {
         timers[timerIndex]->expires_at(expirationTime);
-        auto timerCallback =
-            [ptr = shared_from_this(), timerIndex](const std::error_code& errorCode) {
-                processTimerCallback(ptr, timerIndex, errorCode);
+        auto timerCallback = [ptr = shared_from_this(),
+                              timerIndex](const std::error_code& errorCode) {
+            processTimerCallback(ptr, timerIndex, errorCode);
         };
         expirationTimes[timerIndex] = expirationTime;
         auto ret = (buffers[timerIndex].action() != CMD_IGNORE);
