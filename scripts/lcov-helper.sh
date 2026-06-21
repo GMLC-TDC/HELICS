@@ -8,7 +8,6 @@ if [[ "$1" ]]; then
         lcov \
             --rc geninfo_unexecuted_blocks=1 \
             --ignore-errors gcov,mismatch,inconsistent \
-            --no-external \
             --capture \
             --initial \
             --directory . \
@@ -40,7 +39,6 @@ if [[ "$1" ]]; then
             --gcov-tool "$GCOV_TOOL" \
             --rc geninfo_unexecuted_blocks=1 \
             --ignore-errors gcov,mismatch,inconsistent \
-            --no-external \
             --directory . \
             --capture \
             --output-file coverage.info &>/dev/null
