@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "MessageTimer.hpp"
 
+#include <compare>
 #include <iostream>
 #include <memory>
 #include <utility>
@@ -21,14 +22,14 @@ MessageTimer::MessageTimer(std::function<void(ActionMessage&&)> sFunction):
 
 static void processTimerCallback(const std::shared_ptr<MessageTimer>& mtimer,
                                  int32_t index,
-                                 const std::error_code& ec)
+                                 const std::error_code& errorCode)
 {
-    if (ec != asio::error::operation_aborted) {
+    if (errorCode != asio::error::operation_aborted) {
         try {
             mtimer->sendMessage(index);
         }
         catch (std::exception& e) {
-            std::cerr << "exception caught from sendMessage:" << e.what() << std::endl;
+            std::cerr << "exception caught from sendMessage:" << e.what() << '\n';
         }
     }
 }
@@ -47,8 +48,8 @@ int32_t MessageTimer::addTimer(time_type expirationTime, ActionMessage mess)
     std::unique_lock<std::mutex> lock(timerLock);
 
     auto index = static_cast<int32_t>(timers.size());
-    auto timerCallback = [ptr = shared_from_this(), index](const std::error_code& ec) {
-        processTimerCallback(ptr, index, ec);
+    auto timerCallback = [ptr = shared_from_this(), index](const std::error_code& errorCode) {
+        processTimerCallback(ptr, index, errorCode);
     };
     buffers.push_back(std::move(mess));
     expirationTimes.push_back(expirationTime);
@@ -65,8 +66,8 @@ int32_t MessageTimer::addTimer(time_type expirationTime, ActionMessage mess)
 
 void MessageTimer::cancelTimer(int32_t index)
 {
-    std::lock_guard<std::mutex> lock(timerLock);
-    if ((index >= 0) && (index < static_cast<int32_t>(timers.size()))) {
+    const std::scoped_lock lock(timerLock);
+    if ((index >= 0) && std::cmp_less(index, timers.size())) {
         buffers[index].setAction(CMD_IGNORE);
         timers[index]->cancel();
     }
@@ -74,7 +75,7 @@ void MessageTimer::cancelTimer(int32_t index)
 
 void MessageTimer::cancelAll()
 {
-    std::lock_guard<std::mutex> lock(timerLock);
+    const std::scoped_lock lock(timerLock);
     for (auto& buf : buffers) {
         buf.setAction(CMD_IGNORE);
     }
@@ -85,14 +86,15 @@ void MessageTimer::cancelAll()
 
 void MessageTimer::updateTimer(int32_t timerIndex, time_type expirationTime, ActionMessage mess)
 {
-    std::lock_guard<std::mutex> lock(timerLock);
-    if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t>(timers.size()))) {
+    const std::scoped_lock lock(timerLock);
+    if ((timerIndex >= 0) && std::cmp_less(timerIndex, timers.size())) {
         timers[timerIndex]->expires_at(expirationTime);
         expirationTimes[timerIndex] = expirationTime;
         buffers[timerIndex] = std::move(mess);
 
-        auto timerCallback = [ptr = shared_from_this(), timerIndex](const std::error_code& ec) {
-            processTimerCallback(ptr, timerIndex, ec);
+        auto timerCallback =
+            [ptr = shared_from_this(), timerIndex](const std::error_code& errorCode) {
+                processTimerCallback(ptr, timerIndex, errorCode);
         };
 
         timers[timerIndex]->async_wait(timerCallback);
@@ -108,8 +110,8 @@ void MessageTimer::updateTimerFromNow(int32_t timerIndex,
 
 bool MessageTimer::addTimeToTimer(int32_t timerIndex, std::chrono::nanoseconds time)
 {
-    std::lock_guard<std::mutex> lock(timerLock);
-    if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t>(timers.size()))) {
+    const std::scoped_lock lock(timerLock);
+    if ((timerIndex >= 0) && std::cmp_less(timerIndex, timers.size())) {
         auto ret = (buffers[timerIndex].action() != CMD_IGNORE);
         if (!ret) {
             return false;
@@ -117,8 +119,9 @@ bool MessageTimer::addTimeToTimer(int32_t timerIndex, std::chrono::nanoseconds t
         auto newTime = expirationTimes[timerIndex];
         newTime += time;
         timers[timerIndex]->expires_at(newTime);
-        auto timerCallback = [ptr = shared_from_this(), timerIndex](const std::error_code& ec) {
-            processTimerCallback(ptr, timerIndex, ec);
+        auto timerCallback =
+            [ptr = shared_from_this(), timerIndex](const std::error_code& errorCode) {
+                processTimerCallback(ptr, timerIndex, errorCode);
         };
         expirationTimes[timerIndex] = newTime;
         timers[timerIndex]->async_wait(timerCallback);
@@ -129,11 +132,12 @@ bool MessageTimer::addTimeToTimer(int32_t timerIndex, std::chrono::nanoseconds t
 
 bool MessageTimer::updateTimer(int32_t timerIndex, time_type expirationTime)
 {
-    std::lock_guard<std::mutex> lock(timerLock);
-    if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t>(timers.size()))) {
+    const std::scoped_lock lock(timerLock);
+    if ((timerIndex >= 0) && std::cmp_less(timerIndex, timers.size())) {
         timers[timerIndex]->expires_at(expirationTime);
-        auto timerCallback = [ptr = shared_from_this(), timerIndex](const std::error_code& ec) {
-            processTimerCallback(ptr, timerIndex, ec);
+        auto timerCallback =
+            [ptr = shared_from_this(), timerIndex](const std::error_code& errorCode) {
+                processTimerCallback(ptr, timerIndex, errorCode);
         };
         expirationTimes[timerIndex] = expirationTime;
         auto ret = (buffers[timerIndex].action() != CMD_IGNORE);
@@ -146,8 +150,8 @@ bool MessageTimer::updateTimer(int32_t timerIndex, time_type expirationTime)
 /** update the message associated with a timer*/
 void MessageTimer::updateMessage(int32_t timerIndex, ActionMessage mess)
 {
-    std::lock_guard<std::mutex> lock(timerLock);
-    if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t>(timers.size()))) {
+    const std::scoped_lock lock(timerLock);
+    if ((timerIndex >= 0) && std::cmp_less(timerIndex, timers.size())) {
         buffers[timerIndex] = std::move(mess);
     }
 }
@@ -155,7 +159,7 @@ void MessageTimer::updateMessage(int32_t timerIndex, ActionMessage mess)
 void MessageTimer::sendMessage(int32_t timerIndex)
 {
     std::unique_lock<std::mutex> lock(timerLock);
-    if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t>(timers.size()))) {
+    if ((timerIndex >= 0) && std::cmp_less(timerIndex, timers.size())) {
         if (std::chrono::steady_clock::now() >= expirationTimes[timerIndex]) {
             if (buffers[timerIndex].action() != CMD_IGNORE) {
                 ActionMessage buf = std::move(buffers[timerIndex]);
