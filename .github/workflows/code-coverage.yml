@@ -77,10 +77,11 @@ jobs:
         lcov \
           -a coverage.base \
           -a coverage.info \
+          --ignore-errors inconsistent,corrupt \
           --output-file coverage.total
         lcov \
           --remove coverage.total \
-          --ignore-errors inconsistent,unused,negative \
+          --ignore-errors inconsistent,unused,negative,corrupt,mismatch \
           '/usr/*' \
           '*/test/*' \
           '*/tests/*' \
