@@ -53,17 +53,45 @@ jobs:
         mkdir -p build && cd build
         ../scripts/ci-build.sh
 
-    - name: Setup coverage counters
-      working-directory: build
-      run: ../scripts/lcov-helper.sh setup-counters
-
     - name: Run tests
       working-directory: build
       run: ../scripts/run-coverage-tests.sh
 
-    - name: Gather coverage results
+    - name: Prepare coverage report
       working-directory: build
-      run: ../scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL}
+      run: |
+        lcov \
+          --rc geninfo_unexecuted_blocks=1 \
+          --ignore-errors gcov,mismatch,inconsistent \
+          --capture \
+          --initial \
+          --directory . \
+          --output-file coverage.base
+        lcov \
+          --gcov-tool ${GCOV_TOOL} \
+          --rc geninfo_unexecuted_blocks=1 \
+          --ignore-errors gcov,mismatch,inconsistent \
+          --capture \
+          --directory . \
+          --output-file coverage.info
+        lcov \
+          -a coverage.base \
+          -a coverage.info \
+          --output-file coverage.total
+        lcov \
+          --remove coverage.total \
+          --ignore-errors inconsistent,unused \
+          '/usr/*' \
+          '*/test/*' \
+          '*/tests/*' \
+          '*/ThirdParty/*' \
+          '*/dependencies/*' \
+          '*/examples/*' \
+          '*/interfaces/*' \
+          '*/benchmarks/*' \
+          '*/scripts/*' \
+          --output-file coverage.info.cleaned
+        lcov --list coverage.info.cleaned
 
     - name: Upload coverage artifact
       uses: actions/upload-artifact@v7
