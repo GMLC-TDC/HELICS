@@ -62,7 +62,7 @@ jobs:
       run: |
         lcov \
           --rc geninfo_unexecuted_blocks=1 \
-          --ignore-errors gcov,mismatch,inconsistent \
+          --ignore-errors gcov,mismatch,inconsistent,negative \
           --capture \
           --initial \
           --directory . \
@@ -70,7 +70,7 @@ jobs:
         lcov \
           --gcov-tool ${GCOV_TOOL} \
           --rc geninfo_unexecuted_blocks=1 \
-          --ignore-errors gcov,mismatch,inconsistent \
+          --ignore-errors gcov,mismatch,inconsistent,negative \
           --capture \
           --directory . \
           --output-file coverage.info
@@ -80,7 +80,7 @@ jobs:
           --output-file coverage.total
         lcov \
           --remove coverage.total \
-          --ignore-errors inconsistent,unused \
+          --ignore-errors inconsistent,unused,negative \
           '/usr/*' \
           '*/test/*' \
           '*/tests/*' \
