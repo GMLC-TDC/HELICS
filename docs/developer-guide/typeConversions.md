@@ -173,6 +173,7 @@ Similar to getDoubleFromString in conversion of vectors. It will convert most re
 - BOOL -> (vectorNorm(val)!=0)?"1":"0"
 
 See [Conversion from vector double](#conversion-from-vector-double) for definitions of vectorNorm.
+
 [^6]: if the imaginary part of these values is 0, then the real part is used; otherwise it uses the absolute value.
 
 ### Conversion from Complex
