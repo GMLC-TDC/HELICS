@@ -118,7 +118,7 @@ jobs:
           imageName: "windows-2025-vs2026"
           langArch: "x64"
           vsArch: "x64"
-          extraFlags: "-DCMAKE_CXX_STANDARD=23 -DHELICS_DISABLE_C_SHARED_LIB=ON -DHELICS_DISABLE_WEBSERVER=ON -DHELICS_BUILD_APP_EXECUTABLES=OFF"
+          extraFlags: "-DCMAKE_CXX_STANDARD=23 -DHELICS_DISABLE_C_SHARED_LIB=ON -DHELICS_DISABLE_WEBSERVER=ON -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_DISABLE_ASIO=ON"
           buildExamples: "OFF"
           enablePackageBuild: "OFF"
           runPackaging: "false"

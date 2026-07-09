@@ -136,6 +136,6 @@ struct FederateTestFixture_cpp {
     std::string ctype;
 
   private:
-    bool hasIndexCode(const std::string& type_name);
-    int getIndexCode(const std::string& type_name);
+    static bool hasIndexCode(const std::string& type_name);
+    static int getIndexCode(const std::string& type_name);
 };
