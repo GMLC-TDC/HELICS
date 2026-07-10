@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "testFixtures.hpp"
 
 #include "gmock/gmock.h"
+#include <cstdlib>
 #include <future>
 #include <gtest/gtest.h>
 #include <memory>
@@ -214,7 +215,18 @@ TEST(federate_tests, federate_initialize_iteration_multiple)
 
 TEST(federate, federate_initialize_tests_env)
 {
+    auto envLogLevelMatches = []() {
+        const char* logLevel = std::getenv("HELICS_LOG_LEVEL");
+        return (logLevel != nullptr) && (std::string_view{logLevel} == "connections");
+    };
+
     setEnvironmentVariable("HELICS_LOG_LEVEL", "connections");
+    if (!envLogLevelMatches()) {
+        clearEnvironmentVariable("HELICS_LOG_LEVEL");
+        setEnvironmentVariable("HELICS_LOG_LEVEL", "connections");
+    }
+    ASSERT_TRUE(envLogLevelMatches()) << "failed to set HELICS_LOG_LEVEL=connections";
+
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
     fedInfo.coreInitString = "--autobroker";
 
