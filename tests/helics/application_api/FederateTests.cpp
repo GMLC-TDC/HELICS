@@ -410,7 +410,6 @@ TEST(federate, timeout_error_zmq_ci_skip_nosan)
 
 TEST(federate, timeout_abort_zmq_ci_skip_nosan_nocov)
 {
-    std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
         helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
         fedInfo.coreInitString = "";
@@ -439,7 +438,6 @@ TEST(federate, timeout_abort_zmq_ci_skip_nosan_nocov)
 #ifdef HELICS_ENABLE_TCP_CORE
 TEST(federate, timeout_abort_tcp_ci_skip_nosan_nocov)
 {
-    std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
         helics::FederateInfo fedInfo(helics::CoreType::TCP);
         fedInfo.coreInitString = "";
@@ -465,7 +463,6 @@ TEST(federate, timeout_abort_tcp_ci_skip_nosan_nocov)
 
 TEST(federate, timeout_abort_tcpss_ci_skip_nosan_nocov)
 {
-    std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
         helics::FederateInfo fedInfo(helics::CoreType::TCP_SS);
         fedInfo.coreInitString = "";
@@ -493,7 +490,6 @@ TEST(federate, timeout_abort_tcpss_ci_skip_nosan_nocov)
 #ifdef HELICS_ENABLE_UDP_CORE
 TEST(federate, timeout_abort_udp_ci_skip_nosan_nocov)
 {
-    std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
         helics::FederateInfo fedInfo(helics::CoreType::UDP);
         fedInfo.coreInitString = "";
