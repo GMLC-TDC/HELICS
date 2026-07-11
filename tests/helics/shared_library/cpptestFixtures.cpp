@@ -4,7 +4,7 @@ All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle
 Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for
-Sustainable Energy, LLC.  See the top-level NOTICE for additional details. and the Lawrence
+Energy Innovation LLC.  See the top-level NOTICE for additional details. and the Lawrence
 Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
@@ -26,20 +26,20 @@ static bool hasIndexCode(const std::string& type_name)
     return false;
 }
 
-static auto StartBrokerImp(const std::string& CoreType_name, std::string initialization_string)
+static auto startBrokerImp(const std::string& coreTypeName, std::string initialization_string)
 {
-    if (CoreType_name.compare(0, 3, "tcp") == 0) {
+    if (coreTypeName.starts_with("tcp")) {
         initialization_string += " --reuse_address";
-    } else if (CoreType_name.compare(0, 3, "ipc") == 0) {
+    } else if (coreTypeName.starts_with("ipc")) {
         // this is to use the name instead of the "_ipc_broker" as the queue name
         // since we are linking it directly anyway
         initialization_string += " --client";
     }
-    if (hasIndexCode(CoreType_name)) {
-        std::string new_type(CoreType_name.begin(), CoreType_name.end() - 2);
+    if (hasIndexCode(coreTypeName)) {
+        std::string new_type(coreTypeName.begin(), coreTypeName.end() - 2);
         return std::make_shared<helicscpp::Broker>(new_type, std::string(), initialization_string);
     }
-    return std::make_shared<helicscpp::Broker>(CoreType_name, std::string(), initialization_string);
+    return std::make_shared<helicscpp::Broker>(coreTypeName, std::string(), initialization_string);
 }
 
 bool FederateTestFixture_cpp::hasIndexCode(const std::string& type_name)
@@ -64,7 +64,7 @@ FederateTestFixture_cpp::~FederateTestFixture_cpp()
     }
     federates.clear();
     for (auto& broker : brokers) {
-        if (ctype.compare(0, 3, "tcp") == 0) {
+        if (ctype.starts_with("tcp")) {
             broker->waitForDisconnect(2000);
         } else {
             broker->waitForDisconnect(200);
@@ -90,9 +90,9 @@ std::shared_ptr<helicscpp::Broker>
 {
     std::shared_ptr<helicscpp::Broker> broker;
     if (extraBrokerArgs.empty()) {
-        broker = StartBrokerImp(CoreType_name, initialization_string);
+        broker = startBrokerImp(CoreType_name, initialization_string);
     } else {
-        broker = StartBrokerImp(CoreType_name, initialization_string + " " + extraBrokerArgs);
+        broker = startBrokerImp(CoreType_name, initialization_string + " " + extraBrokerArgs);
     }
     if (broker) {
         brokers.push_back(broker);

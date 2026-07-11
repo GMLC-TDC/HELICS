@@ -27,6 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
+#ifndef HELICS_DISABLE_ASIO
 TEST(grant_timeout, phase1)
 {
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
@@ -69,7 +70,6 @@ TEST(grant_timeout, phase1)
     Fed1->finalize();
     Fed2->finalize();
 }
-
 TEST(grant_timeout, phase2)
 {
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
@@ -252,3 +252,5 @@ TEST(grant_timeout, phase4)
     Fed1->finalize();
     Fed2->finalize();
 }
+
+#endif
