@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -218,7 +218,7 @@ class TimeDependencies {
 inline bool checkSequenceCounter(const DependencyInfo& dep, Time tmin, std::int32_t sq)
 {
     return (!dep.dependency || !dep.dependent || dep.timingVersion <= 0 || dep.next > tmin ||
-            dep.next >= cBigTime || dep.responseSequenceCounter == sq);
+            dep.next >= cTerminationTime || dep.responseSequenceCounter == sq);
 }
 
 const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,

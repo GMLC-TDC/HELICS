@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_ENDPOINT_HPP_
@@ -64,9 +64,9 @@ class Message {
     /** cast to a HelicsMessage object*/
     operator HelicsMessage() const { return mo; }
     /** check if a message_object is valid*/
-    bool isValid() const { return (helicsMessageIsValid(mo) == HELICS_TRUE); }
+    HELICS_NODISCARD bool isValid() const { return (helicsMessageIsValid(mo) == HELICS_TRUE); }
     /** get the message source endpoint name*/
-    const char* source() const { return helicsMessageGetSource(mo); }
+    HELICS_NODISCARD const char* source() const { return helicsMessageGetSource(mo); }
     /** set the message source*/
     Message& source(const std::string& src)
     {
@@ -80,7 +80,7 @@ class Message {
         return *this;
     }
     /** get the message destination */
-    const char* destination() const { return helicsMessageGetDestination(mo); }
+    HELICS_NODISCARD const char* destination() const { return helicsMessageGetDestination(mo); }
     /** set the message destination */
     Message& destination(const std::string& dest)
     {
@@ -95,7 +95,10 @@ class Message {
     }
     /** get the original message source which may be different than source if the message was
      * filtered */
-    const char* originalSource() const { return helicsMessageGetOriginalSource(mo); }
+    HELICS_NODISCARD const char* originalSource() const
+    {
+        return helicsMessageGetOriginalSource(mo);
+    }
     /** set the original source field*/
     Message& originalSource(const std::string& osrc)
     {
@@ -103,7 +106,10 @@ class Message {
         return *this;
     }
     /** get the original message destination if a filter altered it*/
-    const char* originalDestination() const { return helicsMessageGetOriginalDestination(mo); }
+    HELICS_NODISCARD const char* originalDestination() const
+    {
+        return helicsMessageGetOriginalDestination(mo);
+    }
     /** set the original destination field*/
     Message& originalDestination(const std::string& odest)
     {
@@ -111,14 +117,14 @@ class Message {
         return *this;
     }
     /** get the size of the message data field*/
-    int size() const { return helicsMessageGetByteCount(mo); }
+    HELICS_NODISCARD int size() const { return helicsMessageGetByteCount(mo); }
     /** set the size of the message data field*/
     void resize(int newSize) { helicsMessageResize(mo, newSize, hThrowOnError()); }
     /** reserve a certain amount of size in the message data field which is useful for the append
      * operation*/
     void reserve(int newSize) { helicsMessageReserve(mo, newSize, hThrowOnError()); }
     /** get a pointer to the data field*/
-    void* data() const { return helicsMessageGetBytesPointer(mo); }
+    HELICS_NODISCARD void* data() const { return helicsMessageGetBytesPointer(mo); }
     /** set the message data from a pointer and size*/
     Message& data(const void* ptr, int size)
     {
@@ -156,9 +162,9 @@ class Message {
         return *this;
     }
     /** get a the data as a null terminated C string*/
-    const char* c_str() const { return helicsMessageGetString(mo); }
+    HELICS_NODISCARD const char* c_str() const { return helicsMessageGetString(mo); }
     /** get the time of the message*/
-    HelicsTime time() const { return helicsMessageGetTime(mo); }
+    HELICS_NODISCARD HelicsTime time() const { return helicsMessageGetTime(mo); }
     /** set the time the message should be scheduled for*/
     Message& time(HelicsTime val)
     {
@@ -172,12 +178,12 @@ class Message {
         return *this;
     }
     /** check an indexed flag in the message valid numbers are [0,15]*/
-    bool getFlagOption(int flag) const
+    HELICS_NODISCARD bool getFlagOption(int flag) const
     {
         return (helicsMessageGetFlagOption(mo, flag) == HELICS_TRUE);
     }
     /** get the messageID*/
-    int messageID() const { return helicsMessageGetMessageID(mo); }
+    HELICS_NODISCARD int messageID() const { return helicsMessageGetMessageID(mo); }
     /** set the messageID field of a message object*/
     Message& messageID(int newId)
     {
@@ -185,8 +191,9 @@ class Message {
         return *this;
     }
     /** release a C message_object from the structure
-    @details for use with the C shared library*/
-    HelicsMessage release()
+    @details for use with the C shared library. This does not free the memory, the user must call
+    the C library helicsMessageFree to free the memory now*/
+    HELICS_NODISCARD HelicsMessage release()
     {
         HelicsMessage mreturn = mo;
         mo = HELICS_NULL_POINTER;
@@ -194,7 +201,10 @@ class Message {
     }
     void clear() { helicsMessageClear(mo, HELICS_IGNORE_ERROR); }
     /** get the data buffer from the message */
-    DataBuffer dataBuffer() { return DataBuffer(helicsMessageDataBuffer(mo, HELICS_IGNORE_ERROR)); }
+    HELICS_NODISCARD DataBuffer dataBuffer()
+    {
+        return DataBuffer(helicsMessageDataBuffer(mo, HELICS_IGNORE_ERROR));
+    }
     /** generate a new message in a federate*/
     Message& newMessageObject(const Federate& fed);
 
@@ -223,11 +233,11 @@ class Endpoint {
     /** cast to a HelicsEndpoint object*/
     operator HelicsEndpoint() { return ep; }
     /** get the base HelicsEndpoint object for use in the c API functions*/
-    HelicsEndpoint baseObject() const { return ep; }
+    HELICS_NODISCARD HelicsEndpoint baseObject() const { return ep; }
     /** check if the input is valid */
-    bool isValid() const { return (helicsEndpointIsValid(ep) == HELICS_TRUE); }
+    HELICS_NODISCARD bool isValid() const { return (helicsEndpointIsValid(ep) == HELICS_TRUE); }
     /* Checks if endpoint has unread messages **/
-    bool hasMessage() const
+    HELICS_NODISCARD bool hasMessage() const
     {
         // returns int, 1 = true, 0 = false
         return helicsEndpointHasMessage(ep) > 0;
@@ -238,9 +248,15 @@ class Endpoint {
         helicsEndpointSetDefaultDestination(ep, dest.c_str(), hThrowOnError());
     }
     /** get the default destination for an endpoint*/
-    const char* getDefaultDestination() const { return helicsEndpointGetDefaultDestination(ep); }
+    HELICS_NODISCARD const char* getDefaultDestination() const
+    {
+        return helicsEndpointGetDefaultDestination(ep);
+    }
     /** Returns the number of pending receives for endpoint **/
-    uint64_t pendingMessageCount() const { return helicsEndpointPendingMessageCount(ep); }
+    HELICS_NODISCARD uint64_t pendingMessageCount() const
+    {
+        return helicsEndpointPendingMessageCount(ep);
+    }
 
     /** Get a packet from an endpoint **/
     Message getMessage() { return Message(helicsEndpointGetMessage(ep)); }
@@ -384,15 +400,15 @@ class Endpoint {
     {
         // returns helicsStatus
         helicsEndpointSendMessageZeroCopy(ep, static_cast<HelicsMessage>(message), hThrowOnError());
-        message.release();
+        (void)message.release();
     }
     /** get the name of the endpoint*/
-    const char* getName() const { return helicsEndpointGetName(ep); }
+    HELICS_NODISCARD const char* getName() const { return helicsEndpointGetName(ep); }
     /** get the specified type of the endpoint*/
-    const char* getType() { return helicsEndpointGetType(ep); }
+    HELICS_NODISCARD const char* getType() { return helicsEndpointGetType(ep); }
 
     /** get the interface information field of the filter*/
-    const char* getInfo() const { return helicsEndpointGetInfo(ep); }
+    HELICS_NODISCARD const char* getInfo() const { return helicsEndpointGetInfo(ep); }
     /** set the interface information field of the filter*/
     void setInfo(const std::string& info)
     {

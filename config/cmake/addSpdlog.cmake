@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2025, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# Copyright (c) 2017-2026, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Energy Innovation LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
 #
@@ -24,12 +24,24 @@ if(NOT TARGET spdlog::spdlog)
         # the spdlog install internally stores whether it was built with this on our vendored copy
         # of spdlog should never use its own fmt
         set(SPDLOG_FMT_EXTERNAL ON CACHE INTERNAL "")
-
+        if(CMAKE_SYSTEM_NAME STREQUAL "CYGWIN")
+            set(CMAKE_CXX_EXTENSIONS ON CACHE INTERNAL "")
+            set(SPDLOG_FWRITE_UNLOCKED OFF CACHE INTERNAL "")
+        endif()
         # use the vendored SPDLOG library
         if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
             add_subdirectory(ThirdParty/spdlog EXCLUDE_FROM_ALL SYSTEM)
         else()
             add_subdirectory(ThirdParty/spdlog EXCLUDE_FROM_ALL)
+        endif()
+
+        if(CYGWIN)
+            # Match HELICS' Cygwin feature-test setup for vendored spdlog so POSIX stdio APIs like
+            # fileno are visible when spdlog is compiled as its own target.
+            target_compile_definitions(spdlog PUBLIC _XOPEN_SOURCE=500 __USE_W32_SOCKETS)
+            target_compile_definitions(
+                spdlog_header_only INTERFACE _XOPEN_SOURCE=500 __USE_W32_SOCKETS
+            )
         endif()
 
         set_target_properties(spdlog PROPERTIES FOLDER Extern)
@@ -58,5 +70,8 @@ if(NOT TARGET spdlog::spdlog)
         hide_variable(SPDLOG_USE_STD_FORMAT)
         hide_variable(SPDLOG_SYSTEM_INCLUDES)
         hide_variable(SPDLOG_BUILD_PIC)
+        hide_variable(SPDLOG_FWRITE_UNLOCKED)
+        hide_variable(SPDLOG_MSVC_UTF8)
+        hide_variable(SPDLOG_WCHAR_CONSOLE)
     endif()
 endif()

@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -183,6 +183,8 @@ class CommsInterface {
     void join_tx_rx_thread();
     /** get the generated randomID for this comm interface*/
     const std::string& getRandomID() const { return randomID; }
+    /** check if the global shutdown tripwire has been triggered */
+    bool isShutdownTripped() const { return tripDetector.isTripped(); }
 
   private:
     gmlc::concurrency::TripWireDetector

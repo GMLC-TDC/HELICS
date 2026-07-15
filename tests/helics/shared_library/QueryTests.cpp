@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -128,4 +128,4 @@ TEST_F(QueryTestSingle, queries_callback_test)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-INSTANTIATE_TEST_SUITE_P(QueryTests, QueryTests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(QueryTests, QueryTests, ::testing::ValuesIn(CoreTypes_ci_A));

@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 
 SPDX-License-Identifier: BSD-3-Clause
 */
@@ -87,13 +87,23 @@ TEST(federateInfo, constructor3)
 TEST(federateInfo, loadArgs2)
 {
     helics::FederateInfo fedInfo;
+#ifdef HELICS_DISABLE_ASIO
+    fedInfo.loadInfoFromArgs(
+        "--name f3 --coretype ipc --flags realtime;source_only,-buffer_data --port=5000");
+#else
     fedInfo.loadInfoFromArgs(
         "--name f3 --coretype ipc --flags realtime;source_only,-buffer_data --port=5000 --RT_tolerance 200ms");
+#endif
     EXPECT_EQ(fedInfo.coreType, helics::CoreType::INTERPROCESS);
     EXPECT_EQ(fedInfo.defName, "f3");
     EXPECT_EQ(fedInfo.flagProps.size(), 3U);
     EXPECT_EQ(fedInfo.brokerPort, 5000);
+#ifdef HELICS_DISABLE_ASIO
+    // --RT_tolerance is part of the realtime option group and is unavailable without ASIO.
+    EXPECT_EQ(fedInfo.timeProps.size(), 0U);
+#else
     EXPECT_EQ(fedInfo.timeProps.size(), 1U);
+#endif
 }
 
 TEST(federateInfo, loadArgs_error)
@@ -151,7 +161,13 @@ TEST(federateInfo, constructor5b)
 TEST(federateInfo, constructor6)
 {
     helics::FederateInfo fedInfo{"--outputdelay=2 --separator=/ --rtlead=100ms --rtlag=50ms"};
+#ifdef HELICS_DISABLE_ASIO
+    // --rtlead and --rtlag are part of the realtime option group and are disabled without ASIO,
+    // so only --outputdelay contributes a time property in this configuration.
+    EXPECT_EQ(fedInfo.timeProps.size(), 1U);
+#else
     EXPECT_EQ(fedInfo.timeProps.size(), 3U);
+#endif
     EXPECT_EQ(fedInfo.separator, '/');
 }
 

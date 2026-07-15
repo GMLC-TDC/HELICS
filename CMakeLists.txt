@@ -1,13 +1,13 @@
 # ~~~
-# Copyright (c) 2017-2025, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# Copyright (c) 2017-2026, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Energy Innovation LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.22...3.31)
+cmake_minimum_required(VERSION 3.22...4.2)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -18,14 +18,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_D
 endif()
 
 message(STATUS "Generating with CMAKE version ${CMAKE_VERSION}")
-project(HELICS VERSION 3.6.1)
+project(HELICS VERSION 3.7.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2025-02-24")
+set(HELICS_DATE "2026-07-11")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -250,7 +250,7 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
     endif()
 
     if(NOT HELICS_DISABLE_ASIO)
-        if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include/asio.hpp")
+        if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/include/asio.hpp")
             submod_update(ThirdParty/asio)
         endif()
     endif()
@@ -364,14 +364,6 @@ mark_as_advanced(HELICS_ENABLE_MPI_CORE HELICS_ENABLE_ZMQ_CORE)
 # Some specialized configurations
 # -------------------------------------------------------------
 
-show_variable(
-    HELICS_BUILD_CONFIGURATION
-    STRING
-    "specify a build configuration to use for some specialized systems that are not otherwise detectable"
-    ""
-)
-mark_as_advanced(HELICS_BUILD_CONFIGURATION)
-
 # Add to list of enabled vcpkg features based on core type
 if(HELICS_ENABLE_ZMQ_CORE)
     list(APPEND VCPKG_MANIFEST_FEATURES "zeromq")
@@ -454,6 +446,10 @@ if(MSYS OR CYGWIN)
             add_compile_definitions(_WIN32_WINNT=0x0A00)
         endif()
     endif()
+    if(CYGWIN)
+        set(CMAKE_LEGACY_CYGWIN_WIN32 ON)
+        set(CMAKE_CXX_EXTENSIONS ON)
+    endif()
 endif()
 
 if(MINGW AND NOT UNIX_LIKE)
@@ -533,7 +529,7 @@ if(NOT HELICS_DISABLE_ASIO)
     target_compile_definitions(helics_base INTERFACE "-DASIO_STANDALONE")
     target_include_directories(
         helics_base SYSTEM
-        INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
+        INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/include>
     )
 endif()
 
@@ -749,7 +745,7 @@ if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
 endif()
 
 if(NOT HELICS_DISABLE_ASIO)
-    list(APPEND LICENSE_LIST "asio" "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt")
+    list(APPEND LICENSE_LIST "asio" "${PROJECT_SOURCE_DIR}/ThirdParty/asio/LICENSE_1_0.txt")
 endif()
 
 combinelicenses(${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES ${LICENSE_LIST})
@@ -982,7 +978,6 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     if(HELICS_HIDE_CMAKE_VARIABLES)
         hide_variable(HELICS_BINARY_ONLY_INSTALL)
         hide_variable(HELICS_BUILD_APP_LIBRARY)
-        hide_variable(HELICS_BUILD_CONFIGURATION)
         hide_variable(HELICS_BUILD_CXX_SHARED_LIB)
         hide_variable(HELICS_DISABLE_ASIO)
         hide_variable(HELICS_DISABLE_BOOST)

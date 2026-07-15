@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -60,7 +60,7 @@ std::pair<double, int> runInitIterations(HelicsFederate vfed, int index, int tot
     low_target += std::to_string((index == 0) ? total - 1 : index - 1);
     low_target += "/pub";
     std::string high_target = "fed";
-    high_target += std::to_string((index == total - 1) ? (0) : index + 1);
+    high_target += std::to_string((index == total - 1) ? 0 : index + 1);
     high_target += "/pub";
     auto sub_low = helicsFederateRegisterSubscription(vfed, low_target.c_str(), "", nullptr);
     auto sub_high = helicsFederateRegisterSubscription(vfed, high_target.c_str(), "", nullptr);
@@ -92,15 +92,16 @@ std::pair<double, int> runInitIterations(HelicsFederate vfed, int index, int tot
 // a test with an iterative loop with a bunch of federates
 std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<HelicsFederate>& fedVec)
 {
-    auto N = static_cast<int>(fedVec.size());
+    auto fedCount = static_cast<int>(fedVec.size());
     std::vector<std::future<std::pair<double, int>>> futures;
-    for (decltype(N) ii = 0; ii < N; ++ii) {
+    for (decltype(fedCount) ii = 0; ii < fedCount; ++ii) {
         auto vFed = fedVec[ii];
-        futures.push_back(std::async(std::launch::async,
-                                     [vFed, ii, N]() { return runInitIterations(vFed, ii, N); }));
+        futures.push_back(std::async(std::launch::async, [vFed, ii, fedCount]() {
+            return runInitIterations(vFed, ii, fedCount);
+        }));
     }
-    std::vector<std::pair<double, int>> results(N);
-    for (decltype(N) ii = 0; ii < N; ++ii) {
+    std::vector<std::pair<double, int>> results(fedCount);
+    for (decltype(fedCount) ii = 0; ii < fedCount; ++ii) {
         results[ii] = futures[ii].get();
     }
     return results;
@@ -129,14 +130,16 @@ TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
     EXPECT_NEAR(res1.first, 2.5, 0.1);
 }
 
-INSTANTIATE_TEST_SUITE_P(iteration_tests, iteration_tests_type, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(iteration_tests,
+                         iteration_tests_type,
+                         ::testing::ValuesIn(CoreTypes_ci_B));
 
 TEST_F(iteration_tests, execution_iteration_loop3)
 {
-    int N = 5;
-    SetupTest(helicsCreateValueFederate, "test", N);
-    std::vector<HelicsFederate> vfeds(N);
-    for (int ii = 0; ii < N; ++ii) {
+    int fedCount = 5;
+    SetupTest(helicsCreateValueFederate, "test", fedCount);
+    std::vector<HelicsFederate> vfeds(fedCount);
+    for (int ii = 0; ii < fedCount; ++ii) {
         vfeds[ii] = GetFederateAt(ii);
         helicsFederateSetFlagOption(vfeds[ii],
                                     HELICS_FLAG_RESTRICTIVE_TIME_POLICY,
@@ -144,7 +147,7 @@ TEST_F(iteration_tests, execution_iteration_loop3)
                                     nullptr);
     }
     auto results = run_iteration_round_robin(vfeds);
-    for (int ii = 1; ii < N; ++ii) {
+    for (int ii = 1; ii < fedCount; ++ii) {
         if (results[ii].second < 50) {
             EXPECT_NEAR(results[ii].first, results[0].first, 0.1);
         }
@@ -288,23 +291,23 @@ TEST_F(iteration_tests, test_iteration_counter)
     helicsFederateEnterInitializingModeAsync(vFed1, nullptr);
     helicsFederateEnterInitializingMode(vFed2, nullptr);
     helicsFederateEnterInitializingModeComplete(vFed1, nullptr);
-    int64_t c1 = 0;
-    int64_t c2 = 0;
+    int64_t counter1 = 0;
+    int64_t counter2 = 0;
 
-    helicsPublicationPublishInteger(pub1, c1, nullptr);
-    helicsPublicationPublishInteger(pub2, c2, nullptr);
+    helicsPublicationPublishInteger(pub1, counter1, nullptr);
+    helicsPublicationPublishInteger(pub2, counter2, nullptr);
 
     helicsFederateEnterExecutingModeAsync(vFed1, nullptr);
     helicsFederateEnterExecutingMode(vFed2, nullptr);
     helicsFederateEnterExecutingModeComplete(vFed1, nullptr);
-    while (c1 <= 10) {
-        EXPECT_EQ(helicsInputGetInteger(sub1, nullptr), c1);
-        EXPECT_EQ(helicsInputGetInteger(sub2, nullptr), c2);
-        ++c1;
-        ++c2;
-        if (c1 <= 10) {
-            helicsPublicationPublishInteger(pub1, c1, nullptr);
-            helicsPublicationPublishInteger(pub2, c2, nullptr);
+    while (counter1 <= 10) {
+        EXPECT_EQ(helicsInputGetInteger(sub1, nullptr), counter1);
+        EXPECT_EQ(helicsInputGetInteger(sub2, nullptr), counter2);
+        ++counter1;
+        ++counter2;
+        if (counter1 <= 10) {
+            helicsPublicationPublishInteger(pub1, counter1, nullptr);
+            helicsPublicationPublishInteger(pub2, counter2, nullptr);
         }
 
         helicsFederateRequestTimeIterativeAsync(vFed1,
@@ -315,7 +318,7 @@ TEST_F(iteration_tests, test_iteration_counter)
 
         auto grantedTime = helicsFederateRequestTimeIterative(
             vFed2, 1.0, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED, &state, nullptr);
-        if (c1 <= 10) {
+        if (counter1 <= 10) {
             EXPECT_TRUE(state == HELICS_ITERATION_RESULT_ITERATING);
             EXPECT_EQ(grantedTime, 0.0);
         } else {
@@ -323,7 +326,7 @@ TEST_F(iteration_tests, test_iteration_counter)
             EXPECT_EQ(grantedTime, 1.0);
         }
         grantedTime = helicsFederateRequestTimeIterativeComplete(vFed1, &state, nullptr);
-        if (c1 <= 10) {
+        if (counter1 <= 10) {
             EXPECT_TRUE(state == HELICS_ITERATION_RESULT_ITERATING);
             EXPECT_EQ(grantedTime, 0.0);
         } else {

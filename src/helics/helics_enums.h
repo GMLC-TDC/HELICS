@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -433,8 +433,13 @@ typedef enum { /* NOLINT */
                HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
-#define HELICS_BIG_NUMBER 9223372036.854774
+#define HELICS_BIG_NUMBER 9223372000.00000
+#define HELICS_MAX_TIME_VALUE 9223372036.854774
+#define HELICS_TERMINATION_TIME_VALUE HELICS_MAX_TIME_VALUE / 2.0
+
+const double cHelicsMaxTimeValue = HELICS_MAX_TIME_VALUE;
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
+const double cHelicsTerminateTime = HELICS_TERMINATION_TIME_VALUE;
 
 #define HELICS_INVALID_DOUBLE (-1E49)
 

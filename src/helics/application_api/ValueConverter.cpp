@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -216,8 +216,8 @@ void convertFromBinary(const std::byte* data, std::complex<double>& val)
 {
     // https://en.cppreference.com/w/cpp/numeric/complex
     //  the layout used here is guaranteed by the standard
-    std::memcpy(&reinterpret_cast<double(&)[2]>(val)[0], data + 8, 8);
-    std::memcpy(&reinterpret_cast<double(&)[2]>(val)[1], data + 16, 8);
+    std::memcpy(&reinterpret_cast<double (&)[2]>(val)[0], data + 8, 8);
+    std::memcpy(&reinterpret_cast<double (&)[2]>(val)[1], data + 16, 8);
     if ((data[0] & endianMask) != littleEndianCode) {
         checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val));
         checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val) + 8);

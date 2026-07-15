@@ -1,6 +1,6 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy Innovation LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
@@ -108,8 +108,10 @@ typedef double HelicsTime;
 const HelicsTime HELICS_TIME_ZERO = 0.0; /*!< definition of time zero-the beginning of simulation */
 const HelicsTime HELICS_TIME_EPSILON = 1.0e-9; /*!< definition of the minimum time resolution */
 const HelicsTime HELICS_TIME_INVALID = -1.785e39; /*!< definition of an invalid time that has no meaning */
-const HelicsTime HELICS_TIME_MAXTIME = HELICS_BIG_NUMBER; /*!< definition of time signifying the federate has
-                                                             terminated or run until the end of the simulation*/
+const HelicsTime HELICS_TIME_BIGTIME = HELICS_BIG_NUMBER; /*!< definition of a very large time */
+const HelicsTime HELICS_TIME_MAXTIME = HELICS_MAX_TIME_VALUE; /*!< definition of the maximum allowed time value*/
+const HelicsTime HELICS_TIME_TERMINATION =
+    HELICS_TERMINATION_TIME_VALUE; /*!< definition of the minimum time level signifying the simulation has ended*/
 
 /**
  * defining a boolean type for use in the helics interface

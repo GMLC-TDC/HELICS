@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -239,8 +239,16 @@ TEST_F(timing_tests, max_time_consistency)
     CE(helicsFederateEnterExecutingMode(vFed, &err));
     HelicsTime gtime;
     CE(gtime = helicsFederateRequestTime(vFed, HELICS_TIME_MAXTIME, &err));
-    EXPECT_GE(gtime, HELICS_TIME_MAXTIME);
+    EXPECT_DOUBLE_EQ(gtime, HELICS_TIME_MAXTIME);
     CE(helicsFederateFinalize(vFed, &err));
     CE(gtime = helicsFederateGetCurrentTime(vFed, &err));
-    EXPECT_GE(gtime, HELICS_TIME_MAXTIME);
+    EXPECT_DOUBLE_EQ(gtime, HELICS_TIME_MAXTIME);
+}
+
+TEST_F(timing_tests, ordering)
+{
+    EXPECT_LT(HELICS_TIME_BIGTIME, HELICS_TIME_MAXTIME);
+    EXPECT_GT(HELICS_TIME_BIGTIME, HELICS_TIME_TERMINATION);
+    EXPECT_GT(HELICS_TIME_BIGTIME, 9000000000.0);
+    EXPECT_GT(HELICS_TIME_TERMINATION, static_cast<double>(0xFFFFFFFFLL));
 }

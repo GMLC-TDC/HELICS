@@ -31,6 +31,7 @@
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 import os
+import importlib
 import sphinx_rtd_theme
 import shutil
 import subprocess
@@ -126,9 +127,15 @@ extensions = [
     "sphinxcontrib.rsvgconverter",
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
-    "sphinxcontrib.redoc",
     "sphinxcontrib.mermaid",
 ]
+
+try:
+    importlib.import_module("sphinxcontrib.redoc")
+except ImportError:
+    pass
+else:
+    extensions.append("sphinxcontrib.redoc")
 
 myst_enable_extensions = [
     "amsmath",
@@ -153,7 +160,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "HELICS"
-copyright = "2017-2025 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC. See the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause. Documentation source in https://github.com/GMLC-TDC/HELICS"
+copyright = "2017-2026 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy Innovation LLC. See the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause. Documentation source in https://github.com/GMLC-TDC/HELICS"
 author = "Philip Top, Trevor Hardy, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Bryan Palmintier, Jason Fuller"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -213,7 +220,6 @@ mermaid_js_priority = 499
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_TRANSLATOR_HPP_
@@ -33,11 +33,14 @@ class Translator {
     /** cast operator to get the underlying object*/
     operator HelicsTranslator() const { return translator; }
     /** get the underlying HelicsTranslator object*/
-    HelicsTranslator baseObject() const { return translator; }
+    HELICS_NODISCARD HelicsTranslator baseObject() const { return translator; }
     /** check if the translator is valid */
-    bool isValid() const { return (helicsTranslatorIsValid(translator) == HELICS_TRUE); }
+    HELICS_NODISCARD bool isValid() const
+    {
+        return (helicsTranslatorIsValid(translator) == HELICS_TRUE);
+    }
     /** get the name for the translator*/
-    const char* getName() const { return helicsTranslatorGetName(translator); }
+    HELICS_NODISCARD const char* getName() const { return helicsTranslatorGetName(translator); }
     /** set a property on a translator
     @param property the name of the property of the translator to change
     @param val the numerical value of the property
@@ -88,14 +91,14 @@ class Translator {
         helicsTranslatorRemoveTarget(translator, dest.c_str(), hThrowOnError());
     }
     /** get the interface information field of the translator*/
-    const char* getInfo() const { return helicsTranslatorGetInfo(translator); }
+    HELICS_NODISCARD const char* getInfo() const { return helicsTranslatorGetInfo(translator); }
     /** set the interface information field of the translator*/
     void setInfo(const std::string& info)
     {
         helicsTranslatorSetInfo(translator, info.c_str(), HELICS_IGNORE_ERROR);
     }
     /** get the value of a tag for the translator*/
-    const char* getTag(const std::string& tagname) const
+    HELICS_NODISCARD const char* getTag(const std::string& tagname) const
     {
         return helicsTranslatorGetTag(translator, tagname.c_str());
     }

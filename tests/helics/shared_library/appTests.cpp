@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -87,6 +87,7 @@ TEST(app_tests, simple_player)
     thread1.join();
     EXPECT_EQ(err2.error_code, 0);
     EXPECT_EQ(err.error_code, 0);
+    helicsFederateInfoFree(fedInfo);
 }
 
 TEST(app_tests, recorder)
@@ -141,6 +142,7 @@ TEST(app_tests, recorder)
     thread1.join();
 
     helicsAppDestroy(rec1);
+    helicsFederateInfoFree(fedInfo);
 }
 
 TEST(app_tests, recorder_object_nosan_ci_skip)
@@ -162,6 +164,7 @@ TEST(app_tests, recorder_object_nosan_ci_skip)
     helicsAppDestroy(recc1);
 
     EXPECT_EQ(helicsAppIsActive(recc1), HELICS_FALSE);
+    helicsFederateInfoFree(fedInfo);
 }
 
 TEST(app_tests, connector)
@@ -214,6 +217,7 @@ TEST(app_tests, connector)
     EXPECT_EQ(err2.error_code, 0);
 
     helicsAppDestroy(conn1);
+    helicsFederateInfoFree(fedInfo);
 }
 
 TEST(app_tests, echo)
@@ -266,4 +270,5 @@ TEST(app_tests, echo)
     helicsFederateDestroy(mFed);
     thread1.join();
     EXPECT_EQ(err2.error_code, 0);
+    helicsFederateInfoFree(fedInfo);
 }

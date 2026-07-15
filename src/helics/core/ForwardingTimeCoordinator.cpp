@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -48,7 +48,7 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
             downstream.Te = upstream.Te;
         }
     }
-    if (!restrictive_time_policy && upstream.minDe < Time::maxVal()) {
+    if (!restrictive_time_policy && upstream.minDe < cTerminationTime) {
         if (downstream.minDe > downstream.next) {
             //     downstream.next = downstream.minminDe;
         }
@@ -213,7 +213,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
                 continue;
             }
             if (dep.dependency) {
-                if (dep.next > msg.actionTime && dep.next < cBigTime) {
+                if (dep.next > msg.actionTime && dep.next < cTerminationTime) {
                     continue;
                 }
             }

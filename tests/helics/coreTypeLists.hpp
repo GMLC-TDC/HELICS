@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -92,6 +92,9 @@ constexpr const char* CoreTypes_2[] = {IPCTEST2 TCPTEST2 ZMQSSTEST2 "test_2",
 
 constexpr const char* CoreTypes_simple[] = {
     INPROCTEST TCPSSTEST ZMQSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST};
+constexpr const char* CoreTypes_ci[] = {"test", ZMQTEST IPCTEST TCPTEST};
+constexpr const char* CoreTypes_ci_A[] = {"test", IPCTEST2 TCPTEST ZMQTEST ZMQSSTEST};
+constexpr const char* CoreTypes_ci_B[] = {ZMQTEST3 INPROCTEST2 UDPTEST TCPSSTEST ZMQTEST2};
 constexpr const char* CoreTypes_single[] = {INPROCTEST TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST
                                             "test_3",
                                             ZMQTEST3 TCPTEST3 ZMQSSTEST UDPTEST3};

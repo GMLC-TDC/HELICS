@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2025, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# Copyright (c) 2017-2026, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Energy Innovation LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
 #
@@ -17,25 +17,16 @@ if(NOT CMAKE_CXX_STANDARD)
     endif()
 endif()
 
-if(CMAKE_CXX_STANDARD LESS 17)
-    message(FATAL_ERROR "{$PROJECT_NAME} requires C++17 or greater")
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0)
-    if(CMAKE_CXX_STANDARD LESS 20)
-        message(
-            FATAL_ERROR
-                " using gcc>=13.0 {$PROJECT_NAME} requires setting C++ standard to C++20 or greater"
-        )
-    endif()
+if(CMAKE_CXX_STANDARD LESS 20)
+    message(FATAL_ERROR "${PROJECT_NAME} requires C++20 or greater")
 endif()
 
 if(MSVC)
-    if(CMAKE_CXX_STANDARD EQUAL 17)
-        check_cxx_compiler_flag(/std:c++17 has_std_17_flag)
-        if(has_std_17_flag)
-            set(CXX_STANDARD_FLAG /std:c++17)
-            set(has_std_1z_flag ON)
+    if(CMAKE_CXX_STANDARD EQUAL 23)
+        check_cxx_compiler_flag(/std:c++23 has_std_23_flag)
+        if(has_std_23_flag)
+            set(CXX_STANDARD_FLAG /std:c++23)
+            set(has_std_2b_flag ON)
         else()
             set(CXX_STANDARD_FLAG /std:c++latest)
         endif()
@@ -73,15 +64,8 @@ else()
                 set(CXX_STANDARD_FLAG -std=c++2a)
             endif()
         endif()
-    elseif(CMAKE_CXX_STANDARD EQUAL 17)
-        if(CYGWIN AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-            set(CXX_STANDARD_FLAG -std=gnu++17)
-        else()
-            set(CXX_STANDARD_FLAG -std=c++17)
-        endif()
-
     else()
-        message(FATAL_ERROR "{$PROJECT_NAME} requires C++17 or Higher")
+        message(FATAL_ERROR "${PROJECT_NAME} requires C++20 or higher")
     endif()
 
 endif()

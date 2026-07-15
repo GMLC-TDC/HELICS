@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -413,7 +413,7 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
 }
 
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes_ci_B));
 
 // a series of tests exercising the different aspects of message object setting and retrieval
 TEST(message_object, test1_nosan)

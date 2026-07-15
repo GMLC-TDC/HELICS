@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_FEDERATE_HPP_
@@ -160,7 +160,7 @@ class FederateInfo {
     }
 
     /** get the underlying HelicsFederateInfo object*/
-    HelicsFederateInfo getInfo() { return fedInfo; }
+    HELICS_NODISCARD HelicsFederateInfo getInfo() { return fedInfo; }
 
   private:
     HelicsFederateInfo fedInfo;  //!< handle for the underlying federate_info object
@@ -272,7 +272,7 @@ class Federate {
     /** cast operator to get the underlying HelicsFederate object*/
     operator HelicsFederate() const { return fed; }
     /** get the underlying HelicsFederate object*/
-    HelicsFederate baseObject() const { return fed; }
+    HELICS_NODISCARD HelicsFederate baseObject() const { return fed; }
     /** set a flag for the federate
    @param flag an index into the flag /ref flag-definitions.h
    @param flagValue the value of the flag defaults to true
@@ -304,21 +304,21 @@ class Federate {
     /** get the value of a flag option
     @param flag an index into the flag /ref flag-definitions.h
     */
-    bool getFlagOption(int flag) const
+    HELICS_NODISCARD bool getFlagOption(int flag) const
     {
         return (helicsFederateGetFlagOption(fed, flag, hThrowOnError()) != HELICS_FALSE);
     }
     /** get the value of a time option for the federate
     @param tProperty the option to get
     */
-    HelicsTime getTimeProperty(int tProperty) const
+    HELICS_NODISCARD HelicsTime getTimeProperty(int tProperty) const
     {
         return helicsFederateGetTimeProperty(fed, tProperty, hThrowOnError());
     }
     /**  get an integer option for the federate
    @param intProperty  the option to inquire
    */
-    int getIntegerProperty(int intProperty) const
+    HELICS_NODISCARD int getIntegerProperty(int intProperty) const
     {
         return helicsFederateGetIntegerProperty(fed, intProperty, hThrowOnError());
     }
@@ -340,7 +340,7 @@ class Federate {
         helicsFederateRegisterInterfaces(fed, configString.c_str(), hThrowOnError());
     }
     /** get the current state of the federate*/
-    HelicsFederateState getCurrentMode() const
+    HELICS_NODISCARD HelicsFederateState getCurrentMode() const
     {
         return helicsFederateGetState(fed, HELICS_NULL_POINTER);
     }
@@ -348,7 +348,7 @@ class Federate {
     completed
     @details this should only be called from the same thread as the one that called the initial
     async call and will return false if called when no async operation is in flight*/
-    bool isAsyncOperationCompleted() const
+    HELICS_NODISCARD bool isAsyncOperationCompleted() const
     {
         // returns int, 1 = true, 0 = false
         return helicsFederateIsAsyncOperationCompleted(fed, HELICS_NULL_POINTER) != HELICS_FALSE;
@@ -456,7 +456,10 @@ class Federate {
     /** complete the asynchronous terminate pair*/
     void finalizeComplete() { helicsFederateFinalizeComplete(fed, hThrowOnError()); }
     /** get the current time from a federate */
-    HelicsTime getCurrentTime() { return helicsFederateGetCurrentTime(fed, hThrowOnError()); }
+    HELICS_NODISCARD HelicsTime getCurrentTime()
+    {
+        return helicsFederateGetCurrentTime(fed, hThrowOnError());
+    }
     /** request a time advancement
    @param time the next requested time step
    @return the granted time step*/
@@ -529,7 +532,7 @@ class Federate {
         helicsFederateProcessCommunications(fed, period, HELICS_IGNORE_ERROR);
     }
     /** get the federate name*/
-    const char* getName() const { return helicsFederateGetName(fed); }
+    HELICS_NODISCARD const char* getName() const { return helicsFederateGetName(fed); }
 
     /** protect the federate and make it retrievable even if not library objects exist*/
     void protect() { helicsFederateProtect(helicsFederateGetName(fed), HELICS_IGNORE_ERROR); }
@@ -608,7 +611,10 @@ class Federate {
      * @return A string with the command for the federate, if the string is empty no command is
      * available.
      */
-    const char* getCommand() { return helicsFederateGetCommand(fed, HELICS_IGNORE_ERROR); }
+    HELICS_NODISCARD const char* getCommand()
+    {
+        return helicsFederateGetCommand(fed, HELICS_IGNORE_ERROR);
+    }
 
     /**
      * Get a command sent to the federate. Blocks until a command is received.
@@ -616,7 +622,10 @@ class Federate {
      * @return A string with the command for the federate, if the string is empty no command is
      * available.
      */
-    const char* waitCommand() { return helicsFederateWaitCommand(fed, HELICS_IGNORE_ERROR); }
+    HELICS_NODISCARD const char* waitCommand()
+    {
+        return helicsFederateWaitCommand(fed, HELICS_IGNORE_ERROR);
+    }
 
     /**
      * Get the source of the most recently retrieved command sent to the federate.
@@ -624,7 +633,7 @@ class Federate {
      * @return A string with the command for the federate, if the string is empty no command is
      * available.
      */
-    const char* getCommandSource()
+    HELICS_NODISCARD const char* getCommandSource()
     {
         return helicsFederateGetCommandSource(fed, HELICS_IGNORE_ERROR);
     }
@@ -788,18 +797,18 @@ class Federate {
                                                                        hThrowOnError()));
     }
     /** get a count of the number of filters registered in a federate*/
-    int getFilterCount() const { return helicsFederateGetFilterCount(fed); }
+    HELICS_NODISCARD int getFilterCount() const { return helicsFederateGetFilterCount(fed); }
     /** get the id of a source filter from the name of the endpoint
     @param filterName the name of the filter
     @return a reference to a filter object which could be invalid if filterName is not valid*/
-    Filter getFilter(const std::string& filterName)
+    HELICS_NODISCARD Filter getFilter(const std::string& filterName)
     {
         return Filter(helicsFederateGetFilter(fed, filterName.c_str(), hThrowOnError()));
     }
     /** get a filter from its index
     @param index the index of a filter
     @return a reference to a filter object which could be invalid if filterName is not valid*/
-    Filter getFilter(int index)
+    HELICS_NODISCARD Filter getFilter(int index)
     {
         return Filter(helicsFederateGetFilterByIndex(fed, index, hThrowOnError()));
     }
@@ -838,7 +847,7 @@ class Federate {
     @param tag the name of the tag to get the value for
     @return a const char * containing the text value of the tag, if the tag is not defined the
     value is a length 0 string*/
-    const char* getTag(const std::string& tag) const
+    HELICS_NODISCARD const char* getTag(const std::string& tag) const
     {
         return helicsFederateGetTag(fed, tag.c_str(), hThrowOnError());
     }
@@ -896,9 +905,9 @@ class Federate {
         helicsFederateLogLevelMessage(fed, level, message.c_str(), hThrowOnError());
     }
     /** get a Core Object*/
-    HelicsCore getCore() { return helicsFederateGetCore(fed, hThrowOnError()); }
+    HELICS_NODISCARD HelicsCore getCore() { return helicsFederateGetCore(fed, hThrowOnError()); }
     /** get the C object for use in the C library*/
-    HelicsFederate getObject() const { return fed; }
+    HELICS_NODISCARD HelicsFederate getObject() const { return fed; }
 
   protected:
     HelicsFederate fed;  //!< underlying HelicsFederate object

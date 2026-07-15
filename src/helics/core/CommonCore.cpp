@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CommonCore.hpp"
@@ -52,6 +52,65 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
+namespace {
+    const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>& commonCoreMapIndex()
+    {
+        static const auto* mapIndex =
+            new std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>{
+                {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
+                {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
+                {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
+                {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
+                {"barriers", {BARRIERS, QueryReuse::DISABLED}},
+                {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
+                {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
+                {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
+                {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
+        return *mapIndex;
+    }
+
+    const std::set<std::string>& commonCoreQuerySet()
+    {
+        static const auto* querySet = new std::set<std::string>{"isinit",
+                                                                "isconnected",
+                                                                "exists",
+                                                                "name",
+                                                                "identifier",
+                                                                "address",
+                                                                "queries",
+                                                                "address",
+                                                                "barriers",
+                                                                "federates",
+                                                                "inputs",
+                                                                "input_details",
+                                                                "endpoints",
+                                                                "endpoint_details",
+                                                                "filtered_endpoints",
+                                                                "publications",
+                                                                "publication_details",
+                                                                "filters",
+                                                                "filter_details",
+                                                                "interface_details",
+                                                                "tags",
+                                                                "version",
+                                                                "version_all",
+                                                                "federate_map",
+                                                                "dependency_graph",
+                                                                "data_flow_graph",
+                                                                "dependencies",
+                                                                "dependson",
+                                                                "dependents",
+                                                                "logs",
+                                                                "current_time",
+                                                                "global_time",
+                                                                "global_state",
+                                                                "global_flush",
+                                                                "current_state",
+                                                                "logs"};
+        return *querySet;
+    }
+}  // namespace
 
 const std::string& stateString(OperatingState state)
 {
@@ -162,7 +221,13 @@ bool CommonCore::connect()
                 }
                 transmit(parent_route_id, reg);
                 setBrokerState(BrokerState::CONNECTED);
-                disconnection.activate();
+                if (!disconnection.activate()) {
+                    if (!disconnection.isActive()) {
+                        LOG_WARNING(global_id.load(),
+                                    getIdentifier(),
+                                    "disconnect trigger is not active");
+                    }
+                }
                 if (!configString.empty()) {
                     makeConnections(configString);
                 }
@@ -226,7 +291,7 @@ void CommonCore::processDisconnect(bool skipUnregister)
     if (!skipUnregister) {
         unregister();
     }
-    disconnection.trigger();
+    (void)disconnection.trigger();
 }
 
 void CommonCore::disconnect()
@@ -250,7 +315,7 @@ void CommonCore::disconnect()
             addActionMessage(udisconnect);
         }
         if (cnt % 13 == 0) {
-            std::cerr << "waiting on disconnect " << std::endl;
+            std::cerr << "waiting on disconnect " << '\n';
         }
     }
 }
@@ -258,8 +323,7 @@ void CommonCore::disconnect()
 bool CommonCore::waitForDisconnect(std::chrono::milliseconds msToWait) const
 {
     if (msToWait <= std::chrono::milliseconds(0)) {
-        disconnection.wait();
-        return true;
+        return disconnection.wait();
     }
     return disconnection.wait_for(msToWait);
 }
@@ -530,16 +594,14 @@ bool CommonCore::allDisconnected() const
     if (afed && filterFed != nullptr) {
         return !filterFed->hasActiveTimeDependencies();
     }
-    return (afed);
+    return afed;
 }
 
 OperatingState CommonCore::minFederateState() const
 {
     OperatingState state{OperatingState::DISCONNECTED};
     for (const auto& fed : loopFederates) {
-        if (fed.state < state) {
-            state = fed.state;
-        }
+        state = std::min(fed.state, state);
     }
     return state;
 }
@@ -654,7 +716,7 @@ iteration_time CommonCore::enterExecutingMode(LocalFederateId federateID, Iterat
         throw(InvalidIdentifier("federateID not valid (EnterExecutingState)"));
     }
     if (FederateStates::EXECUTING == fed->getState()) {
-        return {fed->grantedTime(), IterationResult::NEXT_STEP};
+        return {.grantedTime = fed->grantedTime(), .state = IterationResult::NEXT_STEP};
     }
     if (FederateStates::INITIALIZING != fed->getState()) {
         throw(InvalidFunctionCall("federate is in invalid state for calling entry to exec mode"));
@@ -735,7 +797,7 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     LocalFederateId local_id;
     {
         auto feds = federates.lock();
-        if (static_cast<decltype(maxFederateCount)>(feds->size()) >= maxFederateCount) {
+        if (std::cmp_greater_equal(feds->size(), maxFederateCount)) {
             throw(RegistrationFailure("maximum number of federates in the core has been reached"));
         }
 
@@ -940,13 +1002,14 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
             break;
         case FederateStates::FINISHED:
         case FederateStates::TERMINATING:
-            return iteration_time{Time::maxVal(), IterationResult::HALTED};
+            return iteration_time{.grantedTime = Time::maxVal(), .state = IterationResult::HALTED};
         case FederateStates::CREATED:
         case FederateStates::INITIALIZING:
-            return iteration_time{timeZero, IterationResult::ERROR_RESULT};
+            return iteration_time{.grantedTime = timeZero, .state = IterationResult::ERROR_RESULT};
         case FederateStates::UNKNOWN:
         case FederateStates::ERRORED:
-            return iteration_time{Time::maxVal(), IterationResult::ERROR_RESULT};
+            return iteration_time{.grantedTime = Time::maxVal(),
+                                  .state = IterationResult::ERROR_RESULT};
     }
 
     // limit the iterations
@@ -1801,7 +1864,7 @@ const std::shared_ptr<const SmallBuffer>& CommonCore::getValue(InterfaceHandle h
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
     auto& fed = *getFederateAt(handleInfo->local_fed_id);
-    const std::lock_guard<FederateState> lock(fed);
+    const std::scoped_lock<FederateState> lock(fed);
     return fed.getValue(handle, inputIndex);
 }
 
@@ -1817,7 +1880,7 @@ const std::vector<std::shared_ptr<const SmallBuffer>>&
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
     auto& fed = *getFederateAt(handleInfo->local_fed_id);
-    const std::lock_guard<FederateState> lock(fed);
+    const std::scoped_lock<FederateState> lock(fed);
     return fed.getAllValues(handle);
 }
 
@@ -2112,7 +2175,7 @@ void CommonCore::sendTo(InterfaceHandle sourceHandle,
     auto* fed = getFederateAt(hndl->local_fed_id);
     if (checkActionFlag(*hndl, targeted_flag)) {
         auto targets = fed->getMessageDestinations(sourceHandle);
-        auto res = std::find_if(targets.begin(), targets.end(), [destination](const auto& val) {
+        auto res = std::ranges::find_if(targets, [destination](const auto& val) {
             return (val.second == destination);
         });
         if (res == targets.end()) {
@@ -2153,7 +2216,7 @@ void CommonCore::sendToAt(InterfaceHandle sourceHandle,
     auto* fed = getFederateAt(hndl->local_fed_id);
     if (checkActionFlag(*hndl, targeted_flag)) {
         auto targets = fed->getMessageDestinations(sourceHandle);
-        auto res = std::find_if(targets.begin(), targets.end(), [destination](const auto& val) {
+        auto res = std::ranges::find_if(targets, [destination](const auto& val) {
             return (val.second == destination);
         });
         if (res == targets.end()) {
@@ -2315,10 +2378,10 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
     } else {
         if (checkActionFlag(*hndl, targeted_flag)) {
             auto targets = fed->getMessageDestinations(sourceHandle);
-            auto res = std::find_if(targets.begin(),
-                                    targets.end(),
-                                    [destination = mess.getString(targetStringLoc)](
-                                        const auto& val) { return (val.second == destination); });
+            auto res =
+                std::ranges::find_if(targets,
+                                     [destination = mess.getString(targetStringLoc)](
+                                         const auto& val) { return (val.second == destination); });
             if (res == targets.end()) {
                 throw(InvalidParameter("targeted endpoint destination not in target list"));
             }
@@ -2611,17 +2674,6 @@ void CommonCore::setIdentifier(std::string_view name)
     }
 }
 
-static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> mapIndex{
-    {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
-    {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
-    {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
-    {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
-    {"barriers", {BARRIERS, QueryReuse::DISABLED}},
-    {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
-    {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
-    {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
-    {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
-
 void CommonCore::setQueryCallback(LocalFederateId federateID,
                                   std::function<std::string(std::string_view)> queryFunction,
                                   int order)
@@ -2699,47 +2751,11 @@ std::string CommonCore::federateQuery(const FederateState* fed,
     return fed->processQuery(queryStr, force_ordering);
 }
 
-static const std::set<std::string> querySet{"isinit",
-                                            "isconnected",
-                                            "exists",
-                                            "name",
-                                            "identifier",
-                                            "address",
-                                            "queries",
-                                            "address",
-                                            "barriers",
-                                            "federates",
-                                            "inputs",
-                                            "input_details",
-                                            "endpoints",
-                                            "endpoint_details",
-                                            "filtered_endpoints",
-                                            "publications",
-                                            "publication_details",
-                                            "filters",
-                                            "filter_details",
-                                            "interface_details",
-                                            "tags",
-                                            "version",
-                                            "version_all",
-                                            "federate_map",
-                                            "dependency_graph",
-                                            "data_flow_graph",
-                                            "dependencies",
-                                            "dependson",
-                                            "logs",
-                                            "dependents",
-                                            "current_time",
-                                            "global_time",
-                                            "global_state",
-                                            "global_flush",
-                                            "current_state",
-                                            "logs"};
-
 std::string CommonCore::quickCoreQueries(std::string_view queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return generateStringVector(querySet, [](const std::string& data) { return data; });
+        return generateStringVector(commonCoreQuerySet(),
+                                    [](const std::string& data) { return data; });
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2909,7 +2925,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
         }
         return fileops::generateJsonString(tagBlock);
     }
-    if (queryStr.compare(0, 4, "tag/") == 0) {
+    if (queryStr.starts_with("tag/")) {
         std::string_view queriedTag = queryStr;
         queriedTag.remove_prefix(4);
         for (const auto& tag : tags) {
@@ -2979,6 +2995,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
         });
         return fileops::generateJsonString(base);
     }
+    const auto& mapIndex = commonCoreMapIndex();
     auto maploc = mapIndex.find(queryStr);
     if (maploc != mapIndex.end()) {
         auto index = maploc->second.first;
@@ -3403,7 +3420,7 @@ void CommonCore::sendErrorToFederates(int errorCode, std::string_view message)
     errorCom.messageID = errorCode;
     errorCom.payload = message;
     loopFederates.apply([&errorCom](auto& fed) {
-        if ((fed) && (fed.state == OperatingState::OPERATING)) {
+        if (fed && fed.state == OperatingState::OPERATING) {
             fed->addAction(errorCom);
         }
     });
@@ -3412,7 +3429,7 @@ void CommonCore::sendErrorToFederates(int errorCode, std::string_view message)
 void CommonCore::broadcastToFederates(ActionMessage& cmd)
 {
     loopFederates.apply([&cmd](auto& fed) {
-        if ((fed) && (fed.state == OperatingState::OPERATING)) {
+        if (fed && fed.state == OperatingState::OPERATING) {
             cmd.dest_id = fed->global_id;
             fed->addAction(cmd);
         }
@@ -4972,8 +4989,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                         setLoggerFunction(std::move(callback));
                     }
                     catch (const std::bad_any_cast&) {
-                        // This shouldn't really happen unless someone is being malicious so just
-                        // ignore it for now.
+                        LOG_WARNING(global_broker_id_local,
+                                    identifier,
+                                    "invalid logging callback update payload");
                     }
                 }
             }
@@ -5006,8 +5024,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                         }
                     }
                     catch (const std::bad_any_cast&) {
-                        // This shouldn't really happen unless someone is being malicious so just
-                        // ignore it for now.
+                        LOG_WARNING(global_broker_id_local,
+                                    identifier,
+                                    "invalid federate operator update payload");
                     }
                 }
             }
@@ -5057,7 +5076,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     queryResp.source_id = global_broker_id_local;
                     queryResp.messageID = cmd.messageID;
                     queryResp.counter = cmd.counter;
-                    std::get<1>(mapBuilders[mapIndex.at(cmd.payload.to_string()).first])
+                    std::get<1>(mapBuilders[commonCoreMapIndex().at(cmd.payload.to_string()).first])
                         .push_back(queryResp);
                 }
 

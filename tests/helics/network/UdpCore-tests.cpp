@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2021,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gmlc/networking/AsioContextManager.h"
@@ -130,9 +130,7 @@ TEST(UdpCore, udpComms_rx)
     bool connected = comm.connect();
     ASSERT_TRUE(connected);
 
-    udp::resolver::query queryNew(udp::v4(), "localhost", "23903");
-
-    auto txendpoint = *resolver.resolve(queryNew);
+    auto txendpoint = *resolver.resolve(udp::v4(), "localhost", "23903").begin();
 
     helics::ActionMessage cmd(helics::CMD_ACK);
     std::string buffer = cmd.to_string();

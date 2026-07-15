@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_BROKER_HPP_
@@ -74,9 +74,12 @@ class Broker {
     operator HelicsBroker() { return broker; }
     /** get the underlying HelicsBroker object
     @return a HelicsBroker object*/
-    HelicsBroker baseObject() const { return broker; }
+    HELICS_NODISCARD HelicsBroker baseObject() const { return broker; }
     /** check if the broker is connected*/
-    bool isConnected() const { return (helicsBrokerIsConnected(broker) != HELICS_FALSE); }
+    HELICS_NODISCARD bool isConnected() const
+    {
+        return (helicsBrokerIsConnected(broker) != HELICS_FALSE);
+    }
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect (-1) implies no timeout
     @return true if the disconnect was successful false if it timed out
@@ -89,9 +92,9 @@ class Broker {
      */
     void disconnect() { helicsBrokerDisconnect(broker, hThrowOnError()); }
     /** get the local identification for the broker*/
-    const char* getIdentifier() const { return helicsBrokerGetIdentifier(broker); }
+    HELICS_NODISCARD const char* getIdentifier() const { return helicsBrokerGetIdentifier(broker); }
     /** get the connection address for the broker*/
-    const char* getAddress() const { return helicsBrokerGetAddress(broker); }
+    HELICS_NODISCARD const char* getAddress() const { return helicsBrokerGetAddress(broker); }
 
     /** set a federation global value
     @details this overwrites any previous value for this name

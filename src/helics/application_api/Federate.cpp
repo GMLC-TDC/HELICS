@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "Federate.hpp"
@@ -941,7 +941,7 @@ Time Federate::requestTime(Time nextInternalTimeStep)
                     preTimeRequestOperations(nextInternalTimeStep, false);
                     newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
                     postTimeRequestOperations(newTime, false);
-                } while (retriggerTimeRequest && newTime < Time::maxVal());
+                } while (retriggerTimeRequest && newTime < cTerminationTime);
 
                 return newTime;
             }
@@ -1188,7 +1188,7 @@ void Federate::updateSimulationTime(Time newTime, Time oldTime, bool iterating)
         timeUpdateCallback(newTime, iterating);
     }
     updateTime(newTime, oldTime);
-    if (newTime == Time::maxVal()) {
+    if (newTime >= cTerminationTime) {
         updateFederateMode(Modes::FINISHED);
     }
 }

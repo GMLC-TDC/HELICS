@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -145,4 +145,4 @@ TEST_P(vfed_dual_transfer_ci_skip, obj_string)
 
 INSTANTIATE_TEST_SUITE_P(vfed_dual_transfer_tests,
                          vfed_dual_transfer_ci_skip,
-                         ::testing::ValuesIn(CoreTypes));
+                         ::testing::ValuesIn(CoreTypes_ci_A));

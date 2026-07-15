@@ -16,21 +16,25 @@ jobs:
           test_config: "ci"
           use_mpi: "true"
           encrypted: "true"
+          helics_debug_cleanup: ""
         gcc11:
           containerImage: "helics/buildenv:gcc11-builder"
           test_config: "ci"
           use_mpi: "true"
           encrypted: "true"
+          helics_debug_cleanup: ""
         clang15:
           containerImage: "helics/buildenv:clang15-builder"
           test_config: "ci"
           use_mpi: ""
           encrypted: ""
+          helics_debug_cleanup: ""
         clang18:
           containerImage: "helics/buildenv:clang18-builder"
           test_config: "ci"
           use_mpi: ""
           encrypted: ""
+          helics_debug_cleanup: "1"
 
     pool:
       vmImage: "ubuntu-latest"
@@ -56,6 +60,7 @@ jobs:
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
         env:
           TEST_CONFIG: $[variables['test_config']]
+          HELICS_DEBUG_CLEANUP: $[variables['helics_debug_cleanup']]
         workingDirectory: "build"
         displayName: "Test HELICS"
 
@@ -64,11 +69,10 @@ jobs:
       matrix:
         XCode-latest:
           test_config: "ci"
-          vmImage: "macOS-14"
+          vmImage: "macOS-15"
         XCode-oldest:
           test_config: "ci"
-          vmImage: "macOS-13"
-          xcode_path: "/Applications/Xcode_14.1.app"
+          vmImage: "macOS-14"
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 60
@@ -102,21 +106,30 @@ jobs:
   - job: Windows
     strategy:
       matrix:
-        VS2019-32bit:
-          imageName: "windows-2019"
+        VS2022-32bit:
+          imageName: "windows-2022"
           langArch: "x86"
           vsArch: "Win32"
           extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
-        VS2019-64bit:
-          imageName: "windows-2019"
+          buildExamples: "ON"
+          enablePackageBuild: "ON"
+          runPackaging: "true"
+        VS2026-64bit:
+          imageName: "windows-2025-vs2026"
           langArch: "x64"
           vsArch: "x64"
-          extraFlags: "-DHELICS_DISABLE_WEBSERVER=ON"
+          extraFlags: "-DCMAKE_CXX_STANDARD=23 -DHELICS_DISABLE_C_SHARED_LIB=ON -DHELICS_DISABLE_WEBSERVER=ON -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_DISABLE_ASIO=ON"
+          buildExamples: "OFF"
+          enablePackageBuild: "OFF"
+          runPackaging: "false"
         VS2022-64bit:
           imageName: "windows-2022"
           langArch: "x64"
           vsArch: "x64"
           extraFlags: "-DCMAKE_CXX_STANDARD=20"
+          buildExamples: "ON"
+          enablePackageBuild: "ON"
+          runPackaging: "true"
 
     pool:
       vmImage: $(imageName)
@@ -143,20 +156,21 @@ jobs:
         condition: ne(variables.BOOST_CACHE_RESTORED, 'true')
         displayName: Install Boost
 
-      - bash: choco install swig --yes --limit-output
+      - bash: swig -version
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
-        displayName: Install swig
+        displayName: Show swig version
 
       # -----------------------
       # Configure HELICS
       # -----------------------
       - bash: |
           echo "BOOST_ROOT=$BOOST_ROOT"
+          echo "NUMBER_OF_PROCESSORS=$NUMBER_OF_PROCESSORS"
           env
         displayName: Show environment info
       - task: CMake@1
         inputs:
-          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
+          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=$(enablePackageBuild) -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=$(buildExamples) -DHELICS_DISABLE_VCPKG=ON -DHELICS_EMBEDDED_DEBUG_INFO=external $(extraFlags) ..
         displayName: "Configure HELICS"
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
@@ -169,7 +183,9 @@ jobs:
       # -----------------------
       # Build HELICS
       # -----------------------
-      - bash: cmake --build . --parallel 4 --config Release
+      - bash: |
+          export CMAKE_BUILD_PARALLEL_LEVEL="${NUMBER_OF_PROCESSORS:-8}"
+          cmake --build . --parallel "$CMAKE_BUILD_PARALLEL_LEVEL" --config Release
         displayName: "Build HELICS"
         workingDirectory: build
 
@@ -182,17 +198,20 @@ jobs:
           "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
         displayName: "Package HELICS"
         workingDirectory: build
+        condition: eq(variables['runPackaging'], 'true')
 
       - task: CopyFiles@2
         inputs:
           sourceFolder: "$(Build.SourcesDirectory)/build/installer-output"
           contents: "*.exe"
           TargetFolder: "$(Build.ArtifactStagingDirectory)"
+        condition: eq(variables['runPackaging'], 'true')
 
       - task: PublishBuildArtifacts@1
         inputs:
           pathtoPublish: "$(Build.ArtifactStagingDirectory)"
           artifactName: installer
+        condition: eq(variables['runPackaging'], 'true')
 
       # -----------------------
       # Test HELICS
@@ -205,5 +224,6 @@ jobs:
       - bash: ctest --output-on-failure --timeout 200 -C Release -L "PackagingFast"
         displayName: "Test HELICS packaging"
         workingDirectory: build
+        condition: eq(variables['runPackaging'], 'true')
 
       # For debugging, can get build folder contents by adding PublishBuildArtifacts task and set pathtoPublish: '$(Build.SourcesDirectory)/build'

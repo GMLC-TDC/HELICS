@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2025, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# Copyright (c) 2017-2026, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Energy Innovation LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
 #
@@ -9,7 +9,7 @@
 
 if(NOT TARGET gmlc::networking)
     set(GMLC_NETWORKING_INSTALL OFF CACHE INTERNAL "")
-    set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include)
+    set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/include)
     set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
     set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO} CACHE INTERNAL "")
     set(GMLC_NETWORKING_JSON_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty)

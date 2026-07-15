@@ -7,10 +7,17 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: coverage-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: helics/buildenv:ubuntu22.04-default-builder
+    container: helics/buildenv:ubuntu26.04-default-builder
     defaults:
       run:
         shell: bash
@@ -24,15 +31,17 @@ jobs:
       DISABLE_CXX_SHARED: 'true'
       
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
-        submodules: true
+        fetch-depth: 0
+        submodules: recursive
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
-        submodules: true
+        fetch-depth: 0
+        submodules: recursive
         ref: develop
       if: github.event_name == 'schedule'
 
@@ -44,12 +53,59 @@ jobs:
         mkdir -p build && cd build
         ../scripts/ci-build.sh
 
-    - name: Setup coverage counters
-      run: scripts/lcov-helper.sh setup-counters
-
     - name: Run tests
       working-directory: build
       run: ../scripts/run-coverage-tests.sh
 
-    - name: Gather and upload coverage results
-      run: scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov
+    - name: Prepare coverage report
+      working-directory: build
+      run: |
+        lcov \
+          --rc geninfo_unexecuted_blocks=1 \
+          --ignore-errors gcov,mismatch,inconsistent,negative \
+          --capture \
+          --initial \
+          --directory . \
+          --output-file coverage.base
+        lcov \
+          --gcov-tool ${GCOV_TOOL} \
+          --rc geninfo_unexecuted_blocks=1 \
+          --ignore-errors gcov,mismatch,inconsistent,negative \
+          --capture \
+          --directory . \
+          --output-file coverage.info
+        lcov \
+          -a coverage.base \
+          -a coverage.info \
+          --ignore-errors inconsistent,corrupt \
+          --output-file coverage.total
+        lcov \
+          --remove coverage.total \
+          --ignore-errors inconsistent,unused,negative,corrupt,mismatch \
+          '/usr/*' \
+          '*/test/*' \
+          '*/tests/*' \
+          '*/ThirdParty/*' \
+          '*/dependencies/*' \
+          '*/examples/*' \
+          '*/interfaces/*' \
+          '*/benchmarks/*' \
+          '*/scripts/*' \
+          --output-file coverage.info.cleaned
+        lcov --list coverage.info.cleaned
+
+    - name: Upload coverage artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        name: coverage-report
+        path: build/coverage.info.cleaned
+
+    - name: Upload coverage results
+      uses: codecov/codecov-action@v6
+      with:
+        disable_search: true
+        files: build/coverage.info.cleaned
+        fail_ci_if_error: true
+        name: coverage-ubuntu2604
+        token: ${{ secrets.CODECOV_TOKEN }}

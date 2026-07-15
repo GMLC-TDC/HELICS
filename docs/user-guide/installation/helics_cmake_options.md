@@ -55,7 +55,7 @@ Options effect the connection of libraries used in HELICS and how they are linke
 - `HELICS_ENABLE_SWIG`: \[Default=OFF\] Conditional option if `HELICS_BUILD_MATLAB_INTERACE` or `HELICS_BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used. This enables swig usage in cases where it would not otherwise be necessary.
 - `HELICS_ENABLE_GIT_HOOKS`: install a git hook to check clang format before a push
 - `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake. So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.
-- `HELICS_BUILD_CONFIGURATION`: A string containing a specialized build configuration, if any. This is currently not in use, but was previously needed for building on a Raspberry PI system, by setting the option to "PI".
+- `HELICS_BUILD_CONFIGURATION`: A string containing a specialized build configuration, if any. This is currently not in use, but was previously needed for building on a Raspberry PI system, by setting the option to "PI". Option has been removed as of HELICS 3.7.0 If needed it may come back someday.
 - `HELICS_DISABLE_C_SHARED_LIB`: \[Default=OFF\] Turns off building of the HELICS C shared library. May be used for building apps that only use the (modern) C++ shared library. Using the C++98 wrapper requires the C shared library.
 
 #### ZeroMQ related Options

@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_CORE_HPP_
@@ -38,9 +38,12 @@ class Core {
     /** implicit operator so the object can be used with the c api functions natively*/
     operator HelicsCore() { return core; }
     /** explicitly get the base HelicsCore object*/
-    HelicsCore baseObject() const { return core; }
+    HELICS_NODISCARD HelicsCore baseObject() const { return core; }
     /** check if the core is connected to the broker*/
-    bool isConnected() const { return (helicsCoreIsConnected(core) != HELICS_FALSE); }
+    HELICS_NODISCARD bool isConnected() const
+    {
+        return (helicsCoreIsConnected(core) != HELICS_FALSE);
+    }
     /** copy constructor*/
     Core(const Core& cr) { core = helicsCoreClone(cr.core, hThrowOnError()); }
     /** copy assignment*/

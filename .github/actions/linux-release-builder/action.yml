@@ -8,6 +8,38 @@ inputs:
     description: "CPack Generator(s) to use"
     required: false
     default: "TGZ"
+  arch:
+    description: "Architecture to build for (x86_64 or aarch64)"
+    required: false
+    default: "x86_64"
 runs:
-  using: "docker"
-  image: "Dockerfile"
+  using: "composite"
+  steps:
+    - name: Set configuration
+      shell: bash
+      run: |
+        if [ "${{ inputs.arch }}" == "aarch64" ]; then
+          echo "BASE_IMAGE=quay.io/pypa/manylinux_2_28_aarch64" >> $GITHUB_ENV
+          echo "DOCKER_ARCH=aarch64" >> $GITHUB_ENV
+        else
+          echo "BASE_IMAGE=quay.io/pypa/manylinux_2_28_x86_64" >> $GITHUB_ENV
+          echo "DOCKER_ARCH=x86_64" >> $GITHUB_ENV
+        fi
+
+    - name: Build Docker image
+      shell: bash
+      run: |
+        docker build -t helics-builder \
+          --build-arg BASE_IMAGE=${{ env.BASE_IMAGE }} \
+          --build-arg ARCH=${{ env.DOCKER_ARCH }} \
+          ${{ github.action_path }}
+
+    - name: Run Build
+      shell: bash
+      run: |
+        docker run --rm \
+          -v ${{ github.workspace }}:/github/workspace \
+          -w /github/workspace \
+          -e INPUT_SCRIPT="${{ inputs.script }}" \
+          -e INPUT_CPACK_GEN="${{ inputs.cpack_gen }}" \
+          helics-builder

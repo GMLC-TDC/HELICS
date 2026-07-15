@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -294,9 +294,9 @@ TEST_F(command_tests, federate_finalize_command)
     vFed1->sendCommand(vFed2->getName(), "terminate");
     vFed1->query("root", "flush");
     auto tres = vFed1->requestNextStep();
-    EXPECT_GE(tres, cHelicsBigNumber);
+    EXPECT_GE(tres, cHelicsTerminateTime);
     tres = vFed2->requestNextStep();
-    EXPECT_GE(tres, cHelicsBigNumber);
+    EXPECT_GE(tres, cHelicsTerminateTime);
     vFed1->finalize();
     vFed2->finalize();
 }

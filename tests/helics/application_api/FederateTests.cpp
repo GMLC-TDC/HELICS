@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "testFixtures.hpp"
 
 #include "gmock/gmock.h"
+#include <cstdlib>
 #include <future>
 #include <gtest/gtest.h>
 #include <memory>
@@ -214,7 +215,18 @@ TEST(federate_tests, federate_initialize_iteration_multiple)
 
 TEST(federate, federate_initialize_tests_env)
 {
+    auto envLogLevelMatches = []() {
+        const char* logLevel = std::getenv("HELICS_LOG_LEVEL");
+        return (logLevel != nullptr) && (std::string_view{logLevel} == "connections");
+    };
+
     setEnvironmentVariable("HELICS_LOG_LEVEL", "connections");
+    if (!envLogLevelMatches()) {
+        clearEnvironmentVariable("HELICS_LOG_LEVEL");
+        setEnvironmentVariable("HELICS_LOG_LEVEL", "connections");
+    }
+    ASSERT_TRUE(envLogLevelMatches()) << "failed to set HELICS_LOG_LEVEL=connections";
+
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
     fedInfo.coreInitString = "--autobroker";
 
@@ -398,7 +410,6 @@ TEST(federate, timeout_error_zmq_ci_skip_nosan)
 
 TEST(federate, timeout_abort_zmq_ci_skip_nosan_nocov)
 {
-    std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
         helics::FederateInfo fedInfo(helics::CoreType::ZMQ);
         fedInfo.coreInitString = "";
@@ -427,7 +438,6 @@ TEST(federate, timeout_abort_zmq_ci_skip_nosan_nocov)
 #ifdef HELICS_ENABLE_TCP_CORE
 TEST(federate, timeout_abort_tcp_ci_skip_nosan_nocov)
 {
-    std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
         helics::FederateInfo fedInfo(helics::CoreType::TCP);
         fedInfo.coreInitString = "";
@@ -453,7 +463,6 @@ TEST(federate, timeout_abort_tcp_ci_skip_nosan_nocov)
 
 TEST(federate, timeout_abort_tcpss_ci_skip_nosan_nocov)
 {
-    std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
         helics::FederateInfo fedInfo(helics::CoreType::TCP_SS);
         fedInfo.coreInitString = "";
@@ -481,7 +490,6 @@ TEST(federate, timeout_abort_tcpss_ci_skip_nosan_nocov)
 #ifdef HELICS_ENABLE_UDP_CORE
 TEST(federate, timeout_abort_udp_ci_skip_nosan_nocov)
 {
-    std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
         helics::FederateInfo fedInfo(helics::CoreType::UDP);
         fedInfo.coreInitString = "";

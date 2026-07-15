@@ -5,7 +5,7 @@ branches:
     - main
     - develop
 
-version: 3.6.1.{build}
+version: 3.8.0.{build}
 
 image: Visual Studio 2022
 
@@ -27,7 +27,7 @@ init:
 # Install needed build dependencies
 #
 install:
-  - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,git,make,gcc-core,gcc-g++,libboost-devel,libzmq-devel'
+  - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,git,make,gcc-core,gcc-g++,libzmq-devel'
   - '%CYG_ROOT%\bin\cygcheck -dc'
   - cd %APPVEYOR_BUILD_FOLDER%
   - git config --global --add safe.directory %APPVEYOR_BUILD_FOLDER%
@@ -37,7 +37,7 @@ before_build:
   - mkdir build
   - cd build
   - git config --global --add safe.directory /cygdrive/c/projects/helics
-  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -DCMAKE_BUILD_TYPE=Release -DHELICS_SKIP_WINNT_DEFINITION=ON -DCMAKE_CXX_STANDARD=17 -DHELICS_ENABLE_SWIG=OFF -DHELICS_DISABLE_GIT_OPERATIONS=ON -DHELICS_BUILD_TESTS=OFF -DHELICS_DISABLE_ASIO=ON -DHELICS_ENABLE_IPC_CORE=OFF"'
+  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -DCMAKE_BUILD_TYPE=Release -DHELICS_SKIP_WINNT_DEFINITION=ON -DHELICS_ENABLE_SWIG=OFF -DHELICS_DISABLE_GIT_OPERATIONS=ON -DHELICS_BUILD_TESTS=OFF -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_BENCHMARKS=OFF -DHELICS_BUILD_APP_LIBRARY=OFF -DHELICS_DISABLE_C_SHARED_LIB=ON -DHELICS_DISABLE_BOOST=ON -DHELICS_DISABLE_ASIO=ON -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_USE_SYSTEM_ZEROMQ_ONLY=ON"'
   - cd ..
 
 # Build and test, actually.

@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2025, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# Copyright (c) 2017-2026, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Energy Innovation LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
 #
@@ -20,6 +20,7 @@ endif()
 
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(CppInterface)
+    add_subdirectory(memoryExample)
 endif()
 
 if(HELICS_BUILD_CXX_SHARED_LIB)

@@ -1,6 +1,6 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy Innovation LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
@@ -292,3 +292,8 @@ class MasterObjectHolder {
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder();
 void clearAllObjects();
+
+double inline timeReturn(HelicsTime val)
+{
+    return (val < cHelicsTerminateTime) ? static_cast<double>(val) : HELICS_TIME_MAXTIME;
+}

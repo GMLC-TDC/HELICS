@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -136,6 +136,6 @@ struct FederateTestFixture_cpp {
     std::string ctype;
 
   private:
-    bool hasIndexCode(const std::string& type_name);
-    int getIndexCode(const std::string& type_name);
+    static bool hasIndexCode(const std::string& type_name);
+    static int getIndexCode(const std::string& type_name);
 };

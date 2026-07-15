@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2017-2025,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
-Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+Copyright (c) 2017-2026,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Energy
+Innovation LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InterfaceInfo.hpp"
@@ -512,7 +512,7 @@ void InterfaceInfo::generateDataFlowGraph(nlohmann::json& base) const
 
 void InterfaceInfo::disconnectFederate(GlobalFederateId fedToDisconnect, Time disconnectTime)
 {
-    if (disconnectTime < cBigTime) {
+    if (disconnectTime < cTerminationTime) {
         auto ihandle = inputs.lock_shared();
         for (auto& ipt : ihandle) {
             ipt->disconnectFederate(fedToDisconnect, disconnectTime);

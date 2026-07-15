@@ -108,6 +108,8 @@ message sent from fed1 to fed2/endpoint at time 3
 
 ## A few Specialized Platforms
 
+NOTE: This option has been removed as of HELICS 3.7 and is not currently needed.
+
 The HELICS build supports a few specialized platforms, more will be added as needed. Generally the build requirements are automatically detected but that is not always possible. So a system configuration can be specified in the HELICS_BUILD_CONFIGURATION variable of CMake.
 
 ### Raspberry PI
