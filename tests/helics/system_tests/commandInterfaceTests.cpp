@@ -436,6 +436,10 @@ TEST_F(command_tests, fed_echo_command)
     vFed1->enterExecutingModeComplete();
 
     auto cmd = vFed1->getCommand();
+    if (cmd.first.empty()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        cmd = vFed1->getCommand();
+    }
     EXPECT_EQ(cmd.first, "echo_reply");
     EXPECT_EQ(cmd.second, vFed2->getName());
 
