@@ -5,7 +5,6 @@ trigger:
       - pre-commit/*
 pr:
   - main
-  - develop
 
 jobs:
   - job: Linux

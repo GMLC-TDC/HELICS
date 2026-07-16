@@ -3,7 +3,6 @@ clone_depth: 1
 branches:
   only:
     - main
-    - develop
 
 version: 3.8.0.{build}
 

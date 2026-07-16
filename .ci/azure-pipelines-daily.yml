@@ -5,7 +5,7 @@ schedules:
     displayName: Daily late night PST (GMT-8)
     branches:
       include:
-        - develop
+        - main
 
 jobs:
   - job: Linux
