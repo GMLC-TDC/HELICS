@@ -8,7 +8,6 @@ on:
       - '**.webp'
   push:
     branches:
-      - '!develop'
       - '!main'
       - '!helics2'
     paths:

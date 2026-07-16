@@ -7,9 +7,9 @@ A multi-language, cross-platform library that enables different simulators to ea
 [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
-[![](https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true)](https://ci.appveyor.com/project/HELICS/helics/history)
+[![](https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/main?svg=true)](https://ci.appveyor.com/project/HELICS/helics/history)
 [![Cirrus Status](https://api.cirrus-ci.com/github/GMLC-TDC/HELICS.svg)](https://cirrus-ci.com/github/GMLC-TDC/HELICS)
-[![](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop)
+[![](https://codecov.io/gh/GMLC-TDC/HELICS/branch/main/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS/branch/main)
 [![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/main/LICENSE)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/GMLC-TDC/HELICS/main.svg)](https://results.pre-commit.ci/latest/github/GMLC-TDC/HELICS/main)
@@ -154,21 +154,17 @@ Contributors are welcome, see the [Contributing](CONTRIBUTING.md) guidelines for
   <tr>
     <td><b>Service</b></td>
     <td><b>Main</b></td>
-    <td><b>Develop</b></td>
   </tr>
   <tr>
   <td>Azure</td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=main"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=main" alt="Build Status" /></a></td>
-  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=develop"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=develop" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Circle-CI</td>
   <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/main"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/main.svg?style=svg" alt="Build Status" /></a></td>
-  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop.svg?style=svg" alt="Build Status" /></a></td>
   </tr>
   <td>Docs</td>
   <td><a href="https://docs.helics.org/en/latest/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
-  <td><a href="https://docs.helics.org/en/develop/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
   </tr>
 </table>
 </details>

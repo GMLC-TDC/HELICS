@@ -10,7 +10,6 @@ on:
         type: choice
         options:
           - main
-          - develop
           - release
           - test
       build_only:
@@ -21,7 +20,6 @@ on:
   push:
     branches:
       - main
-      - develop
       - 'docker/**'
     tags:
       - 'v*'
@@ -51,7 +49,6 @@ jobs:
         tags: |
           type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
           type=edge,branch=main
-          type=ref,event=branch,enable=${{ github.ref_name == 'develop' }}
           type=raw,value=test-apps,enable=${{ startsWith(github.ref_name, 'docker/') }}
           type=semver,pattern={{version}}
     - name: Login to Docker Hub
@@ -71,10 +68,6 @@ jobs:
     - name: Build and push updated main Docker containers
       run: .github/actions/docker/main_docker.sh
       if: (github.event_name == 'push' && github.ref_name == 'main') || (github.event_name == 'workflow_dispatch' && contains(github.event.inputs.build_type, 'main'))
-
-    - name: Build and push updated develop Docker containers
-      run: .github/actions/docker/develop_docker.sh
-      if: (github.event_name == 'push' && github.ref_name == 'develop') || (github.event_name == 'workflow_dispatch' && contains(github.event.inputs.build_type, 'develop'))
 
     - name: Build push updated release Docker containers
       run: .github/actions/docker/release_docker.sh "${{github.ref_name}}"

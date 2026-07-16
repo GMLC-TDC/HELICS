@@ -17,14 +17,9 @@ The following are a few things that could be useful to know before starting out.
 
 Firstly, you can follow HELICS development on our [GitHub](https://github.com/GMLC-TDC/HELICS) page.
 HELICS is open-source. The development team uses `git` for version control, and GitHub to host the code publicly.
-The latest HELICS will be on the `develop` branch.
-Tagged releases occur on the `main` branch.
+The latest HELICS development work will be on the `main` branch.
+Tagged releases also occur on the `main` branch.
 If you clone the HELICS repository, you will be placed in the `main` branch by default.
-To switch to the `develop` branch, you can type the following:
-
-```bash
-git checkout develop
-```
 
 To switch to a tagged release, you can type the following:
 

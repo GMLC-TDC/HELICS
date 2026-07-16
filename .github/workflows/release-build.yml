@@ -109,10 +109,10 @@ jobs:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
     
-    - name: Checkout develop branch
+    - name: Checkout main branch
       uses: actions/checkout@v6
       with:
-        ref: develop
+        ref: main
       if: github.event_name == 'schedule'
 
     - name: Checkout shell scripts for workflow
@@ -201,10 +201,10 @@ jobs:
         submodules: recursive
       if: github.event_name != 'schedule'
 
-    - name: Checkout develop branch
+    - name: Checkout main branch
       uses: actions/checkout@v6
       with:
-        ref: develop
+        ref: main
         submodules: recursive
       if: github.event_name == 'schedule'
  
@@ -307,10 +307,10 @@ jobs:
         submodules: recursive
       if: github.event_name != 'schedule'
 
-    - name: Checkout develop branch
+    - name: Checkout main branch
       uses: actions/checkout@v6
       with:
-        ref: develop
+        ref: main
         submodules: recursive
       if: github.event_name == 'schedule'
 

@@ -594,7 +594,7 @@ Minor release with some updates to the networking portion of HELICS and some API
 - CI tests using docker for clang memory sanitizer and the octave interface.
 - Scripts for generating a single zip file with all the code including submodules. This will be generated for each new release.
 - A broker server that generate multiple brokers on a single system and handles the port allocation intelligently. (Only ZMQ currently supported, this is not backwards compatible, though regular 2.2 brokers should work with 2.1 federates if needed.)
-- A Docker image containing the HELICS apps (available on Docker Hub for tagged releases and the latest develop branch at [https://hub.docker.com/r/helics/helics](https://hub.docker.com/r/helics/helics))
+- A Docker image containing the HELICS apps (available on Docker Hub for tagged releases and the latest main branch at [https://hub.docker.com/r/helics/helics](https://hub.docker.com/r/helics/helics))
 
 ### Removed
 
