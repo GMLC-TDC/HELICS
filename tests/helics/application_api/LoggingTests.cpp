@@ -303,11 +303,11 @@ TEST(logging, dumplog)
     auto core = Fed->getCorePointer();
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     core->setLoggingCallback(helics::gLocalCoreId,
-                           [&mlog](int level,
-                                   std::string_view /*unused*/,
-                                   std::string_view message) {
-                               mlog.lock()->emplace_back(level, message);
-                           });
+                             [&mlog](int level,
+                                     std::string_view /*unused*/,
+                                     std::string_view message) {
+                                 mlog.lock()->emplace_back(level, message);
+                             });
 
     Fed->enterExecutingMode();
     /** We are setting the flag then clearing it
