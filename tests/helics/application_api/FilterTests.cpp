@@ -75,7 +75,8 @@ TEST_P(filter_single_type_test, message_filter_registration)
     const auto* coreType = GetParam();
     const auto logStep = [coreType](const char* step) {
         ::testing::Test::RecordProperty("message_filter_registration_step", step);
-        std::cerr << "[message_filter_registration][" << coreType << "] " << step << std::endl;
+        std::cerr << "[message_filter_registration][" << coreType << "] " << step << '\n'
+                  << std::flush;
     };
     logStep("starting broker");
     auto broker = AddBroker(coreType, 2);
@@ -124,6 +125,11 @@ TEST_P(filter_single_type_test, message_filter_registration)
     logStep("finalizing filter federate");
     fFed->finalize();
     logStep("completing message federate finalize");
+    std::cerr << "[message_filter_registration][" << coreType
+              << "] message federate before finalizeComplete ptr=" << mFed.get()
+              << " mode=" << static_cast<int>(mFed->getCurrentMode())
+              << " name=" << mFed->getName() << '\n'
+              << std::flush;
     mFed->finalizeComplete();
     logStep("checking final mode");
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);

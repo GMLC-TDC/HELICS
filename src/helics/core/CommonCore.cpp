@@ -70,7 +70,8 @@ namespace {
             return;
         }
         std::cerr << "[helics-core-finalize][" << coreName << "][" << fedName << "] " << stage
-                  << " tid=" << std::this_thread::get_id() << std::endl;
+                  << " tid=" << std::this_thread::get_id() << '\n'
+                  << std::flush;
     }
 
     const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>& commonCoreMapIndex()

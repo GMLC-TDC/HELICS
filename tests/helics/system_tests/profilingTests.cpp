@@ -37,25 +37,26 @@ TEST(profiling_tests, basic)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
-    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    auto cr = Fed->getCorePointer();
-    cr->setLoggingCallback(helics::gLocalCoreId,
-                           [&mlog](int level,
-                                   std::string_view /*unused*/,
-                                   std::string_view message) {
-                               mlog.lock()->emplace_back(level, message);
-                           });
+    auto mlog =
+        std::make_shared<gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>>();
+    auto core = Fed->getCorePointer();
+    core->setLoggingCallback(helics::gLocalCoreId,
+                             [mlog](int level,
+                                    std::string_view /*unused*/,
+                                    std::string_view message) {
+                                 mlog->lock()->emplace_back(level, message);
+                             });
 
-    cr.reset();
+    core.reset();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->enterExecutingMode();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->finalize();
 
-    ASSERT_TRUE(!mlog.lock()->empty());
+    ASSERT_TRUE(!mlog->lock()->empty());
     bool hasMarker{false};
     std::vector<std::int64_t> timeValues;
-    for (const auto& logM : mlog.lock()) {
+    for (const auto& logM : mlog->lock()) {
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
@@ -88,25 +89,26 @@ TEST(profiling_tests, broker_basic)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
-    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    auto br = helics::BrokerFactory::findBroker("prbroker");
-    EXPECT_TRUE(br);
+    auto mlog =
+        std::make_shared<gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>>();
+    auto broker = helics::BrokerFactory::findBroker("prbroker");
+    EXPECT_TRUE(broker);
 
-    br->setLoggingCallback(
-        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
-            mlog.lock()->emplace_back(level, message);
+    broker->setLoggingCallback(
+        [mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog->lock()->emplace_back(level, message);
         });
 
-    br.reset();
+    broker.reset();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->enterExecutingMode();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->finalize();
 
-    ASSERT_TRUE(!mlog.lock()->empty());
+    ASSERT_TRUE(!mlog->lock()->empty());
     bool hasMarker{false};
     std::vector<std::int64_t> timeValues;
-    for (const auto& logM : mlog.lock()) {
+    for (const auto& logM : mlog->lock()) {
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
@@ -137,24 +139,25 @@ TEST(profiling_tests, broker_basic_no_flag)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
-    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    auto br = helics::BrokerFactory::findBroker("prbroker2");
-    EXPECT_TRUE(br);
+    auto mlog =
+        std::make_shared<gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>>();
+    auto broker = helics::BrokerFactory::findBroker("prbroker2");
+    EXPECT_TRUE(broker);
 
-    br->setLoggingCallback(
-        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
-            mlog.lock()->emplace_back(level, message);
+    broker->setLoggingCallback(
+        [mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog->lock()->emplace_back(level, message);
         });
 
-    br.reset();
+    broker.reset();
     Fed->setFlagOption(helics::defs::PROFILING);
     Fed->enterExecutingMode();
     Fed->finalize();
 
-    ASSERT_TRUE(!mlog.lock()->empty());
+    ASSERT_TRUE(!mlog->lock()->empty());
     bool hasMarker{false};
     std::vector<std::int64_t> timeValues;
-    for (const auto& logM : mlog.lock()) {
+    for (const auto& logM : mlog->lock()) {
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
@@ -183,10 +186,11 @@ TEST(profiling_tests, fed_capture)
     fedInfo.coreInitString = "--autobroker";
     auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
-    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    auto mlog =
+        std::make_shared<gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>>();
     Fed->setLoggingCallback(
-        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
-            mlog.lock()->emplace_back(level, message);
+        [mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog->lock()->emplace_back(level, message);
         });
     Fed->setFlagOption(helics::defs::LOCAL_PROFILING_CAPTURE);
     Fed->setFlagOption(helics::defs::PROFILING);
@@ -194,10 +198,10 @@ TEST(profiling_tests, fed_capture)
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->finalize();
 
-    ASSERT_TRUE(!mlog.lock()->empty());
+    ASSERT_TRUE(!mlog->lock()->empty());
     bool hasMarker{false};
     std::vector<std::int64_t> timeValues;
-    for (const auto& logM : mlog.lock()) {
+    for (const auto& logM : mlog->lock()) {
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
@@ -228,20 +232,21 @@ TEST(profiling_tests, fed_capture2)
     fedInfo.setFlagOption(helics::defs::PROFILING);
     auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
-    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    auto mlog =
+        std::make_shared<gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>>();
     Fed->setLoggingCallback(
-        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
-            mlog.lock()->emplace_back(level, message);
+        [mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog->lock()->emplace_back(level, message);
         });
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->enterExecutingMode();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->finalize();
 
-    ASSERT_TRUE(!mlog.lock()->empty());
+    ASSERT_TRUE(!mlog->lock()->empty());
     bool hasMarker{false};
     std::vector<std::int64_t> timeValues;
-    for (const auto& logM : mlog.lock()) {
+    for (const auto& logM : mlog->lock()) {
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
@@ -327,7 +332,7 @@ TEST(profiling_tests, save_file_append)
 {
     {
         std::ofstream out("save_profile_app.txt");
-        out << "APPENDING_TO_FILE" << std::endl;
+        out << "APPENDING_TO_FILE\n";
     }
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
     fedInfo.coreInitString = "--autobroker --profiler_append=save_profile_app.txt";
@@ -455,15 +460,15 @@ TEST(profiling_tests, config)
     auto mlog =
         std::make_shared<gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>>();
 
-    auto cr = Fed->getCorePointer();
-    cr->setLoggingCallback(helics::gLocalCoreId,
-                           [mlog](int level,
-                                  std::string_view /*unused*/,
-                                  std::string_view message) {
-                               mlog->lock()->emplace_back(level, message);
-                           });
+    auto core = Fed->getCorePointer();
+    core->setLoggingCallback(helics::gLocalCoreId,
+                             [mlog](int level,
+                                    std::string_view /*unused*/,
+                                    std::string_view message) {
+                                 mlog->lock()->emplace_back(level, message);
+                             });
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    cr.reset();
+    core.reset();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->enterExecutingMode();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
@@ -501,20 +506,21 @@ TEST(profiling_tests, config2)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
 
-    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    auto mlog =
+        std::make_shared<gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>>();
     Fed->setLoggingCallback(
-        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
-            mlog.lock()->emplace_back(level, message);
+        [mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog->lock()->emplace_back(level, message);
         });
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->enterExecutingMode();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->finalize();
 
-    ASSERT_TRUE(!mlog.lock()->empty());
+    ASSERT_TRUE(!mlog->lock()->empty());
     bool hasMarker{false};
     std::vector<std::int64_t> timeValues;
-    for (const auto& logM : mlog.lock()) {
+    for (const auto& logM : mlog->lock()) {
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
