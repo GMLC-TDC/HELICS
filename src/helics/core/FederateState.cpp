@@ -1410,8 +1410,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
                                                queue.empty()));
         if (state == FederateStates::TERMINATING) {
             federateStateFinalizeTrace(
-                name,
-                "processQueue waiting while terminating; expecting disconnect ack or stop");
+                name, "processQueue waiting while terminating; expecting disconnect ack or stop");
         }
         auto cmd = queue.pop();
         federateStateFinalizeTrace(name,
