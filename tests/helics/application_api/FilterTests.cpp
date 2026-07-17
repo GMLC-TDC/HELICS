@@ -72,8 +72,6 @@ TEST_P(filter_single_type_test, message_filter_registration)
     auto& ept1 = fFed->registerEndpoint("fout");
     EXPECT_TRUE(ept1.getHandle().isValid());
 
-    mFed->finalizeAsync();
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     auto& filt3 = fFed->registerCloningFilter();
     filt3.addSourceTarget("filter0/fout");
     filt3.addDestinationTarget("port2");
@@ -82,6 +80,7 @@ TEST_P(filter_single_type_test, message_filter_registration)
     auto& filt4 = fFed->registerFilter();
     filt4.addSourceTarget("filter0/fout");
     EXPECT_TRUE(filt4.getHandle() != filt3.getHandle());
+    mFed->finalizeAsync();
     fFed->finalize();
     // std::cout << "fFed returned\n";
     mFed->finalizeComplete();

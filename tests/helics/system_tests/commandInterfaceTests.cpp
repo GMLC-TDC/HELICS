@@ -98,9 +98,9 @@ TEST_F(command_tests, core_federate_command)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    auto cr = vFed1->getCorePointer();
+    auto core = vFed1->getCorePointer();
 
-    cr->sendCommand(vFed2->getName(), "test", "", HELICS_SEQUENCING_MODE_FAST);
+    core->sendCommand(vFed2->getName(), "test", "", HELICS_SEQUENCING_MODE_FAST);
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
@@ -122,9 +122,9 @@ TEST_F(command_tests, core_federate_command_ordered)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    auto cr = vFed1->getCorePointer();
+    auto core = vFed1->getCorePointer();
 
-    cr->sendCommand(vFed2->getName(), "test", "", HELICS_SEQUENCING_MODE_ORDERED);
+    core->sendCommand(vFed2->getName(), "test", "", HELICS_SEQUENCING_MODE_ORDERED);
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
@@ -146,9 +146,9 @@ TEST_F(command_tests, coreapp_federate_command)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    helics::CoreApp cr(vFed1->getCorePointer());
+    helics::CoreApp coreApp(vFed1->getCorePointer());
 
-    cr.sendCommand(vFed2->getName(), "test");
+    coreApp.sendCommand(vFed2->getName(), "test");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
@@ -241,14 +241,14 @@ TEST_F(command_tests, federation_finalize_command)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    helics::CoreApp cr(vFed1->getCorePointer());
+    helics::CoreApp coreApp(vFed1->getCorePointer());
 
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
     vFed1->sendCommand("federation", "terminate");
 
-    EXPECT_TRUE(cr.waitForDisconnect(std::chrono::milliseconds(600)));
+    EXPECT_TRUE(coreApp.waitForDisconnect(std::chrono::milliseconds(600)));
     vFed1->finalize();
     vFed2->finalize();
 }
@@ -262,14 +262,14 @@ TEST_F(command_tests, federation_finalize_core_command)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    helics::CoreApp cr(vFed1->getCorePointer());
+    helics::CoreApp coreApp(vFed1->getCorePointer());
 
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
-    vFed2->sendCommand(cr.getIdentifier(), "terminate");
+    vFed2->sendCommand(coreApp.getIdentifier(), "terminate");
 
-    EXPECT_TRUE(cr.waitForDisconnect(std::chrono::milliseconds(600)));
+    EXPECT_TRUE(coreApp.waitForDisconnect(std::chrono::milliseconds(600)));
     vFed1->finalize();
     vFed2->finalize();
 }
@@ -341,14 +341,14 @@ TEST_F(command_tests, federation_finalize_command_disable)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    helics::CoreApp cr(vFed1->getCorePointer());
+    helics::CoreApp coreApp(vFed1->getCorePointer());
 
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
     vFed1->sendCommand("federation", "terminate");
 
-    EXPECT_FALSE(cr.waitForDisconnect(std::chrono::milliseconds(600)));
+    EXPECT_FALSE(coreApp.waitForDisconnect(std::chrono::milliseconds(600)));
     vFed1->finalize();
     vFed2->finalize();
 }
@@ -363,14 +363,14 @@ TEST_F(command_tests, federation_finalize_core_command_disable)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    helics::CoreApp cr(vFed1->getCorePointer());
+    helics::CoreApp coreApp(vFed1->getCorePointer());
 
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
-    vFed2->sendCommand(cr.getIdentifier(), "terminate");
+    vFed2->sendCommand(coreApp.getIdentifier(), "terminate");
 
-    EXPECT_FALSE(cr.waitForDisconnect(std::chrono::milliseconds(600)));
+    EXPECT_FALSE(coreApp.waitForDisconnect(std::chrono::milliseconds(600)));
     vFed1->finalize();
     vFed2->finalize();
 }
@@ -384,15 +384,15 @@ TEST_F(command_tests, core_echo_command)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    auto cr = vFed1->getCorePointer();
-    vFed1->sendCommand(cr->getIdentifier(), "echo");
+    auto core = vFed1->getCorePointer();
+    vFed1->sendCommand(core->getIdentifier(), "echo");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
 
     auto cmd = vFed1->getCommand();
     EXPECT_EQ(cmd.first, "echo_reply");
-    EXPECT_EQ(cmd.second, cr->getIdentifier());
+    EXPECT_EQ(cmd.second, core->getIdentifier());
 
     vFed1->finalize();
     vFed2->finalize();
@@ -407,15 +407,15 @@ TEST_F(command_tests, broker_echo_command)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    auto br = brokers[0];
-    vFed1->sendCommand(br->getIdentifier(), "echo");
+    auto broker = brokers[0];
+    vFed1->sendCommand(broker->getIdentifier(), "echo");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
 
     auto cmd = vFed1->getCommand();
     EXPECT_EQ(cmd.first, "echo_reply");
-    EXPECT_EQ(cmd.second, br->getIdentifier());
+    EXPECT_EQ(cmd.second, broker->getIdentifier());
 
     vFed1->finalize();
     vFed2->finalize();
