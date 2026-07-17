@@ -52,14 +52,14 @@ TEST(logging, file_logging)
 {
     const std::string lfilename = "logfile.txt";
     if (std::filesystem::exists(lfilename)) {
-        std::error_code ec;
-        bool res = std::filesystem::remove(lfilename, ec);
-        int ii = 0;
+        std::error_code errorCode;
+        bool res = std::filesystem::remove(lfilename, errorCode);
+        int attempt = 0;
         while (!res) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            res = std::filesystem::remove(lfilename, ec);
-            ++ii;
-            if (ii > 15) {
+            res = std::filesystem::remove(lfilename, errorCode);
+            ++attempt;
+            if (attempt > 15) {
                 break;
             }
         }
@@ -72,29 +72,29 @@ TEST(logging, file_logging)
 
     Fed->enterExecutingMode();
     Fed->finalize();
-    auto cr{Fed->getCorePointer()};
+    auto core{Fed->getCorePointer()};
     Fed.reset();
 
     EXPECT_TRUE(std::filesystem::exists(lfilename));
-    cr->waitForDisconnect();
-    cr.reset();
+    core->waitForDisconnect();
+    core.reset();
     helics::cleanupHelicsLibrary();
-    std::error_code ec;
-    std::filesystem::remove(lfilename, ec);
+    std::error_code errorCode;
+    std::filesystem::remove(lfilename, errorCode);
 }
 
 TEST(logging, file_logging_p2)
 {
     const std::string lfilename = "logfile2.txt";
     if (std::filesystem::exists(lfilename)) {
-        std::error_code ec;
-        bool res = std::filesystem::remove(lfilename, ec);
-        int ii = 0;
+        std::error_code errorCode;
+        bool res = std::filesystem::remove(lfilename, errorCode);
+        int attempt = 0;
         while (!res) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            res = std::filesystem::remove(lfilename, ec);
-            ++ii;
-            if (ii > 15) {
+            res = std::filesystem::remove(lfilename, errorCode);
+            ++attempt;
+            if (attempt > 15) {
                 break;
             }
         }
@@ -104,19 +104,19 @@ TEST(logging, file_logging_p2)
     fedInfo.coreInitString = "--autobroker --fileloglevel=timing";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
-    auto cr = Fed->getCorePointer();
+    auto core = Fed->getCorePointer();
 
-    cr->setLogFile(lfilename);
+    core->setLogFile(lfilename);
     Fed->enterExecutingMode();
     Fed->finalize();
 
     Fed.reset();
     EXPECT_TRUE(std::filesystem::exists(lfilename));
-    cr->waitForDisconnect();
-    cr.reset();
+    core->waitForDisconnect();
+    core.reset();
     helics::cleanupHelicsLibrary();
-    std::error_code ec;
-    std::filesystem::remove(lfilename, ec);
+    std::error_code errorCode;
+    std::filesystem::remove(lfilename, errorCode);
 }
 
 TEST(logging, check_log_message)
@@ -140,8 +140,8 @@ TEST(logging, check_log_message)
 
     auto llock = mlog.lock();
     bool found = false;
-    for (auto& m : llock) {
-        if (m.second.find("MEXAGE") != std::string::npos) {
+    for (auto& message : llock) {
+        if (message.second.find("MEXAGE") != std::string::npos) {
             found = true;
         }
     }
@@ -169,8 +169,8 @@ TEST(logging, check_log_message_command)
 
     auto llock = mlog.lock();
     bool found = false;
-    for (auto& m : llock) {
-        if (m.second.find("MEXAGE") != std::string::npos) {
+    for (auto& message : llock) {
+        if (message.second.find("MEXAGE") != std::string::npos) {
             found = true;
         }
     }
@@ -201,24 +201,24 @@ TEST(logging, check_log_message_functions)
 
     auto llock = mlog.lock();
     int order = 0;
-    for (auto& m : llock) {
-        if (m.second.find("error") != std::string::npos) {
-            EXPECT_EQ(m.first, HELICS_LOG_LEVEL_ERROR);
+    for (auto& message : llock) {
+        if (message.second.find("error") != std::string::npos) {
+            EXPECT_EQ(message.first, HELICS_LOG_LEVEL_ERROR);
             EXPECT_EQ(order, 0);
             order = 1;
         }
-        if (m.second.find("warning") != std::string::npos) {
-            EXPECT_EQ(m.first, HELICS_LOG_LEVEL_WARNING);
+        if (message.second.find("warning") != std::string::npos) {
+            EXPECT_EQ(message.first, HELICS_LOG_LEVEL_WARNING);
             EXPECT_EQ(order, 1);
             order = 2;
         }
-        if (m.second.find("info") != std::string::npos) {
-            EXPECT_EQ(m.first, HELICS_LOG_LEVEL_SUMMARY);
+        if (message.second.find("info") != std::string::npos) {
+            EXPECT_EQ(message.first, HELICS_LOG_LEVEL_SUMMARY);
             EXPECT_EQ(order, 2);
             order = 3;
         }
-        if (m.second.find("debug") != std::string::npos) {
-            EXPECT_GT(m.first, HELICS_LOG_LEVEL_SUMMARY);
+        if (message.second.find("debug") != std::string::npos) {
+            EXPECT_GT(message.first, HELICS_LOG_LEVEL_SUMMARY);
             EXPECT_EQ(order, 3);
             order = 4;
         }
@@ -248,11 +248,11 @@ TEST(logging, check_log_message_levels)
     auto llock = mlog.lock();
     bool found_low = false;
     bool found_high = false;
-    for (auto& m : llock) {
-        if (m.second.find("MEXAGE1") != std::string::npos) {
+    for (auto& message : llock) {
+        if (message.second.find("MEXAGE1") != std::string::npos) {
             found_low = true;
         }
-        if (m.second.find("MEXAGE2") != std::string::npos) {
+        if (message.second.find("MEXAGE2") != std::string::npos) {
             found_high = true;
         }
     }
@@ -282,11 +282,11 @@ TEST(logging, check_log_message_levels_high)
     auto llock = mlog.lock();
     bool found_low = false;
     bool found_high = false;
-    for (auto& m : llock) {
-        if (m.second.find("MEXAGE1") != std::string::npos) {
+    for (auto& message : llock) {
+        if (message.second.find("MEXAGE1") != std::string::npos) {
             found_low = true;
         }
-        if (m.second.find("MEXAGE2") != std::string::npos) {
+        if (message.second.find("MEXAGE2") != std::string::npos) {
             found_high = true;
         }
     }
@@ -300,9 +300,9 @@ TEST(logging, dumplog)
     fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_NO_PRINT);
 
     auto Fed = std::make_shared<helics::Federate>("test1", fedInfo);
-    auto cr = Fed->getCorePointer();
+    auto core = Fed->getCorePointer();
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    cr->setLoggingCallback(helics::gLocalCoreId,
+    core->setLoggingCallback(helics::gLocalCoreId,
                            [&mlog](int level,
                                    std::string_view /*unused*/,
                                    std::string_view message) {
@@ -318,8 +318,8 @@ TEST(logging, dumplog)
     Fed->setFlagOption(HELICS_FLAG_DUMPLOG, false);
 
     Fed->finalize();
-    cr->waitForDisconnect();
-    cr.reset();
+    core->waitForDisconnect();
+    core.reset();
     auto llock = mlog.lock();
     EXPECT_GE(llock->size(), 2U);
     EXPECT_LE(llock->size(), 3U);
@@ -619,18 +619,18 @@ TEST(logging, log_buffer_broker)
     Fed1->finalize();
     auto str = broker->query("broker", "logs", HELICS_SEQUENCING_MODE_ORDERED);
     Fed2->finalize();
-    auto js = helics::fileops::loadJsonStr(str);
+    auto logJson = helics::fileops::loadJsonStr(str);
 
-    ASSERT_TRUE(js["logs"].is_array());
-    EXPECT_EQ(js["logs"].size(), helics::LogBuffer::cDefaultBufferSize);
+    ASSERT_TRUE(logJson["logs"].is_array());
+    EXPECT_EQ(logJson["logs"].size(), helics::LogBuffer::cDefaultBufferSize);
     broker->waitForDisconnect();
 
     str = broker->query("broker", "logs");
     broker.reset();
-    js = helics::fileops::loadJsonStr(str);
+    logJson = helics::fileops::loadJsonStr(str);
 
-    ASSERT_TRUE(js["logs"].is_array());
-    EXPECT_EQ(js["logs"].size(), helics::LogBuffer::cDefaultBufferSize);
+    ASSERT_TRUE(logJson["logs"].is_array());
+    EXPECT_EQ(logJson["logs"].size(), helics::LogBuffer::cDefaultBufferSize);
 }
 
 TEST(logging, log_buffer_broker2)
@@ -661,10 +661,10 @@ TEST(logging, log_buffer_broker2)
     Fed1->finalize();
     auto str = broker->query("broker", "logs", HELICS_SEQUENCING_MODE_ORDERED);
     Fed2->finalize();
-    auto js = helics::fileops::loadJsonStr(str);
+    auto logJson = helics::fileops::loadJsonStr(str);
 
-    ASSERT_TRUE(js["logs"].is_array());
-    EXPECT_EQ(js["logs"].size(), 7U);
+    ASSERT_TRUE(logJson["logs"].is_array());
+    EXPECT_EQ(logJson["logs"].size(), 7U);
     broker.reset();
 }
 
@@ -696,10 +696,10 @@ TEST(logging, log_buffer_broker3)
     Fed1->finalize();
     auto str = broker->query("broker", "logs", HELICS_SEQUENCING_MODE_ORDERED);
     Fed2->finalize();
-    auto js = helics::fileops::loadJsonStr(str);
+    auto logJson = helics::fileops::loadJsonStr(str);
 
-    ASSERT_TRUE(js["logs"].is_array());
-    EXPECT_EQ(js["logs"].size(), helics::LogBuffer::cDefaultBufferSize);
+    ASSERT_TRUE(logJson["logs"].is_array());
+    EXPECT_EQ(logJson["logs"].size(), helics::LogBuffer::cDefaultBufferSize);
     broker.reset();
 }
 
@@ -733,9 +733,9 @@ TEST(logging, log_buffer_broker4)
     Fed2->finalize();
     broker.reset();
 
-    auto js = helics::fileops::loadJsonStr(str);
-    ASSERT_TRUE(js["logs"].is_array());
-    EXPECT_EQ(js["logs"].size(), 7U);
+    auto logJson = helics::fileops::loadJsonStr(str);
+    ASSERT_TRUE(logJson["logs"].is_array());
+    EXPECT_EQ(logJson["logs"].size(), 7U);
 }
 
 TEST(logging, log_buffer_fed)
@@ -765,9 +765,9 @@ TEST(logging, log_buffer_fed)
     EXPECT_EQ(prop, static_cast<int>(helics::LogBuffer::cDefaultBufferSize));
     EXPECT_TRUE(Fed1->getFlagOption(helics::defs::LOG_BUFFER));
     Fed1->finalize();
-    auto js = helics::fileops::loadJsonStr(str);
+    auto logJson = helics::fileops::loadJsonStr(str);
 
-    EXPECT_GE(js["logs"].size(), 1U);
+    EXPECT_GE(logJson["logs"].size(), 1U);
     broker.reset();
 }
 
@@ -795,10 +795,10 @@ TEST(logging, log_buffer_fed2)
     auto str = Fed1->query("logs");
 
     Fed1->finalize();
-    auto js = helics::fileops::loadJsonStr(str);
+    auto logJson = helics::fileops::loadJsonStr(str);
 
-    EXPECT_GE(js["logs"].size(), 1U);
-    EXPECT_LE(js["logs"].size(), 3U);
+    EXPECT_GE(logJson["logs"].size(), 1U);
+    EXPECT_LE(logJson["logs"].size(), 3U);
     broker.reset();
 }
 
@@ -830,9 +830,9 @@ TEST(logging, log_buffer_core)
     auto str = broker->query("logcore1", "logs");
 
     Fed1->finalize();
-    auto js = helics::fileops::loadJsonStr(str);
+    auto logJson = helics::fileops::loadJsonStr(str);
 
-    EXPECT_GE(js["logs"].size(), 1U);
+    EXPECT_GE(logJson["logs"].size(), 1U);
     broker.reset();
 }
 
@@ -847,38 +847,40 @@ TEST(logging, log_buffer_core2)
     fedInfo.coreName = "logcore2";
     fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
     auto Fed1 = std::make_shared<helics::Federate>("monitor1", fedInfo);
-    auto cr = Fed1->getCorePointer();
-    cr->setLoggingCallback(helics::gLocalCoreId,
-                           [](int /*level*/,
-                              std::string_view /*unused*/,
-                              std::string_view /*message*/) {
-                               // this is mainly so it doesn't overload the
-                               // console output
-                           });
+    auto core = Fed1->getCorePointer();
+    core->setLoggingCallback(helics::gLocalCoreId,
+                             [](int /*level*/,
+                                std::string_view /*unused*/,
+                                std::string_view /*message*/) {
+                                 // this is mainly so it doesn't overload the
+                                 // console output
+                             });
 
-    cr->setIntegerProperty(helics::gLocalCoreId, helics::defs::Properties::LOG_BUFFER, 3);
+    core->setIntegerProperty(helics::gLocalCoreId, helics::defs::Properties::LOG_BUFFER, 3);
     Fed1->enterExecutingMode();
 
     auto rtime = Fed1->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
-    auto sz = cr->getIntegerProperty(helics::gLocalCoreId, helics::defs::Properties::LOG_BUFFER);
-    EXPECT_EQ(sz, 3);
-    auto str = cr->query("core", "logs", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+    auto logBufferSize =
+        core->getIntegerProperty(helics::gLocalCoreId, helics::defs::Properties::LOG_BUFFER);
+    EXPECT_EQ(logBufferSize, 3);
+    auto str = core->query("core", "logs", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
 
     Fed1->finalize();
-    auto js = helics::fileops::loadJsonStr(str);
+    auto logJson = helics::fileops::loadJsonStr(str);
 
-    EXPECT_GE(js["logs"].size(), 1U);
-    EXPECT_LE(js["logs"].size(), 3U);
+    EXPECT_GE(logJson["logs"].size(), 1U);
+    EXPECT_LE(logJson["logs"].size(), 3U);
     broker.reset();
-    cr->waitForDisconnect();
+    core->waitForDisconnect();
     // test to make sure this works after disconnect
-    auto str2 = cr->query("core", "logs", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
-    auto js2 = helics::fileops::loadJsonStr(str);
+    auto postDisconnectLogs =
+        core->query("core", "logs", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+    auto postDisconnectLogJson = helics::fileops::loadJsonStr(postDisconnectLogs);
 
-    EXPECT_GE(js2["logs"].size(), 1U);
-    EXPECT_LE(js2["logs"].size(), 3U);
-    cr.reset();
+    EXPECT_GE(postDisconnectLogJson["logs"].size(), 1U);
+    EXPECT_LE(postDisconnectLogJson["logs"].size(), 3U);
+    core.reset();
     helics::cleanupHelicsLibrary();
 }
 
@@ -897,23 +899,23 @@ TEST(logging, remote_log_broker)
     fedInfo.forceNewCore = true;
 
     auto Fed = std::make_shared<helics::Federate>("monitor", fedInfo);
-    std::cout << "send command" << std::endl;
+    std::cout << "send command\n";
     broker->sendCommand("monitor", "remotelog timing");
-    std::cout << "send flush query" << std::endl;
+    std::cout << "send flush query\n";
     broker->query("root", "global_flush");
-    std::cout << "enter exec" << std::endl;
+    std::cout << "enter exec\n";
     Fed->enterExecutingMode();
-    std::cout << "request time" << std::endl;
+    std::cout << "request time\n";
     auto rtime = Fed->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
-    std::cout << "finalize" << std::endl;
+    std::cout << "finalize\n";
     Fed->finalize();
-    std::cout << "wait for disconnect" << std::endl;
+    std::cout << "wait for disconnect\n";
     broker->waitForDisconnect();
     auto llock = mlog.lock();
     int remote_cnt{0};
-    for (const auto& lg : llock) {
-        if (std::get<1>(lg).find("monitor") != std::string::npos) {
+    for (const auto& logEntry : llock) {
+        if (std::get<1>(logEntry).find("monitor") != std::string::npos) {
             ++remote_cnt;
         }
     }
@@ -949,9 +951,9 @@ TEST(logging, remote_log_fed)
     broker.reset();
     auto llock = mlog.lock();
     int remote_cnt{0};
-    for (const auto& lg : llock) {
-        if (std::get<1>(lg).find("broker9") != std::string::npos ||
-            std::get<1>(lg).find("root") != std::string::npos) {
+    for (const auto& logEntry : llock) {
+        if (std::get<1>(logEntry).find("broker9") != std::string::npos ||
+            std::get<1>(logEntry).find("root") != std::string::npos) {
             ++remote_cnt;
         }
     }
@@ -991,9 +993,9 @@ TEST(logging, remote_log_core)
     broker.reset();
     int remote_cnt{0};
     auto llock = mlog.lock();
-    for (const auto& lg : llock) {
-        if (std::get<1>(lg).find("broker10") != std::string::npos ||
-            std::get<1>(lg).find("root") != std::string::npos) {
+    for (const auto& logEntry : llock) {
+        if (std::get<1>(logEntry).find("broker10") != std::string::npos ||
+            std::get<1>(logEntry).find("root") != std::string::npos) {
             ++remote_cnt;
         }
     }
@@ -1036,11 +1038,11 @@ TEST(logging, remote_log_multifed)
     int remote_cnt1{0};
     int remote_cnt2{0};
     auto llock = mlog.lock();
-    for (const auto& lg : llock) {
-        if (std::get<1>(lg).find("monitor1") != std::string::npos) {
+    for (const auto& logEntry : llock) {
+        if (std::get<1>(logEntry).find("monitor1") != std::string::npos) {
             ++remote_cnt1;
         }
-        if (std::get<1>(lg).find("monitor2") != std::string::npos) {
+        if (std::get<1>(logEntry).find("monitor2") != std::string::npos) {
             ++remote_cnt2;
         }
     }
@@ -1093,11 +1095,11 @@ TEST(logging, remote_log_multiObjects)
     int remote_cnt1{0};
     int remote_cnt2{0};
     auto llock = mlog.lock();
-    for (const auto& lg : llock) {
-        if (std::get<1>(lg).find("monitor1") != std::string::npos) {
+    for (const auto& logEntry : llock) {
+        if (std::get<1>(logEntry).find("monitor1") != std::string::npos) {
             ++remote_cnt1;
         }
-        if (std::get<1>(lg).find("monitor2") != std::string::npos) {
+        if (std::get<1>(logEntry).find("monitor2") != std::string::npos) {
             ++remote_cnt2;
         }
     }
@@ -1109,12 +1111,12 @@ TEST(logging, remote_log_multiObjects)
     int remote_cntBroker{0};
     auto llock2 = mlogFed.lock();
 
-    for (const auto& lg : llock2) {
-        if (std::get<1>(lg).find("broker12") != std::string::npos ||
-            std::get<1>(lg).find("root") != std::string::npos) {
+    for (const auto& logEntry : llock2) {
+        if (std::get<1>(logEntry).find("broker12") != std::string::npos ||
+            std::get<1>(logEntry).find("root") != std::string::npos) {
             ++remote_cntBroker;
         }
-        if (std::get<1>(lg).find("monitor2") != std::string::npos) {
+        if (std::get<1>(logEntry).find("monitor2") != std::string::npos) {
             ++remote_cntFed2;
         }
     }
