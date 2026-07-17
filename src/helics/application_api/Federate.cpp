@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
 
+#include <cstdlib>
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
@@ -37,6 +38,24 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 // a key link that does very little yet, but forces linking to a particular file
 static const auto ldcores = loadCores();
+
+namespace {
+    bool debugFinalizeEnabled()
+    {
+        const auto* env = std::getenv("HELICS_DEBUG_FINALIZE");
+        return env != nullptr && env[0] != '\0' && env[0] != '0';
+    }
+
+    void finalizeTrace(std::string_view federateName, std::string_view stage, Federate::Modes mode)
+    {
+        if (!debugFinalizeEnabled()) {
+            return;
+        }
+        std::cerr << "[helics-finalize][" << federateName << "] " << stage
+                  << " mode=" << static_cast<int>(mode)
+                  << " tid=" << std::this_thread::get_id() << std::endl;
+    }
+}  // namespace
 
 using namespace std::chrono_literals;  // NOLINT
 void cleanupHelicsLibrary()
@@ -767,6 +786,7 @@ bool Federate::getFlagOption(int flag) const
 }
 void Federate::finalize()
 {  // since finalize is called in the destructor we can't allow any potential virtual function calls
+    finalizeTrace(getName(), "finalize enter", currentMode.load());
     switch (currentMode.load()) {
         case Modes::STARTUP:
         case Modes::INITIALIZING:
@@ -798,19 +818,25 @@ void Federate::finalize()
             return;
             // do nothing
         case Modes::PENDING_FINALIZE:
+            finalizeTrace(getName(), "finalize delegating to finalizeComplete", currentMode.load());
             finalizeComplete();
             return;
         default:
             throw(InvalidFunctionCall("cannot call finalize in present state"));  // LCOV_EXCL_LINE
     }
     if (coreObject) {
+        finalizeTrace(getName(), "finalize core finalize start", currentMode.load());
         coreObject->finalize(fedID);
+        finalizeTrace(getName(), "finalize core finalize complete", currentMode.load());
     }
+    finalizeTrace(getName(), "finalize operations start", currentMode.load());
     finalizeOperations();
+    finalizeTrace(getName(), "finalize operations complete", currentMode.load());
 }
 
 void Federate::finalizeAsync()
 {
+    finalizeTrace(getName(), "finalizeAsync enter", currentMode.load());
     if (singleThreadFederate) {
         throw(InvalidFunctionCall(
             "Async function calls and methods are not allowed for single thread federates"));
@@ -836,23 +862,34 @@ void Federate::finalizeAsync()
         default:
             break;
     }
-    auto finalizeFunc = [this]() { return coreObject->finalize(fedID); };
+    auto finalizeFunc = [this]() {
+        finalizeTrace(getName(), "finalizeAsync worker core finalize start", currentMode.load());
+        coreObject->finalize(fedID);
+        finalizeTrace(getName(), "finalizeAsync worker core finalize complete", currentMode.load());
+    };
     auto asyncInfo = asyncCallInfo->lock();
     updateFederateMode(Modes::PENDING_FINALIZE);
+    finalizeTrace(getName(), "finalizeAsync launch worker", currentMode.load());
     asyncInfo->finalizeFuture = std::async(std::launch::async, finalizeFunc);
 }
 
 /** complete the asynchronous terminate pair*/
 void Federate::finalizeComplete()
 {
+    finalizeTrace(getName(), "finalizeComplete enter", currentMode.load());
     if (singleThreadFederate) {
         return finalize();
     }
     if (currentMode == Modes::PENDING_FINALIZE) {
         auto asyncInfo = asyncCallInfo->lock();
+        finalizeTrace(getName(), "finalizeComplete future get start", currentMode.load());
         asyncInfo->finalizeFuture.get();
+        finalizeTrace(getName(), "finalizeComplete future get complete", currentMode.load());
+        finalizeTrace(getName(), "finalizeComplete operations start", currentMode.load());
         finalizeOperations();
+        finalizeTrace(getName(), "finalizeComplete operations complete", currentMode.load());
     } else {
+        finalizeTrace(getName(), "finalizeComplete delegating to finalize", currentMode.load());
         finalize();
     }
 }
@@ -861,9 +898,13 @@ void Federate::finalizeOperations()
 {
     // this should not contain virtual calls
     if (cManager) {
+        finalizeTrace(getName(), "finalizeOperations close connectors start", currentMode.load());
         cManager->closeAllConnectors();
+        finalizeTrace(getName(), "finalizeOperations close connectors complete", currentMode.load());
     }
+    finalizeTrace(getName(), "finalizeOperations update mode start", currentMode.load());
     updateFederateMode(Modes::FINALIZE);
+    finalizeTrace(getName(), "finalizeOperations update mode complete", currentMode.load());
 }
 
 void Federate::processCommunication(std::chrono::milliseconds period)
