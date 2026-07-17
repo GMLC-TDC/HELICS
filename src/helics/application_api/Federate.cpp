@@ -867,6 +867,11 @@ void Federate::finalizeAsync()
     }
     auto finalizeFunc = [this]() {
         finalizeTrace(getName(), "finalizeAsync worker core finalize start", currentMode.load());
+        finalizeTrace(getName(),
+                      fmt::format("finalizeAsync worker core call core={} fedID={}",
+                                  static_cast<const void*>(coreObject.get()),
+                                  fedID.baseValue()),
+                      currentMode.load());
         coreObject->finalize(fedID);
         finalizeTrace(getName(), "finalizeAsync worker core finalize complete", currentMode.load());
     };
