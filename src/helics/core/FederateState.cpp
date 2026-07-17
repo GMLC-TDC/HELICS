@@ -999,7 +999,8 @@ void FederateState::finalize()
         mTimer->cancelTimer(grantTimeoutTimeIndex);
     }
 #endif
-    federateStateFinalizeTrace(name, fmt::format("complete state={}", static_cast<int>(state.load())));
+    federateStateFinalizeTrace(name,
+                               fmt::format("complete state={}", static_cast<int>(state.load())));
 }
 
 void FederateState::processCommunications(std::chrono::milliseconds period)

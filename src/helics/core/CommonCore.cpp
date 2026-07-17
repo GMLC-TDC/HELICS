@@ -559,7 +559,9 @@ void CommonCore::finalize(LocalFederateId federateID)
     coreFinalizeTrace(identifier, fmt::format("local:{}", federateID.baseValue()), "enter");
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
-        coreFinalizeTrace(identifier, fmt::format("local:{}", federateID.baseValue()), "invalid federate");
+        coreFinalizeTrace(identifier,
+                          fmt::format("local:{}", federateID.baseValue()),
+                          "invalid federate");
         throw(InvalidIdentifier("federateID not valid finalize"));
     }
     coreFinalizeTrace(identifier, fed->getIdentifier(), "located federate");
@@ -594,7 +596,9 @@ void CommonCore::finalize(LocalFederateId federateID)
         if (fed->getState() == FederateStates::CREATED) {
             coreFinalizeTrace(identifier, fed->getIdentifier(), "callback federate finalize start");
             fed->finalize();
-            coreFinalizeTrace(identifier, fed->getIdentifier(), "callback federate finalize complete");
+            coreFinalizeTrace(identifier,
+                              fed->getIdentifier(),
+                              "callback federate finalize complete");
         }
         // else just let the normal callback operation take place
     } else {
