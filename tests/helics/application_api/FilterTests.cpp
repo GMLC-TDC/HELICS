@@ -20,9 +20,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "testFixtures_shared.hpp"
 #endif
 #include <cstdio>
-#include <iostream>
 #include <future>
 #include <gtest/gtest.h>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <thread>
