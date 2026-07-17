@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "testFixtures_shared.hpp"
 #endif
 #include <cstdio>
+#include <iostream>
 #include <future>
 #include <gtest/gtest.h>
 #include <memory>
@@ -50,42 +51,63 @@ class filter: public ::testing::Test, public FederateTestFixture {};
 /** test registration of filters*/
 TEST_P(filter_single_type_test, message_filter_registration)
 {
-    auto broker = AddBroker(GetParam(), 2);
+    const auto* coreType = GetParam();
+    const auto logStep = [coreType](const char* step) {
+        ::testing::Test::RecordProperty("message_filter_registration_step", step);
+        std::cerr << "[message_filter_registration][" << coreType << "] " << step << std::endl;
+    };
+    logStep("starting broker");
+    auto broker = AddBroker(coreType, 2);
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, helics::timeZero, "filter");
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, helics::timeZero, "message");
+    logStep("adding federates");
+    AddFederates<helics::MessageFederate>(coreType, 1, broker, helics::timeZero, "filter");
+    AddFederates<helics::MessageFederate>(coreType, 1, broker, helics::timeZero, "message");
     // broker->setLoggingLevel (3);
+    logStep("resetting local broker pointer");
     broker.reset();
 
+    logStep("getting federates");
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
 
+    logStep("registering message endpoints");
     mFed->registerGlobalEndpoint("port1");
     mFed->registerGlobalEndpoint("port2");
 
+    logStep("registering source filter");
     auto& filt1 = fFed->registerFilter("filter1");
     filt1.addSourceTarget("port1");
     EXPECT_TRUE(filt1.getHandle().isValid());
+    logStep("registering destination filter");
     auto& filt2 = fFed->registerFilter("filter2");
     filt2.addDestinationTarget("port2");
     EXPECT_TRUE(filt2.getHandle().isValid());
+    logStep("registering filter endpoint");
     auto& ept1 = fFed->registerEndpoint("fout");
     EXPECT_TRUE(ept1.getHandle().isValid());
 
+    logStep("registering cloning filter");
     auto& filt3 = fFed->registerCloningFilter();
     filt3.addSourceTarget("filter0/fout");
     filt3.addDestinationTarget("port2");
     EXPECT_TRUE(filt3.getHandle() != filt2.getHandle());
 
+    logStep("registering unnamed filter");
     auto& filt4 = fFed->registerFilter();
     filt4.addSourceTarget("filter0/fout");
     EXPECT_TRUE(filt4.getHandle() != filt3.getHandle());
+    logStep("finalizing message federate async");
     mFed->finalizeAsync();
+    logStep("finalizing filter federate");
     fFed->finalize();
     // std::cout << "fFed returned\n";
+    logStep("completing message federate finalize");
     mFed->finalizeComplete();
+    logStep("checking final mode");
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    logStep("full disconnect");
     FullDisconnect();
+    logStep("complete");
 }
 
 /** test a filter operator
@@ -126,7 +148,7 @@ TEST_P(filter_single_type_test, message_filter_function)
     EXPECT_TRUE(!res);
     if (res) {
         auto message3 = mFed->getMessage(ept2);
-        (void)(message3);
+        (void)message3;
     }
     mFed->requestTimeAsync(2.0);
     fFed->requestTime(2.0);
@@ -134,7 +156,7 @@ TEST_P(filter_single_type_test, message_filter_function)
     EXPECT_TRUE(!mFed->hasMessage(ept2));
     if (mFed->hasMessage(ept2)) {
         auto message3 = mFed->getMessage(ept2);
-        (void)(message3);
+        (void)message3;
     }
     fFed->requestTimeAsync(3.0);
     auto retTime = mFed->requestTime(3.0);
