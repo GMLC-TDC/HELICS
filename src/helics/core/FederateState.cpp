@@ -26,6 +26,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <chrono>
+#include <cstdlib>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -107,6 +109,23 @@ static const std::string gHelicsEmptyStr;
 using namespace std::chrono_literals;  // NOLINT
 
 namespace helics {
+namespace {
+    bool debugFinalizeEnabled()
+    {
+        const auto* env = std::getenv("HELICS_DEBUG_FINALIZE");
+        return env != nullptr && env[0] != '\0' && env[0] != '0';
+    }
+
+    void federateStateFinalizeTrace(std::string_view federateName, std::string_view stage)
+    {
+        if (!debugFinalizeEnabled()) {
+            return;
+        }
+        std::cerr << "[helics-fedstate-finalize][" << federateName << "] " << stage
+                  << " tid=" << std::this_thread::get_id() << std::endl;
+    }
+}  // namespace
+
 FederateState::FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo):
     name(fedName),
     timeCoord(new TimeCoordinator([this](const ActionMessage& msg) { routeMessage(msg); })),
@@ -932,7 +951,9 @@ MessageProcessingResult FederateState::genericUnspecifiedQueueProcess(bool busyR
 
 void FederateState::finalize()
 {
+    federateStateFinalizeTrace(name, fmt::format("enter state={}", static_cast<int>(state.load())));
     if ((state == FederateStates::FINISHED) || (state == FederateStates::ERRORED)) {
+        federateStateFinalizeTrace(name, "already finished or errored");
         return;
     }
     auto ret = MessageProcessingResult::NEXT_STEP;
@@ -952,11 +973,25 @@ void FederateState::finalize()
         }
     }
 #endif
+    int loopCounter{0};
     while (ret != MessageProcessingResult::HALTED) {
+        if (loopCounter == 0 || loopCounter % 100 == 0) {
+            federateStateFinalizeTrace(name,
+                                       fmt::format("queue process start loop={} state={}",
+                                                   loopCounter,
+                                                   static_cast<int>(state.load())));
+        }
         ret = genericUnspecifiedQueueProcess(false);
+        federateStateFinalizeTrace(name,
+                                   fmt::format("queue process result loop={} result={} state={}",
+                                               loopCounter,
+                                               static_cast<int>(ret),
+                                               static_cast<int>(state.load())));
         if (ret == MessageProcessingResult::ERROR_RESULT) {
+            federateStateFinalizeTrace(name, "error result");
             break;
         }
+        ++loopCounter;
     }
 #ifndef HELICS_DISABLE_ASIO
     ++mGrantCount;
@@ -964,6 +999,7 @@ void FederateState::finalize()
         mTimer->cancelTimer(grantTimeoutTimeIndex);
     }
 #endif
+    federateStateFinalizeTrace(name, fmt::format("complete state={}", static_cast<int>(state.load())));
 }
 
 void FederateState::processCommunications(std::chrono::milliseconds period)
