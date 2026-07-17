@@ -617,18 +617,20 @@ TEST(logging, log_buffer_broker)
     rtime = Fed2->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
     Fed1->finalize();
-    auto str = broker->query("broker", "logs");
+    auto str = broker->query("broker", "logs", HELICS_SEQUENCING_MODE_ORDERED);
     Fed2->finalize();
     auto js = helics::fileops::loadJsonStr(str);
 
-    EXPECT_EQ(js["logs"].size(), 10U);
+    ASSERT_TRUE(js["logs"].is_array());
+    EXPECT_EQ(js["logs"].size(), helics::LogBuffer::cDefaultBufferSize);
     broker->waitForDisconnect();
 
     str = broker->query("broker", "logs");
     broker.reset();
     js = helics::fileops::loadJsonStr(str);
 
-    EXPECT_EQ(js["logs"].size(), 10U);
+    ASSERT_TRUE(js["logs"].is_array());
+    EXPECT_EQ(js["logs"].size(), helics::LogBuffer::cDefaultBufferSize);
 }
 
 TEST(logging, log_buffer_broker2)
@@ -657,10 +659,11 @@ TEST(logging, log_buffer_broker2)
     rtime = Fed2->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
     Fed1->finalize();
-    auto str = broker->query("broker", "logs");
+    auto str = broker->query("broker", "logs", HELICS_SEQUENCING_MODE_ORDERED);
     Fed2->finalize();
     auto js = helics::fileops::loadJsonStr(str);
 
+    ASSERT_TRUE(js["logs"].is_array());
     EXPECT_EQ(js["logs"].size(), 7U);
     broker.reset();
 }
@@ -691,11 +694,12 @@ TEST(logging, log_buffer_broker3)
     rtime = Fed2->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
     Fed1->finalize();
-    auto str = broker->query("broker", "logs");
+    auto str = broker->query("broker", "logs", HELICS_SEQUENCING_MODE_ORDERED);
     Fed2->finalize();
     auto js = helics::fileops::loadJsonStr(str);
 
-    EXPECT_EQ(js["logs"].size(), 10U);
+    ASSERT_TRUE(js["logs"].is_array());
+    EXPECT_EQ(js["logs"].size(), helics::LogBuffer::cDefaultBufferSize);
     broker.reset();
 }
 
@@ -725,7 +729,7 @@ TEST(logging, log_buffer_broker4)
     rtime = Fed2->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
     Fed1->finalize();
-    auto str = broker->query("broker", "logs");
+    auto str = broker->query("broker", "logs", HELICS_SEQUENCING_MODE_ORDERED);
     Fed2->finalize();
     broker.reset();
 

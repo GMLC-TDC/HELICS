@@ -403,6 +403,15 @@ void FederateState::routeMessage(ActionMessage&& msg)
 void FederateState::addAction(const ActionMessage& action)
 {
     if (action.action() != CMD_IGNORE) {
+        if (action.action() == CMD_DISCONNECT_FED_ACK) {
+            federateStateFinalizeTrace(name,
+                                       fmt::format("addAction disconnect ack source={} dest={} "
+                                                   "state={} queueSizeBefore={}",
+                                                   action.source_id.baseValue(),
+                                                   action.dest_id.baseValue(),
+                                                   static_cast<int>(state.load()),
+                                                   queue.size()));
+        }
         queue.push(action);
         if (mCallbackBased) {
             callbackProcessing();
@@ -413,6 +422,15 @@ void FederateState::addAction(const ActionMessage& action)
 void FederateState::addAction(ActionMessage&& action)
 {
     if (action.action() != CMD_IGNORE) {
+        if (action.action() == CMD_DISCONNECT_FED_ACK) {
+            federateStateFinalizeTrace(name,
+                                       fmt::format("addAction disconnect ack source={} dest={} "
+                                                   "state={} queueSizeBefore={}",
+                                                   action.source_id.baseValue(),
+                                                   action.dest_id.baseValue(),
+                                                   static_cast<int>(state.load()),
+                                                   queue.size()));
+        }
         queue.push(std::move(action));
         if (mCallbackBased) {
             callbackProcessing();
@@ -1384,7 +1402,17 @@ MessageProcessingResult FederateState::processQueue() noexcept
                                            static_cast<int>(ret_code)));
 
     while (!(returnableResult(ret_code))) {
-        federateStateFinalizeTrace(name, "processQueue pop start");
+        federateStateFinalizeTrace(name,
+                                   fmt::format("processQueue pop start state={} queueSize={} "
+                                               "queueEmpty={}",
+                                               static_cast<int>(state.load()),
+                                               queue.size(),
+                                               queue.empty()));
+        if (state == FederateStates::TERMINATING) {
+            federateStateFinalizeTrace(
+                name,
+                "processQueue waiting while terminating; expecting disconnect ack or stop");
+        }
         auto cmd = queue.pop();
         federateStateFinalizeTrace(name,
                                    fmt::format("processQueue pop action={} source={} dest={}",

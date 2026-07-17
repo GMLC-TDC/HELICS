@@ -60,21 +60,21 @@ TEST(profiling_tests, basic)
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM.second, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM.second, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
 }
@@ -112,21 +112,21 @@ TEST(profiling_tests, broker_basic)
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM.second, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM.second, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
 }
@@ -161,21 +161,21 @@ TEST(profiling_tests, broker_basic_no_flag)
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM.second, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM.second, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
 }
@@ -205,21 +205,21 @@ TEST(profiling_tests, fed_capture)
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM.second, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM.second, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
 }
@@ -250,21 +250,21 @@ TEST(profiling_tests, fed_capture2)
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM.second, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM.second, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
 }
@@ -286,20 +286,20 @@ TEST(profiling_tests, save_file)
     ASSERT_TRUE(std::filesystem::exists("save_profile.txt"));
 
     std::vector<std::string> mlog;
-    std::ifstream in("save_profile.txt");
+    std::ifstream profileInput("save_profile.txt");
     // Check if object is valid
-    ASSERT_TRUE(in) << "Cannot open save_profile.txt";
+    ASSERT_TRUE(profileInput) << "Cannot open save_profile.txt";
 
     std::string str;
     // Read the next line from File until it reaches the end.
-    while (std::getline(in, str)) {
+    while (std::getline(profileInput, str)) {
         // Line contains string of length > 0 then save it in vector
         if (!str.empty()) {
             mlog.push_back(str);
         }
     }
     // Close The File
-    in.close();
+    profileInput.close();
 
     ASSERT_TRUE(!mlog.empty());
     bool hasMarker{false};
@@ -308,21 +308,21 @@ TEST(profiling_tests, save_file)
         if (logM.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
     std::filesystem::remove("save_profile.txt");
@@ -347,20 +347,20 @@ TEST(profiling_tests, save_file_append)
     helics::cleanupHelicsLibrary();
 
     std::vector<std::string> mlog;
-    std::ifstream in("save_profile_app.txt");
+    std::ifstream profileInput("save_profile_app.txt");
     // Check if object is valid
-    ASSERT_TRUE(in) << "Cannot open save_profile_app.txt";
+    ASSERT_TRUE(profileInput) << "Cannot open save_profile_app.txt";
 
     std::string str;
     // Read the next line from File until it reaches the end.
-    while (std::getline(in, str)) {
+    while (std::getline(profileInput, str)) {
         // Line contains string of length > 0 then save it in vector
         if (!str.empty()) {
             mlog.push_back(str);
         }
     }
     // Close The File
-    in.close();
+    profileInput.close();
 
     ASSERT_TRUE(!mlog.empty());
     bool hasMarker{false};
@@ -370,21 +370,21 @@ TEST(profiling_tests, save_file_append)
         if (logM.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
     std::filesystem::remove("save_profile_app.txt");
@@ -409,20 +409,20 @@ TEST(profiling_tests, broker_file_save)
     ASSERT_TRUE(std::filesystem::exists("save_profile2.txt"));
 
     std::vector<std::string> mlog;
-    std::ifstream in("save_profile2.txt");
+    std::ifstream profileInput("save_profile2.txt");
     // Check if object is valid
-    ASSERT_TRUE(in) << "Cannot open save_profile2.txt";
+    ASSERT_TRUE(profileInput) << "Cannot open save_profile2.txt";
 
     std::string str;
     // Read the next line from File until it reaches the end.
-    while (std::getline(in, str)) {
+    while (std::getline(profileInput, str)) {
         // Line contains string of length > 0 then save it in vector
         if (!str.empty()) {
             mlog.push_back(str);
         }
     }
     // Close The File
-    in.close();
+    profileInput.close();
 
     ASSERT_TRUE(!mlog.empty());
     bool hasMarker{false};
@@ -431,21 +431,21 @@ TEST(profiling_tests, broker_file_save)
         if (logM.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
     std::filesystem::remove("save_profile2.txt");
@@ -481,21 +481,21 @@ TEST(profiling_tests, config)
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM.second, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM.second, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
 }
@@ -524,21 +524,21 @@ TEST(profiling_tests, config2)
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
-            std::smatch ml;
+            std::smatch profilingMatch;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM.second, ml, ptime)) {
-                timeValues.push_back(std::stoll(ml[1]));
+            if (std::regex_search(logM.second, profilingMatch, ptime)) {
+                timeValues.push_back(std::stoll(profilingMatch[1]));
             }
         }
     }
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st : timeValues) {
-        if (st < current) {
+    for (auto timeValue : timeValues) {
+        if (timeValue < current) {
             increasing = false;
         }
-        current = st;
+        current = timeValue;
     }
     EXPECT_TRUE(increasing);
 }
