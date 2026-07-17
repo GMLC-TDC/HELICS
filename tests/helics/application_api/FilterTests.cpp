@@ -127,8 +127,8 @@ TEST_P(filter_single_type_test, message_filter_registration)
     logStep("completing message federate finalize");
     std::cerr << "[message_filter_registration][" << coreType
               << "] message federate before finalizeComplete ptr=" << mFed.get()
-              << " mode=" << static_cast<int>(mFed->getCurrentMode())
-              << " name=" << mFed->getName() << '\n'
+              << " mode=" << static_cast<int>(mFed->getCurrentMode()) << " name=" << mFed->getName()
+              << '\n'
               << std::flush;
     mFed->finalizeComplete();
     logStep("checking final mode");
