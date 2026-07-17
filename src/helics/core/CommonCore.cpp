@@ -4918,7 +4918,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_FED:
             if (cmd.dest_id == parent_broker_id) {
-                if (getBrokerState() < BrokerState::TERMINATING) {
+                if (getBrokerState() <= BrokerState::TERMINATING) {
                     auto fed = loopFederates.find(cmd.source_id);
                     if (fed == loopFederates.end()) {
                         return;
