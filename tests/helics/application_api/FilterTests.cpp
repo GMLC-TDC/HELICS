@@ -21,7 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 #include <cstdio>
 #include <cstdlib>
-#include <iostream>
 #include <future>
 #include <gtest/gtest.h>
 #include <iostream>
@@ -35,23 +34,23 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 
 namespace {
-    void setDebugFinalizeEnv()
-    {
+void setDebugFinalizeEnv()
+{
 #ifdef _WIN32
-        _putenv_s("HELICS_DEBUG_FINALIZE", "1");
+    _putenv_s("HELICS_DEBUG_FINALIZE", "1");
 #else
-        setenv("HELICS_DEBUG_FINALIZE", "1", 1);
+    setenv("HELICS_DEBUG_FINALIZE", "1", 1);
 #endif
-    }
+}
 
-    void clearDebugFinalizeEnv()
-    {
+void clearDebugFinalizeEnv()
+{
 #ifdef _WIN32
-        _putenv_s("HELICS_DEBUG_FINALIZE", "");
+    _putenv_s("HELICS_DEBUG_FINALIZE", "");
 #else
-        unsetenv("HELICS_DEBUG_FINALIZE");
+    unsetenv("HELICS_DEBUG_FINALIZE");
 #endif
-    }
+}
 }  // namespace
 
 class filter_single_type_test:

@@ -52,8 +52,8 @@ namespace {
             return;
         }
         std::cerr << "[helics-finalize][" << federateName << "] " << stage
-                  << " mode=" << static_cast<int>(mode)
-                  << " tid=" << std::this_thread::get_id() << std::endl;
+                  << " mode=" << static_cast<int>(mode) << " tid=" << std::this_thread::get_id()
+                  << std::endl;
     }
 }  // namespace
 
@@ -900,7 +900,9 @@ void Federate::finalizeOperations()
     if (cManager) {
         finalizeTrace(getName(), "finalizeOperations close connectors start", currentMode.load());
         cManager->closeAllConnectors();
-        finalizeTrace(getName(), "finalizeOperations close connectors complete", currentMode.load());
+        finalizeTrace(getName(),
+                      "finalizeOperations close connectors complete",
+                      currentMode.load());
     }
     finalizeTrace(getName(), "finalizeOperations update mode start", currentMode.load());
     updateFederateMode(Modes::FINALIZE);
