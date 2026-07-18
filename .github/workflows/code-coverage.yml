@@ -102,7 +102,7 @@ jobs:
         path: build/coverage.info.cleaned
 
     - name: Upload coverage results
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@v7
       with:
         disable_search: true
         files: build/coverage.info.cleaned
