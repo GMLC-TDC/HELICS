@@ -557,15 +557,10 @@ std::string CommonCore::getErrorMessage() const
 
 void CommonCore::finalize(LocalFederateId federateID)
 {
-    coreFinalizeTrace(identifier, fmt::format("local:{}", federateID.baseValue()), "enter");
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
-        coreFinalizeTrace(identifier,
-                          fmt::format("local:{}", federateID.baseValue()),
-                          "invalid federate");
         throw(InvalidIdentifier("federateID not valid finalize"));
     }
-    coreFinalizeTrace(identifier, fed->getIdentifier(), "located federate");
 
     auto cbrokerState = getBrokerState();
     coreFinalizeTrace(identifier,
@@ -581,7 +576,6 @@ void CommonCore::finalize(LocalFederateId federateID)
             bye.dest_id = bye.source_id;
             coreFinalizeTrace(identifier, fed->getIdentifier(), "add stop action to core");
             addActionMessage(bye);
-            coreFinalizeTrace(identifier, fed->getIdentifier(), "add stop action to federate");
             fed->addAction(bye);
         } break;
         default: {
@@ -593,13 +587,8 @@ void CommonCore::finalize(LocalFederateId federateID)
         } break;
     }
     if (fed->isCallbackFederate()) {
-        coreFinalizeTrace(identifier, fed->getIdentifier(), "callback federate path");
         if (fed->getState() == FederateStates::CREATED) {
-            coreFinalizeTrace(identifier, fed->getIdentifier(), "callback federate finalize start");
             fed->finalize();
-            coreFinalizeTrace(identifier,
-                              fed->getIdentifier(),
-                              "callback federate finalize complete");
         }
         // else just let the normal callback operation take place
     } else {

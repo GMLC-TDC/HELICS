@@ -971,9 +971,7 @@ MessageProcessingResult FederateState::genericUnspecifiedQueueProcess(bool busyR
 
 void FederateState::finalize()
 {
-    federateStateFinalizeTrace(name, fmt::format("enter state={}", static_cast<int>(state.load())));
     if ((state == FederateStates::FINISHED) || (state == FederateStates::ERRORED)) {
-        federateStateFinalizeTrace(name, "already finished or errored");
         return;
     }
     auto ret = MessageProcessingResult::NEXT_STEP;
@@ -995,18 +993,7 @@ void FederateState::finalize()
 #endif
     int loopCounter{0};
     while (ret != MessageProcessingResult::HALTED) {
-        if (loopCounter == 0 || loopCounter % 100 == 0) {
-            federateStateFinalizeTrace(name,
-                                       fmt::format("queue process start loop={} state={}",
-                                                   loopCounter,
-                                                   static_cast<int>(state.load())));
-        }
         ret = genericUnspecifiedQueueProcess(false);
-        federateStateFinalizeTrace(name,
-                                   fmt::format("queue process result loop={} result={} state={}",
-                                               loopCounter,
-                                               static_cast<int>(ret),
-                                               static_cast<int>(state.load())));
         if (ret == MessageProcessingResult::ERROR_RESULT) {
             federateStateFinalizeTrace(name, "error result");
             break;
@@ -1019,8 +1006,6 @@ void FederateState::finalize()
         mTimer->cancelTimer(grantTimeoutTimeIndex);
     }
 #endif
-    federateStateFinalizeTrace(name,
-                               fmt::format("complete state={}", static_cast<int>(state.load())));
 }
 
 void FederateState::processCommunications(std::chrono::milliseconds period)
@@ -1380,11 +1365,7 @@ void FederateState::callbackProcessing() noexcept
 
 MessageProcessingResult FederateState::processQueue() noexcept
 {
-    federateStateFinalizeTrace(name,
-                               fmt::format("processQueue enter state={}",
-                                           static_cast<int>(state.load())));
     if (state == FederateStates::FINISHED) {
-        federateStateFinalizeTrace(name, "processQueue already finished");
         return MessageProcessingResult::HALTED;
     }
     auto initError = (state == FederateStates::ERRORED);
@@ -1395,46 +1376,36 @@ MessageProcessingResult FederateState::processQueue() noexcept
         generateProfilingMessage(true);
     }
     // process the delay Queue first
-    federateStateFinalizeTrace(name, "processQueue delay queue start");
     auto ret_code = processDelayQueue();
-    federateStateFinalizeTrace(name,
-                               fmt::format("processQueue delay queue result={}",
-                                           static_cast<int>(ret_code)));
 
     while (!(returnableResult(ret_code))) {
-        federateStateFinalizeTrace(name,
-                                   fmt::format("processQueue pop start state={} queueSize={} "
-                                               "queueEmpty={}",
-                                               static_cast<int>(state.load()),
-                                               queue.size(),
-                                               queue.empty()));
         if (state == FederateStates::TERMINATING) {
             federateStateFinalizeTrace(
                 name, "processQueue waiting while terminating; expecting disconnect ack or stop");
         }
         auto cmd = queue.pop();
-        federateStateFinalizeTrace(name,
-                                   fmt::format("processQueue pop action={} source={} dest={}",
-                                               static_cast<int>(cmd.action()),
-                                               cmd.source_id.baseValue(),
-                                               cmd.dest_id.baseValue()));
+        const bool disconnectAck = (cmd.action() == CMD_DISCONNECT_FED_ACK);
+        if (disconnectAck) {
+            federateStateFinalizeTrace(name,
+                                       fmt::format("processQueue pop disconnect ack source={} "
+                                                   "dest={}",
+                                                   cmd.source_id.baseValue(),
+                                                   cmd.dest_id.baseValue()));
+        }
         if (messageShouldBeDelayed(cmd)) {
-            federateStateFinalizeTrace(name, "processQueue delayed popped command");
             delayQueues[cmd.source_id].push_back(cmd);
             continue;
         }
-        federateStateFinalizeTrace(name,
-                                   fmt::format("processQueue process action={} start",
-                                               static_cast<int>(cmd.action())));
         ret_code = processActionMessage(cmd);
-        federateStateFinalizeTrace(name,
-                                   fmt::format("processQueue process action={} result={} state={}",
-                                               static_cast<int>(cmd.action()),
-                                               static_cast<int>(ret_code),
-                                               static_cast<int>(state.load())));
+        if (disconnectAck) {
+            federateStateFinalizeTrace(name,
+                                       fmt::format("processQueue process disconnect ack result={} "
+                                                   "state={}",
+                                                   static_cast<int>(ret_code),
+                                                   static_cast<int>(state.load())));
+        }
 
         if (ret_code == MessageProcessingResult::DELAY_MESSAGE) {
-            federateStateFinalizeTrace(name, "processQueue delay message result");
             delayQueues[static_cast<GlobalFederateId>(cmd.source_id)].push_back(cmd);
         }
         if (ret_code == MessageProcessingResult::ERROR_RESULT && cmd.action() == CMD_GLOBAL_ERROR) {
