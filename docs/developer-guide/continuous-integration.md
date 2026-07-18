@@ -11,7 +11,7 @@ GitHub Actions, Appveyor, Circle-CI, Azure and Drone.
 
 Azure pipelines is currently running the majority of CI tests.
 
-The main tests for pull requests and pushes targeting the main and develop branches are:
+The main tests for pull requests and pushes targeting the main branch are:
 
 - Default Ubuntu 20.04 build and test using GCC with MPI and encryption support enabled
 - GCC 8 build and test running on Linux with MPI and encryption support enabled
@@ -52,7 +52,7 @@ GitHub Actions is used for various release related builds, and some special CI c
 - Building pre-compiled packages for releases
 - Building Docker images
 - Daily build of benchmark binaries
-- Daily build of the release artifacts using code in the develop branch
+- Daily build of the release artifacts using code in the main branch
 - Daily MSYS2 CI builds using both MinGW and MSYS makefiles
 - Daily code coverage build and test
 

@@ -16,7 +16,7 @@ ARG MAKE_PARALLEL
 # Set ENABLE_GITHUB to true if you have only downloaded this Dockerfile without the rest of the HELICS source code repository
 # For users, it is recommended to just pull an already built Docker image from Docker Hub (building can take up to 30 minutes)
 ARG ENABLE_GITHUB=false
-ARG GIT_BRANCH=develop
+ARG GIT_BRANCH=main
 
 # Remove the copied source directory and replace it with a GitHub clone
 # The git clone part of this line shows how to recursively clone a specific branch from a git repository

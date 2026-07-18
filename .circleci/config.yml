@@ -180,7 +180,7 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - main
     jobs:
       - helicsTumbleweed
       - helicsNoZmq
@@ -192,6 +192,6 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - main
     jobs:
       - benchmarkjob

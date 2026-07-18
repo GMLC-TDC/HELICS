@@ -47,11 +47,11 @@ jobs:
         submodules: true
       if: github.event_name != 'schedule'
 
-    - name: Checkout develop branch
+    - name: Checkout main branch
       uses: actions/checkout@v6
       with:
         submodules: true
-        ref: develop
+        ref: main
       if: github.event_name == 'schedule'
 
     - name: Build HELICS
