@@ -41,7 +41,7 @@ jobs:
         echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event.action == 'published' || github.event_name == 'workflow_dispatch'
@@ -104,13 +104,13 @@ jobs:
         echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
     
     - name: Checkout main branch
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: main
       if: github.event_name == 'schedule'
@@ -195,14 +195,14 @@ jobs:
         echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
         submodules: recursive
       if: github.event_name != 'schedule'
 
     - name: Checkout main branch
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: main
         submodules: recursive
@@ -301,14 +301,14 @@ jobs:
         echo "DEPTH=${DEPTH}" >> $GITHUB_OUTPUT
 
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
         submodules: recursive
       if: github.event_name != 'schedule'
 
     - name: Checkout main branch
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: main
         submodules: recursive
@@ -372,7 +372,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       
     - name: Get all artifacts
       uses: actions/download-artifact@v7
