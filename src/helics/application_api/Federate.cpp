@@ -838,9 +838,7 @@ void Federate::finalizeAsync()
         default:
             break;
     }
-    auto finalizeFunc = [this]() {
-        coreObject->finalize(fedID);
-    };
+    auto finalizeFunc = [this]() { coreObject->finalize(fedID); };
     auto asyncInfo = asyncCallInfo->lock();
     updateFederateMode(Modes::PENDING_FINALIZE);
     asyncInfo->finalizeFuture = std::async(std::launch::async, finalizeFunc);
