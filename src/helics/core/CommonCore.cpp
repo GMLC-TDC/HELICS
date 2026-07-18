@@ -4925,12 +4925,12 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     }
                     fed->state = OperatingState::DISCONNECTED;
                     auto cstate = getBrokerState();
+                    const bool preOperating = (cstate < BrokerState::OPERATING);
                     const bool alreadyTerminating = (cstate == BrokerState::TERMINATING);
-                    if ((!checkAndProcessDisconnect()) || (cstate < BrokerState::OPERATING) ||
-                        alreadyTerminating) {
+                    if ((!checkAndProcessDisconnect()) || preOperating || alreadyTerminating) {
                         cmd.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, cmd);
-                        if ((alreadyTerminating ||
+                        if ((preOperating || alreadyTerminating ||
                              minFederateState() != OperatingState::DISCONNECTED ||
                              filterFed != nullptr || translatorFed != nullptr) &&
                             !globalDisconnect) {
