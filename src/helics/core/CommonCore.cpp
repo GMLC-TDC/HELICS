@@ -38,7 +38,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <cassert>
-#include <cstdlib>
 #include <cstring>
 #include <fmt/format.h>
 #include <fstream>
@@ -56,24 +55,6 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 namespace {
-    bool debugFinalizeEnabled()
-    {
-        const auto* env = std::getenv("HELICS_DEBUG_FINALIZE");
-        return env != nullptr && env[0] != '\0' && env[0] != '0';
-    }
-
-    void coreFinalizeTrace(std::string_view coreName,
-                           std::string_view fedName,
-                           std::string_view stage)
-    {
-        if (!debugFinalizeEnabled()) {
-            return;
-        }
-        std::cerr << "[helics-core-finalize][" << coreName << "][" << fedName << "] " << stage
-                  << " tid=" << std::this_thread::get_id() << '\n'
-                  << std::flush;
-    }
-
     const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>>& commonCoreMapIndex()
     {
         static const auto* mapIndex =
@@ -563,9 +544,6 @@ void CommonCore::finalize(LocalFederateId federateID)
     }
 
     auto cbrokerState = getBrokerState();
-    coreFinalizeTrace(identifier,
-                      fed->getIdentifier(),
-                      fmt::format("broker state {}", static_cast<int>(cbrokerState)));
     switch (cbrokerState) {
         case BrokerState::TERMINATED:
         case BrokerState::TERMINATING:
@@ -574,7 +552,6 @@ void CommonCore::finalize(LocalFederateId federateID)
             ActionMessage bye(CMD_STOP);
             bye.source_id = fed->global_id.load();
             bye.dest_id = bye.source_id;
-            coreFinalizeTrace(identifier, fed->getIdentifier(), "add stop action to core");
             addActionMessage(bye);
             fed->addAction(bye);
         } break;
@@ -582,7 +559,6 @@ void CommonCore::finalize(LocalFederateId federateID)
             ActionMessage bye(CMD_DISCONNECT);
             bye.source_id = fed->global_id.load();
             bye.dest_id = bye.source_id;
-            coreFinalizeTrace(identifier, fed->getIdentifier(), "add disconnect action to core");
             addActionMessage(bye);
         } break;
     }
@@ -592,9 +568,7 @@ void CommonCore::finalize(LocalFederateId federateID)
         }
         // else just let the normal callback operation take place
     } else {
-        coreFinalizeTrace(identifier, fed->getIdentifier(), "federate state finalize start");
         fed->finalize();
-        coreFinalizeTrace(identifier, fed->getIdentifier(), "federate state finalize complete");
     }
 }
 

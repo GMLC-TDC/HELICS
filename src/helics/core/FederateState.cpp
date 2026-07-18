@@ -26,8 +26,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <chrono>
-#include <cstdlib>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -109,24 +107,6 @@ static const std::string gHelicsEmptyStr;
 using namespace std::chrono_literals;  // NOLINT
 
 namespace helics {
-namespace {
-    bool debugFinalizeEnabled()
-    {
-        const auto* env = std::getenv("HELICS_DEBUG_FINALIZE");
-        return env != nullptr && env[0] != '\0' && env[0] != '0';
-    }
-
-    void federateStateFinalizeTrace(std::string_view federateName, std::string_view stage)
-    {
-        if (!debugFinalizeEnabled()) {
-            return;
-        }
-        std::cerr << "[helics-fedstate-finalize][" << federateName << "] " << stage
-                  << " tid=" << std::this_thread::get_id() << '\n'
-                  << std::flush;
-    }
-}  // namespace
-
 FederateState::FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo):
     name(fedName),
     timeCoord(new TimeCoordinator([this](const ActionMessage& msg) { routeMessage(msg); })),
@@ -403,15 +383,6 @@ void FederateState::routeMessage(ActionMessage&& msg)
 void FederateState::addAction(const ActionMessage& action)
 {
     if (action.action() != CMD_IGNORE) {
-        if (action.action() == CMD_DISCONNECT_FED_ACK) {
-            federateStateFinalizeTrace(name,
-                                       fmt::format("addAction disconnect ack source={} dest={} "
-                                                   "state={} queueSizeBefore={}",
-                                                   action.source_id.baseValue(),
-                                                   action.dest_id.baseValue(),
-                                                   static_cast<int>(state.load()),
-                                                   queue.size()));
-        }
         queue.push(action);
         if (mCallbackBased) {
             callbackProcessing();
@@ -422,15 +393,6 @@ void FederateState::addAction(const ActionMessage& action)
 void FederateState::addAction(ActionMessage&& action)
 {
     if (action.action() != CMD_IGNORE) {
-        if (action.action() == CMD_DISCONNECT_FED_ACK) {
-            federateStateFinalizeTrace(name,
-                                       fmt::format("addAction disconnect ack source={} dest={} "
-                                                   "state={} queueSizeBefore={}",
-                                                   action.source_id.baseValue(),
-                                                   action.dest_id.baseValue(),
-                                                   static_cast<int>(state.load()),
-                                                   queue.size()));
-        }
         queue.push(std::move(action));
         if (mCallbackBased) {
             callbackProcessing();
@@ -995,7 +957,6 @@ void FederateState::finalize()
     while (ret != MessageProcessingResult::HALTED) {
         ret = genericUnspecifiedQueueProcess(false);
         if (ret == MessageProcessingResult::ERROR_RESULT) {
-            federateStateFinalizeTrace(name, "error result");
             break;
         }
         ++loopCounter;
@@ -1379,31 +1340,12 @@ MessageProcessingResult FederateState::processQueue() noexcept
     auto ret_code = processDelayQueue();
 
     while (!(returnableResult(ret_code))) {
-        if (state == FederateStates::TERMINATING) {
-            federateStateFinalizeTrace(
-                name, "processQueue waiting while terminating; expecting disconnect ack or stop");
-        }
         auto cmd = queue.pop();
-        const bool disconnectAck = (cmd.action() == CMD_DISCONNECT_FED_ACK);
-        if (disconnectAck) {
-            federateStateFinalizeTrace(name,
-                                       fmt::format("processQueue pop disconnect ack source={} "
-                                                   "dest={}",
-                                                   cmd.source_id.baseValue(),
-                                                   cmd.dest_id.baseValue()));
-        }
         if (messageShouldBeDelayed(cmd)) {
             delayQueues[cmd.source_id].push_back(cmd);
             continue;
         }
         ret_code = processActionMessage(cmd);
-        if (disconnectAck) {
-            federateStateFinalizeTrace(name,
-                                       fmt::format("processQueue process disconnect ack result={} "
-                                                   "state={}",
-                                                   static_cast<int>(ret_code),
-                                                   static_cast<int>(state.load())));
-        }
 
         if (ret_code == MessageProcessingResult::DELAY_MESSAGE) {
             delayQueues[static_cast<GlobalFederateId>(cmd.source_id)].push_back(cmd);

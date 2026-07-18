@@ -26,7 +26,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
 
-#include <cstdlib>
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
@@ -39,25 +38,6 @@ namespace helics {
 // a key link that does very little yet, but forces linking to a particular file
 // NOLINTNEXTLINE(bugprone-throwing-static-initialization)
 static const auto ldcores = loadCores();
-
-namespace {
-    bool debugFinalizeEnabled()
-    {
-        const auto* env = std::getenv("HELICS_DEBUG_FINALIZE");
-        return env != nullptr && env[0] != '\0' && env[0] != '0';
-    }
-
-    void finalizeTrace(std::string_view federateName, std::string_view stage, Federate::Modes mode)
-    {
-        if (!debugFinalizeEnabled()) {
-            return;
-        }
-        std::cerr << "[helics-finalize][" << federateName << "] " << stage
-                  << " mode=" << static_cast<int>(mode) << " tid=" << std::this_thread::get_id()
-                  << '\n'
-                  << std::flush;
-    }
-}  // namespace
 
 using namespace std::chrono_literals;  // NOLINT
 void cleanupHelicsLibrary()
@@ -859,9 +839,7 @@ void Federate::finalizeAsync()
             break;
     }
     auto finalizeFunc = [this]() {
-        finalizeTrace(getName(), "finalizeAsync worker core finalize start", currentMode.load());
         coreObject->finalize(fedID);
-        finalizeTrace(getName(), "finalizeAsync worker core finalize complete", currentMode.load());
     };
     auto asyncInfo = asyncCallInfo->lock();
     updateFederateMode(Modes::PENDING_FINALIZE);
@@ -877,9 +855,7 @@ void Federate::finalizeComplete()
     }
     if (currentMode == Modes::PENDING_FINALIZE) {
         auto asyncInfo = asyncCallInfo->lock();
-        finalizeTrace(getName(), "finalizeComplete future get start", currentMode.load());
         asyncInfo->finalizeFuture.get();
-        finalizeTrace(getName(), "finalizeComplete future get complete", currentMode.load());
         finalizeOperations();
     } else {
         finalize();

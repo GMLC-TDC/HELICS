@@ -20,7 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "testFixtures_shared.hpp"
 #endif
 #include <cstdio>
-#include <cstdlib>
 #include <future>
 #include <gtest/gtest.h>
 #include <memory>
@@ -31,26 +30,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** these test cases test out the message federates
  */
-
-namespace {
-void setDebugFinalizeEnv()
-{
-#ifdef _WIN32
-    _putenv_s("HELICS_DEBUG_FINALIZE", "1");
-#else
-    setenv("HELICS_DEBUG_FINALIZE", "1", 1);
-#endif
-}
-
-void clearDebugFinalizeEnv()
-{
-#ifdef _WIN32
-    _putenv_s("HELICS_DEBUG_FINALIZE", "");
-#else
-    unsetenv("HELICS_DEBUG_FINALIZE");
-#endif
-}
-}  // namespace
 
 class filter_single_type_test:
     public ::testing::TestWithParam<const char*>,
@@ -102,13 +81,11 @@ TEST_P(filter_single_type_test, message_filter_registration)
     auto& filt4 = fFed->registerFilter();
     filt4.addSourceTarget("filter0/fout");
     EXPECT_TRUE(filt4.getHandle() != filt3.getHandle());
-    setDebugFinalizeEnv();
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     FullDisconnect();
-    clearDebugFinalizeEnv();
 }
 
 /** test a filter operator
