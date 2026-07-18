@@ -953,13 +953,11 @@ void FederateState::finalize()
         }
     }
 #endif
-    int loopCounter{0};
     while (ret != MessageProcessingResult::HALTED) {
         ret = genericUnspecifiedQueueProcess(false);
         if (ret == MessageProcessingResult::ERROR_RESULT) {
             break;
         }
-        ++loopCounter;
     }
 #ifndef HELICS_DISABLE_ASIO
     ++mGrantCount;
