@@ -37,7 +37,7 @@ jobs:
     - uses: actions/checkout@v7
     - name: Docker meta data
       id: meta
-      uses: docker/metadata-action@v5
+      uses: docker/metadata-action@v6
       with:
         images: |
           helics/helics
