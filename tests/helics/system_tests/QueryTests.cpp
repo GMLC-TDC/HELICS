@@ -309,7 +309,7 @@ TEST_F(query, current_time)
 
     mFed1->requestTimeAsync(3.0);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    res = mFed1->query("current_time");
+    res = mFed2->query(mFed1->getName(), "current_time");
     val = loadJsonStr(res);
     EXPECT_EQ(val["granted_time"].get<double>(), 1.0);
     EXPECT_EQ(val["requested_time"].get<double>(), 3.0);

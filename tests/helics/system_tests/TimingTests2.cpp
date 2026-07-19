@@ -644,6 +644,7 @@ TEST_F(timing2, wait_for_current_time_flag_endpoint_nocov)
     EXPECT_EQ(retTime, 3.0);
     ept1.sendTo("message3", "ept2");
 
+    broker.reset();
     mFed1->disconnect();
 
     retTime = mFed2->requestTimeComplete();
@@ -653,8 +654,6 @@ TEST_F(timing2, wait_for_current_time_flag_endpoint_nocov)
     EXPECT_EQ(retTime, 7.0);
     EXPECT_EQ(ept2.pendingMessageCount(), 3U);
     mFed2->disconnect();
-    broker->disconnect();
-    broker.reset();
 }
 
 TEST_F(timing2, offset_timing)
