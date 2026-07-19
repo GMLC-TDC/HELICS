@@ -50,10 +50,11 @@ class filter: public ::testing::Test, public FederateTestFixture {};
 /** test registration of filters*/
 TEST_P(filter_single_type_test, message_filter_registration)
 {
-    auto broker = AddBroker(GetParam(), 2);
+    const auto* coreType = GetParam();
+    auto broker = AddBroker(coreType, 2);
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, helics::timeZero, "filter");
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, helics::timeZero, "message");
+    AddFederates<helics::MessageFederate>(coreType, 1, broker, helics::timeZero, "filter");
+    AddFederates<helics::MessageFederate>(coreType, 1, broker, helics::timeZero, "message");
     // broker->setLoggingLevel (3);
     broker.reset();
 
@@ -72,8 +73,6 @@ TEST_P(filter_single_type_test, message_filter_registration)
     auto& ept1 = fFed->registerEndpoint("fout");
     EXPECT_TRUE(ept1.getHandle().isValid());
 
-    mFed->finalizeAsync();
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     auto& filt3 = fFed->registerCloningFilter();
     filt3.addSourceTarget("filter0/fout");
     filt3.addDestinationTarget("port2");
@@ -82,8 +81,8 @@ TEST_P(filter_single_type_test, message_filter_registration)
     auto& filt4 = fFed->registerFilter();
     filt4.addSourceTarget("filter0/fout");
     EXPECT_TRUE(filt4.getHandle() != filt3.getHandle());
+    mFed->finalizeAsync();
     fFed->finalize();
-    // std::cout << "fFed returned\n";
     mFed->finalizeComplete();
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     FullDisconnect();
@@ -127,7 +126,7 @@ TEST_P(filter_single_type_test, message_filter_function)
     EXPECT_TRUE(!res);
     if (res) {
         auto message3 = mFed->getMessage(ept2);
-        (void)(message3);
+        (void)message3;
     }
     mFed->requestTimeAsync(2.0);
     fFed->requestTime(2.0);
@@ -135,7 +134,7 @@ TEST_P(filter_single_type_test, message_filter_function)
     EXPECT_TRUE(!mFed->hasMessage(ept2));
     if (mFed->hasMessage(ept2)) {
         auto message3 = mFed->getMessage(ept2);
-        (void)(message3);
+        (void)message3;
     }
     fFed->requestTimeAsync(3.0);
     auto retTime = mFed->requestTime(3.0);

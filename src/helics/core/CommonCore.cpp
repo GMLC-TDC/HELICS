@@ -48,6 +48,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <set>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -4880,17 +4881,20 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_FED:
             if (cmd.dest_id == parent_broker_id) {
-                if (getBrokerState() < BrokerState::TERMINATING) {
+                if (getBrokerState() <= BrokerState::TERMINATING) {
                     auto fed = loopFederates.find(cmd.source_id);
                     if (fed == loopFederates.end()) {
                         return;
                     }
                     fed->state = OperatingState::DISCONNECTED;
                     auto cstate = getBrokerState();
-                    if ((!checkAndProcessDisconnect()) || (cstate < BrokerState::OPERATING)) {
+                    const bool preOperating = (cstate < BrokerState::OPERATING);
+                    const bool alreadyTerminating = (cstate == BrokerState::TERMINATING);
+                    if ((!checkAndProcessDisconnect()) || preOperating || alreadyTerminating) {
                         cmd.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, cmd);
-                        if ((minFederateState() != OperatingState::DISCONNECTED ||
+                        if ((preOperating || alreadyTerminating ||
+                             minFederateState() != OperatingState::DISCONNECTED ||
                              filterFed != nullptr || translatorFed != nullptr) &&
                             !globalDisconnect) {
                             cmd.setAction(CMD_DISCONNECT_FED_ACK);

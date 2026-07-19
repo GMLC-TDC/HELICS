@@ -36,6 +36,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 // a key link that does very little yet, but forces linking to a particular file
+// NOLINTNEXTLINE(bugprone-throwing-static-initialization)
 static const auto ldcores = loadCores();
 
 using namespace std::chrono_literals;  // NOLINT
@@ -344,7 +345,8 @@ bool Federate::isAsyncOperationCompleted() const
 void Federate::enterInitializingModeComplete()
 {
     if (singleThreadFederate) {
-        return enterInitializingMode();
+        enterInitializingMode();
+        return;
     }
     switch (currentMode.load()) {
         case Modes::PENDING_INIT: {
@@ -836,7 +838,7 @@ void Federate::finalizeAsync()
         default:
             break;
     }
-    auto finalizeFunc = [this]() { return coreObject->finalize(fedID); };
+    auto finalizeFunc = [this]() { coreObject->finalize(fedID); };
     auto asyncInfo = asyncCallInfo->lock();
     updateFederateMode(Modes::PENDING_FINALIZE);
     asyncInfo->finalizeFuture = std::async(std::launch::async, finalizeFunc);
@@ -846,7 +848,8 @@ void Federate::finalizeAsync()
 void Federate::finalizeComplete()
 {
     if (singleThreadFederate) {
-        return finalize();
+        finalize();
+        return;
     }
     if (currentMode == Modes::PENDING_FINALIZE) {
         auto asyncInfo = asyncCallInfo->lock();
@@ -1004,7 +1007,7 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, Iterati
         return iterativeTime;
     }
     if (currentMode == Modes::FINALIZE || currentMode == Modes::FINISHED) {
-        return {Time::maxVal(), IterationResult::HALTED};
+        return {.grantedTime = Time::maxVal(), .state = IterationResult::HALTED};
     }
     throw(InvalidFunctionCall("cannot call request time in present state"));
 }
@@ -1249,8 +1252,8 @@ static Translator& generateTranslator(Federate* fed,
                                       std::string_view endpointType,
                                       std::string_view units)
 {
-    Translator& trans = (global) ? fed->registerGlobalTranslator(name, endpointType, units) :
-                                   fed->registerTranslator(name, endpointType, units);
+    Translator& trans = global ? fed->registerGlobalTranslator(name, endpointType, units) :
+                                 fed->registerTranslator(name, endpointType, units);
     if (ttype != TranslatorTypes::CUSTOM) {
         trans.setTranslatorType(static_cast<std::int32_t>(ttype));
     }
@@ -1266,16 +1269,16 @@ static Filter& registerFilter(Federate* fed,
     const bool useTypes = !((inputType.empty()) && (outputType.empty()));
     if (useTypes) {
         if (cloning) {
-            return (global) ? fed->registerGlobalCloningFilter(name, inputType, outputType) :
-                              fed->registerCloningFilter(name, inputType, outputType);
+            return global ? fed->registerGlobalCloningFilter(name, inputType, outputType) :
+                            fed->registerCloningFilter(name, inputType, outputType);
         }
-        return (global) ? fed->registerGlobalFilter(name, inputType, outputType) :
-                          fed->registerFilter(name, inputType, outputType);
+        return global ? fed->registerGlobalFilter(name, inputType, outputType) :
+                        fed->registerFilter(name, inputType, outputType);
     }
     if (cloning) {
-        return (global) ? fed->registerGlobalCloningFilter(name) : fed->registerCloningFilter(name);
+        return global ? fed->registerGlobalCloningFilter(name) : fed->registerCloningFilter(name);
     }
-    return (global) ? fed->registerGlobalFilter(name) : fed->registerFilter(name);
+    return global ? fed->registerGlobalFilter(name) : fed->registerFilter(name);
 }
 
 static Filter& generateFilter(Federate* fed,
@@ -1350,7 +1353,7 @@ bool Federate::checkValidFilterType(bool useTypes,
                                     FilterTypes opType,
                                     const std::string& operation) const
 {
-    if ((useTypes) && (operation != "custom")) {
+    if (useTypes && operation != "custom") {
         if (strictConfigChecking) {
             logMessage(HELICS_LOG_LEVEL_ERROR,
                        "input and output types may only be specified for custom filters");
@@ -1450,7 +1453,7 @@ void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& 
             const std::string operation =
                 getOrDefault(filt,
                              "operation",
-                             (cloningFlag) ? std::string("clone") : std::string("custom"));
+                             cloningFlag ? std::string("clone") : std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
             if (!checkValidFilterType(useTypes, opType, operation)) {

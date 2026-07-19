@@ -33,7 +33,7 @@ jobs:
           test_config: "ci"
           use_mpi: ""
           encrypted: ""
-          helics_debug_cleanup: "1"
+          helics_debug_cleanup: "0"
 
     pool:
       vmImage: "ubuntu-latest"

@@ -244,7 +244,7 @@ int32_t FederateState::getCurrentIteration() const
 
 bool FederateState::checkAndSetValue(InterfaceHandle pub_id, const char* data, uint64_t len)
 {
-    const std::lock_guard<FederateState> plock(*this);
+    const std::scoped_lock<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     auto* pub = interfaceInformation.getPublication(pub_id);
     auto res = pub->CheckSetValue(data, len, time_granted, only_transmit_on_change);
@@ -321,7 +321,7 @@ std::unique_ptr<Message> FederateState::receiveAny(InterfaceHandle& hid)
     // Return the message found and remove from the queue
     if (earliest_time <= time_granted) {
         auto result = endpointI->getMessage(time_granted);
-        hid = (result) ? endpointI->id.handle : InterfaceHandle{};
+        hid = result ? endpointI->id.handle : InterfaceHandle{};
 
         return result;
     }
@@ -407,7 +407,7 @@ void FederateState::createInterface(InterfaceType htype,
                                     std::string_view units,
                                     uint16_t flags)
 {
-    const std::lock_guard<FederateState> plock(*this);
+    const std::scoped_lock<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     switch (htype) {
         case InterfaceType::PUBLICATION:
@@ -510,7 +510,7 @@ IterationResult FederateState::waitSetup()
     }
     // this function can fail try_lock gracefully
 
-    const std::lock_guard<FederateState> fedlock(*this);
+    const std::scoped_lock<FederateState> fedlock(*this);
     IterationResult ret;
     switch (getState()) {
         case FederateStates::CREATED: {  // we are still in the created state
@@ -587,17 +587,17 @@ iteration_time FederateState::enterExecutingMode(IterationRequest iterate, bool 
         if ((realtime) && (ret == MessageProcessingResult::NEXT_STEP)) {
             if (!mTimer) {
                 mTimer = std::make_shared<MessageTimer>(
-                    [this](ActionMessage&& mess) { return this->addAction(std::move(mess)); });
+                    [this](ActionMessage&& mess) { this->addAction(std::move(mess)); });
             }
             start_clock_time = std::chrono::steady_clock::now();
         } else if (grantTimeOutPeriod > timeZero) {
             if (!mTimer) {
                 mTimer = std::make_shared<MessageTimer>(
-                    [this](ActionMessage&& mess) { return this->addAction(std::move(mess)); });
+                    [this](ActionMessage&& mess) { this->addAction(std::move(mess)); });
             }
         }
 #endif
-        return {time_granted, static_cast<IterationResult>(ret)};
+        return {.grantedTime = time_granted, .state = static_cast<IterationResult>(ret)};
     }
 
     // if this is not true then try again the core may have been handing something short so try
@@ -612,7 +612,7 @@ iteration_time FederateState::enterExecutingMode(IterationRequest iterate, bool 
     // the following code is for a situation in which this method has been called multiple times
     // from different threads, which really shouldn't be done but it isn't really an error so we
     // need to deal with it.
-    const std::lock_guard<FederateState> plock(*this);
+    const std::scoped_lock<FederateState> plock(*this);
     IterationResult ret;
     switch (getState()) {
         case FederateStates::ERRORED:
@@ -630,7 +630,7 @@ iteration_time FederateState::enterExecutingMode(IterationRequest iterate, bool 
             ret = IterationResult::NEXT_STEP;
             break;
     }
-    return {time_granted, ret};
+    return {.grantedTime = time_granted, .state = ret};
 }
 
 void FederateState::updateDataForExecEntry(MessageProcessingResult result, IterationRequest iterate)
@@ -670,7 +670,7 @@ void FederateState::updateDataForExecEntry(MessageProcessingResult result, Itera
 
 std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
 {
-    const std::lock_guard<FederateState> fedlock(*this);
+    const std::scoped_lock<FederateState> fedlock(*this);
     std::vector<GlobalHandle> subs;
     auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
@@ -684,7 +684,7 @@ std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
 std::vector<std::pair<GlobalHandle, std::string_view>>
     FederateState::getMessageDestinations(InterfaceHandle handle)
 {
-    const std::lock_guard<FederateState> fedlock(*this);
+    const std::scoped_lock<FederateState> fedlock(*this);
     const auto* eptInfo = interfaceInformation.getEndpoint(handle);
     if (eptInfo != nullptr) {
         return eptInfo->getTargets();
@@ -749,7 +749,8 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
 #endif
         auto ret = processQueue();
         updateDataForTimeReturn(ret, nextTime, iterate);
-        iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
+        iteration_time retTime = {.grantedTime = time_granted,
+                                  .state = static_cast<IterationResult>(ret)};
 #ifndef HELICS_DISABLE_ASIO
         if (realtime) {
             if (rt_lag < Time::maxVal()) {
@@ -794,14 +795,14 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
     LOG_WARNING("duplicate locking attempted");
     // this would not be good practice to get into this part of the function
     // but the area must protect itself against the possibility and should return something sensible
-    const std::lock_guard<FederateState> fedlock(*this);
+    const std::scoped_lock<FederateState> fedlock(*this);
     IterationResult ret = iterating ? IterationResult::ITERATING : IterationResult::NEXT_STEP;
     if (state == FederateStates::FINISHED) {
         ret = IterationResult::HALTED;
     } else if (state == FederateStates::ERRORED) {
         ret = IterationResult::ERROR_RESULT;
     }
-    return {time_granted, ret};
+    return {.grantedTime = time_granted, .state = ret};
 }
 
 void FederateState::updateDataForTimeReturn(MessageProcessingResult result,
@@ -1145,7 +1146,7 @@ void FederateState::initCallbackProcessing()
 
 void FederateState::execCallbackProcessing(IterationResult result)
 {
-    auto execIter = fedCallbacks->operate({grantedTime(), result});
+    auto execIter = fedCallbacks->operate({.grantedTime = grantedTime(), .state = result});
     switch (execIter.second) {
         case IterationRequest::NO_ITERATIONS:
         case IterationRequest::ITERATE_IF_NEEDED:
@@ -1637,7 +1638,7 @@ void FederateState::timeoutCheck(ActionMessage& cmd)
     if (timeGranted_mode && cmd.actionTime != Time::maxVal()) {
         return;
     }
-    if (mGrantCount != static_cast<std::uint32_t>(cmd.getExtraData())) {
+    if (std::cmp_not_equal(mGrantCount, cmd.getExtraData())) {
         // time has been granted since this was triggered
         return;
     }
@@ -2053,9 +2054,8 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
                 if (getState() >= FederateStates::INITIALIZING && grantTimeOutPeriod > timeZero) {
                     if (!mTimer) {
                         if (!mTimer) {
-                            mTimer = std::make_shared<MessageTimer>([this](ActionMessage&& mess) {
-                                return this->addAction(std::move(mess));
-                            });
+                            mTimer = std::make_shared<MessageTimer>(
+                                [this](ActionMessage&& mess) { this->addAction(std::move(mess)); });
                         }
                     }
                 }
@@ -2095,7 +2095,7 @@ void FederateState::setProperty(int intProperty, int propertyVal)
             rt_lag = helics::Time(static_cast<double>(propertyVal));
             break;
         case defs::Properties::INDEX_GROUP:
-            indexGroup = (propertyVal > 16) ? 16 : ((propertyVal < 0) ? 0 : propertyVal);
+            indexGroup = std::clamp(propertyVal, 0, 16);
             break;
         case defs::Properties::RT_LEAD:
             rt_lead = helics::Time(static_cast<double>(propertyVal));
@@ -2613,7 +2613,7 @@ std::pair<std::string, std::string> FederateState::getCommand()
         }
         val = commandQueue.try_pop();
     }
-    return (val) ? *val : std::pair<std::string, std::string>{std::string{}, std::string{}};
+    return val ? *val : std::pair<std::string, std::string>{std::string{}, std::string{}};
 }
 
 std::pair<std::string, std::string> FederateState::waitCommand()
@@ -2768,7 +2768,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         }
         return fileops::generateJsonString(tagBlock);
     }
-    if (query.compare(0, 4, "tag/") == 0) {
+    if (query.starts_with("tag/")) {
         std::string_view keyTag = query;
         keyTag.remove_prefix(4);
         for (const auto& tag : tags) {
