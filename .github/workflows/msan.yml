@@ -20,14 +20,14 @@ jobs:
       image: helics/buildenv:sanitizers-22
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: github.event_name != 'schedule'
         with:
           submodules: recursive
 
       - name: Checkout main branch
         if: github.event_name == 'schedule'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           ref: main
