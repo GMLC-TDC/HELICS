@@ -103,31 +103,31 @@ where a very small period could cause the time to be negative
 TEST_F(timing2, small_period)
 {
     SetupTest<helics::MessageFederate>("test", 3);
-    auto rx = GetFederateAs<helics::MessageFederate>(0);
-    rx->setProperty(helics::defs::Properties::TIME_DELTA, 1.0);
-    rx->setProperty(helics::defs::Properties::PERIOD, 0.000001);
-    rx->setProperty(helics::defs::Properties::OFFSET, 0.0);
+    auto receiver = GetFederateAs<helics::MessageFederate>(0);
+    receiver->setProperty(helics::defs::Properties::TIME_DELTA, 1.0);
+    receiver->setProperty(helics::defs::Properties::PERIOD, 0.000001);
+    receiver->setProperty(helics::defs::Properties::OFFSET, 0.0);
     auto send1 = GetFederateAs<helics::MessageFederate>(1);
     auto send2 = GetFederateAs<helics::MessageFederate>(2);
 
-    auto& erx = rx->registerEndpoint("data");
-    auto& s1 = send1->registerEndpoint("data");
-    auto& s2 = send2->registerEndpoint("data");
+    auto& receiverEndpoint = receiver->registerEndpoint("data");
+    auto& sendEndpoint1 = send1->registerEndpoint("data");
+    auto& sendEndpoint2 = send2->registerEndpoint("data");
 
     int cnt = 0;
     int cmess = 0;
-    auto rxrun = [rx, &erx, &cnt, &cmess]() {
-        rx->enterExecutingMode();
+    auto rxrun = [receiver, &receiverEndpoint, &cnt, &cmess]() {
+        receiver->enterExecutingMode();
         helics::Time maxtime = 1e9;
         helics::Time ctime = -1;
         while (ctime < maxtime) {
-            ctime = rx->requestTime(maxtime);
+            ctime = receiver->requestTime(maxtime);
             // std::cout << "receiver: granted time " << static_cast<double> (ctime) << std::endl;
             ++cnt;
-            while (erx.hasMessage()) {
-                auto m = erx.getMessage();
-                // std::cout << "receiver: message from " << m->source << " with data " <<
-                // m->data.to_string ()
+            while (receiverEndpoint.hasMessage()) {
+                auto message = receiverEndpoint.getMessage();
+                // std::cout << "receiver: message from " << message->source << " with data " <<
+                // message->data.to_string ()
                 //           << std::endl;
                 ++cmess;
             }
@@ -135,9 +135,9 @@ TEST_F(timing2, small_period)
                 break;
             }
         }
-        rx->finalize();
+        receiver->finalize();
     };
-    auto send1run = [send1, &s1]() {
+    auto send1run = [send1, &sendEndpoint1]() {
         send1->enterExecutingMode();
         helics::Time ctime = helics::timeZero;
         while (ctime <= 10.0) {
@@ -146,12 +146,12 @@ TEST_F(timing2, small_period)
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             //   std::cout << "sender1: sending message at time " << static_cast<double> (ctime) <<
             //   std::endl;
-            s1.sendTo("3.14", "fed0/data");
+            sendEndpoint1.sendTo("3.14", "fed0/data");
         }
         send1->finalize();
     };
 
-    auto send2run = [send2, &s2]() {
+    auto send2run = [send2, &sendEndpoint2]() {
         send2->enterExecutingMode();
         helics::Time ctime = helics::timeZero;
         while (ctime <= 10.0) {
@@ -160,7 +160,7 @@ TEST_F(timing2, small_period)
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
             // std::cout << "sender2: sending message at time " << static_cast<double> (ctime) <<
             // std::endl;
-            s2.sendTo("3.14", "fed0/data");
+            sendEndpoint2.sendTo("3.14", "fed0/data");
         }
         send2->finalize();
     };
@@ -811,10 +811,10 @@ TEST_F(timing2, time_barrier_clear)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
     EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
-    auto tm = vFed1->requestTimeComplete();
-    EXPECT_EQ(tm, 1.0);
-    tm = vFed2->requestTimeComplete();
-    EXPECT_EQ(tm, 1.0);
+    auto grantedTime = vFed1->requestTimeComplete();
+    EXPECT_EQ(grantedTime, 1.0);
+    grantedTime = vFed2->requestTimeComplete();
+    EXPECT_EQ(grantedTime, 1.0);
 
     vFed1->requestTimeAsync(3.0);
     auto rtime = vFed2->requestTime(1.89);
@@ -864,10 +864,10 @@ TEST_F(timing2, time_barrier_clear2)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
     EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
-    auto tm = vFed1->requestTimeComplete();
-    EXPECT_EQ(tm, 1.0);
-    tm = vFed2->requestTimeComplete();
-    EXPECT_EQ(tm, 1.0);
+    auto grantedTime = vFed1->requestTimeComplete();
+    EXPECT_EQ(grantedTime, 1.0);
+    grantedTime = vFed2->requestTimeComplete();
+    EXPECT_EQ(grantedTime, 1.0);
 
     vFed1->requestTimeAsync(3.0);
     auto rtime = vFed2->requestTime(1.89);
@@ -905,8 +905,8 @@ TEST_F(timing2, value_to_endpoint_timing)
     pub1.publish(3.7);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
-    auto tm = vFed1->requestTime(2.0);
-    EXPECT_EQ(tm, 2.0);
+    auto grantedTime = vFed1->requestTime(2.0);
+    EXPECT_EQ(grantedTime, 2.0);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
     auto tm2 = vFed2->requestTimeComplete();
