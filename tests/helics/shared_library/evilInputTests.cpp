@@ -5582,11 +5582,13 @@ TEST(evil_translator_fed_test, helicsFederateRegisterTranslator)
     auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    auto res = helicsFederateRegisterTranslator(nullptr, HELICS_TRANSLATOR_TYPE_JSON, nullptr, &err);
+    auto res =
+        helicsFederateRegisterTranslator(nullptr, HELICS_TRANSLATOR_TYPE_JSON, nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res, nullptr);
     helicsErrorClear(&err);
-    res = helicsFederateRegisterTranslator(evil_federate, HELICS_TRANSLATOR_TYPE_JSON, "trans", &err);
+    res =
+        helicsFederateRegisterTranslator(evil_federate, HELICS_TRANSLATOR_TYPE_JSON, "trans", &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(res, nullptr);
 }
@@ -5597,11 +5599,15 @@ TEST(evil_translator_fed_test, helicsFederateRegisterGlobalTranslator)
     auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    auto res = helicsFederateRegisterGlobalTranslator(nullptr, HELICS_TRANSLATOR_TYPE_JSON, nullptr, &err);
+    auto res =
+        helicsFederateRegisterGlobalTranslator(nullptr, HELICS_TRANSLATOR_TYPE_JSON, nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res, nullptr);
     helicsErrorClear(&err);
-    res = helicsFederateRegisterGlobalTranslator(evil_federate, HELICS_TRANSLATOR_TYPE_JSON, "trans", &err);
+    res = helicsFederateRegisterGlobalTranslator(evil_federate,
+                                                 HELICS_TRANSLATOR_TYPE_JSON,
+                                                 "trans",
+                                                 &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(res, nullptr);
 }
