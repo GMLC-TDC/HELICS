@@ -15,6 +15,7 @@ Checks: "
   -hicpp-special-member-functions,
   -hicpp-avoid-c-arrays,
   -hicpp-no-array-decay,
+  -modernize-use-using,
   -hicpp-deprecated-headers,
   clang-analyzer-*,
   bugprone-*,
@@ -26,10 +27,12 @@ Checks: "
   cert-*,
   -cert-err58-cpp,
   portability-*,
+  -portability-avoid-pragma-once,
   readability-*,
   -readability-magic-numbers,
   -readability-avoid-unconditional-preprocessor-if,
-  performance-*
+  performance-*,
+  -performance-enum-size
   "
 
 WarningsAsErrors: "
@@ -47,6 +50,7 @@ WarningsAsErrors: "
   -hicpp-special-member-functions,
   -hicpp-avoid-c-arrays,
   -hicpp-no-array-decay,
+  -modernize-use-using,
   clang-analyzer-*,
   bugprone-*,
   -bugprone-narrowing-conversions,
@@ -55,16 +59,16 @@ WarningsAsErrors: "
   -misc-non-private-member-variables-in-classes,
   -misc-include-cleaner,
   portability-*,
+  -portability-avoid-pragma-once,
   readability-*,
   -readability-magic-numbers,
   -readability-identifier-naming,
   -readability-avoid-unconditional-preprocessor-if,
-  performance-*
+  performance-*,
+  -performance-enum-size
   "
 
-HeaderFilterRegex: "src/helics/shared_api_library/*.h"
-
-AnalyzeTemporaryDtors: false
+HeaderFilterRegex: ".*/src/helics/shared_api_library/[^/\\\\]+\\.h$"
 CheckOptions:
   - key: cert-dcl59-cpp.HeaderFileExtensions
     value: h,hh,hpp,hxx

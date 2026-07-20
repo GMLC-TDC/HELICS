@@ -5283,7 +5283,7 @@ TEST(evil_data_buffer_test, helicsDataBufferFillFromComplex)
 
 TEST(evil_data_buffer_test, helicsDataBufferFillFromComplexObject)
 {
-    HelicsComplex value{1.0, 2.0};
+    HelicsComplex value{.real = 1.0, .imag = 2.0};
     EXPECT_EQ(helicsDataBufferFillFromComplexObject(nullptr, value), 0);
 }
 

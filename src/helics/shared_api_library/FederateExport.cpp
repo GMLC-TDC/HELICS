@@ -24,6 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <mutex>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -415,8 +416,8 @@ int helicsGetDataType(const char* val)
         return static_cast<int>(type);
     }
     std::string typeString{val};
-    std::transform(typeString.begin(), typeString.end(), typeString.begin(), [](unsigned char ch) {
-        return static_cast<char>(std::tolower(ch));
+    std::transform(typeString.begin(), typeString.end(), typeString.begin(), [](unsigned char character) {
+        return static_cast<char>(std::tolower(character));
     });
     if (typeString == "map" || typeString == "raw" || typeString == "custom") {
         return HELICS_DATA_TYPE_RAW;
@@ -482,7 +483,7 @@ HelicsFederate generateNewHelicsFederateObject(std::shared_ptr<helics::Federate>
     fedI->valid = fedValidationIdentifier;
     auto* hfed = reinterpret_cast<HelicsFederate>(fedI.get());
     getMasterHolder()->addFed(std::move(fedI));
-    return (hfed);
+    return hfed;
 }
 
 /* Creation and destruction of Federates */
@@ -1237,7 +1238,8 @@ void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, 
 namespace {
 HelicsFederateState stateConversion(helics::Federate::Modes mode)
 {
-    return static_cast<HelicsFederateState>(static_cast<int32_t>(static_cast<std::underlying_type<helics::Federate::Modes>::type>(mode)));
+    return static_cast<HelicsFederateState>(
+        static_cast<int32_t>(static_cast<std::underlying_type_t<helics::Federate::Modes>>(mode)));
 }
 }  // namespace
 
@@ -1269,7 +1271,7 @@ void helicsFederateSetTimeRequestEntryCallback(
         } else {
             fedptr->setTimeRequestEntryCallback(
                 [requestTimeEntry, userdata](helics::Time currentTime, helics::Time requestTime, bool iterating) {
-                    requestTimeEntry(currentTime, requestTime, (iterating) ? HELICS_TRUE : HELICS_FALSE, userdata);
+                    requestTimeEntry(currentTime, requestTime, iterating ? HELICS_TRUE : HELICS_FALSE, userdata);
                 });
         }
     }
@@ -1407,7 +1409,7 @@ void helicsFederateSetTimeRequestReturnCallback(HelicsFederate fed,
             fedptr->setTimeRequestReturnCallback({});
         } else {
             fedptr->setTimeRequestReturnCallback([requestTimeReturn, userdata](helics::Time newTime, bool iterating) {
-                requestTimeReturn(newTime, (iterating) ? HELICS_TRUE : HELICS_FALSE, userdata);
+                requestTimeReturn(newTime, iterating ? HELICS_TRUE : HELICS_FALSE, userdata);
             });
         }
     }
@@ -1570,7 +1572,7 @@ HelicsBool helicsFederateGetFlagOption(HelicsFederate fed, int flag, HelicsError
     }
     try {
         const bool res = fedObj->getFlagOption(flag);
-        return (res) ? HELICS_TRUE : HELICS_FALSE;
+        return res ? HELICS_TRUE : HELICS_FALSE;
     }
     // LCOV_EXCL_START
     catch (...) {
