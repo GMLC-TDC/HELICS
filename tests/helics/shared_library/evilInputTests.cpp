@@ -4351,4 +4351,1686 @@ TEST(evil_query_test, helicsQueryFree)
     EXPECT_NO_THROW(helicsQueryFree(evil_query));
 }
 
+TEST(evil_query_test, helicsQuerySetTarget)
+{
+    char rdata[256];
+    auto evil_query = reinterpret_cast<HelicsQuery>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsQuerySetTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsQuerySetTarget(evil_query, "target", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_query_test, helicsQuerySetQueryString)
+{
+    char rdata[256];
+    auto evil_query = reinterpret_cast<HelicsQuery>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsQuerySetQueryString(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsQuerySetQueryString(evil_query, "query", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_query_test, helicsQuerySetOrdering)
+{
+    char rdata[256];
+    auto evil_query = reinterpret_cast<HelicsQuery>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsQuerySetOrdering(nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsQuerySetOrdering(evil_query, 1, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_general_test, helicsGetVersion)
+{
+    EXPECT_STRNE(helicsGetVersion(), "");
+}
+
+TEST(evil_general_test, helicsGetBuildFlags)
+{
+    EXPECT_NE(helicsGetBuildFlags(), nullptr);
+}
+
+TEST(evil_general_test, helicsGetCompilerVersion)
+{
+    EXPECT_NE(helicsGetCompilerVersion(), nullptr);
+}
+
+TEST(evil_general_test, helicsGetSystemInfo)
+{
+    EXPECT_NE(helicsGetSystemInfo(), nullptr);
+}
+
+TEST(evil_general_test, helicsGetFlagIndex)
+{
+    auto res = helicsGetFlagIndex(nullptr);
+    EXPECT_LT(res, 0);
+    res = helicsGetFlagIndex("not_a_flag");
+    EXPECT_LT(res, 0);
+}
+
+TEST(evil_general_test, helicsGetOptionValue)
+{
+    auto res = helicsGetOptionValue(nullptr);
+    EXPECT_EQ(res, HELICS_FALSE);
+    res = helicsGetOptionValue("not_an_option_value");
+    EXPECT_EQ(res, HELICS_FALSE);
+}
+
+TEST(evil_general_test, helicsGetDataType)
+{
+    auto res = helicsGetDataType(nullptr);
+    EXPECT_EQ(res, HELICS_DATA_TYPE_UNKNOWN);
+    res = helicsGetDataType("not_a_type");
+    EXPECT_EQ(res, HELICS_DATA_TYPE_UNKNOWN);
+}
+
+TEST(evil_general_test, helicsLoadSignalHandler)
+{
+    EXPECT_NO_THROW(helicsLoadSignalHandler());
+    helicsClearSignalHandler();
+}
+
+TEST(evil_general_test, helicsLoadThreadedSignalHandler)
+{
+    EXPECT_NO_THROW(helicsLoadThreadedSignalHandler());
+    helicsClearSignalHandler();
+}
+
+TEST(evil_general_test, helicsLoadSignalHandlerCallback)
+{
+    EXPECT_NO_THROW(helicsLoadSignalHandlerCallback(nullptr, HELICS_FALSE));
+    helicsClearSignalHandler();
+}
+
+TEST(evil_general_test, helicsLoadSignalHandlerCallbackNoExit)
+{
+    EXPECT_NO_THROW(helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_FALSE));
+    helicsClearSignalHandler();
+}
+
+TEST(evil_general_test, helicsClearSignalHandler)
+{
+    EXPECT_NO_THROW(helicsClearSignalHandler());
+}
+
+TEST(evil_general_test, helicsAbort)
+{
+    EXPECT_NO_THROW(helicsAbort(HELICS_ERROR_USER_ABORT, nullptr));
+}
+
+TEST(evil_creation_test, helicsCreateCallbackFederate)
+{
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res1 = helicsCreateCallbackFederate("callback", nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(helicsFederateIsValid(res1), HELICS_FALSE);
+    helicsErrorClear(&err);
+
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_NNG, nullptr);
+    auto res2 = helicsCreateCallbackFederate("callback", fedInfo, &err);
+    EXPECT_EQ(helicsFederateIsValid(res2), HELICS_FALSE);
+    helicsErrorClear(&err);
+
+    char rdata[256];
+    auto evil_fi = reinterpret_cast<HelicsFederateInfo>(rdata);
+    auto res3 = helicsCreateCallbackFederate("callback", evil_fi, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(helicsFederateIsValid(res3), HELICS_FALSE);
+}
+
+TEST(evil_creation_test, helicsCreateCallbackFederateFromConfig)
+{
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res1 = helicsCreateCallbackFederateFromConfig("unknownfile.json", &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(helicsFederateIsValid(res1), HELICS_FALSE);
+    helicsErrorClear(&err);
+
+    auto res2 = helicsCreateCallbackFederateFromConfig("unknownfile.json", &err);
+    EXPECT_EQ(helicsFederateIsValid(res2), HELICS_FALSE);
+    auto res3 = helicsCreateCallbackFederateFromConfig(nullptr, nullptr);
+    EXPECT_EQ(helicsFederateIsValid(res3), HELICS_FALSE);
+}
+
+TEST(evil_core_test, helicsCoreAddAlias)
+{
+    char rdata[256];
+    auto evil_core = reinterpret_cast<HelicsCore>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsCoreAddAlias(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsCoreAddAlias(evil_core, "interface", "alias", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_core_test, helicsCoreSendCommand)
+{
+    char rdata[256];
+    auto evil_core = reinterpret_cast<HelicsCore>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsCoreSendCommand(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsCoreSendCommand(evil_core, "target", "command", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_core_test, helicsCoreSendOrderedCommand)
+{
+    char rdata[256];
+    auto evil_core = reinterpret_cast<HelicsCore>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsCoreSendOrderedCommand(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsCoreSendOrderedCommand(evil_core, "target", "command", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_core_test, helicsCoreGlobalError)
+{
+    char rdata[256];
+    auto evil_core = reinterpret_cast<HelicsCore>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsCoreGlobalError(nullptr, HELICS_ERROR_USER_ABORT, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsCoreGlobalError(evil_core, HELICS_ERROR_USER_ABORT, "error", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_broker_test, helicsBrokerAddAlias)
+{
+    char rdata[256];
+    auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsBrokerAddAlias(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsBrokerAddAlias(evil_broker, "interface", "alias", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_broker_test, helicsBrokerSendCommand)
+{
+    char rdata[256];
+    auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsBrokerSendCommand(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsBrokerSendCommand(evil_broker, "target", "command", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_broker_test, helicsBrokerSendOrderedCommand)
+{
+    char rdata[256];
+    auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsBrokerSendOrderedCommand(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsBrokerSendOrderedCommand(evil_broker, "target", "command", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_broker_test, helicsBrokerSetTimeBarrier)
+{
+    char rdata[256];
+    auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsBrokerSetTimeBarrier(nullptr, 1.0, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsBrokerSetTimeBarrier(evil_broker, 1.0, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_broker_test, helicsBrokerClearTimeBarrier)
+{
+    char rdata[256];
+    auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
+    EXPECT_NO_THROW(helicsBrokerClearTimeBarrier(nullptr));
+    EXPECT_NO_THROW(helicsBrokerClearTimeBarrier(evil_broker));
+}
+
+TEST(evil_broker_test, helicsBrokerGlobalError)
+{
+    char rdata[256];
+    auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsBrokerGlobalError(nullptr, HELICS_ERROR_USER_ABORT, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsBrokerGlobalError(evil_broker, HELICS_ERROR_USER_ABORT, "error", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_fedInfo_test, helicsFederateInfoLoadFromString)
+{
+    char rdata[256];
+    auto evil_fi = reinterpret_cast<HelicsFederateInfo>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoLoadFromString(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateInfoLoadFromString(evil_fi, "--invalid", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateDisconnect)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateDisconnect(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateDisconnect(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateDisconnectAsync)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateDisconnectAsync(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateDisconnectAsync(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateDisconnectComplete)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateDisconnectComplete(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateDisconnectComplete(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateEnterInitializingModeIterative)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateEnterInitializingModeIterative(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateEnterInitializingModeIterative(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateEnterInitializingModeIterativeAsync)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateEnterInitializingModeIterativeAsync(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateEnterInitializingModeIterativeAsync(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateEnterInitializingModeIterativeComplete)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateEnterInitializingModeIterativeComplete(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateEnterInitializingModeIterativeComplete(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateProcessCommunications)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateProcessCommunications(nullptr, 1.0, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateProcessCommunications(evil_federate, 1.0, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateProtect)
+{
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateProtect(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateProtect("unknown_federate", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateUnProtect)
+{
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateUnProtect("unknown_federate", &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateUnProtect("unknown_federate", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateIsProtected)
+{
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateIsProtected("unknown_federate", &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, HELICS_FALSE);
+    helicsErrorClear(&err);
+    res = helicsFederateIsProtected("unknown_federate", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, HELICS_FALSE);
+}
+
+TEST(evil_federate_test, helicsFederateAddAlias)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateAddAlias(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateAddAlias(evil_federate, "interface", "alias", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateSetTag)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateSetTag(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateSetTag(evil_federate, "tag", "value", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateGetTag)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateGetTag(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_STREQ(res, "");
+    helicsErrorClear(&err);
+    res = helicsFederateGetTag(evil_federate, "tag", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_STREQ(res, "");
+}
+
+TEST(evil_federate_test, helicsFederateSendCommand)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateSendCommand(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateSendCommand(evil_federate, "target", "command", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateGetCommand)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateGetCommand(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_STREQ(res, "");
+    helicsErrorClear(&err);
+    res = helicsFederateGetCommand(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_STREQ(res, "");
+}
+
+TEST(evil_federate_test, helicsFederateGetCommandSource)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateGetCommandSource(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_STREQ(res, "");
+    helicsErrorClear(&err);
+    res = helicsFederateGetCommandSource(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_STREQ(res, "");
+}
+
+TEST(evil_federate_test, helicsFederateWaitCommand)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateWaitCommand(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_STREQ(res, "");
+    helicsErrorClear(&err);
+    res = helicsFederateWaitCommand(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_STREQ(res, "");
+}
+
+TEST(evil_message_fed_test, helicsFederateRegisterTargetedEndpoint)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateRegisterTargetedEndpoint(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsFederateRegisterTargetedEndpoint(evil_federate, "ept", "type", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_message_fed_test, helicsFederateRegisterGlobalTargetedEndpoint)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateRegisterGlobalTargetedEndpoint(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsFederateRegisterGlobalTargetedEndpoint(evil_federate, "ept", "type", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_message_fed_test, helicsFederateGetMessage)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    EXPECT_EQ(helicsFederateGetMessage(nullptr), nullptr);
+    EXPECT_EQ(helicsFederateGetMessage(evil_federate), nullptr);
+}
+
+TEST(evil_message_fed_test, helicsFederateCreateMessage)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateCreateMessage(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsFederateCreateMessage(evil_federate, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_endpoint_test, helicsEndpointSendString)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointSendString(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointSendString(evil_ept, "message", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointSendBytes)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointSendBytes(nullptr, nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointSendBytes(evil_ept, "message", 7, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointSendMessage)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto evil_message = reinterpret_cast<HelicsMessage>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointSendMessage(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointSendMessage(evil_ept, evil_message, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointSendMessageZeroCopy)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto evil_message = reinterpret_cast<HelicsMessage>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointSendMessageZeroCopy(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointSendMessageZeroCopy(evil_ept, evil_message, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointPendingMessageCount)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    EXPECT_EQ(helicsEndpointPendingMessageCount(nullptr), 0);
+    EXPECT_EQ(helicsEndpointPendingMessageCount(evil_ept), 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointCreateMessage)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsEndpointCreateMessage(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsEndpointCreateMessage(evil_ept, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_endpoint_test, helicsEndpointClearMessages)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    EXPECT_NO_THROW(helicsEndpointClearMessages(nullptr));
+    EXPECT_NO_THROW(helicsEndpointClearMessages(evil_ept));
+}
+
+TEST(evil_endpoint_test, helicsEndpointGetTag)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    EXPECT_STREQ(helicsEndpointGetTag(nullptr, nullptr), "");
+    EXPECT_STREQ(helicsEndpointGetTag(evil_ept, "tag"), "");
+}
+
+TEST(evil_endpoint_test, helicsEndpointSetTag)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointSetTag(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointSetTag(evil_ept, "tag", "value", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointAddSourceTarget)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointAddSourceTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointAddSourceTarget(evil_ept, "target", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointAddDestinationTarget)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointAddDestinationTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointAddDestinationTarget(evil_ept, "target", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointRemoveTarget)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointRemoveTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointRemoveTarget(evil_ept, "target", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointAddSourceFilter)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointAddSourceFilter(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointAddSourceFilter(evil_ept, "filter", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_endpoint_test, helicsEndpointAddDestinationFilter)
+{
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsEndpointAddDestinationFilter(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsEndpointAddDestinationFilter(evil_ept, "filter", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_message_object_test, helicsMessageGetFlagOption)
+{
+    char rdata[256];
+    auto evil_message = reinterpret_cast<HelicsMessage>(rdata);
+    EXPECT_EQ(helicsMessageGetFlagOption(nullptr, 0), HELICS_FALSE);
+    EXPECT_EQ(helicsMessageGetFlagOption(evil_message, 0), HELICS_FALSE);
+}
+
+TEST(evil_message_object_test, helicsMessageGetBytesPointer)
+{
+    char rdata[256];
+    auto evil_message = reinterpret_cast<HelicsMessage>(rdata);
+    EXPECT_EQ(helicsMessageGetBytesPointer(nullptr), nullptr);
+    EXPECT_EQ(helicsMessageGetBytesPointer(evil_message), nullptr);
+}
+
+TEST(evil_message_object_test, helicsMessageDataBuffer)
+{
+    char rdata[256];
+    auto evil_message = reinterpret_cast<HelicsMessage>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsMessageDataBuffer(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsMessageDataBuffer(evil_message, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_message_object_test, helicsMessageSetDataBuffer)
+{
+    char rdata[256];
+    auto evil_message = reinterpret_cast<HelicsMessage>(rdata);
+    auto evil_buffer = reinterpret_cast<HelicsDataBuffer>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsMessageSetDataBuffer(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsMessageSetDataBuffer(evil_message, evil_buffer, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_message_object_test, helicsMessageClear)
+{
+    char rdata[256];
+    auto evil_message = reinterpret_cast<HelicsMessage>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsMessageClear(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsMessageClear(evil_message, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_message_object_test, helicsMessageClone)
+{
+    char rdata[256];
+    auto evil_message = reinterpret_cast<HelicsMessage>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsMessageClone(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsMessageClone(evil_message, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_message_object_test, helicsMessageFree)
+{
+    char rdata[256];
+    auto evil_message = reinterpret_cast<HelicsMessage>(rdata);
+    EXPECT_NO_THROW(helicsMessageFree(nullptr));
+    EXPECT_NO_THROW(helicsMessageFree(evil_message));
+}
+
+TEST(evil_data_buffer_test, helicsCreateDataBuffer)
+{
+    auto buffer = helicsCreateDataBuffer(0);
+    EXPECT_NE(buffer, nullptr);
+    EXPECT_EQ(helicsDataBufferIsValid(buffer), HELICS_TRUE);
+    helicsDataBufferFree(buffer);
+}
+
+TEST(evil_data_buffer_test, helicsWrapDataInBuffer)
+{
+    auto buffer = helicsWrapDataInBuffer(nullptr, 0, 0);
+    EXPECT_NE(buffer, nullptr);
+    EXPECT_EQ(helicsDataBufferIsValid(buffer), HELICS_TRUE);
+    helicsDataBufferFree(buffer);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferIsValid)
+{
+    char rdata[256];
+    auto evil_buffer = reinterpret_cast<HelicsDataBuffer>(rdata);
+    EXPECT_EQ(helicsDataBufferIsValid(nullptr), HELICS_FALSE);
+    EXPECT_EQ(helicsDataBufferIsValid(evil_buffer), HELICS_FALSE);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFree)
+{
+    char rdata[256];
+    auto evil_buffer = reinterpret_cast<HelicsDataBuffer>(rdata);
+    EXPECT_NO_THROW(helicsDataBufferFree(nullptr));
+    EXPECT_NO_THROW(helicsDataBufferFree(evil_buffer));
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferSize)
+{
+    char rdata[256];
+    auto evil_buffer = reinterpret_cast<HelicsDataBuffer>(rdata);
+    EXPECT_EQ(helicsDataBufferSize(nullptr), 0);
+    EXPECT_EQ(helicsDataBufferSize(evil_buffer), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferCapacity)
+{
+    char rdata[256];
+    auto evil_buffer = reinterpret_cast<HelicsDataBuffer>(rdata);
+    EXPECT_EQ(helicsDataBufferCapacity(nullptr), 0);
+    EXPECT_EQ(helicsDataBufferCapacity(evil_buffer), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferData)
+{
+    char rdata[256];
+    auto evil_buffer = reinterpret_cast<HelicsDataBuffer>(rdata);
+    EXPECT_EQ(helicsDataBufferData(nullptr), nullptr);
+    EXPECT_EQ(helicsDataBufferData(evil_buffer), nullptr);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferReserve)
+{
+    char rdata[256];
+    auto evil_buffer = reinterpret_cast<HelicsDataBuffer>(rdata);
+    EXPECT_EQ(helicsDataBufferReserve(nullptr, 1), HELICS_FALSE);
+    EXPECT_EQ(helicsDataBufferReserve(evil_buffer, 1), HELICS_FALSE);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferClone)
+{
+    char rdata[256];
+    auto evil_buffer = reinterpret_cast<HelicsDataBuffer>(rdata);
+    EXPECT_EQ(helicsDataBufferClone(nullptr), nullptr);
+    EXPECT_EQ(helicsDataBufferClone(evil_buffer), nullptr);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromInteger)
+{
+    EXPECT_EQ(helicsDataBufferFillFromInteger(nullptr, 5), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromDouble)
+{
+    EXPECT_EQ(helicsDataBufferFillFromDouble(nullptr, 5.0), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromString)
+{
+    EXPECT_EQ(helicsDataBufferFillFromString(nullptr, nullptr), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromRawString)
+{
+    EXPECT_EQ(helicsDataBufferFillFromRawString(nullptr, nullptr, 0), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromBoolean)
+{
+    EXPECT_EQ(helicsDataBufferFillFromBoolean(nullptr, HELICS_TRUE), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromChar)
+{
+    EXPECT_EQ(helicsDataBufferFillFromChar(nullptr, 'c'), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromTime)
+{
+    EXPECT_EQ(helicsDataBufferFillFromTime(nullptr, 5.0), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromComplex)
+{
+    EXPECT_EQ(helicsDataBufferFillFromComplex(nullptr, 1.0, 2.0), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromComplexObject)
+{
+    HelicsComplex value{1.0, 2.0};
+    EXPECT_EQ(helicsDataBufferFillFromComplexObject(nullptr, value), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromVector)
+{
+    double value[2]{1.0, 2.0};
+    EXPECT_EQ(helicsDataBufferFillFromVector(nullptr, value, 2), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromComplexVector)
+{
+    double value[4]{1.0, 2.0, 3.0, 4.0};
+    EXPECT_EQ(helicsDataBufferFillFromComplexVector(nullptr, value, 2), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferFillFromNamedPoint)
+{
+    EXPECT_EQ(helicsDataBufferFillFromNamedPoint(nullptr, nullptr, 0.0), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferType)
+{
+    EXPECT_EQ(helicsDataBufferType(nullptr), HELICS_DATA_TYPE_UNKNOWN);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToInteger)
+{
+    EXPECT_EQ(helicsDataBufferToInteger(nullptr), -101);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToDouble)
+{
+    EXPECT_EQ(helicsDataBufferToDouble(nullptr), HELICS_INVALID_DOUBLE);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToBoolean)
+{
+    EXPECT_EQ(helicsDataBufferToBoolean(nullptr), HELICS_FALSE);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToChar)
+{
+    EXPECT_EQ(helicsDataBufferToChar(nullptr), HELICS_FALSE);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToTime)
+{
+    EXPECT_EQ(helicsDataBufferToTime(nullptr), HELICS_TIME_INVALID);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToComplexObject)
+{
+    auto value = helicsDataBufferToComplexObject(nullptr);
+    EXPECT_EQ(value.real, HELICS_TIME_INVALID);
+    EXPECT_EQ(value.imag, HELICS_TIME_INVALID);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToComplex)
+{
+    double real = 0.0;
+    double imag = 0.0;
+    helicsDataBufferToComplex(nullptr, &real, &imag);
+    EXPECT_EQ(real, HELICS_TIME_INVALID);
+    EXPECT_EQ(imag, HELICS_TIME_INVALID);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferStringSize)
+{
+    EXPECT_EQ(helicsDataBufferStringSize(nullptr), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToString)
+{
+    int actualLength = 6;
+    helicsDataBufferToString(nullptr, nullptr, 0, &actualLength);
+    EXPECT_EQ(actualLength, 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToRawString)
+{
+    int actualLength = 6;
+    helicsDataBufferToRawString(nullptr, nullptr, 0, &actualLength);
+    EXPECT_EQ(actualLength, 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferVectorSize)
+{
+    EXPECT_EQ(helicsDataBufferVectorSize(nullptr), 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToVector)
+{
+    int actualSize = 6;
+    helicsDataBufferToVector(nullptr, nullptr, 0, &actualSize);
+    EXPECT_EQ(actualSize, 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToComplexVector)
+{
+    int actualSize = 6;
+    helicsDataBufferToComplexVector(nullptr, nullptr, 0, &actualSize);
+    EXPECT_EQ(actualSize, 0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferToNamedPoint)
+{
+    int actualLength = 6;
+    double value = 2.0;
+    helicsDataBufferToNamedPoint(nullptr, nullptr, 0, &actualLength, &value);
+    EXPECT_EQ(actualLength, 0);
+    EXPECT_EQ(value, 2.0);
+}
+
+TEST(evil_data_buffer_test, helicsDataBufferConvertToType)
+{
+    EXPECT_EQ(helicsDataBufferConvertToType(nullptr, HELICS_DATA_TYPE_STRING), HELICS_FALSE);
+}
+
+TEST(evil_pub_test, helicsPublicationPublishComplexVector)
+{
+    char rdata[256];
+    auto evil_pub = reinterpret_cast<HelicsPublication>(rdata);
+    double value[4]{1.0, 2.0, 3.0, 4.0};
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsPublicationPublishComplexVector(nullptr, nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsPublicationPublishComplexVector(evil_pub, value, 2, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_pub_test, helicsPublicationPublishDataBuffer)
+{
+    char rdata[256];
+    auto evil_pub = reinterpret_cast<HelicsPublication>(rdata);
+    auto evil_buffer = reinterpret_cast<HelicsDataBuffer>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsPublicationPublishDataBuffer(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsPublicationPublishDataBuffer(evil_pub, evil_buffer, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_pub_test, helicsPublicationGetTag)
+{
+    char rdata[256];
+    auto evil_pub = reinterpret_cast<HelicsPublication>(rdata);
+    EXPECT_STREQ(helicsPublicationGetTag(nullptr, nullptr), "");
+    EXPECT_STREQ(helicsPublicationGetTag(evil_pub, "tag"), "");
+}
+
+TEST(evil_pub_test, helicsPublicationSetTag)
+{
+    char rdata[256];
+    auto evil_pub = reinterpret_cast<HelicsPublication>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsPublicationSetTag(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsPublicationSetTag(evil_pub, "tag", "value", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_input_test, helicsInputGetDataBuffer)
+{
+    char rdata[256];
+    auto evil_inp = reinterpret_cast<HelicsInput>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsInputGetDataBuffer(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsInputGetDataBuffer(evil_inp, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_input_test, helicsInputGetComplexVector)
+{
+    char rdata[256];
+    auto evil_inp = reinterpret_cast<HelicsInput>(rdata);
+    double values[4]{};
+    int actualSize = 3;
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsInputGetComplexVector(nullptr, values, 2, &actualSize, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(actualSize, 0);
+    helicsErrorClear(&err);
+    helicsInputGetComplexVector(evil_inp, values, 2, &actualSize, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(actualSize, 0);
+}
+
+TEST(evil_input_test, helicsInputSetDefaultComplexVector)
+{
+    char rdata[256];
+    auto evil_inp = reinterpret_cast<HelicsInput>(rdata);
+    double values[4]{1.0, 2.0, 3.0, 4.0};
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsInputSetDefaultComplexVector(nullptr, nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsInputSetDefaultComplexVector(evil_inp, values, 2, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_input_test, helicsInputGetPublicationDataType)
+{
+    char rdata[256];
+    auto evil_inp = reinterpret_cast<HelicsInput>(rdata);
+    EXPECT_EQ(helicsInputGetPublicationDataType(nullptr), HELICS_DATA_TYPE_UNKNOWN);
+    EXPECT_EQ(helicsInputGetPublicationDataType(evil_inp), HELICS_DATA_TYPE_UNKNOWN);
+}
+
+TEST(evil_input_test, helicsInputGetTag)
+{
+    char rdata[256];
+    auto evil_inp = reinterpret_cast<HelicsInput>(rdata);
+    EXPECT_STREQ(helicsInputGetTag(nullptr, nullptr), "");
+    EXPECT_STREQ(helicsInputGetTag(evil_inp, "tag"), "");
+}
+
+TEST(evil_input_test, helicsInputSetTag)
+{
+    char rdata[256];
+    auto evil_inp = reinterpret_cast<HelicsInput>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsInputSetTag(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsInputSetTag(evil_inp, "tag", "value", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_input_test, helicsSubscriptionGetTarget)
+{
+    char rdata[256];
+    auto evil_inp = reinterpret_cast<HelicsInput>(rdata);
+    EXPECT_STREQ(helicsSubscriptionGetTarget(nullptr), "");
+    EXPECT_STREQ(helicsSubscriptionGetTarget(evil_inp), "");
+}
+
+TEST(evil_input_test, helicsFederateGetSubscription)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateGetSubscription(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsFederateGetSubscription(evil_federate, "target", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_filter_test, helicsFilterGetPropertyDouble)
+{
+    char rdata[256];
+    auto evil_filt = reinterpret_cast<HelicsFilter>(rdata);
+    EXPECT_EQ(helicsFilterGetPropertyDouble(nullptr, nullptr), 0.0);
+    EXPECT_EQ(helicsFilterGetPropertyDouble(evil_filt, "prop"), 0.0);
+}
+
+TEST(evil_filter_test, helicsFilterGetPropertyString)
+{
+    char rdata[256];
+    auto evil_filt = reinterpret_cast<HelicsFilter>(rdata);
+    EXPECT_STREQ(helicsFilterGetPropertyString(nullptr, nullptr), "");
+    EXPECT_STREQ(helicsFilterGetPropertyString(evil_filt, "prop"), "");
+}
+
+TEST(evil_filter_test, helicsFilterGetTag)
+{
+    char rdata[256];
+    auto evil_filt = reinterpret_cast<HelicsFilter>(rdata);
+    EXPECT_STREQ(helicsFilterGetTag(nullptr, nullptr), "");
+    EXPECT_STREQ(helicsFilterGetTag(evil_filt, "tag"), "");
+}
+
+TEST(evil_filter_test, helicsFilterSetTag)
+{
+    char rdata[256];
+    auto evil_filt = reinterpret_cast<HelicsFilter>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFilterSetTag(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFilterSetTag(evil_filt, "tag", "value", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_filter_test, helicsFilterSetCustomCallback)
+{
+    char rdata[256];
+    auto evil_filt = reinterpret_cast<HelicsFilter>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFilterSetCustomCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFilterSetCustomCallback(evil_filt, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_fed_test, helicsFederateRegisterTranslator)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateRegisterTranslator(nullptr, HELICS_TRANSLATOR_TYPE_JSON, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsFederateRegisterTranslator(evil_federate, HELICS_TRANSLATOR_TYPE_JSON, "trans", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_translator_fed_test, helicsFederateRegisterGlobalTranslator)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateRegisterGlobalTranslator(nullptr, HELICS_TRANSLATOR_TYPE_JSON, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsFederateRegisterGlobalTranslator(evil_federate, HELICS_TRANSLATOR_TYPE_JSON, "trans", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_translator_fed_test, helicsCoreRegisterTranslator)
+{
+    char rdata[256];
+    auto evil_core = reinterpret_cast<HelicsCore>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsCoreRegisterTranslator(nullptr, HELICS_TRANSLATOR_TYPE_JSON, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsCoreRegisterTranslator(evil_core, HELICS_TRANSLATOR_TYPE_JSON, "trans", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_translator_fed_test, helicsFederateGetTranslatorCount)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    EXPECT_EQ(helicsFederateGetTranslatorCount(nullptr), 0);
+    EXPECT_EQ(helicsFederateGetTranslatorCount(evil_federate), 0);
+}
+
+TEST(evil_translator_fed_test, helicsFederateGetTranslator)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateGetTranslator(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsFederateGetTranslator(evil_federate, "trans", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_translator_fed_test, helicsFederateGetTranslatorByIndex)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res = helicsFederateGetTranslatorByIndex(nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    res = helicsFederateGetTranslatorByIndex(evil_federate, 0, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, nullptr);
+}
+
+TEST(evil_translator_test, helicsTranslatorIsValid)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    EXPECT_EQ(helicsTranslatorIsValid(nullptr), HELICS_FALSE);
+    EXPECT_EQ(helicsTranslatorIsValid(evil_trans), HELICS_FALSE);
+}
+
+TEST(evil_translator_test, helicsTranslatorGetName)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    EXPECT_STREQ(helicsTranslatorGetName(nullptr), "");
+    EXPECT_STREQ(helicsTranslatorGetName(evil_trans), "");
+}
+
+TEST(evil_translator_test, helicsTranslatorSet)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorSet(nullptr, nullptr, 1.0, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorSet(evil_trans, "prop", 1.0, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorSetString)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorSetString(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorSetString(evil_trans, "prop", "value", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorAddInputTarget)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorAddInputTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorAddInputTarget(evil_trans, "input", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorAddPublicationTarget)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorAddPublicationTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorAddPublicationTarget(evil_trans, "pub", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorAddSourceEndpoint)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorAddSourceEndpoint(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorAddSourceEndpoint(evil_trans, "ept", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorAddDestinationEndpoint)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorAddDestinationEndpoint(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorAddDestinationEndpoint(evil_trans, "ept", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorRemoveTarget)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorRemoveTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorRemoveTarget(evil_trans, "target", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorGetInfo)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    EXPECT_STREQ(helicsTranslatorGetInfo(nullptr), "");
+    EXPECT_STREQ(helicsTranslatorGetInfo(evil_trans), "");
+}
+
+TEST(evil_translator_test, helicsTranslatorSetInfo)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorSetInfo(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorSetInfo(evil_trans, "info", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorGetTag)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    EXPECT_STREQ(helicsTranslatorGetTag(nullptr, nullptr), "");
+    EXPECT_STREQ(helicsTranslatorGetTag(evil_trans, "tag"), "");
+}
+
+TEST(evil_translator_test, helicsTranslatorSetTag)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorSetTag(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorSetTag(evil_trans, "tag", "value", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorSetOption)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorSetOption(nullptr, 0, HELICS_TRUE, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorSetOption(evil_trans, 0, HELICS_TRUE, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_translator_test, helicsTranslatorGetOption)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    EXPECT_EQ(helicsTranslatorGetOption(nullptr, 0), HELICS_FALSE);
+    EXPECT_EQ(helicsTranslatorGetOption(evil_trans, 0), HELICS_FALSE);
+}
+
+TEST(evil_translator_test, helicsTranslatorSetCustomCallback)
+{
+    char rdata[256];
+    auto evil_trans = reinterpret_cast<HelicsTranslator>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsTranslatorSetCustomCallback(nullptr, nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsTranslatorSetCustomCallback(evil_trans, nullptr, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsFederateSetTimeRequestEntryCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateSetTimeRequestEntryCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateSetTimeRequestEntryCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsFederateSetTimeUpdateCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateSetTimeUpdateCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateSetTimeUpdateCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsFederateSetStateChangeCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateSetStateChangeCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateSetStateChangeCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsFederateSetTimeRequestReturnCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateSetTimeRequestReturnCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateSetTimeRequestReturnCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsFederateInitializingEntryCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInitializingEntryCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateInitializingEntryCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsFederateExecutingEntryCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateExecutingEntryCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateExecutingEntryCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsFederateCosimulationTerminationCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateCosimulationTerminationCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateCosimulationTerminationCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsFederateErrorHandlerCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateErrorHandlerCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateErrorHandlerCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsFederateSetQueryCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateSetQueryCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateSetQueryCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsCallbackFederateNextTimeCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsCallbackFederateNextTimeCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsCallbackFederateNextTimeCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsCallbackFederateNextTimeIterativeCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsCallbackFederateNextTimeIterativeCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsCallbackFederateNextTimeIterativeCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsCallbackFederateInitializeCallback)
+{
+    char rdata[256];
+    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsCallbackFederateInitializeCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsCallbackFederateInitializeCallback(evil_federate, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_callback_test, helicsQueryBufferFill)
+{
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsQueryBufferFill(nullptr, nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
+}
+
 // end generated code
