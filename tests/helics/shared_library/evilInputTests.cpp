@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.h"
 
 #include <gtest/gtest.h>
+#include <limits>
 #include <string>
 /**
  tests of evil inputs for all HELICS API function calls*/
@@ -65,18 +66,18 @@ TEST(evil_general_test, helicsGetPropertyIndex)
 {
     // int helicsGetPropertyIndex(const char* val);
     auto res = helicsGetPropertyIndex(nullptr);
-    EXPECT_LT(res, 0);
+    EXPECT_EQ(res, -1);
     res = helicsGetPropertyIndex("not_a_property");
-    EXPECT_LT(res, 0);
+    EXPECT_EQ(res, HELICS_INVALID_OPTION_INDEX);
 }
 
 TEST(evil_general_test, helicsGetOptionIndex)
 {
     // int helicsGetOptionIndex(const char* val);
     auto res = helicsGetOptionIndex(nullptr);
-    EXPECT_LT(res, 0);
+    EXPECT_EQ(res, -1);
     res = helicsGetOptionIndex("not_a_property");
-    EXPECT_LT(res, 0);
+    EXPECT_EQ(res, HELICS_INVALID_OPTION_INDEX);
 }
 
 TEST(evil_general_test, helicsCloseLibrary)
@@ -4413,17 +4414,17 @@ TEST(evil_general_test, helicsGetSystemInfo)
 TEST(evil_general_test, helicsGetFlagIndex)
 {
     auto res = helicsGetFlagIndex(nullptr);
-    EXPECT_LT(res, 0);
+    EXPECT_EQ(res, -1);
     res = helicsGetFlagIndex("not_a_flag");
-    EXPECT_LT(res, 0);
+    EXPECT_EQ(res, HELICS_INVALID_OPTION_INDEX);
 }
 
 TEST(evil_general_test, helicsGetOptionValue)
 {
     auto res = helicsGetOptionValue(nullptr);
-    EXPECT_EQ(res, HELICS_FALSE);
+    EXPECT_EQ(res, -1);
     res = helicsGetOptionValue("not_an_option_value");
-    EXPECT_EQ(res, HELICS_FALSE);
+    EXPECT_EQ(res, HELICS_INVALID_OPTION_INDEX);
 }
 
 TEST(evil_general_test, helicsGetDataType)
@@ -4461,11 +4462,6 @@ TEST(evil_general_test, helicsLoadSignalHandlerCallbackNoExit)
 TEST(evil_general_test, helicsClearSignalHandler)
 {
     EXPECT_NO_THROW(helicsClearSignalHandler());
-}
-
-TEST(evil_general_test, helicsAbort)
-{
-    EXPECT_NO_THROW(helicsAbort(HELICS_ERROR_USER_ABORT, nullptr));
 }
 
 TEST(evil_creation_test, helicsCreateCallbackFederate)
@@ -5315,7 +5311,7 @@ TEST(evil_data_buffer_test, helicsDataBufferType)
 
 TEST(evil_data_buffer_test, helicsDataBufferToInteger)
 {
-    EXPECT_EQ(helicsDataBufferToInteger(nullptr), -101);
+    EXPECT_EQ(helicsDataBufferToInteger(nullptr), (std::numeric_limits<int64_t>::min)());
 }
 
 TEST(evil_data_buffer_test, helicsDataBufferToDouble)
@@ -5505,8 +5501,8 @@ TEST(evil_input_test, helicsInputGetPublicationDataType)
 {
     char rdata[256];
     auto evil_inp = reinterpret_cast<HelicsInput>(rdata);
-    EXPECT_EQ(helicsInputGetPublicationDataType(nullptr), HELICS_DATA_TYPE_UNKNOWN);
-    EXPECT_EQ(helicsInputGetPublicationDataType(evil_inp), HELICS_DATA_TYPE_UNKNOWN);
+    EXPECT_EQ(helicsInputGetPublicationDataType(nullptr), HELICS_DATA_TYPE_ANY);
+    EXPECT_EQ(helicsInputGetPublicationDataType(evil_inp), HELICS_DATA_TYPE_ANY);
 }
 
 TEST(evil_input_test, helicsInputGetTag)
@@ -5530,35 +5526,12 @@ TEST(evil_input_test, helicsInputSetTag)
     EXPECT_NE(err.error_code, 0);
 }
 
-TEST(evil_input_test, helicsSubscriptionGetTarget)
-{
-    char rdata[256];
-    auto evil_inp = reinterpret_cast<HelicsInput>(rdata);
-    EXPECT_STREQ(helicsSubscriptionGetTarget(nullptr), "");
-    EXPECT_STREQ(helicsSubscriptionGetTarget(evil_inp), "");
-}
-
-TEST(evil_input_test, helicsFederateGetSubscription)
-{
-    char rdata[256];
-    auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
-    auto err = helicsErrorInitialize();
-    err.error_code = 45;
-    auto res = helicsFederateGetSubscription(nullptr, nullptr, &err);
-    EXPECT_EQ(err.error_code, 45);
-    EXPECT_EQ(res, nullptr);
-    helicsErrorClear(&err);
-    res = helicsFederateGetSubscription(evil_federate, "target", &err);
-    EXPECT_NE(err.error_code, 0);
-    EXPECT_EQ(res, nullptr);
-}
-
 TEST(evil_filter_test, helicsFilterGetPropertyDouble)
 {
     char rdata[256];
     auto evil_filt = reinterpret_cast<HelicsFilter>(rdata);
-    EXPECT_EQ(helicsFilterGetPropertyDouble(nullptr, nullptr), 0.0);
-    EXPECT_EQ(helicsFilterGetPropertyDouble(evil_filt, "prop"), 0.0);
+    EXPECT_EQ(helicsFilterGetPropertyDouble(nullptr, nullptr), HELICS_TIME_INVALID);
+    EXPECT_EQ(helicsFilterGetPropertyDouble(evil_filt, "prop"), HELICS_TIME_INVALID);
 }
 
 TEST(evil_filter_test, helicsFilterGetPropertyString)

@@ -1609,14 +1609,14 @@ HELICS_EXPORT void helicsFederateInfoSetLocalPort(HelicsFederateInfo fedInfo, co
  * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty,
  * or /ref helicsFederateInfoSetIntegerProperty
  * @param val A string with the property name.
- * @return An int with the property code or (-1) if not a valid property.
+ * @return An int with the property code, (-1) if val is NULL, or HELICS_INVALID_OPTION_INDEX if not a valid property.
  */
 HELICS_EXPORT int helicsGetPropertyIndex(const char* val);
 
 /**
  * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,
  * @param val A string with the option name.
- * @return An int with the property code or (-1) if not a valid property.
+ * @return An int with the flag index, (-1) if val is NULL, or HELICS_INVALID_OPTION_INDEX if not a valid flag.
  */
 HELICS_EXPORT int helicsGetFlagIndex(const char* val);
 
@@ -1626,7 +1626,7 @@ HELICS_EXPORT int helicsGetFlagIndex(const char* val);
  *
  * @param val A string with the option name.
  *
- * @return An int with the option index or (-1) if not a valid property.
+ * @return An int with the option index, (-1) if val is NULL, or HELICS_INVALID_OPTION_INDEX if not a valid option.
  */
 HELICS_EXPORT int helicsGetOptionIndex(const char* val);
 
@@ -1636,7 +1636,7 @@ HELICS_EXPORT int helicsGetOptionIndex(const char* val);
  *
  * @param val A string representing the value.
  *
- * @return An int with the option value or (-1) if not a valid value.
+ * @return An int with the option value, (-1) if val is NULL, or HELICS_INVALID_OPTION_INDEX if not a valid value.
  */
 HELICS_EXPORT int helicsGetOptionValue(const char* val);
 

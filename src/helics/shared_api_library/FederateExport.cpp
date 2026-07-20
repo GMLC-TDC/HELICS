@@ -17,6 +17,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCore.h"
 #include "internal/api_objects.h"
 
+#include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -408,7 +410,18 @@ int helicsGetDataType(const char* val)
     if (val == nullptr) {
         return -1;
     }
-    return static_cast<int>(helics::getTypeFromString(val));
+    const auto type = helics::getTypeFromString(val);
+    if (type != helics::DataType::HELICS_CUSTOM) {
+        return static_cast<int>(type);
+    }
+    std::string typeString{val};
+    std::transform(typeString.begin(), typeString.end(), typeString.begin(), [](unsigned char ch) {
+        return static_cast<char>(std::tolower(ch));
+    });
+    if (typeString == "map" || typeString == "raw" || typeString == "custom") {
+        return HELICS_DATA_TYPE_RAW;
+    }
+    return HELICS_DATA_TYPE_UNKNOWN;
 }
 
 void helicsFederateInfoSetFlagOption(HelicsFederateInfo fedInfo, int flag, HelicsBool value, HelicsError* err)
