@@ -1238,8 +1238,7 @@ void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, 
 namespace {
 HelicsFederateState stateConversion(helics::Federate::Modes mode)
 {
-    return static_cast<HelicsFederateState>(
-        static_cast<int32_t>(static_cast<std::underlying_type_t<helics::Federate::Modes>>(mode)));
+    return static_cast<HelicsFederateState>(static_cast<int32_t>(static_cast<std::underlying_type_t<helics::Federate::Modes>>(mode)));
 }
 }  // namespace
 
