@@ -132,14 +132,14 @@ TEST(misc_tests, misc_tests)
     helicsInputSetDefaultVector(sub6, sub6Default, 3, nullptr);
     helicsEndpointSubscribe(ep2, "fed1/pub3", nullptr);
     helicsFederateEnterInitializingModeAsync(fed1, nullptr);
-    auto rs = helicsFederateIsAsyncOperationCompleted(fed1, nullptr);
-    if (rs == HELICS_FALSE) {
+    auto result = helicsFederateIsAsyncOperationCompleted(fed1, nullptr);
+    if (result == HELICS_FALSE) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        rs = helicsFederateIsAsyncOperationCompleted(fed1, nullptr);
-        if (rs == HELICS_FALSE) {
+        result = helicsFederateIsAsyncOperationCompleted(fed1, nullptr);
+        if (result == HELICS_FALSE) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            rs = helicsFederateIsAsyncOperationCompleted(fed1, nullptr);
-            ASSERT_EQ(rs, HELICS_TRUE);
+            result = helicsFederateIsAsyncOperationCompleted(fed1, nullptr);
+            ASSERT_EQ(result, HELICS_TRUE);
         }
     }
     helicsFederateEnterInitializingModeComplete(fed1, nullptr);
@@ -230,11 +230,14 @@ TEST(type_conversion, namedType)
     EXPECT_TRUE(helicsGetDataType(typeid(std::complex<double>).name()) == HELICS_DATA_TYPE_COMPLEX);
     EXPECT_TRUE(helicsGetDataType("COMPLEX") == HELICS_DATA_TYPE_COMPLEX);
     EXPECT_TRUE(helicsGetDataType("map") == HELICS_DATA_TYPE_RAW);
+    EXPECT_TRUE(helicsGetDataType("raw") == HELICS_DATA_TYPE_RAW);
+    EXPECT_TRUE(helicsGetDataType("custom") == HELICS_DATA_TYPE_RAW);
     EXPECT_TRUE(helicsGetDataType("any") == HELICS_DATA_TYPE_ANY);
     EXPECT_TRUE(helicsGetDataType("json") == HELICS_DATA_TYPE_JSON);
     EXPECT_TRUE(helicsGetDataType("JSON") == HELICS_DATA_TYPE_JSON);
     EXPECT_TRUE(helicsGetDataType("namedpoint") == HELICS_DATA_TYPE_NAMED_POINT);
     EXPECT_TRUE(helicsGetDataType("") == HELICS_DATA_TYPE_ANY);
+    EXPECT_TRUE(helicsGetDataType("not_a_type") == HELICS_DATA_TYPE_UNKNOWN);
     EXPECT_TRUE(helicsGetDataType(typeid(std::vector<std::complex<double>>).name()) ==
                 HELICS_DATA_TYPE_COMPLEX_VECTOR);
 }

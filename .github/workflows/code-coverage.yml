@@ -6,6 +6,8 @@ on:
     - cron: '15 09 * * *' # Run in the early hours of the morning (UTC)
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -16,6 +18,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'coverage_')
     runs-on: ubuntu-latest
     container: helics/buildenv:ubuntu26.04-default-builder
     defaults:
