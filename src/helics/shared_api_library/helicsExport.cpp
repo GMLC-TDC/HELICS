@@ -1549,7 +1549,7 @@ std::shared_ptr<MasterObjectHolder> getMasterHolder()
 namespace {
 // NOLINTNEXTLINE(bugprone-throwing-static-initialization)
 gmlc::concurrency::TripWireTrigger tripTrigger;
-}
+}  // namespace
 
 void clearAllObjects()
 {
