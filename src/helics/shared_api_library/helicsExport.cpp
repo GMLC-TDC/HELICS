@@ -438,10 +438,12 @@ HelicsCore helicsCoreClone(HelicsCore core, HelicsError* err)
 
         return retcore;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 HelicsBool helicsCoreIsValid(HelicsCore core)
@@ -1261,7 +1263,7 @@ HelicsBool helicsQueryIsCompleted(HelicsQuery query)
     try {
         if (queryObj->asyncIndexCode.isValid()) {
             auto res = queryObj->activeFed->isQueryCompleted(queryObj->asyncIndexCode);
-            return (res) ? HELICS_TRUE : HELICS_FALSE;
+            return res ? HELICS_TRUE : HELICS_FALSE;
         }
         return HELICS_FALSE;
     }
@@ -1370,7 +1372,7 @@ helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName)
 {
     auto handle = feds.lock();
     for (auto& fed : (*handle)) {
-        if ((fed) && (fed->fedptr)) {
+        if (fed && fed->fedptr) {
             if (fed->fedptr->getName() == fedName) {
                 return fed.get();
             }
@@ -1383,7 +1385,7 @@ helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName, int val
 {
     auto handle = feds.lock();
     for (auto& fed : (*handle)) {
-        if ((fed) && (fed->fedptr)) {
+        if (fed && fed->fedptr) {
             if (fed->valid == validationCode && fed->fedptr->getName() == fedName) {
                 return fed.get();
             }
@@ -1398,7 +1400,7 @@ bool MasterObjectHolder::removeFed(std::string_view fedName, int validationCode)
     auto handle = feds.lock();
     bool found{false};
     for (auto& fed : (*handle)) {
-        if ((fed) && (fed->fedptr)) {
+        if (fed && fed->fedptr) {
             if (fed->fedptr->getName() == fedName && fed->valid == validationCode) {
                 fed->valid = 0;
                 fed->fedptr.reset();
@@ -1471,7 +1473,7 @@ void MasterObjectHolder::abortAll(int code, std::string_view error)
     {
         auto fedHandle = feds.lock();
         for (auto& fed : fedHandle) {
-            if ((fed) && (fed->fedptr)) {
+            if (fed && fed->fedptr) {
                 fed->fedptr->globalError(code, fed->fedptr->getName() + " sent abort message: '" + std::string(error) + "'");
             }
         }
@@ -1489,7 +1491,7 @@ void MasterObjectHolder::deleteAll()
     {
         auto fedHandle = feds.lock();
         for (auto& fed : fedHandle) {
-            if ((fed) && (fed->fedptr)) {
+            if (fed && fed->fedptr) {
                 fed->valid = 0;
                 fed->fedptr->finalize();
             }
@@ -1499,7 +1501,7 @@ void MasterObjectHolder::deleteAll()
     {
         auto appHandle = apps.lock();
         for (auto& app : appHandle) {
-            if ((app) && (app->app)) {
+            if (app && app->app) {
                 helicsAppFinalize(reinterpret_cast<HelicsApp>(app.get()), nullptr);
                 app->valid = 0;
             }
@@ -1509,7 +1511,7 @@ void MasterObjectHolder::deleteAll()
     {
         auto coreHandle = cores.lock();
         for (auto& core : coreHandle) {
-            if ((core) && (core->coreptr)) {
+            if (core && core->coreptr) {
                 core->valid = 0;
                 core->coreptr->disconnect();
             }
@@ -1519,7 +1521,7 @@ void MasterObjectHolder::deleteAll()
     {
         auto brokerHandle = brokers.lock();
         for (auto& brk : brokerHandle) {
-            if ((brk) && (brk->brokerptr)) {
+            if (brk && brk->brokerptr) {
                 brk->valid = 0;
                 brk->brokerptr->disconnect();
             }
@@ -1544,7 +1546,8 @@ std::shared_ptr<MasterObjectHolder> getMasterHolder()
     return instance;
 }
 
-gmlc::concurrency::TripWireTrigger tripTrigger;
+// NOLINTNEXTLINE(bugprone-throwing-static-initialization)
+static gmlc::concurrency::TripWireTrigger tripTrigger;
 
 void clearAllObjects()
 {
