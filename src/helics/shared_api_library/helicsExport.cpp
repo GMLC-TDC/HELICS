@@ -125,10 +125,7 @@ HelicsBool (*keyHandler)(int) = nullptr;
 
 void signalHandlerCallback(int signum)
 {
-    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
-    if (keyHandler != nullptr) {
-        runDefaultSignalHandler = keyHandler(signum);
-    }
+    auto runDefaultSignalHandler = keyHandler(signum);
     if (runDefaultSignalHandler != HELICS_FALSE) {
         signalHandler(signum);
     }
@@ -136,10 +133,7 @@ void signalHandlerCallback(int signum)
 
 void signalHandlerCallbackNoExit(int signum)
 {
-    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
-    if (keyHandler != nullptr) {
-        runDefaultSignalHandler = keyHandler(signum);
-    }
+    auto runDefaultSignalHandler = keyHandler(signum);
     if (runDefaultSignalHandler != HELICS_FALSE) {
         signalHandlerNoExit(signum);
     }
@@ -147,10 +141,7 @@ void signalHandlerCallbackNoExit(int signum)
 
 void signalHandlerThreadedCallback(int signum)
 {
-    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
-    if (keyHandler != nullptr) {
-        runDefaultSignalHandler = keyHandler(signum);
-    }
+    auto runDefaultSignalHandler = keyHandler(signum);
     if (runDefaultSignalHandler != HELICS_FALSE) {
         signalHandlerThreaded(signum);
     }
@@ -158,10 +149,7 @@ void signalHandlerThreadedCallback(int signum)
 
 void signalHandlerThreadedCallbackNoExit(int signum)
 {
-    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
-    if (keyHandler != nullptr) {
-        runDefaultSignalHandler = keyHandler(signum);
-    }
+    auto runDefaultSignalHandler = keyHandler(signum);
     if (runDefaultSignalHandler != HELICS_FALSE) {
         signalHandlerThreadedNoExit(signum);
     }

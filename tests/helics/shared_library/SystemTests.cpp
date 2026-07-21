@@ -470,6 +470,15 @@ static HelicsBool testHandlerTrue(int /*unused*/)
     return HELICS_TRUE;
 }
 
+static HelicsBool waitForSignalBrokerDisconnect(HelicsBroker broker)
+{
+    auto result = helicsBrokerWaitForDisconnect(broker, 1000, nullptr);
+    if (result == HELICS_FALSE) {
+        result = helicsBrokerWaitForDisconnect(broker, 1000, nullptr);
+    }
+    return result;
+}
+
 TEST(other_tests, signal_handler_callback)
 {
     handlerCount.store(0);
@@ -481,8 +490,51 @@ TEST(other_tests, signal_handler_callback)
     helicsCloseLibrary();
 }
 
+TEST(other_tests, signal_handler_callback_exit_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallback(testHandlerTrue, HELICS_FALSE);
+    EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 0);
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_threaded_exit_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallback(testHandlerTrue, HELICS_TRUE);
+    EXPECT_EXIT(
+        {
+            raise(SIGINT);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        },
+        testing::ExitedWithCode(HELICS_ERROR_USER_ABORT),
+        "");
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 0);
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_default_threaded_exit_ci_skip)
+{
+    helicsLoadSignalHandlerCallback(nullptr, HELICS_TRUE);
+    EXPECT_EXIT(
+        {
+            raise(SIGINT);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        },
+        testing::ExitedWithCode(HELICS_ERROR_USER_ABORT),
+        "");
+    helicsClearSignalHandler();
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
 /** test the default signal handler*/
-TEST(other_tests, signal_handler_death_ci_skip)
+TEST(other_tests, signal_handler_exit_ci_skip)
 {
     helicsLoadSignalHandler();
     EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
@@ -491,37 +543,95 @@ TEST(other_tests, signal_handler_death_ci_skip)
     helicsCloseLibrary();
 }
 
-/** test the default signal handler*/
-TEST(other_tests, signal_handler_threaded_death_ci_skip)
+/** test the threaded default signal handler*/
+TEST(other_tests, signal_handler_threaded_exit_ci_skip)
 {
-    helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_TRUE);
-    auto hb = helicsCreateBroker("TEST", "zbroker1", nullptr, nullptr);
-    EXPECT_TRUE(helicsBrokerIsConnected(hb));
-    raise(SIGINT);
-    auto res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
-    if (res == HELICS_FALSE) {
-        res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
-    }
-    EXPECT_TRUE(res);
+    helicsLoadThreadedSignalHandler();
+    EXPECT_EXIT(
+        {
+            raise(SIGINT);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        },
+        testing::ExitedWithCode(HELICS_ERROR_USER_ABORT),
+        "");
     helicsClearSignalHandler();
     helicsCleanupLibrary();
     helicsCloseLibrary();
 }
 
+/** test the default signal handler*/
+TEST(other_tests, signal_handler_no_exit_ci_skip)
+{
+    helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_FALSE);
+    auto broker = helicsCreateBroker("TEST", "zbroker_no_exit", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(broker));
+    raise(SIGINT);
+    EXPECT_TRUE(waitForSignalBrokerDisconnect(broker));
+    helicsClearSignalHandler();
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_no_exit_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallbackNoExit(testHandlerTrue, HELICS_FALSE);
+    auto broker = helicsCreateBroker("TEST", "zbroker_callback_no_exit", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(broker));
+    raise(SIGINT);
+    EXPECT_TRUE(waitForSignalBrokerDisconnect(broker));
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 1);
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_no_exit_false_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallbackNoExit(testHandlerFalse, HELICS_FALSE);
+    raise(SIGINT);
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 1);
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+/** test the threaded no-exit signal handler*/
+TEST(other_tests, signal_handler_threaded_no_exit_ci_skip)
+{
+    helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_TRUE);
+    auto broker = helicsCreateBroker("TEST", "zbroker1", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(broker));
+    raise(SIGINT);
+    EXPECT_TRUE(waitForSignalBrokerDisconnect(broker));
+    helicsClearSignalHandler();
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_threaded_no_exit_false_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallbackNoExit(testHandlerFalse, HELICS_TRUE);
+    raise(SIGINT);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 1);
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
 /** test the threaded signal handler*/
-TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
+TEST(other_tests, signal_handler_callback_threaded_no_exit_ci_skip)
 {
     handlerCount.store(0);
     helicsLoadSignalHandlerCallbackNoExit(testHandlerTrue, HELICS_TRUE);
 
-    auto hb = helicsCreateBroker("TEST", "zbroker2", nullptr, nullptr);
-    EXPECT_TRUE(helicsBrokerIsConnected(hb));
+    auto broker = helicsCreateBroker("TEST", "zbroker2", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(broker));
     raise(SIGINT);
-    auto res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
-    if (res == HELICS_FALSE) {
-        res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
-    }
-    EXPECT_TRUE(res);
+    EXPECT_TRUE(waitForSignalBrokerDisconnect(broker));
     helicsClearSignalHandler();
     EXPECT_EQ(handlerCount.load(), 1);
     helicsCleanupLibrary();
@@ -529,7 +639,7 @@ TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
 }
 
 /** test the threaded signal handler during disconnected fed construction*/
-TEST(other_tests, signal_handler_fed_construction_death_ci_skip)
+TEST(other_tests, signal_handler_fed_construction_ci_skip)
 {
     handlerCount.store(0);
     helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_TRUE);
