@@ -1153,7 +1153,7 @@ const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsErro
         helicsErrorHandler(err);
     }
     return queryErrorString;
-    // LCOV_EXCL_START
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err)
@@ -1176,7 +1176,7 @@ const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsErr
         helicsErrorHandler(err);
     }
     return queryErrorString;
-    // LCOV_EXCL_START
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, HelicsError* err)
@@ -1546,8 +1546,10 @@ std::shared_ptr<MasterObjectHolder> getMasterHolder()
     return instance;
 }
 
+namespace {
 // NOLINTNEXTLINE(bugprone-throwing-static-initialization)
-static gmlc::concurrency::TripWireTrigger tripTrigger;
+gmlc::concurrency::TripWireTrigger tripTrigger;
+}
 
 void clearAllObjects()
 {
