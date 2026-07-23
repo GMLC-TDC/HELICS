@@ -1297,7 +1297,7 @@ public class helics implements helicsConstants {
    * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty,<br>
    * or /ref helicsFederateInfoSetIntegerProperty<br>
    * @param val A string with the property name.<br>
-   * @return An int with the property code or (-1) if not a valid property.
+   * @return An int with the property code, (-1) if val is NULL, or HELICS_INVALID_OPTION_INDEX if not a valid property.
    */
   public static int helicsGetPropertyIndex(String val) {
     return helicsJNI.helicsGetPropertyIndex(val);
@@ -1306,7 +1306,7 @@ public class helics implements helicsConstants {
   /**
    * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,<br>
    * @param val A string with the option name.<br>
-   * @return An int with the property code or (-1) if not a valid property.
+   * @return An int with the flag index, (-1) if val is NULL, or HELICS_INVALID_OPTION_INDEX if not a valid flag.
    */
   public static int helicsGetFlagIndex(String val) {
     return helicsJNI.helicsGetFlagIndex(val);
@@ -1318,7 +1318,7 @@ public class helics implements helicsConstants {
    * <br>
    * @param val A string with the option name.<br>
    * <br>
-   * @return An int with the option index or (-1) if not a valid property.
+   * @return An int with the option index, (-1) if val is NULL, or HELICS_INVALID_OPTION_INDEX if not a valid option.
    */
   public static int helicsGetOptionIndex(String val) {
     return helicsJNI.helicsGetOptionIndex(val);
@@ -1330,7 +1330,7 @@ public class helics implements helicsConstants {
    * <br>
    * @param val A string representing the value.<br>
    * <br>
-   * @return An int with the option value or (-1) if not a valid value.
+   * @return An int with the option value, (-1) if val is NULL, or HELICS_INVALID_OPTION_INDEX if not a valid value.
    */
   public static int helicsGetOptionValue(String val) {
     return helicsJNI.helicsGetOptionValue(val);
