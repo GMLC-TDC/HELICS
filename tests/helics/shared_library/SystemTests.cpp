@@ -16,6 +16,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <thread>
 
+static void raiseSigint()
+{
+    static_cast<void>(raise(SIGINT));
+}
+
 // test generating a global from a broker and some of its error pathways
 TEST(other_tests, broker_global_value)
 {
@@ -24,17 +29,17 @@ TEST(other_tests, broker_global_value)
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsBrokerSetGlobal(brk, "testglobal", globalVal.c_str(), &err);
-    auto q = helicsCreateQuery("global_value", "testglobal");
-    auto res = helicsQueryBrokerExecute(q, brk, &err);
+    auto query = helicsCreateQuery("global_value", "testglobal");
+    auto res = helicsQueryBrokerExecute(query, brk, &err);
     EXPECT_EQ(res, globalVal);
     helicsBrokerSetGlobal(brk, "testglobal2", globalVal2.c_str(), &err);
-    helicsQueryFree(q);
-    q = helicsCreateQuery("global_value", "testglobal2");
-    res = helicsQueryBrokerExecute(q, brk, &err);
+    helicsQueryFree(query);
+    query = helicsCreateQuery("global_value", "testglobal2");
+    res = helicsQueryBrokerExecute(query, brk, &err);
     EXPECT_EQ(res, globalVal2);
 
     helicsBrokerDisconnect(brk, &err);
-    helicsQueryFree(q);
+    helicsQueryFree(query);
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
     helicsBrokerFree(brk);
 }
@@ -43,13 +48,13 @@ TEST(other_tests, broker_global_value_errors_nosan_ci_skip)
 {
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbroker2", "--root", &err);
-    auto q = helicsCreateQuery("global_value", "testglobal");
+    auto query = helicsCreateQuery("global_value", "testglobal");
     auto res = helicsQueryBrokerExecute(nullptr, brk, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
 
-    res = helicsQueryBrokerExecute(q, nullptr, &err);
+    res = helicsQueryBrokerExecute(query, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
@@ -64,7 +69,7 @@ TEST(other_tests, broker_global_value_errors_nosan_ci_skip)
     helicsErrorClear(&err);
 
     helicsBrokerDisconnect(brk, &err);
-    helicsQueryFree(q);
+    helicsQueryFree(query);
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
     helicsBrokerFree(brk);
 }
@@ -76,27 +81,27 @@ TEST(other_tests, core_global_value)
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
 
-    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
+    auto core = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
     EXPECT_EQ(err.error_code, 0);
-    auto connected = helicsCoreConnect(cr, &err);
+    auto connected = helicsCoreConnect(core, &err);
     EXPECT_EQ(connected, HELICS_TRUE);
     EXPECT_EQ(err.error_code, 0);
-    EXPECT_EQ(helicsCoreIsConnected(cr), HELICS_TRUE);
+    EXPECT_EQ(helicsCoreIsConnected(core), HELICS_TRUE);
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
-    helicsCoreSetGlobal(cr, "testglobal", globalVal.c_str(), &err);
-    auto q = helicsCreateQuery("global_value", "testglobal");
-    auto res = helicsQueryCoreExecute(q, cr, &err);
+    helicsCoreSetGlobal(core, "testglobal", globalVal.c_str(), &err);
+    auto query = helicsCreateQuery("global_value", "testglobal");
+    auto res = helicsQueryCoreExecute(query, core, &err);
     EXPECT_EQ(res, globalVal);
-    helicsCoreSetGlobal(cr, "testglobal2", globalVal2.c_str(), &err);
-    helicsQueryFree(q);
-    q = helicsCreateQuery("global_value", "testglobal2");
-    res = helicsQueryCoreExecute(q, cr, &err);
+    helicsCoreSetGlobal(core, "testglobal2", globalVal2.c_str(), &err);
+    helicsQueryFree(query);
+    query = helicsCreateQuery("global_value", "testglobal2");
+    res = helicsQueryCoreExecute(query, core, &err);
     EXPECT_EQ(res, globalVal2);
     helicsBrokerDisconnect(brk, &err);
-    helicsCoreDisconnect(cr, &err);
+    helicsCoreDisconnect(core, &err);
 
-    helicsQueryFree(q);
+    helicsQueryFree(query);
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
 
@@ -107,19 +112,19 @@ TEST(other_tests, core_global_value_errors_nosan_ci_skip)
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerce", "--root", &err);
 
-    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerce", &err);
+    auto core = helicsCreateCore("test", "gcore", "--broker=gbrokerce", &err);
     EXPECT_EQ(err.error_code, 0);
-    auto connected = helicsCoreConnect(cr, &err);
+    auto connected = helicsCoreConnect(core, &err);
     EXPECT_EQ(connected, HELICS_TRUE);
     EXPECT_EQ(err.error_code, 0);
-    EXPECT_EQ(helicsCoreIsConnected(cr), HELICS_TRUE);
-    auto q = helicsCreateQuery("global_value", "testglobal");
+    EXPECT_EQ(helicsCoreIsConnected(core), HELICS_TRUE);
+    auto query = helicsCreateQuery("global_value", "testglobal");
 
-    auto res = helicsQueryCoreExecute(nullptr, cr, &err);
+    auto res = helicsQueryCoreExecute(nullptr, core, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
-    res = helicsQueryCoreExecute(q, nullptr, &err);
+    res = helicsQueryCoreExecute(query, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
@@ -127,13 +132,13 @@ TEST(other_tests, core_global_value_errors_nosan_ci_skip)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
-    helicsCoreSetGlobal(cr, nullptr, "v2", &err);
+    helicsCoreSetGlobal(core, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     helicsBrokerDisconnect(brk, &err);
-    helicsCoreDisconnect(cr, &err);
+    helicsCoreDisconnect(core, &err);
 
-    helicsQueryFree(q);
+    helicsQueryFree(query);
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
 
@@ -144,7 +149,7 @@ TEST(other_tests, federate_global_value)
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerf", "--root", &err);
 
-    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerf", &err);
+    auto core = helicsCreateCore("test", "gcore", "--broker=gbrokerf", &err);
 
     // test creation of federateInfo from command line arguments
     const char* argv[4];
@@ -165,34 +170,34 @@ TEST(other_tests, federate_global_value)
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsFederateSetGlobal(fed, "testglobal", globalVal.c_str(), &err);
-    auto q = helicsCreateQuery("global_value", "testglobal");
-    auto res = helicsQueryExecute(q, fed, &err);
+    auto query = helicsCreateQuery("global_value", "testglobal");
+    auto res = helicsQueryExecute(query, fed, &err);
     EXPECT_EQ(res, globalVal);
     helicsFederateSetGlobal(fed, "testglobal2", globalVal2.c_str(), &err);
-    helicsQueryFree(q);
-    q = helicsCreateQuery("global_value", "testglobal2");
-    helicsQueryExecuteAsync(q, fed, &err);
-    while (helicsQueryIsCompleted(q) == HELICS_FALSE) {
+    helicsQueryFree(query);
+    query = helicsCreateQuery("global_value", "testglobal2");
+    helicsQueryExecuteAsync(query, fed, &err);
+    while (helicsQueryIsCompleted(query) == HELICS_FALSE) {
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
-    res = helicsQueryExecuteComplete(q, &err);
+    res = helicsQueryExecuteComplete(query, &err);
     EXPECT_EQ(res, globalVal2);
 
-    auto q2 = helicsCreateQuery(nullptr, "isinit");
-    helicsQueryExecuteAsync(q2, fed, &err);
-    while (helicsQueryIsCompleted(q2) == HELICS_FALSE) {
+    auto query2 = helicsCreateQuery(nullptr, "isinit");
+    helicsQueryExecuteAsync(query2, fed, &err);
+    while (helicsQueryIsCompleted(query2) == HELICS_FALSE) {
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
-    res = helicsQueryExecuteComplete(q2, &err);
+    res = helicsQueryExecuteComplete(query2, &err);
     EXPECT_STREQ(res, "false");
 
     helicsFederateFinalize(fed, &err);
 
-    helicsCoreDisconnect(cr, &err);
+    helicsCoreDisconnect(core, &err);
     helicsBrokerDisconnect(brk, &err);
 
-    helicsQueryFree(q);
-    helicsQueryFree(q2);
+    helicsQueryFree(query);
+    helicsQueryFree(query2);
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
 
@@ -201,7 +206,7 @@ TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerfe", "--root", &err);
 
-    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerfe", &err);
+    auto core = helicsCreateCore("test", "gcore", "--broker=gbrokerfe", &err);
 
     // test creation of federateInfo from command line arguments
     const char* argv[4];
@@ -226,7 +231,7 @@ TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
     helicsFederateInfoFree(fi2);
     helicsFederateInfoFree(fedInfo);
 
-    auto q = helicsCreateQuery("global_value", "testglobal2");
+    auto query = helicsCreateQuery("global_value", "testglobal2");
 
     // a series of invalid query calls
     auto res = helicsQueryExecute(nullptr, fed, &err);
@@ -234,7 +239,7 @@ TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
     helicsErrorClear(&err);
     EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
 
-    res = helicsQueryExecute(q, nullptr, &err);
+    res = helicsQueryExecute(query, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
@@ -248,7 +253,7 @@ TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    helicsQueryExecuteAsync(q, nullptr, &err);
+    helicsQueryExecuteAsync(query, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
@@ -258,10 +263,10 @@ TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
 
     helicsFederateFinalize(fed, &err);
 
-    helicsCoreDisconnect(cr, &err);
+    helicsCoreDisconnect(core, &err);
     helicsBrokerDisconnect(brk, &err);
 
-    helicsQueryFree(q);
+    helicsQueryFree(query);
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
 
@@ -272,7 +277,7 @@ TEST(other_tests, federate_add_dependency)
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerd", "--root", &err);
 
-    auto cr = helicsCreateCore("test", "dcore", "--broker=gbrokerd", &err);
+    auto core = helicsCreateCore("test", "dcore", "--broker=gbrokerd", &err);
 
     // test creation of federateInfo from command line arguments
     const char* argv[4];
@@ -307,7 +312,7 @@ TEST(other_tests, federate_add_dependency)
     helicsFederateFinalize(fed1, &err);
     helicsFederateFinalize(fed2, &err);
     helicsBrokerFree(brk);
-    helicsCoreFree(cr);
+    helicsCoreFree(core);
 }
 
 // test core creation from command line arguments
@@ -322,12 +327,12 @@ TEST(other_tests, core_creation)
     argv[2] = "--timeout=2000";
     argv[3] = "--broker=gbrokercn";
 
-    auto cr = helicsCreateCoreFromArgs("test", nullptr, 4, argv, &err);
+    auto core = helicsCreateCoreFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_EQ(err.error_code, 0);
-    EXPECT_STREQ(helicsCoreGetIdentifier(cr), "gcore");
+    EXPECT_STREQ(helicsCoreGetIdentifier(core), "gcore");
 
     helicsBrokerDisconnect(brk, &err);
-    helicsCoreDisconnect(cr, &err);
+    helicsCoreDisconnect(core, &err);
 
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
@@ -404,9 +409,9 @@ TEST(federate_tests, federateGeneratedLocalError_nosan)
     helicsFederateRequestTime(fed1, 3.0, &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto cr = helicsFederateGetCore(fed1, nullptr);
-    helicsCoreDisconnect(cr, nullptr);
-    helicsCoreFree(cr);
+    auto core = helicsFederateGetCore(fed1, nullptr);
+    helicsCoreDisconnect(core, nullptr);
+    helicsCoreFree(core);
     helicsFederateDestroy(fed1);
 }
 
@@ -441,11 +446,11 @@ TEST(other_tests, broker_after_close_nosan)
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsBrokerSetGlobal(brk, "testglobal", globalVal.c_str(), &err);
-    auto q = helicsCreateQuery("global_value", "testglobal");
-    auto res = helicsQueryBrokerExecute(q, brk, &err);
+    auto query = helicsCreateQuery("global_value", "testglobal");
+    auto res = helicsQueryBrokerExecute(query, brk, &err);
     EXPECT_EQ(res, globalVal);
     helicsBrokerSetGlobal(brk, "testglobal2", globalVal2.c_str(), &err);
-    helicsQueryFree(q);
+    helicsQueryFree(query);
     helicsCloseLibrary();
 
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
@@ -470,58 +475,168 @@ static HelicsBool testHandlerTrue(int /*unused*/)
     return HELICS_TRUE;
 }
 
+static HelicsBool waitForSignalBrokerDisconnect(HelicsBroker broker)
+{
+    auto result = helicsBrokerWaitForDisconnect(broker, 1000, nullptr);
+    if (result == HELICS_FALSE) {
+        result = helicsBrokerWaitForDisconnect(broker, 1000, nullptr);
+    }
+    return result;
+}
+
 TEST(other_tests, signal_handler_callback)
 {
     handlerCount.store(0);
     helicsLoadSignalHandlerCallback(testHandlerFalse, HELICS_FALSE);
-    raise(SIGINT);
+    raiseSigint();
     EXPECT_EQ(handlerCount.load(), 1);
     helicsClearSignalHandler();
     helicsCleanupLibrary();
     helicsCloseLibrary();
 }
 
-/** test the default signal handler*/
-TEST(other_tests, signal_handler_death_ci_skip)
+TEST(other_tests, signal_handler_callback_exit_ci_skip)
 {
-    helicsLoadSignalHandler();
-    EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallback(testHandlerTrue, HELICS_FALSE);
+    EXPECT_EXIT(raiseSigint(), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 0);
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_threaded_exit_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallback(testHandlerTrue, HELICS_TRUE);
+    EXPECT_EXIT(
+        {
+            raiseSigint();
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        },
+        testing::ExitedWithCode(HELICS_ERROR_USER_ABORT),
+        "");
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 0);
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_default_threaded_exit_ci_skip)
+{
+    helicsLoadSignalHandlerCallback(nullptr, HELICS_TRUE);
+    EXPECT_EXIT(
+        {
+            raiseSigint();
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        },
+        testing::ExitedWithCode(HELICS_ERROR_USER_ABORT),
+        "");
     helicsClearSignalHandler();
     helicsCleanupLibrary();
     helicsCloseLibrary();
 }
 
 /** test the default signal handler*/
-TEST(other_tests, signal_handler_threaded_death_ci_skip)
+TEST(other_tests, signal_handler_exit_ci_skip)
+{
+    helicsLoadSignalHandler();
+    EXPECT_EXIT(raiseSigint(), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
+    helicsClearSignalHandler();
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+/** test the threaded default signal handler*/
+TEST(other_tests, signal_handler_threaded_exit_ci_skip)
+{
+    helicsLoadThreadedSignalHandler();
+    EXPECT_EXIT(
+        {
+            raiseSigint();
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        },
+        testing::ExitedWithCode(HELICS_ERROR_USER_ABORT),
+        "");
+    helicsClearSignalHandler();
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+/** test the default signal handler*/
+TEST(other_tests, signal_handler_no_exit_ci_skip)
+{
+    helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_FALSE);
+    auto broker = helicsCreateBroker("TEST", "zbroker_no_exit", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(broker));
+    raiseSigint();
+    EXPECT_TRUE(waitForSignalBrokerDisconnect(broker));
+    helicsClearSignalHandler();
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_no_exit_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallbackNoExit(testHandlerTrue, HELICS_FALSE);
+    auto broker = helicsCreateBroker("TEST", "zbroker_callback_no_exit", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(broker));
+    raiseSigint();
+    EXPECT_TRUE(waitForSignalBrokerDisconnect(broker));
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 1);
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_no_exit_false_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallbackNoExit(testHandlerFalse, HELICS_FALSE);
+    raiseSigint();
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 1);
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+/** test the threaded no-exit signal handler*/
+TEST(other_tests, signal_handler_threaded_no_exit_ci_skip)
 {
     helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_TRUE);
-    auto hb = helicsCreateBroker("TEST", "zbroker1", nullptr, nullptr);
-    EXPECT_TRUE(helicsBrokerIsConnected(hb));
-    raise(SIGINT);
-    auto res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
-    if (res == HELICS_FALSE) {
-        res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
-    }
-    EXPECT_TRUE(res);
+    auto broker = helicsCreateBroker("TEST", "zbroker1", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(broker));
+    raiseSigint();
+    EXPECT_TRUE(waitForSignalBrokerDisconnect(broker));
     helicsClearSignalHandler();
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
+}
+
+TEST(other_tests, signal_handler_callback_threaded_no_exit_false_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallbackNoExit(testHandlerFalse, HELICS_TRUE);
+    raiseSigint();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 1);
     helicsCleanupLibrary();
     helicsCloseLibrary();
 }
 
 /** test the threaded signal handler*/
-TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
+TEST(other_tests, signal_handler_callback_threaded_no_exit_ci_skip)
 {
     handlerCount.store(0);
     helicsLoadSignalHandlerCallbackNoExit(testHandlerTrue, HELICS_TRUE);
 
-    auto hb = helicsCreateBroker("TEST", "zbroker2", nullptr, nullptr);
-    EXPECT_TRUE(helicsBrokerIsConnected(hb));
-    raise(SIGINT);
-    auto res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
-    if (res == HELICS_FALSE) {
-        res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
-    }
-    EXPECT_TRUE(res);
+    auto broker = helicsCreateBroker("TEST", "zbroker2", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(broker));
+    raiseSigint();
+    EXPECT_TRUE(waitForSignalBrokerDisconnect(broker));
     helicsClearSignalHandler();
     EXPECT_EQ(handlerCount.load(), 1);
     helicsCleanupLibrary();
@@ -529,7 +644,7 @@ TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
 }
 
 /** test the threaded signal handler during disconnected fed construction*/
-TEST(other_tests, signal_handler_fed_construction_death_ci_skip)
+TEST(other_tests, signal_handler_fed_construction_ci_skip)
 {
     handlerCount.store(0);
     helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_TRUE);
@@ -542,13 +657,13 @@ TEST(other_tests, signal_handler_fed_construction_death_ci_skip)
         helicsFederateDestroy(federate);
     };
 
-    auto t1 = std::async(std::launch::async, fedGen);
+    auto federateTask = std::async(std::launch::async, fedGen);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     helicsAbort(-44, "zippity_zoo_za");
-    auto status = t1.wait_for(std::chrono::milliseconds(3000));
+    auto status = federateTask.wait_for(std::chrono::milliseconds(3000));
     EXPECT_EQ(status, std::future_status::ready);
-    t1.wait();
+    federateTask.wait();
     EXPECT_NE(err.error_code, HELICS_OK);
     EXPECT_TRUE(std::string(err.message).find("zippity_zoo_za") != std::string::npos);
     helicsClearSignalHandler();
