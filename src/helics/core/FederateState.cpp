@@ -741,7 +741,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
                 grantTimeoutTimeIndex =
                     mTimer->addTimerFromNow(grantTimeOutPeriod.to_ms(), std::move(grantCheck));
             } else {
-                mTimer->updateTimerFromNow(realTimeTimerIndex,
+                mTimer->updateTimerFromNow(grantTimeoutTimeIndex,
                                            grantTimeOutPeriod.to_ms(),
                                            std::move(grantCheck));
             }
@@ -947,7 +947,7 @@ void FederateState::finalize()
             grantTimeoutTimeIndex =
                 mTimer->addTimerFromNow(grantTimeOutPeriod.to_ms(), std::move(grantCheck));
         } else {
-            mTimer->updateTimerFromNow(realTimeTimerIndex,
+            mTimer->updateTimerFromNow(grantTimeoutTimeIndex,
                                        grantTimeOutPeriod.to_ms(),
                                        std::move(grantCheck));
         }
