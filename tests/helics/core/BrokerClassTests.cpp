@@ -98,10 +98,9 @@ TEST(brokers, local_federates_min)
                                              "local_fed_root",
                                              "--root -f 2 --local_federates 2");
 
-    auto subbrk =
-        helics::BrokerFactory::create(helics::CoreType::TEST,
-                                      "local_fed_sub",
-                                      "--broker=local_fed_root -f 1");
+    auto subbrk = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                                "local_fed_sub",
+                                                "--broker=local_fed_root -f 1");
     auto localCore1 = helics::CoreFactory::create(helics::CoreType::TEST,
                                                   "local_fed_core1",
                                                   "--broker=local_fed_root");
@@ -145,34 +144,30 @@ TEST(brokers, local_subbrokers_min)
                                              "local_sub_root",
                                              "--root -f 2 --local_subbrokers 2");
 
-    auto subbrk1 =
-        helics::BrokerFactory::create(helics::CoreType::TEST,
-                                      "local_sub1",
-                                      "--broker=local_sub_root -f 1");
+    auto subbrk1 = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                                 "local_sub1",
+                                                 "--broker=local_sub_root -f 1");
     auto remoteCore1 = helics::CoreFactory::create(helics::CoreType::TEST,
                                                    "local_sub_core1",
                                                    "--broker=local_sub1");
 
     helics::CoreFederateInfo cf1;
     auto fed1 = remoteCore1->registerFederate("local_sub_fed1", cf1);
-    auto future1 = std::async(std::launch::async, [fed1, &remoteCore1]() {
-        remoteCore1->enterInitializingMode(fed1);
-    });
+    auto future1 = std::async(std::launch::async,
+                              [fed1, &remoteCore1]() { remoteCore1->enterInitializingMode(fed1); });
 
     auto res = future1.wait_for(std::chrono::milliseconds(100));
     EXPECT_EQ(res, std::future_status::timeout);
 
-    auto subbrk2 =
-        helics::BrokerFactory::create(helics::CoreType::TEST,
-                                      "local_sub2",
-                                      "--broker=local_sub_root -f 1");
+    auto subbrk2 = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                                 "local_sub2",
+                                                 "--broker=local_sub_root -f 1");
     auto remoteCore2 = helics::CoreFactory::create(helics::CoreType::TEST,
                                                    "local_sub_core2",
                                                    "--broker=local_sub2");
     auto fed2 = remoteCore2->registerFederate("local_sub_fed2", cf1);
-    auto future2 = std::async(std::launch::async, [fed2, &remoteCore2]() {
-        remoteCore2->enterInitializingMode(fed2);
-    });
+    auto future2 = std::async(std::launch::async,
+                              [fed2, &remoteCore2]() { remoteCore2->enterInitializingMode(fed2); });
 
     future1.get();
     future2.get();
@@ -217,11 +212,10 @@ TEST(brokers, required_federates_core)
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST,
                                              "required_fed_core_broker",
                                              "-f 2 --root");
-    auto cr1 =
-        helics::CoreFactory::create(helics::CoreType::TEST,
-                                    "required_fed_core",
-                                    "--broker=required_fed_core_broker -f 1 "
-                                    "--required_federates fed_required_core");
+    auto cr1 = helics::CoreFactory::create(helics::CoreType::TEST,
+                                           "required_fed_core",
+                                           "--broker=required_fed_core_broker -f 1 "
+                                           "--required_federates fed_required_core");
 
     helics::CoreFederateInfo cf1;
     auto fid1 = cr1->registerFederate("fed_other_core", cf1);
