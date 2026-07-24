@@ -18,22 +18,11 @@ environment:
 cache:
   - '%CYG_CACHE%'
 
-init:
-  ps: |
-    $GitCurl = "${env:ProgramFiles}\Git\mingw64\bin\curl.exe"
-    if (!(Test-Path $GitCurl)) {
-      $GitCurl = "${env:ProgramFiles(x86)}\Git\mingw64\bin\curl.exe"
-    }
-    if (!(Test-Path $GitCurl)) {
-      throw "Git for Windows curl.exe was not found"
-    }
-    & $GitCurl -fsSL -o C:\cygwin64\setup-x86_64.exe https://cygwin.com/setup-x86_64.exe
-
 #
 # Install needed build dependencies
 #
 install:
-  - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,git,make,gcc-core,gcc-g++,libzmq-devel'
+  - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --root %CYG_ROOT% --site %CYG_MIRROR% --local-package-dir %CYG_CACHE% --packages cmake,git,make,gcc-core,gcc-g++,libzmq-devel'
   - '%CYG_ROOT%\bin\cygcheck -dc'
   - cd %APPVEYOR_BUILD_FOLDER%
   - git config --global --add safe.directory %APPVEYOR_BUILD_FOLDER%
