@@ -23,25 +23,25 @@ namespace helics {
 
 static Time findNextTriggerEvent(const TimeDependencies& deps)
 {
-    Time me{Time::maxVal()};
+    Time minEvent{Time::maxVal()};
     for (const auto& dep : deps) {
         if (!dep.nonGranting) {
-            if (dep.Te < me) {
-                me = dep.Te;
+            if (dep.Te < minEvent) {
+                minEvent = dep.Te;
             }
         }
     }
-    return me;
+    return minEvent;
 }
 
 static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Time nextEvent)
 {
-    Time me{Time::maxVal()};
+    Time minEvent{Time::maxVal()};
     bool triggered{false};
     for (const auto& dep : deps) {
         if (dep.next > nextEvent) {
-            if (dep.Te < me) {
-                me = dep.Te;
+            if (dep.Te < minEvent) {
+                minEvent = dep.Te;
             }
             continue;
         }
@@ -50,12 +50,12 @@ static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Tim
                 triggered = true;
             }
         } else {
-            if (dep.Te < me) {
-                me = dep.Te;
+            if (dep.Te < minEvent) {
+                minEvent = dep.Te;
             }
         }
     }
-    return {triggered, me};
+    return {triggered, minEvent};
 }
 
 void GlobalTimeCoordinator::sendTimeUpdateRequest(Time triggerTime)
@@ -137,7 +137,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                     }
                     if (dep.next <= trigTime && dep.next < cTerminationTime) {
                         if (!checkSequenceCounter(dep, trigTime, sequenceCounter)) {
-                            std::cerr << "sequence check but no request" << std::endl;
+                            std::cerr << "sequence check but no request\n";
                             /* ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME,
                                                        mSourceId,
                                                        mSourceId);
