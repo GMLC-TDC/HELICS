@@ -2450,6 +2450,13 @@ std::shared_ptr<helicsCLI11App> CoreBroker::generateCLI()
     app->remove_helics_specifics();
     app->add_flag_callback(
         "--root", [this]() { setAsRoot(); }, "specify whether the broker is a root");
+    app->add_option("--local_federates",
+                    minLocalFederateCount,
+                    "the minimum number of federates attached through direct child cores before "
+                    "entering init mode");
+    app->add_option("--local_subbrokers",
+                    minLocalBrokerCount,
+                    "the minimum number of direct child brokers before entering init mode");
     auto* tfed = app->add_option(
         "--timemonitor",
         mTimeMonitorFederate,
@@ -4739,6 +4746,35 @@ bool CoreBroker::allInitReady() const
             }
         }
         if (children < minChildCount) {
+            return false;
+        }
+    }
+    if (minLocalBrokerCount > 0) {
+        decltype(minLocalBrokerCount) localBrokers{0};
+        for (const auto& brk : mBrokers) {
+            if (brk.parent == global_broker_id_local && !brk._core) {
+                ++localBrokers;
+            }
+        }
+        if (localBrokers < minLocalBrokerCount) {
+            return false;
+        }
+    }
+    if (minLocalFederateCount > 0) {
+        decltype(minLocalFederateCount) localFederates{0};
+        for (const auto& fed : mFederates) {
+            const auto* parentBroker = getBrokerById(fed.parent);
+            if (!fed.nonCounting && parentBroker != nullptr &&
+                parentBroker->parent == global_broker_id_local && parentBroker->_core) {
+                ++localFederates;
+            }
+        }
+        if (localFederates < minLocalFederateCount) {
+            return false;
+        }
+    }
+    for (const auto& requiredFederate : requiredFederates) {
+        if (!requiredFederate.empty() && mFederates.find(requiredFederate) == mFederates.end()) {
             return false;
         }
     }

@@ -55,6 +55,12 @@ class BrokerBase {
     int32_t maxBrokerCount{(std::numeric_limits<int32_t>::max)()};
     /** the minimum number of children that must connect before entering init mode */
     int32_t minChildCount{0};
+    /** the minimum number of direct local federates that must connect before entering init mode */
+    int32_t minLocalFederateCount{0};
+    /** the minimum number of direct child brokers that must connect before entering init mode */
+    int32_t minLocalBrokerCount{0};
+    /** federate names that must be registered before entering init mode */
+    std::vector<std::string> requiredFederates;
     int32_t maxIterationCount{10000};  //!< the maximum number of iterative loops that are allowed
     Time tickTimer{5.0};  //!< the length of each heartbeat tick
     Time timeout{30.0};  //!< timeout to wait to establish a broker connection before giving up

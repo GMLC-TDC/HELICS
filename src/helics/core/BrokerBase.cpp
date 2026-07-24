@@ -119,6 +119,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     hApp->add_option("--federates,-f",
                      minFederateCount,
                      "the minimum number of federates that will be connecting");
+    hApp->add_option("--required_federates",
+                     requiredFederates,
+                     "federate name or list of federate names that must be registered before "
+                     "entering init mode")
+        ->delimiter(',');
     hApp->add_option("--maxfederates",
                      maxFederateCount,
                      "the maximum number of federates that will be connecting");
@@ -1156,7 +1161,7 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
         case CMD_ERROR_CHECK:
             return command.action();
         case CMD_MULTI_MESSAGE:
-            for (int ii = 0; ii < command.counter; ++ii) {
+            for (int ii = 0; std::cmp_less(ii, command.counter); ++ii) {
                 ActionMessage NMess;
                 NMess.from_string(command.getString(ii));
                 auto commandAction = commandProcessor(NMess);
