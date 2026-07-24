@@ -96,10 +96,13 @@ configuration:
 
 configuration:
   -n [ --name ] arg      name of the broker/core
-  --federates arg        the minimum number of federates that will be
-                         connecting
-  --minfed arg           the minimum number of federates that will be
-                         connecting
+  --federates arg        the minimum total number of federates that will be
+                         connecting through this broker and any sub-brokers
+  --required_federates arg
+                         federate name or list of federate names that must be
+                         registered before entering init mode
+  --minfed arg           the minimum total number of federates that will be
+                         connecting through this broker and any sub-brokers
   --maxiter arg          maximum number of iterations
   --logfile arg          the file to log message to
   --loglevel arg         the level which to log the higher this is set to the
@@ -108,6 +111,10 @@ configuration:
   --consoleloglevel arg  the level at which message get sent to the console
   --minbrokers arg       the minimum number of core/brokers that need to be
                          connected (ignored in cores)
+  --local_federates arg  the minimum number of federates attached through direct
+                         child cores before entering init mode
+  --local_subbrokers arg the minimum number of direct child brokers before
+                         entering init mode
   --identifier arg       name of the core/broker
   --tick arg             number of milliseconds per tick counter if there is no
                          broker communication for 2 ticks then secondary actions

@@ -31,7 +31,7 @@ For examples, the config JSON for the Distribution System A (where Broker A is a
 }
 ```
 
-The command line for launching Broker A also needs to be adjusted. For this examples, let's assume there is a total of 200 federates are expected by Broker A. Note that `broker_address` is used to define the address of the broker next up in the hierarchy; in this, case Broker C.
+The command line for launching Broker A also needs to be adjusted. For this example, let's assume there are 200 total federates expected by Broker A and any sub-brokers below it. Note that `broker_address` is used to define the address of the broker next up in the hierarchy; in this case, Broker C.
 
 ```shell-session
 $ helics_broker -f200 --broker_address=tcp://127.0.0.127
@@ -46,11 +46,13 @@ The JSON config file for the Transmission and Generation System federate needs t
 }
 ```
 
-Lastly, when broker C, the root broker, is instantiated, it may optionally specify the number of sub-brokers that are expected to connect to it (as well as the number of federates). Since it is the root broker, there is no parent broker address to specify.
+Lastly, when Broker C, the root broker, is instantiated, it may optionally specify the number of direct child brokers that are expected to connect to it as well as the total number of federates in its full branch of the hierarchy. If Broker C has one local federate and two child brokers, each managing 200 federates, the `-f` value for Broker C is 401. Since it is the root broker, there is no parent broker address to specify.
 
 ```shell-session
-$ helics_broker -f1 --sub_brokers=2
+$ helics_broker -f401 --local_subbrokers=2
 ```
+
+The `--federates`/`-f` option always counts the total federates known through that broker, including federates forwarded from sub-brokers. When you need to wait only for federates attached through direct child cores, use `--local_federates`. When you need to wait for a number of direct child brokers, use `--local_subbrokers`. To wait for specific federates by name, use `--required_federates=name1,name2`.
 
 ## Hierarchies with Complex Networks
 
@@ -97,7 +99,7 @@ $ helics_broker -f200 --broker_address=tcp://127.0.0.127:24000 --local_port=2700
 Lastly, to complete the configuration implied by the above, Broker C would need to be called like this:
 
 ```shell-session
-$ helics_broker -f1 --sub_brokers=2 --local_port=24000
+$ helics_broker -f401 --local_subbrokers=2 --local_port=24000
 ```
 
 ## Example

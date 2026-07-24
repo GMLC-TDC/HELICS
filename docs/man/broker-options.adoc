@@ -86,7 +86,12 @@ All Core/Broker Types
 --minfed::
 --federates::
 --minfederates <num>::
-        The minimum number of federates that will be connecting to the broker.
+        The minimum total number of federates that will be connecting through
+        the broker and any sub-brokers below it.
+
+--required_federates <names>::
+        A federate name or comma-separated list of federate names that must be
+        registered before entering initialization mode.
 
 -n::
 --name::
@@ -102,6 +107,14 @@ All Core/Broker Types
 --minbrokers::
 --minbrokercount <num>::
         The minimum number of core/brokers that need to be connected.
+
+--local_federates <num>::
+        The minimum number of federates attached through direct child cores of
+        this broker before entering initialization mode.
+
+--local_subbrokers <num>::
+        The minimum number of direct child brokers, excluding cores, before
+        entering initialization mode.
 
 --key::
 --broker_key <key>::
