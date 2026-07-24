@@ -21,6 +21,129 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
+namespace {
+
+struct RestrictionCheckResult {
+    bool allowed{false};
+    bool restrictionAdvance{false};
+    int restrictionLevel{50};
+};
+
+RestrictionCheckResult checkTimeGrantRestriction(const TimeDependencies& dependencies,
+                                                 GlobalFederateId sourceId,
+                                                 std::int32_t sequenceCounter,
+                                                 Time executionTime,
+                                                 bool waitForCurrentTimeUpdates,
+                                                 bool restricted)
+{
+    RestrictionCheckResult result{!waitForCurrentTimeUpdates, restricted, 50};
+    if (!result.allowed) {
+        return result;
+    }
+
+    for (const auto& dep : dependencies) {
+        if (!dep.dependency) {
+            continue;
+        }
+        if (dep.next > executionTime || dep.connection == ConnectionType::SELF) {
+            continue;
+        }
+
+        if (dep.minFed != sourceId) {
+            result.allowed = false;
+        }
+        if (dep.responseSequenceCounter == sequenceCounter) {
+            if (restricted) {
+                result.restrictionLevel =
+                    (std::min)(result.restrictionLevel,
+                               static_cast<int>(dep.restrictionLevel));
+            }
+
+        } else {
+            result.restrictionAdvance = false;
+            result.allowed = false;
+            break;
+        }
+    }
+
+    return result;
+}
+
+RestrictionCheckResult checkExecEntryRestriction(const TimeDependencies& dependencies,
+                                                 GlobalFederateId sourceId,
+                                                 std::int32_t sequenceCounter,
+                                                 bool waitForCurrentTimeUpdates,
+                                                 bool restricted)
+{
+    RestrictionCheckResult result{!waitForCurrentTimeUpdates, restricted, 50};
+    if (!result.allowed) {
+        return result;
+    }
+
+    for (const auto& dep : dependencies) {
+        if (!dep.dependency) {
+            continue;
+        }
+        if (dep.mTimeState == TimeState::initialized) {
+            result.allowed = false;
+            result.restrictionAdvance = false;
+            break;
+        }
+        if (dep.mTimeState >= TimeState::exec_requested) {
+            continue;
+        }
+        if (dep.minFed != sourceId) {
+            result.allowed = false;
+        }
+        if (dep.responseSequenceCounter == sequenceCounter) {
+            if (restricted) {
+                result.restrictionLevel =
+                    (std::min)(result.restrictionLevel,
+                               static_cast<int>(dep.restrictionLevel));
+            }
+
+        } else {
+            result.restrictionAdvance = false;
+            result.allowed = false;
+            break;
+        }
+    }
+
+    return result;
+}
+
+MessageProcessingResult applyRestrictionCheckResult(const RestrictionCheckResult& checkResult,
+                                                    bool restricted,
+                                                    std::uint8_t& currentRestrictionLevel,
+                                                    std::int32_t& sequenceCounter,
+                                                    bool& sendAll,
+                                                    MessageProcessingResult allowedResult)
+{
+    if (checkResult.allowed) {
+        if (!restricted) {
+            return allowedResult;
+        }
+        if (checkResult.restrictionLevel >= 1) {
+            return allowedResult;
+        }
+        if (currentRestrictionLevel != checkResult.restrictionLevel + 1) {
+            currentRestrictionLevel = checkResult.restrictionLevel + 1;
+            sendAll = true;
+            ++sequenceCounter;
+        }
+        return MessageProcessingResult::CONTINUE_PROCESSING;
+    }
+
+    if (checkResult.restrictionAdvance) {
+        currentRestrictionLevel = checkResult.restrictionLevel + 1;
+        sendAll = true;
+        ++sequenceCounter;
+    }
+    return MessageProcessingResult::CONTINUE_PROCESSING;
+}
+
+}  // namespace
+
 void TimeCoordinator::enteringExecMode(IterationRequest mode)
 {
     if (executionMode) {
@@ -633,62 +756,20 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                         ret = MessageProcessingResult::NEXT_STEP;
                         break;
                     }
-                    // time_
-                    bool allowed{!info.wait_for_current_time_updates};
                     const bool restricted{info.restrictive_time_policy};
-                    bool restrictionAdvance{restricted};
-                    int restrictionLevel{50};
-                    if (allowed) {
-                        for (const auto& dep : dependencies) {
-                            if (!dep.dependency) {
-                                continue;
-                            }
-                            if (dep.next > time_exec || dep.connection == ConnectionType::SELF) {
-                                continue;
-                            }
-
-                            if (dep.minFed != mSourceId) {
-                                allowed = false;
-                            }
-                            if (dep.responseSequenceCounter == sequenceCounter) {
-                                if (restricted) {
-                                    restrictionLevel =
-                                        (std::min)(restrictionLevel,
-                                                   static_cast<int>(dep.restrictionLevel));
-                                }
-
-                            } else {
-                                restrictionAdvance = false;
-                                allowed = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (allowed) {
-                        if (restricted) {
-                            if (restrictionLevel >= 1) {
-                                ret = MessageProcessingResult::NEXT_STEP;
-                            } else {
-                                if (currentRestrictionLevel != restrictionLevel + 1) {
-                                    currentRestrictionLevel = restrictionLevel + 1;
-                                    sendAll = true;
-                                    ++sequenceCounter;
-                                }
-
-                                ret = MessageProcessingResult::CONTINUE_PROCESSING;
-                            }
-                        } else {
-                            ret = MessageProcessingResult::NEXT_STEP;
-                        }
-
-                    } else {
-                        if (restrictionAdvance) {
-                            currentRestrictionLevel = restrictionLevel + 1;
-                            sendAll = true;
-                            ++sequenceCounter;
-                        }
-                        ret = MessageProcessingResult::CONTINUE_PROCESSING;
-                    }
+                    const auto restrictionCheck =
+                        checkTimeGrantRestriction(dependencies,
+                                                  mSourceId,
+                                                  sequenceCounter,
+                                                  time_exec,
+                                                  info.wait_for_current_time_updates,
+                                                  restricted);
+                    ret = applyRestrictionCheckResult(restrictionCheck,
+                                                      restricted,
+                                                      currentRestrictionLevel,
+                                                      sequenceCounter,
+                                                      sendAll,
+                                                      MessageProcessingResult::NEXT_STEP);
                 }
             }
 
@@ -1061,69 +1142,22 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                         MessageProcessingResult::ITERATING :
                         MessageProcessingResult::NEXT_STEP;
                 } else {
-                    bool allowed{!info.wait_for_current_time_updates};
                     const bool restricted{info.restrictive_time_policy};
-                    bool restrictionAdvance{restricted};
-                    int restrictionLevel{50};
-                    if (allowed) {
-                        for (const auto& dep : dependencies) {
-                            if (!dep.dependency) {
-                                continue;
-                            }
-                            if (dep.mTimeState == TimeState::initialized) {
-                                allowed = false;
-                                restrictionAdvance = false;
-                                break;
-                            }
-                            if (dep.mTimeState >= TimeState::exec_requested) {
-                                continue;
-                            }
-                            if (dep.minFed != mSourceId) {
-                                allowed = false;
-                            }
-                            if (dep.responseSequenceCounter == sequenceCounter) {
-                                if (restricted) {
-                                    restrictionLevel =
-                                        (std::min)(restrictionLevel,
-                                                   static_cast<int>(dep.restrictionLevel));
-                                }
-
-                            } else {
-                                restrictionAdvance = false;
-                                allowed = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (allowed) {
-                        if (restricted) {
-                            if (restrictionLevel >= 1) {
-                                ret = (iterating == IterationRequest::FORCE_ITERATION) ?
-                                    MessageProcessingResult::ITERATING :
-                                    MessageProcessingResult::NEXT_STEP;
-                            } else {
-                                if (currentRestrictionLevel != restrictionLevel + 1) {
-                                    currentRestrictionLevel = restrictionLevel + 1;
-                                    sendAll = true;
-                                    ++sequenceCounter;
-                                }
-
-                                ret = MessageProcessingResult::CONTINUE_PROCESSING;
-                            }
-                        } else {
-                            ret = (iterating == IterationRequest::FORCE_ITERATION) ?
-                                MessageProcessingResult::ITERATING :
-                                MessageProcessingResult::NEXT_STEP;
-                        }
-
-                    } else {
-                        if (restrictionAdvance) {
-                            currentRestrictionLevel = restrictionLevel + 1;
-                            sendAll = true;
-                            ++sequenceCounter;
-                        }
-                        ret = MessageProcessingResult::CONTINUE_PROCESSING;
-                    }
+                    const auto allowedResult = (iterating == IterationRequest::FORCE_ITERATION) ?
+                        MessageProcessingResult::ITERATING :
+                        MessageProcessingResult::NEXT_STEP;
+                    const auto restrictionCheck =
+                        checkExecEntryRestriction(dependencies,
+                                                  mSourceId,
+                                                  sequenceCounter,
+                                                  info.wait_for_current_time_updates,
+                                                  restricted);
+                    ret = applyRestrictionCheckResult(restrictionCheck,
+                                                      restricted,
+                                                      currentRestrictionLevel,
+                                                      sequenceCounter,
+                                                      sendAll,
+                                                      allowedResult);
                 }
             }
             break;
