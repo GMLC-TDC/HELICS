@@ -1161,7 +1161,7 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
         case CMD_ERROR_CHECK:
             return command.action();
         case CMD_MULTI_MESSAGE:
-            for (int ii = 0; ii < command.counter; ++ii) {
+            for (int ii = 0; std::cmp_less(ii, command.counter); ++ii) {
                 ActionMessage NMess;
                 NMess.from_string(command.getString(ii));
                 auto commandAction = commandProcessor(NMess);
