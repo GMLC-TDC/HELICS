@@ -20,8 +20,7 @@ cache:
 
 init:
   ps: |
-    [Net.ServicePointManager]::SecurityProtocol = 'Tls12'
-    (New-Object Net.WebClient).DownloadFile('https://cygwin.com/setup-x86_64.exe', 'C:\cygwin64\setup-x86_64.exe')
+    curl.exe -fsSL -o C:\cygwin64\setup-x86_64.exe https://cygwin.com/setup-x86_64.exe
 
 #
 # Install needed build dependencies

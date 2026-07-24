@@ -24,120 +24,124 @@ namespace helics {
 namespace {
 
     struct RestrictionCheckResult {
-        bool allowed{false};
-        bool restrictionAdvance{false};
-        int restrictionLevel{50};
+    bool allowed{false};
+    bool restrictionAdvance{false};
+    int restrictionLevel{50};
     };
 
     RestrictionCheckResult checkTimeGrantRestriction(const TimeDependencies& dependencies,
-                                                     GlobalFederateId sourceId,
-                                                     std::int32_t sequenceCounter,
-                                                     Time executionTime,
-                                                     bool waitForCurrentTimeUpdates,
-                                                     bool restricted)
+                                                 GlobalFederateId sourceId,
+                                                 std::int32_t sequenceCounter,
+                                                 Time executionTime,
+                                                 bool waitForCurrentTimeUpdates,
+                                                 bool restricted)
     {
-        RestrictionCheckResult result{!waitForCurrentTimeUpdates, restricted, 50};
-        if (!result.allowed) {
-            return result;
-        }
-
-        for (const auto& dep : dependencies) {
-            if (!dep.dependency) {
-                continue;
-            }
-            if (dep.next > executionTime || dep.connection == ConnectionType::SELF) {
-                continue;
-            }
-
-            if (dep.minFed != sourceId) {
-                result.allowed = false;
-            }
-            if (dep.responseSequenceCounter == sequenceCounter) {
-                if (restricted) {
-                    result.restrictionLevel =
-                        (std::min)(result.restrictionLevel, static_cast<int>(dep.restrictionLevel));
-                }
-
-            } else {
-                result.restrictionAdvance = false;
-                result.allowed = false;
-                break;
-            }
-        }
-
+    RestrictionCheckResult result{.allowed = !waitForCurrentTimeUpdates,
+                                  .restrictionAdvance = restricted,
+                                  .restrictionLevel = 50};
+    if (!result.allowed) {
         return result;
+    }
+
+    for (const auto& dep : dependencies) {
+        if (!dep.dependency) {
+            continue;
+        }
+        if (dep.next > executionTime || dep.connection == ConnectionType::SELF) {
+            continue;
+        }
+
+        if (dep.minFed != sourceId) {
+            result.allowed = false;
+        }
+        if (dep.responseSequenceCounter == sequenceCounter) {
+            if (restricted) {
+                result.restrictionLevel =
+                        (std::min)(result.restrictionLevel, static_cast<int>(dep.restrictionLevel));
+            }
+
+        } else {
+            result.restrictionAdvance = false;
+            result.allowed = false;
+            break;
+        }
+    }
+
+    return result;
     }
 
     RestrictionCheckResult checkExecEntryRestriction(const TimeDependencies& dependencies,
-                                                     GlobalFederateId sourceId,
-                                                     std::int32_t sequenceCounter,
-                                                     bool waitForCurrentTimeUpdates,
-                                                     bool restricted)
+                                                 GlobalFederateId sourceId,
+                                                 std::int32_t sequenceCounter,
+                                                 bool waitForCurrentTimeUpdates,
+                                                 bool restricted)
     {
-        RestrictionCheckResult result{!waitForCurrentTimeUpdates, restricted, 50};
-        if (!result.allowed) {
-            return result;
-        }
-
-        for (const auto& dep : dependencies) {
-            if (!dep.dependency) {
-                continue;
-            }
-            if (dep.mTimeState == TimeState::initialized) {
-                result.allowed = false;
-                result.restrictionAdvance = false;
-                break;
-            }
-            if (dep.mTimeState >= TimeState::exec_requested) {
-                continue;
-            }
-            if (dep.minFed != sourceId) {
-                result.allowed = false;
-            }
-            if (dep.responseSequenceCounter == sequenceCounter) {
-                if (restricted) {
-                    result.restrictionLevel =
-                        (std::min)(result.restrictionLevel, static_cast<int>(dep.restrictionLevel));
-                }
-
-            } else {
-                result.restrictionAdvance = false;
-                result.allowed = false;
-                break;
-            }
-        }
-
+    RestrictionCheckResult result{.allowed = !waitForCurrentTimeUpdates,
+                                  .restrictionAdvance = restricted,
+                                  .restrictionLevel = 50};
+    if (!result.allowed) {
         return result;
     }
 
-    MessageProcessingResult applyRestrictionCheckResult(const RestrictionCheckResult& checkResult,
-                                                        bool restricted,
-                                                        std::uint8_t& currentRestrictionLevel,
-                                                        std::int32_t& sequenceCounter,
-                                                        bool& sendAll,
-                                                        MessageProcessingResult allowedResult)
-    {
-        if (checkResult.allowed) {
-            if (!restricted) {
-                return allowedResult;
-            }
-            if (checkResult.restrictionLevel >= 1) {
-                return allowedResult;
-            }
-            if (currentRestrictionLevel != checkResult.restrictionLevel + 1) {
-                currentRestrictionLevel = checkResult.restrictionLevel + 1;
-                sendAll = true;
-                ++sequenceCounter;
-            }
-            return MessageProcessingResult::CONTINUE_PROCESSING;
+    for (const auto& dep : dependencies) {
+        if (!dep.dependency) {
+            continue;
         }
+        if (dep.mTimeState == TimeState::initialized) {
+            result.allowed = false;
+            result.restrictionAdvance = false;
+            break;
+        }
+        if (dep.mTimeState >= TimeState::exec_requested) {
+            continue;
+        }
+        if (dep.minFed != sourceId) {
+            result.allowed = false;
+        }
+        if (dep.responseSequenceCounter == sequenceCounter) {
+            if (restricted) {
+                result.restrictionLevel =
+                        (std::min)(result.restrictionLevel, static_cast<int>(dep.restrictionLevel));
+            }
 
-        if (checkResult.restrictionAdvance) {
+        } else {
+            result.restrictionAdvance = false;
+            result.allowed = false;
+            break;
+        }
+    }
+
+    return result;
+    }
+
+    MessageProcessingResult applyRestrictionCheckResult(const RestrictionCheckResult& checkResult,
+                                                    bool restricted,
+                                                    std::uint8_t& currentRestrictionLevel,
+                                                    std::int32_t& sequenceCounter,
+                                                    bool& sendAll,
+                                                    MessageProcessingResult allowedResult)
+    {
+    if (checkResult.allowed) {
+        if (!restricted) {
+            return allowedResult;
+        }
+        if (checkResult.restrictionLevel >= 1) {
+            return allowedResult;
+        }
+        if (currentRestrictionLevel != checkResult.restrictionLevel + 1) {
             currentRestrictionLevel = checkResult.restrictionLevel + 1;
             sendAll = true;
             ++sequenceCounter;
         }
         return MessageProcessingResult::CONTINUE_PROCESSING;
+    }
+
+    if (checkResult.restrictionAdvance) {
+        currentRestrictionLevel = checkResult.restrictionLevel + 1;
+        sendAll = true;
+        ++sequenceCounter;
+    }
+    return MessageProcessingResult::CONTINUE_PROCESSING;
     }
 
 }  // namespace
@@ -941,7 +945,7 @@ void TimeCoordinator::updateTimeGrant()
     treq.source_id = mSourceId;
     treq.actionTime = time_granted;
     treq.counter = sequenceCounter;
-    if (static_cast<std::int32_t>(treq.counter) != sequenceCounter) {
+    if (std::cmp_not_equal(treq.counter, sequenceCounter)) {
         sequenceCounter = 0;
     }
     if (iterating != IterationRequest::NO_ITERATIONS) {
