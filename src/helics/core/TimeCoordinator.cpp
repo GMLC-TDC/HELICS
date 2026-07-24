@@ -44,7 +44,7 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
     execreq.source_id = mSourceId;
     if (iterating != IterationRequest::NO_ITERATIONS) {
         setIterationFlags(execreq, iterating);
-        ++sequenceCounter;
+        incrementSequenceCounter(sequenceCounter);
         execreq.counter = sequenceCounter;
         if (!hasInitUpdates) {
             const auto& mfed = getExecEntryMinFederate(dependencies, mSourceId);
@@ -136,7 +136,7 @@ void TimeCoordinator::timeRequest(Time nextTime,
         }
     }
     dependencies.resetDependentEvents(time_granted);
-    ++sequenceCounter;
+    incrementSequenceCounter(sequenceCounter);
     updateTimeFactors();
 
     if (!dependencies.empty()) {
@@ -672,7 +672,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                                 if (currentRestrictionLevel != restrictionLevel + 1) {
                                     currentRestrictionLevel = restrictionLevel + 1;
                                     sendAll = true;
-                                    ++sequenceCounter;
+                                    incrementSequenceCounter(sequenceCounter);
                                 }
 
                                 ret = MessageProcessingResult::CONTINUE_PROCESSING;
@@ -685,7 +685,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                         if (restrictionAdvance) {
                             currentRestrictionLevel = restrictionLevel + 1;
                             sendAll = true;
-                            ++sequenceCounter;
+                            incrementSequenceCounter(sequenceCounter);
                         }
                         ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     }
@@ -857,14 +857,11 @@ void TimeCoordinator::updateTimeGrant()
         time_granted = time_exec;
         time_grantBase = time_granted;
     }
-    ++sequenceCounter;
+    incrementSequenceCounter(sequenceCounter);
     ActionMessage treq(CMD_TIME_GRANT);
     treq.source_id = mSourceId;
     treq.actionTime = time_granted;
     treq.counter = sequenceCounter;
-    if (static_cast<std::int32_t>(treq.counter) != sequenceCounter) {
-        sequenceCounter = 0;
-    }
     if (iterating != IterationRequest::NO_ITERATIONS) {
         dependencies.resetIteratingTimeRequests(time_exec);
     }
@@ -1105,7 +1102,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                                 if (currentRestrictionLevel != restrictionLevel + 1) {
                                     currentRestrictionLevel = restrictionLevel + 1;
                                     sendAll = true;
-                                    ++sequenceCounter;
+                                    incrementSequenceCounter(sequenceCounter);
                                 }
 
                                 ret = MessageProcessingResult::CONTINUE_PROCESSING;
@@ -1120,7 +1117,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                         if (restrictionAdvance) {
                             currentRestrictionLevel = restrictionLevel + 1;
                             sendAll = true;
-                            ++sequenceCounter;
+                            incrementSequenceCounter(sequenceCounter);
                         }
                         ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     }

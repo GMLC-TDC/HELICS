@@ -61,6 +61,7 @@ static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Tim
 void GlobalTimeCoordinator::sendTimeUpdateRequest(Time triggerTime)
 {
     ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
+    normalizeSequenceCounter(sequenceCounter);
     updateTime.counter = sequenceCounter;
     for (auto& dep : dependencies) {
         if (dep.next <= triggerTime && dep.next < cTerminationTime) {
@@ -87,7 +88,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
             currentTimeState = TimeState::time_requested;
             currentMinTime = timeStream.next;
             nextEvent = findNextTriggerEvent(dependencies);
-            ++sequenceCounter;
+            incrementSequenceCounter(sequenceCounter);
             auto trigTime =
                 (nextEvent < cTerminationTime) ? nextEvent + Time::epsilon() : nextEvent;
             mNewRequest = false;
@@ -107,7 +108,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 }
 
                 if (trig.first || !verified || mNewRequest) {
-                    ++sequenceCounter;
+                    incrementSequenceCounter(sequenceCounter);
                     mNewRequest = false;
                     sendTimeUpdateRequest(trigTime);
                     return true;
@@ -117,7 +118,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 updateTime.Te = trigTime;
                 updateTime.Tdemin = trigTime;
 
-                ++sequenceCounter;
+                incrementSequenceCounter(sequenceCounter);
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {
                     if (dep.next <= trigTime && dep.next < cTerminationTime) {
