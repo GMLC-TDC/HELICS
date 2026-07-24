@@ -11,7 +11,7 @@ image: Visual Studio 2022
 environment:
   global:
     CYG_ROOT: C:\cygwin64
-    CYG_MIRROR: http://mirrors.sonic.net
+    CYG_MIRROR: http://mirrors.sonic.net/cygwin/
     CYG_CACHE: C:\cygwin64\var\cache\setup
     CYG_BASH: C:\cygwin64\bin\bash
 
@@ -22,7 +22,7 @@ cache:
 # Install needed build dependencies
 #
 install:
-  - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --root %CYG_ROOT% --site %CYG_MIRROR% --local-package-dir %CYG_CACHE% --packages cmake,git,make,gcc-core,gcc-g++,libzmq-devel'
+  - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --only-site --root %CYG_ROOT% --site %CYG_MIRROR% --local-package-dir %CYG_CACHE% --packages cmake,git,make,gcc-core,gcc-g++,libzmq-devel'
   - '%CYG_ROOT%\bin\cygcheck -dc'
   - cd %APPVEYOR_BUILD_FOLDER%
   - git config --global --add safe.directory %APPVEYOR_BUILD_FOLDER%
