@@ -25,15 +25,17 @@ static DependencyInfo generateDependencyInfoExcluding(const TimeDependencies& de
                                                       GlobalFederateId sourceId,
                                                       GlobalFederateId excludedFed)
 {
-    auto td = generateMinTimeUpstream(
-        dependencies, restrictiveTimePolicy, sourceId, excludedFed, 0);
+    auto td =
+        generateMinTimeUpstream(dependencies, restrictiveTimePolicy, sourceId, excludedFed, 0);
     const bool noPendingUpstream =
-        std::none_of(dependencies.begin(), dependencies.end(), [sourceId, excludedFed](const auto& dep) {
-            return dep.dependency && dep.fedID != excludedFed &&
-                dep.connection != ConnectionType::PARENT &&
-                (!sourceId.isValid() || dep.minFedActual != sourceId) &&
-                (dep.mTimeState == TimeState::error || dep.next < cTerminationTime);
-        });
+        std::none_of(dependencies.begin(),
+                     dependencies.end(),
+                     [sourceId, excludedFed](const auto& dep) {
+                         return dep.dependency && dep.fedID != excludedFed &&
+                             dep.connection != ConnectionType::PARENT &&
+                             (!sourceId.isValid() || dep.minFedActual != sourceId) &&
+                             (dep.mTimeState == TimeState::error || dep.next < cTerminationTime);
+                     });
     if (td.mTimeState == TimeState::error && noPendingUpstream) {
         return DependencyInfo(Time::maxVal(), TimeState::time_granted);
     }
@@ -90,8 +92,10 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
             if (upd.action() != CMD_IGNORE) {
                 transmitTimingMessagesDownstream(upd, downstream.minFed);
             }
-            auto dependency = generateDependencyInfoExcluding(
-                dependencies, restrictive_time_policy, mSourceId, downstream.minFed);
+            auto dependency = generateDependencyInfoExcluding(dependencies,
+                                                              restrictive_time_policy,
+                                                              mSourceId,
+                                                              downstream.minFed);
             auto upd_delayed = generateTimeRequest(dependency,
                                                    downstream.minFed,
                                                    dependency.responseSequenceCounter);
@@ -106,8 +110,10 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
         }
     } else if (dependencies.hasDelayedDependency() && mTimeDownstream.minFed.isValid() &&
                executionMode) {
-        auto dependency = generateDependencyInfoExcluding(
-            dependencies, restrictive_time_policy, mSourceId, mTimeDownstream.minFed);
+        auto dependency = generateDependencyInfoExcluding(dependencies,
+                                                          restrictive_time_policy,
+                                                          mSourceId,
+                                                          mTimeDownstream.minFed);
         auto upd_delayed = generateTimeRequest(dependency,
                                                mTimeDownstream.minFed,
                                                dependency.responseSequenceCounter);
