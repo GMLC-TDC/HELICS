@@ -20,21 +20,20 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-static DependencyInfo generateDelayedDependencyInfo(const TimeDependencies& dependencies,
-                                                    bool restrictiveTimePolicy,
-                                                    GlobalFederateId sourceId,
-                                                    GlobalFederateId delayedFed)
+static DependencyInfo generateDependencyInfoExcluding(const TimeDependencies& dependencies,
+                                                      bool restrictiveTimePolicy,
+                                                      GlobalFederateId sourceId,
+                                                      GlobalFederateId excludedFed)
 {
-    auto td = generateMinTimeUpstream(dependencies, restrictiveTimePolicy, sourceId, delayedFed, 0);
+    auto td = generateMinTimeUpstream(
+        dependencies, restrictiveTimePolicy, sourceId, excludedFed, 0);
     const bool noPendingUpstream =
-        std::none_of(dependencies.begin(),
-                     dependencies.end(),
-                     [sourceId, delayedFed](const auto& dep) {
-                         return dep.dependency && dep.fedID != delayedFed &&
-                             dep.connection != ConnectionType::PARENT &&
-                             (!sourceId.isValid() || dep.minFedActual != sourceId) &&
-                             (dep.mTimeState == TimeState::error || dep.next < cTerminationTime);
-                     });
+        std::none_of(dependencies.begin(), dependencies.end(), [sourceId, excludedFed](const auto& dep) {
+            return dep.dependency && dep.fedID != excludedFed &&
+                dep.connection != ConnectionType::PARENT &&
+                (!sourceId.isValid() || dep.minFedActual != sourceId) &&
+                (dep.mTimeState == TimeState::error || dep.next < cTerminationTime);
+        });
     if (td.mTimeState == TimeState::error && noPendingUpstream) {
         return DependencyInfo(Time::maxVal(), TimeState::time_granted);
     }
@@ -86,16 +85,13 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
         }
     }
     if (updateDownStream) {
-        if (dependencies.hasDelayedDependency() &&
-            downstream.minFed == dependencies.delayedDependency()) {
+        if (dependencies.hasDelayedDependency() && downstream.minFed.isValid()) {
             auto upd = generateTimeRequest(downstream, GlobalFederateId{}, 0);
             if (upd.action() != CMD_IGNORE) {
                 transmitTimingMessagesDownstream(upd, downstream.minFed);
             }
-            auto dependency = generateDelayedDependencyInfo(dependencies,
-                                                            restrictive_time_policy,
-                                                            mSourceId,
-                                                            downstream.minFed);
+            auto dependency = generateDependencyInfoExcluding(
+                dependencies, restrictive_time_policy, mSourceId, downstream.minFed);
             auto upd_delayed = generateTimeRequest(dependency,
                                                    downstream.minFed,
                                                    dependency.responseSequenceCounter);
@@ -108,12 +104,10 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
                 transmitTimingMessagesDownstream(upd);
             }
         }
-    } else if (dependencies.hasDelayedDependency() &&
-               mTimeDownstream.minFed == dependencies.delayedDependency() && executionMode) {
-        auto dependency = generateDelayedDependencyInfo(dependencies,
-                                                        restrictive_time_policy,
-                                                        mSourceId,
-                                                        mTimeDownstream.minFed);
+    } else if (dependencies.hasDelayedDependency() && mTimeDownstream.minFed.isValid() &&
+               executionMode) {
+        auto dependency = generateDependencyInfoExcluding(
+            dependencies, restrictive_time_policy, mSourceId, mTimeDownstream.minFed);
         auto upd_delayed = generateTimeRequest(dependency,
                                                mTimeDownstream.minFed,
                                                dependency.responseSequenceCounter);
