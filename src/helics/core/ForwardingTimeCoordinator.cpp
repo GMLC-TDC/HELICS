@@ -55,6 +55,7 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
     }
 
     sequenceCounter = upstream.sequenceCounter + sequenceModifier;
+    normalizeSequenceCounter(sequenceCounter);
     if (updateUpStream || updateDownStream) {
         auto upd =
             generateTimeRequest(upstream, GlobalFederateId{}, upstream.responseSequenceCounter);
@@ -69,10 +70,10 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
             if (upd.action() != CMD_IGNORE) {
                 transmitTimingMessagesDownstream(upd, downstream.minFed);
             }
-            auto td = generateMinTimeUpstream(
+            auto timeData = generateMinTimeUpstream(
                 dependencies, restrictive_time_policy, mSourceId, downstream.minFed, 0);
             DependencyInfo dependency;
-            dependency.update(td);
+            dependency.update(timeData);
             auto upd_delayed = generateTimeRequest(dependency,
                                                    downstream.minFed,
                                                    dependency.responseSequenceCounter);
@@ -131,6 +132,7 @@ TimeProcessingResult ForwardingTimeCoordinator::processTimeMessage(const ActionM
             sequenceModifier = mSequenceIncrement;
         }
         sequenceCounter = upstream.sequenceCounter + sequenceModifier;
+        normalizeSequenceCounter(sequenceCounter);
     }
     return res;
 }
