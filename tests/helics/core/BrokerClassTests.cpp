@@ -92,6 +92,149 @@ TEST(brokers, subbroker_min)
     EXPECT_TRUE(brk3->waitForDisconnect());
 }
 
+TEST(brokers, local_federates_min)
+{
+    auto brk = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                             "local_fed_root",
+                                             "--root -f 2 --local_federates 2");
+
+    auto subbrk = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                                "local_fed_sub",
+                                                "--broker=local_fed_root -f 1");
+    auto localCore1 = helics::CoreFactory::create(helics::CoreType::TEST,
+                                                  "local_fed_core1",
+                                                  "--broker=local_fed_root");
+    auto remoteCore = helics::CoreFactory::create(helics::CoreType::TEST,
+                                                  "local_fed_remote_core",
+                                                  "--broker=local_fed_sub");
+
+    helics::CoreFederateInfo cf1;
+    auto localFed1 = localCore1->registerFederate("local_fed1", cf1);
+    auto remoteFed = remoteCore->registerFederate("local_remote_fed", cf1);
+
+    auto localFuture1 = std::async(std::launch::async, [localFed1, &localCore1]() {
+        localCore1->enterInitializingMode(localFed1);
+    });
+    auto remoteFuture = std::async(std::launch::async, [remoteFed, &remoteCore]() {
+        remoteCore->enterInitializingMode(remoteFed);
+    });
+
+    auto res = localFuture1.wait_for(std::chrono::milliseconds(100));
+    EXPECT_EQ(res, std::future_status::timeout);
+
+    auto localCore2 = helics::CoreFactory::create(helics::CoreType::TEST,
+                                                  "local_fed_core2",
+                                                  "--broker=local_fed_root");
+    auto localFed2 = localCore2->registerFederate("local_fed2", cf1);
+    auto localFuture2 = std::async(std::launch::async, [localFed2, &localCore2]() {
+        localCore2->enterInitializingMode(localFed2);
+    });
+
+    localFuture1.get();
+    localFuture2.get();
+    remoteFuture.get();
+
+    brk->disconnect();
+    EXPECT_TRUE(subbrk->waitForDisconnect());
+}
+
+TEST(brokers, local_subbrokers_min)
+{
+    auto brk = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                             "local_sub_root",
+                                             "--root -f 2 --local_subbrokers 2");
+
+    auto subbrk1 = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                                 "local_sub1",
+                                                 "--broker=local_sub_root -f 1");
+    auto remoteCore1 = helics::CoreFactory::create(helics::CoreType::TEST,
+                                                   "local_sub_core1",
+                                                   "--broker=local_sub1");
+
+    helics::CoreFederateInfo cf1;
+    auto fed1 = remoteCore1->registerFederate("local_sub_fed1", cf1);
+    auto future1 = std::async(std::launch::async,
+                              [fed1, &remoteCore1]() { remoteCore1->enterInitializingMode(fed1); });
+
+    auto res = future1.wait_for(std::chrono::milliseconds(100));
+    EXPECT_EQ(res, std::future_status::timeout);
+
+    auto subbrk2 = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                                 "local_sub2",
+                                                 "--broker=local_sub_root -f 1");
+    auto remoteCore2 = helics::CoreFactory::create(helics::CoreType::TEST,
+                                                   "local_sub_core2",
+                                                   "--broker=local_sub2");
+    auto fed2 = remoteCore2->registerFederate("local_sub_fed2", cf1);
+    auto future2 = std::async(std::launch::async,
+                              [fed2, &remoteCore2]() { remoteCore2->enterInitializingMode(fed2); });
+
+    future1.get();
+    future2.get();
+
+    brk->disconnect();
+    EXPECT_TRUE(subbrk1->waitForDisconnect());
+    EXPECT_TRUE(subbrk2->waitForDisconnect());
+}
+
+TEST(brokers, required_federates_broker)
+{
+    auto brk = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                             "required_fed_broker",
+                                             "--root -f 1 --required_federates fed_required");
+    auto cr1 = helics::CoreFactory::create(helics::CoreType::TEST,
+                                           "required_core1",
+                                           "--broker=required_fed_broker");
+
+    helics::CoreFederateInfo cf1;
+    auto fid1 = cr1->registerFederate("fed_other", cf1);
+    auto fut1 =
+        std::async(std::launch::async, [fid1, &cr1]() { cr1->enterInitializingMode(fid1); });
+
+    auto res = fut1.wait_for(std::chrono::milliseconds(100));
+    EXPECT_EQ(res, std::future_status::timeout);
+
+    auto cr2 = helics::CoreFactory::create(helics::CoreType::TEST,
+                                           "required_core2",
+                                           "--broker=required_fed_broker");
+    auto fid2 = cr2->registerFederate("fed_required", cf1);
+    auto fut2 =
+        std::async(std::launch::async, [fid2, &cr2]() { cr2->enterInitializingMode(fid2); });
+
+    fut1.get();
+    fut2.get();
+
+    brk->disconnect();
+}
+
+TEST(brokers, required_federates_core)
+{
+    auto brk = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                             "required_fed_core_broker",
+                                             "-f 2 --root");
+    auto cr1 = helics::CoreFactory::create(helics::CoreType::TEST,
+                                           "required_fed_core",
+                                           "--broker=required_fed_core_broker -f 1 "
+                                           "--required_federates fed_required_core");
+
+    helics::CoreFederateInfo cf1;
+    auto fid1 = cr1->registerFederate("fed_other_core", cf1);
+    auto fut1 =
+        std::async(std::launch::async, [fid1, &cr1]() { cr1->enterInitializingMode(fid1); });
+
+    auto res = fut1.wait_for(std::chrono::milliseconds(100));
+    EXPECT_EQ(res, std::future_status::timeout);
+
+    auto fid2 = cr1->registerFederate("fed_required_core", cf1);
+    auto fut2 =
+        std::async(std::launch::async, [fid2, &cr1]() { cr1->enterInitializingMode(fid2); });
+
+    fut1.get();
+    fut2.get();
+
+    brk->disconnect();
+}
+
 /** test the assignment and retrieval of global value from a broker object*/
 TEST(brokers, subbroker_min_files)
 {
