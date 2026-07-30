@@ -1469,7 +1469,7 @@ Translators are used to bridge the gap between the value and message interfaces 
 
 _API:_ `helicsCoreRegisterTranslator`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Translator.html#a34a960d2259756912ad1dd6e70609416)
-| [C]()
+| [C](<>)
 | [Python](https://python.helics.org/api/capi-py/#helicsCoreRegisterTranslator)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCoreRegisterTranslator-Tuple{HELICS.Core,%20Int64,%20String})
 
@@ -1477,7 +1477,7 @@ or
 
 _API:_ `helicsFederateRegisterGlobalTranslator`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Translator.html#a16f2ce4896c3f5e72d353b10584102a5)
-| [C]()
+| [C](<>)
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateRegisterGlobalTranslator)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterGlobalTranslator-Tuple{HELICS.Federate,%20Int64,%20String})
 
@@ -1505,7 +1505,7 @@ _Alternative names:_ `sourcetargets`, `sourceTargets`
 
 _API:_ `helicsTranslatorAddPublicationTarget`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Translator.html)
-| [C]()
+| [C](<>)
 | [Python](https://python.helics.org/api/capi-py/#helicsTranslatorAddPublicationTarget)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsTranslatorAddPublicationTarget-Tuple{HELICS.Translator,%20String})
 
@@ -1513,7 +1513,7 @@ or
 
 _API:_ `helicsTranslatorAddSourceEndpoint`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Translator.html)
-| [C]()
+| [C](<>)
 | [Python](https://python.helics.org/api/capi-py/#helicsTranslatorAddSourceEndpoint)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsTranslatorAddSourceEndpoint-Tuple{HELICS.Translator,%20String})
 
@@ -1527,7 +1527,7 @@ _Alternative names:_ `destinationtargets`, `destinationTargets`
 
 _API:_ `helicsTranslatorAddInputTarget`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Translator.html)
-| [C]()
+| [C](<>)
 | [Python](https://python.helics.org/api/capi-py/#helicsTranslatorAddInputTarget)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsTranslatorAddInputTarget-Tuple{HELICS.Translator,%20String})
 
@@ -1535,7 +1535,7 @@ or
 
 _API:_ `helicsTranslatorAddDestinationEndpoint`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Translator.html)
-| [C]()
+| [C](<>)
 | [Python](https://python.helics.org/api/capi-py/#helicsTranslatorAddDestinationEndpoint)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsTranslatorAddDestinationEndpoint-Tuple{HELICS.Translator,%20String})
 
