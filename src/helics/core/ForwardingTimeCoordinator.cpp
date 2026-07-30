@@ -79,6 +79,7 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
     }
 
     sequenceCounter = upstream.sequenceCounter + sequenceModifier;
+    normalizeSequenceCounter(sequenceCounter);
     if (updateUpStream || updateDownStream) {
         auto upd =
             generateTimeRequest(upstream, GlobalFederateId{}, upstream.responseSequenceCounter);
@@ -154,6 +155,7 @@ TimeProcessingResult ForwardingTimeCoordinator::processTimeMessage(const ActionM
             sequenceModifier = mSequenceIncrement;
         }
         sequenceCounter = upstream.sequenceCounter + sequenceModifier;
+        normalizeSequenceCounter(sequenceCounter);
     }
     return res;
 }

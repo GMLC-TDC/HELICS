@@ -12,7 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "nlohmann/json_fwd.hpp"
 
 #include <atomic>
+#include <cstdint>
 #include <functional>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -45,6 +47,28 @@ class BaseTimeCoordinator {
 
   public:
     static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
+
+  protected:
+    // Timing sequence counters are echoed through several compatibility paths; keep them in the
+    // positive signed 16-bit range even though ActionMessage stores the counter as uint16_t.
+    static constexpr auto maxTimingSequenceCounter = std::numeric_limits<std::int16_t>::max();
+
+    static void incrementSequenceCounter(std::int32_t& counter)
+    {
+        ++counter;
+        if (counter > maxTimingSequenceCounter) {
+            counter = 1;
+        }
+    }
+
+    static void normalizeSequenceCounter(std::int32_t& counter)
+    {
+        if (counter > maxTimingSequenceCounter) {
+            counter = 1;
+        }
+    }
+
+  public:
     BaseTimeCoordinator();
     explicit BaseTimeCoordinator(std::function<void(const ActionMessage&)> userSendMessageFunction);
     virtual ~BaseTimeCoordinator() = default;

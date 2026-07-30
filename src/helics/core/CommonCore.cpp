@@ -582,6 +582,12 @@ bool CommonCore::allInitReady() const
     if (fcount < minFederateCount || fcount < minChildCount) {
         return false;
     }
+    for (const auto& requiredFederate : requiredFederates) {
+        if (!requiredFederate.empty() &&
+            loopFederates.find(requiredFederate) == loopFederates.end()) {
+            return false;
+        }
+    }
     // all federates must be requesting init
     return std::all_of(loopFederates.begin(), loopFederates.end(), [](const auto& fed) {
         return fed->init_transmitted.load();

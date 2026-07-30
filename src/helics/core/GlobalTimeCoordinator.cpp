@@ -23,25 +23,25 @@ namespace helics {
 
 static Time findNextTriggerEvent(const TimeDependencies& deps)
 {
-    Time me{Time::maxVal()};
+    Time minEvent{Time::maxVal()};
     for (const auto& dep : deps) {
         if (!dep.nonGranting) {
-            if (dep.Te < me) {
-                me = dep.Te;
+            if (dep.Te < minEvent) {
+                minEvent = dep.Te;
             }
         }
     }
-    return me;
+    return minEvent;
 }
 
 static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Time nextEvent)
 {
-    Time me{Time::maxVal()};
+    Time minEvent{Time::maxVal()};
     bool triggered{false};
     for (const auto& dep : deps) {
         if (dep.next > nextEvent) {
-            if (dep.Te < me) {
-                me = dep.Te;
+            if (dep.Te < minEvent) {
+                minEvent = dep.Te;
             }
             continue;
         }
@@ -50,17 +50,18 @@ static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Tim
                 triggered = true;
             }
         } else {
-            if (dep.Te < me) {
-                me = dep.Te;
+            if (dep.Te < minEvent) {
+                minEvent = dep.Te;
             }
         }
     }
-    return {triggered, me};
+    return {triggered, minEvent};
 }
 
 void GlobalTimeCoordinator::sendTimeUpdateRequest(Time triggerTime)
 {
     ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
+    normalizeSequenceCounter(sequenceCounter);
     updateTime.counter = sequenceCounter;
     for (auto& dep : dependencies) {
         if (dep.next <= triggerTime && dep.next < cTerminationTime) {
@@ -87,7 +88,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
             currentTimeState = TimeState::time_requested;
             currentMinTime = timeStream.next;
             nextEvent = findNextTriggerEvent(dependencies);
-            ++sequenceCounter;
+            incrementSequenceCounter(sequenceCounter);
             auto trigTime =
                 (nextEvent < cTerminationTime) ? nextEvent + Time::epsilon() : nextEvent;
             mNewRequest = false;
@@ -107,7 +108,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 }
 
                 if (trig.first || !verified || mNewRequest) {
-                    ++sequenceCounter;
+                    incrementSequenceCounter(sequenceCounter);
                     mNewRequest = false;
                     sendTimeUpdateRequest(trigTime);
                     return true;
@@ -117,7 +118,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 updateTime.Te = trigTime;
                 updateTime.Tdemin = trigTime;
 
-                ++sequenceCounter;
+                incrementSequenceCounter(sequenceCounter);
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {
                     if (dep.next <= trigTime && dep.next < cTerminationTime) {
@@ -136,7 +137,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                     }
                     if (dep.next <= trigTime && dep.next < cTerminationTime) {
                         if (!checkSequenceCounter(dep, trigTime, sequenceCounter)) {
-                            std::cerr << "sequence check but no request" << std::endl;
+                            std::cerr << "sequence check but no request\n";
                             /* ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME,
                                                        mSourceId,
                                                        mSourceId);
