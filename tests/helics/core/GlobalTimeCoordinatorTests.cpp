@@ -65,6 +65,11 @@ TEST(global_time_coord_tests, iterative_runtime_states_start_time_update)
         EXPECT_EQ(gtc.checkExecEntry(), MessageProcessingResult::NEXT_STEP);
         sentMessages.clear();
 
+        // A delayed execution request must not move an executing coordinator back into an
+        // initialization state and prevent the next time request from starting its handshake.
+        EXPECT_GE(gtc.processTimeMessage(execRequest), TimeProcessingResult::PROCESSED);
+        EXPECT_TRUE(gtc.updateTimeFactors());
+
         ActionMessage timeRequest(CMD_TIME_REQUEST, federate, coordinator);
         setIterationFlags(timeRequest, iterationRequest);
         timeRequest.actionTime = 1.0;
@@ -74,7 +79,7 @@ TEST(global_time_coord_tests, iterative_runtime_states_start_time_update)
         EXPECT_GE(gtc.processTimeMessage(timeRequest), TimeProcessingResult::PROCESSED);
 
         EXPECT_TRUE(gtc.updateTimeFactors());
-        EXPECT_TRUE(std::any_of(sentMessages.begin(), sentMessages.end(), [](const auto& message) {
+        EXPECT_TRUE(std::ranges::any_of(sentMessages, [](const auto& message) {
             return message.action() == CMD_REQUEST_CURRENT_TIME;
         }));
     }

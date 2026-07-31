@@ -77,7 +77,7 @@ void GlobalTimeCoordinator::sendTimeUpdateRequest(Time triggerTime)
 bool GlobalTimeCoordinator::updateTimeFactors()
 {
     auto timeStream = generateMinTimeUpstream(dependencies, true, mSourceId, NoIgnoredFederates, 0);
-    if (timeStream.mTimeState < TimeState::time_granted) {
+    if (!executionMode && timeStream.mTimeState < TimeState::time_granted) {
         currentTimeState = timeStream.mTimeState;
         currentMinTime = timeStream.next;
         nextEvent = timeStream.next;
