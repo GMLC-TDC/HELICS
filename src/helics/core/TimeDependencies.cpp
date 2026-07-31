@@ -815,10 +815,18 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.interrupted = false;
         }
     } else if (dep.next == mTime.next) {
-        // A grant only indicates that one dependency has completed this time.  A concurrent
-        // request must be forwarded so that the remaining dependencies can complete it too.
-        if (mTime.mTimeState == TimeState::time_granted ||
-            (dep.mTimeState != TimeState::time_granted && dep.mTimeState < mTime.mTimeState)) {
+        const auto iterativeRequest = [](TimeState state) {
+            return state == TimeState::time_requested_iterative ||
+                state == TimeState::time_requested_require_iteration;
+        };
+        if (iterativeRequest(dep.mTimeState)) {
+            // A grant only indicates that one dependency has completed this time. A concurrent
+            // iterative request must still be forwarded so the remaining dependencies complete it.
+            if (!iterativeRequest(mTime.mTimeState) || dep.mTimeState < mTime.mTimeState) {
+                mTime.mTimeState = dep.mTimeState;
+            }
+        } else if (dep.mTimeState == TimeState::time_granted &&
+                   !iterativeRequest(mTime.mTimeState)) {
             mTime.mTimeState = dep.mTimeState;
         }
         if (dep.mTimeState == TimeState::time_granted || !dep.interrupted) {
