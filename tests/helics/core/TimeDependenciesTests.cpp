@@ -86,7 +86,6 @@ TEST(timeDep_tests, equal_time_iteration_state_precedence)
               TimeState::time_requested_iterative);
     EXPECT_EQ(generateState(TimeState::time_requested_iterative, TimeState::time_granted),
               TimeState::time_requested_iterative);
-    EXPECT_EQ(generateState(TimeState::time_granted,
-                            TimeState::time_requested_require_iteration),
+    EXPECT_EQ(generateState(TimeState::time_granted, TimeState::time_requested_require_iteration),
               TimeState::time_requested_require_iteration);
 }
