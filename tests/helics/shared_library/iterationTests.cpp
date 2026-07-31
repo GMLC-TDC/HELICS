@@ -111,6 +111,10 @@ class iteration_tests_type:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {};
 
+static const auto coreTypeTestNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
+
 TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
 {
     SetupTest(helicsCreateValueFederate, GetParam(), 3);
@@ -129,10 +133,6 @@ TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
     EXPECT_NEAR(res2.first, 2.5, 0.1);
     EXPECT_NEAR(res1.first, 2.5, 0.1);
 }
-
-INSTANTIATE_TEST_SUITE_P(iteration_tests,
-                         iteration_tests_type,
-                         ::testing::ValuesIn(CoreTypes_ci_B));
 
 TEST_F(iteration_tests, execution_iteration_loop3)
 {
@@ -267,6 +267,131 @@ TEST_F(iteration_tests, time_iteration_test_2fed)
 
     EXPECT_EQ(val2, val);
 }
+
+struct paired_iteration_result {
+    HelicsTime time1{HELICS_TIME_INVALID};
+    HelicsTime time2{HELICS_TIME_INVALID};
+    HelicsIterationResult state1{HELICS_ITERATION_RESULT_ERROR};
+    HelicsIterationResult state2{HELICS_ITERATION_RESULT_ERROR};
+};
+
+static paired_iteration_result requestTimeIterativePair(HelicsFederate fed1,
+                                                        HelicsFederate fed2,
+                                                        HelicsTime requestTime)
+{
+    paired_iteration_result result;
+    helicsFederateRequestTimeIterativeAsync(fed1,
+                                            requestTime,
+                                            HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
+                                            nullptr);
+    result.time2 = helicsFederateRequestTimeIterative(fed2,
+                                                      requestTime,
+                                                      HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
+                                                      &result.state2,
+                                                      nullptr);
+    result.time1 = helicsFederateRequestTimeIterativeComplete(fed1, &result.state1, nullptr);
+    return result;
+}
+
+TEST_P(iteration_tests_type, time_iteration_value_loop_with_endpoint_federate)
+{
+    auto broker = AddBroker(GetParam(), 3);
+    AddFederates(helicsCreateCombinationFederate, GetParam(), 1, broker, 1.0, "Battery");
+    AddFederates(helicsCreateCombinationFederate, GetParam(), 1, broker, 1.0, "Charger");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "Controller");
+
+    auto batteryFed = GetFederateAt(0);
+    auto chargerFed = GetFederateAt(1);
+    auto controllerFed = GetFederateAt(2);
+
+    auto batteryPub = helicsFederateRegisterGlobalPublication(
+        batteryFed, "Battery/EV1_current", HELICS_DATA_TYPE_DOUBLE, "A", nullptr);
+    auto batterySub = helicsFederateRegisterSubscription(
+        batteryFed, "Charger/EV1_voltage", "V", nullptr);
+    auto chargerPub = helicsFederateRegisterGlobalPublication(
+        chargerFed, "Charger/EV1_voltage", HELICS_DATA_TYPE_DOUBLE, "V", nullptr);
+    auto chargerSub = helicsFederateRegisterSubscription(
+        chargerFed, "Battery/EV1_current", "A", nullptr);
+
+    auto batteryEndpoint =
+        helicsFederateRegisterGlobalEndpoint(batteryFed, "Battery/EV1.co", "message", nullptr);
+    helicsEndpointSetDefaultDestination(batteryEndpoint, "Controller/battery_ep", nullptr);
+    auto chargerEndpoint =
+        helicsFederateRegisterGlobalEndpoint(chargerFed, "Charger/EV1.so", "message", nullptr);
+    helicsEndpointSetDefaultDestination(chargerEndpoint, "Controller/charger_ep", nullptr);
+
+    auto controllerBatteryEndpoint = helicsFederateRegisterGlobalEndpoint(
+        controllerFed, "Controller/battery_ep", "message", nullptr);
+    helicsEndpointSetDefaultDestination(controllerBatteryEndpoint, "Battery/EV1.co", nullptr);
+    auto controllerChargerEndpoint = helicsFederateRegisterGlobalEndpoint(
+        controllerFed, "Controller/charger_ep", "message", nullptr);
+    helicsEndpointSetDefaultDestination(controllerChargerEndpoint, "Charger/EV1.so", nullptr);
+
+    constexpr int timeStepCount = 20;
+    constexpr int iterationRoundsPerStep = 4;
+    constexpr int maxIterations = iterationRoundsPerStep + 2;
+
+    helicsFederateSetIntegerProperty(
+        batteryFed, HELICS_PROPERTY_INT_MAX_ITERATIONS, maxIterations, nullptr);
+    helicsFederateSetIntegerProperty(
+        chargerFed, HELICS_PROPERTY_INT_MAX_ITERATIONS, maxIterations, nullptr);
+
+    helicsFederateEnterExecutingModeAsync(batteryFed, nullptr);
+    helicsFederateEnterExecutingModeAsync(chargerFed, nullptr);
+    helicsFederateEnterExecutingMode(controllerFed, nullptr);
+    helicsFederateEnterExecutingModeComplete(batteryFed, nullptr);
+    helicsFederateEnterExecutingModeComplete(chargerFed, nullptr);
+
+    double batteryValue = 5.0;
+    double chargerValue = 10.0;
+    HelicsTime currentTime = HELICS_TIME_ZERO;
+    for (int step = 1; step <= timeStepCount; ++step) {
+        const auto requestTime = static_cast<HelicsTime>(step);
+        batteryValue += 1.0;
+        chargerValue += 2.0;
+        helicsPublicationPublishDouble(batteryPub, batteryValue, nullptr);
+        helicsPublicationPublishDouble(chargerPub, chargerValue, nullptr);
+
+        helicsFederateRequestTimeAsync(controllerFed, requestTime, nullptr);
+        for (int iter = 0; iter < iterationRoundsPerStep; ++iter) {
+            auto iteration = requestTimeIterativePair(batteryFed, chargerFed, requestTime);
+            EXPECT_EQ(iteration.state1, HELICS_ITERATION_RESULT_ITERATING);
+            EXPECT_EQ(iteration.state2, HELICS_ITERATION_RESULT_ITERATING);
+            EXPECT_EQ(iteration.time1, currentTime);
+            EXPECT_EQ(iteration.time2, currentTime);
+            EXPECT_EQ(helicsInputGetDouble(batterySub, nullptr), chargerValue);
+            EXPECT_EQ(helicsInputGetDouble(chargerSub, nullptr), batteryValue);
+
+            if (iter + 1 < iterationRoundsPerStep) {
+                batteryValue += 0.5;
+                chargerValue += 0.75;
+                helicsPublicationPublishDouble(batteryPub, batteryValue, nullptr);
+                helicsPublicationPublishDouble(chargerPub, chargerValue, nullptr);
+            }
+        }
+
+        auto iteration = requestTimeIterativePair(batteryFed, chargerFed, requestTime);
+        EXPECT_EQ(iteration.state1, HELICS_ITERATION_RESULT_NEXT_STEP);
+        EXPECT_EQ(iteration.state2, HELICS_ITERATION_RESULT_NEXT_STEP);
+        EXPECT_EQ(iteration.time1, requestTime);
+        EXPECT_EQ(iteration.time2, requestTime);
+
+        auto controllerTime = helicsFederateRequestTimeComplete(controllerFed, nullptr);
+        EXPECT_EQ(controllerTime, requestTime);
+        currentTime = requestTime;
+    }
+
+    helicsFederateFinalizeAsync(batteryFed, nullptr);
+    helicsFederateFinalizeAsync(chargerFed, nullptr);
+    helicsFederateFinalize(controllerFed, nullptr);
+    helicsFederateFinalizeComplete(batteryFed, nullptr);
+    helicsFederateFinalizeComplete(chargerFed, nullptr);
+}
+
+INSTANTIATE_TEST_SUITE_P(iteration_tests,
+                         iteration_tests_type,
+                         ::testing::ValuesIn(CoreTypes_2),
+                         coreTypeTestNamer);
 
 // force iteration a specific number of times and exercise some of the async calls
 TEST_F(iteration_tests, test_iteration_counter)

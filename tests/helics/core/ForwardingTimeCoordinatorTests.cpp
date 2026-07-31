@@ -168,6 +168,36 @@ TEST(ftc_tests, execMode_entry)
     EXPECT_TRUE(ret == MessageProcessingResult::NEXT_STEP);
 }
 
+TEST(ftc_tests, execMode_mixed_iterative_and_non_iterative_dependencies)
+{
+    ForwardingTimeCoordinator ftc;
+    const GlobalFederateId coordinator(1);
+    const GlobalFederateId iterativeFed(2);
+    const GlobalFederateId nonIterativeFed(3);
+
+    ftc.setSourceId(coordinator);
+    ftc.addDependency(iterativeFed);
+    ftc.addDependent(iterativeFed);
+    ftc.setAsChild(iterativeFed);
+    ftc.addDependency(nonIterativeFed);
+    ftc.addDependent(nonIterativeFed);
+    ftc.setAsChild(nonIterativeFed);
+    ftc.enteringExecMode();
+
+    ActionMessage iterativeRequest(CMD_EXEC_REQUEST, iterativeFed, coordinator);
+    setIterationFlags(iterativeRequest, IterationRequest::ITERATE_IF_NEEDED);
+    iterativeRequest.counter = 1;
+    iterativeRequest.setExtraData(coordinator.baseValue());
+    iterativeRequest.setExtraDestData(1);
+    EXPECT_GE(ftc.processTimeMessage(iterativeRequest), TimeProcessingResult::PROCESSED);
+
+    ActionMessage nonIterativeRequest(CMD_EXEC_REQUEST, nonIterativeFed, coordinator);
+    EXPECT_GE(ftc.processTimeMessage(nonIterativeRequest), TimeProcessingResult::PROCESSED);
+
+    ftc.updateTimeFactors();
+    EXPECT_EQ(ftc.checkExecEntry(), MessageProcessingResult::NEXT_STEP);
+}
+
 void getFTCtoExecMode(ForwardingTimeCoordinator& ftc)
 {
     ActionMessage execReady(CMD_EXEC_REQUEST);
