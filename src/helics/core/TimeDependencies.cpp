@@ -815,7 +815,12 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.interrupted = false;
         }
     } else if (dep.next == mTime.next) {
-        mTime.mTimeState = (std::min)(dep.mTimeState, mTime.mTimeState);
+        // A grant only indicates that one dependency has completed this time.  A concurrent
+        // request must be forwarded so that the remaining dependencies can complete it too.
+        if (mTime.mTimeState == TimeState::time_granted ||
+            (dep.mTimeState != TimeState::time_granted && dep.mTimeState < mTime.mTimeState)) {
+            mTime.mTimeState = dep.mTimeState;
+        }
         if (dep.mTimeState == TimeState::time_granted || !dep.interrupted) {
             mTime.interrupted = false;
         }

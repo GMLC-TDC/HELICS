@@ -91,7 +91,7 @@ std::pair<double, int> runInitIterations(helics::ValueFederate* vfed, int index,
     low_target += std::to_string((index == 0) ? total - 1 : index - 1);
     low_target += "/pub";
     std::string high_target = "fed";
-    high_target += std::to_string((index == total - 1) ? (0) : index + 1);
+    high_target += std::to_string((index == total - 1) ? 0 : index + 1);
     high_target += "/pub";
     auto& sub_low = vfed->registerSubscription(low_target);
     auto& sub_high = vfed->registerSubscription(high_target);
