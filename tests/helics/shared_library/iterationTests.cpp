@@ -275,20 +275,16 @@ struct paired_iteration_result {
     HelicsIterationResult state2{HELICS_ITERATION_RESULT_ERROR};
 };
 
-static paired_iteration_result requestTimeIterativePair(HelicsFederate fed1,
-                                                        HelicsFederate fed2,
-                                                        HelicsTime requestTime)
+static paired_iteration_result
+    requestTimeIterativePair(HelicsFederate fed1, HelicsFederate fed2, HelicsTime requestTime)
 {
     paired_iteration_result result;
     helicsFederateRequestTimeIterativeAsync(fed1,
                                             requestTime,
                                             HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
                                             nullptr);
-    result.time2 = helicsFederateRequestTimeIterative(fed2,
-                                                      requestTime,
-                                                      HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
-                                                      &result.state2,
-                                                      nullptr);
+    result.time2 = helicsFederateRequestTimeIterative(
+        fed2, requestTime, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED, &result.state2, nullptr);
     result.time1 = helicsFederateRequestTimeIterativeComplete(fed1, &result.state1, nullptr);
     return result;
 }
@@ -306,12 +302,12 @@ TEST_P(iteration_tests_type, time_iteration_value_loop_with_endpoint_federate)
 
     auto batteryPub = helicsFederateRegisterGlobalPublication(
         batteryFed, "Battery/EV1_current", HELICS_DATA_TYPE_DOUBLE, "A", nullptr);
-    auto batterySub = helicsFederateRegisterSubscription(
-        batteryFed, "Charger/EV1_voltage", "V", nullptr);
+    auto batterySub =
+        helicsFederateRegisterSubscription(batteryFed, "Charger/EV1_voltage", "V", nullptr);
     auto chargerPub = helicsFederateRegisterGlobalPublication(
         chargerFed, "Charger/EV1_voltage", HELICS_DATA_TYPE_DOUBLE, "V", nullptr);
-    auto chargerSub = helicsFederateRegisterSubscription(
-        chargerFed, "Battery/EV1_current", "A", nullptr);
+    auto chargerSub =
+        helicsFederateRegisterSubscription(chargerFed, "Battery/EV1_current", "A", nullptr);
 
     auto batteryEndpoint =
         helicsFederateRegisterGlobalEndpoint(batteryFed, "Battery/EV1.co", "message", nullptr);
@@ -320,21 +316,29 @@ TEST_P(iteration_tests_type, time_iteration_value_loop_with_endpoint_federate)
         helicsFederateRegisterGlobalEndpoint(chargerFed, "Charger/EV1.so", "message", nullptr);
     helicsEndpointSetDefaultDestination(chargerEndpoint, "Controller/charger_ep", nullptr);
 
-    auto controllerBatteryEndpoint = helicsFederateRegisterGlobalEndpoint(
-        controllerFed, "Controller/battery_ep", "message", nullptr);
+    auto controllerBatteryEndpoint = helicsFederateRegisterGlobalEndpoint(controllerFed,
+                                                                          "Controller/battery_ep",
+                                                                          "message",
+                                                                          nullptr);
     helicsEndpointSetDefaultDestination(controllerBatteryEndpoint, "Battery/EV1.co", nullptr);
-    auto controllerChargerEndpoint = helicsFederateRegisterGlobalEndpoint(
-        controllerFed, "Controller/charger_ep", "message", nullptr);
+    auto controllerChargerEndpoint = helicsFederateRegisterGlobalEndpoint(controllerFed,
+                                                                          "Controller/charger_ep",
+                                                                          "message",
+                                                                          nullptr);
     helicsEndpointSetDefaultDestination(controllerChargerEndpoint, "Charger/EV1.so", nullptr);
 
     constexpr int timeStepCount = 20;
     constexpr int iterationRoundsPerStep = 4;
     constexpr int maxIterations = iterationRoundsPerStep + 2;
 
-    helicsFederateSetIntegerProperty(
-        batteryFed, HELICS_PROPERTY_INT_MAX_ITERATIONS, maxIterations, nullptr);
-    helicsFederateSetIntegerProperty(
-        chargerFed, HELICS_PROPERTY_INT_MAX_ITERATIONS, maxIterations, nullptr);
+    helicsFederateSetIntegerProperty(batteryFed,
+                                     HELICS_PROPERTY_INT_MAX_ITERATIONS,
+                                     maxIterations,
+                                     nullptr);
+    helicsFederateSetIntegerProperty(chargerFed,
+                                     HELICS_PROPERTY_INT_MAX_ITERATIONS,
+                                     maxIterations,
+                                     nullptr);
 
     helicsFederateEnterExecutingModeAsync(batteryFed, nullptr);
     helicsFederateEnterExecutingModeAsync(chargerFed, nullptr);

@@ -48,9 +48,8 @@ TEST(timeDep_tests, equal_time_iteration_state_precedence)
     auto generateState = [](TimeState firstState, TimeState secondState) {
         std::vector<DependencyInfo> deps;
         deps.reserve(2);
-        for (const auto& [fedID, state] :
-             {std::pair{GlobalFederateId{2}, firstState},
-              std::pair{GlobalFederateId{3}, secondState}}) {
+        for (const auto& [fedID, state] : {std::pair{GlobalFederateId{2}, firstState},
+                                           std::pair{GlobalFederateId{3}, secondState}}) {
             DependencyInfo dep(fedID);
             dep.connection = ConnectionType::CHILD;
             dep.dependency = true;
@@ -63,11 +62,8 @@ TEST(timeDep_tests, equal_time_iteration_state_precedence)
 
         TimeDependencies timeDependencies;
         timeDependencies.setDependencyVector(deps);
-        return generateMinTimeUpstream(timeDependencies,
-                                       false,
-                                       GlobalFederateId{1},
-                                       GlobalFederateId{},
-                                       0)
+        return generateMinTimeUpstream(
+                   timeDependencies, false, GlobalFederateId{1}, GlobalFederateId{}, 0)
             .mTimeState;
     };
 

@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/GlobalTimeCoordinator.hpp"
 
 #include "gtest/gtest.h"
-
 #include <algorithm>
 #include <vector>
 
