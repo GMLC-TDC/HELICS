@@ -360,7 +360,7 @@ Numerous bug fixes were included related to timing in unusual edge cases.
 
 - Added support for openSSL based encryption on the tcp tcpss cores and some tests using that capability.
 - Added a callback option which triggers when a federate changes mode.
-- Added [Translators]() as a beta API, this is not version locked and likely has a few bugs. The API is subject to minor revisions based on user feedback.
+- Added [Translators](<>) as a beta API, this is not version locked and likely has a few bugs. The API is subject to minor revisions based on user feedback.
 - Added Data API to the C interface as a beta. API is subject to further revisions based on user feedback in upcoming releases until 3.3.
 - Added support for command operations through the REST API on the webserver.
 - Added swagger documentation for the REST API and queries.
