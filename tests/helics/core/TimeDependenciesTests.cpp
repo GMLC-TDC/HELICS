@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/TimeDependencies.hpp"
 
 #include "gtest/gtest.h"
+#include <utility>
 #include <vector>
 
 using namespace helics;
@@ -40,4 +41,47 @@ TEST(timeDep_tests, dependency_tests)
     depTest.setDependencyVector(deps);
     auto total = generateMinTimeTotal(depTest, false, GlobalFederateId{1}, GlobalFederateId{}, 0);
     EXPECT_EQ(total.next, 2.0);
+}
+
+TEST(timeDep_tests, equal_time_iteration_state_precedence)
+{
+    auto generateState = [](TimeState firstState, TimeState secondState) {
+        std::vector<DependencyInfo> deps;
+        deps.reserve(2);
+        for (const auto& [fedID, state] :
+             {std::pair{GlobalFederateId{2}, firstState},
+              std::pair{GlobalFederateId{3}, secondState}}) {
+            DependencyInfo dep(fedID);
+            dep.connection = ConnectionType::CHILD;
+            dep.dependency = true;
+            dep.next = 1.0;
+            dep.Te = 1.0;
+            dep.minDe = 1.0;
+            dep.mTimeState = state;
+            deps.push_back(dep);
+        }
+
+        TimeDependencies timeDependencies;
+        timeDependencies.setDependencyVector(deps);
+        return generateMinTimeUpstream(timeDependencies,
+                                       false,
+                                       GlobalFederateId{1},
+                                       GlobalFederateId{},
+                                       0)
+            .mTimeState;
+    };
+
+    // Iteration requirements at the same time must not depend on federate ID ordering.
+    EXPECT_EQ(generateState(TimeState::time_requested, TimeState::time_requested_iterative),
+              TimeState::time_requested_iterative);
+    EXPECT_EQ(generateState(TimeState::time_requested_iterative, TimeState::time_requested),
+              TimeState::time_requested_iterative);
+
+    // A required iteration has stronger precedence than an optional iteration.
+    EXPECT_EQ(generateState(TimeState::time_requested_iterative,
+                            TimeState::time_requested_require_iteration),
+              TimeState::time_requested_require_iteration);
+    EXPECT_EQ(generateState(TimeState::time_requested_require_iteration,
+                            TimeState::time_requested_iterative),
+              TimeState::time_requested_require_iteration);
 }

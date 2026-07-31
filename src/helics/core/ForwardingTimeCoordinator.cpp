@@ -169,7 +169,7 @@ MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry(GlobalFederate
         if (downstream.mTimeState == TimeState::exec_requested_iterative) {
             allowed = true;
             for (auto& dep : dependencies) {
-                if (dep.dependency) {
+                if (dep.dependency && dep.mTimeState < TimeState::exec_requested) {
                     if (dep.minFed != mSourceId) {
                         allowed = false;
                         break;

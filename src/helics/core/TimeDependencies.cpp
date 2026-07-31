@@ -809,8 +809,10 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.interrupted = false;
         }
     } else if (dep.next == mTime.next) {
-        if (dep.mTimeState == TimeState::time_granted) {
+        if (dep.mTimeState < mTime.mTimeState) {
             mTime.mTimeState = dep.mTimeState;
+        }
+        if (dep.mTimeState == TimeState::time_granted) {
             mTime.interrupted = false;
         } else if (!dep.interrupted) {
             mTime.interrupted = false;

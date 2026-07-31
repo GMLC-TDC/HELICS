@@ -359,6 +359,39 @@ TEST_F(iteration, time_iteration_2fed)
     EXPECT_EQ(val2, val);
 }
 
+TEST_F(iteration, time_iteration_2fed_global_time)
+{
+    extraBrokerArgs = "--globaltime";
+    SetupTest<helics::ValueFederate>("test", 2, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto pubid = vFed1->registerGlobalPublication<double>("pub1");
+    auto subid = vFed2->registerSubscription("pub1");
+
+    vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    pubid.publish(27.0);
+
+    // Mix an ordinary request with an iterative request at the same runtime time. The global
+    // coordinator must include the iterative state in its time-update handshake.
+    vFed1->requestTimeAsync(1.0);
+    auto comp = vFed2->requestTimeIterative(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+
+    EXPECT_EQ(comp.state, helics::IterationResult::ITERATING);
+    EXPECT_EQ(comp.grantedTime, helics::timeZero);
+    EXPECT_EQ(subid.getValue<double>(), 27.0);
+
+    comp = vFed2->requestTimeIterative(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+
+    EXPECT_EQ(comp.state, helics::IterationResult::NEXT_STEP);
+    EXPECT_EQ(comp.grantedTime, 1.0);
+    EXPECT_EQ(vFed1->requestTimeComplete(), 1.0);
+}
+
 TEST_F(iteration, time_iteration_message)
 {
     SetupTest<helics::MessageFederate>("test", 1);

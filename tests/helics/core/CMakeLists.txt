@@ -17,6 +17,7 @@ set(core_test_sources
     BrokerClassTests.cpp
     CoreFactory-tests.cpp
     ForwardingTimeCoordinatorTests.cpp
+    GlobalTimeCoordinatorTests.cpp
     TimeCoordinatorTests.cpp
     CoreConfigureTests.cpp
     FilterFederateTests.cpp

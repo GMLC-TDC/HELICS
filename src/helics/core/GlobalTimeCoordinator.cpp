@@ -77,13 +77,21 @@ void GlobalTimeCoordinator::sendTimeUpdateRequest(Time triggerTime)
 bool GlobalTimeCoordinator::updateTimeFactors()
 {
     auto timeStream = generateMinTimeUpstream(dependencies, true, mSourceId, NoIgnoredFederates, 0);
+    if (timeStream.mTimeState < TimeState::time_granted) {
+        currentTimeState = timeStream.mTimeState;
+        currentMinTime = timeStream.next;
+        nextEvent = timeStream.next;
+        return true;
+    }
     if (timeStream.mTimeState == TimeState::time_granted) {
         currentTimeState = TimeState::time_granted;
         currentMinTime = timeStream.next;
         nextEvent = timeStream.next;
         return false;
     }
-    if (timeStream.mTimeState == TimeState::time_requested) {
+    if (timeStream.mTimeState == TimeState::time_requested ||
+        timeStream.mTimeState == TimeState::time_requested_iterative ||
+        timeStream.mTimeState == TimeState::time_requested_require_iteration) {
         if (currentTimeState == TimeState::time_granted) {
             currentTimeState = TimeState::time_requested;
             currentMinTime = timeStream.next;
@@ -203,7 +211,7 @@ MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId /
         if (currentTimeState == TimeState::exec_requested_iterative) {
             allowed = true;
             for (const auto& dep : dependencies) {
-                if (dep.dependency) {
+                if (dep.dependency && dep.mTimeState < TimeState::exec_requested) {
                     if (dep.minFed != mSourceId) {
                         allowed = false;
                         break;

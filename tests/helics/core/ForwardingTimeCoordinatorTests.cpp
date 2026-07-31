@@ -170,6 +170,8 @@ TEST(ftc_tests, execMode_entry)
 
 TEST(ftc_tests, execMode_mixed_iterative_and_non_iterative_dependencies)
 {
+    // Model a forwarding core with two child federates. Both children are interdependent with the
+    // core, so their execution requests are aggregated before the core sends an execution grant.
     ForwardingTimeCoordinator ftc;
     const GlobalFederateId coordinator(1);
     const GlobalFederateId iterativeFed(2);
@@ -184,6 +186,9 @@ TEST(ftc_tests, execMode_mixed_iterative_and_non_iterative_dependencies)
     ftc.setAsChild(nonIterativeFed);
     ftc.enteringExecMode();
 
+    // The iterative child reports that the coordinator is the minimum federate in its dependency
+    // cycle. Its response sequence acknowledges aggregate sequence 1, so this request has
+    // completed the iterative cycle handshake and does not require another initialization round.
     ActionMessage iterativeRequest(CMD_EXEC_REQUEST, iterativeFed, coordinator);
     setIterationFlags(iterativeRequest, IterationRequest::ITERATE_IF_NEEDED);
     iterativeRequest.counter = 1;
@@ -191,9 +196,15 @@ TEST(ftc_tests, execMode_mixed_iterative_and_non_iterative_dependencies)
     iterativeRequest.setExtraDestData(1);
     EXPECT_GE(ftc.processTimeMessage(iterativeRequest), TimeProcessingResult::PROCESSED);
 
+    // The other child requests ordinary execution and is already ready to proceed. Ordinary
+    // requests do not carry minFed or response-sequence fields because they are not participating
+    // in the iterative cycle handshake.
     ActionMessage nonIterativeRequest(CMD_EXEC_REQUEST, nonIterativeFed, coordinator);
     EXPECT_GE(ftc.processTimeMessage(nonIterativeRequest), TimeProcessingResult::PROCESSED);
 
+    // Normal readiness is blocked by the iterative request, so checkExecEntry uses its cycle
+    // fallback. That fallback should validate only the iterative dependency; requiring the ready
+    // ordinary dependency to contain iterative fields makes this otherwise-resolved state stall.
     ftc.updateTimeFactors();
     EXPECT_EQ(ftc.checkExecEntry(), MessageProcessingResult::NEXT_STEP);
 }
