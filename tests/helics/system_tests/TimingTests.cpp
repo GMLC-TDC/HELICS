@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 
 #include "gtest/gtest.h"
+#include <chrono>
 #include <complex>
 #include <future>
 #include <iostream>
@@ -982,4 +983,85 @@ TEST_F(timing, dual_max_time_endpoint)
     std::string test{"bababababababa"};
     // compute the expected value
     EXPECT_EQ(finalValue, test);
+}
+
+static void maxTimeDrainAfterSenderFinalizeEndpoint(FederateTestFixture& fixture,
+                                                    std::string_view coreType,
+                                                    bool waitForCurrentTimeUpdate = false)
+{
+    fixture.SetupTest<helics::MessageFederate>(coreType, 2);
+    auto sender = fixture.GetFederateAs<helics::MessageFederate>(0);
+    auto receiver = fixture.GetFederateAs<helics::MessageFederate>(1);
+
+    if (waitForCurrentTimeUpdate) {
+        receiver->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
+    }
+
+    auto& sendEndpoint = sender->registerGlobalEndpoint("source");
+    auto& receiveEndpoint = receiver->registerGlobalEndpoint("sink");
+    sendEndpoint.setDefaultDestination("sink");
+
+    auto senderTask = [&]() {
+        sender->enterExecutingMode();
+        for (int ii = 0; ii < 5; ++ii) {
+            const auto payload = std::string("message") + std::to_string(ii);
+            sendEndpoint.send(payload.data(), payload.size());
+            sender->requestTime(static_cast<double>(ii + 1));
+        }
+        sender->finalize();
+    };
+
+    auto receiverTask = [&]() {
+        receiver->enterExecutingMode();
+        std::vector<std::string> messages;
+        helics::Time grantedTime = helics::timeZero;
+        while (grantedTime < cHelicsTerminateTime) {
+            grantedTime = receiver->requestTime(helics::Time::maxVal());
+            while (receiveEndpoint.hasMessage()) {
+                auto msg = receiveEndpoint.getMessage();
+                messages.emplace_back(msg->data.to_string());
+            }
+        }
+        receiver->finalize();
+        return messages;
+    };
+
+    auto receiverFuture = std::async(std::launch::async, receiverTask);
+    auto senderFuture = std::async(std::launch::async, senderTask);
+
+    ASSERT_EQ(senderFuture.wait_for(std::chrono::seconds(5)), std::future_status::ready);
+    senderFuture.get();
+
+    ASSERT_EQ(receiverFuture.wait_for(std::chrono::seconds(5)), std::future_status::ready);
+    const auto messages = receiverFuture.get();
+
+    ASSERT_EQ(messages.size(), 5U);
+    EXPECT_EQ(messages.front(), "message0");
+    EXPECT_EQ(messages.back(), "message4");
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint)
+{
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "test_2");
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint_zmq)
+{
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "zmq_2");
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint_global_time)
+{
+    extraBrokerArgs = "--globaltime";
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "test_2");
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint_wait_for_current_time)
+{
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "test_2", true);
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint_wait_for_current_time_zmq)
+{
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "zmq_2", true);
 }
