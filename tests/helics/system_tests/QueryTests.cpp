@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include <exception>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -308,13 +309,33 @@ TEST_F(query, current_time)
     EXPECT_EQ(val["requested_time"].get<double>(), 1.0);
 
     mFed1->requestTimeAsync(3.0);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    res = mFed2->query(mFed1->getName(), "current_time");
-    val = loadJsonStr(res);
-    EXPECT_EQ(val["granted_time"].get<double>(), 1.0);
-    EXPECT_EQ(val["requested_time"].get<double>(), 3.0);
+    bool observedPendingTimeRequest{false};
+    std::exception_ptr queryException;
+    try {
+        const auto queryDeadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
+        do {
+            res = mFed2->query(mFed1->getName(), "current_time");
+            val = loadJsonStr(res);
+            observedPendingTimeRequest = (val["granted_time"].get<double>() == 1.0 &&
+                                          val["requested_time"].get<double>() == 3.0);
+            if (observedPendingTimeRequest) {
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        } while (std::chrono::steady_clock::now() < queryDeadline);
+    }
+    catch (...) {
+        queryException = std::current_exception();
+    }
+
     mFed2->requestTime(3.0);
     mFed1->requestTimeComplete();
+    if (queryException) {
+        std::rethrow_exception(queryException);
+    }
+    ASSERT_TRUE(observedPendingTimeRequest);
+    EXPECT_EQ(val["granted_time"].get<double>(), 1.0);
+    EXPECT_EQ(val["requested_time"].get<double>(), 3.0);
     mFed1->query("broker", "flush");
     res = mFed1->query("broker", "current_time");
     val = loadJsonStr(res);
