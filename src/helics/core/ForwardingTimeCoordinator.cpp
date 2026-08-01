@@ -25,7 +25,7 @@ static DependencyInfo generateDependencyInfoExcluding(const TimeDependencies& de
                                                       GlobalFederateId sourceId,
                                                       GlobalFederateId excludedFed)
 {
-    auto td =
+    auto minTime =
         generateMinTimeUpstream(dependencies, restrictiveTimePolicy, sourceId, excludedFed, 0);
     const bool noPendingUpstream =
         std::none_of(dependencies.begin(),
@@ -36,11 +36,11 @@ static DependencyInfo generateDependencyInfoExcluding(const TimeDependencies& de
                              (!sourceId.isValid() || dep.minFedActual != sourceId) &&
                              (dep.mTimeState == TimeState::error || dep.next < cTerminationTime);
                      });
-    if (td.mTimeState == TimeState::error && noPendingUpstream) {
+    if (minTime.mTimeState == TimeState::error && noPendingUpstream) {
         return DependencyInfo(Time::maxVal(), TimeState::time_granted);
     }
     DependencyInfo dependency;
-    dependency.update(td);
+    dependency.update(minTime);
     return dependency;
 }
 
@@ -169,7 +169,7 @@ MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry(GlobalFederate
         if (downstream.mTimeState == TimeState::exec_requested_iterative) {
             allowed = true;
             for (auto& dep : dependencies) {
-                if (dep.dependency) {
+                if (dep.dependency && dep.mTimeState < TimeState::exec_requested) {
                     if (dep.minFed != mSourceId) {
                         allowed = false;
                         break;

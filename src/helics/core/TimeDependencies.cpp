@@ -24,10 +24,13 @@ static TimeProcessingResult processMessage(const ActionMessage& cmd, DependencyI
     bool delayed{false};
     switch (cmd.action()) {
         case CMD_EXEC_REQUEST:
-            dep.mTimeState = checkActionFlag(cmd, iteration_requested_flag) ?
-                (checkActionFlag(cmd, required_flag) ? TimeState::exec_requested_require_iteration :
-                                                       TimeState::exec_requested_iterative) :
-                TimeState::exec_requested;
+            if (checkActionFlag(cmd, iteration_requested_flag)) {
+                dep.mTimeState = checkActionFlag(cmd, required_flag) ?
+                    TimeState::exec_requested_require_iteration :
+                    TimeState::exec_requested_iterative;
+            } else {
+                dep.mTimeState = TimeState::exec_requested;
+            }
             delayed = checkActionFlag(cmd, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
                 res = TimeProcessingResult::PROCESSED_AND_CHECK;
@@ -69,10 +72,13 @@ static TimeProcessingResult processMessage(const ActionMessage& cmd, DependencyI
                 dep.lastGrant = dep.next;
                 res = TimeProcessingResult::PROCESSED_NEW_REQUEST;
             }
-            dep.mTimeState = checkActionFlag(cmd, iteration_requested_flag) ?
-                (checkActionFlag(cmd, required_flag) ? TimeState::time_requested_require_iteration :
-                                                       TimeState::time_requested_iterative) :
-                TimeState::time_requested;
+            if (checkActionFlag(cmd, iteration_requested_flag)) {
+                dep.mTimeState = checkActionFlag(cmd, required_flag) ?
+                    TimeState::time_requested_require_iteration :
+                    TimeState::time_requested_iterative;
+            } else {
+                dep.mTimeState = TimeState::time_requested;
+            }
             //   printf("%d Request from %d time %f, te=%f, Tdemin=%f\n", fedID, m.source_id,
             //   static_cast<double>(m.actionTime), static_cast<double>(m.Te),
             //   static_cast<double>(m.Tdemin)); assert(m.actionTime >= Tnext);
@@ -809,10 +815,21 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.interrupted = false;
         }
     } else if (dep.next == mTime.next) {
-        if (dep.mTimeState == TimeState::time_granted) {
+        const auto iterativeRequest = [](TimeState state) {
+            return state == TimeState::time_requested_iterative ||
+                state == TimeState::time_requested_require_iteration;
+        };
+        if (iterativeRequest(dep.mTimeState)) {
+            // A grant only indicates that one dependency has completed this time. A concurrent
+            // iterative request must still be forwarded so the remaining dependencies complete it.
+            if (!iterativeRequest(mTime.mTimeState) || dep.mTimeState < mTime.mTimeState) {
+                mTime.mTimeState = dep.mTimeState;
+            }
+        } else if (dep.mTimeState == TimeState::time_granted &&
+                   !iterativeRequest(mTime.mTimeState)) {
             mTime.mTimeState = dep.mTimeState;
-            mTime.interrupted = false;
-        } else if (!dep.interrupted) {
+        }
+        if (dep.mTimeState == TimeState::time_granted || !dep.interrupted) {
             mTime.interrupted = false;
         }
     }
