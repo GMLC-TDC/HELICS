@@ -1138,8 +1138,8 @@ TEST_F(timing, max_time_drain_after_sender_finalize_mixed_value_endpoint_zmq)
             std::complex<double> aggregate{0.0, 0.0};
             for (int ii = 0; ii < storageDeviceCount; ++ii) {
                 aggregate += powerSubscriptions[ii]->getValue<std::complex<double>>();
-                voltagePublications[ii]->publish(1.0 + 0.01 * ii);
-                socPublications[ii]->publish(0.5 + 0.01 * step);
+                voltagePublications[ii]->publish(1.0 + (0.01 * ii));
+                socPublications[ii]->publish(0.5 + (0.01 * step));
                 gridPowerPublications[ii]->publish(aggregate);
             }
             totalPower.publish(aggregate);
