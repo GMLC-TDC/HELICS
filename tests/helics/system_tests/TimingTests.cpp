@@ -435,8 +435,9 @@ TEST_F(timing, uninterruptible_iterations)
                 std::cerr << "error in fed 1 publication at time " << requestTime << '\n';
                 break;
             }
-            auto grantedTime = vFed1->requestTimeIterative(
-                requestTime, helics::IterationRequest::ITERATE_IF_NEEDED);
+            auto grantedTime =
+                vFed1->requestTimeIterative(requestTime,
+                                            helics::IterationRequest::ITERATE_IF_NEEDED);
             if (grantedTime.grantedTime == helics::Time::maxVal()) {
                 break;
             }
@@ -464,8 +465,9 @@ TEST_F(timing, uninterruptible_iterations)
                 std::cerr << "error in fed 2 publication at time " << requestTime << '\n';
                 break;
             }
-            auto grantedTime = vFed2->requestTimeIterative(
-                requestTime, helics::IterationRequest::ITERATE_IF_NEEDED);
+            auto grantedTime =
+                vFed2->requestTimeIterative(requestTime,
+                                            helics::IterationRequest::ITERATE_IF_NEEDED);
             res.push_back(grantedTime.grantedTime);
             previousTime = requestTime;
             if (grantedTime.state == helics::IterationResult::NEXT_STEP) {
@@ -1100,8 +1102,9 @@ TEST_F(timing, max_time_drain_after_sender_finalize_mixed_value_endpoint_zmq)
             &grid->registerGlobalPublication<double>("storage." + device + ".voltage", "pu"));
         socPublications.push_back(
             &grid->registerGlobalPublication<double>("storage." + device + ".soc"));
-        gridPowerPublications.push_back(&grid->registerGlobalPublication<std::complex<double>>(
-            "storage." + device + ".power", "kW"));
+        gridPowerPublications.push_back(
+            &grid->registerGlobalPublication<std::complex<double>>("storage." + device + ".power",
+                                                                   "kW"));
 
         storagePowerPublications.push_back(
             &storage->registerGlobalPublication<std::complex<double>>(device + "/power", "kW"));
