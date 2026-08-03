@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "basic_CoreTypes.hpp"
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -84,6 +85,7 @@ class InputInfo {
     std::vector<int32_t> priority_sources;  //!< the list of priority inputs;
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
+    std::uint64_t queuedDataSizeBytes{0};  //!< total bytes stored in data_queues
 
   public:
     /** get all the current data*/
@@ -132,6 +134,8 @@ class InputInfo {
     void disconnectFederate(GlobalFederateId fedToDisconnect, Time minTime);
     /** clear all non-current data*/
     void clearFutureData();
+    /** get the total payload bytes queued for future update*/
+    std::uint64_t queuedDataSize() const { return queuedDataSizeBytes; }
 
     const std::string& getInjectionType() const;
     const std::string& getInjectionUnits() const;

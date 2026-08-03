@@ -82,6 +82,21 @@ static auto recordComparison = [](const InputInfo::dataRecord& rec1,
         ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
+static std::uint64_t dataSize(const std::shared_ptr<const SmallBuffer>& data)
+{
+    return data ? static_cast<std::uint64_t>(data->size()) : 0U;
+}
+
+template<class Iter>
+static std::uint64_t dataSize(Iter begin, Iter end)
+{
+    std::uint64_t total{0};
+    for (auto current = begin; current != end; ++current) {
+        total += dataSize(current->data);
+    }
+    return total;
+}
+
 bool InputInfo::addData(GlobalHandle source_id,
                         Time valueTime,
                         unsigned int iteration,
@@ -104,6 +119,7 @@ bool InputInfo::addData(GlobalHandle source_id,
     if (!found) {
         return false;
     }
+    const auto dataBytes = dataSize(data);
     if (data_queues[index].empty()) {
         if (current_data[index]) {
             if (minTimeGap > timeZero) {
@@ -152,6 +168,7 @@ bool InputInfo::addData(GlobalHandle source_id,
         }
         data_queues[index].insert(m, std::move(newRecord));
     }
+    queuedDataSizeBytes += dataBytes;
     return true;
 }
 
@@ -210,6 +227,7 @@ void InputInfo::removeSource(GlobalHandle sourceToRemove, Time minTime)
     for (size_t ii = 0; ii < input_sources.size(); ++ii) {
         if (input_sources[ii] == sourceToRemove) {
             while ((!data_queues[ii].empty()) && (data_queues[ii].back().time > minTime)) {
+                queuedDataSizeBytes -= dataSize(data_queues[ii].back().data);
                 data_queues[ii].pop_back();
             }
             if (minTime < deactivated[ii]) {
@@ -227,6 +245,7 @@ void InputInfo::removeSource(std::string_view sourceName, Time minTime)
     for (size_t ii = 0; ii < source_info.size(); ++ii) {
         if (source_info[ii].key == sourceName) {
             while ((!data_queues[ii].empty()) && (data_queues[ii].back().time > minTime)) {
+                queuedDataSizeBytes -= dataSize(data_queues[ii].back().data);
                 data_queues[ii].pop_back();
             }
             if (minTime < deactivated[ii]) {
@@ -242,6 +261,7 @@ void InputInfo::clearFutureData()
     for (auto& vec : data_queues) {
         vec.clear();
     }
+    queuedDataSizeBytes = 0;
 }
 
 const std::string& InputInfo::getInjectionType() const
@@ -350,8 +370,10 @@ bool InputInfo::updateTimeUpTo(Time newTime)
             ++currentValue;
         }
 
+        const auto removedBytes = dataSize(data_queue.begin(), currentValue);
         auto res = updateData(std::move(*last), index);
         data_queue.erase(data_queue.begin(), currentValue);
+        queuedDataSizeBytes -= removedBytes;
         ++index;
         if (res) {
             updated = true;
@@ -392,8 +414,10 @@ bool InputInfo::updateTimeNextIteration(Time newTime)
             }
         }
 
+        const auto removedBytes = dataSize(data_queue.begin(), currentValue);
         auto res = updateData(std::move(*last), index);
         data_queue.erase(data_queue.begin(), currentValue);
+        queuedDataSizeBytes -= removedBytes;
         ++index;
         if (res) {
             updated = true;
@@ -424,8 +448,10 @@ bool InputInfo::updateTimeInclusive(Time newTime)
             ++currentValue;
         }
 
+        const auto removedBytes = dataSize(data_queue.begin(), currentValue);
         auto res = updateData(std::move(*last), index);
         data_queue.erase(data_queue.begin(), currentValue);
+        queuedDataSizeBytes -= removedBytes;
         ++index;
         if (res) {
             updated = true;

@@ -841,6 +841,26 @@ TEST_P(valuefed_single_type, block_send_receive)
     vFed1->disconnect();
 }
 
+TEST_F(valuefed, get_string_clears_update)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& sub1 = vFed1->registerSubscription("pub1");
+
+    vFed1->enterExecutingMode();
+    pub1.publish(1.25);
+    vFed1->requestTime(1.0);
+
+    EXPECT_TRUE(sub1.isUpdated());
+    const auto& value = sub1.getString();
+    EXPECT_FALSE(value.empty());
+    EXPECT_FALSE(sub1.isUpdated());
+
+    vFed1->finalize();
+}
+
 /** test the all callback*/
 
 TEST_F(valuefed, all_callback)

@@ -65,7 +65,7 @@ FederateInfo::FederateInfo(const std::string& args)
     loadInfoFromArgsIgnoreOutput(args);
 }
 
-static constexpr frozen::unordered_map<std::string_view, int, 69> propStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 78> propStringsTranslations{
     {"period", HELICS_PROPERTY_TIME_PERIOD},
     {"timeperiod", HELICS_PROPERTY_TIME_PERIOD},
     {"time_period", HELICS_PROPERTY_TIME_PERIOD},
@@ -134,7 +134,16 @@ static constexpr frozen::unordered_map<std::string_view, int, 69> propStringsTra
     {"indexGroup", HELICS_PROPERTY_INT_INDEX_GROUP},
     {"logbuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
-    {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
+    {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER},
+    {"valuebufferwarning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
+    {"valueBufferWarning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
+    {"value_buffer_warning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
+    {"value_buffer_warning_mib", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
+    {"valuebufferwarningmib", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
+    {"valueBufferWarningMiB", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
+    {"intvaluebufferwarning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
+    {"intValueBufferWarning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
+    {"int_value_buffer_warning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING}};
 
 static constexpr frozen::unordered_map<std::string_view, int, 97> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
@@ -695,6 +704,10 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 
         ->transform(CLI::IsMember(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
         ->envname("HELICS_LOG_LEVEL");
+    app->add_option_function<int>(
+        "--value_buffer_warning",
+        [this](int val) { setProperty(HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING, val); },
+        "queued value buffer warning threshold in MiB, use 0 to disable");
 
     app->add_option("--separator", separator, "separator character for local federates")
         ->default_str(std::string(1, separator));

@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <chrono>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -107,6 +108,8 @@ static const std::string gHelicsEmptyStr;
 using namespace std::chrono_literals;  // NOLINT
 
 namespace helics {
+static constexpr std::uint64_t valueBufferWarningDefaultBytes{100ULL * 1024ULL * 1024ULL};
+
 FederateState::FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo):
     name(fedName),
     timeCoord(new TimeCoordinator([this](const ActionMessage& msg) { routeMessage(msg); })),
@@ -193,6 +196,9 @@ void FederateState::reset(const CoreFederateInfo& fedInfo)
     rt_lag = timeZero;
     rt_lead = timeZero;
     grantTimeOutPeriod = timeZero;
+    queuedValueBytes = 0;
+    valueBufferWarningLimit = valueBufferWarningDefaultBytes;
+    nextValueBufferWarning = valueBufferWarningLimit;
     realTimeTimerIndex = -1;
     grantTimeoutTimeIndex = -1;
     initRequested = false;
@@ -470,6 +476,7 @@ void FederateState::closeInterface(InterfaceHandle handle, InterfaceType type)
                 }
                 ipt->input_sources.clear();
                 ipt->clearFutureData();
+                updateQueuedValueBytes();
             }
         } break;
         default:
@@ -853,6 +860,8 @@ void FederateState::fillEventVectorUpTo(Time currentTime)
             events.push_back(ipt->id.handle);
         }
     }
+    updateQueuedValueBytes();
+    checkValueBufferWarning();
     for (const auto& ept : interfaceInformation.getEndpoints()) {
         if (ept->updateTimeUpTo(currentTime)) {
             eventMessages.push_back(ept->id.handle);
@@ -868,6 +877,8 @@ void FederateState::fillEventVectorInclusive(Time currentTime)
             events.push_back(ipt->id.handle);
         }
     }
+    updateQueuedValueBytes();
+    checkValueBufferWarning();
     eventMessages.clear();
     for (const auto& ept : interfaceInformation.getEndpoints()) {
         if (ept->updateTimeInclusive(currentTime)) {
@@ -884,12 +895,52 @@ void FederateState::fillEventVectorNextIteration(Time currentTime)
             events.push_back(ipt->id.handle);
         }
     }
+    updateQueuedValueBytes();
+    checkValueBufferWarning();
     eventMessages.clear();
     for (const auto& ept : interfaceInformation.getEndpoints()) {
         if (ept->updateTimeNextIteration(currentTime)) {
             eventMessages.push_back(ept->id.handle);
         }
     }
+}
+
+void FederateState::updateQueuedValueBytes()
+{
+    queuedValueBytes = 0;
+    for (const auto& ipt : interfaceInformation.getInputs()) {
+        queuedValueBytes += ipt->queuedDataSize();
+    }
+}
+
+void FederateState::checkValueBufferWarning()
+{
+    if (valueBufferWarningLimit == 0) {
+        return;
+    }
+    if (queuedValueBytes < valueBufferWarningLimit) {
+        nextValueBufferWarning = valueBufferWarningLimit;
+        return;
+    }
+    if (queuedValueBytes < nextValueBufferWarning) {
+        return;
+    }
+    const auto queuedMiB = static_cast<double>(queuedValueBytes) / (1024.0 * 1024.0);
+    const auto limitMiB = static_cast<double>(valueBufferWarningLimit) / (1024.0 * 1024.0);
+    LOG_WARNING(fmt::format(
+        "queued future value buffers contain {:.1f} MiB of payload data, exceeding the configured "
+        "warning threshold of {:.1f} MiB; this can occur when publishers advance ahead of "
+        "subscribers, so consider adding pacing/dependencies or increasing/disabling "
+        "value_buffer_warning",
+        queuedMiB,
+        limitMiB));
+    do {
+        if (nextValueBufferWarning > (std::numeric_limits<std::uint64_t>::max() / 2U)) {
+            nextValueBufferWarning = std::numeric_limits<std::uint64_t>::max();
+            break;
+        }
+        nextValueBufferWarning *= 2U;
+    } while (nextValueBufferWarning <= queuedValueBytes);
 }
 
 MessageProcessingResult FederateState::genericUnspecifiedQueueProcess(bool busyReturn)
@@ -1866,11 +1917,19 @@ void FederateState::processDataMessage(ActionMessage& cmd)
                     }
                 }
                 if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
+                    const auto payloadSize = static_cast<std::uint64_t>(cmd.payload.size());
                     if (subI->addData(src,
                                       valueTime,
                                       cmd.counter,
-                                      std::make_shared<const SmallBuffer>(
-                                          std::move(cmd.payload)))) {
+                                          std::make_shared<const SmallBuffer>(
+                                              std::move(cmd.payload)))) {
+                        if (payloadSize >
+                            (std::numeric_limits<std::uint64_t>::max() - queuedValueBytes)) {
+                            queuedValueBytes = std::numeric_limits<std::uint64_t>::max();
+                        } else {
+                            queuedValueBytes += payloadSize;
+                        }
+                        checkValueBufferWarning();
                         if (!subI->not_interruptible) {
                             timeCoord->updateValueTime(valueTime, !timeGranted_mode);
                             LOG_TRACE(timeCoord->printTimeStatus());
@@ -2108,6 +2167,11 @@ void FederateState::setProperty(int intProperty, int propertyVal)
             mLogManager->getLogBuffer().resize(
                 (propertyVal <= 0) ? 0UL : static_cast<std::size_t>(propertyVal));
             break;
+        case defs::Properties::VALUE_BUFFER_WARNING:
+            valueBufferWarningLimit =
+                (propertyVal <= 0) ? 0U : static_cast<std::uint64_t>(propertyVal) * 1024U * 1024U;
+            nextValueBufferWarning = valueBufferWarningLimit;
+            break;
         default:
             timeCoord->setProperty(intProperty, propertyVal);
     }
@@ -2322,6 +2386,8 @@ int FederateState::getIntegerProperty(int intProperty) const
             return static_cast<int>(mLogManager->getLogBuffer().capacity());
         case defs::Properties::INDEX_GROUP:
             return indexGroup;
+        case defs::Properties::VALUE_BUFFER_WARNING:
+            return static_cast<int>(valueBufferWarningLimit / (1024U * 1024U));
         default:
             return timeCoord->getIntegerProperty(intProperty);
     }

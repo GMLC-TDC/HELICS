@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <deque>
 #include <map>
 #include <memory>
@@ -111,6 +112,9 @@ class FederateState {
     Time rt_lag{timeZero};  //!< max lag for the rt control
     Time rt_lead{timeZero};  //!< min lag for the realtime control
     Time grantTimeOutPeriod{timeZero};  //!< period to raise an inquiry about lack of grant
+    std::uint64_t queuedValueBytes{0};  //!< estimated queued future value payload bytes
+    std::uint64_t valueBufferWarningLimit{100ULL * 1024ULL * 1024ULL};
+    std::uint64_t nextValueBufferWarning{100ULL * 1024ULL * 1024ULL};
     std::int32_t realTimeTimerIndex{-1};  //!< the timer index for the real time timer;
     std::int32_t grantTimeoutTimeIndex{-1};  //!< time index for the grant time out timer;
   public:
@@ -349,6 +353,10 @@ class FederateState {
     @param currentTime the time of the update
     */
     void fillEventVectorNextIteration(Time currentTime);
+    /** update the queued value byte estimate from the input queues*/
+    void updateQueuedValueBytes();
+    /** issue a warning if queued future value buffers exceed the configured threshold*/
+    void checkValueBufferWarning();
     /** add a dependency to the timing coordination*/
     void addDependency(GlobalFederateId fedToDependOn);
     /** add a dependent federate*/
