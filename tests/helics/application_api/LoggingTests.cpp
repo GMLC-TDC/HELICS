@@ -1162,7 +1162,8 @@ TEST(logging, value_buffer_warning)
     subFed->requestTime(1.0);
 
     const auto loggedWarnings = warnings.lock();
-    EXPECT_TRUE(std::any_of(loggedWarnings->begin(), loggedWarnings->end(), [](const auto& warning) {
-        return warning.find("queued future value buffers contain") != std::string::npos;
-    }));
+    EXPECT_TRUE(
+        std::any_of(loggedWarnings->begin(), loggedWarnings->end(), [](const auto& warning) {
+            return warning.find("queued future value buffers contain") != std::string::npos;
+        }));
 }

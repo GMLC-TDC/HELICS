@@ -1921,8 +1921,8 @@ void FederateState::processDataMessage(ActionMessage& cmd)
                     if (subI->addData(src,
                                       valueTime,
                                       cmd.counter,
-                                          std::make_shared<const SmallBuffer>(
-                                              std::move(cmd.payload)))) {
+                                      std::make_shared<const SmallBuffer>(
+                                          std::move(cmd.payload)))) {
                         if (payloadSize >
                             (std::numeric_limits<std::uint64_t>::max() - queuedValueBytes)) {
                             queuedValueBytes = std::numeric_limits<std::uint64_t>::max();

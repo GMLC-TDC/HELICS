@@ -31,8 +31,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #    ifndef NOMINMAX
 #        define NOMINMAX
 #    endif
-#    include <windows.h>
 #    include <psapi.h>
+#    include <windows.h>
 #elif defined(__linux__)
 #    include <unistd.h>
 #endif
@@ -479,7 +479,7 @@ TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
                  << "  steps per stage: " << stepsPerStage << "\n"
                  << "  total updates published: "
                  << static_cast<std::uint64_t>(interfaceCount) *
-                        static_cast<std::uint64_t>(stepCount)
+            static_cast<std::uint64_t>(stepCount)
                  << "\n"
                  << "  baseline RSS: " << toMiB(initialMemory) << " MiB\n"
                  << "  publisher-side checkpoints while backlog is being produced:\n";
