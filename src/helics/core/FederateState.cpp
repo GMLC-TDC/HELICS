@@ -2169,7 +2169,8 @@ void FederateState::setProperty(int intProperty, int propertyVal)
             break;
         case defs::Properties::VALUE_BUFFER_WARNING:
             valueBufferWarningLimit =
-                (propertyVal <= 0) ? 0U : static_cast<std::uint64_t>(propertyVal) * 1024U * 1024U;
+                (propertyVal <= 0) ? 0U :
+                                      static_cast<std::uint64_t>(propertyVal) * 1024ULL * 1024ULL;
             nextValueBufferWarning = valueBufferWarningLimit;
             break;
         default:
@@ -2387,7 +2388,7 @@ int FederateState::getIntegerProperty(int intProperty) const
         case defs::Properties::INDEX_GROUP:
             return indexGroup;
         case defs::Properties::VALUE_BUFFER_WARNING:
-            return static_cast<int>(valueBufferWarningLimit / (1024U * 1024U));
+            return static_cast<int>(valueBufferWarningLimit / (1024ULL * 1024ULL));
         default:
             return timeCoord->getIntegerProperty(intProperty);
     }

@@ -2023,7 +2023,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterTypeInput)
 
 TEST(evil_value_federate_test, helicsFederateRegisterGlobalInput)
 {
-    // HelicsPublication helicsFederateRegisterGlobalInput(HelicsFederate fed, const char* key,
+    // HelicsInput helicsFederateRegisterGlobalInput(HelicsFederate fed, const char* key,
     // HelicsDataTypes type, const char* units, HelicsError* err);
     char rdata[256];
     auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
@@ -2044,7 +2044,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterGlobalInput)
 
 TEST(evil_value_federate_test, helicsFederateRegisterGlobalTypeInput)
 {
-    // HelicsPublication helicsFederateRegisterGlobalTypeInput(HelicsFederate fed, const char*
+    // HelicsInput helicsFederateRegisterGlobalTypeInput(HelicsFederate fed, const char*
     // key, const char* type, const char* units, HelicsError* err);
     char rdata[256];
     auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);

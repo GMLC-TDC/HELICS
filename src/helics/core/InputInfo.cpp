@@ -11,9 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "units/units.hpp"
 
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
 #include <memory>
-#include <set>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -36,11 +39,12 @@ const std::shared_ptr<const SmallBuffer>& InputInfo::getData(int index) const
 /** return true if index1 has higher priority than index2*/
 static bool priorityCheck(int32_t index1, int32_t index2, const std::vector<int32_t>& priorities)
 {
-    for (auto priority = priorities.rbegin(); priority != priorities.rend(); ++priority) {
-        if (*priority == index1) {
+    for (auto priorityIndex = priorities.size(); priorityIndex > 0; --priorityIndex) {
+        const auto priority = priorities[priorityIndex - 1];
+        if (priority == index1) {
             return true;
         }
-        if (*priority == index2) {
+        if (priority == index2) {
             return false;
         }
     }
@@ -52,11 +56,11 @@ const std::shared_ptr<const SmallBuffer>& InputInfo::getData(uint32_t* inputInde
     int ind{0};
     int mxind{-1};
     Time mxTime{Time::minVal()};
-    for (const auto& cd : current_data_time) {
-        if (cd.first > mxTime) {
-            mxTime = cd.first;
+    for (const auto& currentDataTime : current_data_time) {
+        if (currentDataTime.first > mxTime) {
+            mxTime = currentDataTime.first;
             mxind = ind;
-        } else if (cd.first == mxTime) {
+        } else if (currentDataTime.first == mxTime) {
             if (priorityCheck(ind, mxind, priority_sources)) {
                 mxind = ind;
             }
@@ -77,9 +81,13 @@ const std::shared_ptr<const SmallBuffer>& InputInfo::getData(uint32_t* inputInde
 
 static auto recordComparison = [](const InputInfo::dataRecord& rec1,
                                   const InputInfo::dataRecord& rec2) {
-    return (rec1.time < rec2.time) ?
-        true :
-        ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
+    if (rec1.time < rec2.time) {
+        return true;
+    }
+    if (rec1.time == rec2.time) {
+        return rec1.iteration < rec2.iteration;
+    }
+    return false;
 };
 
 static std::uint64_t dataSize(const std::shared_ptr<const SmallBuffer>& data)
@@ -105,9 +113,9 @@ bool InputInfo::addData(GlobalHandle source_id,
     if (!data) {
         return false;
     }
-    int index;
+    std::size_t index{0};
     bool found = false;
-    for (index = 0; index < static_cast<int>(input_sources.size()); ++index) {
+    for (; index < input_sources.size(); ++index) {
         if (input_sources[index] == source_id) {
             if (valueTime > deactivated[index]) {
                 return false;
@@ -293,8 +301,7 @@ const std::string& InputInfo::getInjectionType() const
 const std::string& InputInfo::getSourceName(GlobalHandle source) const
 {
     static const std::string empty{};
-    size_t ii{0};
-    while (ii < input_sources.size()) {
+    for (std::size_t ii{0}; ii < input_sources.size(); ++ii) {
         if (source == input_sources[ii]) {
             return source_info[ii].key;
         }
@@ -498,7 +505,7 @@ Time InputInfo::nextValueTime() const
 
 void InputInfo::setProperty(int32_t option, int32_t value)
 {
-    bool bvalue = (value != 0);
+    const bool bvalue = (value != 0);
     switch (option) {
         case defs::Options::IGNORE_INTERRUPTS:
             not_interruptible = bvalue;
@@ -581,25 +588,31 @@ int32_t InputInfo::getProperty(int32_t option) const
     return flagval ? 1 : 0;
 }
 
-static const std::set<std::string_view> convertible_set{"double_vector",
-                                                        "complex_vector",
-                                                        "vector",
-                                                        "double",
-                                                        "float",
-                                                        "bool",
-                                                        "time",
-                                                        "char",
-                                                        "uchar",
-                                                        "json",
-                                                        "int32",
-                                                        "int64",
-                                                        "uint32",
-                                                        "uint64",
-                                                        "int16",
-                                                        "string",
-                                                        "complex",
-                                                        "complex_f",
-                                                        "named_point"};
+static constexpr std::array<std::string_view, 19> convertibleSet{"double_vector",
+                                                                 "complex_vector",
+                                                                 "vector",
+                                                                 "double",
+                                                                 "float",
+                                                                 "bool",
+                                                                 "time",
+                                                                 "char",
+                                                                 "uchar",
+                                                                 "json",
+                                                                 "int32",
+                                                                 "int64",
+                                                                 "uint32",
+                                                                 "uint64",
+                                                                 "int16",
+                                                                 "string",
+                                                                 "complex",
+                                                                 "complex_f",
+                                                                 "named_point"};
+
+static bool isConvertibleType(std::string_view type)
+{
+    return std::find(convertibleSet.begin(), convertibleSet.end(), type) != convertibleSet.end();
+}
+
 bool checkTypeMatch(std::string_view type1, std::string_view type2, bool strict_match)
 {
     if ((type1.empty()) || (type1 == type2) || (type1 == "def") || (type1 == "any") ||
@@ -613,8 +626,8 @@ bool checkTypeMatch(std::string_view type1, std::string_view type2, bool strict_
     if ((type2.empty()) || (type2 == "def") || (type2 == "any") || (type1 == "json")) {
         return true;
     }
-    if (convertible_set.find(type1) != convertible_set.end()) {
-        return ((convertible_set.find(type2) != convertible_set.end()));
+    if (isConvertibleType(type1)) {
+        return isConvertibleType(type2);
     }
     return (type2 == "raw");
 }
@@ -635,10 +648,10 @@ bool checkUnitMatch(const std::string& unit1, const std::string& unit2, bool str
         return false;
     }
     if (strict_match) {
-        double conv = units::quick_convert(u1, u2);
+        const double conv = units::quick_convert(u1, u2);
         return (!std::isnan(conv));
     }
-    double conv = units::convert(u1, u2);
+    const double conv = units::convert(u1, u2);
     return (!std::isnan(conv));
 }
 

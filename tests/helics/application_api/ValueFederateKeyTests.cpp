@@ -1532,7 +1532,7 @@ TEST_F(valuefed, publish_change_restrict)
         if (sub1.isUpdated()) {
             returned.push_back(sub1.getValue<int>());
         }
-        pub1.publish(static_cast<int>(ii / 10));
+        pub1.publish(ii / 10);
         vFed1->requestNextStep();
     }
 
@@ -1559,7 +1559,7 @@ TEST_F(valuefed, input_change_restrict)
         if (sub1.isUpdated()) {
             returned.push_back(sub1.getValue<int>());
         }
-        pub1.publish(static_cast<int>(ii / 10));
+        pub1.publish(ii / 10);
         vFed1->requestNextStep();
     }
 

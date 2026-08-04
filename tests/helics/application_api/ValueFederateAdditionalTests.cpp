@@ -27,7 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-#if defined(_WIN32)
+#ifdef _WIN32
 #    ifndef NOMINMAX
 #        define NOMINMAX
 #    endif
@@ -56,11 +56,38 @@ class valuefed_add_tests_ci_skip: public ::testing::Test, public FederateTestFix
 
 static std::uint64_t getResidentMemoryBytes()
 {
-#if defined(_WIN32)
-    PROCESS_MEMORY_COUNTERS_EX pmc{};
-    if (GetProcessMemoryInfo(GetCurrentProcess(),
-                             reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc),
-                             sizeof(pmc)) != 0) {
+#ifdef _WIN32
+    struct ProcessMemoryCounters {
+        DWORD cb;
+        DWORD PageFaultCount;
+        SIZE_T PeakWorkingSetSize;
+        SIZE_T WorkingSetSize;
+        SIZE_T QuotaPeakPagedPoolUsage;
+        SIZE_T QuotaPagedPoolUsage;
+        SIZE_T QuotaPeakNonPagedPoolUsage;
+        SIZE_T QuotaNonPagedPoolUsage;
+        SIZE_T PagefileUsage;
+        SIZE_T PeakPagefileUsage;
+    };
+
+    using GetProcessMemoryInfoFunction = BOOL(WINAPI*)(HANDLE, ProcessMemoryCounters*, DWORD);
+    static const auto getProcessMemoryInfo = []() -> GetProcessMemoryInfoFunction {
+        auto* proc = reinterpret_cast<GetProcessMemoryInfoFunction>(
+            GetProcAddress(GetModuleHandleA("kernel32.dll"), "K32GetProcessMemoryInfo"));
+        if (proc != nullptr) {
+            return proc;
+        }
+        const auto psapi = LoadLibraryA("psapi.dll");
+        return (psapi == nullptr) ?
+            nullptr :
+            reinterpret_cast<GetProcessMemoryInfoFunction>(
+                GetProcAddress(psapi, "GetProcessMemoryInfo"));
+    }();
+
+    ProcessMemoryCounters pmc{};
+    pmc.cb = sizeof(pmc);
+    if (getProcessMemoryInfo != nullptr &&
+        getProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)) != 0) {
         return static_cast<std::uint64_t>(pmc.WorkingSetSize);
     }
 #elif defined(__linux__)
@@ -391,10 +418,10 @@ TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
     constexpr int stageCount = 5;
     constexpr int stepsPerStage = 500;
     constexpr int stepCount = stageCount * stepsPerStage;
-    constexpr std::uint64_t maxExpectedGrowth = 32U * 1024U * 1024U;
-    constexpr std::uint64_t maxExpectedStageGrowth = 16U * 1024U * 1024U;
+    constexpr std::uint64_t maxExpectedGrowth = 32ULL * 1024ULL * 1024ULL;
+    constexpr std::uint64_t maxExpectedStageGrowth = 16ULL * 1024ULL * 1024ULL;
 
-    auto toMiB = [](std::uint64_t bytes) { return bytes / (1024U * 1024U); };
+    auto toMiB = [](std::uint64_t bytes) { return bytes / (1024ULL * 1024ULL); };
 
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
     auto pubFed = GetFederateAs<helics::ValueFederate>(0);
@@ -428,8 +455,10 @@ TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
     std::vector<MemoryCheckpoint> subscriberCheckpoints;
     publisherCheckpoints.reserve(stageCount + 1);
     subscriberCheckpoints.reserve(stageCount + 1);
-    publisherCheckpoints.push_back({0, 0, initialMemory});
-    subscriberCheckpoints.push_back({0, 0, initialMemory});
+    publisherCheckpoints.push_back(
+        {.stage = 0, .timeStep = 0, .residentBytes = initialMemory});
+    subscriberCheckpoints.push_back(
+        {.stage = 0, .timeStep = 0, .residentBytes = initialMemory});
     std::size_t observedBytes = 0;
 
     auto pubLoop = std::async(std::launch::async, [&]() {
@@ -444,8 +473,9 @@ TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
             }
             grantedTime = pubFed->requestTime(static_cast<double>(tt + 1));
             if (((tt + 1) % stepsPerStage) == 0) {
-                publisherCheckpoints.push_back(
-                    {(tt + 1) / stepsPerStage, tt + 1, getResidentMemoryBytes()});
+                publisherCheckpoints.push_back({.stage = (tt + 1) / stepsPerStage,
+                                                .timeStep = tt + 1,
+                                                .residentBytes = getResidentMemoryBytes()});
             }
         }
         return grantedTime;
@@ -463,7 +493,8 @@ TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
                 }
             }
         }
-        subscriberCheckpoints.push_back({stage, stageEnd, getResidentMemoryBytes()});
+        subscriberCheckpoints.push_back(
+            {.stage = stage, .timeStep = stageEnd, .residentBytes = getResidentMemoryBytes()});
     }
 
     const auto pubTime = pubLoop.get();
@@ -479,7 +510,7 @@ TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
                  << "  steps per stage: " << stepsPerStage << "\n"
                  << "  total updates published: "
                  << static_cast<std::uint64_t>(interfaceCount) *
-            static_cast<std::uint64_t>(stepCount)
+                        static_cast<std::uint64_t>(stepCount)
                  << "\n"
                  << "  baseline RSS: " << toMiB(initialMemory) << " MiB\n"
                  << "  publisher-side checkpoints while backlog is being produced:\n";

@@ -2842,7 +2842,7 @@ HELICS_EXPORT HelicsInput
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
- * @return An object containing the publication.
+ * @return An object containing the input.
  */
 HELICS_EXPORT HelicsInput
     helicsFederateRegisterTypeInput(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
@@ -2850,10 +2850,10 @@ HELICS_EXPORT HelicsInput
 /**
  * Register a global named input.
  *
- * @details The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+ * @details The input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
  * functions for inputs and publications.
  *
- * @param fed The federate object in which to create a publication.
+ * @param fed The federate object in which to create an input.
  * @param key The identifier for the input (may be NULL).
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the input (may be NULL).
@@ -2863,7 +2863,7 @@ HELICS_EXPORT HelicsInput
  *
  * @return An object containing the input.
  */
-HELICS_EXPORT HelicsPublication
+HELICS_EXPORT HelicsInput
     helicsFederateRegisterGlobalInput(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
 
 /**
@@ -2880,7 +2880,7 @@ HELICS_EXPORT HelicsPublication
  * @param[in,out] err A pointer to an error object for catching errors.
  * @return An object containing the input.
  */
-HELICS_EXPORT HelicsPublication
+HELICS_EXPORT HelicsInput
     helicsFederateRegisterGlobalTypeInput(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
 
 /**

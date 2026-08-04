@@ -322,24 +322,21 @@ static constexpr frozen::unordered_map<std::string_view, int, 28> option_value_m
     {"diff", HELICS_MULTI_INPUT_DIFF_OPERATION}};
 
 // this one is used in a few places that can't use std::string_view
-static const std::unordered_map<std::string, int> log_level_map{
-    {"none", HELICS_LOG_LEVEL_NO_PRINT},
-    {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
-    {"error", HELICS_LOG_LEVEL_ERROR},
-    {"warning", HELICS_LOG_LEVEL_WARNING},
-    {"summary", HELICS_LOG_LEVEL_SUMMARY},
-    {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
-    /** connections+ interface definitions*/
-    {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
-    /** interfaces + timing message*/
-    {"timing", HELICS_LOG_LEVEL_TIMING},
-    {"profiling", HELICS_LOG_LEVEL_PROFILING},
-    /** timing+ data transfer notices*/
-    {"data", HELICS_LOG_LEVEL_DATA},
-    /** same as data for now*/
-    {"debug", HELICS_LOG_LEVEL_DEBUG},
-    /** all internal messages*/
-    {"trace", HELICS_LOG_LEVEL_TRACE}};
+static std::unordered_map<std::string, int> makeLogLevelMap()
+{
+    return {{"none", HELICS_LOG_LEVEL_NO_PRINT},
+            {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
+            {"error", HELICS_LOG_LEVEL_ERROR},
+            {"warning", HELICS_LOG_LEVEL_WARNING},
+            {"summary", HELICS_LOG_LEVEL_SUMMARY},
+            {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
+            {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
+            {"timing", HELICS_LOG_LEVEL_TIMING},
+            {"profiling", HELICS_LOG_LEVEL_PROFILING},
+            {"data", HELICS_LOG_LEVEL_DATA},
+            {"debug", HELICS_LOG_LEVEL_DEBUG},
+            {"trace", HELICS_LOG_LEVEL_TRACE}};
+}
 
 static void loadFlags(FederateInfo& fedInfo, const std::string& flags)
 {
@@ -462,8 +459,9 @@ int getOptionValue(std::string val)
     if (fnd2 != option_value_map.end()) {
         return fnd2->second;
     }
-    auto fnd = log_level_map.find(val);
-    if (fnd != log_level_map.end()) {
+    const auto logLevelMap = makeLogLevelMap();
+    auto fnd = logLevelMap.find(val);
+    if (fnd != logLevelMap.end()) {
         return fnd->second;
     }
     gmlc::utilities::makeLowerCase(val);
@@ -471,8 +469,8 @@ int getOptionValue(std::string val)
     if (fnd2 != option_value_map.end()) {
         return fnd2->second;
     }
-    fnd = log_level_map.find(val);
-    if (fnd != log_level_map.end()) {
+    fnd = logLevelMap.find(val);
+    if (fnd != logLevelMap.end()) {
         return fnd->second;
     }
     return HELICS_INVALID_OPTION_INDEX;
@@ -700,9 +698,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            [this](int val) { setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, val); },
            "the logging level of a federate")
         ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
+            CLI::CheckedTransformer(makeLogLevelMap(), CLI::ignore_case, CLI::ignore_underscore))
 
-        ->transform(CLI::IsMember(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
+        ->transform(CLI::IsMember(makeLogLevelMap(), CLI::ignore_case, CLI::ignore_underscore))
         ->envname("HELICS_LOG_LEVEL");
     app->add_option_function<int>(
         "--value_buffer_warning",

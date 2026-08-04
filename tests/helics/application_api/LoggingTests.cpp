@@ -1149,7 +1149,7 @@ TEST(logging, value_buffer_warning)
 
     auto pubThread = std::async(std::launch::async, [&pubFed, &pub]() {
         pubFed->enterExecutingMode();
-        const std::string payload(600U * 1024U, 'a');
+        const std::string payload(600ULL * 1024ULL, 'a');
         for (int ii = 1; ii <= 4; ++ii) {
             pub.publish(payload);
             pubFed->requestTime(ii);
