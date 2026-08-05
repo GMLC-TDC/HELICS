@@ -78,10 +78,9 @@ static std::uint64_t getResidentMemoryBytes()
             return proc;
         }
         const auto psapi = LoadLibraryA("psapi.dll");
-        return (psapi == nullptr) ?
-            nullptr :
-            reinterpret_cast<GetProcessMemoryInfoFunction>(
-                GetProcAddress(psapi, "GetProcessMemoryInfo"));
+        return (psapi == nullptr) ? nullptr :
+                                    reinterpret_cast<GetProcessMemoryInfoFunction>(
+                                        GetProcAddress(psapi, "GetProcessMemoryInfo"));
     }();
 
     ProcessMemoryCounters pmc{};
@@ -455,10 +454,8 @@ TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
     std::vector<MemoryCheckpoint> subscriberCheckpoints;
     publisherCheckpoints.reserve(stageCount + 1);
     subscriberCheckpoints.reserve(stageCount + 1);
-    publisherCheckpoints.push_back(
-        {.stage = 0, .timeStep = 0, .residentBytes = initialMemory});
-    subscriberCheckpoints.push_back(
-        {.stage = 0, .timeStep = 0, .residentBytes = initialMemory});
+    publisherCheckpoints.push_back({.stage = 0, .timeStep = 0, .residentBytes = initialMemory});
+    subscriberCheckpoints.push_back({.stage = 0, .timeStep = 0, .residentBytes = initialMemory});
     std::size_t observedBytes = 0;
 
     auto pubLoop = std::async(std::launch::async, [&]() {
@@ -510,7 +507,7 @@ TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
                  << "  steps per stage: " << stepsPerStage << "\n"
                  << "  total updates published: "
                  << static_cast<std::uint64_t>(interfaceCount) *
-                        static_cast<std::uint64_t>(stepCount)
+            static_cast<std::uint64_t>(stepCount)
                  << "\n"
                  << "  baseline RSS: " << toMiB(initialMemory) << " MiB\n"
                  << "  publisher-side checkpoints while backlog is being produced:\n";

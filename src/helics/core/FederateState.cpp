@@ -2168,9 +2168,9 @@ void FederateState::setProperty(int intProperty, int propertyVal)
                 (propertyVal <= 0) ? 0UL : static_cast<std::size_t>(propertyVal));
             break;
         case defs::Properties::VALUE_BUFFER_WARNING:
-            valueBufferWarningLimit =
-                (propertyVal <= 0) ? 0U :
-                                      static_cast<std::uint64_t>(propertyVal) * 1024ULL * 1024ULL;
+            valueBufferWarningLimit = (propertyVal <= 0) ?
+                0U :
+                static_cast<std::uint64_t>(propertyVal) * 1024ULL * 1024ULL;
             nextValueBufferWarning = valueBufferWarningLimit;
             break;
         default:
