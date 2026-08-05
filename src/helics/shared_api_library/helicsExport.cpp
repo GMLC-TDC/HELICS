@@ -812,6 +812,15 @@ HelicsBool helicsCoreIsConnected(HelicsCore core)
     return (cppcore->isConnected()) ? HELICS_TRUE : HELICS_FALSE;
 }
 
+HelicsBool helicsCoreIsOpenToNewFederates(HelicsCore core)
+{
+    auto* cppcore = getCore(core, nullptr);
+    if (cppcore == nullptr) {
+        return HELICS_FALSE;
+    }
+    return (cppcore->isOpenToNewFederates()) ? HELICS_TRUE : HELICS_FALSE;
+}
+
 void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* value, HelicsError* err)
 {
     auto* cppcore = getCore(core, err);

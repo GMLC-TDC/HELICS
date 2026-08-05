@@ -328,6 +328,15 @@ HELICS_EXPORT HelicsBool helicsBrokerWaitForDisconnect(HelicsBroker broker, int 
 HELICS_EXPORT HelicsBool helicsCoreIsConnected(HelicsCore core);
 
 /**
+ * Check if a core can accept new federates.
+ *
+ * @param core The core to query.
+ *
+ * @return HELICS_TRUE if the core is open to new federates, HELICS_FALSE otherwise.
+ */
+HELICS_EXPORT HelicsBool helicsCoreIsOpenToNewFederates(HelicsCore core);
+
+/**
  * Link a named publication and named input using a core.
  *
  * @param core The core to generate the connection from.

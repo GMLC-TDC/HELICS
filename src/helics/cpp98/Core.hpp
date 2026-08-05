@@ -44,6 +44,11 @@ class Core {
     {
         return (helicsCoreIsConnected(core) != HELICS_FALSE);
     }
+    /** check if the core can accept new federates*/
+    HELICS_NODISCARD bool isOpenToNewFederates() const
+    {
+        return (helicsCoreIsOpenToNewFederates(core) != HELICS_FALSE);
+    }
     /** copy constructor*/
     Core(const Core& cr) { core = helicsCoreClone(cr.core, hThrowOnError()); }
     /** copy assignment*/

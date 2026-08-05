@@ -376,6 +376,7 @@ void helicsBrokerMakeConnections(HelicsBroker broker, const char* file, HelicsEr
 HelicsBool helicsCoreWaitForDisconnect(HelicsCore core, int msToWait, HelicsError* err);
 HelicsBool helicsBrokerWaitForDisconnect(HelicsBroker broker, int msToWait, HelicsError* err);
 HelicsBool helicsCoreIsConnected(HelicsCore core);
+HelicsBool helicsCoreIsOpenToNewFederates(HelicsCore core);
 void helicsCoreDataLink(HelicsCore core, const char* source, const char* target, HelicsError* err);
 void helicsCoreAddSourceFilterToEndpoint(HelicsCore core, const char* filter, const char* endpoint, HelicsError* err);
 void helicsCoreAddDestinationFilterToEndpoint(HelicsCore core, const char* filter, const char* endpoint, HelicsError* err);

@@ -73,6 +73,39 @@ TEST(other_tests, broker_status_queries)
     helicsBrokerFree(brk);
 }
 
+TEST(other_tests, core_status_queries)
+{
+    auto err = helicsErrorInitialize();
+    auto brk = helicsCreateBroker("test", "gcore_status_broker", "--root -f 1", &err);
+    EXPECT_EQ(err.error_code, 0);
+    auto core = helicsCreateCore("test", "gcore_status", "--broker=gcore_status_broker", &err);
+    EXPECT_EQ(err.error_code, 0);
+    ASSERT_TRUE(helicsCoreIsValid(core));
+    auto connected = helicsCoreConnect(core, &err);
+    EXPECT_EQ(connected, HELICS_TRUE);
+    EXPECT_EQ(helicsCoreIsConnected(core), HELICS_TRUE);
+    EXPECT_EQ(helicsCoreIsOpenToNewFederates(core), HELICS_TRUE);
+
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreName(fedInfo, "gcore_status", &err);
+    auto fed = helicsCreateValueFederate("core_status_fed", fedInfo, &err);
+    ASSERT_EQ(err.error_code, 0);
+
+    helicsFederateEnterInitializingMode(fed, &err);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(helicsCoreIsOpenToNewFederates(core), HELICS_FALSE);
+
+    helicsFederateFinalize(fed, &err);
+    helicsFederateInfoFree(fedInfo);
+    helicsFederateFree(fed);
+    helicsCoreDisconnect(core, &err);
+    EXPECT_EQ(helicsCoreIsConnected(core), HELICS_FALSE);
+    EXPECT_EQ(helicsCoreIsOpenToNewFederates(core), HELICS_FALSE);
+    helicsBrokerDisconnect(brk, &err);
+    helicsCoreFree(core);
+    helicsBrokerFree(brk);
+}
+
 TEST(other_tests, broker_global_value_errors_nosan_ci_skip)
 {
     auto err = helicsErrorInitialize();

@@ -56,6 +56,7 @@ functions applying to a \ref HelicsCore object
  - \ref helicsCoreIsValid
  - \ref helicsCoreWaitForDisconnect
  - \ref helicsCoreIsConnected
+ - \ref helicsCoreIsOpenToNewFederates
  - \ref helicsCoreDataLink
  - \ref helicsCoreAddSourceFilterToEndpoint
  - \ref helicsCoreAddDestinationFilterToEndpoint
