@@ -44,6 +44,35 @@ TEST(other_tests, broker_global_value)
     helicsBrokerFree(brk);
 }
 
+TEST(other_tests, broker_status_queries)
+{
+    auto err = helicsErrorInitialize();
+    auto brk = helicsCreateBroker("test", "gbroker_status", "--root -f 1", &err);
+    EXPECT_EQ(err.error_code, 0);
+    ASSERT_TRUE(helicsBrokerIsValid(brk));
+    EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_TRUE);
+    EXPECT_EQ(helicsBrokerIsRoot(brk), HELICS_TRUE);
+    EXPECT_EQ(helicsBrokerIsOpenToNewFederates(brk), HELICS_TRUE);
+
+    auto fedInfo = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreTypeFromString(fedInfo, "test", &err);
+    helicsFederateInfoSetCoreInitString(fedInfo, "--broker=gbroker_status", &err);
+    auto fed = helicsCreateValueFederate("status_fed", fedInfo, &err);
+    ASSERT_EQ(err.error_code, 0);
+
+    helicsFederateEnterInitializingMode(fed, &err);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(helicsBrokerIsOpenToNewFederates(brk), HELICS_FALSE);
+
+    helicsFederateFinalize(fed, &err);
+    helicsFederateInfoFree(fedInfo);
+    helicsFederateFree(fed);
+    helicsBrokerDisconnect(brk, &err);
+    EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
+    EXPECT_EQ(helicsBrokerIsOpenToNewFederates(brk), HELICS_FALSE);
+    helicsBrokerFree(brk);
+}
+
 TEST(other_tests, broker_global_value_errors_nosan_ci_skip)
 {
     auto err = helicsErrorInitialize();

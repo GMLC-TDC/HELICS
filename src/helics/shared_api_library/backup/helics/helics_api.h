@@ -367,6 +367,8 @@ HelicsBroker helicsCreateBrokerFromArgs(const char* type, const char* name, int 
 HelicsBroker helicsBrokerClone(HelicsBroker broker, HelicsError* err);
 HelicsBool helicsBrokerIsValid(HelicsBroker broker);
 HelicsBool helicsBrokerIsConnected(HelicsBroker broker);
+HelicsBool helicsBrokerIsRoot(HelicsBroker broker);
+HelicsBool helicsBrokerIsOpenToNewFederates(HelicsBroker broker);
 void helicsBrokerDataLink(HelicsBroker broker, const char* source, const char* target, HelicsError* err);
 void helicsBrokerAddSourceFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err);
 void helicsBrokerAddDestinationFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err);

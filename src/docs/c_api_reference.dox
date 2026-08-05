@@ -83,6 +83,8 @@ Functions applying to a \ref HelicsBroker object
  - \ref helicsBrokerClone
  - \ref helicsBrokerIsValid
  - \ref helicsBrokerIsConnected
+ - \ref helicsBrokerIsRoot
+ - \ref helicsBrokerIsOpenToNewFederates
  - \ref helicsBrokerDataLink
  - \ref helicsBrokerAddSourceFilterToEndpoint
  - \ref helicsBrokerAddDestinationFilterToEndpoint

@@ -630,6 +630,28 @@ TEST(evil_broker_test, helicsBrokerIsConnected)
     EXPECT_EQ(res2, HELICS_FALSE);
 }
 
+TEST(evil_broker_test, helicsBrokerIsRoot)
+{
+    // HelicsBool helicsBrokerIsRoot(HelicsBroker broker);
+    char rdata[256];
+    auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
+    auto res1 = helicsBrokerIsRoot(evil_broker);
+    EXPECT_EQ(res1, HELICS_FALSE);
+    auto res2 = helicsBrokerIsRoot(nullptr);
+    EXPECT_EQ(res2, HELICS_FALSE);
+}
+
+TEST(evil_broker_test, helicsBrokerIsOpenToNewFederates)
+{
+    // HelicsBool helicsBrokerIsOpenToNewFederates(HelicsBroker broker);
+    char rdata[256];
+    auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
+    auto res1 = helicsBrokerIsOpenToNewFederates(evil_broker);
+    EXPECT_EQ(res1, HELICS_FALSE);
+    auto res2 = helicsBrokerIsOpenToNewFederates(nullptr);
+    EXPECT_EQ(res2, HELICS_FALSE);
+}
+
 TEST(evil_broker_test, helicsBrokerDataLink)
 {
     // void helicsBrokerDataLink(HelicsBroker broker, const char* source, const char* target,

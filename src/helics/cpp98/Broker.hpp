@@ -80,6 +80,13 @@ class Broker {
     {
         return (helicsBrokerIsConnected(broker) != HELICS_FALSE);
     }
+    /** check if the broker is a root broker*/
+    HELICS_NODISCARD bool isRoot() const { return (helicsBrokerIsRoot(broker) != HELICS_FALSE); }
+    /** check if the broker can accept new federates*/
+    HELICS_NODISCARD bool isOpenToNewFederates() const
+    {
+        return (helicsBrokerIsOpenToNewFederates(broker) != HELICS_FALSE);
+    }
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect (-1) implies no timeout
     @return true if the disconnect was successful false if it timed out
