@@ -47,38 +47,37 @@ TEST(other_tests, broker_global_value)
 TEST(other_tests, broker_status_queries)
 {
     auto err = helicsErrorInitialize();
-    auto brk = helicsCreateBroker("test", "gbroker_status", "--root -f 1", &err);
+    auto brk = helicsCreateBroker("test", "gbroker_status", "--root --maxfederates 1", &err);
     EXPECT_EQ(err.error_code, 0);
     ASSERT_TRUE(helicsBrokerIsValid(brk));
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_TRUE);
     EXPECT_EQ(helicsBrokerIsRoot(brk), HELICS_TRUE);
     EXPECT_EQ(helicsBrokerIsOpenToNewFederates(brk), HELICS_TRUE);
 
-    auto fedInfo = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreTypeFromString(fedInfo, "test", &err);
-    helicsFederateInfoSetCoreInitString(fedInfo, "--broker=gbroker_status", &err);
-    auto fed = helicsCreateValueFederate("status_fed", fedInfo, &err);
+    auto closedBrk =
+        helicsCreateBroker("test", "gbroker_status_closed", "--root --maxfederates 0", &err);
     ASSERT_EQ(err.error_code, 0);
+    ASSERT_TRUE(helicsBrokerIsValid(closedBrk));
+    EXPECT_EQ(helicsBrokerIsRoot(closedBrk), HELICS_TRUE);
+    EXPECT_EQ(helicsBrokerIsOpenToNewFederates(closedBrk), HELICS_FALSE);
 
-    helicsFederateEnterInitializingMode(fed, &err);
-    EXPECT_EQ(err.error_code, 0);
-    EXPECT_EQ(helicsBrokerIsOpenToNewFederates(brk), HELICS_FALSE);
-
-    helicsFederateFinalize(fed, &err);
-    helicsFederateInfoFree(fedInfo);
-    helicsFederateFree(fed);
+    helicsBrokerDisconnect(closedBrk, &err);
+    EXPECT_EQ(helicsBrokerIsConnected(closedBrk), HELICS_FALSE);
+    EXPECT_EQ(helicsBrokerIsOpenToNewFederates(closedBrk), HELICS_FALSE);
     helicsBrokerDisconnect(brk, &err);
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
     EXPECT_EQ(helicsBrokerIsOpenToNewFederates(brk), HELICS_FALSE);
+    helicsBrokerFree(closedBrk);
     helicsBrokerFree(brk);
 }
 
 TEST(other_tests, core_status_queries)
 {
     auto err = helicsErrorInitialize();
-    auto brk = helicsCreateBroker("test", "gcore_status_broker", "--root -f 1", &err);
+    auto brk = helicsCreateBroker("test", "gcore_status_broker", "--root", &err);
     EXPECT_EQ(err.error_code, 0);
-    auto core = helicsCreateCore("test", "gcore_status", "--broker=gcore_status_broker", &err);
+    auto core = helicsCreateCore(
+        "test", "gcore_status", "--broker=gcore_status_broker --maxfederates 1", &err);
     EXPECT_EQ(err.error_code, 0);
     ASSERT_TRUE(helicsCoreIsValid(core));
     auto connected = helicsCoreConnect(core, &err);
@@ -86,22 +85,22 @@ TEST(other_tests, core_status_queries)
     EXPECT_EQ(helicsCoreIsConnected(core), HELICS_TRUE);
     EXPECT_EQ(helicsCoreIsOpenToNewFederates(core), HELICS_TRUE);
 
-    auto fedInfo = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreName(fedInfo, "gcore_status", &err);
-    auto fed = helicsCreateValueFederate("core_status_fed", fedInfo, &err);
+    auto closedCore = helicsCreateCore(
+        "test", "gcore_status_closed", "--broker=gcore_status_broker --maxfederates 0", &err);
     ASSERT_EQ(err.error_code, 0);
+    ASSERT_TRUE(helicsCoreIsValid(closedCore));
+    connected = helicsCoreConnect(closedCore, &err);
+    EXPECT_EQ(connected, HELICS_TRUE);
+    EXPECT_EQ(helicsCoreIsOpenToNewFederates(closedCore), HELICS_FALSE);
 
-    helicsFederateEnterInitializingMode(fed, &err);
-    EXPECT_EQ(err.error_code, 0);
-    EXPECT_EQ(helicsCoreIsOpenToNewFederates(core), HELICS_FALSE);
-
-    helicsFederateFinalize(fed, &err);
-    helicsFederateInfoFree(fedInfo);
-    helicsFederateFree(fed);
+    helicsCoreDisconnect(closedCore, &err);
+    EXPECT_EQ(helicsCoreIsConnected(closedCore), HELICS_FALSE);
+    EXPECT_EQ(helicsCoreIsOpenToNewFederates(closedCore), HELICS_FALSE);
     helicsCoreDisconnect(core, &err);
     EXPECT_EQ(helicsCoreIsConnected(core), HELICS_FALSE);
     EXPECT_EQ(helicsCoreIsOpenToNewFederates(core), HELICS_FALSE);
     helicsBrokerDisconnect(brk, &err);
+    helicsCoreFree(closedCore);
     helicsCoreFree(core);
     helicsBrokerFree(brk);
 }
