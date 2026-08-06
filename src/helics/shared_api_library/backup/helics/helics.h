@@ -1021,6 +1021,24 @@ HELICS_EXPORT HelicsBool helicsBrokerIsValid(HelicsBroker broker);
 HELICS_EXPORT HelicsBool helicsBrokerIsConnected(HelicsBroker broker);
 
 /**
+ * Check if a broker is configured as a root broker.
+ *
+ * @param broker The broker to query.
+ *
+ * @return HELICS_TRUE if the broker is a root broker, HELICS_FALSE otherwise.
+ */
+HELICS_EXPORT HelicsBool helicsBrokerIsRoot(HelicsBroker broker);
+
+/**
+ * Check if a broker can accept new federates.
+ *
+ * @param broker The broker to query.
+ *
+ * @return HELICS_TRUE if the broker is open to new federates, HELICS_FALSE otherwise.
+ */
+HELICS_EXPORT HelicsBool helicsBrokerIsOpenToNewFederates(HelicsBroker broker);
+
+/**
  * Link a named publication and named input using a broker.
  *
  * @param broker The broker to generate the connection from.
@@ -1102,6 +1120,15 @@ HELICS_EXPORT HelicsBool helicsBrokerWaitForDisconnect(HelicsBroker broker, int 
  * @return HELICS_FALSE if not connected, HELICS_TRUE if it is connected.
  */
 HELICS_EXPORT HelicsBool helicsCoreIsConnected(HelicsCore core);
+
+/**
+ * Check if a core can accept new federates.
+ *
+ * @param core The core to query.
+ *
+ * @return HELICS_TRUE if the core is open to new federates, HELICS_FALSE otherwise.
+ */
+HELICS_EXPORT HelicsBool helicsCoreIsOpenToNewFederates(HelicsCore core);
 
 /**
  * Link a named publication and named input using a core.
