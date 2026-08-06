@@ -31,7 +31,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #    ifndef NOMINMAX
 #        define NOMINMAX
 #    endif
-#    include <psapi.h>
 #    include <windows.h>
 #elif defined(__linux__)
 #    include <unistd.h>
