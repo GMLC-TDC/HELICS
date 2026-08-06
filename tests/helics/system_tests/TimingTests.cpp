@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 
 #include "gtest/gtest.h"
+#include <chrono>
 #include <complex>
 #include <future>
 #include <iostream>
@@ -132,7 +133,7 @@ TEST_F(timing, simple_timing2_single_thread)
     vFed2->registerSubscription("pub1");
     std::vector<helics::Time> times;
 
-    auto t1 = std::thread([&vFed1, &times, &pub]() {
+    auto fedThread = std::thread([&vFed1, &times, &pub]() {
         vFed1->enterExecutingMode();
         auto res = vFed1->requestTime(0.32);
         times.push_back(res);
@@ -148,7 +149,7 @@ TEST_F(timing, simple_timing2_single_thread)
     res = vFed2->requestTime(2.0);
     EXPECT_EQ(res, 2.0);
 
-    t1.join();
+    fedThread.join();
     // check that the request is only granted at the appropriate period
     EXPECT_EQ(times[0], 0.5);
 
@@ -173,7 +174,7 @@ TEST_F(timing, simple_timing_message_single_thread)
     vFed2->registerGlobalEndpoint("e2");
 
     std::vector<helics::Time> times;
-    auto t1 = std::thread([&vFed1, &times, &ept1]() {
+    auto fedThread = std::thread([&vFed1, &times, &ept1]() {
         vFed1->enterExecutingMode();
         auto res = vFed1->requestTime(0.32);
         times.push_back(res);
@@ -191,7 +192,7 @@ TEST_F(timing, simple_timing_message_single_thread)
     EXPECT_EQ(res, 2.25);  // the message should show up at the next available time point
     vFed2->finalize();
 
-    t1.join();
+    fedThread.join();
     EXPECT_EQ(times[0], 0.6);
 
     EXPECT_EQ(times[1], 2.4);
@@ -248,18 +249,18 @@ TEST_F(timing, test_uninteruptible_flag)
 
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
-        for (helics::Time t = 1.0; t <= 100.0; t += 1.0) {
-            pub.publish(t);
-            vFed1->requestTime(t);
+        for (helics::Time requestTime = 1.0; requestTime <= 100.0; requestTime += 1.0) {
+            pub.publish(requestTime);
+            vFed1->requestTime(requestTime);
         }
     };
 
     auto rfed2 = [&]() {
         vFed2->enterExecutingMode();
         std::vector<helics::Time> res;
-        for (helics::Time t = 5.0; t <= 100.0; t += 5.0) {
-            auto T2 = vFed2->requestTime(t);
-            res.push_back(T2);
+        for (helics::Time requestTime = 5.0; requestTime <= 100.0; requestTime += 5.0) {
+            auto grantedTime = vFed2->requestTime(requestTime);
+            res.push_back(grantedTime);
         }
         return res;
     };
@@ -293,14 +294,14 @@ TEST_F(timing, uninteruptible_flag_option)
     IP2.setOption(helics::defs::Options::IGNORE_INTERRUPTS);
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
-        helics::Time t{1.0};
-        while (t <= 100.0) {
-            pub.publish(t);
-            auto tr = vFed1->requestTime(t);
-            if (tr == helics::Time::maxVal()) {
+        helics::Time requestTime{1.0};
+        while (requestTime <= 100.0) {
+            pub.publish(requestTime);
+            auto grantedTime = vFed1->requestTime(requestTime);
+            if (grantedTime == helics::Time::maxVal()) {
                 break;
             }
-            t += 1.0;
+            requestTime += 1.0;
         }
     };
 
@@ -309,8 +310,8 @@ TEST_F(timing, uninteruptible_flag_option)
         std::vector<helics::Time> res;
         double time{5.0};
         while (time <= 100.0) {
-            auto T2 = vFed2->requestTime(time);
-            res.push_back(T2);
+            auto grantedTime = vFed2->requestTime(time);
+            res.push_back(grantedTime);
             time += 5.0;
         }
         return res;
@@ -349,39 +350,39 @@ TEST_F(timing, uninterruptible_flag_two_way_comm)
 
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
-        double t{1.0};
-        while (t <= 100.0) {
+        double requestTime{1.0};
+        while (requestTime <= 100.0) {
             try {
-                pub1.publish(t);
+                pub1.publish(requestTime);
             }
             catch (const helics::HelicsException&) {
-                std::cerr << "error in fed 1 publication at time " << t << std::endl;
+                std::cerr << "error in fed 1 publication at time " << requestTime << '\n';
                 break;
             }
-            auto T2 = vFed1->requestTime(t);
-            if (T2 == helics::Time::maxVal()) {
+            auto grantedTime = vFed1->requestTime(requestTime);
+            if (grantedTime == helics::Time::maxVal()) {
                 break;
             }
-            t += 1.0;
+            requestTime += 1.0;
         }
     };
 
     auto rfed2 = [&]() {
         vFed2->enterExecutingMode();
         std::vector<helics::Time> res;
-        double t{5.0};
-        while (t <= 100.0) {
+        double requestTime{5.0};
+        while (requestTime <= 100.0) {
             try {
-                pub2.publish(t);
+                pub2.publish(requestTime);
             }
             catch (const helics::HelicsException&) {
-                std::cerr << "error in fed 2 publication at time " << t << std::endl;
+                std::cerr << "error in fed 2 publication at time " << requestTime << '\n';
                 break;
             }
-            auto T2 = vFed2->requestTime(t);
-            res.push_back(T2);
-            t += 5.0;
-            if (T2 == helics::Time::maxVal()) {
+            auto grantedTime = vFed2->requestTime(requestTime);
+            res.push_back(grantedTime);
+            requestTime += 5.0;
+            if (grantedTime == helics::Time::maxVal()) {
                 break;
             }
         }
@@ -422,25 +423,27 @@ TEST_F(timing, uninterruptible_iterations)
     int iterationCount2{0};
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
-        double t{1.0};
-        double prevT{0.0};
-        while (t <= 100.0) {
+        double requestTime{1.0};
+        double previousTime{0.0};
+        while (requestTime <= 100.0) {
             try {
-                if (t > prevT) {
-                    pub1.publish(t);
+                if (requestTime > previousTime) {
+                    pub1.publish(requestTime);
                 }
             }
             catch (const helics::HelicsException&) {
-                std::cerr << "error in fed 1 publication at time " << t << std::endl;
+                std::cerr << "error in fed 1 publication at time " << requestTime << '\n';
                 break;
             }
-            auto T2 = vFed1->requestTimeIterative(t, helics::IterationRequest::ITERATE_IF_NEEDED);
-            if (T2.grantedTime == helics::Time::maxVal()) {
+            auto grantedTime =
+                vFed1->requestTimeIterative(requestTime,
+                                            helics::IterationRequest::ITERATE_IF_NEEDED);
+            if (grantedTime.grantedTime == helics::Time::maxVal()) {
                 break;
             }
-            prevT = t;
-            if (T2.state == helics::IterationResult::NEXT_STEP) {
-                t += 1.0;
+            previousTime = requestTime;
+            if (grantedTime.state == helics::IterationResult::NEXT_STEP) {
+                requestTime += 1.0;
             } else {
                 ++iterationCount1;
             }
@@ -450,28 +453,30 @@ TEST_F(timing, uninterruptible_iterations)
     auto rfed2 = [&]() {
         vFed2->enterExecutingMode();
         std::vector<helics::Time> res;
-        double t{5.0};
-        double prevT{0.0};
-        while (t <= 100.0) {
+        double requestTime{5.0};
+        double previousTime{0.0};
+        while (requestTime <= 100.0) {
             try {
-                if (t > prevT) {
-                    pub2.publish(t);
+                if (requestTime > previousTime) {
+                    pub2.publish(requestTime);
                 }
             }
             catch (const helics::HelicsException&) {
-                std::cerr << "error in fed 2 publication at time " << t << std::endl;
+                std::cerr << "error in fed 2 publication at time " << requestTime << '\n';
                 break;
             }
-            auto T2 = vFed2->requestTimeIterative(t, helics::IterationRequest::ITERATE_IF_NEEDED);
-            res.push_back(T2.grantedTime);
-            prevT = t;
-            if (T2.state == helics::IterationResult::NEXT_STEP) {
-                t += 5.0;
+            auto grantedTime =
+                vFed2->requestTimeIterative(requestTime,
+                                            helics::IterationRequest::ITERATE_IF_NEEDED);
+            res.push_back(grantedTime.grantedTime);
+            previousTime = requestTime;
+            if (grantedTime.state == helics::IterationResult::NEXT_STEP) {
+                requestTime += 5.0;
             } else {
                 ++iterationCount2;
             }
 
-            if (T2.grantedTime == helics::Time::maxVal()) {
+            if (grantedTime.grantedTime == helics::Time::maxVal()) {
                 break;
             }
         }
@@ -887,8 +892,8 @@ TEST_F(timing, dual_max_time)
         helics::Time maxTime = cHelicsBigNumber;
         grantedTime = controller->requestTime(maxTime);
         while (grantedTime < cHelicsTerminateTime) {
-            double v = subc.getDouble();
-            pubc.publish(2.0 * v);
+            double value = subc.getDouble();
+            pubc.publish(2.0 * value);
             grantedTime = controller->requestTime(maxTime);
         }
         controller->disconnect();
@@ -902,8 +907,8 @@ TEST_F(timing, dual_max_time)
         pubv.publish(1.0);
         while (grantedTime < maxTime) {
             grantedTime = vFed2->requestTime(grantedTime + 2.0);
-            double v = subv.getDouble();
-            pubv.publish(v + 0.7);
+            double value = subv.getDouble();
+            pubv.publish(value + 0.7);
         }
         vFed2->requestTime(cHelicsBigNumber);
         finalValue = subv.getDouble();
@@ -917,9 +922,9 @@ TEST_F(timing, dual_max_time)
     fed2res.get();
     double testVal{2.0};
     // compute the expected value
-    auto mx = [](double val) { return 2.0 * (val + 0.7); };
+    auto updateValue = [](double val) { return 2.0 * (val + 0.7); };
     for (int ii = 0; ii < 6; ++ii) {
-        testVal = mx(testVal);
+        testVal = updateValue(testVal);
     }
     EXPECT_DOUBLE_EQ(finalValue, testVal);
 }
@@ -932,8 +937,8 @@ TEST_F(timing, dual_max_time_endpoint)
 
     vFed2->setFlagOption(HELICS_FLAG_UNINTERRUPTIBLE, true);
 
-    auto& e1 = controller->registerGlobalEndpoint("control");
-    auto& e2 = vFed2->registerGlobalEndpoint("value");
+    auto& controlEndpoint = controller->registerGlobalEndpoint("control");
+    auto& valueEndpoint = vFed2->registerGlobalEndpoint("value");
 
     auto cfed = [&]() {
         controller->enterExecutingMode();
@@ -942,10 +947,10 @@ TEST_F(timing, dual_max_time_endpoint)
 
         grantedTime = controller->requestTime(maxTime);
         while (grantedTime < cHelicsTerminateTime) {
-            auto m = e1.getMessage();
-            m->data.append("a", 1);
-            m->dest = "value";
-            e1.send(std::move(m));
+            auto message = controlEndpoint.getMessage();
+            message->data.append("a", 1);
+            message->dest = "value";
+            controlEndpoint.send(std::move(message));
             grantedTime = controller->requestTime(maxTime);
         }
         controller->disconnect();
@@ -956,20 +961,20 @@ TEST_F(timing, dual_max_time_endpoint)
         vFed2->enterExecutingMode();
         helics::Time grantedTime = helics::timeZero;
         helics::Time maxTime = 12.0;
-        e2.sendTo("b", "control");
+        valueEndpoint.sendTo("b", "control");
         while (grantedTime < maxTime) {
             grantedTime = vFed2->requestTime(grantedTime + 2.0);
-            auto m = e2.getMessage();
-            if (m) {
-                m->data.append("b", 1);
-                m->dest = "control";
-                e2.send(std::move(m));
+            auto message = valueEndpoint.getMessage();
+            if (message) {
+                message->data.append("b", 1);
+                message->dest = "control";
+                valueEndpoint.send(std::move(message));
             }
         }
         vFed2->requestTime(cHelicsBigNumber);
-        auto m = e2.getMessage();
-        if (m) {
-            finalValue = m->data.to_string();
+        auto message = valueEndpoint.getMessage();
+        if (message) {
+            finalValue = message->data.to_string();
         }
     };
 
@@ -982,4 +987,190 @@ TEST_F(timing, dual_max_time_endpoint)
     std::string test{"bababababababa"};
     // compute the expected value
     EXPECT_EQ(finalValue, test);
+}
+
+static void maxTimeDrainAfterSenderFinalizeEndpoint(FederateTestFixture& fixture,
+                                                    std::string_view coreType,
+                                                    bool waitForCurrentTimeUpdate = false)
+{
+    fixture.SetupTest<helics::MessageFederate>(coreType, 2);
+    auto sender = fixture.GetFederateAs<helics::MessageFederate>(0);
+    auto receiver = fixture.GetFederateAs<helics::MessageFederate>(1);
+
+    if (waitForCurrentTimeUpdate) {
+        receiver->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
+    }
+
+    auto& sendEndpoint = sender->registerGlobalEndpoint("source");
+    auto& receiveEndpoint = receiver->registerGlobalEndpoint("sink");
+    sendEndpoint.setDefaultDestination("sink");
+
+    auto senderTask = [&]() {
+        sender->enterExecutingMode();
+        for (int ii = 0; ii < 5; ++ii) {
+            const auto payload = std::string("message") + std::to_string(ii);
+            sendEndpoint.send(payload.data(), payload.size());
+            sender->requestTime(static_cast<double>(ii + 1));
+        }
+        sender->finalize();
+    };
+
+    auto receiverTask = [&]() {
+        receiver->enterExecutingMode();
+        std::vector<std::string> messages;
+        helics::Time grantedTime = helics::timeZero;
+        while (grantedTime < cHelicsTerminateTime) {
+            grantedTime = receiver->requestTime(helics::Time::maxVal());
+            while (receiveEndpoint.hasMessage()) {
+                auto msg = receiveEndpoint.getMessage();
+                messages.emplace_back(msg->data.to_string());
+            }
+        }
+        receiver->finalize();
+        return messages;
+    };
+
+    auto receiverFuture = std::async(std::launch::async, receiverTask);
+    auto senderFuture = std::async(std::launch::async, senderTask);
+
+    ASSERT_EQ(senderFuture.wait_for(std::chrono::seconds(5)), std::future_status::ready);
+    senderFuture.get();
+
+    ASSERT_EQ(receiverFuture.wait_for(std::chrono::seconds(5)), std::future_status::ready);
+    const auto messages = receiverFuture.get();
+
+    ASSERT_EQ(messages.size(), 5U);
+    EXPECT_EQ(messages.front(), "message0");
+    EXPECT_EQ(messages.back(), "message4");
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint)
+{
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "test_2");
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint_zmq)
+{
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "zmq_2");
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint_global_time)
+{
+    extraBrokerArgs = "--globaltime";
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "test_2");
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint_wait_for_current_time)
+{
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "test_2", true);
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_endpoint_wait_for_current_time_zmq)
+{
+    maxTimeDrainAfterSenderFinalizeEndpoint(*this, "zmq_2", true);
+}
+
+TEST_F(timing, max_time_drain_after_sender_finalize_mixed_value_endpoint_zmq)
+{
+    SetupTest<helics::CombinationFederate>("zmq_2", 2);
+    auto grid = GetFederateAs<helics::CombinationFederate>(0);
+    auto storage = GetFederateAs<helics::CombinationFederate>(1);
+
+    grid->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+
+    constexpr int storageDeviceCount = 4;
+    auto& totalPower = grid->registerGlobalPublication<std::complex<double>>("total_power", "kW");
+    std::vector<helics::Input*> powerSubscriptions;
+    std::vector<helics::Publication*> voltagePublications;
+    std::vector<helics::Publication*> socPublications;
+    std::vector<helics::Publication*> gridPowerPublications;
+    std::vector<helics::Publication*> storagePowerPublications;
+
+    powerSubscriptions.reserve(storageDeviceCount);
+    voltagePublications.reserve(storageDeviceCount);
+    socPublications.reserve(storageDeviceCount);
+    gridPowerPublications.reserve(storageDeviceCount);
+    storagePowerPublications.reserve(storageDeviceCount);
+
+    for (int ii = 0; ii < storageDeviceCount; ++ii) {
+        const auto device = std::string("storage") + std::to_string(ii);
+        auto& powerSub = grid->registerSubscription(device + "/power", "kW");
+        powerSub.setDefault(std::complex<double>{0.0, 0.0});
+        powerSubscriptions.push_back(&powerSub);
+
+        voltagePublications.push_back(
+            &grid->registerGlobalPublication<double>("storage." + device + ".voltage", "pu"));
+        socPublications.push_back(
+            &grid->registerGlobalPublication<double>("storage." + device + ".soc"));
+        gridPowerPublications.push_back(
+            &grid->registerGlobalPublication<std::complex<double>>("storage." + device + ".power",
+                                                                   "kW"));
+
+        storagePowerPublications.push_back(
+            &storage->registerGlobalPublication<std::complex<double>>(device + "/power", "kW"));
+    }
+
+    auto& reliabilityEndpoint = grid->registerGlobalEndpoint("reliability");
+    auto& metricsEndpoint = grid->registerGlobalEndpoint("metrics");
+    auto& storageEndpoint = storage->registerGlobalEndpoint("storage_status");
+
+    auto storageTask = [&]() {
+        storage->enterExecutingMode();
+        for (int step = 0; step < 12; ++step) {
+            for (int ii = 0; ii < storageDeviceCount; ++ii) {
+                storagePowerPublications[ii]->publish(
+                    std::complex<double>{static_cast<double>(step + ii), -0.25 * ii});
+            }
+            storageEndpoint.sendTo(std::string("reliability") + std::to_string(step),
+                                   "reliability");
+            storageEndpoint.sendTo(std::string("metrics") + std::to_string(step), "metrics");
+            storage->requestTime(static_cast<double>(step + 1));
+        }
+        storage->finalize();
+    };
+
+    auto gridTask = [&]() {
+        grid->enterExecutingMode();
+        std::vector<std::string> endpointMessages;
+        helics::Time grantedTime = helics::timeZero;
+        for (int step = 0; step < 12; ++step) {
+            grantedTime = grid->requestTime(static_cast<double>(step + 1));
+            std::complex<double> aggregate{0.0, 0.0};
+            for (int ii = 0; ii < storageDeviceCount; ++ii) {
+                aggregate += powerSubscriptions[ii]->getValue<std::complex<double>>();
+                voltagePublications[ii]->publish(1.0 + (0.01 * ii));
+                socPublications[ii]->publish(0.5 + (0.01 * step));
+                gridPowerPublications[ii]->publish(aggregate);
+            }
+            totalPower.publish(aggregate);
+
+            while (reliabilityEndpoint.hasMessage()) {
+                endpointMessages.emplace_back(reliabilityEndpoint.getMessage()->data.to_string());
+            }
+            while (metricsEndpoint.hasMessage()) {
+                endpointMessages.emplace_back(metricsEndpoint.getMessage()->data.to_string());
+            }
+        }
+
+        while (grantedTime < cHelicsTerminateTime) {
+            grantedTime = grid->requestTime(helics::Time::maxVal());
+            while (reliabilityEndpoint.hasMessage()) {
+                endpointMessages.emplace_back(reliabilityEndpoint.getMessage()->data.to_string());
+            }
+            while (metricsEndpoint.hasMessage()) {
+                endpointMessages.emplace_back(metricsEndpoint.getMessage()->data.to_string());
+            }
+        }
+        grid->finalize();
+        return endpointMessages.size();
+    };
+
+    auto gridFuture = std::async(std::launch::async, gridTask);
+    auto storageFuture = std::async(std::launch::async, storageTask);
+
+    ASSERT_EQ(storageFuture.wait_for(std::chrono::seconds(10)), std::future_status::ready);
+    storageFuture.get();
+
+    ASSERT_EQ(gridFuture.wait_for(std::chrono::seconds(10)), std::future_status::ready);
+    EXPECT_EQ(gridFuture.get(), 24U);
 }

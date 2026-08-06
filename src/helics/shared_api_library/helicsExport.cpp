@@ -548,6 +548,24 @@ HelicsBool helicsBrokerIsConnected(HelicsBroker broker)
     return (brk->isConnected()) ? HELICS_TRUE : HELICS_FALSE;
 }
 
+HelicsBool helicsBrokerIsRoot(HelicsBroker broker)
+{
+    auto* brk = getBroker(broker, nullptr);
+    if (brk == nullptr) {
+        return HELICS_FALSE;
+    }
+    return (brk->isRoot()) ? HELICS_TRUE : HELICS_FALSE;
+}
+
+HelicsBool helicsBrokerIsOpenToNewFederates(HelicsBroker broker)
+{
+    auto* brk = getBroker(broker, nullptr);
+    if (brk == nullptr) {
+        return HELICS_FALSE;
+    }
+    return (brk->isOpenToNewFederates()) ? HELICS_TRUE : HELICS_FALSE;
+}
+
 static constexpr char invalidDataLinkString[] = "Data link arguments cannot be null";
 
 void helicsBrokerDataLink(HelicsBroker broker, const char* source, const char* target, HelicsError* err)
@@ -792,6 +810,15 @@ HelicsBool helicsCoreIsConnected(HelicsCore core)
         return HELICS_FALSE;
     }
     return (cppcore->isConnected()) ? HELICS_TRUE : HELICS_FALSE;
+}
+
+HelicsBool helicsCoreIsOpenToNewFederates(HelicsCore core)
+{
+    auto* cppcore = getCore(core, nullptr);
+    if (cppcore == nullptr) {
+        return HELICS_FALSE;
+    }
+    return (cppcore->isOpenToNewFederates()) ? HELICS_TRUE : HELICS_FALSE;
 }
 
 void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* value, HelicsError* err)

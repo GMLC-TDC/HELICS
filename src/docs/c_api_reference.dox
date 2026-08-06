@@ -56,6 +56,7 @@ functions applying to a \ref HelicsCore object
  - \ref helicsCoreIsValid
  - \ref helicsCoreWaitForDisconnect
  - \ref helicsCoreIsConnected
+ - \ref helicsCoreIsOpenToNewFederates
  - \ref helicsCoreDataLink
  - \ref helicsCoreAddSourceFilterToEndpoint
  - \ref helicsCoreAddDestinationFilterToEndpoint
@@ -83,6 +84,8 @@ Functions applying to a \ref HelicsBroker object
  - \ref helicsBrokerClone
  - \ref helicsBrokerIsValid
  - \ref helicsBrokerIsConnected
+ - \ref helicsBrokerIsRoot
+ - \ref helicsBrokerIsOpenToNewFederates
  - \ref helicsBrokerDataLink
  - \ref helicsBrokerAddSourceFilterToEndpoint
  - \ref helicsBrokerAddDestinationFilterToEndpoint
