@@ -76,8 +76,10 @@ TEST(other_tests, core_status_queries)
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gcore_status_broker", "--root", &err);
     EXPECT_EQ(err.error_code, 0);
-    auto core = helicsCreateCore(
-        "test", "gcore_status", "--broker=gcore_status_broker --maxfederates 1", &err);
+    auto core = helicsCreateCore("test",
+                                 "gcore_status",
+                                 "--broker=gcore_status_broker --maxfederates 1",
+                                 &err);
     EXPECT_EQ(err.error_code, 0);
     ASSERT_TRUE(helicsCoreIsValid(core));
     auto connected = helicsCoreConnect(core, &err);
@@ -85,8 +87,10 @@ TEST(other_tests, core_status_queries)
     EXPECT_EQ(helicsCoreIsConnected(core), HELICS_TRUE);
     EXPECT_EQ(helicsCoreIsOpenToNewFederates(core), HELICS_TRUE);
 
-    auto closedCore = helicsCreateCore(
-        "test", "gcore_status_closed", "--broker=gcore_status_broker --maxfederates 0", &err);
+    auto closedCore = helicsCreateCore("test",
+                                       "gcore_status_closed",
+                                       "--broker=gcore_status_broker --maxfederates 0",
+                                       &err);
     ASSERT_EQ(err.error_code, 0);
     ASSERT_TRUE(helicsCoreIsValid(closedCore));
     connected = helicsCoreConnect(closedCore, &err);
