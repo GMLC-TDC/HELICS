@@ -620,6 +620,28 @@ public class helics implements helicsConstants {
   }
 
   /**
+   * Check if a broker is configured as a root broker.<br>
+   * <br>
+   * @param broker The broker to query.<br>
+   * <br>
+   * @return HELICS_TRUE if the broker is a root broker, HELICS_FALSE otherwise.
+   */
+  public static int helicsBrokerIsRoot(SWIGTYPE_p_void broker) {
+    return helicsJNI.helicsBrokerIsRoot(SWIGTYPE_p_void.getCPtr(broker));
+  }
+
+  /**
+   * Check if a broker can accept new federates.<br>
+   * <br>
+   * @param broker The broker to query.<br>
+   * <br>
+   * @return HELICS_TRUE if the broker is open to new federates, HELICS_FALSE otherwise.
+   */
+  public static int helicsBrokerIsOpenToNewFederates(SWIGTYPE_p_void broker) {
+    return helicsJNI.helicsBrokerIsOpenToNewFederates(SWIGTYPE_p_void.getCPtr(broker));
+  }
+
+  /**
    * Link a named publication and named input using a broker.<br>
    * <br>
    * @param broker The broker to generate the connection from.<br>
@@ -709,6 +731,17 @@ public class helics implements helicsConstants {
    */
   public static int helicsCoreIsConnected(SWIGTYPE_p_void core) {
     return helicsJNI.helicsCoreIsConnected(SWIGTYPE_p_void.getCPtr(core));
+  }
+
+  /**
+   * Check if a core can accept new federates.<br>
+   * <br>
+   * @param core The core to query.<br>
+   * <br>
+   * @return HELICS_TRUE if the core is open to new federates, HELICS_FALSE otherwise.
+   */
+  public static int helicsCoreIsOpenToNewFederates(SWIGTYPE_p_void core) {
+    return helicsJNI.helicsCoreIsOpenToNewFederates(SWIGTYPE_p_void.getCPtr(core));
   }
 
   /**
@@ -2750,7 +2783,7 @@ public class helics implements helicsConstants {
    * @param err A pointer to an error object for catching errors.<br>
    * <br>
    * <br>
-   * @return An object containing the publication.
+   * @return An object containing the input.
    */
   public static SWIGTYPE_p_void helicsFederateRegisterTypeInput(SWIGTYPE_p_void fed, String key, String type, String units) {
     long cPtr = helicsJNI.helicsFederateRegisterTypeInput(SWIGTYPE_p_void.getCPtr(fed), key, type, units);
@@ -2760,10 +2793,10 @@ public class helics implements helicsConstants {
   /**
    * Register a global named input.<br>
    * <br>
-   * The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free<br>
+   * The input becomes part of the federate and is destroyed when the federate is freed so there are no separate free<br>
    * functions for inputs and publications.<br>
    * <br>
-   * @param fed The federate object in which to create a publication.<br>
+   * @param fed The federate object in which to create an input.<br>
    * @param key The identifier for the input (may be NULL).<br>
    * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.<br>
    * @param units A string listing the units of the input (may be NULL).<br>

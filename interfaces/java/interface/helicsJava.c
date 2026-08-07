@@ -1605,6 +1605,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1PROPERTY_1INT_1IN
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1PROPERTY_1INT_1VALUE_1BUFFER_1WARNING_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsProperties result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsProperties)HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1INVALID_1PROPERTY_1VALUE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
@@ -3885,6 +3897,34 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsBrokerIsConnected(J
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsBrokerIsRoot(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  HelicsBroker arg1 = 0 ;
+  HelicsBool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(HelicsBroker *)&jarg1; 
+  result = (HelicsBool)helicsBrokerIsRoot(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsBrokerIsOpenToNewFederates(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  HelicsBroker arg1 = 0 ;
+  HelicsBool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(HelicsBroker *)&jarg1; 
+  result = (HelicsBool)helicsBrokerIsOpenToNewFederates(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsBrokerDataLink(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jstring jarg3) {
   HelicsBroker arg1 = 0 ;
   char *arg2 = 0 ;
@@ -4093,6 +4133,20 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsCoreIsConnected(JNI
   (void)jcls;
   arg1 = *(HelicsCore *)&jarg1; 
   result = (HelicsBool)helicsCoreIsConnected(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsCoreIsOpenToNewFederates(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  HelicsCore arg1 = 0 ;
+  HelicsBool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(HelicsCore *)&jarg1; 
+  result = (HelicsBool)helicsCoreIsOpenToNewFederates(arg1);
   jresult = (jint)result; 
   return jresult;
 }
@@ -8373,7 +8427,7 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterGl
   char *arg4 = 0 ;
   HelicsError *arg5 = 0 ;
   HelicsError etemp5 ;
-  HelicsPublication result;
+  HelicsInput result;
   
   (void)jenv;
   (void)jcls;
@@ -8393,8 +8447,8 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterGl
     arg4 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg4, 0);
     if (!arg4) return 0;
   }
-  result = (HelicsPublication)helicsFederateRegisterGlobalInput(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
-  *(HelicsPublication *)&jresult = result; 
+  result = (HelicsInput)helicsFederateRegisterGlobalInput(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
+  *(HelicsInput *)&jresult = result; 
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);
   {
@@ -8416,7 +8470,7 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterGl
   char *arg4 = 0 ;
   HelicsError *arg5 = 0 ;
   HelicsError etemp5 ;
-  HelicsPublication result;
+  HelicsInput result;
   
   (void)jenv;
   (void)jcls;
@@ -8440,8 +8494,8 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterGl
     arg4 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg4, 0);
     if (!arg4) return 0;
   }
-  result = (HelicsPublication)helicsFederateRegisterGlobalTypeInput(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
-  *(HelicsPublication *)&jresult = result; 
+  result = (HelicsInput)helicsFederateRegisterGlobalTypeInput(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
+  *(HelicsInput *)&jresult = result; 
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
   if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);

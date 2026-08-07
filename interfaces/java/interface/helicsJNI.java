@@ -123,6 +123,7 @@ public class helicsJNI {
   public final static native int HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL_get();
   public final static native int HELICS_PROPERTY_INT_LOG_BUFFER_get();
   public final static native int HELICS_PROPERTY_INT_INDEX_GROUP_get();
+  public final static native int HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING_get();
   public final static native int HELICS_INVALID_PROPERTY_VALUE_get();
   public final static native int HELICS_MULTI_INPUT_NO_OP_get();
   public final static native int HELICS_MULTI_INPUT_VECTORIZE_OPERATION_get();
@@ -262,6 +263,8 @@ public class helicsJNI {
   public final static native long helicsBrokerClone(long jarg1);
   public final static native int helicsBrokerIsValid(long jarg1);
   public final static native int helicsBrokerIsConnected(long jarg1);
+  public final static native int helicsBrokerIsRoot(long jarg1);
+  public final static native int helicsBrokerIsOpenToNewFederates(long jarg1);
   public final static native void helicsBrokerDataLink(long jarg1, String jarg2, String jarg3);
   public final static native void helicsBrokerAddSourceFilterToEndpoint(long jarg1, String jarg2, String jarg3);
   public final static native void helicsBrokerAddDestinationFilterToEndpoint(long jarg1, String jarg2, String jarg3);
@@ -269,6 +272,7 @@ public class helicsJNI {
   public final static native int helicsCoreWaitForDisconnect(long jarg1, int jarg2);
   public final static native int helicsBrokerWaitForDisconnect(long jarg1, int jarg2);
   public final static native int helicsCoreIsConnected(long jarg1);
+  public final static native int helicsCoreIsOpenToNewFederates(long jarg1);
   public final static native void helicsCoreDataLink(long jarg1, String jarg2, String jarg3);
   public final static native void helicsCoreAddSourceFilterToEndpoint(long jarg1, String jarg2, String jarg3);
   public final static native void helicsCoreAddDestinationFilterToEndpoint(long jarg1, String jarg2, String jarg3);
