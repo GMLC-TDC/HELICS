@@ -89,6 +89,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "console_log_level": "",
   "dump_log": false,
   "logbuffer": 10,
+  "value_buffer_warning": 100,
 
   //Timing
   "ignore_time_mismatch_warnings": false,
@@ -553,6 +554,22 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_BUFFER` [276]
 
 When set to a number greater than 0 will enable the most recent X log messages of the object to be buffered for retrieval via the ["logs" query](../user-guide/advanced_topics/queries.md). Also see discussion in [Logging](../user-guide/fundamental_topics/logging.md#log-buffer).
+
+---
+
+### `value_buffer_warning` [100]
+
+_Alternative names:_ `valuebufferwarning`
+
+_API:_ `helicsFederateInfoSetIntegerProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#a01dddbf428e5d1f0ad8ead05491dabff)
+| [C](api-reference/C_API.md#federateinfo)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetIntegerProperty)
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Int64})
+
+_Property's enumerated name:_ `HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING` [283]
+
+Sets the federate warning threshold, in MiB, for queued future value payload data. The default threshold is 100 MiB. Set this option to 0 to disable the warning. This warning is intended to highlight cases where value publications are being buffered faster than the receiving federate is consuming them, such as when a producer advances ahead of a subscriber.
 
 ## Other Options
 

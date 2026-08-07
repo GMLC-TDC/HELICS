@@ -62,6 +62,10 @@ Federate Info
         error(0), interfaces(4), no_print(-1), none(-1), summary(2), timing(5),
         trace(7), and warning(1).
 
+--value_buffer_warning <MiB>::
+        The queued value buffer warning threshold in MiB for a federate. The
+        default is 100 MiB. Use 0 to disable this warning.
+
 --separator <char>::
         Separator character for local federates. Default is '/'.
 
