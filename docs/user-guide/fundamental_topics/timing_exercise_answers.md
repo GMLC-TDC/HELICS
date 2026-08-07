@@ -51,7 +51,7 @@ A few simple exercises about co-simulation timing
 
     ![Connectivity Diagram](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/timing_fed_setup.png "Exercise Federate Setup")
 
-5.  Federation Setup \[A: period=1; B: period=2; C: period=3\], Federates will send an update when they have received an update from the all other connected federates. Federate A sends an update at time 0, what is the Update sequence
+5.  Federation Setup \[A: period=1; B: period=2; C: period=3\], Federates will send an update when they have received an update from all other connected federates. Federate A sends an update at time 0, what is the update sequence
 
 <center>
 

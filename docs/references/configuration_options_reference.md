@@ -1612,7 +1612,7 @@ Generates an additional `marker` message if logging is enabled.
 
 ## Network
 
-For most HELICS users, most of the time, the following network options are not needed. They are most likely to be needed when working in complex networking environments, particularly when running co-simulations across multiple sites with differing network configurations. Many of these options require non-trivial knowledge of network operations and rather and it is assumed that those that needs these options will understand what they do, even with the minimal descriptions given.
+For most HELICS users, most of the time, the following network options are not needed. They are most likely to be needed when working in complex networking environments, particularly when running co-simulations across multiple sites with differing network configurations. Many of these options require non-trivial knowledge of network operations, and it is assumed that those who need these options will understand what they do, even with the minimal descriptions given.
 
 ### interface network
 

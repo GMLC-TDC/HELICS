@@ -41,7 +41,7 @@ The figure below shows the most common architecture for HELICS co-simulation. Ea
 
 ## Configuring the federate
 
-Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
+Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having to modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
 
 ### Sample federate JSON configuration file
 
@@ -159,7 +159,7 @@ Additionally, there are ways to create and configure the federate directly throu
 fi = h.helicsCreateFederateInfo()
 ```
 
-Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../../references/configuration_options_reference.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
+Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../../references/configuration_options_reference.md) as appropriate. For example, to set the only_transmit_on_change flag to true, you would use the following API call:
 
 ```python
 h.helicsFederateInfoSetFlagOption(fi, 6, True)
@@ -183,7 +183,7 @@ This call takes in the federate object, a string containing the publication key 
 pub = h.helicsPublicationSetOption(pub, 454, True)
 ```
 
-Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the cosimulation. The API calls are syntactically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revisit the above example where the only_transmit_on_change on change flag is set to true in the federate info object, if operating on an existing federate, that call would be:
+Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the co-simulation. The API calls are syntactically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revisit the above example where the only_transmit_on_change flag is set to true in the federate info object, if operating on an existing federate, that call would be:
 
 ```python
 h.helicsFederateSetFlagOption(fi, 6, True)
@@ -191,7 +191,7 @@ h.helicsFederateSetFlagOption(fi, 6, True)
 
 ### Error Handling
 
-By default, HELICS will not terminate execution of every participating federate if an error occurs in one. However, in most cases, if such an error occurs, the cosimulation is no longer valid. It is therefore generally a good idea to set the following flag in your simulator federate so that its execution will be terminated if an error occurs anywhere in the cosimulation.
+By default, HELICS will not terminate execution of every participating federate if an error occurs in one. However, in most cases, if such an error occurs, the co-simulation is no longer valid. It is therefore generally a good idea to set the following flag in your simulator federate so that its execution will be terminated if an error occurs anywhere in the co-simulation.
 
 ```python
 h.helicsFederateSetFlagOption(fed, helics_flag_terminate_on_error)
@@ -201,7 +201,7 @@ This will prevent your federate from hanging in the event that another federate 
 
 ### Collecting the Publication, Subscription and Endpoint Objects
 
-Having configured the publications, subscriptions and endpoints and registered this information with HELICS, the channels for sending and receiving this information have been created within the cosimulation framework. If you registered the publication, subscriptions and endpoints within your code (i.e., using HELICS API calls), you already have access to each respective object as it was returned when made the registration call. However, if you created your federate using a configuration file which contained all of this information, you now need to retrieve these objects from HELICS so that you can invoke them during the execution of your cosimulation. The following calls will allow you to query HELICS for the metadata associated with each publication. Similar calls can be used to get input (or subscription) and endpoint information.
+Having configured the publications, subscriptions and endpoints and registered this information with HELICS, the channels for sending and receiving this information have been created within the co-simulation framework. If you registered the publication, subscriptions and endpoints within your code (i.e., using HELICS API calls), you already have access to each respective object because it was returned when you made the registration call. However, if you created your federate using a configuration file which contained all of this information, you now need to retrieve these objects from HELICS so that you can invoke them during the execution of your co-simulation. The following calls will allow you to query HELICS for the metadata associated with each publication. Similar calls can be used to get input (or subscription) and endpoint information.
 
 ```python
 pub_count = h.helicsFederateGetPublicationCount(fed)
@@ -221,15 +221,15 @@ h.helicsFederateEnterExecutingMode(fed)
 
 This method call is a blocking call; your custom federate will sit there and do nothing until all other federates have also finished any set-up work and have also requested to begin execution of the co-simulation. Once this method returns, the federation is effectively at simulation time of zero.
 
-At this point, each federate will now set through time, exchanging values with other federates in the cosimulation as appropriate. This will be implemented in a loop where each federate will go through a set of prescribed steps at each time step. At the beginning of the cosimulation, time is at the zeroth time step (t = 0). Let's assume that the cosimulation will end at a pre-determined time, t = max_time. The nature of the simulator will dictate how the time loop is handled. However, it is likely that the cosimulation loop will start with something like this:
+At this point, each federate will now step through time, exchanging values with other federates in the co-simulation as appropriate. This will be implemented in a loop where each federate will go through a set of prescribed steps at each time step. At the beginning of the co-simulation, time is at the zeroth time step (t = 0). Let's assume that the co-simulation will end at a pre-determined time, t = max_time. The nature of the simulator will dictate how the time loop is handled. However, it is likely that the co-simulation loop will start with something like this:
 
 ```python
 t = 0
 while t < end_time:
-    pass  # cosimulation code would go here
+    pass  # co-simulation code would go here
 ```
 
-Now, the federate begins to step through time. For the purposes of this example, we will assume that during every time step, the federate will first take inputs in from the rest of the cosimulation, then make internal updates and calculations and finish the time step by publishing values back to the rest of the cosimulation before requesting the next time step.
+Now, the federate begins to step through time. For the purposes of this example, we will assume that during every time step, the federate will first take inputs in from the rest of the co-simulation, then make internal updates and calculations and finish the time step by publishing values back to the rest of the co-simulation before requesting the next time step.
 
 #### Get Inputs
 

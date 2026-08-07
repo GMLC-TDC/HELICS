@@ -32,7 +32,7 @@ The file `fundamental_default_runner.json` includes:
 }
 ```
 
-This tells HELICS to launch three federates named `broker`, `Charger`, and `Battery`. The `directory` tells HELICS the location of the executable. For the `broker`, the executable `helics_broker` should be [configured to suite your needs](../installation/index.md). The `broker` is launched with the executable `helics_broker`, to which we pass the information `-f 2` meaning there will be two federates, and `--loglevel=7` meaning that we want [all internal messages](./logging.md) to be sent to the log file.
+This tells HELICS to launch three federates named `broker`, `Charger`, and `Battery`. The `directory` tells HELICS the location of the executable. For the `broker`, the executable `helics_broker` should be [configured to suit your needs](../installation/index.md). The `broker` is launched with the executable `helics_broker`, to which we pass the information `-f 2` meaning there will be two federates, and `--loglevel=7` meaning that we want [all internal messages](./logging.md) to be sent to the log file.
 
 The other two federates are Python based and just need to be called with `python -u`.
 

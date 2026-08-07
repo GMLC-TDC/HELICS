@@ -111,7 +111,7 @@ We have described the individual distributions for each level of charging port. 
 
 We want to address the research question: What is the likely power draw that EVs will demand?
 
-At the beginning of the co-simulation, the distributions defined above will be sampled _N_ times within the EV federate, where _N =_ the number of parking spots/charging ports in the garage. The output of the initial sampling is the number of requested Level 1, 2, and 3 charging ports. The SOC for the batteries on board are initialized to a uniform random number between 0.05 and 0.5, and these SOC are sent to the Charger federate. If the SOC of an EV battery is less than 0.9, the EV Controller federate tells the EV battery in the EV federate to continue charging. Otherwise, the EV Charger disconnects the EV battery, and instructs the it to sample a new EV battery from the distributions (one sample).
+At the beginning of the co-simulation, the distributions defined above will be sampled _N_ times within the EV federate, where _N =_ the number of parking spots/charging ports in the garage. The output of the initial sampling is the number of requested Level 1, 2, and 3 charging ports. The SOC values for the batteries on board are initialized to a uniform random number between 0.05 and 0.5, and these SOC values are sent to the Charger federate. If the SOC of an EV battery is less than 0.9, the EV Controller federate tells the EV battery in the EV federate to continue charging. Otherwise, the EV Charger disconnects the EV battery and instructs it to sample a new EV battery from the distributions (one sample).
 
 After the two federates pass information between each other -- EV Battery sends SOC, EV Charger instructs whether to keep charging or resample the distributions -- the EV Battery calculates the total power demanded in the last time interval.
 
@@ -148,7 +148,7 @@ $ python advanced_orchestration.py 10 . 100 24*7 0 0
 
 This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not execute the JSON files with the HELICS runner (meaning the user will need to manually run each JSON file).
 
-You may decide to adapt `advanced_orchestration.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to use the HELICS runner for the generated runner JSON files using the helper script, subdirectories are created for the HELICS runner JSON files and for the csv results. Results for the default simulation are in the repo and can be used for confirming accurate execution.
+You may decide to adapt `advanced_orchestration.py` to suit your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to use the HELICS runner for the generated runner JSON files using the helper script, subdirectories are created for the HELICS runner JSON files and for the csv results. Results for the default simulation are in the repo and can be used for confirming accurate execution.
 
 ```python
 out_json = output_path + "/cli_runner_scripts"
@@ -250,7 +250,7 @@ Merlin will have its own subdirectory in `./UQ_EV_Study`.
 
 Remember this step is for Merlin to setup all the files and data it
 needs to execute its jobs. In the Monte Carlo co-simulation there is
-a python script we created that will generated the HELICS runner
+a python script we created that will generate the HELICS runner
 files that Merlin will use when it executes a specific run. The
 `make_samples_merlin.py` script (located under the `simple` subfolder of
 the advanced orchestration example code) will also output a csv file that

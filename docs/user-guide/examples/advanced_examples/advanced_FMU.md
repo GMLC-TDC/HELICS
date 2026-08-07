@@ -7,7 +7,7 @@
 
 ```
 
-This demonstrates the use of HELICS-FMI to integrate an FMU into a HELICS-based co-simulation. [Functional Mock-Up Interface (FMI)](https://fmi-standard.org/) is an existing method of integrating models that is similar to HELICS is some ways. FMI provides a way to specify a model and with the help of a supporting tool, compile into a binary and provide a companion specification of the interface to that model. In some cases, a solver for the model is also distributed along with the model, effectively making it a highly specialized simulation tool. These elements can be bundled up into a distributable unit called a "functional mock-up unit" (FMU) that can be distributed without revealing the inner workings of a model. HELICS provides a way to allow one or more FMUs to participate in a HELICS co-simulation using the HELICS-FMI application.
+This demonstrates the use of HELICS-FMI to integrate an FMU into a HELICS-based co-simulation. [Functional Mock-Up Interface (FMI)](https://fmi-standard.org/) is an existing method of integrating models that is similar to HELICS in some ways. FMI provides a way to specify a model and, with the help of a supporting tool, compile it into a binary and provide a companion specification of the interface to that model. In some cases, a solver for the model is also distributed along with the model, effectively making it a highly specialized simulation tool. These elements can be bundled up into a distributable unit called a "functional mock-up unit" (FMU) that can be distributed without revealing the inner workings of a model. HELICS provides a way to allow one or more FMUs to participate in a HELICS co-simulation using the HELICS-FMI application.
 
 - [Where is the code?](#where-is-the-code)
 - [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
@@ -18,7 +18,7 @@ This demonstrates the use of HELICS-FMI to integrate an FMU into a HELICS-based 
 
 ## Where is the code?
 
-The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. This example on [using an FMU in a HELICS-based co-simulation](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_fmu). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
+The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. The example on [using an FMU in a HELICS-based co-simulation can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_fmu). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
 Note that this code contains a component (the FMU) that has been compiled for Windows and thus will only function on Windows. The FMU source code has been included and can be compiled into an FMU for other platforms with the appropriate tools.
 
@@ -26,13 +26,13 @@ Note that this code contains a component (the FMU) that has been compiled for Wi
 
 This example shows you how to take an existing FMU and incorporate it into a HELICS-based co-simulation. This effectively allows FMUs to act as HELICS federates.
 
-The [Functional Mock-up Interface (FMI)](https://fmi-standard.org/) is a modeling language popularly implemented by the commercial tool [Modelon](https://modelon.com/) (_nee_ Modelica) but also has an open-source implementation [OpenModelica](https://openmodelica.org/). The modeling language allows for a black-box description of a model's interfaces to support co-simulation of various modeled entities through the creation of an FMU. The FMU, when used for co-simulation, consists of two main components: 1. An XML file describing the data exchange interfaces 2. Binary version of the model with callable FMI-defined functions that simulate the model.
+The [Functional Mock-up Interface (FMI)](https://fmi-standard.org/) is a modeling language popularly implemented by the commercial tool [Modelon](https://modelon.com/) (_nee_ Modelica) but also has an open-source implementation [OpenModelica](https://openmodelica.org/). The modeling language allows for a black-box description of a model's interfaces to support co-simulation of various modeled entities through the creation of an FMU. The FMU, when used for co-simulation, consists of two main components: 1. an XML file describing the data exchange interfaces and 2. a binary version of the model with callable FMI-defined functions that simulate the model.
 
 FMI effectively defines another means of performing a co-simulation using FMUs and the HELICS team has created a means by which these FMUs can join a HELICS-based co-simulation. To integrate the FMU into the example, HELICS-FMI acts as a bridge that is able to execute the "SimpleBattery.fmu" FMU. HELICS-FMI takes care of executing the FMU using the inputs from the rest of the co-simulation and providing the outputs on its behalf.
 
 ## HELICS components
 
-To enable an FMU to act as a HELICS federate, the "helics_fmi" application as been developed. This application has the ability to read an FMU, set-up the defined data-exchange interfaces as HELICS value interfaces, and call the necessary simulation functions for the FMU to push it forward in simulated time. This puts the HELICS in the role of "master algorithm" (to use the FMI parlance).
+To enable an FMU to act as a HELICS federate, the "helics_fmi" application has been developed. This application has the ability to read an FMU, set up the defined data-exchange interfaces as HELICS value interfaces, and call the necessary simulation functions for the FMU to push it forward in simulated time. This puts HELICS in the role of "master algorithm" (to use the FMI parlance).
 
 As a more specialty item, helics_fmi is not included as a part of the standard HELICS distribution and must be built from source. The source code can be found in the ["helics_fmi"](https://github.com/GMLC-TDC/HELICS-FMI) repository and uses a CMake build process like the main HELICS library. You can follow [the instructions here on building the main HELICS library](https://docs.helics.org/en/latest/user-guide/installation/build_from_source.html) but work from the helics_fmi repo.
 
