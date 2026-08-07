@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
 
+#include <algorithm>
 #include <filesystem>
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
@@ -1123,4 +1124,46 @@ TEST(logging, remote_log_multiObjects)
     llock2.unlock();
     EXPECT_GT(remote_cntBroker, 0);
     EXPECT_GT(remote_cntFed2, 0);
+}
+
+TEST(logging, value_buffer_warning)
+{
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreInitString = "--autobroker";
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_WARNING);
+    fedInfo.setProperty(helics::defs::Properties::VALUE_BUFFER_WARNING, 1);
+
+    auto pubFed = std::make_shared<helics::ValueFederate>("value_buffer_pub", fedInfo);
+    auto subFed = std::make_shared<helics::ValueFederate>("value_buffer_sub", fedInfo);
+
+    auto& pub = pubFed->registerGlobalPublication<std::string>("buffer_pub");
+    subFed->registerSubscription("buffer_pub");
+
+    gmlc::libguarded::guarded<std::vector<std::string>> warnings;
+    subFed->setLoggingCallback(
+        [&warnings](int level, std::string_view /*unused*/, std::string_view message) {
+            if (level == HELICS_LOG_LEVEL_WARNING) {
+                warnings.lock()->emplace_back(message);
+            }
+        });
+
+    auto pubThread = std::async(std::launch::async, [&pubFed, &pub]() {
+        pubFed->enterExecutingMode();
+        const std::string payload(600ULL * 1024ULL, 'a');
+        for (int ii = 1; ii <= 4; ++ii) {
+            pub.publish(payload);
+            pubFed->requestTime(ii);
+        }
+    });
+
+    subFed->enterExecutingMode();
+    pubThread.get();
+
+    subFed->requestTime(1.0);
+
+    const auto loggedWarnings = warnings.lock();
+    EXPECT_TRUE(
+        std::any_of(loggedWarnings->begin(), loggedWarnings->end(), [](const auto& warning) {
+            return warning.find("queued future value buffers contain") != std::string::npos;
+        }));
 }

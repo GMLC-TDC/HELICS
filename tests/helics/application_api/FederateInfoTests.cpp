@@ -250,6 +250,9 @@ TEST(federateInfo, loadinfoPropsJson)
     EXPECT_EQ(fedInfo.checkIntProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_NO_PRINT),
               HELICS_LOG_LEVEL_SUMMARY);
 
+    fedInfo = helics::loadFederateInfo(R"({"value_buffer_warning":12})");
+    EXPECT_EQ(fedInfo.checkIntProperty(HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING, 100), 12);
+
     EXPECT_THROW(helics::loadFederateInfo("{\"loglevel\":\"unknown\"}"), helics::InvalidIdentifier);
 }
 

@@ -15,15 +15,26 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "testFixtures.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <future>
 #include <gtest/gtest.h>
+#include <iomanip>
 #include <memory>
 #include <numeric>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
+
+#ifdef _WIN32
+#    ifndef NOMINMAX
+#        define NOMINMAX
+#    endif
+#    include <windows.h>
+#elif defined(__linux__)
+#    include <unistd.h>
+#endif
 
 /** these test cases test out the value federates with some additional tests
  */
@@ -41,6 +52,59 @@ class valuefed_add_type_tests_ci_skip:
     public FederateTestFixture {};
 
 class valuefed_add_tests_ci_skip: public ::testing::Test, public FederateTestFixture {};
+
+static std::uint64_t getResidentMemoryBytes()
+{
+#ifdef _WIN32
+    struct ProcessMemoryCounters {
+        DWORD cb;
+        DWORD PageFaultCount;
+        SIZE_T PeakWorkingSetSize;
+        SIZE_T WorkingSetSize;
+        SIZE_T QuotaPeakPagedPoolUsage;
+        SIZE_T QuotaPagedPoolUsage;
+        SIZE_T QuotaPeakNonPagedPoolUsage;
+        SIZE_T QuotaNonPagedPoolUsage;
+        SIZE_T PagefileUsage;
+        SIZE_T PeakPagefileUsage;
+    };
+
+    using GetProcessMemoryInfoFunction = BOOL(WINAPI*)(HANDLE, ProcessMemoryCounters*, DWORD);
+    static const auto getProcessMemoryInfo = []() -> GetProcessMemoryInfoFunction {
+        auto* proc = reinterpret_cast<GetProcessMemoryInfoFunction>(
+            GetProcAddress(GetModuleHandleA("kernel32.dll"), "K32GetProcessMemoryInfo"));
+        if (proc != nullptr) {
+            return proc;
+        }
+        const auto psapi = LoadLibraryA("psapi.dll");
+        return (psapi == nullptr) ? nullptr :
+                                    reinterpret_cast<GetProcessMemoryInfoFunction>(
+                                        GetProcAddress(psapi, "GetProcessMemoryInfo"));
+    }();
+
+    ProcessMemoryCounters pmc{};
+    pmc.cb = sizeof(pmc);
+    if (getProcessMemoryInfo != nullptr &&
+        getProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)) != 0) {
+        return static_cast<std::uint64_t>(pmc.WorkingSetSize);
+    }
+#elif defined(__linux__)
+    std::ifstream statm("/proc/self/statm");
+    std::uint64_t size = 0;
+    std::uint64_t resident = 0;
+    if (statm >> size >> resident) {
+        return resident * static_cast<std::uint64_t>(sysconf(_SC_PAGESIZE));
+    }
+#endif
+    return 0;
+}
+
+static std::string issue2794Key(int index)
+{
+    std::ostringstream key;
+    key << "issue2794_pub" << std::setw(4) << std::setfill('0') << index;
+    return key.str();
+}
 
 /** test simple creation and destruction*/
 TEST_P(valuefed_add_single_type_tests_ci_skip, initialize)
@@ -338,6 +402,156 @@ TEST_F(valuefed_add_tests_ci_skip, dual_transfer_complex_long)
     std::complex<double> val1 = std::polar(10.0, 0.43);
     std::complex<double> val2 = {-3e45, 1e-23};
     runDualFederateTest<std::complex<double>>("test_7", def, val1, val2);
+}
+
+TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
+{
+    struct MemoryCheckpoint {
+        int stage;
+        int timeStep;
+        std::uint64_t residentBytes;
+    };
+
+    constexpr int interfaceCount = 1500;
+    constexpr int stageCount = 5;
+    constexpr int stepsPerStage = 500;
+    constexpr int stepCount = stageCount * stepsPerStage;
+    constexpr std::uint64_t maxExpectedGrowth = 32ULL * 1024ULL * 1024ULL;
+    constexpr std::uint64_t maxExpectedStageGrowth = 16ULL * 1024ULL * 1024ULL;
+
+    auto toMiB = [](std::uint64_t bytes) { return bytes / (1024ULL * 1024ULL); };
+
+    SetupTest<helics::ValueFederate>("test", 2, 1.0);
+    auto pubFed = GetFederateAs<helics::ValueFederate>(0);
+    auto subFed = GetFederateAs<helics::ValueFederate>(1);
+
+    std::vector<helics::Publication> pubs;
+    std::vector<helics::Input> subs;
+    pubs.reserve(interfaceCount);
+    subs.reserve(interfaceCount);
+
+    for (int ii = 0; ii < interfaceCount; ++ii) {
+        const auto key = issue2794Key(ii);
+        if ((ii % 2) == 0) {
+            pubs.push_back(pubFed->registerGlobalPublication<double>(key));
+        } else {
+            pubs.push_back(pubFed->registerGlobalPublication<std::string>(key));
+        }
+        subFed->registerSubscription(key);
+    }
+    for (int ii = 0; ii < subFed->getInputCount(); ++ii) {
+        subs.push_back(subFed->getInput(ii));
+    }
+
+    auto pubExec = std::async(std::launch::async, [&]() { pubFed->enterExecutingMode(); });
+    subFed->enterExecutingMode();
+    pubExec.get();
+
+    const auto initialMemory = getResidentMemoryBytes();
+    ASSERT_NE(initialMemory, 0U);
+    std::vector<MemoryCheckpoint> publisherCheckpoints;
+    std::vector<MemoryCheckpoint> subscriberCheckpoints;
+    publisherCheckpoints.reserve(stageCount + 1);
+    subscriberCheckpoints.reserve(stageCount + 1);
+    publisherCheckpoints.push_back({.stage = 0, .timeStep = 0, .residentBytes = initialMemory});
+    subscriberCheckpoints.push_back({.stage = 0, .timeStep = 0, .residentBytes = initialMemory});
+    std::size_t observedBytes = 0;
+
+    auto pubLoop = std::async(std::launch::async, [&]() {
+        helics::Time grantedTime = 0.0;
+        for (int tt = 0; tt < stepCount; ++tt) {
+            for (int ii = 0; ii < interfaceCount; ++ii) {
+                if ((ii % 2) == 0) {
+                    pubs[ii].publish(static_cast<double>(ii + tt));
+                } else {
+                    pubs[ii].publish(std::to_string(ii + tt));
+                }
+            }
+            grantedTime = pubFed->requestTime(static_cast<double>(tt + 1));
+            if (((tt + 1) % stepsPerStage) == 0) {
+                publisherCheckpoints.push_back({.stage = (tt + 1) / stepsPerStage,
+                                                .timeStep = tt + 1,
+                                                .residentBytes = getResidentMemoryBytes()});
+            }
+        }
+        return grantedTime;
+    });
+
+    helics::Time subTime = 0.0;
+    for (int stage = 1; stage <= stageCount; ++stage) {
+        const int stageEnd = stage * stepsPerStage;
+        for (int tt = (stage - 1) * stepsPerStage; tt < stageEnd; ++tt) {
+            subTime = subFed->requestTime(static_cast<double>(tt + 1));
+            for (auto& sub : subs) {
+                if (sub.isUpdated()) {
+                    const auto& value = sub.getString();
+                    observedBytes += value.size();
+                }
+            }
+        }
+        subscriberCheckpoints.push_back(
+            {.stage = stage, .timeStep = stageEnd, .residentBytes = getResidentMemoryBytes()});
+    }
+
+    const auto pubTime = pubLoop.get();
+    publisherCheckpoints.back().residentBytes =
+        std::max(publisherCheckpoints.back().residentBytes, getResidentMemoryBytes());
+    subscriberCheckpoints.back().residentBytes =
+        std::max(subscriberCheckpoints.back().residentBytes, getResidentMemoryBytes());
+
+    std::ostringstream memoryReport;
+    memoryReport << "\nissue-2794 temporary memory reproducer\n"
+                 << "  interfaces: " << interfaceCount << "\n"
+                 << "  stages: " << stageCount << "\n"
+                 << "  steps per stage: " << stepsPerStage << "\n"
+                 << "  total updates published: "
+                 << static_cast<std::uint64_t>(interfaceCount) *
+            static_cast<std::uint64_t>(stepCount)
+                 << "\n"
+                 << "  baseline RSS: " << toMiB(initialMemory) << " MiB\n"
+                 << "  publisher-side checkpoints while backlog is being produced:\n";
+
+    auto appendCheckpoints = [&](const std::vector<MemoryCheckpoint>& checkpoints) {
+        std::uint64_t largestGrowth = 0;
+        for (std::size_t ii = 1; ii < checkpoints.size(); ++ii) {
+            const auto previous = checkpoints[ii - 1].residentBytes;
+            const auto current = checkpoints[ii].residentBytes;
+            const auto stageGrowth = (current > previous) ? (current - previous) : 0U;
+            largestGrowth = std::max(largestGrowth, stageGrowth);
+
+            memoryReport << "    stage " << checkpoints[ii].stage << " time "
+                         << checkpoints[ii].timeStep << ": RSS " << toMiB(current)
+                         << " MiB, total growth " << toMiB(current - initialMemory)
+                         << " MiB, stage growth " << toMiB(stageGrowth) << " MiB\n";
+        }
+        return largestGrowth;
+    };
+
+    const auto largestPublisherStageGrowth = appendCheckpoints(publisherCheckpoints);
+    memoryReport << "  subscriber-side checkpoints after each drain stage:\n";
+    const auto largestSubscriberStageGrowth = appendCheckpoints(subscriberCheckpoints);
+
+    std::uint64_t peakMemory = initialMemory;
+    for (const auto& checkpoint : publisherCheckpoints) {
+        peakMemory = std::max(peakMemory, checkpoint.residentBytes);
+    }
+    for (const auto& checkpoint : subscriberCheckpoints) {
+        peakMemory = std::max(peakMemory, checkpoint.residentBytes);
+    }
+    const auto largestStageGrowth =
+        std::max(largestPublisherStageGrowth, largestSubscriberStageGrowth);
+
+    const auto peakGrowth = peakMemory - initialMemory;
+
+    EXPECT_EQ(pubTime, helics::Time(static_cast<double>(stepCount)));
+    EXPECT_EQ(subTime, helics::Time(static_cast<double>(stepCount)));
+    EXPECT_GT(observedBytes, 0U);
+    EXPECT_LT(largestStageGrowth, maxExpectedStageGrowth) << memoryReport.str();
+    EXPECT_LT(peakGrowth, maxExpectedGrowth) << memoryReport.str();
+
+    pubFed->finalizeAsync();
+    subFed->finalize();
+    pubFed->finalizeComplete();
 }
 
 TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_types_obj8)

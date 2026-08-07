@@ -28,6 +28,13 @@ TEST(prop_tests, intprops)
     EXPECT_EQ(helicsGetPropertyIndex("CONSOLE_LOG_LEVEL"), HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL);
     EXPECT_EQ(helicsGetPropertyIndex("INT_CONSOLE_LOG_LEVEL"),
               HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL);
+
+    EXPECT_EQ(helicsGetPropertyIndex("value_buffer_warning"),
+              HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING);
+    EXPECT_EQ(helicsGetPropertyIndex("VALUE_BUFFER_WARNING"),
+              HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING);
+    EXPECT_EQ(helicsGetPropertyIndex("INT_VALUE_BUFFER_WARNING"),
+              HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING);
 }
 
 TEST(prop_tests, timeprops)

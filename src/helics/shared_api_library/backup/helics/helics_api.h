@@ -151,7 +151,8 @@ typedef enum {
     HELICS_PROPERTY_INT_FILE_LOG_LEVEL = 272,
     HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274,
     HELICS_PROPERTY_INT_LOG_BUFFER = 276,
-    HELICS_PROPERTY_INT_INDEX_GROUP = 282
+    HELICS_PROPERTY_INT_INDEX_GROUP = 282,
+    HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING = 283
 } HelicsProperties;
 
 const int HELICS_INVALID_PROPERTY_VALUE = -972;
@@ -542,9 +543,9 @@ HelicsPublication
     helicsFederateRegisterGlobalTypePublication(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
 HelicsInput helicsFederateRegisterInput(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
 HelicsInput helicsFederateRegisterTypeInput(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
-HelicsPublication
+HelicsInput
     helicsFederateRegisterGlobalInput(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
-HelicsPublication
+HelicsInput
     helicsFederateRegisterGlobalTypeInput(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
 HelicsPublication helicsFederateGetPublication(HelicsFederate fed, const char* key, HelicsError* err);
 HelicsPublication helicsFederateGetPublicationByIndex(HelicsFederate fed, int index, HelicsError* err);

@@ -526,6 +526,7 @@ const X& Input::getValueRef()
         }
     }
 
+    hasUpdate = false;
     return getValueRefImpl<remove_cv_ref<X>>(lastValue);
 }
 }  // namespace helics
