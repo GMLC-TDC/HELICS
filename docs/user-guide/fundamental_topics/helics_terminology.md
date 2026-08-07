@@ -22,7 +22,7 @@ Before digging into the specifics of how a HELICS co-simulation runs, there are 
 - Depending on the needs of the co-simulation, a federate can be configured to contain one or many models.
 - For example, if we want to create a co-simulation of electric vehicles, we may write a simulator (executable program) to model the physics of the electric vehicle battery. We can then designate any number of agents/models of this battery by configuring the transfer of signals between the "Battery Federate" (which has _N_ batteries modeled) and another federate.
 
-**Signals** - Signals are the the information passed between federates during the execution of the co-simulation. Fundamentally, co-simulation is about message-passing via these signals.
+**Signals** - Signals are the information passed between federates during the execution of the co-simulation. Fundamentally, co-simulation is about message-passing via these signals.
 
 - We can notionally think of federates talking directly to each other by passing signals back and forth. Under the hood, the path the data takes is through the core and then broker.
 - HELICS divides these messages into two types: value signals and message signal. The former is used when coupling two federates that share physics (_e.g._ batteries providing power to wheel motors on an electric car) and the later is used to couple two federates with information (_e.g._ a battery charge controller and a charge relay on a battery).

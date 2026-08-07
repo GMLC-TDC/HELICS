@@ -6,9 +6,9 @@ The Base Example tutorial is organized as follows:
 
 - [Example files](#example-files)
 - [Default Setup](#default-setup)
-  - [Messages + Communication: pub sub](#messages-and-communication-pubsub)
+  - [Messages and Communication: pub/sub](#messages-and-communication-pubsub)
   - [Simulator Integration: External JSON](#simulator-integration-external-json)
-  - [Co-simulation Execution:](#co-simulation-execution)
+  - [Co-simulation Execution](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
 ## Example files
@@ -138,9 +138,9 @@ The runner JSON for the Base Example is called `fundamental_default_runner.json`
 }
 ```
 
-This runner tells `helics_broker` that there are three federates and to take a specific action for each federate:
+This runner tells HELICS to launch a broker and two federates:
 
-1. Launch `helics_broker` in the current directory: `helics_broker -f 2 --loglevel=7`
+1. Launch a broker for the co-simulation.
 2. Launch the `Charger.py` federate in the current directory: `python -u Charger.py 1`
 3. Launch the `Battery.py` federate in the current directory: `python -u Battery.py 1`
 

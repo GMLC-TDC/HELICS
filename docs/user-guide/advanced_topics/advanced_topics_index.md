@@ -51,7 +51,7 @@ The Advanced Topics will cover:
 - [**Callbacks**](./callbacks.md) - Over time a number of callbacks have been added for various operations and stages of the life cycle of a federate. This document describes the different callbacks available.
 - [**Callback Federates**](./CallbackFederate.md) - HELICS 3.3 introduced a beta test for callback federates which allow a federate to operate purely inline with a core based solely on callbacks. This can allow a much higher number of federates on a given system than was previously possible.
 - [**Command Interface**](./commandInterface.md) - HELICS v3 introduced the command interface as a method of asynchronously communicating between federates.
-- [**helics_connector**](./commandInterface.md) - App that creates connections between federates as a separate process from the declaration of said interfaces.
+- [**helics_connector**](./connector_fed.md) - App that creates connections between federates as a separate process from the declaration of said interfaces.
 - [**Cores**](./CoreTypes.md) - Discussion of the different types of message-passing buses and their implementation as HELICS cores.
 - [**Dynamic Federations**](./dynamic_federations.md) - Sometimes it is useful to have a federate that is not ready at the beginning of co-simulation. This is a dynamic federation. There are various levels of this (not all are available yet) and this document discusses some aspects of dynamic co-simulation.
 - [**Encrypted Communication**](./encrypted_communication.md) - How to encrypt communication between HELICS brokers/federates.

@@ -13,11 +13,11 @@ This demonstrates the use of iteration both in the initialization phase, as well
 
 ## Where is the code?
 
-This example on [Iteration](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_iteration). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
+The example on [iteration can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_iteration). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
 ## What is this co-simulation doing?
 
-This example shows how to use set up the iteration calls that support state convergence across federates. This is discussed in more detail in the [User Guide](../../advanced_topics/iteration.md).
+This example shows how to set up the iteration calls that support state convergence across federates. This is discussed in more detail in the [User Guide](../../advanced_topics/iteration.md).
 
 ### Differences Compared to the Advanced Default Example
 
@@ -140,7 +140,7 @@ For the three charger types defined that is:
 
 Taking the maximum (so we make sure the current decays _at least_ to 3% rated by full charge) we fix $R(1) \overset{!}{=} 267\Omega$.
 
-the function $R(soc)$ is now created as a two linear segments: one from 0 to 0.6 and the other from 0.6 to 1:
+The function $R(soc)$ is now created as two linear segments: one from 0 to 0.6 and the other from 0.6 to 1:
 
 ```python
 def effective_R(soc):
@@ -352,11 +352,11 @@ The voltages meanwhile are _not_ nominal (240V or 630V) but rather determined ba
 
 ### Time Loop Results
 
-Four figures are produced once the co-simulation runs its course, two from Batter.py and two from Charger.py.
+Four figures are produced once the co-simulation runs its course, two from Battery.py and two from Charger.py.
 
 #### Battery Results
 
-The Battery results show the the charging current in each battery, and the development of the SoC over time.
+The Battery results show the charging current in each battery and the development of the SoC over time.
 As desired, the charging current exhibits the constant current followed by a decay characteristic, and the SoC rise to 1.
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_battery_current.png?raw=true)
@@ -365,10 +365,10 @@ As desired, the charging current exhibits the constant current followed by a dec
 
 #### Charger Results
 
-The Charger results show the how the voltage rises to its rated value and then remains there.
-The total power plot is also quite interesting
+The Charger results show how the voltage rises to its rated value and then remains there.
+The total power plot is also quite interesting.
 Since initially the current remains fixed while the voltage rises, the total power draw increases.
-Once the charging mode switches to constant voltage and the current decreases the power draw follows suite.
+Once the charging mode switches to constant voltage and the current decreases, the power draw follows suit.
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_voltage.png?raw=true)
 

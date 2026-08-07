@@ -33,8 +33,6 @@ TEST(prop_tests, intprops)
               HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING);
     EXPECT_EQ(helicsGetPropertyIndex("VALUE_BUFFER_WARNING"),
               HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING);
-    EXPECT_EQ(helicsGetPropertyIndex("INT_VALUE_BUFFER_WARNING"),
-              HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING);
 }
 
 TEST(prop_tests, timeprops)

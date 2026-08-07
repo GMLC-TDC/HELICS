@@ -1,6 +1,6 @@
 # Connector
 
-The Connector app can automatically connect interfaces together. It does this using the query mechanisms inside HELICS to detect all the unconnected interfaces in a cosimulation. Then using given configuration rules it will establish connections between those interfaces.
+The Connector app can automatically connect interfaces together. It does this using the query mechanisms inside HELICS to detect all the unconnected interfaces in a co-simulation. Then, using given configuration rules, it will establish connections between those interfaces.
 
 It can also run in a two-phase mode to have the federates create then connect interfaces. In the first phase, the connector app will query the federates for their potential interfaces and then go through those interfaces to see if there is a potential connection to be made using the same rules. If a potential interface has a connection available, it will send a command to the appropriate federate to create the interface. Once the interfaces exist, the Connector enters the second phase and makes the requested connections from the new and existing unconnected interfaces.
 
@@ -100,7 +100,7 @@ On launch of the federation, the federates are created with no exposed interface
 
 The Connector queries the federates to determine which interfaces each one can create. The query is made after the federate enter initializing mode and the federate must enter initializing mode iteratively (`helicsFederateEnterInitializingModeIterative()`) to synchronize the query responses across the federation. Every federate that is going to create interfaces needs to register a callback function to handle this custom query by the Connector and respond appropriately. The Connector will query the federate with "potential_interfaces" and the federate must respond with a properly formatted JSON:
 
-```json
+```text
 {
   "publications": [<list of names of publications that can be created>]
   "inputs": [<list of names of inputs that can be created>]
@@ -114,7 +114,7 @@ As this is a query operation, which are executed asynchronously with the simulat
 
 After receiving the query responses from all the federates, the connector performs its standard matching operation using a match-file. Once the matches are made, it determines which connections need to be made and sends a command to each federate telling it which interfaces to create. As with the query, the commands are received asynchronously but are guaranteed to be present after calling `helicsFederateEnterInitializingModeIterative()` twice. At that point, the federate can get the command and parse the returned JSON to determine which interfaces to create. The format is the same as the query response:
 
-```json
+```text
 {
   "publications": [<list of names of publications to be created>]
   "inputs": [<list of names of inputs to be created>]

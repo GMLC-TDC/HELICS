@@ -1,6 +1,6 @@
 # Broker Hierarchies
 
-The simplest and most straight-forward way HELICS co-simulations are constructed is with a single broker. If all federates are running on a single compute node, a single broker is likely all you'll need. In situations where the co-simulation is running across multiple compute nodes, with a little bit of planning, the use of a hierarchy of brokers can help improve co-simulation performance.
+The simplest and most straightforward way HELICS co-simulations are constructed is with a single broker. If all federates are running on a single compute node, a single broker is likely all you'll need. In situations where the co-simulation is running across multiple compute nodes, with a little bit of planning, the use of a hierarchy of brokers can help improve co-simulation performance.
 
 ## Why Multiple Brokers?
 
@@ -12,7 +12,7 @@ When federates join the federation they can be assigned to specific brokers and 
 
 So, using an example we've seen several times, imagine a scenario where a single transmission system covering the western US is being simulated with many, many individual neighborhood level power systems attached to that regional system and controllers manage a hypothetical fleet of electric vehicles (EVs) whose owners are in these neighborhoods. The EV controllers and the distribution system federates interact frequently and the distribution system federates and the transmission system federates also interact frequently.
 
-The diagrams below show the message and broker topologies for this hypothetical examples.
+The diagrams below show the message and broker topologies for this hypothetical example.
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/broker_hierarchy_message_topology.png)
 
@@ -22,7 +22,7 @@ The diagrams below show the message and broker topologies for this hypothetical 
 
 To implement a broker hierarchy, modifications to the configuration files for the federates and command line options for the brokers need to be made.
 
-For examples, the config JSON for the Distribution System A (where Broker A is at IP 127.0.0.1) would look something like this:
+For example, the config JSON for the Distribution System A (where Broker A is at IP 127.0.0.1) would look something like this:
 
 ```json
 {
@@ -37,7 +37,7 @@ The command line for launching Broker A also needs to be adjusted. For this exam
 $ helics_broker -f200 --broker_address=tcp://127.0.0.127
 ```
 
-The JSON config file for the Transmission and Generation System federate needs to indicate where it's broker (Broker C) is at (IP 127.0.0.127):
+The JSON config file for the Transmission and Generation System federate needs to indicate where its broker (Broker C) is located (IP 127.0.0.127):
 
 ```json
 {

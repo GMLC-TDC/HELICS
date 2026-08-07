@@ -96,7 +96,7 @@ This call takes in the federate object, a string containing the publication key 
 pub = h.helicsPublicationSetOption(pub, 454, True)
 ```
 
-Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the cosimulation. The API calls are syntactically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revisit the above example where the `only_transmit_on_change` flag is set to true in the federate info object, if operating on an existing federate, that call would be:
+Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the co-simulation. The API calls are syntactically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revisit the above example where the `only_transmit_on_change` flag is set to true in the federate info object, if operating on an existing federate, that call would be:
 
 ```python
 h.helicsFederateSetFlagOption(fed, 6, True)
@@ -104,7 +104,7 @@ h.helicsFederateSetFlagOption(fed, 6, True)
 
 ### Collecting the Interface Objects
 
-Having configured the publications, subscriptions and endpoints and registered this information with HELICS, the channels for sending and receiving this information have been created within the cosimulation framework. If you registered the publication, subscriptions and endpoints within your code (i.e., using HELICS API calls), you already have access to each respective object as it was returned when made the registration call. However, if you created your federate using a configuration file which contained all of this information, you now need to retrieve these objects from HELICS so that you can invoke them during the execution of your cosimulation. The following calls will allow you to query HELICS for the metadata associated with each publication. Similar calls can be used to get input (or subscription) and endpoint information.
+Having configured the publications, subscriptions and endpoints and registered this information with HELICS, the channels for sending and receiving this information have been created within the co-simulation framework. If you registered the publication, subscriptions and endpoints within your code (i.e., using HELICS API calls), you already have access to each respective object because it was returned when you made the registration call. However, if you created your federate using a configuration file which contained all of this information, you now need to retrieve these objects from HELICS so that you can invoke them during the execution of your co-simulation. The following calls will allow you to query HELICS for the metadata associated with each publication. Similar calls can be used to get input (or subscription) and endpoint information.
 
 ```python
 pub_count = h.helicsFederateGetPublicationCount(fed)
@@ -134,7 +134,7 @@ If the federation needs to iterate in initialization mode prior to entering exec
 
    `ITERATING` - Federation has not ceased iterating and will iterate once again. During this time the federate will need to check all its inputs and subscriptions, recalculate its model, and produce new outputs for the rest of the federation.
 
-To implement this initialization iteration, all federates need to implement a loop where `helicsFederateEnterExecutingModeIterative()` is repeatedly called and the output of the call is evaluated. The call to the API needs to use the federate's internal evaluation of the stability of the solution to determine if needs to request another iteration. The returned value of the API will determine whether the federate needs to re-solve its model with new inputs from the of the federation or enter normal execution.
+To implement this initialization iteration, all federates need to implement a loop where `helicsFederateEnterExecutingModeIterative()` is repeatedly called and the output of the call is evaluated. The call to the API needs to use the federate's internal evaluation of the stability of the solution to determine whether it needs to request another iteration. The returned value of the API will determine whether the federate needs to re-solve its model with new inputs from the rest of the federation or enter normal execution.
 
 ## Execution
 
@@ -146,15 +146,15 @@ h.helicsFederateEnterExecutingMode(fed)
 
 This method call is a blocking call; your custom federate will sit there and do nothing until all other federates have also finished any set-up work and have also requested to begin execution of the co-simulation. Once this method returns, the federation is effectively at simulation time of zero.
 
-At this point, each federate will now step through time, exchanging values with other federates in the cosimulation as appropriate. This will be implemented in a loop where each federate will go through a set of prescribed steps at each time step. At the beginning of the cosimulation, time is at the zeroth time step (t = 0). Let's assume that the cosimulation will end at a pre-determined time, t = max_time. The nature of the simulator will dictate how the time loop is handled. However, it is likely that the cosimulation loop will start with something like this:
+At this point, each federate will now step through time, exchanging values with other federates in the co-simulation as appropriate. This will be implemented in a loop where each federate will go through a set of prescribed steps at each time step. At the beginning of the co-simulation, time is at the zeroth time step (t = 0). Let's assume that the co-simulation will end at a pre-determined time, t = max_time. The nature of the simulator will dictate how the time loop is handled. However, it is likely that the co-simulation loop will start with something like this:
 
 ```python
 t = 0
 while t < end_time:
-    pass  # cosimulation code would go here
+    pass  # co-simulation code would go here
 ```
 
-Now, the federate begins to step through time. For the purposes of this example, we will assume that during every time step, the federate will first take inputs in from the rest of the cosimulation, then make internal updates and calculations and finish the time step by publishing values back to the rest of the cosimulation before requesting the next time step.
+Now, the federate begins to step through time. For the purposes of this example, we will assume that during every time step, the federate will first take inputs in from the rest of the co-simulation, then make internal updates and calculations and finish the time step by publishing values back to the rest of the co-simulation before requesting the next time step.
 
 ### Get Inputs
 
