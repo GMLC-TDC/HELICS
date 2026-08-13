@@ -1,0 +1,72 @@
+name: C++26 Clang CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '45 08 * * 2'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cxx26-clang-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Clang 22 C++26
+    runs-on: ubuntu-latest
+    container: helics/buildenv:clang22-builder
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    env:
+      CC: clang
+      CXX: clang++
+      CMAKE_GENERATOR: Unix Makefiles
+      CXX_STANDARD: 26
+      MAKEFLAGS: '-j 4'
+      DISABLE_INTERFACES: 'Java'
+      DISABLE_EXAMPLES: 'true'
+      DISABLE_CXX_SHARED: 'true'
+      ZMQ_SUBPROJECT: 'true'
+      ZMQ_FORCE_SUBPROJECT: 'true'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v7
+      if: github.event_name != 'schedule'
+      with:
+        submodules: recursive
+
+    - name: Checkout main branch
+      uses: actions/checkout@v7
+      if: github.event_name == 'schedule'
+      with:
+        submodules: recursive
+        ref: main
+
+    - name: Show compiler versions
+      run: |
+        "${CC}" --version
+        "${CXX}" --version
+        cmake --version
+        grep BOOST_LIB_VERSION /usr/include/boost/version.hpp
+
+    - name: Build HELICS
+      run: |
+        unset VCPKG_ROOT
+        git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+        source scripts/setup-helics-ci-options.sh
+        mkdir -p build && cd build
+        ../scripts/ci-build.sh
+
+    - name: Run smoke tests
+      working-directory: build
+      run: |
+        ctest --output-on-failure -R "^(common-tests|core-ci-tests|applicationApiTests-ci|valueFederateTests-ci|messageFederateTests-ci|shared-library-ci-tests|shared-library-ci-tests-cpp)$"

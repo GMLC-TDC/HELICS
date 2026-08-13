@@ -404,7 +404,7 @@ TEST_F(valuefed_add_tests_ci_skip, dual_transfer_complex_long)
     runDualFederateTest<std::complex<double>>("test_7", def, val1, val2);
 }
 
-TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth)
+TEST_F(valuefed_add_tests_ci_skip, issue_2794_string_subscription_memory_growth_nocov)
 {
     struct MemoryCheckpoint {
         int stage;
