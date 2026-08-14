@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ctestFixtures.hpp"
 #include "helics/helics.h"
 
+#include <cstdlib>
 #include <future>
 #include <gtest/gtest.h>
 #include <string>
@@ -339,6 +340,15 @@ void toVC(HelicsMessage message, HelicsDataBuffer value, void* /*userData*/)
     helicsDataBufferFillFromDouble(value, v);
 }
 
+void expectMessageStringDouble(HelicsMessage message, double expected)
+{
+    const auto* messageString = helicsMessageGetString(message);
+    char* end{nullptr};
+    EXPECT_DOUBLE_EQ(std::strtod(messageString, &end), expected);
+    EXPECT_NE(end, messageString);
+    EXPECT_EQ(*end, '\0');
+}
+
 TEST_F(translator, custom_translator)
 {
     HelicsBroker broker = AddBroker("test_2", 2);
@@ -402,7 +412,7 @@ TEST_F(translator, custom_translator)
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port1");
 
     EXPECT_EQ(helicsMessageGetTime(m2), 1e-9);
-    EXPECT_STREQ(helicsMessageGetString(m2), "99.230000");
+    expectMessageStringDouble(m2, 99.23);
     helicsMessageFree(m2);
     CE(helicsFederateFinalize(mFed, &err));
     CE(helicsFederateFinalize(vFed, &err));
@@ -474,7 +484,7 @@ TEST_F(translator, custom_translator2)
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port1");
 
     EXPECT_EQ(helicsMessageGetTime(m2), 1e-9);
-    EXPECT_STREQ(helicsMessageGetString(m2), "99.230000");
+    expectMessageStringDouble(m2, 99.23);
     helicsMessageFree(m2);
     CE(helicsFederateFinalize(mFed, &err));
     CE(helicsFederateFinalize(vFed, &err));

@@ -6,8 +6,6 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  schedule:
-    - cron: '45 08 * * 2'
 
 permissions:
   contents: read
@@ -32,24 +30,12 @@ jobs:
       CXX_STANDARD: 26
       MAKEFLAGS: '-j 4'
       DISABLE_INTERFACES: 'Java'
-      DISABLE_EXAMPLES: 'true'
-      DISABLE_CXX_SHARED: 'true'
-      ZMQ_SUBPROJECT: 'true'
-      ZMQ_FORCE_SUBPROJECT: 'true'
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
-      if: github.event_name != 'schedule'
       with:
         submodules: recursive
-
-    - name: Checkout main branch
-      uses: actions/checkout@v7
-      if: github.event_name == 'schedule'
-      with:
-        submodules: recursive
-        ref: main
 
     - name: Show compiler versions
       run: |
@@ -70,3 +56,8 @@ jobs:
       working-directory: build
       run: |
         ctest --output-on-failure -R "^(common-tests|core-ci-tests|applicationApiTests-ci|valueFederateTests-ci|messageFederateTests-ci|shared-library-ci-tests|shared-library-ci-tests-cpp)$"
+
+    - name: Run shared C++ smoke tests
+      working-directory: build
+      run: |
+        ./bin/shared_cxx-tests --gtest_filter=valuefed.single_transfer_publisher_alias:mfed_tests.send_receive_2fed_extra:filter.message_filter_function_two_stage_endpoint_target_alias --gtest_catch_exceptions=0
