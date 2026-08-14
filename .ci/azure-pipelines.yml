@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         ubuntuDefault:
-          containerImage: "helics/buildenv:ubuntu22.04-default-builder"
+          containerImage: "helics/buildenv:ubuntu24.04-default-builder"
           test_config: "ci"
           use_mpi: "true"
           encrypted: "true"
