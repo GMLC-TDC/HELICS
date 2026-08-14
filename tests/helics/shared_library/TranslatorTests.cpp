@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ctestFixtures.hpp"
 #include "helics/helics.h"
 
+#include <cstdlib>
 #include <future>
 #include <gtest/gtest.h>
 #include <string>
@@ -41,19 +42,19 @@ TEST_P(translator_simple_type, registration)
     auto fFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
 
-    CE(auto t1 = helicsFederateRegisterGlobalTranslator(
+    CE(auto globalTranslator = helicsFederateRegisterGlobalTranslator(
            fFed, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "trans1", &err));
     helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
 
-    CE(auto t2 = helicsFederateRegisterTranslator(
+    CE(auto localTranslator = helicsFederateRegisterTranslator(
            fFed, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "trans2", &err));
 
     EXPECT_EQ(err.error_code, HELICS_OK);
-    CE(auto p1 =
+    CE(auto publication =
            helicsFederateRegisterPublication(fFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "", &err));
-    CE(helicsPublicationAddTarget(p1, "trans1", &err));
-    EXPECT_NE(t1, nullptr);
-    EXPECT_NE(t1, t2);
+    CE(helicsPublicationAddTarget(publication, "trans1", &err));
+    EXPECT_NE(globalTranslator, nullptr);
+    EXPECT_NE(globalTranslator, localTranslator);
 
     auto f1_b = helicsFederateGetTranslator(fFed, "trans1", &err);
     const char* tmp;
@@ -93,14 +94,14 @@ TEST_F(translator, core_translator_reg)
 
     EXPECT_EQ(core1IdentifierString, "core1");
 
-    CE(auto t1 = helicsCoreRegisterTranslator(
+    CE(auto coreTranslator = helicsCoreRegisterTranslator(
            core1, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "core1trans", &err));
 
-    CE(helicsTranslatorAddDestinationEndpoint(t1, "ep1", &err));
+    CE(helicsTranslatorAddDestinationEndpoint(coreTranslator, "ep1", &err));
     CE(helicsCoreRegisterTranslator(
         core1, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "core1trans2", &err));
 
-    helicsTranslatorAddSourceEndpoint(t1, "ep2", &err);
+    helicsTranslatorAddSourceEndpoint(coreTranslator, "ep2", &err);
 
     int core1IsConnected = helicsCoreIsConnected(core1);
     EXPECT_NE(core1IsConnected, HELICS_FALSE);
@@ -335,8 +336,17 @@ void toVC(HelicsMessage message, HelicsDataBuffer value, void* /*userData*/)
 {
     const auto* str = helicsMessageGetString(message);
     char* ptr{nullptr};
-    double v = strtod(str, &ptr) + 9.0;
-    helicsDataBufferFillFromDouble(value, v);
+    double convertedValue = strtod(str, &ptr) + 9.0;
+    helicsDataBufferFillFromDouble(value, convertedValue);
+}
+
+void expectMessageStringDouble(HelicsMessage message, double expected)
+{
+    const auto* messageString = helicsMessageGetString(message);
+    char* end{nullptr};
+    EXPECT_DOUBLE_EQ(std::strtod(messageString, &end), expected);
+    EXPECT_NE(end, messageString);
+    EXPECT_EQ(*end, '\0');
 }
 
 TEST_F(translator, custom_translator)
@@ -348,28 +358,28 @@ TEST_F(translator, custom_translator)
     auto vFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
 
-    auto e1 = helicsFederateRegisterGlobalTargetedEndpoint(mFed, "port1", "", &err);
+    auto endpoint = helicsFederateRegisterGlobalTargetedEndpoint(mFed, "port1", "", &err);
 
     EXPECT_EQ(err.error_code, HELICS_OK);
 
-    auto p1 =
+    auto publication =
         helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "V", &err);
 
-    auto i1 = helicsFederateRegisterGlobalInput(vFed, "in1", HELICS_DATA_TYPE_DOUBLE, "V", &err);
+    auto input = helicsFederateRegisterGlobalInput(vFed, "in1", HELICS_DATA_TYPE_DOUBLE, "V", &err);
 
     EXPECT_EQ(err.error_code, HELICS_OK);
 
-    CE(auto t1 =
+    CE(auto translatorHandle =
            helicsFederateRegisterGlobalTranslator(mFed, HELICS_TRANSLATOR_TYPE_CUSTOM, "t1", &err));
-    EXPECT_TRUE(t1 != nullptr);
+    EXPECT_TRUE(translatorHandle != nullptr);
 
-    helicsTranslatorAddSourceEndpoint(t1, "port1", nullptr);
-    helicsTranslatorAddDestinationEndpoint(t1, "port1", nullptr);
+    helicsTranslatorAddSourceEndpoint(translatorHandle, "port1", nullptr);
+    helicsTranslatorAddDestinationEndpoint(translatorHandle, "port1", nullptr);
 
-    helicsTranslatorAddPublicationTarget(t1, "pub1", nullptr);
-    helicsTranslatorAddInputTarget(t1, "in1", nullptr);
+    helicsTranslatorAddPublicationTarget(translatorHandle, "pub1", nullptr);
+    helicsTranslatorAddInputTarget(translatorHandle, "in1", nullptr);
 
-    helicsTranslatorSetCustomCallback(t1, toMC, toVC, nullptr, &err);
+    helicsTranslatorSetCustomCallback(translatorHandle, toMC, toVC, nullptr, &err);
 
     EXPECT_EQ(err.error_code, HELICS_OK);
 
@@ -380,9 +390,9 @@ TEST_F(translator, custom_translator)
     CE(HelicsFederateState state = helicsFederateGetState(vFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data = "45.7";
-    CE(helicsEndpointSendString(e1, data.c_str(), &err));
+    CE(helicsEndpointSendString(endpoint, data.c_str(), &err));
 
-    helicsPublicationPublishDouble(p1, 99.23, &err);
+    helicsPublicationPublishDouble(publication, 99.23, &err);
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
     CE(helicsFederateRequestTime(vFed, 1.0, &err));
@@ -391,19 +401,19 @@ TEST_F(translator, custom_translator)
     auto res = helicsFederateHasMessage(mFed);
     EXPECT_TRUE(res);
 
-    EXPECT_TRUE(helicsInputIsUpdated(i1) == HELICS_TRUE);
+    EXPECT_TRUE(helicsInputIsUpdated(input) == HELICS_TRUE);
 
-    double v3 = helicsInputGetDouble(i1, nullptr);
-    EXPECT_DOUBLE_EQ(v3, 54.7);
-    auto m2 = helicsEndpointGetMessage(e1);
-    EXPECT_EQ(helicsMessageIsValid(m2), HELICS_TRUE);
-    EXPECT_STREQ(helicsMessageGetSource(m2), "t1");
-    EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "pub1");
-    EXPECT_STREQ(helicsMessageGetDestination(m2), "port1");
+    double inputValue = helicsInputGetDouble(input, nullptr);
+    EXPECT_DOUBLE_EQ(inputValue, 54.7);
+    auto translatedMessage = helicsEndpointGetMessage(endpoint);
+    EXPECT_EQ(helicsMessageIsValid(translatedMessage), HELICS_TRUE);
+    EXPECT_STREQ(helicsMessageGetSource(translatedMessage), "t1");
+    EXPECT_STREQ(helicsMessageGetOriginalSource(translatedMessage), "pub1");
+    EXPECT_STREQ(helicsMessageGetDestination(translatedMessage), "port1");
 
-    EXPECT_EQ(helicsMessageGetTime(m2), 1e-9);
-    EXPECT_STREQ(helicsMessageGetString(m2), "99.230000");
-    helicsMessageFree(m2);
+    EXPECT_EQ(helicsMessageGetTime(translatedMessage), 1e-9);
+    expectMessageStringDouble(translatedMessage, 99.23);
+    helicsMessageFree(translatedMessage);
     CE(helicsFederateFinalize(mFed, &err));
     CE(helicsFederateFinalize(vFed, &err));
     CE(state = helicsFederateGetState(vFed, &err));
@@ -419,29 +429,29 @@ TEST_F(translator, custom_translator2)
     auto vFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
 
-    CE(auto t1 =
+    CE(auto translatorHandle =
            helicsFederateRegisterGlobalTranslator(mFed, HELICS_TRANSLATOR_TYPE_CUSTOM, "t1", &err));
-    EXPECT_TRUE(t1 != nullptr);
+    EXPECT_TRUE(translatorHandle != nullptr);
 
-    helicsTranslatorAddSourceEndpoint(t1, "port1", nullptr);
-    helicsTranslatorAddDestinationEndpoint(t1, "port1", nullptr);
+    helicsTranslatorAddSourceEndpoint(translatorHandle, "port1", nullptr);
+    helicsTranslatorAddDestinationEndpoint(translatorHandle, "port1", nullptr);
 
-    helicsTranslatorAddPublicationTarget(t1, "pub1", nullptr);
-    helicsTranslatorAddInputTarget(t1, "in1", nullptr);
+    helicsTranslatorAddPublicationTarget(translatorHandle, "pub1", nullptr);
+    helicsTranslatorAddInputTarget(translatorHandle, "in1", nullptr);
 
-    helicsTranslatorSetCustomCallback(t1, toMC, toVC, nullptr, &err);
+    helicsTranslatorSetCustomCallback(translatorHandle, toMC, toVC, nullptr, &err);
 
     EXPECT_EQ(err.error_code, HELICS_OK);
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-    auto e1 = helicsFederateRegisterGlobalTargetedEndpoint(mFed, "port1", "", &err);
+    auto endpoint = helicsFederateRegisterGlobalTargetedEndpoint(mFed, "port1", "", &err);
 
     EXPECT_EQ(err.error_code, HELICS_OK);
 
-    auto p1 =
+    auto publication =
         helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "V", &err);
 
-    auto i1 = helicsFederateRegisterGlobalInput(vFed, "in1", HELICS_DATA_TYPE_DOUBLE, "V", &err);
+    auto input = helicsFederateRegisterGlobalInput(vFed, "in1", HELICS_DATA_TYPE_DOUBLE, "V", &err);
 
     EXPECT_EQ(err.error_code, HELICS_OK);
 
@@ -452,9 +462,9 @@ TEST_F(translator, custom_translator2)
     CE(HelicsFederateState state = helicsFederateGetState(vFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data = "45.7";
-    CE(helicsEndpointSendBytes(e1, data.c_str(), static_cast<int>(data.size()), &err));
+    CE(helicsEndpointSendBytes(endpoint, data.c_str(), static_cast<int>(data.size()), &err));
 
-    helicsPublicationPublishDouble(p1, 99.23, &err);
+    helicsPublicationPublishDouble(publication, 99.23, &err);
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
     CE(helicsFederateRequestTime(vFed, 1.0, &err));
@@ -463,19 +473,19 @@ TEST_F(translator, custom_translator2)
     auto res = helicsFederateHasMessage(mFed);
     EXPECT_TRUE(res);
 
-    EXPECT_TRUE(helicsInputIsUpdated(i1) == HELICS_TRUE);
+    EXPECT_TRUE(helicsInputIsUpdated(input) == HELICS_TRUE);
 
-    double v3 = helicsInputGetDouble(i1, nullptr);
-    EXPECT_DOUBLE_EQ(v3, 54.7);
-    auto m2 = helicsEndpointGetMessage(e1);
-    EXPECT_EQ(helicsMessageIsValid(m2), HELICS_TRUE);
-    EXPECT_STREQ(helicsMessageGetSource(m2), "t1");
-    EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "pub1");
-    EXPECT_STREQ(helicsMessageGetDestination(m2), "port1");
+    double inputValue = helicsInputGetDouble(input, nullptr);
+    EXPECT_DOUBLE_EQ(inputValue, 54.7);
+    auto translatedMessage = helicsEndpointGetMessage(endpoint);
+    EXPECT_EQ(helicsMessageIsValid(translatedMessage), HELICS_TRUE);
+    EXPECT_STREQ(helicsMessageGetSource(translatedMessage), "t1");
+    EXPECT_STREQ(helicsMessageGetOriginalSource(translatedMessage), "pub1");
+    EXPECT_STREQ(helicsMessageGetDestination(translatedMessage), "port1");
 
-    EXPECT_EQ(helicsMessageGetTime(m2), 1e-9);
-    EXPECT_STREQ(helicsMessageGetString(m2), "99.230000");
-    helicsMessageFree(m2);
+    EXPECT_EQ(helicsMessageGetTime(translatedMessage), 1e-9);
+    expectMessageStringDouble(translatedMessage, 99.23);
+    helicsMessageFree(translatedMessage);
     CE(helicsFederateFinalize(mFed, &err));
     CE(helicsFederateFinalize(vFed, &err));
     CE(state = helicsFederateGetState(vFed, &err));
