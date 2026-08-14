@@ -21,177 +21,165 @@ using timetype = boost::posix_time::ptime;
 using clocktype = boost::interprocess::ipcdetail::microsec_clock<timetype>;
 
 namespace helics::ipc {
-    OwnedQueue::~OwnedQueue()
-    {
-        if (rqueue) {
-            ipc_queue::remove(connectionName.c_str());
-        }
-        if (queue_state) {
-            ipc_state::remove(stateName.c_str());
-        }
-    }
-
-    bool OwnedQueue::connect(const std::string& connection, int maxMessages, int maxSize)
-    {
-        // remove the old queue if are connecting again
-        if (rqueue) {
-            ipc_queue::remove(connectionName.c_str());
-        }
-        if (queue_state) {
-            ipc_state::remove(stateName.c_str());
-        }
-        connectionNameOrig = connection;
-        connectionName = stringTranslateToCppName(connection);
-        stateName = connectionName + "_state";
+OwnedQueue::~OwnedQueue()
+{
+    if (rqueue) {
         ipc_queue::remove(connectionName.c_str());
-
+    }
+    if (queue_state) {
         ipc_state::remove(stateName.c_str());
+    }
+}
 
-        try {
-            queue_state = std::make_unique<ipc_state>(boostipc::create_only,
-                                                      stateName.c_str(),
-                                                      boostipc::read_write);
-        }
-        catch (boost::interprocess::interprocess_exception const& ipe) {
-            errorString = std::string("Unable to open local state shared memory:") + ipe.what();
-            return false;
-        }
-        queue_state->truncate(sizeof(SharedQueueState) + 256);
-        // Map the whole shared memory in this process
+bool OwnedQueue::connect(const std::string& connection, int maxMessages, int maxSize)
+{
+    // remove the old queue if are connecting again
+    if (rqueue) {
+        ipc_queue::remove(connectionName.c_str());
+    }
+    if (queue_state) {
+        ipc_state::remove(stateName.c_str());
+    }
+    connectionNameOrig = connection;
+    connectionName = stringTranslateToCppName(connection);
+    stateName = connectionName + "_state";
+    ipc_queue::remove(connectionName.c_str());
+
+    ipc_state::remove(stateName.c_str());
+
+    try {
+        queue_state = std::make_unique<ipc_state>(boostipc::create_only,
+                                                  stateName.c_str(),
+                                                  boostipc::read_write);
+    }
+    catch (boost::interprocess::interprocess_exception const& ipe) {
+        errorString = std::string("Unable to open local state shared memory:") + ipe.what();
+        return false;
+    }
+    queue_state->truncate(sizeof(SharedQueueState) + 256);
+    // Map the whole shared memory in this process
+    const boostipc::mapped_region region(*queue_state, boostipc::read_write);
+
+    auto* sstate = new (region.get_address()) SharedQueueState;
+    sstate->setState(queue_state_t::startup);
+
+    try {
+        rqueue = std::make_unique<ipc_queue>(boostipc::create_only,
+                                             connectionName.c_str(),
+                                             maxMessages,
+                                             maxSize);
+    }
+    catch (boost::interprocess::interprocess_exception const& ipe) {
+        errorString = std::string("Unable to open local connection:") + ipe.what();
+        return false;
+    }
+    sstate->setState(queue_state_t::connected);
+    mxSize = maxSize;
+    buffer.resize(maxSize);
+    connected = true;
+    return true;
+}
+
+void OwnedQueue::changeState(queue_state_t newState)
+{
+    if (connected) {
         const boostipc::mapped_region region(*queue_state, boostipc::read_write);
 
-        auto* sstate = new (region.get_address()) SharedQueueState;
-        sstate->setState(queue_state_t::startup);
-
-        try {
-            rqueue = std::make_unique<ipc_queue>(boostipc::create_only,
-                                                 connectionName.c_str(),
-                                                 maxMessages,
-                                                 maxSize);
-        }
-        catch (boost::interprocess::interprocess_exception const& ipe) {
-            errorString = std::string("Unable to open local connection:") + ipe.what();
-            return false;
-        }
-        sstate->setState(queue_state_t::connected);
-        mxSize = maxSize;
-        buffer.resize(maxSize);
-        connected = true;
-        return true;
+        auto* sstate = reinterpret_cast<SharedQueueState*>(region.get_address());
+        sstate->setState(newState);
     }
+}
 
-    void OwnedQueue::changeState(queue_state_t newState)
-    {
-        if (connected) {
+ActionMessage OwnedQueue::getMessage()
+{
+    if (!connected) {
+        return (CMD_ERROR);
+    }
+    size_t rx_size = 0;
+    unsigned int priority{0};
+    while (true) {
+        rqueue->receive(buffer.data(), mxSize, rx_size, priority);
+        if (rx_size < 8) {
+            continue;
+        }
+        ActionMessage cmd(reinterpret_cast<std::byte*>(buffer.data()), rx_size);
+        if (!isValidCommand(cmd)) {
+            std::cerr << "invalid command received ipc\n";
+            continue;
+        }
+        return cmd;
+    }
+}
+
+std::optional<ActionMessage> OwnedQueue::getMessage(int timeout)
+{
+    if (!connected) {
+        return std::nullopt;
+    }
+    size_t rx_size = 0;
+    unsigned int priority{0};
+    while (true) {
+        if (timeout >= 0) {
+            timetype abs_time = clocktype::universal_time();
+            abs_time += boost::posix_time::milliseconds(timeout);
+            const bool res =
+                rqueue->timed_receive(buffer.data(), mxSize, rx_size, priority, abs_time);
+            if (!res) {
+                return std::nullopt;
+            }
+        } else if (timeout <= 0) {
+            const bool res = rqueue->try_receive(buffer.data(), mxSize, rx_size, priority);
+            if (!res) {
+                return std::nullopt;
+            }
+        }
+
+        if (rx_size < 8) {
+            continue;
+        }
+        ActionMessage cmd(reinterpret_cast<std::byte*>(buffer.data()), rx_size);
+        if (!isValidCommand(cmd)) {
+            std::cerr << "invalid command received ipc\n";
+            continue;
+        }
+        return cmd;
+    }
+}
+
+bool SendToQueue::connect(const std::string& connection, bool initOnly, int retries)
+{
+    connectionNameOrig = connection;
+    connectionName = stringTranslateToCppName(connection);
+    const std::string stateName = connectionName + "_state";
+    bool goodToConnect = false;
+    int tries = 0;
+    while (!goodToConnect) {
+        try {
+            auto queue_state = std::make_unique<ipc_state>(boostipc::open_only,
+                                                           stateName.c_str(),
+                                                           boostipc::read_write);
             const boostipc::mapped_region region(*queue_state, boostipc::read_write);
 
             auto* sstate = reinterpret_cast<SharedQueueState*>(region.get_address());
-            sstate->setState(newState);
-        }
-    }
 
-    ActionMessage OwnedQueue::getMessage()
-    {
-        if (!connected) {
-            return (CMD_ERROR);
-        }
-        size_t rx_size = 0;
-        unsigned int priority{0};
-        while (true) {
-            rqueue->receive(buffer.data(), mxSize, rx_size, priority);
-            if (rx_size < 8) {
-                continue;
-            }
-            ActionMessage cmd(reinterpret_cast<std::byte*>(buffer.data()), rx_size);
-            if (!isValidCommand(cmd)) {
-                std::cerr << "invalid command received ipc\n";
-                continue;
-            }
-            return cmd;
-        }
-    }
-
-    std::optional<ActionMessage> OwnedQueue::getMessage(int timeout)
-    {
-        if (!connected) {
-            return std::nullopt;
-        }
-        size_t rx_size = 0;
-        unsigned int priority{0};
-        while (true) {
-            if (timeout >= 0) {
-                timetype abs_time = clocktype::universal_time();
-                abs_time += boost::posix_time::milliseconds(timeout);
-                const bool res =
-                    rqueue->timed_receive(buffer.data(), mxSize, rx_size, priority, abs_time);
-                if (!res) {
-                    return std::nullopt;
-                }
-            } else if (timeout <= 0) {
-                const bool res = rqueue->try_receive(buffer.data(), mxSize, rx_size, priority);
-                if (!res) {
-                    return std::nullopt;
-                }
-            }
-
-            if (rx_size < 8) {
-                continue;
-            }
-            ActionMessage cmd(reinterpret_cast<std::byte*>(buffer.data()), rx_size);
-            if (!isValidCommand(cmd)) {
-                std::cerr << "invalid command received ipc\n";
-                continue;
-            }
-            return cmd;
-        }
-    }
-
-    bool SendToQueue::connect(const std::string& connection, bool initOnly, int retries)
-    {
-        connectionNameOrig = connection;
-        connectionName = stringTranslateToCppName(connection);
-        const std::string stateName = connectionName + "_state";
-        bool goodToConnect = false;
-        int tries = 0;
-        while (!goodToConnect) {
-            try {
-                auto queue_state = std::make_unique<ipc_state>(boostipc::open_only,
-                                                               stateName.c_str(),
-                                                               boostipc::read_write);
-                const boostipc::mapped_region region(*queue_state, boostipc::read_write);
-
-                auto* sstate = reinterpret_cast<SharedQueueState*>(region.get_address());
-
-                switch (sstate->getState()) {
-                    case queue_state_t::connected:
-                    case queue_state_t::startup:
+            switch (sstate->getState()) {
+                case queue_state_t::connected:
+                case queue_state_t::startup:
+                    goodToConnect = true;
+                    break;
+                case queue_state_t::operating:
+                    if (!initOnly) {
                         goodToConnect = true;
-                        break;
-                    case queue_state_t::operating:
-                        if (!initOnly) {
-                            goodToConnect = true;
-                        }
-                        break;
-                    case queue_state_t::unknown:  // probably still undergoing setup
-                    default:
-                        break;
-                }
-                if (!goodToConnect) {
-                    ++tries;
-                    if (tries <= retries) {
-                        queue_state.reset();
-                        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                    } else {
-                        errorString = "timed out waiting for the queue to become available";
-                        return false;
                     }
-                }
+                    break;
+                case queue_state_t::unknown:  // probably still undergoing setup
+                default:
+                    break;
             }
-
-            catch (boost::interprocess::interprocess_exception const&) {
-                // this likely means the shared_memory_object doesn't exist yet
+            if (!goodToConnect) {
                 ++tries;
                 if (tries <= retries) {
+                    queue_state.reset();
                     std::this_thread::sleep_for(std::chrono::milliseconds(200));
                 } else {
                     errorString = "timed out waiting for the queue to become available";
@@ -200,31 +188,43 @@ namespace helics::ipc {
             }
         }
 
-        while (!connected) {
-            try {
-                txqueue = std::make_unique<ipc_queue>(boostipc::open_only, connectionName.c_str());
-                connected = true;
-            }
-            catch (boost::interprocess::interprocess_exception const& ipe) {
-                // this likely means the shared file doesn't exist yet
-                ++tries;
-                if (tries <= retries) {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                } else {
-                    errorString = std::string("Unable to open connection:") + ipe.what();
-                    break;
-                }
+        catch (boost::interprocess::interprocess_exception const&) {
+            // this likely means the shared_memory_object doesn't exist yet
+            ++tries;
+            if (tries <= retries) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            } else {
+                errorString = "timed out waiting for the queue to become available";
+                return false;
             }
         }
-        return connected;
     }
 
-    void SendToQueue::sendMessage(const ActionMessage& cmd, int priority)
-    {
-        if (connected) {
-            cmd.to_vector(buffer);
-
-            txqueue->send(buffer.data(), buffer.size(), priority);
+    while (!connected) {
+        try {
+            txqueue = std::make_unique<ipc_queue>(boostipc::open_only, connectionName.c_str());
+            connected = true;
+        }
+        catch (boost::interprocess::interprocess_exception const& ipe) {
+            // this likely means the shared file doesn't exist yet
+            ++tries;
+            if (tries <= retries) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            } else {
+                errorString = std::string("Unable to open connection:") + ipe.what();
+                break;
+            }
         }
     }
+    return connected;
+}
+
+void SendToQueue::sendMessage(const ActionMessage& cmd, int priority)
+{
+    if (connected) {
+        cmd.to_vector(buffer);
+
+        txqueue->send(buffer.data(), buffer.size(), priority);
+    }
+}
 }  // namespace helics::ipc
