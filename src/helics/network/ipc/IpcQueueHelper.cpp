@@ -20,8 +20,7 @@ using timetype = boost::posix_time::ptime;
 
 using clocktype = boost::interprocess::ipcdetail::microsec_clock<timetype>;
 
-namespace helics {
-namespace ipc {
+namespace helics::ipc {
     OwnedQueue::~OwnedQueue()
     {
         if (rqueue) {
@@ -59,7 +58,7 @@ namespace ipc {
         }
         queue_state->truncate(sizeof(SharedQueueState) + 256);
         // Map the whole shared memory in this process
-        boostipc::mapped_region region(*queue_state, boostipc::read_write);
+        const boostipc::mapped_region region(*queue_state, boostipc::read_write);
 
         auto* sstate = new (region.get_address()) SharedQueueState;
         sstate->setState(queue_state_t::startup);
@@ -84,7 +83,7 @@ namespace ipc {
     void OwnedQueue::changeState(queue_state_t newState)
     {
         if (connected) {
-            boostipc::mapped_region region(*queue_state, boostipc::read_write);
+            const boostipc::mapped_region region(*queue_state, boostipc::read_write);
 
             auto* sstate = reinterpret_cast<SharedQueueState*>(region.get_address());
             sstate->setState(newState);
@@ -105,7 +104,7 @@ namespace ipc {
             }
             ActionMessage cmd(reinterpret_cast<std::byte*>(buffer.data()), rx_size);
             if (!isValidCommand(cmd)) {
-                std::cerr << "invalid command received ipc" << std::endl;
+                std::cerr << "invalid command received ipc\n";
                 continue;
             }
             return cmd;
@@ -123,13 +122,13 @@ namespace ipc {
             if (timeout >= 0) {
                 timetype abs_time = clocktype::universal_time();
                 abs_time += boost::posix_time::milliseconds(timeout);
-                bool res =
+                const bool res =
                     rqueue->timed_receive(buffer.data(), mxSize, rx_size, priority, abs_time);
                 if (!res) {
                     return std::nullopt;
                 }
             } else if (timeout <= 0) {
-                bool res = rqueue->try_receive(buffer.data(), mxSize, rx_size, priority);
+                const bool res = rqueue->try_receive(buffer.data(), mxSize, rx_size, priority);
                 if (!res) {
                     return std::nullopt;
                 }
@@ -140,7 +139,7 @@ namespace ipc {
             }
             ActionMessage cmd(reinterpret_cast<std::byte*>(buffer.data()), rx_size);
             if (!isValidCommand(cmd)) {
-                std::cerr << "invalid command received ipc" << std::endl;
+                std::cerr << "invalid command received ipc\n";
                 continue;
             }
             return cmd;
@@ -151,7 +150,7 @@ namespace ipc {
     {
         connectionNameOrig = connection;
         connectionName = stringTranslateToCppName(connection);
-        std::string stateName = connectionName + "_state";
+        const std::string stateName = connectionName + "_state";
         bool goodToConnect = false;
         int tries = 0;
         while (!goodToConnect) {
@@ -159,7 +158,7 @@ namespace ipc {
                 auto queue_state = std::make_unique<ipc_state>(boostipc::open_only,
                                                                stateName.c_str(),
                                                                boostipc::read_write);
-                boostipc::mapped_region region(*queue_state, boostipc::read_write);
+                const boostipc::mapped_region region(*queue_state, boostipc::read_write);
 
                 auto* sstate = reinterpret_cast<SharedQueueState*>(region.get_address());
 
@@ -228,5 +227,4 @@ namespace ipc {
             txqueue->send(buffer.data(), buffer.size(), priority);
         }
     }
-}  // namespace ipc
-}  // namespace helics
+}  // namespace helics::ipc
