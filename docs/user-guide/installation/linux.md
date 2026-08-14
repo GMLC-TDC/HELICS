@@ -8,7 +8,7 @@
 - C++20 compiler (GCC 11 or clang 15 or higher)
 - CMake 3.22 or newer
 - git
-- Boost 1.73 or newer
+- Boost 1.83 or newer
 - ZeroMQ 4.2 or newer (generally recommended but technically not essential)
 - MPI-2 implementation (if MPI support is needed)
 

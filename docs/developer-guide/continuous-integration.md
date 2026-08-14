@@ -28,7 +28,7 @@ There are also a few tests run daily:
 
 - Ubuntu 20.04 build using default package versions that runs the larger "daily" CI tests
 - Ubuntu 20.04 build using default package versions that uses ZeroMQ as a subproject instead of installing it with a package manager
-- MSVC2022 64 bit build and test using Boost 1.74
+- MSVC2022 64 bit build and test using Boost 1.83
 
 ## Circle CI
 

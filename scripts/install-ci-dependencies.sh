@@ -7,7 +7,7 @@ os_name="$(uname -s)"
 
 boost_version=$CI_BOOST_VERSION
 if [[ -z "$CI_BOOST_VERSION" ]]; then
-    boost_version=1.72.0
+    boost_version=1.83.0
 fi
 boost_install_path=${CI_DEPENDENCY_DIR}/boost
 
