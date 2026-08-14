@@ -18,11 +18,7 @@ namespace boostipc = boost::interprocess;
 
 using timetype = boost::posix_time::ptime;
 
-#if BOOST_VERSION >= 107700
 using clocktype = boost::interprocess::ipcdetail::microsec_clock<timetype>;
-#else
-using clocktype = boost::date_time::microsec_clock<timetype>;
-#endif
 
 namespace helics {
 namespace ipc {

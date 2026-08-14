@@ -143,7 +143,7 @@ jobs:
       - task: Cache@2
         inputs:
           path: $(BOOST_ROOT)
-          key: boost-1.83
+          key: '"boost-1.83"'
           cacheHitVar: BOOST_CACHE_RESTORED
         displayName: Restore Boost cache
       - bash: |

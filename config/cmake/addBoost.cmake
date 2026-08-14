@@ -148,10 +148,13 @@ if(NOT Boost_FOUND)
             math(EXPR Boost_VERSION_MAJOR "${Boost_VERSION_MACRO} / 100000")
             math(EXPR Boost_VERSION_MINOR "${Boost_VERSION_MACRO} / 100 % 1000")
             math(EXPR Boost_VERSION_PATCH "${Boost_VERSION_MACRO} % 100")
+            set(Boost_VERSION
+                "${Boost_VERSION_MAJOR}.${Boost_VERSION_MINOR}.${Boost_VERSION_PATCH}"
+            )
 
             message(STATUS "Boost VERSION ${Boost_VERSION_MACRO}")
         endif()
-        if(Boost_VERSION_MINOR GREATER_EQUAL ${BOOST_MINIMUM_VERSION})
+        if(Boost_VERSION VERSION_GREATER_EQUAL ${BOOST_MINIMUM_VERSION})
             add_library(Boost::headers INTERFACE IMPORTED)
             set_target_properties(
                 Boost::headers PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
