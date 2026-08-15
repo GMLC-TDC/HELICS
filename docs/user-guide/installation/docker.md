@@ -6,11 +6,11 @@
 
 ## Dockerfile
 
-This `Dockerfile` will build and install HELICS in Ubuntu 22.04 with
+This `Dockerfile` will build and install HELICS in Ubuntu 24.04 with
 Python support.
 
 ```dockerfile
-FROM ubuntu:22.04 as builder
+FROM ubuntu:24.04 as builder
 
 WORKDIR /root/develop
 
@@ -32,7 +32,7 @@ RUN cmake \
 RUN cmake --build build -j -t install
 
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 COPY --from=builder /helics /usr/local/
 
@@ -41,8 +41,8 @@ ENV PYTHONPATH /usr/local/python
 # Python must be installed after the PYTHONPATH is set above for it to
 # recognize and import libhelicsSharedLib.so.
 RUN apt update && apt install -y --no-install-recommends \
-  libboost-filesystem1.74.0 libboost-program-options1.74.0 \
-  libboost-test1.74.0 libzmq5 pip python3-dev
+  libboost-filesystem1.83.0 libboost-program-options1.83.0 \
+  libboost-test1.83.0 libzmq5 pip python3-dev
 
 RUN pip install helics
 

@@ -9,7 +9,7 @@ Windows installers are available with the different [releases](https://github.co
 - Microsoft Visual C++ 2019 or newer (MS Build Tools also works)
 - CMake 3.22 or newer (CMake should be newer than the Visual Studio and Boost version you are using;)
 - git
-- Boost 1.75 or newer (needs to have boost cmake configuration)- 1.73 and 1.74 may work with older versions of Cmake
+- Boost 1.83 or newer (needs to have boost cmake configuration)
 - MS-MPI v8 or newer (if MPI support is needed)
 
 ## Setup for Visual Studio
@@ -21,11 +21,11 @@ _Note_: Keep in mind that your CMake version should be newer than the boost vers
 **1.** Install Microsoft Visual C++ 2019 or newer that supports C++20 [MSVC](https://visualstudio.microsoft.com/)
 
 **2.** Install [Boost](https://dl.bintray.com/boostorg/release/1.84.0/binaries/)
-1.75 or later. For CMake to detect it automatically either
+1.83 or later. For CMake to detect it automatically either
 extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
 environment variable to the install location. The CMake will only automatically find
-Boost 1.67 or newer.
-Building with Visual Studio 2019 will require boost 1.75 or newer and CMake 3.22+
+Boost 1.83 or newer.
+Building with Visual Studio 2019 will require boost 1.83 or newer and CMake 3.22+
 or newer.
 Boost 1.84 with CMake 3.28+ is the current recommended configuration.
 
@@ -325,7 +325,7 @@ For building with clang using libc++, CMake 3.18+ must be used.
 HELICS can also be built with the standalone MinGW
 
 - We assume you have MinGW installed or know how to install it.
-- [Boost](https://www.boost.org/doc/libs/1_75_0/more/getting_started/windows.html); you can use the [Windows installer](https://sourceforge.net/projects/boost/files/boost-binaries/) for Boost installed in the default location
+- [Boost](https://www.boost.org/doc/libs/1_83_0/more/getting_started/windows.html); you can use the [Windows installer](https://sourceforge.net/projects/boost/files/boost-binaries/) for Boost installed in the default location
 - Run CMake to configure and generate build files, using "MinGW Makefiles" as the generator,
 - Run mingw32-make -j to build
 

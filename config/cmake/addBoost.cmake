@@ -27,6 +27,7 @@ if(WIN32 AND NOT UNIX_LIKE)
         endif()
     endif()
     set(boost_versions
+        boost_1_92_0
         boost_1_91_0
         boost_1_90_0
         boost_1_89_0
@@ -36,16 +37,6 @@ if(WIN32 AND NOT UNIX_LIKE)
         boost_1_85_0
         boost_1_84_0
         boost_1_83_0
-        boost_1_82_0
-        boost_1_81_0
-        boost_1_80_0
-        boost_1_79_0
-        boost_1_78_0
-        boost_1_77_0
-        boost_1_76_0
-        boost_1_75_0
-        boost_1_74_0
-        boost_1_73_0
     )
 
     set(poss_prefixes
@@ -98,16 +89,6 @@ if(WIN32 AND NOT UNIX_LIKE)
                     Boost-1.85.0
                     Boost-1.84.0
                     Boost-1.83.0
-                    Boost-1.82.0
-                    Boost-1.81.0
-                    Boost-1.80.0
-                    Boost-1.79.0
-                    Boost-1.78.0
-                    Boost-1.77.0
-                    Boost-1.76.0
-                    Boost-1.75.0
-                    Boost-1.74.0
-                    Boost-1.73.0
             )
             set(Boost_ROOT ${BOOST_CMAKE_PATH})
         else()
@@ -139,7 +120,7 @@ if(NOT BOOST_REQUIRED_LIBRARIES)
     set(BOOST_REQUIRED_LIBRARIES)
 endif()
 
-set(BOOST_MINIMUM_VERSION 1.73)
+set(BOOST_MINIMUM_VERSION 1.83)
 
 if(BOOST_REQUIRED_LIBRARIES)
     find_package(Boost ${BOOST_MINIMUM_VERSION} QUIET COMPONENTS ${BOOST_REQUIRED_LIBRARIES})
@@ -167,10 +148,13 @@ if(NOT Boost_FOUND)
             math(EXPR Boost_VERSION_MAJOR "${Boost_VERSION_MACRO} / 100000")
             math(EXPR Boost_VERSION_MINOR "${Boost_VERSION_MACRO} / 100 % 1000")
             math(EXPR Boost_VERSION_PATCH "${Boost_VERSION_MACRO} % 100")
+            set(Boost_VERSION
+                "${Boost_VERSION_MAJOR}.${Boost_VERSION_MINOR}.${Boost_VERSION_PATCH}"
+            )
 
             message(STATUS "Boost VERSION ${Boost_VERSION_MACRO}")
         endif()
-        if(Boost_VERSION_MINOR GREATER_EQUAL ${BOOST_MINIMUM_VERSION})
+        if(Boost_VERSION VERSION_GREATER_EQUAL ${BOOST_MINIMUM_VERSION})
             add_library(Boost::headers INTERFACE IMPORTED)
             set_target_properties(
                 Boost::headers PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES

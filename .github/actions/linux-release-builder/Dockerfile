@@ -11,8 +11,8 @@ RUN yum install -y git && yum clean all
 # Install Boost
 # Install a copy of git and the Boost headers
 # curl -L follows redirects and -k ignores SSL certificate warnings
-RUN curl -Lk -o boost.tar.gz https://sourceforge.net/projects/boost/files/boost/1.75.0/boost_1_75_0.tar.gz/download \
-    && tar --strip-components=1 -xf boost.tar.gz boost_1_75_0/boost \
+RUN curl -Lk -o boost.tar.gz https://sourceforge.net/projects/boost/files/boost/1.83.0/boost_1_83_0.tar.gz/download \
+    && tar --strip-components=1 -xf boost.tar.gz boost_1_83_0/boost \
     && mv boost /usr/include/boost \
     && rm boost.tar.gz
 
