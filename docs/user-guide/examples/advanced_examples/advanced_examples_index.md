@@ -16,7 +16,9 @@
     advanced_iteration
     advanced_FMU
     advanced_async_time_request
+    advanced_single_core
     advanced_helics_connector
+    advanced_dynamic_federation
 
 ```
 
@@ -177,5 +179,5 @@ Using the [Advanced Default Example](./advanced_default.md) as the starting poin
   - [**Multi-Protocol Brokers (Multi-broker) for Multiple Core Types)**](advanced_brokers_multibroker) What to do when one type of communication isn't sufficient.
   - [**Multi-compute-node Co-simulation**](advanced_brokers_multicomputer) - Executing a co-simulation across multiple compute nodes.
 - [**Queries**](./advanced_query.md) - Demonstration of the use of queries for dynamic federate configuration.
-- [**Multi-Source Inputs**](./advanced_multi_input.md) - Demonstration of use and configuration of a a multi-sourced input value interface.
+- [**Multi-Source Inputs**](./advanced_multi_input.md) - Demonstration of use and configuration of a multi-sourced input value interface.
 - [**Orchestration Tool (Merlin)**](./advanced_orchestration.md) Demonstration of using [Merlin](https://github.com/LLNL/merlin) to handle situations where a HELICS co-simulation is just one step in an automated analysis process (_e.g._ uncertainty quantification) or where assistance is needed deploying a large co-simulation in an HPC environment.

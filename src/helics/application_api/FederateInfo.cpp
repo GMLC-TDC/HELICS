@@ -65,7 +65,7 @@ FederateInfo::FederateInfo(const std::string& args)
     loadInfoFromArgsIgnoreOutput(args);
 }
 
-static constexpr frozen::unordered_map<std::string_view, int, 78> propStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 71> propStringsTranslations{
     {"period", HELICS_PROPERTY_TIME_PERIOD},
     {"timeperiod", HELICS_PROPERTY_TIME_PERIOD},
     {"time_period", HELICS_PROPERTY_TIME_PERIOD},
@@ -136,14 +136,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 78> propStringsTra
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"valuebufferwarning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
-    {"valueBufferWarning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
-    {"value_buffer_warning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
-    {"value_buffer_warning_mib", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
-    {"valuebufferwarningmib", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
-    {"valueBufferWarningMiB", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
-    {"intvaluebufferwarning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
-    {"intValueBufferWarning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING},
-    {"int_value_buffer_warning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING}};
+    {"value_buffer_warning", HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING}};
 
 static constexpr frozen::unordered_map<std::string_view, int, 97> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},

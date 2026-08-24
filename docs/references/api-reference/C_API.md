@@ -422,6 +422,9 @@
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_LOG_BUFFER
     :project: helics
 
+.. doxygenenumvalue:: HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING
+    :project: helics
+
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_INDEX_GROUP
     :project: helics
 

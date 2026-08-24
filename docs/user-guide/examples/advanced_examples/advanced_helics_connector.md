@@ -10,7 +10,7 @@ This example demonstrates the use of the "helics_connector" app to create interf
     - [HELICS components](#helics-components)
       - [Configuration by match-file](#configuration-by-match-file)
       - [Match-file specification](#match-file-specification)
-      - [Configuration by interface creation](#condfiguration-by-interface-creation)
+      - [Configuration by interface creation](#configuration-by-interface-creation)
         - [Query callback](#query-callback)
         - [Configuration command response](#configuration-command-response)
         - [Interface creation timing](#interface-creation-timing)
@@ -19,7 +19,7 @@ This example demonstrates the use of the "helics_connector" app to create interf
 
 ## Where is the code?
 
-This example code on [the use of helics_connector can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_connector). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
+Example code for [using `helics_connector` can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_connector). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
 [![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_connector_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_connector)
 

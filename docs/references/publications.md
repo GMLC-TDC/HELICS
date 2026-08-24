@@ -34,7 +34,7 @@ William Lardier, "ASGARDS-H: Enabling Advanced Smart Grid cyber-physical Attacks
 
 Y. Liu, R. Huang, W. Du, A. Singhal and Z. Huang, "High-Performance Transmission and Distribution Co-simulation with 10,000+ Inverter-Based Resources," 2022 IEEE Industry Applications Society Annual Meeting (IAS), Detroit, MI, USA, 2022, pp. 1-5, doi: 10.1109/IAS54023.2022.9940149, available at [https://ieeexplore.ieee.org/document/9940149](https://ieeexplore.ieee.org/document/9940149).
 
-Narayanan, Anantha, and Hardy, Trevor. "Synthetic Data Generation for Machine Learning Model Training for Energy Theft Scenarios Ssing Cosimulation". United Kingdom: N. p., 2022. Web. doi:10.1049/gtd2.12619, available at [https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/gtd2.12619](https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/gtd2.12619).
+Narayanan, Anantha, and Hardy, Trevor. "Synthetic Data Generation for Machine Learning Model Training for Energy Theft Scenarios Using Cosimulation". United Kingdom: N. p., 2022. Web. doi:10.1049/gtd2.12619, available at [https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/gtd2.12619](https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/gtd2.12619).
 
 Jing Wang, Prateek Munankarmi, Jeff Maguire, Chengnan Shi, Wangda Zuo, David Roberts, Xin Jin. "Carbon emission responsive building control: A case study with an all-electric residential community in a cold climate". Applied Energy, Volume 314,2022, 118910,
 doi: 10.1016/j.apenergy.2022.118910, available at [https://www.sciencedirect.com/science/article/pii/S0306261922003336](https://www.sciencedirect.com/science/article/pii/S0306261922003336).

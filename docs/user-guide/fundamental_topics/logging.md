@@ -184,6 +184,10 @@ h.helicsFederateSetLoggingCallback(fed, logger, user_data)
 As of Version 3.2,
 HELICS cores, brokers, and federates have the capability to buffer log messages. This can be activated via the `--logbuffer` flag, or `--logbuffer=X` option. The default size is 10 messages for the `--logbuffer` flag. For cores and federates there is a `HELICS_PROPERTY_INT_LOG_BUFFER` property that can be set. And it can also be activated via the [`logbuffer <X>` command](../advanced_topics/commandInterface.md) remotely. `<X>` is the desired size of the buffer. `logbuffer stop` will deactivate the buffer in a remote command. The logs can be retrieved via the ["logs"](../advanced_topics/queries.md) query. The buffer is available even after disconnect for cores and brokers from the local object.
 
+## Value Buffer Warning
+
+Federates can warn when queued future value buffers exceed the `value_buffer_warning` threshold. The threshold is specified in MiB, defaults to 100 MiB, and can be disabled by setting it to 0. This warning can indicate that publishers are advancing faster than subscribers and queued value payload data is accumulating.
+
 ## Remote Logging
 
 As of version 3.2 it is possible to have a HELICS object clone its logging to another object. For example a federate can request the broker log messages be sent to a federate log via a [`remotelog` command](../advanced_topics/commandInterface.md). Multiple objects can receive the same log and a single object can receive multiple remote logs. The federate/broker/core that sends the remote log command is the one who will receive the logs and can include logging level to receive debugging logs from a particular location. This can be stopped as well via the `remotelog stop` command.

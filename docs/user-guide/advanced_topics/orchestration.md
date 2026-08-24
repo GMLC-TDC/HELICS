@@ -74,7 +74,7 @@ analysis step.
 A Merlin specification has multiple parts that control how a
 co-simulation may run. Below we describe how each part can be used in
 a HELICS co-simulation workflow. For the sake of simplicity we are
-using the the pi-exchange python example that can be found
+using the pi-exchange python example that can be found
 [here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/python/pi-exchange). The
 goal will be to have Merlin launch multiple pi-senders and
 pi-receivers.

@@ -12,7 +12,7 @@ Generally, there are a few changes that will be necessary for running a multi-co
 
 Which is not to say there can't be other networking complications. Once running on multiple computers the network configuration and configuration can create new challenges. Handling these is beyond the scope of this document but take a look at the some of the other examples to get an idea of how you might be able to handle this. There's also the [Configuration Options Reference](../../references/configuration_options_reference.md) that has a more comprehensive list of the [network configurations available](../../references/configuration_options_reference.md#network).
 
-For those that are doing configuration via APIs, the "broker_address" and "broker_port" options can be included as part of the ["core_init_string"](../../references/configuration_options_reference.md#core_init_string---i-null) for the federates and the ["broker_init_string"](../../references/configuration_options_reference.md#broker_init_string--null) if instantiating the broker via APIs.
+For those that are doing configuration via APIs, the "broker_address" and "broker_port" options can be included as part of the ["core_init_string"](../../references/configuration_options_reference.md#core_init_string---i-null) for the federates and the ["broker_init_string"](../../references/configuration_options_reference.md#broker_init_string-null) if instantiating the broker via APIs.
 
 ## Example
 

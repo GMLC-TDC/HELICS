@@ -18,7 +18,7 @@ This example shows how to configure a HELICS co-simulation to run across multipl
 
 ## Where is the code?
 
-The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. This example on [multi-computer co-simulation can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/multi_computer). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
+The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. The example on [multi-computer co-simulation can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/multi_computer). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
 [![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/advanced_broker_multicomputer_github.png?raw=true)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
@@ -50,7 +50,7 @@ On the computer(s) where the broker is not running, each of the federates has to
 "broker_address": "tcp://<IP address of broker>",
 ```
 
-If for whatever reason the federation need to run on a different port, this can easily be done with minor alterations. The broker instantiation would be:
+If for whatever reason the federation needs to run on a different port, this can easily be done with minor alterations. The broker instantiation would be:
 
 ```shell-session
 $ helics_broker --loglevel=debug --timeout='10s' --ipv4 --port=<port number>",

@@ -2,7 +2,7 @@
 
 Once a federate has been granted the ability to move forward to a specific time (the granted time), the federate will execute its simulation, calculating its new state, behavior, or control action to advance to that time. Prior to these calculations, it will receive any messages that have been sent to it by other federates and after simulating up to the granted time, may send out messages with new values other federates may need.
 
-Using the webserver that HELICS provides to access data about a cosimulation (without having to using the [HELICS APIs](../../references/api-reference/index.md) yourself), HELICS also has a GUI via a web page that allows users to more easily run, monitor and debug a co-simulation.
+Using the webserver that HELICS provides to access data about a co-simulation (without having to use the [HELICS APIs](../../references/api-reference/index.md) yourself), HELICS also has a GUI via a web page that allows users to more easily run, monitor and debug a co-simulation.
 
 ## Launching Web Interface
 
@@ -34,7 +34,7 @@ Forthcoming description of how the web interface configuration file is formatted
 
 ### Normal, everyday runs
 
-When you have a co-simulation that you've vetted and feel comfortable will run without difficulty (or at least you don't anticipate a need to debug it), running the co-simulation to completion from the interface is straight-forward:
+When you have a co-simulation that you've vetted and feel comfortable will run without difficulty (or at least you don't anticipate a need to debug it), running the co-simulation to completion from the interface is straightforward:
 
 1. (optional) Load in a configuration file - If you just want to look at a few federates and/or publications to track the progress of the co-simulation, make a web interface configuration file that does so and load it up.
 2. Press the "Run" button (number 2 in the screenshot above).
