@@ -1,73 +1,39 @@
-# Description of the different continuous integration test setups running on the CI servers
+# Continuous integration builds
 
-There are 5 CI servers that are running along with a couple additional checks
-GitHub Actions, Appveyor, Circle-CI, Azure and Drone.
+The CI configuration is defined in the repository. This page summarizes the jobs currently enabled; the workflow and pipeline files are the authoritative source when a job matrix changes.
 
-## Appveyor tests
+## Azure Pipelines
 
-- Cygwin builds
+Pushes (except `pre-commit/*`) and pull requests targeting `main` run the primary build-and-test matrix:
 
-## Azure tests
+- Linux containers: Ubuntu 24.04 default, GCC 11, Clang 15, and Clang 18. The Ubuntu default and GCC 11 jobs enable MPI and encryption.
+- macOS 14 and macOS 15.
+- Windows: Visual Studio 2022 32-bit and 64-bit, plus Visual Studio 2026 64-bit.
 
-Azure pipelines is currently running the majority of CI tests.
+The daily pipeline runs the full Linux test suite, a Linux build using ZeroMQ as a subproject, and a 64-bit Visual Studio 2022 build. Windows jobs use Boost 1.83.
 
-The main tests for pull requests and pushes targeting the main branch are:
+## CircleCI
 
-- Default Ubuntu 20.04 build and test using GCC with MPI and encryption support enabled
-- GCC 8 build and test running on Linux with MPI and encryption support enabled
-- Clang 13 build and test running on Linux
-- Clang 7 build and test running on Linux
-- XCode 10.2: Test a recent XCode compiler with the Shared API library tests
-- XCode build and test using the newest version of macOS that is available for CI builds
-- XCode build and test using the oldest version of macOS still supported by Apple
-- MSVC2022 32 bit build and test without the webserver component
-- MSVC2026 64 bit build and test
-- MSVC2022 64 bit build and test using the C++20 standard
-
-There are also a few tests run daily:
-
-- Ubuntu 20.04 build using default package versions that runs the larger "daily" CI tests
-- Ubuntu 20.04 build using default package versions that uses ZeroMQ as a subproject instead of installing it with a package manager
-- MSVC2022 64 bit build and test using Boost 1.83
-
-## Circle CI
-
-All PR's and branches trigger a set of builds using Docker images on Circle-CI.
-
-- Clang-MSAN - runs the clang memory sanitizer
-- Clang-ASAN - runs the clang address sanitizer and undefined behavior sanitizer
-- Clang-TSAN - runs the clang thread sanitizer
-- install1 - build and install and link with the C shared library, C\++ shared library, C\++98 library and C\++ apps library, and run some tests linking to the installed libraries
-- install2 - build and install and link with the C shared library, and C\++98 library only and run some tests linking with the installed library
-
-### Benchmark tests
-
-Circle ci also runs a benchmark test that runs every couple days. Eventually this will form the basis of benchmark regression test.
+For pull requests and branches other than `pre-commit/*`, CircleCI runs install/package checks plus GCC 14, Clang 18, and Clang 18 with C++23. Scheduled jobs on `main` also run OpenSUSE Tumbleweed, a no-ZeroMQ configuration, and an ARM64 build. Benchmarks run three times weekly.
 
 ## GitHub Actions
 
-GitHub Actions is used for various release related builds, and some special CI configurations that don't need to run often.
+GitHub Actions runs the following repository workflows:
 
-- Static analyzers
-- Building pre-compiled packages for releases
-- Building Docker images
-- Daily build of benchmark binaries
-- Daily build of the release artifacts using code in the main branch
-- Daily MSYS2 CI builds using both MinGW and MSYS makefiles
-- Daily code coverage build and test
+- Static analysis (`cpplint` on pushes and pull requests to `main`, and `clang-tidy` on pull requests).
+- A Clang 22 C++26 build and smoke-test job on pushes and pull requests to `main`.
+- MSYS2 builds using both MinGW and MSYS Makefiles on pull requests to `main`, relevant branch pushes, and a daily schedule.
+- Code coverage on `main` pushes and scheduled runs; pull-request coverage runs for branches whose names begin with `coverage_`.
+- Address, memory, and thread sanitizer builds on the daily schedule.
+- Scheduled benchmark and release-artifact builds, plus release packaging when a GitHub release is published.
+- Docker image builds for `main`, Docker-focused branches, tags, and releases.
+- CodeQL, generated SWIG-interface updates, image compression, and release-checklist automation.
 
-## Drone
+## AppVeyor and Cirrus CI
 
-- 64 bit and 32 bit builds on ARM processors
+- AppVeyor performs a Cygwin 64-bit Release compilation on `main`; tests are disabled for this job.
+- Cirrus CI builds and runs the `SystemCI` test label on FreeBSD 15.
 
-## Cirrus CI
+## Documentation
 
-- FreeBSD 12.2 build
-
-## Read the docs
-
-- Build the docs for the website and test on every commit
-
-## Codacy
-
-There are some static analysis checks run with Codacy. While it is watched it is not always required to pass.
+Read the Docs builds and hosts the published documentation. Codacy checks may also be reported, but they are informational and are not part of the required CI matrix.
