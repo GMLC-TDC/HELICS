@@ -3,7 +3,7 @@
 _realname=helics
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.4.0
+pkgver=3.7.0
 pkgrel=1
 pkgdesc="Hierarchical Engine for Large-scale Infrastructure Co-Simulation (mingw-w64)"
 arch=('any')
@@ -16,8 +16,9 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
     "${MINGW_PACKAGE_PREFIX}-zeromq"
     "${MINGW_PACKAGE_PREFIX}-boost")
 options=('!staticlibs' '!strip')
-source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/GMLC-TDC/HELICS/releases/download/v${pkgver}/HELICS-v${pkgver}-source.tar.gz")
-sha256sums=('8de39728c7bb03be0bde0d506acc827bea732eddb7bb46892027b777b10dab27')
+# Replace SKIP with the SHA-256 from the published v${pkgver} source asset.
+source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/GMLC-TDC/HELICS/releases/download/v${pkgver}/Helics-v${pkgver}-source.tar.gz")
+sha256sums=('SKIP')
 
 #prepare() {
 #  mkdir -p test

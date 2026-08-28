@@ -105,13 +105,3 @@ message sent from fed1 to fed2/endpoint at time 3
 
 ...
 ```
-
-## A few Specialized Platforms
-
-NOTE: This option has been removed as of HELICS 3.7 and is not currently needed.
-
-The HELICS build supports a few specialized platforms, more will be added as needed. Generally the build requirements are automatically detected but that is not always possible. So a system configuration can be specified in the HELICS_BUILD_CONFIGURATION variable of CMake.
-
-### Raspberry PI
-
-Prior to HELICS 3.6.1, to build on Raspberry PI system using Raspbian required using `HELICS_BUILD_CONFIGURATION=PI`. This added a few required libraries to the build so it works without other configuration. Otherwise it is also possible to build using `-DCMAKE_CXX_FLAGS=-latomic`.
