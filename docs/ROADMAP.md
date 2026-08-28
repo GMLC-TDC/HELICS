@@ -5,7 +5,7 @@ This document contains tentative plans for changes and improvements of note in u
 ## \[3.8\] ~ Fall/Winter 2026
 
 - Update IPC core
-- remove Webserver from C++ migrate to pyHELICS with additional capabilities
+- Remove Webserver from C++, migrate it to pyHELICS with additional capabilities
 
 ## Further in the future
 

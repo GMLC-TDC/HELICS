@@ -32,7 +32,6 @@ GitHub Actions runs the following repository workflows:
 ## AppVeyor and Cirrus CI
 
 - AppVeyor performs a Cygwin 64-bit Release compilation on `main`; tests are disabled for this job.
-- Cirrus CI builds and runs the `SystemCI` test label on FreeBSD 15.
 
 ## Documentation
 
