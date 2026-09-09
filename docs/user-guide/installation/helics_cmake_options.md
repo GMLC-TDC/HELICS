@@ -15,7 +15,7 @@
 - `HELICS_WITH_CMAKE_PACKAGE` : \[Default=ON\] Generate a `HELICSConfig.cmake` file on install for loading into other libraries
 - `HELICS_BUILD_JAVA_INTERACE` : \[Default=OFF\] Build the HELICS Java Interface
 - `HELICS_BUILD_CSHARP_INTERACE` : \[Default=OFF\] Build the HELICS C# Interface
-- `CMAKE_CXX_STANDARD` : Specify the C++ standard to use in building, HELICS 3.0 requires 17 or higher which will be used if nothing is specified.
+- `CMAKE_CXX_STANDARD` : Specify the C++ standard to use in building. HELICS requires C++20 or higher and uses C++20 if no standard is specified.
 - `HELICS_INSTALL` :\[Default=ON\] If set to off HELICS will not generate any install instructions
 
 NOTE: All HELICS options are prefixed with HELICS\_ to separate them from other libraries so HELICS can be used cleanly as a subproject.
@@ -55,7 +55,6 @@ Options effect the connection of libraries used in HELICS and how they are linke
 - `HELICS_ENABLE_SWIG`: \[Default=OFF\] Conditional option if `HELICS_BUILD_MATLAB_INTERACE` or `HELICS_BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used. This enables swig usage in cases where it would not otherwise be necessary.
 - `HELICS_ENABLE_GIT_HOOKS`: install a git hook to check clang format before a push
 - `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake. So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.
-- `HELICS_BUILD_CONFIGURATION`: A string containing a specialized build configuration, if any. This is currently not in use, but was previously needed for building on a Raspberry PI system, by setting the option to "PI". Option has been removed as of HELICS 3.7.0 If needed it may come back someday.
 - `HELICS_DISABLE_C_SHARED_LIB`: \[Default=OFF\] Turns off building of the HELICS C shared library. May be used for building apps that only use the (modern) C++ shared library. Using the C++98 wrapper requires the C shared library.
 
 #### ZeroMQ related Options
@@ -81,7 +80,6 @@ When enabling these options, if the static library variant is found it _must_ ha
 Furthermore, there are no guarantees that HELICS will compile using arbitrary versions of these libraries other than the exact version that is included as a vendored library in the HELICS repository. To get the current commit hashes for the libraries included in the HELICS repository, the command `git submodule status` can be run using a git clone of the HELICS repository with your desired branch checked out (_beware that if there is a + before the hash_ it means you _must_ run `git submodule update` and _re-run the status command_ to get the correct commit hash for the submodule the currently checked out branch). The GitHub website will also show the current commit hash for submodules when you use a browser to view the contents of the `ThirdParty` folder; for example, <https://github.com/GMLC-TDC/HELICS/tree/main/ThirdParty> will show the current commit hashes used for the various library submodules on the `main` HELICS branch.
 
 - `HELICS_USE_EXTERNAL_FMT` : Use an external copy of the fmt library.
-- `HELICS_USE_EXTERNAL_JSONCPP` : Use an external copy of the jsoncpp library.
 - `HELICS_USE_EXTERNAL_SPDLOG` : Use an external copy of the spdlog library. Note that an external spdlog library may itself depend on an external fmt library, resulting in weird, confusing errors if it is incompabile with the internal fmt library used by HELICS.
 - `HELICS_USE_EXTERNAL_UNITS` : Use an external copy of the LLNL units library.
 

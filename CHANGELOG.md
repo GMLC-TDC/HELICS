@@ -11,9 +11,33 @@ Everything within a major version number should be code compatible (with the exc
 
 ## Unreleased
 
+## [3.7.0][] - 2026-08-25
+
+Major release with improved broker startup controls, C shared library support for querying broker and core status, and updates to build requirements and third party libraries.
+
+### Fixed
+
+- Fixed several timing and iteration coordination issues, including sequence counter resets, mixed value and message federate iterations, and disconnect handling with the `wait_for_current_time` flag.
+- Fixed an incorrect timer index that could lead to sporadic test failures.
+- Fixed the C shared library declarations for global input registration functions to return `HelicsInput`.
+- Fixed `helicsGetDataType` to recognize the `raw`, `map`, and `custom` type aliases.
+- Fixed Cygwin build configuration issues.
+
 ### Changed
 
+- C++20 is now the minimum required C++ standard.
 - Updated the minimum Boost build requirement to 1.83.
+- Updated the handling of `HELICS_TIME_MAXTIME`, `HELICS_TIME_BIGTIME`, and simulation termination times.
+- Updated third party libraries, including Asio, CLI11, fmt, spdlog, toml, units, ZeroMQ, and GoogleTest.
+- Updated build and CI support, including builds with CMake 4.2, Boost 1.92, and C++26.
+
+### Added
+
+- Added `--local_federates`, `--local_subbrokers`, and `--required_federates` broker options to control when a federation may enter initialization mode.
+- Added C shared library functions to check whether a broker is a root broker or whether a broker or core can accept new federates.
+- Added `HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING` and the `--value_buffer_warning` federate option to report when queued value buffers exceed a configurable threshold.
+- Added distinct maximum-time and termination-time constants to the C shared library API.
+- Added `[[nodiscard]]` annotations to C++98 interface methods where their return values should be used.
 
 ## [3.6.1][] - 2025-02-21
 
@@ -530,3 +554,6 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 [3.4.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.4.0
 [3.5.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.5.0
 [3.5.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.5.1
+[3.6.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.6.0
+[3.6.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.6.1
+[3.7.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.7.0

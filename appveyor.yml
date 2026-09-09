@@ -4,7 +4,7 @@ branches:
   only:
     - main
 
-version: 3.8.0.{build}
+version: 3.7.0.{build}
 
 image: Visual Studio 2022
 

@@ -24,7 +24,7 @@ If you clone the HELICS repository, you will be placed in the `main` branch by d
 To switch to a tagged release, you can type the following:
 
 ```bash
-git checkout v3.6.1
+git checkout v3.7.0
 ```
 
 You will not need a full understanding of how `git` works for installing HELICS, but if you are interested you can find a good `git` resource in [this page](https://git-scm.com/book/en/v2).

@@ -2,18 +2,10 @@
 
 This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library. All dates are approximate and subject to change, but this is a snapshot of the current planning thoughts. See the [projects](https://github.com/GMLC-TDC/HELICS/projects) for additional details
 
-## \[3.7\] ~ Spring-Early Summer 2025
+## \[3.8\] ~ Fall/Winter 2026
 
-- Make C++20 the minimum compiler standard and utilize C++20 features.
 - Update IPC core
-- Observer App
-
-## Nearer term features (Maybe Summer 2025)
-
-- Full xSDK compatibility
-- Separate Java Interface
-- Tag based subscriptions
-- Single thread cores
+- Remove Webserver from C++, migrate it to pyHELICS with additional capabilities
 
 ## Further in the future
 
@@ -22,3 +14,8 @@ This document contains tentative plans for changes and improvements of note in u
 - Remote procedure call type of federate
 - Plugin architecture for user defined cores
 - Enable mesh networking in HELICS
+- Full xSDK compatibility
+- Separate Java Interface
+- Observer App
+- Tag based subscriptions
+- Single thread cores
