@@ -45,6 +45,7 @@ add_library(
 )
 
 target_link_libraries(helicscpp PRIVATE HELICS::network fmt::fmt)
+helics_hide_static_cpp_runtime(helicscpp)
 target_compile_definitions(helicscpp PRIVATE helicscpp_EXPORTS PUBLIC HELICS_SHARED_LIBRARY)
 
 target_compile_options(helicscpp PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/wd4251 /wd4275>)
