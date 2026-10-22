@@ -85,9 +85,9 @@ if(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
 else()
     set_target_properties(libzmq PROPERTIES FOLDER "Extern")
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        # The Linux release links the C++ runtime statically. Keep it, and
-        # libzmq's C++ implementation, out of the shared library's exports.
-        # This is libzmq's own map, also used by its Autotools build.
+        # The Linux release links the C++ runtime statically. Keep it, and libzmq's C++
+        # implementation, out of the shared library's exports. This is libzmq's own map, also used
+        # by its Autotools build.
         target_link_options(
             libzmq PRIVATE
             "LINKER:--version-script=${PROJECT_SOURCE_DIR}/ThirdParty/libzmq/src/libzmq.vers"

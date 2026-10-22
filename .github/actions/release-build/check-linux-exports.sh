@@ -18,8 +18,8 @@ fi
 
 temporary=$(mktemp -d)
 trap 'rm -rf "$temporary"' EXIT
-tar -xOzf "$archive" "$zmq_library" > "$temporary/libzmq.so"
-nm -D --defined-only "$temporary/libzmq.so" | awk '{ print $NF }' > "$temporary/exports"
+tar -xOzf "$archive" "$zmq_library" >"$temporary/libzmq.so"
+nm -D --defined-only "$temporary/libzmq.so" | awk '{ print $NF }' >"$temporary/exports"
 
 if ! grep -qx zmq_version "$temporary/exports"; then
     echo "zmq_version is missing from $archive" >&2
@@ -28,19 +28,19 @@ fi
 
 # libzmq's public C API is zmq_*; all other exports can interpose on users of
 # the wheel, particularly when the release statically links libstdc++.
-if grep -Ev '^zmq_[A-Za-z0-9_]+$' "$temporary/exports" > "$temporary/unexpected"; then
+if grep -Ev '^zmq_[A-Za-z0-9_]+$' "$temporary/exports" >"$temporary/unexpected"; then
     echo "unexpected exports in $archive:" >&2
     head -n 20 "$temporary/unexpected" >&2
     exit 1
 fi
 
-tar -xOzf "$archive" "$helics_library" > "$temporary/libhelics.so"
-nm -D --defined-only "$temporary/libhelics.so" | awk '{ print $NF }' > "$temporary/exports"
+tar -xOzf "$archive" "$helics_library" >"$temporary/libhelics.so"
+nm -D --defined-only "$temporary/libhelics.so" | awk '{ print $NF }' >"$temporary/exports"
 if ! grep -qx helicsGetVersion "$temporary/exports"; then
     echo "helicsGetVersion is missing from $archive" >&2
     exit 1
 fi
-if grep -Ev '^helics[A-Za-z0-9_]+$' "$temporary/exports" > "$temporary/unexpected"; then
+if grep -Ev '^helics[A-Za-z0-9_]+$' "$temporary/exports" >"$temporary/unexpected"; then
     echo "unexpected libhelics exports in $archive:" >&2
     head -n 20 "$temporary/unexpected" >&2
     exit 1

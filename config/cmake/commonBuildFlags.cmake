@@ -59,16 +59,15 @@ elseif(STATIC_STANDARD_LIB STREQUAL "dynamic")
     ucm_set_runtime(DYNAMIC)
 endif()
 
-# GNU's static runtime archives otherwise contribute globally visible symbols
-# to Linux C++ shared libraries. Keep their own exported C++ APIs visible.
+# GNU's static runtime archives otherwise contribute globally visible symbols to Linux C++ shared
+# libraries. Keep their own exported C++ APIs visible.
 function(helics_hide_static_cpp_runtime target)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
        AND STATIC_STANDARD_LIB STREQUAL "static"
     )
         target_link_options(
-            ${target} PRIVATE "LINKER:--exclude-libs=libstdc++.a"
-                              "LINKER:--exclude-libs=libgcc.a"
-                              "LINKER:--exclude-libs=libgcc_eh.a"
+            ${target} PRIVATE "LINKER:--exclude-libs=libstdc++.a" "LINKER:--exclude-libs=libgcc.a"
+            "LINKER:--exclude-libs=libgcc_eh.a"
         )
     endif()
 endfunction()
