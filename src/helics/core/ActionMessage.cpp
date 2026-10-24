@@ -744,7 +744,7 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
 static constexpr char unknownStr[] = "unknown";
 
 // Map to translate the action to a description
-static constexpr frozen::unordered_map<action_message_def::action_t, std::string_view, 96>
+static constexpr frozen::unordered_map<action_message_def::action_t, std::string_view, 98>
     actionStrings = {
         // priority commands
         {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
@@ -791,6 +791,8 @@ static constexpr frozen::unordered_map<action_message_def::action_t, std::string
         {action_message_def::action_t::cmd_time_unblock, "time_unblock"},
         {action_message_def::action_t::cmd_request_current_time, "request current time"},
         {action_message_def::action_t::cmd_pub, "pub"},
+        {action_message_def::action_t::cmd_buffers_at_capacity, "buffers at capacity"},
+        {action_message_def::action_t::cmd_buffer_capacity_restored, "buffer capacity restored"},
         {action_message_def::action_t::cmd_bye, "bye"},
         {action_message_def::action_t::cmd_log, "log"},
         {action_message_def::action_t::cmd_warning, "warning"},

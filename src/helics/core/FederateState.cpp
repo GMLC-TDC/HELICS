@@ -49,6 +49,8 @@ class MessageTimer {};
 
 // NOLINTNEXTLINE
 static const std::string gHelicsEmptyStr;
+static constexpr std::int32_t bufferCapacityTimeBlockId =
+    std::numeric_limits<std::int32_t>::min();
 #define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, gHelicsEmptyStr, message)
 #define LOG_WARNING(message) logMessage(HELICS_LOG_LEVEL_WARNING, gHelicsEmptyStr, message)
 
@@ -108,7 +110,7 @@ static const std::string gHelicsEmptyStr;
 using namespace std::chrono_literals;  // NOLINT
 
 namespace helics {
-static constexpr std::uint64_t valueBufferWarningDefaultBytes{100ULL * 1024ULL * 1024ULL};
+static constexpr std::uint64_t valueBufferWarningDefaultBytes{50ULL * 1024ULL * 1024ULL};
 
 FederateState::FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo):
     name(fedName),
@@ -199,6 +201,13 @@ void FederateState::reset(const CoreFederateInfo& fedInfo)
     queuedValueBytes = 0;
     valueBufferWarningLimit = valueBufferWarningDefaultBytes;
     nextValueBufferWarning = valueBufferWarningLimit;
+    bufferCapacityPriority = 0;
+    bufferCapacityPublishers.clear();
+    bufferCapacityRequests.clear();
+    bufferCapacityTimeBlocked = false;
+    bufferCapacityLastGrant = startupTime;
+    bufferCapacityGrantedStep = timeZero;
+    bufferCapacityRequestedStep = timeZero;
     realTimeTimerIndex = -1;
     grantTimeoutTimeIndex = -1;
     initRequested = false;
@@ -646,6 +655,7 @@ void FederateState::updateDataForExecEntry(MessageProcessingResult result, Itera
     if (result == MessageProcessingResult::NEXT_STEP) {
         time_granted = timeCoord->getGrantedTime();
         allowed_send_time = timeCoord->allowedSendTime();
+        bufferCapacityLastGrant = time_granted;
     } else if (result == MessageProcessingResult::ITERATING) {
         time_granted = initializationTime;
         allowed_send_time = initializationTime;
@@ -673,6 +683,7 @@ void FederateState::updateDataForExecEntry(MessageProcessingResult result, Itera
                 break;
         }
     }
+    updateBufferCapacityBlock();
 }
 
 std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
@@ -825,6 +836,10 @@ void FederateState::updateDataForTimeReturn(MessageProcessingResult result,
         time_granted = timeCoord->getGrantedTime();
         allowed_send_time = timeCoord->allowedSendTime();
         iterating = (result == MessageProcessingResult::ITERATING);
+        if (bufferCapacityLastGrant >= timeZero && time_granted > bufferCapacityLastGrant) {
+            bufferCapacityGrantedStep = time_granted - bufferCapacityLastGrant;
+        }
+        bufferCapacityLastGrant = time_granted;
     }
 
     // now fill the event vector so external systems know what has been updated
@@ -849,6 +864,7 @@ void FederateState::updateDataForTimeReturn(MessageProcessingResult result,
         default:
             break;
     }
+    updateBufferCapacityBlock();
 }
 
 void FederateState::fillEventVectorUpTo(Time currentTime)
@@ -915,6 +931,7 @@ void FederateState::updateQueuedValueBytes()
 
 void FederateState::checkValueBufferWarning()
 {
+    updateBufferCapacityNotices();
     if (valueBufferWarningLimit == 0) {
         return;
     }
@@ -941,6 +958,129 @@ void FederateState::checkValueBufferWarning()
         }
         nextValueBufferWarning *= 2U;
     } while (nextValueBufferWarning <= queuedValueBytes);
+}
+
+std::vector<GlobalFederateId> FederateState::getBufferCapacityPublishers() const
+{
+    std::vector<GlobalFederateId> destinations;
+    {
+        const auto pubs = interfaceInformation.getPublications();
+        for (const auto& pub : pubs) {
+            for (const auto& sub : pub->subscribers) {
+                destinations.push_back(sub.id.fed_id);
+            }
+        }
+    }
+    {
+        const auto endpoints = interfaceInformation.getEndpoints();
+        for (const auto& endpoint : endpoints) {
+            for (const auto& target : endpoint->getTargets()) {
+                destinations.push_back(target.first.fed_id);
+            }
+        }
+    }
+    std::sort(destinations.begin(), destinations.end());
+    destinations.erase(std::unique(destinations.begin(), destinations.end()), destinations.end());
+
+    std::vector<GlobalFederateId> sources;
+    {
+        const auto inputs = interfaceInformation.getInputs();
+        for (const auto& input : inputs) {
+            for (const auto& source : input->input_sources) {
+                if (source.fed_id.isFederate() && source.fed_id != global_id.load() &&
+                    !std::binary_search(destinations.begin(), destinations.end(), source.fed_id)) {
+                    sources.push_back(source.fed_id);
+                }
+            }
+        }
+    }
+    std::sort(sources.begin(), sources.end());
+    sources.erase(std::unique(sources.begin(), sources.end()), sources.end());
+    return sources;
+}
+
+void FederateState::updateBufferCapacityNotices()
+{
+    if (state != FederateStates::EXECUTING) {
+        return;
+    }
+    std::int32_t priority = bufferCapacityPriority;
+    if (valueBufferWarningLimit == 0 || queuedValueBytes < valueBufferWarningLimit / 2U) {
+        priority = 0;
+    } else if (queuedValueBytes >= valueBufferWarningLimit * 2U) {
+        priority = static_cast<std::int32_t>(BufferCapacityPriority::URGENT);
+    } else if (queuedValueBytes >= valueBufferWarningLimit && priority == 0) {
+        priority = static_cast<std::int32_t>(BufferCapacityPriority::ADVISORY);
+    }
+    if (priority == bufferCapacityPriority) {
+        return;
+    }
+
+    const auto receiverId = global_id.load();
+    if (priority == 0) {
+        for (auto publisher : bufferCapacityPublishers) {
+            ActionMessage restored(CMD_BUFFER_CAPACITY_RESTORED, receiverId, publisher);
+            restored.actionTime = time_granted;
+            routeMessage(std::move(restored));
+        }
+        bufferCapacityPublishers.clear();
+    } else {
+        auto publishers = getBufferCapacityPublishers();
+        for (auto publisher : publishers) {
+            ActionMessage capacity(CMD_BUFFERS_AT_CAPACITY, receiverId, publisher);
+            capacity.actionTime = time_granted;
+            capacity.messageID = priority;
+            routeMessage(std::move(capacity));
+        }
+        bufferCapacityPublishers = std::move(publishers);
+    }
+    bufferCapacityPriority = priority;
+}
+
+void FederateState::updateBufferCapacityBlock()
+{
+    if (state != FederateStates::EXECUTING || time_granted >= Time::maxVal()) {
+        return;
+    }
+
+    auto step = timeCoord->getTimeProperty(defs::Properties::PERIOD);
+    if (step <= timeZero) {
+        step = timeCoord->getTimeProperty(defs::Properties::TIME_DELTA);
+    }
+    if (step <= timeEpsilon) {
+        step = (bufferCapacityGrantedStep > timeZero) ? bufferCapacityGrantedStep :
+                                                         bufferCapacityRequestedStep;
+    }
+
+    bool shouldBlock = false;
+    if (step > timeZero) {
+        for (const auto& entry : bufferCapacityRequests) {
+            const auto [receiverTime, priority] = entry.second;
+            if (priority == BufferCapacityPriority::NONE || time_granted < receiverTime) {
+                continue;
+            }
+            const int steps = (priority == BufferCapacityPriority::URGENT) ? 4 : 8;
+            if (time_granted - receiverTime >= step * steps) {
+                shouldBlock = true;
+                break;
+            }
+        }
+    }
+    if (shouldBlock == bufferCapacityTimeBlocked) {
+        return;
+    }
+
+    ActionMessage block(shouldBlock ? CMD_TIME_BLOCK : CMD_TIME_UNBLOCK);
+    block.messageID = bufferCapacityTimeBlockId;
+    block.actionTime = shouldBlock ? time_granted + timeEpsilon : Time::maxVal();
+    timeCoord->processTimeMessage(block);
+    bufferCapacityTimeBlocked = shouldBlock;
+    LOG_TIMING(shouldBlock ? "buffer capacity blocking next time grant" :
+                             "buffer capacity time block cleared");
+    if (!shouldBlock && !timeGranted_mode) {
+        ActionMessage check(CMD_TIME_CHECK, global_id.load(), global_id.load());
+        addAction(std::move(check));
+    }
 }
 
 MessageProcessingResult FederateState::genericUnspecifiedQueueProcess(bool busyReturn)
@@ -1511,6 +1651,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         if ((cmd.source_id == global_id.load()) &&
             checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
             requestingMode.store(true);
+            bufferCapacityRequestedStep =
+                (cmd.actionTime > time_granted) ? cmd.actionTime - time_granted : timeZero;
+            updateBufferCapacityBlock();
             IterationRequest iterate = IterationRequest::NO_ITERATIONS;
             if (checkActionFlag(cmd, iteration_requested_flag)) {
                 iterate = (checkActionFlag(cmd, required_flag)) ?
@@ -1588,6 +1731,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 }
 
                 interfaceInformation.disconnectFederate(cmd.source_id, lastTime);
+                if (bufferCapacityRequests.erase(cmd.source_id) != 0) {
+                    updateBufferCapacityBlock();
+                }
                 if (!timeGranted_mode) {
                     auto ret = timeCoord->checkTimeGrant();
                     if (returnableResult(ret)) {
@@ -1603,6 +1749,41 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_PUB:
             processDataMessage(cmd);
             break;
+        case CMD_BUFFERS_AT_CAPACITY:
+            if (cmd.messageID == static_cast<std::int32_t>(BufferCapacityPriority::ADVISORY) ||
+                cmd.messageID == static_cast<std::int32_t>(BufferCapacityPriority::URGENT)) {
+                auto request = bufferCapacityRequests.find(cmd.source_id);
+                const auto priority = static_cast<BufferCapacityPriority>(cmd.messageID);
+                if (request == bufferCapacityRequests.end() ||
+                    cmd.actionTime > request->second.first ||
+                    (cmd.actionTime == request->second.first &&
+                     request->second.second != BufferCapacityPriority::NONE &&
+                     priority > request->second.second)) {
+                    bufferCapacityRequests[cmd.source_id] = {cmd.actionTime, priority};
+                    LOG_TIMING(fmt::format("buffer capacity priority {} from federate {} at time {}",
+                                           cmd.messageID,
+                                           cmd.source_id.baseValue(),
+                                           static_cast<double>(cmd.actionTime)));
+                    updateBufferCapacityBlock();
+                }
+            }
+            break;
+        case CMD_BUFFER_CAPACITY_RESTORED: {
+            auto request = bufferCapacityRequests.find(cmd.source_id);
+            if (request == bufferCapacityRequests.end() ||
+                cmd.actionTime >= request->second.first) {
+                const bool wasAtCapacity =
+                    request != bufferCapacityRequests.end() &&
+                    request->second.second != BufferCapacityPriority::NONE;
+                bufferCapacityRequests[cmd.source_id] = {cmd.actionTime, BufferCapacityPriority::NONE};
+                if (wasAtCapacity) {
+                    LOG_TIMING(fmt::format("buffer capacity restored from federate {} at time {}",
+                                           cmd.source_id.baseValue(),
+                                           static_cast<double>(cmd.actionTime)));
+                }
+                updateBufferCapacityBlock();
+            }
+        } break;
         case CMD_LOG:
         case CMD_REMOTE_LOG:
         case CMD_WARNING:
@@ -2137,6 +2318,10 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
         } break;
         default:
             timeCoord->setProperty(timeProperty, propertyVal);
+            if (timeProperty == defs::Properties::PERIOD ||
+                timeProperty == defs::Properties::TIME_DELTA) {
+                updateBufferCapacityBlock();
+            }
             break;
     }
 }
@@ -2172,6 +2357,7 @@ void FederateState::setProperty(int intProperty, int propertyVal)
                 0U :
                 static_cast<std::uint64_t>(propertyVal) * 1024ULL * 1024ULL;
             nextValueBufferWarning = valueBufferWarningLimit;
+            updateBufferCapacityNotices();
             break;
         default:
             timeCoord->setProperty(intProperty, propertyVal);
