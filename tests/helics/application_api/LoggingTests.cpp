@@ -1259,8 +1259,7 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
         subFed->setLoggingCallback(
             [&receiverWarnings](int level, std::string_view /*unused*/, std::string_view message) {
                 if (level == HELICS_LOG_LEVEL_WARNING &&
-                    message.find("queued future value buffers contain") !=
-                        std::string_view::npos) {
+                    message.find("queued future value buffers contain") != std::string_view::npos) {
                     receiverWarnings.lock()->emplace_back(message);
                 }
             });
