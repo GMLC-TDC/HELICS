@@ -1137,8 +1137,13 @@ TEST(logging, value_buffer_warning_default)
 
 TEST(logging, value_buffer_warning)
 {
+    auto broker =
+        helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--name=value_buffer_warning_broker");
+    broker->connect();
+
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
-    fedInfo.coreInitString = "--autobroker";
+    fedInfo.broker = "value_buffer_warning_broker";
+    fedInfo.forceNewCore = true;
     fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
     fedInfo.setProperty(helics::defs::Properties::VALUE_BUFFER_WARNING, 1);
 
@@ -1146,7 +1151,8 @@ TEST(logging, value_buffer_warning)
     gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
 
     auto pubFed = std::make_shared<helics::ValueFederate>("value_buffer_pub", fedInfo);
-    auto subFed = std::make_shared<helics::ValueFederate>("value_buffer_sub", fedInfo);
+    auto core = pubFed->getCorePointer();
+    auto subFed = std::make_shared<helics::ValueFederate>("value_buffer_sub", core, fedInfo);
 
     auto& pub = pubFed->registerGlobalPublication<std::string>("buffer_pub");
     subFed->registerSubscription("buffer_pub");
@@ -1192,19 +1198,25 @@ TEST(logging, value_buffer_warning)
         subFed->requestTime(4.0);
     }
     EXPECT_EQ(pubFed->requestTime(5.0), helics::Time(5.0));
-    const auto notices = publisherNotices.lock();
-    EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
-        return notice.find("buffer capacity priority 1") != std::string::npos &&
-            notice.find("at time 0") != std::string::npos;
-    }));
-    EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
-        return notice.find("buffer capacity priority 2") != std::string::npos &&
-            notice.find("at time 0") != std::string::npos;
-    }));
-    EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
-        return notice.find("buffer capacity restored from federate") != std::string::npos &&
-            notice.find("at time ") != std::string::npos;
-    }));
+    {
+        const auto notices = publisherNotices.lock();
+        EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+            return notice.find("buffer capacity priority 1") != std::string::npos &&
+                notice.find("at time 0") != std::string::npos;
+        }));
+        EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+            return notice.find("buffer capacity priority 2") != std::string::npos &&
+                notice.find("at time 0") != std::string::npos;
+        }));
+        EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+            return notice.find("buffer capacity restored from federate") != std::string::npos &&
+                notice.find("at time ") != std::string::npos;
+        }));
+    }
+    subFed->finalize();
+    pubFed->finalize();
+    core->waitForDisconnect();
+    broker->waitForDisconnect();
 }
 
 TEST(logging, value_buffer_capacity_holds_next_grant)
@@ -1221,22 +1233,30 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
           Scenario{.priority = 1, .publicationCount = 2, .blockTime = 8, .configuredPeriod = false},
           Scenario{
               .priority = 2, .publicationCount = 4, .blockTime = 4, .configuredPeriod = false}}) {
+        const auto suffix = std::to_string(scenario.priority) +
+            (scenario.configuredPeriod ? "_period" : "_inferred");
         helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
-        fedInfo.coreInitString = "--autobroker";
+        const auto brokerName = "buffer_capacity_broker_" + suffix;
+        auto broker = helics::BrokerFactory::create(
+            CORE_TYPE_TO_TEST, "--name=" + brokerName);
+        broker->connect();
+        fedInfo.broker = brokerName;
+        fedInfo.forceNewCore = true;
         if (scenario.configuredPeriod) {
             fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         }
         fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
         fedInfo.setProperty(helics::defs::Properties::VALUE_BUFFER_WARNING, 1);
 
-        const auto suffix = std::to_string(scenario.priority) +
-            (scenario.configuredPeriod ? "_period" : "_inferred");
         gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
 
         auto pubFed =
             std::make_shared<helics::ValueFederate>("buffer_capacity_pub_" + suffix, fedInfo);
+        auto core = pubFed->getCorePointer();
         auto subFed =
-            std::make_shared<helics::ValueFederate>("buffer_capacity_sub_" + suffix, fedInfo);
+            std::make_shared<helics::ValueFederate>("buffer_capacity_sub_" + suffix,
+                                                    core,
+                                                    fedInfo);
         auto& pub =
             pubFed->registerGlobalPublication<std::string>("buffer_capacity_value_" + suffix);
         subFed->registerSubscription("buffer_capacity_value_" + suffix);
@@ -1293,5 +1313,9 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
             subFed->requestTime(scenario.publicationCount);
         }
         EXPECT_EQ(nextGrant.get(), helics::Time(scenario.blockTime + 1.0));
+        subFed->finalize();
+        pubFed->finalize();
+        core->waitForDisconnect();
+        broker->waitForDisconnect();
     }
 }
