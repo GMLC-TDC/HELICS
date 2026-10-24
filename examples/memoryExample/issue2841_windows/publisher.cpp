@@ -16,8 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #ifdef _WIN32
 #    define NOMINMAX
-#    include <psapi.h>
 #    include <windows.h>
+#    include <psapi.h>
 #else
 #    include <fstream>
 #    include <sstream>
@@ -37,7 +37,7 @@ std::int64_t getProcessMemoryInfoKb()
     std::ifstream statusFile("/proc/self/status");
     std::string line;
     while (std::getline(statusFile, line)) {
-        if (line.rfind("VmRSS:", 0) == 0) {
+        if (line.starts_with("VmRSS:")) {
             std::istringstream lineStream(line);
             std::string label;
             std::int64_t value = -1;
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
         const double duration = parseDuration(argc, argv);
         const std::string config = (argc > 2) ? argv[2] : "pub_fed.json";
         helics::ValueFederate fed(config);
-        std::cout << "Loaded publisher config " << config << std::endl;
+        std::cout << "Loaded publisher config " << config << '\n';
 
         std::vector<helics::Publication> pubs;
         const int pubCount = fed.getPublicationCount();
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
         for (int i = 0; i < pubCount; ++i) {
             pubs.push_back(fed.getPublication(i));
         }
-        std::cout << "pubCount = " << pubCount << std::endl;
+        std::cout << "pubCount = " << pubCount << '\n';
 
         fed.enterExecutingMode();
         helics::Time time = 0.0;
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
             if (static_cast<int>(time) % 60 == 0) {
                 std::cout << "Publisher sent values at time " << time
                           << " publisher process memory usage = " << getProcessMemoryInfoKb()
-                          << " KiB" << std::endl;
+                          << " KiB\n" << std::flush;
             }
             for (std::size_t i = 0; i < pubs.size(); ++i) {
                 // Keep the original issue reproducer's publication behavior.
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
         fed.finalize();
     }
     catch (const std::exception& error) {
-        std::cerr << "Publisher error: " << error.what() << std::endl;
+        std::cerr << "Publisher error: " << error.what() << '\n';
         return 1;
     }
     return 0;

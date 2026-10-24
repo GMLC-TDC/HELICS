@@ -21,8 +21,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #ifdef _WIN32
 #    define NOMINMAX
-#    include <psapi.h>
 #    include <windows.h>
+#    include <psapi.h>
 #endif
 
 namespace {
@@ -44,7 +44,7 @@ std::int64_t getProcessMemoryInfoKb()
     std::ifstream statusFile("/proc/self/status");
     std::string line;
     while (std::getline(statusFile, line)) {
-        if (line.rfind("VmRSS:", 0) == 0) {
+        if (line.starts_with("VmRSS:")) {
             std::istringstream lineStream(line);
             std::string label;
             std::int64_t value = -1;
@@ -100,8 +100,8 @@ unsigned int parseInitialDelayMs(int argc, char* argv[])
     if (argc < 4) {
         return 0;
     }
-    const unsigned long delay = std::stoul(argv[3]);
-    if (delay > 600000UL) {
+    const std::uint64_t delay = std::stoull(argv[3]);
+    if (delay > 600000U) {
         throw std::invalid_argument("initial delay must not exceed 600000 ms");
     }
     return static_cast<unsigned int>(delay);
@@ -117,13 +117,14 @@ int main(int argc, char* argv[])
         helics::ValueFederate fed(config);
         fed.setLoggingCallback([](int level, std::string_view source, std::string_view message) {
             if (level <= HELICS_LOG_LEVEL_WARNING) {
-                std::cout << "[HELICS " << level << "] " << source << "::" << message << std::endl;
+                std::cout << "[HELICS " << level << "] " << source << "::" << message
+                          << '\n' << std::flush;
             }
         });
         fed.enterExecutingMode();
 
         if (initialDelayMs > 0U) {
-            std::cout << "Delaying subscriber requests by " << initialDelayMs << " ms" << std::endl;
+            std::cout << "Delaying subscriber requests by " << initialDelayMs << " ms\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(initialDelayMs));
         }
 
@@ -147,7 +148,7 @@ int main(int argc, char* argv[])
                                   << " used system memory KB = "
                                   << (memory.memTotalKb - memory.memAvailableKb)
                                   << " used subscriber process memory KB = "
-                                  << getProcessMemoryInfoKb() << std::endl;
+                                  << getProcessMemoryInfoKb() << '\n';
                     }
                 }
             }
@@ -155,7 +156,7 @@ int main(int argc, char* argv[])
         fed.finalize();
     }
     catch (const std::exception& error) {
-        std::cerr << "Subscriber error: " << error.what() << std::endl;
+        std::cerr << "Subscriber error: " << error.what() << '\n';
         return 1;
     }
     return 0;

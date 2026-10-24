@@ -1215,10 +1215,22 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
         int blockTime;
         bool configuredPeriod;
     };
-    for (const auto scenario : {Scenario{1, 2, 8, true},
-                                Scenario{2, 4, 4, true},
-                                Scenario{1, 2, 8, false},
-                                Scenario{2, 4, 4, false}}) {
+    for (const auto scenario : {Scenario{.priority = 1,
+                                        .publicationCount = 2,
+                                        .blockTime = 8,
+                                        .configuredPeriod = true},
+                                Scenario{.priority = 2,
+                                         .publicationCount = 4,
+                                         .blockTime = 4,
+                                         .configuredPeriod = true},
+                                Scenario{.priority = 1,
+                                         .publicationCount = 2,
+                                         .blockTime = 8,
+                                         .configuredPeriod = false},
+                                Scenario{.priority = 2,
+                                         .publicationCount = 4,
+                                         .blockTime = 4,
+                                         .configuredPeriod = false}}) {
         helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
         fedInfo.coreInitString = "--autobroker";
         if (scenario.configuredPeriod) {
