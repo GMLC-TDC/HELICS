@@ -1237,8 +1237,7 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
             (scenario.configuredPeriod ? "_period" : "_inferred");
         helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
         const auto brokerName = "buffer_capacity_broker_" + suffix;
-        auto broker = helics::BrokerFactory::create(
-            CORE_TYPE_TO_TEST, "--name=" + brokerName);
+        auto broker = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--name=" + brokerName);
         broker->connect();
         fedInfo.broker = brokerName;
         fedInfo.forceNewCore = true;
@@ -1254,9 +1253,7 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
             std::make_shared<helics::ValueFederate>("buffer_capacity_pub_" + suffix, fedInfo);
         auto core = pubFed->getCorePointer();
         auto subFed =
-            std::make_shared<helics::ValueFederate>("buffer_capacity_sub_" + suffix,
-                                                    core,
-                                                    fedInfo);
+            std::make_shared<helics::ValueFederate>("buffer_capacity_sub_" + suffix, core, fedInfo);
         auto& pub =
             pubFed->registerGlobalPublication<std::string>("buffer_capacity_value_" + suffix);
         subFed->registerSubscription("buffer_capacity_value_" + suffix);
