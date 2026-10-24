@@ -89,7 +89,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "console_log_level": "",
   "dump_log": false,
   "logbuffer": 10,
-  "value_buffer_warning": 100,
+  "value_buffer_warning": 50,
 
   //Timing
   "ignore_time_mismatch_warnings": false,
@@ -557,9 +557,11 @@ When set to a number greater than 0 will enable the most recent X log messages o
 
 ---
 
-### `value_buffer_warning` [100]
+### `value_buffer_warning` [50]
 
 _Alternative names:_ `valuebufferwarning`
+
+_Command line:_ `--value_buffer_warning=<MiB>`
 
 _API:_ `helicsFederateInfoSetIntegerProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#a01dddbf428e5d1f0ad8ead05491dabff)
@@ -569,7 +571,13 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING` [283]
 
-Sets the federate warning threshold, in MiB, for queued future value payload data. The default threshold is 100 MiB. Set this option to 0 to disable the warning. This warning is intended to highlight cases where value publications are being buffered faster than the receiving federate is consuming them, such as when a producer advances ahead of a subscriber.
+Sets the warning and backpressure threshold for a receiving federate, in MiB. The threshold counts the total payload bytes in its queued future value updates across all inputs; it is not a per-input or federation-wide limit. The default is 50 MiB. Set this option to 0 to disable both the warning and buffer capacity notices. For example, `"value_buffer_warning": 20` in a federate configuration or `--value_buffer_warning=20` on its command line sets a 20 MiB threshold.
+
+When the queued payload reaches the threshold, the receiver logs a warning and sends an advisory buffers-at-capacity control message to each source publisher for which it has no declared return publication or endpoint target. At twice the threshold it sends an urgent message. Each message carries the receiver's current granted time. The pressure level remains active until the queued payload falls below half the threshold, when the receiver sends a buffer-capacity-restored message. With the default setting, those levels are 50 MiB, 100 MiB, and below 25 MiB, respectively.
+
+A publisher receiving an advisory notice holds its next time grant once its current granted time is at least eight steps ahead of the receiver's reported time. An urgent notice reduces that gap to four steps. A configured period defines the step; otherwise HELICS uses the time delta. When the time delta is only epsilon, HELICS uses the gap between the two most recent distinct grants, or the gap between the current grant and requested time if no earlier gap is available. The current grant and iterations at that time remain available. A restoration message releases the hold.
+
+The threshold measures queued payload, not process memory. Metadata, other allocations, and values already in transit can make the process memory use substantially higher than this setting. The notice is sent when the receiver updates its queued-value count during time processing, so the setting is not a hard memory cap.
 
 ## Other Options
 

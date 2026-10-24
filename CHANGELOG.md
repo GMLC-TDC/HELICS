@@ -11,6 +11,14 @@ Everything within a major version number should be code compatible (with the exc
 
 ## Unreleased
 
+### Changed
+
+- Lowered the default queued value buffer warning and backpressure threshold from 100 MiB to 50 MiB. The urgent threshold is 100 MiB, and capacity is restored below 25 MiB by default.
+
+### Added
+
+- Added internal receiver-to-publisher buffers-at-capacity and buffer-capacity-restored messages for queued future values. Capacity messages carry the receiver's granted time and an advisory or urgent level, and are omitted for declared return publication or endpoint connections. Publishers hold later time grants when they are eight steps ahead for advisory pressure or four steps ahead for urgent pressure, until capacity is restored. Without a configured period or meaningful time delta, the step is inferred from recent grants or the pending request.
+
 ## [3.7.0][] - 2026-08-25
 
 Major release with improved broker startup controls, C shared library support for querying broker and core status, and updates to build requirements and third party libraries.

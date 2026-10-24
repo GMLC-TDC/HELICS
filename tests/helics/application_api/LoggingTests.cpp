@@ -1126,26 +1126,51 @@ TEST(logging, remote_log_multiObjects)
     EXPECT_GT(remote_cntFed2, 0);
 }
 
-TEST(logging, value_buffer_warning)
+TEST(logging, value_buffer_warning_default)
 {
     helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
     fedInfo.coreInitString = "--autobroker";
-    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_WARNING);
+    helics::ValueFederate fed("value_buffer_warning_default", fedInfo);
+
+    EXPECT_EQ(fed.getIntegerProperty(helics::defs::Properties::VALUE_BUFFER_WARNING), 50);
+}
+
+TEST(logging, value_buffer_warning)
+{
+    auto broker =
+        helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--name=value_buffer_warning_broker");
+    broker->connect();
+
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.broker = "value_buffer_warning_broker";
+    fedInfo.forceNewCore = true;
+    fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
     fedInfo.setProperty(helics::defs::Properties::VALUE_BUFFER_WARNING, 1);
 
+    gmlc::libguarded::guarded<std::vector<std::string>> warnings;
+    gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
+
     auto pubFed = std::make_shared<helics::ValueFederate>("value_buffer_pub", fedInfo);
-    auto subFed = std::make_shared<helics::ValueFederate>("value_buffer_sub", fedInfo);
+    auto core = pubFed->getCorePointer();
+    auto subFed = std::make_shared<helics::ValueFederate>("value_buffer_sub", core, fedInfo);
 
     auto& pub = pubFed->registerGlobalPublication<std::string>("buffer_pub");
     subFed->registerSubscription("buffer_pub");
-
-    gmlc::libguarded::guarded<std::vector<std::string>> warnings;
     subFed->setLoggingCallback(
         [&warnings](int level, std::string_view /*unused*/, std::string_view message) {
             if (level == HELICS_LOG_LEVEL_WARNING) {
                 warnings.lock()->emplace_back(message);
             }
         });
+    pubFed->setLoggingCallback([&publisherNotices](int level,
+                                                   std::string_view /*unused*/,
+                                                   std::string_view message) {
+        if (level == HELICS_LOG_LEVEL_TIMING &&
+            (message.find("buffer capacity priority") != std::string_view::npos ||
+             message.find("buffer capacity restored from federate") != std::string_view::npos)) {
+            publisherNotices.lock()->emplace_back(message);
+        }
+    });
 
     auto pubThread = std::async(std::launch::async, [&pubFed, &pub]() {
         pubFed->enterExecutingMode();
@@ -1161,9 +1186,160 @@ TEST(logging, value_buffer_warning)
 
     subFed->requestTime(1.0);
 
-    const auto loggedWarnings = warnings.lock();
-    EXPECT_TRUE(
-        std::any_of(loggedWarnings->begin(), loggedWarnings->end(), [](const auto& warning) {
-            return warning.find("queued future value buffers contain") != std::string::npos;
+    {
+        const auto loggedWarnings = warnings.lock();
+        EXPECT_TRUE(
+            std::any_of(loggedWarnings->begin(), loggedWarnings->end(), [](const auto& warning) {
+                return warning.find("queued future value buffers contain") != std::string::npos;
+            }));
+    }
+
+    while (subFed->getCurrentTime() < helics::Time(4.0)) {
+        subFed->requestTime(4.0);
+    }
+    EXPECT_EQ(pubFed->requestTime(5.0), helics::Time(5.0));
+    {
+        const auto notices = publisherNotices.lock();
+        EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+            return notice.find("buffer capacity priority 1") != std::string::npos &&
+                notice.find("at time 0") != std::string::npos;
         }));
+        EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+            return notice.find("buffer capacity priority 2") != std::string::npos &&
+                notice.find("at time 0") != std::string::npos;
+        }));
+        EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+            return notice.find("buffer capacity restored from federate") != std::string::npos &&
+                notice.find("at time ") != std::string::npos;
+        }));
+    }
+    subFed->finalize();
+    pubFed->finalize();
+    core->waitForDisconnect();
+    broker->waitForDisconnect();
+}
+
+TEST(logging, value_buffer_capacity_holds_next_grant)
+{
+    struct Scenario {
+        int priority;
+        int publicationCount;
+        int blockTime;
+        bool configuredPeriod;
+    };
+    for (const auto scenario :
+         {Scenario{.priority = 1, .publicationCount = 2, .blockTime = 8, .configuredPeriod = true},
+          Scenario{.priority = 2, .publicationCount = 4, .blockTime = 4, .configuredPeriod = true},
+          Scenario{.priority = 1, .publicationCount = 2, .blockTime = 8, .configuredPeriod = false},
+          Scenario{
+              .priority = 2, .publicationCount = 4, .blockTime = 4, .configuredPeriod = false}}) {
+        const auto suffix = std::to_string(scenario.priority) +
+            (scenario.configuredPeriod ? "_period" : "_inferred");
+        helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+        const auto brokerName = "buffer_capacity_broker_" + suffix;
+        auto broker = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--name=" + brokerName);
+        broker->connect();
+        fedInfo.broker = brokerName;
+        fedInfo.forceNewCore = true;
+        if (scenario.configuredPeriod) {
+            fedInfo.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+        }
+        fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
+        fedInfo.setProperty(helics::defs::Properties::VALUE_BUFFER_WARNING, 1);
+
+        gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
+        gmlc::libguarded::guarded<std::vector<std::string>> receiverWarnings;
+
+        auto pubFed =
+            std::make_shared<helics::ValueFederate>("buffer_capacity_pub_" + suffix, fedInfo);
+        auto core = pubFed->getCorePointer();
+        auto subFed =
+            std::make_shared<helics::ValueFederate>("buffer_capacity_sub_" + suffix, fedInfo);
+        auto subCore = subFed->getCorePointer();
+        subFed->setLoggingCallback(
+            [&receiverWarnings](int level, std::string_view /*unused*/, std::string_view message) {
+                if (level == HELICS_LOG_LEVEL_WARNING &&
+                    message.find("queued future value buffers contain") != std::string_view::npos) {
+                    receiverWarnings.lock()->emplace_back(message);
+                }
+            });
+        auto& pub =
+            pubFed->registerGlobalPublication<std::string>("buffer_capacity_value_" + suffix);
+        subFed->registerSubscription("buffer_capacity_value_" + suffix);
+        pubFed->setLoggingCallback([&publisherNotices](int level,
+                                                       std::string_view /*unused*/,
+                                                       std::string_view message) {
+            if (level == HELICS_LOG_LEVEL_TIMING &&
+                (message.find("buffer capacity priority") != std::string_view::npos ||
+                 message.find("buffer capacity blocking next time grant") !=
+                     std::string_view::npos ||
+                 message.find("buffer capacity time block cleared") != std::string_view::npos)) {
+                publisherNotices.lock()->emplace_back(message);
+            }
+        });
+
+        auto pubThread = std::async(std::launch::async, [&pubFed, &pub, scenario]() {
+            pubFed->enterExecutingMode();
+            const std::string payload(600ULL * 1024ULL, 'a');
+            for (int ii = 1; ii <= scenario.blockTime; ++ii) {
+                if (ii <= scenario.publicationCount) {
+                    pub.publish(payload);
+                }
+                pubFed->requestTime(ii);
+            }
+        });
+        subFed->enterExecutingMode();
+        pubThread.get();
+        EXPECT_EQ(pubFed->getCurrentTime(), helics::Time(scenario.blockTime));
+
+        const auto hasExpectedBufferWarnings = [&receiverWarnings, priority = scenario.priority]() {
+            const auto warnings = receiverWarnings.lock();
+            return warnings->size() >= static_cast<std::size_t>(priority);
+        };
+        for (int ii = 0; ii < 300; ++ii) {
+            subFed->processCommunication(std::chrono::milliseconds(10));
+            if (hasExpectedBufferWarnings()) {
+                break;
+            }
+        }
+        EXPECT_TRUE(hasExpectedBufferWarnings());
+        subFed->requestTime(1.0);
+
+        for (int ii = 0; ii < 100; ++ii) {
+            pubFed->processCommunication(std::chrono::milliseconds(10));
+            const auto notices = publisherNotices.lock();
+            if (std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+                    return notice.find("buffer capacity blocking next time grant") !=
+                        std::string::npos;
+                })) {
+                break;
+            }
+        }
+        {
+            const auto notices = publisherNotices.lock();
+            EXPECT_TRUE(
+                std::any_of(notices->begin(), notices->end(), [scenario](const auto& notice) {
+                    return notice.find("buffer capacity priority " +
+                                       std::to_string(scenario.priority)) != std::string::npos;
+                }));
+            EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+                return notice.find("buffer capacity blocking next time grant") != std::string::npos;
+            }));
+        }
+
+        auto nextGrant = std::async(std::launch::async, [&pubFed, scenario]() {
+            return pubFed->requestTime(scenario.blockTime + 1.0);
+        });
+        EXPECT_EQ(nextGrant.wait_for(std::chrono::milliseconds(100)), std::future_status::timeout);
+
+        while (subFed->getCurrentTime() < helics::Time(scenario.publicationCount)) {
+            subFed->requestTime(scenario.publicationCount);
+        }
+        EXPECT_EQ(nextGrant.get(), helics::Time(scenario.blockTime + 1.0));
+        subFed->finalize();
+        pubFed->finalize();
+        core->waitForDisconnect();
+        subCore->waitForDisconnect();
+        broker->waitForDisconnect();
+    }
 }
