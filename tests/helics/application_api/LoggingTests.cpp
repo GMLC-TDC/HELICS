@@ -1253,7 +1253,8 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
             std::make_shared<helics::ValueFederate>("buffer_capacity_pub_" + suffix, fedInfo);
         auto core = pubFed->getCorePointer();
         auto subFed =
-            std::make_shared<helics::ValueFederate>("buffer_capacity_sub_" + suffix, core, fedInfo);
+            std::make_shared<helics::ValueFederate>("buffer_capacity_sub_" + suffix, fedInfo);
+        auto subCore = subFed->getCorePointer();
         auto& pub =
             pubFed->registerGlobalPublication<std::string>("buffer_capacity_value_" + suffix);
         subFed->registerSubscription("buffer_capacity_value_" + suffix);
@@ -1287,15 +1288,20 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
         for (int ii = 0; ii < 100; ++ii) {
             pubFed->processCommunication(std::chrono::milliseconds(10));
             const auto notices = publisherNotices.lock();
-            if (std::any_of(notices->begin(), notices->end(), [scenario](const auto& notice) {
-                    return notice.find("buffer capacity priority " +
-                                       std::to_string(scenario.priority)) != std::string::npos;
+            if (std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+                    return notice.find("buffer capacity blocking next time grant") !=
+                        std::string::npos;
                 })) {
                 break;
             }
         }
         {
             const auto notices = publisherNotices.lock();
+            EXPECT_TRUE(
+                std::any_of(notices->begin(), notices->end(), [scenario](const auto& notice) {
+                    return notice.find("buffer capacity priority " +
+                                       std::to_string(scenario.priority)) != std::string::npos;
+                }));
             EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
                 return notice.find("buffer capacity blocking next time grant") != std::string::npos;
             }));
@@ -1313,6 +1319,7 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
         subFed->finalize();
         pubFed->finalize();
         core->waitForDisconnect();
+        subCore->waitForDisconnect();
         broker->waitForDisconnect();
     }
 }
