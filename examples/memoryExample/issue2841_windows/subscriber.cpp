@@ -21,8 +21,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #ifdef _WIN32
 #    define NOMINMAX
-#    include <windows.h>
 #    include <psapi.h>
+#    include <windows.h>
 #endif
 
 namespace {
@@ -117,8 +117,8 @@ int main(int argc, char* argv[])
         helics::ValueFederate fed(config);
         fed.setLoggingCallback([](int level, std::string_view source, std::string_view message) {
             if (level <= HELICS_LOG_LEVEL_WARNING) {
-                std::cout << "[HELICS " << level << "] " << source << "::" << message
-                          << '\n' << std::flush;
+                std::cout << "[HELICS " << level << "] " << source << "::" << message << '\n'
+                          << std::flush;
             }
         });
         fed.enterExecutingMode();

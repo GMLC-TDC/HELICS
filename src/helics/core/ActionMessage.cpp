@@ -177,8 +177,7 @@ static inline std::uint8_t isLittleEndian()
 // action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8
 // bytes)+payload size(4 bytes)+1 byte for number of strings=45
 static constexpr std::size_t action_message_base_size =
-    (7 * sizeof(uint32_t)) + (2 * sizeof(uint16_t)) + sizeof(Time::baseType) +
-    sizeof(int32_t) + 1;
+    (7 * sizeof(uint32_t)) + (2 * sizeof(uint16_t)) + sizeof(Time::baseType) + sizeof(int32_t) + 1;
 
 int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
 {
@@ -450,8 +449,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
         return 0;
     }
     const std::size_t size = (256ULL * 256ULL * std::to_integer<std::size_t>(data[1])) +
-        (256ULL * std::to_integer<std::size_t>(data[2])) +
-        std::to_integer<std::size_t>(data[3]);
+        (256ULL * std::to_integer<std::size_t>(data[2])) + std::to_integer<std::size_t>(data[3]);
     tsize += size;
     if (buffer_size < tsize) {
         messageAction = CMD_INVALID;

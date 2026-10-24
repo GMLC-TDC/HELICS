@@ -16,8 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #ifdef _WIN32
 #    define NOMINMAX
-#    include <windows.h>
 #    include <psapi.h>
+#    include <windows.h>
 #else
 #    include <fstream>
 #    include <sstream>
@@ -85,7 +85,8 @@ int main(int argc, char* argv[])
             if (static_cast<int>(time) % 60 == 0) {
                 std::cout << "Publisher sent values at time " << time
                           << " publisher process memory usage = " << getProcessMemoryInfoKb()
-                          << " KiB\n" << std::flush;
+                          << " KiB\n"
+                          << std::flush;
             }
             for (std::size_t i = 0; i < pubs.size(); ++i) {
                 // Keep the original issue reproducer's publication behavior.
