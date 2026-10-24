@@ -1142,14 +1142,14 @@ TEST(logging, value_buffer_warning)
     fedInfo.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
     fedInfo.setProperty(helics::defs::Properties::VALUE_BUFFER_WARNING, 1);
 
+    gmlc::libguarded::guarded<std::vector<std::string>> warnings;
+    gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
+
     auto pubFed = std::make_shared<helics::ValueFederate>("value_buffer_pub", fedInfo);
     auto subFed = std::make_shared<helics::ValueFederate>("value_buffer_sub", fedInfo);
 
     auto& pub = pubFed->registerGlobalPublication<std::string>("buffer_pub");
     subFed->registerSubscription("buffer_pub");
-
-    gmlc::libguarded::guarded<std::vector<std::string>> warnings;
-    gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
     subFed->setLoggingCallback(
         [&warnings](int level, std::string_view /*unused*/, std::string_view message) {
             if (level == HELICS_LOG_LEVEL_WARNING) {
@@ -1231,6 +1231,8 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
 
         const auto suffix = std::to_string(scenario.priority) +
             (scenario.configuredPeriod ? "_period" : "_inferred");
+        gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
+
         auto pubFed =
             std::make_shared<helics::ValueFederate>("buffer_capacity_pub_" + suffix, fedInfo);
         auto subFed =
@@ -1238,8 +1240,6 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
         auto& pub =
             pubFed->registerGlobalPublication<std::string>("buffer_capacity_value_" + suffix);
         subFed->registerSubscription("buffer_capacity_value_" + suffix);
-
-        gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
         pubFed->setLoggingCallback([&publisherNotices](int level,
                                                        std::string_view /*unused*/,
                                                        std::string_view message) {
