@@ -5,13 +5,12 @@ Innovation LLC.  See the top-level NOTICE for additional details. All rights res
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <helics/application_api/ValueFederate.hpp>
-#include <helics/application_api/Subscriptions.hpp>
-
 #include <chrono>
 #include <cstdint>
 #include <exception>
 #include <fstream>
+#include <helics/application_api/Subscriptions.hpp>
+#include <helics/application_api/ValueFederate.hpp>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -22,8 +21,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #ifdef _WIN32
 #    define NOMINMAX
-#    include <windows.h>
 #    include <psapi.h>
+#    include <windows.h>
 #endif
 
 namespace {
@@ -116,19 +115,15 @@ int main(int argc, char* argv[])
         const std::string config = (argc > 2) ? argv[2] : "sub_fed.json";
         const unsigned int initialDelayMs = parseInitialDelayMs(argc, argv);
         helics::ValueFederate fed(config);
-        fed.setLoggingCallback([](int level,
-                                  std::string_view source,
-                                  std::string_view message) {
+        fed.setLoggingCallback([](int level, std::string_view source, std::string_view message) {
             if (level <= HELICS_LOG_LEVEL_WARNING) {
-                std::cout << "[HELICS " << level << "] " << source << "::" << message
-                          << std::endl;
+                std::cout << "[HELICS " << level << "] " << source << "::" << message << std::endl;
             }
         });
         fed.enterExecutingMode();
 
         if (initialDelayMs > 0U) {
-            std::cout << "Delaying subscriber requests by " << initialDelayMs << " ms"
-                      << std::endl;
+            std::cout << "Delaying subscriber requests by " << initialDelayMs << " ms" << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(initialDelayMs));
         }
 
@@ -158,7 +153,8 @@ int main(int argc, char* argv[])
             }
         }
         fed.finalize();
-    } catch (const std::exception& error) {
+    }
+    catch (const std::exception& error) {
         std::cerr << "Subscriber error: " << error.what() << std::endl;
         return 1;
     }

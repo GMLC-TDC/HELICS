@@ -1156,14 +1156,15 @@ TEST(logging, value_buffer_warning)
                 warnings.lock()->emplace_back(message);
             }
         });
-    pubFed->setLoggingCallback(
-        [&publisherNotices](int level, std::string_view /*unused*/, std::string_view message) {
-            if (level == HELICS_LOG_LEVEL_TIMING &&
-                (message.find("buffer capacity priority") != std::string_view::npos ||
-                 message.find("buffer capacity restored from federate") != std::string_view::npos)) {
-                publisherNotices.lock()->emplace_back(message);
-            }
-        });
+    pubFed->setLoggingCallback([&publisherNotices](int level,
+                                                   std::string_view /*unused*/,
+                                                   std::string_view message) {
+        if (level == HELICS_LOG_LEVEL_TIMING &&
+            (message.find("buffer capacity priority") != std::string_view::npos ||
+             message.find("buffer capacity restored from federate") != std::string_view::npos)) {
+            publisherNotices.lock()->emplace_back(message);
+        }
+    });
 
     auto pubThread = std::async(std::launch::async, [&pubFed, &pub]() {
         pubFed->enterExecutingMode();
@@ -1232,21 +1233,22 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
             std::make_shared<helics::ValueFederate>("buffer_capacity_pub_" + suffix, fedInfo);
         auto subFed =
             std::make_shared<helics::ValueFederate>("buffer_capacity_sub_" + suffix, fedInfo);
-        auto& pub = pubFed->registerGlobalPublication<std::string>("buffer_capacity_value_" + suffix);
+        auto& pub =
+            pubFed->registerGlobalPublication<std::string>("buffer_capacity_value_" + suffix);
         subFed->registerSubscription("buffer_capacity_value_" + suffix);
 
         gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
-        pubFed->setLoggingCallback(
-            [&publisherNotices](int level, std::string_view /*unused*/, std::string_view message) {
-                if (level == HELICS_LOG_LEVEL_TIMING &&
-                    (message.find("buffer capacity priority") != std::string_view::npos ||
-                     message.find("buffer capacity blocking next time grant") !=
-                         std::string_view::npos ||
-                     message.find("buffer capacity time block cleared") !=
-                         std::string_view::npos)) {
-                    publisherNotices.lock()->emplace_back(message);
-                }
-            });
+        pubFed->setLoggingCallback([&publisherNotices](int level,
+                                                       std::string_view /*unused*/,
+                                                       std::string_view message) {
+            if (level == HELICS_LOG_LEVEL_TIMING &&
+                (message.find("buffer capacity priority") != std::string_view::npos ||
+                 message.find("buffer capacity blocking next time grant") !=
+                     std::string_view::npos ||
+                 message.find("buffer capacity time block cleared") != std::string_view::npos)) {
+                publisherNotices.lock()->emplace_back(message);
+            }
+        });
 
         auto pubThread = std::async(std::launch::async, [&pubFed, &pub, scenario]() {
             pubFed->enterExecutingMode();
@@ -1276,8 +1278,7 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
         {
             const auto notices = publisherNotices.lock();
             EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
-                return notice.find("buffer capacity blocking next time grant") !=
-                    std::string::npos;
+                return notice.find("buffer capacity blocking next time grant") != std::string::npos;
             }));
         }
 

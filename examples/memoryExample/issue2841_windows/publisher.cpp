@@ -5,11 +5,10 @@ Innovation LLC.  See the top-level NOTICE for additional details. All rights res
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <helics/application_api/ValueFederate.hpp>
-#include <helics/application_api/Publications.hpp>
-
 #include <cstdint>
 #include <exception>
+#include <helics/application_api/Publications.hpp>
+#include <helics/application_api/ValueFederate.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -17,8 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #ifdef _WIN32
 #    define NOMINMAX
-#    include <windows.h>
 #    include <psapi.h>
+#    include <windows.h>
 #else
 #    include <fstream>
 #    include <sstream>
@@ -95,7 +94,8 @@ int main(int argc, char* argv[])
             time = fed.requestTime(time + 1.0);
         }
         fed.finalize();
-    } catch (const std::exception& error) {
+    }
+    catch (const std::exception& error) {
         std::cerr << "Publisher error: " << error.what() << std::endl;
         return 1;
     }

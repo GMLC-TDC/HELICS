@@ -49,8 +49,7 @@ class MessageTimer {};
 
 // NOLINTNEXTLINE
 static const std::string gHelicsEmptyStr;
-static constexpr std::int32_t bufferCapacityTimeBlockId =
-    std::numeric_limits<std::int32_t>::min();
+static constexpr std::int32_t bufferCapacityTimeBlockId = std::numeric_limits<std::int32_t>::min();
 #define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, gHelicsEmptyStr, message)
 #define LOG_WARNING(message) logMessage(HELICS_LOG_LEVEL_WARNING, gHelicsEmptyStr, message)
 
@@ -1049,7 +1048,7 @@ void FederateState::updateBufferCapacityBlock()
     }
     if (step <= timeEpsilon) {
         step = (bufferCapacityGrantedStep > timeZero) ? bufferCapacityGrantedStep :
-                                                         bufferCapacityRequestedStep;
+                                                        bufferCapacityRequestedStep;
     }
 
     bool shouldBlock = false;
@@ -1760,10 +1759,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                      request->second.second != BufferCapacityPriority::NONE &&
                      priority > request->second.second)) {
                     bufferCapacityRequests[cmd.source_id] = {cmd.actionTime, priority};
-                    LOG_TIMING(fmt::format("buffer capacity priority {} from federate {} at time {}",
-                                           cmd.messageID,
-                                           cmd.source_id.baseValue(),
-                                           static_cast<double>(cmd.actionTime)));
+                    LOG_TIMING(
+                        fmt::format("buffer capacity priority {} from federate {} at time {}",
+                                    cmd.messageID,
+                                    cmd.source_id.baseValue(),
+                                    static_cast<double>(cmd.actionTime)));
                     updateBufferCapacityBlock();
                 }
             }
@@ -1772,10 +1772,10 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto request = bufferCapacityRequests.find(cmd.source_id);
             if (request == bufferCapacityRequests.end() ||
                 cmd.actionTime >= request->second.first) {
-                const bool wasAtCapacity =
-                    request != bufferCapacityRequests.end() &&
+                const bool wasAtCapacity = request != bufferCapacityRequests.end() &&
                     request->second.second != BufferCapacityPriority::NONE;
-                bufferCapacityRequests[cmd.source_id] = {cmd.actionTime, BufferCapacityPriority::NONE};
+                bufferCapacityRequests[cmd.source_id] = {cmd.actionTime,
+                                                         BufferCapacityPriority::NONE};
                 if (wasAtCapacity) {
                     LOG_TIMING(fmt::format("buffer capacity restored from federate {} at time {}",
                                            cmd.source_id.baseValue(),
