@@ -1248,6 +1248,7 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
         fedInfo.setProperty(helics::defs::Properties::VALUE_BUFFER_WARNING, 1);
 
         gmlc::libguarded::guarded<std::vector<std::string>> publisherNotices;
+        gmlc::libguarded::guarded<std::vector<std::string>> receiverWarnings;
 
         auto pubFed =
             std::make_shared<helics::ValueFederate>("buffer_capacity_pub_" + suffix, fedInfo);
@@ -1255,6 +1256,14 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
         auto subFed =
             std::make_shared<helics::ValueFederate>("buffer_capacity_sub_" + suffix, fedInfo);
         auto subCore = subFed->getCorePointer();
+        subFed->setLoggingCallback(
+            [&receiverWarnings](int level, std::string_view /*unused*/, std::string_view message) {
+                if (level == HELICS_LOG_LEVEL_WARNING &&
+                    message.find("queued future value buffers contain") !=
+                        std::string_view::npos) {
+                    receiverWarnings.lock()->emplace_back(message);
+                }
+            });
         auto& pub =
             pubFed->registerGlobalPublication<std::string>("buffer_capacity_value_" + suffix);
         subFed->registerSubscription("buffer_capacity_value_" + suffix);
@@ -1283,6 +1292,18 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
         subFed->enterExecutingMode();
         pubThread.get();
         EXPECT_EQ(pubFed->getCurrentTime(), helics::Time(scenario.blockTime));
+
+        const auto hasExpectedBufferWarnings = [&receiverWarnings, priority = scenario.priority]() {
+            const auto warnings = receiverWarnings.lock();
+            return warnings->size() >= static_cast<std::size_t>(priority);
+        };
+        for (int ii = 0; ii < 300; ++ii) {
+            subFed->processCommunication(std::chrono::milliseconds(10));
+            if (hasExpectedBufferWarnings()) {
+                break;
+            }
+        }
+        EXPECT_TRUE(hasExpectedBufferWarnings());
         subFed->requestTime(1.0);
 
         for (int ii = 0; ii < 100; ++ii) {
