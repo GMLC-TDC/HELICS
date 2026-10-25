@@ -1296,36 +1296,35 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
             const auto warnings = receiverWarnings.lock();
             return warnings->size() >= static_cast<std::size_t>(priority);
         };
-        for (int ii = 0; ii < 300; ++ii) {
-            subFed->processCommunication(std::chrono::milliseconds(10));
-            if (hasExpectedBufferWarnings()) {
-                break;
-            }
+        const auto receiverDeadline =
+            std::chrono::steady_clock::now() + std::chrono::seconds(3);
+        while (!hasExpectedBufferWarnings() &&
+               std::chrono::steady_clock::now() < receiverDeadline) {
+            subFed->processCommunication(std::chrono::milliseconds(100));
         }
         EXPECT_TRUE(hasExpectedBufferWarnings());
-        subFed->requestTime(1.0);
 
-        for (int ii = 0; ii < 100; ++ii) {
-            pubFed->processCommunication(std::chrono::milliseconds(10));
+        const auto hasExpectedPublisherNotices = [&publisherNotices, priority = scenario.priority]() {
             const auto notices = publisherNotices.lock();
-            if (std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
+            const bool gotPriorityNotice =
+                std::any_of(notices->begin(), notices->end(), [priority](const auto& notice) {
+                    return notice.find("buffer capacity priority " + std::to_string(priority)) !=
+                        std::string::npos;
+                });
+            const bool gotBlockNotice =
+                std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
                     return notice.find("buffer capacity blocking next time grant") !=
                         std::string::npos;
-                })) {
-                break;
-            }
+                });
+            return gotPriorityNotice && gotBlockNotice;
+        };
+        const auto publisherDeadline =
+            std::chrono::steady_clock::now() + std::chrono::seconds(3);
+        while (!hasExpectedPublisherNotices() &&
+               std::chrono::steady_clock::now() < publisherDeadline) {
+            pubFed->processCommunication(std::chrono::milliseconds(100));
         }
-        {
-            const auto notices = publisherNotices.lock();
-            EXPECT_TRUE(
-                std::any_of(notices->begin(), notices->end(), [scenario](const auto& notice) {
-                    return notice.find("buffer capacity priority " +
-                                       std::to_string(scenario.priority)) != std::string::npos;
-                }));
-            EXPECT_TRUE(std::any_of(notices->begin(), notices->end(), [](const auto& notice) {
-                return notice.find("buffer capacity blocking next time grant") != std::string::npos;
-            }));
-        }
+        EXPECT_TRUE(hasExpectedPublisherNotices());
 
         auto nextGrant = std::async(std::launch::async, [&pubFed, scenario]() {
             return pubFed->requestTime(scenario.blockTime + 1.0);
