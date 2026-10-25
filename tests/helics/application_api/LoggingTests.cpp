@@ -1296,15 +1296,15 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
             const auto warnings = receiverWarnings.lock();
             return warnings->size() >= static_cast<std::size_t>(priority);
         };
-        const auto receiverDeadline =
-            std::chrono::steady_clock::now() + std::chrono::seconds(3);
+        const auto receiverDeadline = std::chrono::steady_clock::now() + std::chrono::seconds(3);
         while (!hasExpectedBufferWarnings() &&
                std::chrono::steady_clock::now() < receiverDeadline) {
             subFed->processCommunication(std::chrono::milliseconds(100));
         }
         EXPECT_TRUE(hasExpectedBufferWarnings());
 
-        const auto hasExpectedPublisherNotices = [&publisherNotices, priority = scenario.priority]() {
+        const auto hasExpectedPublisherNotices = [&publisherNotices,
+                                                  priority = scenario.priority]() {
             const auto notices = publisherNotices.lock();
             const bool gotPriorityNotice =
                 std::any_of(notices->begin(), notices->end(), [priority](const auto& notice) {
@@ -1318,8 +1318,7 @@ TEST(logging, value_buffer_capacity_holds_next_grant)
                 });
             return gotPriorityNotice && gotBlockNotice;
         };
-        const auto publisherDeadline =
-            std::chrono::steady_clock::now() + std::chrono::seconds(3);
+        const auto publisherDeadline = std::chrono::steady_clock::now() + std::chrono::seconds(3);
         while (!hasExpectedPublisherNotices() &&
                std::chrono::steady_clock::now() < publisherDeadline) {
             pubFed->processCommunication(std::chrono::milliseconds(100));
