@@ -319,8 +319,10 @@ TEST(logging_tests, fed_logging_file)
     auto fedInfo = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_INPROC, &err);
     helicsFederateInfoSetCoreName(fedInfo, "clogf", &err);
-    helicsFederateInfoSetIntegerProperty(
-        fedInfo, HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY, &err);
+    helicsFederateInfoSetIntegerProperty(fedInfo,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_SUMMARY,
+                                         &err);
     auto fed = helicsCreateValueFederate("f1", fedInfo, &err);
     helicsFederateSetLogFile(fed, lfile.c_str(), &err);
     helicsFederateEnterExecutingMode(fed, &err);
