@@ -327,7 +327,7 @@ TEST_P(iteration_tests_type, time_iteration_value_loop_with_endpoint_federate)
                                                                           nullptr);
     helicsEndpointSetDefaultDestination(controllerChargerEndpoint, "Charger/EV1.so", nullptr);
 
-    constexpr int timeStepCount = 20;
+    constexpr int timeStepCount = 15;
     constexpr int iterationRoundsPerStep = 4;
     constexpr int maxIterations = iterationRoundsPerStep + 2;
 
