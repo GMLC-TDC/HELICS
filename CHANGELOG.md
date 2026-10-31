@@ -11,7 +11,6 @@ Everything within a major version number should be code compatible (with the exc
 
 ## Unreleased
 
-
 ### Changed
 
 - Lowered the default queued value buffer warning and backpressure threshold from 100 MiB to 50 MiB. The urgent threshold is 100 MiB, and capacity is restored below 25 MiB by default.
