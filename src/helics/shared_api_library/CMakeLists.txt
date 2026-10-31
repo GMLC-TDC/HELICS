@@ -128,15 +128,19 @@ endif()
 
 if(UNIX OR MINGW)
     if(NOT APPLE)
+        if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+            # The release links the C++ runtime statically; keep it and other C++ symbols out of
+            # this C library's exports too.
+            set(helics_export_script "${CMAKE_CURRENT_SOURCE_DIR}/export_linux.txt")
+        else()
+            set(helics_export_script "${CMAKE_CURRENT_SOURCE_DIR}/export.txt")
+        endif()
         include(CheckLinkerFlag)
         check_linker_flag(
-            CXX "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt"
-            flag_linker_version_script
+            CXX "-Wl,--version-script=${helics_export_script}" flag_linker_version_script
         )
         if(flag_linker_version_script)
-            target_link_libraries(
-                helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
-            )
+            target_link_libraries(helics PRIVATE "-Wl,--version-script=${helics_export_script}")
         endif()
         check_linker_flag(CXX "-Wl,--exclude-libs,ALL" flag_linker_exclude_libs)
         if(flag_linker_exclude_libs)

@@ -178,6 +178,7 @@ if(HELICS_BUILD_APP_LIBRARY)
             helicscpp-apps PRIVATE HELICS::common spdlog::spdlog fmt::fmt gmlc::utilities
                                    gmlc::networking
         )
+        helics_hide_static_cpp_runtime(helicscpp-apps)
 
         # add and alias library to match the find_package
         add_library(HELICS::helicscpp-apps ALIAS helicscpp-apps)

@@ -243,6 +243,11 @@ jobs:
         script: ./.github/actions/release-build/installer-${{ runner.os }}.sh
         cpack_gen: ${{ matrix.cpack_gen }}
         arch: ${{ matrix.arch }}
+
+    - name: Check Linux installer exports
+      if: runner.os == 'Linux'
+      shell: bash
+      run: bash ./.github/actions/release-build/check-linux-exports.sh artifact/Helics-*-Linux-*.tar.gz
        
     - name: Upload installer to release
       if: github.event.action == 'published'
@@ -347,6 +352,11 @@ jobs:
       with:
         script: ./.github/actions/release-build/shared-library-${{ runner.os }}.sh
         arch: ${{ matrix.arch }}
+
+    - name: Check Linux shared library exports
+      if: runner.os == 'Linux'
+      shell: bash
+      run: bash ./.github/actions/release-build/check-linux-exports.sh artifact/Helics-shared-*-Linux-*.tar.gz
 
     - name: Upload installer to release
       if: github.event.action == 'published'
