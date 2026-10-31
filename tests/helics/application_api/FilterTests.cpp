@@ -51,10 +51,15 @@ class filter: public ::testing::Test, public FederateTestFixture {};
 TEST_P(filter_single_type_test, message_filter_registration)
 {
     const auto* coreType = GetParam();
+    const auto checkpoint = [coreType](const char* stage) {
+        std::fprintf(stderr, "[message_filter_registration:%s] %s\n", coreType, stage);
+        std::fflush(stderr);
+    };
     auto broker = AddBroker(coreType, 2);
 
     AddFederates<helics::MessageFederate>(coreType, 1, broker, helics::timeZero, "filter");
     AddFederates<helics::MessageFederate>(coreType, 1, broker, helics::timeZero, "message");
+    checkpoint("broker and federates created");
     // broker->setLoggingLevel (3);
     broker.reset();
 
@@ -81,11 +86,14 @@ TEST_P(filter_single_type_test, message_filter_registration)
     auto& filt4 = fFed->registerFilter();
     filt4.addSourceTarget("filter0/fout");
     EXPECT_TRUE(filt4.getHandle() != filt3.getHandle());
+    checkpoint("filters and endpoints registered");
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    checkpoint("federates finalized");
     FullDisconnect();
+    checkpoint("full disconnect complete");
 }
 
 /** test a filter operator
