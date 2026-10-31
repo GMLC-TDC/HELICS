@@ -11,6 +11,11 @@ Everything within a major version number should be code compatible (with the exc
 
 ## Unreleased
 
+### Fixed
+
+- Limit bundled ZeroMQ and HELICS C shared library exports on Linux to their public APIs, preventing static C++ runtime symbols from colliding with other libraries in the same process.
+- Hide statically linked C++ runtime symbols in optional Linux C++ shared libraries while keeping their public C++ API exported.
+
 ## [3.7.0][] - 2026-08-25
 
 Major release with improved broker startup controls, C shared library support for querying broker and core status, and updates to build requirements and third party libraries.
