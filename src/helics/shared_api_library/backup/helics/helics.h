@@ -339,7 +339,8 @@ typedef enum { /* NOLINT */
                HELICS_PROPERTY_INT_LOG_BUFFER = 276,
                /** integer property specifying an index group*/
                HELICS_PROPERTY_INT_INDEX_GROUP = 282,
-               /** integer property specifying queued value buffer warning threshold in MiB*/
+               /** integer property specifying queued value warning and backpressure threshold in MiB;
+                   default 50, 0 disables both */
                HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING = 283
 } HelicsProperties;
 

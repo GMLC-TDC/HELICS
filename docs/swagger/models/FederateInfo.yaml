@@ -53,6 +53,11 @@ properties:
     type: integer
   loglevel:
     type: string
+  value_buffer_warning:
+    type: integer
+    minimum: 0
+    default: 50
+    description: Queued future value payload threshold in MiB for warnings and publisher backpressure. Zero disables both.
   separator:
     type: string
   flags:

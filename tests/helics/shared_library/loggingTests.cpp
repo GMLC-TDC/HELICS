@@ -7,9 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../ThirdParty/concurrency/gmlc/libguarded/guarded.hpp"
 
+#include <algorithm>
 #include <complex>
 #include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
+#include <iterator>
 #include <string>
 #include <thread>
 /** these test cases test out the value converters
@@ -18,6 +21,40 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.h"
 
 using logblocktype = gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>;
+
+namespace {
+// The logging setters are queued. An ordered local query waits for them without shutting down
+// the library. "logs" is deliberately used because simple queries such as "name" bypass the queue.
+void synchronizeCoreLogging(HelicsCore core, HelicsError* err)
+{
+    auto query = helicsCreateQuery("core", "logs");
+    helicsQuerySetOrdering(query, HELICS_SEQUENCING_MODE_ORDERED, err);
+    helicsQueryCoreExecute(query, core, err);
+    helicsQueryFree(query);
+}
+
+void synchronizeBrokerLogging(HelicsBroker broker, HelicsError* err)
+{
+    auto query = helicsCreateQuery("broker", "logs");
+    helicsQuerySetOrdering(query, HELICS_SEQUENCING_MODE_ORDERED, err);
+    helicsQueryBrokerExecute(query, broker, err);
+    helicsQueryFree(query);
+}
+
+bool hasLogMessage(logblocktype& messages, int level, const std::string& message)
+{
+    const auto logs = messages.lock();
+    return std::any_of(logs->begin(), logs->end(), [&](const auto& entry) {
+        return entry.first == level && entry.second == message;
+    });
+}
+
+std::string readLogFile(const std::string& filename)
+{
+    std::ifstream stream(filename);
+    return {std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>()};
+}
+}  // namespace
 
 TEST(logging_tests, check_log_message)
 {
@@ -188,9 +225,15 @@ TEST(logging_tests, core_logging)
     auto err = helicsErrorInitialize();
     helicsCoreSetLoggingCallback(core, logg, &mlog, &err);
     EXPECT_EQ(err.error_code, 0);
-    helicsCoreDisconnect(core, nullptr);
-    helicsCloseLibrary();
-    EXPECT_FALSE(mlog.lock()->empty());
+    helicsCoreSendOrderedCommand(core, "core", "log core logging test message", &err);
+    EXPECT_EQ(err.error_code, 0);
+    // Detach the callback before the stack-owned message storage can be destroyed.
+    helicsErrorClear(&err);
+    helicsCoreSetLoggingCallback(core, nullptr, nullptr, &err);
+    synchronizeCoreLogging(core, &err);
+    helicsCoreDestroy(core);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_TRUE(hasLogMessage(mlog, HELICS_LOG_LEVEL_SUMMARY, "core logging test message"));
 }
 
 TEST(logging_tests, broker_logging)
@@ -208,9 +251,13 @@ TEST(logging_tests, broker_logging)
     auto err = helicsErrorInitialize();
     helicsBrokerSetLoggingCallback(broker, logg, &mlog, &err);
     EXPECT_EQ(err.error_code, 0);
+    helicsBrokerSendOrderedCommand(broker, "broker", "log broker logging test message", &err);
+    synchronizeBrokerLogging(broker, &err);
     helicsBrokerDisconnect(broker, nullptr);
+    // Retain coverage of a logging callback through full library shutdown.
     helicsCloseLibrary();
-    EXPECT_FALSE(mlog.lock()->empty());
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_TRUE(hasLogMessage(mlog, HELICS_LOG_LEVEL_SUMMARY, "broker logging test message"));
 }
 
 TEST(logging_tests, broker_logging_file)
@@ -223,11 +270,15 @@ TEST(logging_tests, broker_logging_file)
     auto err = helicsErrorInitialize();
     auto broker = helicsCreateBroker("inproc", "blog", "--log_level=trace", &err);
     helicsBrokerSetLogFile(broker, lfile.c_str(), &err);
-    helicsBrokerDisconnect(broker, &err);
-    helicsCloseLibrary();
-    ASSERT_TRUE(std::filesystem::exists(lfile));
-    std::filesystem::remove(lfile);
+    helicsBrokerSendOrderedCommand(broker, "broker", "log broker file test message", &err);
+    // Clearing the sink flushes and closes the file before it is read or removed on Windows.
+    helicsBrokerSetLogFile(broker, "", &err);
+    synchronizeBrokerLogging(broker, &err);
+    const auto contents = readLogFile(lfile);
+    helicsBrokerDestroy(broker);
     EXPECT_EQ(err.error_code, 0);
+    EXPECT_NE(contents.find("broker file test message"), std::string::npos);
+    std::filesystem::remove(lfile);
 }
 
 TEST(logging_tests, core_logging_file)
@@ -243,9 +294,13 @@ TEST(logging_tests, core_logging_file)
 
     auto err = helicsErrorInitialize();
     helicsCoreSetLogFile(core, lfile.c_str(), &err);
-    helicsCoreDisconnect(core, &err);
-    helicsCloseLibrary();
-    ASSERT_TRUE(std::filesystem::exists(lfile));
+    helicsCoreSendOrderedCommand(core, "core", "log core file test message", &err);
+    helicsCoreSetLogFile(core, "", &err);
+    synchronizeCoreLogging(core, &err);
+    const auto contents = readLogFile(lfile);
+    helicsCoreDestroy(core);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_NE(contents.find("core file test message"), std::string::npos);
     std::filesystem::remove(lfile);
 }
 
@@ -262,17 +317,26 @@ TEST(logging_tests, fed_logging_file)
 
     auto err = helicsErrorInitialize();
     auto fedInfo = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreName(fedInfo, "clogf", nullptr);
-    auto fed = helicsCreateValueFederate("f1", fedInfo, nullptr);
-    helicsFederateSetLogFile(fed, lfile.c_str(), nullptr);
-
-    helicsCoreSetLogFile(core, lfile.c_str(), &err);
-    helicsCoreDisconnect(core, &err);
+    helicsFederateInfoSetCoreType(fedInfo, HELICS_CORE_TYPE_INPROC, &err);
+    helicsFederateInfoSetCoreName(fedInfo, "clogf", &err);
+    helicsFederateInfoSetIntegerProperty(fedInfo,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_SUMMARY,
+                                         &err);
+    auto fed = helicsCreateValueFederate("f1", fedInfo, &err);
+    helicsFederateSetLogFile(fed, lfile.c_str(), &err);
+    helicsFederateEnterExecutingMode(fed, &err);
+    helicsFederateLogInfoMessage(fed, "federate file test message", &err);
+    // A completed step drains the federate's logging message before the core closes its sink.
+    helicsFederateRequestNextStep(fed, &err);
+    helicsFederateSetLogFile(fed, "", &err);
+    synchronizeCoreLogging(core, &err);
+    const auto contents = readLogFile(lfile);
     helicsFederateFinalize(fed, &err);
-
-    helicsFederateSetLogFile(fed, "emptyfile.txt", nullptr);
+    helicsFederateFree(fed);
     helicsFederateInfoFree(fedInfo);
-    helicsCloseLibrary();
-    ASSERT_TRUE(std::filesystem::exists(lfile));
+    helicsCoreDestroy(core);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_NE(contents.find("federate file test message"), std::string::npos);
     std::filesystem::remove(lfile);
 }

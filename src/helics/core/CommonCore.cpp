@@ -3648,6 +3648,8 @@ void CommonCore::processCommand(ActionMessage&& command)
             //  }
             break;
         case CMD_PUB:
+        case CMD_BUFFERS_AT_CAPACITY:
+        case CMD_BUFFER_CAPACITY_RESTORED:
             routeMessage(command);
             break;
         case CMD_LOG:

@@ -184,9 +184,13 @@ h.helicsFederateSetLoggingCallback(fed, logger, user_data)
 As of Version 3.2,
 HELICS cores, brokers, and federates have the capability to buffer log messages. This can be activated via the `--logbuffer` flag, or `--logbuffer=X` option. The default size is 10 messages for the `--logbuffer` flag. For cores and federates there is a `HELICS_PROPERTY_INT_LOG_BUFFER` property that can be set. And it can also be activated via the [`logbuffer <X>` command](../advanced_topics/commandInterface.md) remotely. `<X>` is the desired size of the buffer. `logbuffer stop` will deactivate the buffer in a remote command. The logs can be retrieved via the ["logs"](../advanced_topics/queries.md) query. The buffer is available even after disconnect for cores and brokers from the local object.
 
-## Value Buffer Warning
+## Value Buffer Warning and Backpressure
 
-Federates can warn when queued future value buffers exceed the `value_buffer_warning` threshold. The threshold is specified in MiB, defaults to 100 MiB, and can be disabled by setting it to 0. This warning can indicate that publishers are advancing faster than subscribers and queued value payload data is accumulating.
+The `value_buffer_warning` federate option watches the total queued future value payload across the federate's inputs. It defaults to 50 MiB. Set it in a federate configuration with `"value_buffer_warning": 20`, on its command line with `--value_buffer_warning=20`, or through the integer property `HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING`. The value is in MiB; 0 disables the warning and buffer capacity notices.
+
+At the threshold, the receiving federate logs a warning and notifies its eligible publishers that its buffers are at capacity. A publisher that is sufficiently ahead of the receiver holds its next time grant while the receiver drains queued values. An urgent notice is sent at twice the configured threshold, and a restoration notice is sent when the queue falls below half the threshold. The current time grant is never interrupted. See the [configuration option reference](../../references/configuration_options_reference.md) for the timing rules and recipient selection.
+
+The threshold measures queued payload, not total process memory. It does not impose a hard memory limit.
 
 ## Remote Logging
 

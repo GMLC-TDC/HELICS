@@ -63,8 +63,11 @@ Federate Info
         trace(7), and warning(1).
 
 --value_buffer_warning <MiB>::
-        The queued value buffer warning threshold in MiB for a federate. The
-        default is 100 MiB. Use 0 to disable this warning.
+        The threshold for queued future value payload across a federate's inputs.
+        At the threshold, the federate logs a warning and sends capacity notices
+        to eligible publishers. The default is 50 MiB; urgent notices begin at
+        100 MiB and capacity is restored below 25 MiB. Use 0 to disable the
+        warning and capacity notices.
 
 --separator <char>::
         Separator character for local federates. Default is '/'.

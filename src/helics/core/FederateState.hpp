@@ -113,8 +113,15 @@ class FederateState {
     Time rt_lead{timeZero};  //!< min lag for the realtime control
     Time grantTimeOutPeriod{timeZero};  //!< period to raise an inquiry about lack of grant
     std::uint64_t queuedValueBytes{0};  //!< estimated queued future value payload bytes
-    std::uint64_t valueBufferWarningLimit{100ULL * 1024ULL * 1024ULL};
-    std::uint64_t nextValueBufferWarning{100ULL * 1024ULL * 1024ULL};
+    std::uint64_t valueBufferWarningLimit{50ULL * 1024ULL * 1024ULL};
+    std::uint64_t nextValueBufferWarning{50ULL * 1024ULL * 1024ULL};
+    std::int32_t bufferCapacityPriority{0};  //!< last capacity level sent to publishers
+    std::vector<GlobalFederateId> bufferCapacityPublishers;  //!< publishers notified of capacity
+    std::map<GlobalFederateId, std::pair<Time, BufferCapacityPriority>> bufferCapacityRequests;
+    bool bufferCapacityTimeBlocked{false};  //!< a buffer pressure time block is active
+    Time bufferCapacityLastGrant{startupTime};  //!< last distinct grant returned to the federate
+    Time bufferCapacityGrantedStep{timeZero};  //!< gap between the two most recent distinct grants
+    Time bufferCapacityRequestedStep{timeZero};  //!< gap from the current grant to the request
     std::int32_t realTimeTimerIndex{-1};  //!< the timer index for the real time timer;
     std::int32_t grantTimeoutTimeIndex{-1};  //!< time index for the grant time out timer;
   public:
@@ -357,6 +364,11 @@ class FederateState {
     void updateQueuedValueBytes();
     /** issue a warning if queued future value buffers exceed the configured threshold*/
     void checkValueBufferWarning();
+    /** send capacity or restoration notices to publishers without a declared return data path*/
+    void updateBufferCapacityNotices();
+    std::vector<GlobalFederateId> getBufferCapacityPublishers() const;
+    /** block only a later time grant when active buffer notices are far enough behind*/
+    void updateBufferCapacityBlock();
     /** add a dependency to the timing coordination*/
     void addDependency(GlobalFederateId fedToDependOn);
     /** add a dependent federate*/

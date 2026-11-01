@@ -96,6 +96,10 @@ across different compilers*/
         cmd_time_barrier_clear = 44,  //!< clear a global time barrier
 
         cmd_pub = 52,  //!< publish a value
+        cmd_buffers_at_capacity =
+            53,  //!< receiver reports queued value buffer pressure to a publisher
+        cmd_buffer_capacity_restored =
+            54,  //!< receiver reports that queued value buffers have drained
         cmd_bye = 2000,  //!< message stating this is the last communication from a federate
         cmd_log = 55,  //!< log a message with the root broker
         cmd_remote_log = 2055,  //!< send a log message to a remote host
@@ -209,6 +213,11 @@ across different compilers*/
 
 }  // namespace action_message_def
 
+/** Urgency carried in the messageID of CMD_BUFFERS_AT_CAPACITY.
+ * The receiver's current granted time is carried in actionTime.
+ */
+enum class BufferCapacityPriority : int32_t { NONE = 0, ADVISORY = 1, URGENT = 2 };
+
 #define CMD_IGNORE action_message_def::action_t::cmd_ignore
 #define CMD_INVALID action_message_def::action_t::cmd_invalid
 #define CMD_TICK action_message_def::action_t::cmd_tick
@@ -276,6 +285,8 @@ across different compilers*/
 #define CMD_DEST_FILTER_RESULT action_message_def::action_t::cmd_dest_filter_result
 
 #define CMD_PUB action_message_def::action_t::cmd_pub
+#define CMD_BUFFERS_AT_CAPACITY action_message_def::action_t::cmd_buffers_at_capacity
+#define CMD_BUFFER_CAPACITY_RESTORED action_message_def::action_t::cmd_buffer_capacity_restored
 #define CMD_LOG action_message_def::action_t::cmd_log
 #define CMD_REMOTE_LOG action_message_def::action_t::cmd_remote_log
 #define CMD_WARNING action_message_def::action_t::cmd_warning

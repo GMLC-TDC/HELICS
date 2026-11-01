@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 // For warnings about constexpr paths in visual studio from frozen libraries
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #    pragma warning(disable : 4127 4245)
 #endif
 
@@ -161,7 +161,7 @@ void ActionMessage::setString(int index, std::string_view str)
     if (index >= 255 || index < 0) {
         throw(std::invalid_argument("index out of specified range (0-254)"));
     }
-    if (index >= static_cast<int>(stringData.size())) {
+    if (static_cast<std::size_t>(index) >= stringData.size()) {
         stringData.resize(static_cast<size_t>(index) + 1);
     }
     stringData[index] = str;
@@ -177,7 +177,7 @@ static inline std::uint8_t isLittleEndian()
 // action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8
 // bytes)+payload size(4 bytes)+1 byte for number of strings=45
 static constexpr std::size_t action_message_base_size =
-    7 * sizeof(uint32_t) + 2 * sizeof(uint16_t) + sizeof(Time::baseType) + sizeof(int32_t) + 1;
+    (7 * sizeof(uint32_t)) + (2 * sizeof(uint16_t)) + sizeof(Time::baseType) + sizeof(int32_t) + 1;
 
 int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
 {
@@ -197,7 +197,7 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
         return -1;
     }
 
-    std::byte* dataStart = data;
+    const std::byte* dataStart = data;
 
     *data = static_cast<std::byte>(littleEndian);
     data[1] = static_cast<std::byte>(ssize >> 16U);
@@ -223,18 +223,18 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
     *reinterpret_cast<int32_t*>(data) = sequenceID;
     data += sizeof(int32_t);  // 32
     auto baseTimeCode = actionTime.getBaseTimeCode();
-    std::memcpy(data, &(baseTimeCode), sizeof(Time::baseType));
+    std::memcpy(data, &baseTimeCode, sizeof(Time::baseType));
     data += sizeof(Time::baseType);  // 40
 
     if (messageAction == CMD_TIME_REQUEST) {
         baseTimeCode = Te.getBaseTimeCode();
-        std::memcpy(data, &(baseTimeCode), sizeof(Time::baseType));
+        std::memcpy(data, &baseTimeCode, sizeof(Time::baseType));
         data += sizeof(Time::baseType);
         baseTimeCode = Tdemin.getBaseTimeCode();
-        std::memcpy(data, &(baseTimeCode), sizeof(Time::baseType));
+        std::memcpy(data, &baseTimeCode, sizeof(Time::baseType));
         data += sizeof(Time::baseType);
         baseTimeCode = Tso.getBaseTimeCode();
-        std::memcpy(data, &(baseTimeCode), sizeof(Time::baseType));
+        std::memcpy(data, &baseTimeCode, sizeof(Time::baseType));
         data += sizeof(Time::baseType);
         *data = std::byte{0};
         ++data;
@@ -317,7 +317,7 @@ std::string ActionMessage::to_json_string() const
 {
     nlohmann::json packet;
     packet["version"] =
-        HELICS_VERSION_MAJOR * 10000 + HELICS_VERSION_MINOR * 100 + HELICS_VERSION_PATCH;
+        (HELICS_VERSION_MAJOR * 10000) + (HELICS_VERSION_MINOR * 100) + HELICS_VERSION_PATCH;
     packet["command"] = static_cast<int>(messageAction);
     packet["messageId"] = messageID;
     packet["sourceId"] = source_id.baseValue();
@@ -423,7 +423,7 @@ void ActionMessage::to_string(std::string& data) const
 }
 
 template<std::size_t DataSize>
-inline void swap_bytes(std::uint8_t* data)
+static inline void swap_bytes(std::uint8_t* data)
 {
     for (std::size_t ii = 0, end = DataSize / 2; ii < end; ++ii) {
         std::swap(data[ii], data[DataSize - ii - 1]);
@@ -436,7 +436,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
     static const uint8_t littleEndian = isLittleEndian();
     if (buffer_size < tsize) {
         messageAction = CMD_INVALID;
-        return (0);
+        return 0;
     }
     if (data[0] == static_cast<std::byte>(LEADING_CHAR)) {
         auto res = depacketize(data, buffer_size);
@@ -448,12 +448,12 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
     if (data[0] == std::byte{'{'}) {
         return 0;
     }
-    const std::size_t size = 256ULL * 256ULL * (std::to_integer<std::size_t>(data[1])) +
-        256ULL * std::to_integer<std::size_t>(data[2]) + std::to_integer<std::size_t>(data[3]);
+    const std::size_t size = (256ULL * 256ULL * std::to_integer<std::size_t>(data[1])) +
+        (256ULL * std::to_integer<std::size_t>(data[2])) + std::to_integer<std::size_t>(data[3]);
     tsize += size;
     if (buffer_size < tsize) {
         messageAction = CMD_INVALID;
-        return (0);
+        return 0;
     }
     const bool swap = (data[0] != static_cast<std::byte>(littleEndian));
     data += sizeof(uint32_t);
@@ -497,7 +497,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
         tsize += 3 * sizeof(Time::baseType);
         if (buffer_size < tsize) {
             messageAction = CMD_INVALID;
-            return (0);
+            return 0;
         }
         memcpy(&btc, data, sizeof(Time::baseType));
         Te.setBaseTimeCode(btc);
@@ -524,7 +524,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
         tsize += 4 * stringCount;
         if (buffer_size < tsize) {
             messageAction = CMD_INVALID;
-            return (0);
+            return 0;
         }
 
         for (std::size_t ii = 0; ii < stringCount; ++ii) {
@@ -537,7 +537,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
             tsize += ssize;
             if (buffer_size < tsize) {
                 messageAction = CMD_INVALID;
-                return (0);
+                return 0;
             }
             stringData[ii].assign(reinterpret_cast<const char*>(data), ssize);
             data += ssize;
@@ -744,7 +744,7 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
 static constexpr char unknownStr[] = "unknown";
 
 // Map to translate the action to a description
-static constexpr frozen::unordered_map<action_message_def::action_t, std::string_view, 96>
+static constexpr frozen::unordered_map<action_message_def::action_t, std::string_view, 98>
     actionStrings = {
         // priority commands
         {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
@@ -791,6 +791,8 @@ static constexpr frozen::unordered_map<action_message_def::action_t, std::string
         {action_message_def::action_t::cmd_time_unblock, "time_unblock"},
         {action_message_def::action_t::cmd_request_current_time, "request current time"},
         {action_message_def::action_t::cmd_pub, "pub"},
+        {action_message_def::action_t::cmd_buffers_at_capacity, "buffers at capacity"},
+        {action_message_def::action_t::cmd_buffer_capacity_restored, "buffer capacity restored"},
         {action_message_def::action_t::cmd_bye, "bye"},
         {action_message_def::action_t::cmd_log, "log"},
         {action_message_def::action_t::cmd_warning, "warning"},

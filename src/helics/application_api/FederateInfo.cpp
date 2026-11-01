@@ -698,7 +698,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_option_function<int>(
         "--value_buffer_warning",
         [this](int val) { setProperty(HELICS_PROPERTY_INT_VALUE_BUFFER_WARNING, val); },
-        "queued value buffer warning threshold in MiB, use 0 to disable");
+        "queued value warning and backpressure threshold in MiB (default 50; 0 disables both)");
 
     app->add_option("--separator", separator, "separator character for local federates")
         ->default_str(std::string(1, separator));
