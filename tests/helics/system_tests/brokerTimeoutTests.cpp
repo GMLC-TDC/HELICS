@@ -24,6 +24,34 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
+TEST(broker_timeout, configured_timeout_is_not_shortened)
+{
+    auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=10s --tick=500ms");
+    ASSERT_TRUE(brk->connect());
+
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "timeout_units_core";
+    fedInfo.coreInitString = "--broker=" + brk->getIdentifier() + " --timeout=20s";
+    helics::Federate fed("timeout_units_federate", fedInfo);
+    fed.enterExecutingMode();
+
+    auto core = std::dynamic_pointer_cast<helics::testcore::TestCore>(fed.getCorePointer());
+    ASSERT_TRUE(core);
+    auto comms = core->getCommsObjectPointer();
+    comms->pauseComms(true);
+    // Several broker heartbeats may pass without a reply, but not its 10 s timeout.
+    EXPECT_FALSE(brk->waitForDisconnect(std::chrono::seconds(3)));
+    comms->pauseComms(false);
+
+    EXPECT_TRUE(brk->isConnected());
+    EXPECT_TRUE(core->isConnected());
+    if (brk->isConnected() && core->isConnected()) {
+        EXPECT_EQ(fed.requestTime(1.0), helics::Time(1.0));
+    }
+    fed.finalize();
+    brk->disconnect();
+}
+
 TEST(broker_timeout, core_fail_timeout)
 {
     auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=100ms --tick 30ms");
