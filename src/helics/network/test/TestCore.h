@@ -15,4 +15,6 @@ namespace testcore {
     using TestCore = NetworkCore<TestComms, gmlc::networking::InterfaceTypes::INPROC>;
 
 }  // namespace testcore
+// The instantiation is provided by TestCore.cpp.
+extern template class NetworkCore<testcore::TestComms, InterfaceTypes::INPROC>;
 }  // namespace helics
