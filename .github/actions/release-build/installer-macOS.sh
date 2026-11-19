@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # This uses bash variable substitution in a few places
 # 1. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
 

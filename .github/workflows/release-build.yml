@@ -20,8 +20,28 @@ on:
         default: ''
   schedule:
     - cron: '15 09 * * *' # Run in the early hours of the morning (UTC)
+  # Test mode: build (but never upload) everything when the release build scripts change
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/release-build.yml'
+      - '.github/actions/release-build/**'
+      - '.github/actions/linux-release-builder/**'
+      - '.github/actions/common/**'
+      - '.github/actions/setup-macos-sdk.sh'
+      - '.github/actions/upload-release-asset.sh'
+      - 'scripts/_git-all-archive.sh'
   release:
     types: published
+
+# Uploading assets to a release needs write access to repository contents
+permissions:
+  contents: write
+
+# Only pull request runs are grouped (and superseded by newer pushes); every other run is independent
+concurrency:
+  group: release-build-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
 #####################################
@@ -76,6 +96,7 @@ jobs:
       with:
         name: all-submodules-archive
         path: artifact
+        if-no-files-found: error
         
 #####################################
 # Build MSVC archives
@@ -83,7 +104,10 @@ jobs:
   build-windows-msvc:
     runs-on: ${{ matrix.os }}
     if: (github.event_name != 'workflow_dispatch') || (contains(github.event.inputs.packages, 'msvc') || contains(github.event.inputs.packages, 'everything'))
+    timeout-minutes: 120
     strategy:
+      # Keep building the other packages when one fails so a release gets every asset that can be built
+      fail-fast: false
       matrix:
         # windows-2019 (VS 2019) runner image was retired; VS 2026 replaces it
         os: [windows-2022, windows-2025-vs2026]
@@ -148,6 +172,7 @@ jobs:
       with:
         name: ${{ matrix.os }}-msvc-installers
         path: artifact
+        if-no-files-found: error
         
 #####################################
 # Build installers
@@ -156,7 +181,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
     if: (github.event_name != 'workflow_dispatch') || (contains(github.event.inputs.packages, 'installer') || contains(github.event.inputs.packages, 'everything'))
+    timeout-minutes: 120
     strategy:
+      # Keep building the other packages when one fails so a release gets every asset that can be built
+      fail-fast: false
       matrix:
         id: [windows-x64, windows-x86, macos-x64, linux-x64, linux-aarch64]
         include:
@@ -265,6 +293,7 @@ jobs:
       with:
         name: ${{ matrix.id }}-installers
         path: artifact
+        if-no-files-found: error
       
 #####################################
 # Build shared libraries
@@ -273,7 +302,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     if: (github.event_name != 'workflow_dispatch') || (contains(github.event.inputs.packages, 'sharedlib') || contains(github.event.inputs.packages, 'everything'))
     name: Build ${{ matrix.os }} ${{ matrix.arch }} Shared Library
+    timeout-minutes: 120
     strategy:
+      # Keep building the other packages when one fails so a release gets every asset that can be built
+      fail-fast: false
       matrix:
         id: [windows-x86, windows-x64, macos-x64, ubuntu-x64, ubuntu-aarch64]
         include:
@@ -374,6 +406,7 @@ jobs:
       with:
         name: ${{ matrix.id }}-sharedlib-installers
         path: artifact
+        if-no-files-found: error
         
 #####################################
 # Generate SHA-256 file

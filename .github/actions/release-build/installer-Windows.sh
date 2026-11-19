@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # This uses bash variable substitution for:
 # - getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
 
@@ -9,6 +10,12 @@ unset VCPKG_ROOT
 
 # Install SWIG
 choco install -y swig
+
+# Install NSIS if an NSIS installer is requested (not preinstalled on the windows-2025 images)
+if [[ "${CPACK_GEN}" == *NSIS* ]] && ! command -v makensis >/dev/null 2>&1; then
+    choco install -y nsis
+    export PATH="/c/Program Files (x86)/NSIS:${PATH}"
+fi
 
 # Install Boost
 COMMON_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common/Windows" && pwd)"
