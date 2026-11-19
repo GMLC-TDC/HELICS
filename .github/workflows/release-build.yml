@@ -85,12 +85,10 @@ jobs:
     if: (github.event_name != 'workflow_dispatch') || (contains(github.event.inputs.packages, 'msvc') || contains(github.event.inputs.packages, 'everything'))
     strategy:
       matrix:
-        os: [windows-2019, windows-2022]
+        # windows-2019 runner image was retired; VS 2019 builds are no longer hosted
+        os: [windows-2022]
         arch: [x64]
         include:
-          - os: windows-2019
-            cmake_gen: 'Visual Studio 16 2019'
-            msvc_ver: 'msvc2019'
           - os: windows-2022
             cmake_gen: 'Visual Studio 17 2022'
             msvc_ver: 'msvc2022'
@@ -160,19 +158,20 @@ jobs:
         id: [windows-x64, windows-x86, macos-x64, linux-x64, linux-aarch64]
         include:
           - id: windows-x64
-            os: windows-2019
+            os: windows-2022
             arch: x64
             cpack_gen: NSIS;ZIP
-            cmake_gen: 'Visual Studio 16 2019'
-            msvc_ver: 'msvc2019'
+            cmake_gen: 'Visual Studio 17 2022'
+            msvc_ver: 'msvc2022'
           - id: windows-x86
-            os: windows-2019
+            os: windows-2022
             arch: x86
             cpack_gen: ZIP
-            cmake_gen: 'Visual Studio 16 2019'
-            msvc_ver: 'msvc2019'
+            cmake_gen: 'Visual Studio 17 2022'
+            msvc_ver: 'msvc2022'
           - id: macos-x64
-            os: macos-latest
+            # macos-latest is now Apple Silicon; pin the image. Builds are universal (arm64;x86_64).
+            os: macos-15
             arch: x64
             cpack_gen: ZIP
             macos_target_ver: '10.15'
@@ -276,17 +275,17 @@ jobs:
         id: [windows-x86, windows-x64, macos-x64, ubuntu-x64, ubuntu-aarch64]
         include:
           - id: windows-x86
-            os: windows-2019
+            os: windows-2022
             arch: x86
-            cmake_gen: 'Visual Studio 16 2019'
-            msvc_ver: 'msvc2019'
+            cmake_gen: 'Visual Studio 17 2022'
+            msvc_ver: 'msvc2022'
           - id: windows-x64
-            os: windows-2019
+            os: windows-2022
             arch: x64
-            cmake_gen: 'Visual Studio 16 2019'
-            msvc_ver: 'msvc2019'
+            cmake_gen: 'Visual Studio 17 2022'
+            msvc_ver: 'msvc2022'
           - id: macos-x64
-            os: macos-latest
+            os: macos-15
             arch: x64
             macos_target_ver: '10.15'
           - id: ubuntu-x64
