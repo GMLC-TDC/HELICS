@@ -69,10 +69,10 @@ jobs:
       matrix:
         XCode-latest:
           test_config: "ci"
-          vmImage: "macOS-15"
+          vmImage: "macOS-26"
         XCode-oldest:
           test_config: "ci"
-          vmImage: "macOS-14"
+          vmImage: "macOS-15"
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 60

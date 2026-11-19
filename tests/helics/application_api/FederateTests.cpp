@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 /** these test cases test out the value converters
@@ -94,10 +95,9 @@ TEST_P(LateFederateRegistration, startup_readiness)
         const auto state = helics::fileops::loadJsonStr(
             broker.query("broker", "current_state", HELICS_SEQUENCING_MODE_ORDERED));
         const auto& children = state.at(nextIsCore ? "cores" : "brokers");
-        const auto child =
-            std::find_if(children.begin(), children.end(), [&childName](const auto& entry) {
-                return entry.at("attributes").at("name") == childName;
-            });
+        const auto child = std::ranges::find_if(children, [&childName](const auto& entry) {
+            return entry.at("attributes").at("name") == childName;
+        });
         return child != children.end() ? *child : nlohmann::json{};
     };
     core.setReadyToInit();

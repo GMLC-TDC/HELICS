@@ -27,7 +27,7 @@ jobs:
             cmake_gen: 'Visual Studio 17 2022'
             msvc_ver: 'msvc2022'
           - id: macos-x64
-            os: macos-latest
+            os: macos-26
             arch: x64
             cpack_gen: ZIP
             macos_target_ver: '10.15'
