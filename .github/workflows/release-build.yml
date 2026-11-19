@@ -85,13 +85,16 @@ jobs:
     if: (github.event_name != 'workflow_dispatch') || (contains(github.event.inputs.packages, 'msvc') || contains(github.event.inputs.packages, 'everything'))
     strategy:
       matrix:
-        # windows-2019 runner image was retired; VS 2019 builds are no longer hosted
-        os: [windows-2022]
+        # windows-2019 (VS 2019) runner image was retired; VS 2026 replaces it
+        os: [windows-2022, windows-2025-vs2026]
         arch: [x64]
         include:
           - os: windows-2022
             cmake_gen: 'Visual Studio 17 2022'
             msvc_ver: 'msvc2022'
+          - os: windows-2025-vs2026
+            cmake_gen: 'Visual Studio 18 2026'
+            msvc_ver: 'msvc2026'
     steps:
     - name: Determine fetch depth
       id: determine_fd
@@ -158,17 +161,17 @@ jobs:
         id: [windows-x64, windows-x86, macos-x64, linux-x64, linux-aarch64]
         include:
           - id: windows-x64
-            os: windows-2022
+            os: windows-2025-vs2026
             arch: x64
             cpack_gen: NSIS;ZIP
-            cmake_gen: 'Visual Studio 17 2022'
-            msvc_ver: 'msvc2022'
+            cmake_gen: 'Visual Studio 18 2026'
+            msvc_ver: 'msvc2026'
           - id: windows-x86
-            os: windows-2022
+            os: windows-2025-vs2026
             arch: x86
             cpack_gen: ZIP
-            cmake_gen: 'Visual Studio 17 2022'
-            msvc_ver: 'msvc2022'
+            cmake_gen: 'Visual Studio 18 2026'
+            msvc_ver: 'msvc2026'
           - id: macos-x64
             # macos-latest is now Apple Silicon; pin the image. Builds are universal (arm64;x86_64).
             os: macos-15
@@ -275,15 +278,15 @@ jobs:
         id: [windows-x86, windows-x64, macos-x64, ubuntu-x64, ubuntu-aarch64]
         include:
           - id: windows-x86
-            os: windows-2022
+            os: windows-2025-vs2026
             arch: x86
-            cmake_gen: 'Visual Studio 17 2022'
-            msvc_ver: 'msvc2022'
+            cmake_gen: 'Visual Studio 18 2026'
+            msvc_ver: 'msvc2026'
           - id: windows-x64
-            os: windows-2022
+            os: windows-2025-vs2026
             arch: x64
-            cmake_gen: 'Visual Studio 17 2022'
-            msvc_ver: 'msvc2022'
+            cmake_gen: 'Visual Studio 18 2026'
+            msvc_ver: 'msvc2026'
           - id: macos-x64
             os: macos-15
             arch: x64
