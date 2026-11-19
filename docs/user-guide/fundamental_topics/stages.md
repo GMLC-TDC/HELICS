@@ -118,6 +118,8 @@ The object returned when the helicsFederateGetPublicationByIndex() method is inv
 
 Initialization mode exists to help a federation reach a consistent state or otherwise generally prepare to begin the advancement through time. Each federate can call `helicsFederateEnterInitializingMode()` and perform whatever internal set-up it needs to do as well as publish outputs that will be available to the rest of the federation at simulation time t=0 when entering execution mode (see the next section).
 
+An empty core can report that it is ready with `helicsCoreSetReadyToInit()`. If a federate registers on that core before the broker grants initialization, the broker waits for the new federate to request initialization too.
+
 If the federation needs to iterate in initialization mode prior to entering execution mode each federate calls `helicsFederateEnterExecutingModeIterative()`. This API has two special aspects:
 
 1. Calling the API requires that the federate declare its needs for iteration using an enumeration:

@@ -83,6 +83,7 @@ class BasicBrokerInfo {
     bool _disable_ping{false};  //!< indicator that the broker doesn't respond to pings
     bool _observer{false};  //!< indicator that the broker is an observer
     bool initIterating{false};  //!< indicator that initIteration was requested
+    std::uint32_t initGeneration{0};  //!< generation required for this child's init request
     std::string routeInfo;  //!< string describing the connection information for the route
     explicit BasicBrokerInfo(std::string_view brokerName): name(brokerName) {}
 };
@@ -103,6 +104,7 @@ class CoreBroker: public Broker, public BrokerBase {
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     bool initIterating{false};  //!< using init iterations in some cores
+    std::uint32_t initGeneration{0};  //!< acknowledged readiness resets reported to the parent
     int routeCount = 1;  //!< counter for creating new routes;
     /// container for all federates
     gmlc::containers::
@@ -402,6 +404,8 @@ class CoreBroker: public Broker, public BrokerBase {
     const BasicBrokerInfo* getBrokerById(GlobalBrokerId brokerid) const;
 
     BasicBrokerInfo* getBrokerById(GlobalBrokerId brokerid);
+
+    void resetChildInitReadiness(GlobalBrokerId childId);
 
     void addLocalInfo(BasicHandleInfo& handleInfo, const ActionMessage& message);
     void addPublication(ActionMessage& message);
