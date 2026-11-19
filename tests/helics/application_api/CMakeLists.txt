@@ -86,7 +86,18 @@ foreach(testTarget IN LISTS testExecutables)
     set_property(TEST ${testTarget} PROPERTY LABELS ApplicationApi Coverage Daily)
 
     # Tests for Continuous Integration builds
-    add_test(NAME ${testTarget}-ci COMMAND ${testTarget} --gtest_filter=-*ci_skip*:*nosan*)
+    set(ciTestCommand ${testTarget})
+    if(testTarget STREQUAL "filterTranslatorTests" AND CMAKE_SYSTEM_NAME STREQUAL "Linux"
+       AND NOT "$ENV{HELICS_FILTER_TEST_GDB}" STREQUAL ""
+    )
+        set(ciTestCommand
+            "$ENV{HELICS_FILTER_TEST_GDB}" -nx -batch -return-child-result
+            -ex "set disable-randomization off" -ex "set print thread-events off"
+            -ex "handle SIGPIPE nostop noprint pass" -ex run -ex "thread apply all bt"
+            --args $<TARGET_FILE:${testTarget}>
+        )
+    endif()
+    add_test(NAME ${testTarget}-ci COMMAND ${ciTestCommand} --gtest_filter=-*ci_skip*:*nosan*)
     set_property(TEST ${testTarget}-ci PROPERTY LABELS ApplicationApiCI Continuous)
 
 endforeach()
