@@ -11,10 +11,21 @@ unset VCPKG_ROOT
 # Install SWIG
 choco install -y swig
 
-# Install NSIS if an NSIS installer is requested (not preinstalled on the windows-2025 images)
+# Install NSIS if an NSIS installer is requested (not preinstalled on the windows-2025 images).
+# The Chocolatey community feed is sometimes unavailable (HTTP 503) and choco does not always
+# return an error when that happens, so retry and check that makensis is really there.
 if [[ "${CPACK_GEN}" == *NSIS* ]] && ! command -v makensis >/dev/null 2>&1; then
-    choco install -y nsis
     export PATH="/c/Program Files (x86)/NSIS:${PATH}"
+    for attempt in 1 2 3 4; do
+        choco install -y --no-progress nsis || true
+        command -v makensis >/dev/null 2>&1 && break
+        echo "NSIS install attempt ${attempt} failed; retrying in $((attempt * 30)) seconds"
+        sleep $((attempt * 30))
+    done
+    if ! command -v makensis >/dev/null 2>&1; then
+        echo "::error::NSIS could not be installed (Chocolatey feed unavailable?); cannot build the NSIS installer"
+        exit 1
+    fi
 fi
 
 # Install Boost
