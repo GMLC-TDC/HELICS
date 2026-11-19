@@ -91,10 +91,22 @@ foreach(testTarget IN LISTS testExecutables)
        AND NOT "$ENV{HELICS_FILTER_TEST_GDB}" STREQUAL ""
     )
         set(ciTestCommand
-            "$ENV{HELICS_FILTER_TEST_GDB}" -nx -batch -return-child-result
-            -ex "set disable-randomization off" -ex "set print thread-events off"
-            -ex "handle SIGPIPE nostop noprint pass" -ex run -ex "thread apply all bt"
-            --args $<TARGET_FILE:${testTarget}>
+            "$ENV{HELICS_FILTER_TEST_GDB}"
+            -nx
+            -batch
+            -return-child-result
+            -ex
+            "set disable-randomization off"
+            -ex
+            "set print thread-events off"
+            -ex
+            "handle SIGPIPE nostop noprint pass"
+            -ex
+            run
+            -ex
+            "thread apply all bt"
+            --args
+            $<TARGET_FILE:${testTarget}>
         )
     endif()
     add_test(NAME ${testTarget}-ci COMMAND ${ciTestCommand} --gtest_filter=-*ci_skip*:*nosan*)

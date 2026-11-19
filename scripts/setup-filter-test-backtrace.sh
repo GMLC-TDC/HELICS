@@ -3,7 +3,7 @@
 
 if ! command -v gdb >/dev/null; then
     apt=(apt-get)
-    if (( EUID != 0 )); then
+    if ((EUID != 0)); then
         apt=(sudo -n apt-get)
     fi
     if ! "${apt[@]}" update || ! "${apt[@]}" install -y --no-install-recommends gdb; then
