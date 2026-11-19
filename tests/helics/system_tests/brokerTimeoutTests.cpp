@@ -24,6 +24,34 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
+TEST(broker_timeout, configured_timeout_is_not_shortened)
+{
+    auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=10s --tick=500ms");
+    ASSERT_TRUE(brk->connect());
+
+    helics::FederateInfo fedInfo(CORE_TYPE_TO_TEST);
+    fedInfo.coreName = "timeout_units_core";
+    fedInfo.coreInitString = "--broker=" + brk->getIdentifier() + " --timeout=20s";
+    helics::Federate fed("timeout_units_federate", fedInfo);
+    fed.enterExecutingMode();
+
+    auto core = std::dynamic_pointer_cast<helics::testcore::TestCore>(fed.getCorePointer());
+    ASSERT_TRUE(core);
+    auto comms = core->getCommsObjectPointer();
+    comms->pauseComms(true);
+    // Several broker heartbeats may pass without a reply, but not its 10 s timeout.
+    EXPECT_FALSE(brk->waitForDisconnect(std::chrono::seconds(3)));
+    comms->pauseComms(false);
+
+    EXPECT_TRUE(brk->isConnected());
+    EXPECT_TRUE(core->isConnected());
+    if (brk->isConnected() && core->isConnected()) {
+        EXPECT_EQ(fed.requestTime(1.0), helics::Time(1.0));
+    }
+    fed.finalize();
+    brk->disconnect();
+}
+
 TEST(broker_timeout, core_fail_timeout)
 {
     auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=100ms --tick 30ms");
@@ -43,8 +71,8 @@ TEST(broker_timeout, core_fail_timeout)
 
     Fed1->finalize();
 
-    auto cr = Fed2->getCorePointer();
-    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(cr);
+    auto core = Fed2->getCorePointer();
+    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(core);
     EXPECT_TRUE(tcr);
 
     auto cms = tcr->getCommsObjectPointer();
@@ -59,7 +87,7 @@ TEST(broker_timeout, core_fail_timeout)
         brk->waitForDisconnect(std::chrono::milliseconds(1000));
     }
     EXPECT_TRUE(val);
-    cr->disconnect();
+    core->disconnect();
     Fed2->finalize();
 }
 // this test is exactly like the previous one except the core was specified with no_ping so it won't
@@ -85,8 +113,8 @@ TEST(broker_timeout, core_fail_timeout_no_ping_ci_skip)
 
     Fed1->finalize();
 
-    auto cr = Fed2->getCorePointer();
-    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(cr);
+    auto core = Fed2->getCorePointer();
+    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(core);
     EXPECT_TRUE(tcr);
 
     auto cms = tcr->getCommsObjectPointer();
@@ -97,7 +125,7 @@ TEST(broker_timeout, core_fail_timeout_no_ping_ci_skip)
     EXPECT_FALSE(val);
     brk->disconnect();
 
-    cr->disconnect();
+    core->disconnect();
     Fed1->finalize();
     Fed2->finalize();
 }
@@ -125,8 +153,8 @@ TEST(broker_timeout, core_fail_debugging_ci_skip)
 
     Fed1->finalize();
 
-    auto cr = Fed2->getCorePointer();
-    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(cr);
+    auto core = Fed2->getCorePointer();
+    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(core);
     EXPECT_TRUE(tcr);
 
     auto cms = tcr->getCommsObjectPointer();
@@ -137,7 +165,7 @@ TEST(broker_timeout, core_fail_debugging_ci_skip)
     EXPECT_FALSE(val);
     brk->disconnect();
 
-    cr->disconnect();
+    core->disconnect();
     Fed1->finalize();
     Fed2->finalize();
 }
@@ -164,8 +192,8 @@ TEST(broker_timeout, core_fail_timeout_no_timer_ci_skip)
 
     Fed1->finalize();
 
-    auto cr = Fed2->getCorePointer();
-    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(cr);
+    auto core = Fed2->getCorePointer();
+    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(core);
     EXPECT_TRUE(tcr);
 
     auto cms = tcr->getCommsObjectPointer();
@@ -176,7 +204,7 @@ TEST(broker_timeout, core_fail_timeout_no_timer_ci_skip)
     EXPECT_FALSE(val);
     brk->disconnect();
 
-    cr->disconnect();
+    core->disconnect();
     Fed1->finalize();
     Fed2->finalize();
 }
@@ -200,8 +228,8 @@ TEST(broker_timeout, core_fail_error)
     Fed2->enterExecutingMode();
     Fed1->enterExecutingModeComplete();
 
-    auto cr = Fed1->getCorePointer();
-    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(cr);
+    auto core = Fed1->getCorePointer();
+    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(core);
     EXPECT_TRUE(tcr);
 
     auto cms = tcr->getCommsObjectPointer();
@@ -209,7 +237,7 @@ TEST(broker_timeout, core_fail_error)
     tcr.reset();
 
     EXPECT_THROW(Fed2->requestTime(1.0), helics::HelicsException);
-    cr->disconnect();
+    core->disconnect();
     Fed2->finalize();
     Fed1->finalize();
 }
@@ -271,11 +299,11 @@ TEST(broker_timeout, max_duration_core)
     auto str = brk->query(brk->getIdentifier(), "exists");
     EXPECT_EQ(str, "true");
 
-    auto cr = helics::CoreFactory::create(CORE_TYPE_TO_TEST, "--broker=" + brk->getIdentifier());
-    EXPECT_TRUE(cr->connect());
-    auto res = cr->waitForDisconnect(std::chrono::milliseconds(600));
+    auto core = helics::CoreFactory::create(CORE_TYPE_TO_TEST, "--broker=" + brk->getIdentifier());
+    EXPECT_TRUE(core->connect());
+    auto res = core->waitForDisconnect(std::chrono::milliseconds(600));
     if (!res) {
-        res = cr->waitForDisconnect(std::chrono::milliseconds(400));
+        res = core->waitForDisconnect(std::chrono::milliseconds(400));
     }
     EXPECT_TRUE(res);
     if (!res) {

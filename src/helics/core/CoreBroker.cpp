@@ -2511,7 +2511,7 @@ bool CoreBroker::connect()
     if (getBrokerState() < BrokerState::CONNECTED) {
         if (transitionBrokerState(BrokerState::CONFIGURED, BrokerState::CONNECTING)) {
             LOG_CONNECTIONS(parent_broker_id, getIdentifier(), "connecting");
-            timeoutMon->setTimeout(std::chrono::milliseconds(timeout));
+            timeoutMon->setTimeout(timeout.to_ms());
             auto res = brokerConnect();
             if (res) {
                 if (!disconnection.activate()) {
