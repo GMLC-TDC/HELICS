@@ -3328,7 +3328,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                                     command.name(),
                                     commandErrorString(command.messageID)));
                 } else {
-                    if (checkActionFlag(command, reset_init_flag) && !fed->global_id.load().isValid()) {
+                    if (checkActionFlag(command, reset_init_flag) &&
+                        !fed->global_id.load().isValid()) {
                         ++initGeneration;
                         transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED);
                     }

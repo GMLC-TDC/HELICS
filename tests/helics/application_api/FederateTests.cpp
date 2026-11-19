@@ -124,7 +124,8 @@ TEST_P(LateFederateRegistration, startup_readiness)
             std::dynamic_pointer_cast<helics::CoreBroker>(brokers[hop].getCopyofBrokerPointer());
         ASSERT_TRUE(receiver);
         helics::ActionMessage staleInit(helics::CMD_INIT);
-        staleInit.source_id = helics::GlobalFederateId{child.at("attributes").at("id").get<int32_t>()};
+        staleInit.source_id =
+            helics::GlobalFederateId{child.at("attributes").at("id").get<int32_t>()};
         receiver->addActionMessage(std::move(staleInit));
         EXPECT_EQ(childState(hop).at("state"), "connected");
     }
@@ -142,8 +143,8 @@ TEST_P(LateFederateRegistration, startup_readiness)
             std::dynamic_pointer_cast<helics::CoreBroker>(brokers.front().getCopyofBrokerPointer());
         ASSERT_TRUE(root);
         helics::ActionMessage lateRegistration(helics::CMD_REG_FED);
-        lateRegistration.source_id =
-            helics::GlobalFederateId{state.at("cores").at(0).at("attributes").at("id").get<int32_t>()};
+        lateRegistration.source_id = helics::GlobalFederateId{
+            state.at("cores").at(0).at("attributes").at("id").get<int32_t>()};
         lateRegistration.name("too_late");
         helics::setActionFlag(lateRegistration, helics::reset_init_flag);
         root->addActionMessage(std::move(lateRegistration));
