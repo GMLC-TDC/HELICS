@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics_enums.h"
 
 #include "gtest/gtest.h"
-
 #include <vector>
 
 using namespace helics;
