@@ -43,6 +43,7 @@ jobs:
     steps:
       - bash: |
           unset VCPKG_ROOT
+          source scripts/setup-filter-test-backtrace.sh
           source scripts/setup-helics-ci-options.sh
           mkdir -p build && cd build
           ../scripts/ci-build.sh
@@ -68,10 +69,10 @@ jobs:
       matrix:
         XCode-latest:
           test_config: "ci"
-          vmImage: "macOS-15"
+          vmImage: "macOS-26"
         XCode-oldest:
           test_config: "ci"
-          vmImage: "macOS-14"
+          vmImage: "macOS-15"
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 60
@@ -141,18 +142,21 @@ jobs:
       # Install dependencies
       # -----------------------
       - task: Cache@2
+        continueOnError: true
         inputs:
           path: $(BOOST_ROOT)
           key: '"boost-1.83"'
           cacheHitVar: BOOST_CACHE_RESTORED
         displayName: Restore Boost cache
       - bash: |
-          cd $(mktemp -d)
-          curl --location --output "download.tar.bz2" "$BOOST_URL"
+          set -e
+          work_dir=$(mktemp -d)
+          cd "$work_dir"
+          curl --fail --location --output "download.tar.bz2" "$BOOST_URL"
           tar xfj "download.tar.bz2"
           mkdir -p "$BOOST_ROOT"
           cp -r boost_*/* "$BOOST_ROOT"
-        condition: ne(variables.BOOST_CACHE_RESTORED, 'true')
+        condition: and(succeeded(), ne(variables.BOOST_CACHE_RESTORED, 'true'))
         displayName: Install Boost
 
       - bash: swig -version

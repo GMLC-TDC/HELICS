@@ -21,6 +21,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ### Fixed
 
+- Fixed an initialization stall when a federate joined a core that had already reported itself ready while empty.
 - Preserve the configured broker connection timeout when converting it to milliseconds.
 - Limit bundled ZeroMQ and HELICS C shared library exports on Linux to their public APIs, preventing static C++ runtime symbols from colliding with other libraries in the same process.
 - Hide statically linked C++ runtime symbols in optional Linux C++ shared libraries while keeping their public C++ API exported.

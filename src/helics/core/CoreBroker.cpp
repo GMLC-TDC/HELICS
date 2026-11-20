@@ -550,13 +550,14 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         return;
     }
     const bool countable = !checkActionFlag(command, non_counting_flag);
+    const bool resetInit = countable && checkActionFlag(command, reset_init_flag);
     bool dynamicFed{false};
     if (countable && getCountableFederates() >= maxFederateCount) {
         sendFedErrorAck(command, max_federate_count_exceeded);
         return;
     }
     if (getBrokerState() < BrokerState::OPERATING) {
-        if (countable && allInitReady()) {
+        if (countable && !resetInit && allInitReady()) {
             ActionMessage noInit(CMD_INIT_NOT_READY);
             noInit.source_id = global_broker_id_local;
             transmit(parent_route_id, noInit);
@@ -654,6 +655,10 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         fedReply.source_id = global_broker_id_local;
         fedReply.dest_id = global_fedid;
         fedReply.name(fedName);
+        if (resetInit && !dynamicFed) {
+            resetChildInitReadiness(GlobalBrokerId{command.source_id});
+            setActionFlag(fedReply, reset_init_flag);
+        }
         if (checkActionFlag(command, child_flag)) {
             setActionFlag(fedReply, child_flag);
         }
@@ -741,6 +746,11 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             if (fed != mFederates.end()) {
                 auto route = fed->route;
                 if (!fed->global_id.isValid()) {
+                    if (!checkActionFlag(command, error_flag) &&
+                        checkActionFlag(command, reset_init_flag)) {
+                        resetChildInitReadiness(fed->parent);
+                        ++initGeneration;
+                    }
                     fed->global_id = command.dest_id;
                     mFederates.addSearchTerm(command.dest_id, fed->name);
                 }
@@ -1590,13 +1600,32 @@ void CoreBroker::processCommand(ActionMessage&& command)
     }
 }
 
+void CoreBroker::resetChildInitReadiness(GlobalBrokerId childId)
+{
+    auto* child = getBrokerById(childId);
+    if (child == nullptr) {
+        return;
+    }
+    ++child->initGeneration;
+    if (child->state == ConnectionState::INIT_REQUESTED) {
+        child->state = ConnectionState::CONNECTED;
+    }
+    if (child->initIterating) {
+        child->initIterating = false;
+        initIterating = std::any_of(mBrokers.begin(), mBrokers.end(), [](const auto& broker) {
+            return broker.initIterating;
+        });
+    }
+}
+
 void CoreBroker::processInitCommand(ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_INIT: {
             auto* brk = getBrokerById(static_cast<GlobalBrokerId>(cmd.source_id));
 
-            if (brk == nullptr) {
+            // A registration can overtake an init request in the priority queue.
+            if (brk == nullptr || cmd.sequenceID < brk->initGeneration) {
                 break;
             }
             if (brk->state == ConnectionState::CONNECTED) {
@@ -1644,6 +1673,7 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
                                    "entering initialization mode");
                         checkDependencies();
                         cmd.source_id = global_broker_id_local;
+                        cmd.sequenceID = initGeneration;
                         if (initIterating) {
                             setActionFlag(cmd, iteration_requested_flag);
                         }

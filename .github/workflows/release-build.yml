@@ -172,7 +172,7 @@ jobs:
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
           - id: macos-x64
-            os: macos-latest
+            os: macos-26
             arch: x64
             cpack_gen: ZIP
             macos_target_ver: '10.15'
@@ -286,7 +286,7 @@ jobs:
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
           - id: macos-x64
-            os: macos-latest
+            os: macos-26
             arch: x64
             macos_target_ver: '10.15'
           - id: ubuntu-x64

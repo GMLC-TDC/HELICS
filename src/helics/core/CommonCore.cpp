@@ -3228,6 +3228,9 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 lfed->state = OperatingState::OPERATING;
             }
 
+            if (getBrokerState() == BrokerState::INITIALIZING) {
+                setActionFlag(command, reset_init_flag);
+            }
             if (global_broker_id_local != parent_broker_id) {
                 // forward on to Broker
                 command.source_id = global_broker_id_local;
@@ -3306,6 +3309,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                             checkDependencies();
                             init.source_id = global_broker_id_local;
                             init.dest_id = parent_broker_id;
+                            init.sequenceID = initGeneration;
                             transmit(parent_route_id, init);
                         }
                     }
@@ -3324,6 +3328,11 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                                     command.name(),
                                     commandErrorString(command.messageID)));
                 } else {
+                    if (checkActionFlag(command, reset_init_flag) &&
+                        !fed->global_id.load().isValid()) {
+                        ++initGeneration;
+                        transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED);
+                    }
                     fed->global_id = command.dest_id;
                     loopFederates.addSearchTerm(command.dest_id, command.name());
                     if (!keyFed.isValid()) {
@@ -4681,9 +4690,11 @@ void CommonCore::processInitRequest(ActionMessage& cmd)
                         checkDependencies();
                     }
                     cmd.source_id = global_broker_id_local;
+                    cmd.sequenceID = initGeneration;
                     transmit(parent_route_id, cmd);
                 } else if (checkActionFlag(cmd, observer) || dynamicFederation) {
                     cmd.source_id = global_broker_id_local;
+                    cmd.sequenceID = initGeneration;
                     transmit(parent_route_id, cmd);
                 }
             }
@@ -4952,6 +4963,7 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                         cmd.setAction(CMD_INIT);
                         cmd.source_id = global_broker_id_local;
                         cmd.dest_id = parent_broker_id;
+                        cmd.sequenceID = initGeneration;
                         transmit(parent_route_id, cmd);
                     }
                 }

@@ -462,6 +462,7 @@ class CommonCore: public Core, public BrokerBase {
     int32_t mGlobalFederationSize{0};  //!< total size of the federation
     /// counter for the number of times the entry to initialization Mode was explicitly delayed
     std::atomic<int16_t> delayInitCounter{0};
+    std::uint32_t initGeneration{0};  //!< registrations acknowledged after requesting init
     bool filterTiming{false};  //!< if there are filters needing a time connection
     /** threadsafe local federate information list for external functions */
     shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>> federates;

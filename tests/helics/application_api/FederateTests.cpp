@@ -12,18 +12,22 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
+#include "helics/core/CoreBroker.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include "testFixtures.hpp"
 
 #include "gmock/gmock.h"
+#include <algorithm>
 #include <cstdlib>
 #include <future>
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 /** these test cases test out the value converters
  */
@@ -58,6 +62,142 @@ TEST(federate, federate_initialize_tests)
     // EXPECT_EQ(fedName+"_core", coreName);
     Fed = nullptr;  // force the destructor
 }
+
+#if defined(HELICS_ENABLE_INPROC_CORE) && !defined(HELICS_DISABLE_ASIO)
+class LateFederateRegistration: public ::testing::TestWithParam<int> {};
+
+TEST_P(LateFederateRegistration, startup_readiness)
+{
+    std::vector<helics::BrokerApp> brokers;
+    brokers.emplace_back(helics::CoreType::INPROC,
+                         "--root --federates=1 --tick=100ms --maxcosimduration=5s");
+    ASSERT_TRUE(brokers.back().connect());
+    for (int depth = 0; depth < GetParam(); ++depth) {
+        const auto initString = "--federates=0 --broker=" + brokers.back().getIdentifier();
+        brokers.emplace_back(helics::CoreType::INPROC, initString);
+        ASSERT_TRUE(brokers.back().connect());
+    }
+    helics::CoreApp core(helics::CoreType::INPROC,
+                         "--federates=0 --broker=" + brokers.back().getIdentifier());
+    ASSERT_TRUE(core.connect());
+    // A query to the broker through the core waits for the core's registration ACK.
+    ASSERT_EQ(core.query("root", "isconnected", HELICS_SEQUENCING_MODE_ORDERED), "true");
+
+    auto rootState = [&core]() {
+        return helics::fileops::loadJsonStr(
+            core.query("root", "current_state", HELICS_SEQUENCING_MODE_ORDERED));
+    };
+    auto childState = [&brokers, &core](std::size_t hop) {
+        auto& broker = brokers[hop];
+        const bool nextIsCore = hop + 1 == brokers.size();
+        const auto& childName =
+            nextIsCore ? core.getIdentifier() : brokers[hop + 1].getIdentifier();
+        const auto state = helics::fileops::loadJsonStr(
+            broker.query("broker", "current_state", HELICS_SEQUENCING_MODE_ORDERED));
+        const auto& children = state.at(nextIsCore ? "cores" : "brokers");
+        const auto child = std::ranges::find_if(children, [&childName](const auto& entry) {
+            return entry.at("attributes").at("name") == childName;
+        });
+        return child != children.end() ? *child : nlohmann::json{};
+    };
+    core.setReadyToInit();
+    // The ordered query to the root follows the init request through the broker chain.
+    auto state = rootState();
+    ASSERT_EQ(state.at("state"), "connected");
+    ASSERT_TRUE(state.at("federates").empty());
+    for (std::size_t hop = 0; hop < brokers.size(); ++hop) {
+        SCOPED_TRACE(brokers[hop].getIdentifier());
+        const auto child = childState(hop);
+        ASSERT_FALSE(child.is_null());
+        ASSERT_EQ(child.at("state"), "init_requested");
+    }
+
+    helics::Federate fed("late_fed", core);
+    for (std::size_t hop = 0; hop < brokers.size(); ++hop) {
+        SCOPED_TRACE(brokers[hop].getIdentifier());
+        const auto child = childState(hop);
+        ASSERT_FALSE(child.is_null());
+        EXPECT_EQ(child.at("state"), "connected");
+
+        // Deliver an old init request after registration to each broker in the chain.
+        auto receiver =
+            std::dynamic_pointer_cast<helics::CoreBroker>(brokers[hop].getCopyofBrokerPointer());
+        ASSERT_TRUE(receiver);
+        helics::ActionMessage staleInit(helics::CMD_INIT);
+        staleInit.source_id =
+            helics::GlobalFederateId{child.at("attributes").at("id").get<int32_t>()};
+        receiver->addActionMessage(std::move(staleInit));
+        EXPECT_EQ(childState(hop).at("state"), "connected");
+    }
+    EXPECT_EQ(rootState().at("state"), "connected");
+
+    ASSERT_NO_THROW(fed.enterInitializingMode());
+    EXPECT_EQ(fed.getCurrentMode(), helics::Federate::Modes::INITIALIZING);
+
+    state = rootState();
+    EXPECT_EQ(state.at("state"), "operating");
+    EXPECT_EQ(state.at("federates").size(), 1U);
+    if (brokers.size() == 1) {
+        // The root rejects a new static registration after granting init.
+        auto root =
+            std::dynamic_pointer_cast<helics::CoreBroker>(brokers.front().getCopyofBrokerPointer());
+        ASSERT_TRUE(root);
+        helics::ActionMessage lateRegistration(helics::CMD_REG_FED);
+        lateRegistration.source_id = helics::GlobalFederateId{
+            state.at("cores").at(0).at("attributes").at("id").get<int32_t>()};
+        lateRegistration.name("too_late");
+        helics::setActionFlag(lateRegistration, helics::reset_init_flag);
+        root->addActionMessage(std::move(lateRegistration));
+        state = rootState();
+        EXPECT_EQ(state.at("state"), "operating");
+        EXPECT_EQ(state.at("federates").size(), 1U);
+        EXPECT_EQ(state.at("cores").at(0).at("state"), "init_requested");
+    }
+    fed.finalize();
+}
+
+INSTANTIATE_TEST_SUITE_P(brokers,
+                         LateFederateRegistration,
+                         ::testing::Range(0, 4),
+                         [](const ::testing::TestParamInfo<int>& info) {
+                             return "intermediates_" + std::to_string(info.param);
+                         });
+
+TEST(federate, late_registration_in_multiple_broker_branches)
+{
+    constexpr auto inproc = helics::CoreType::INPROC;
+    helics::BrokerApp root(inproc, "--root --federates=2 --tick=100ms --maxcosimduration=5s");
+    ASSERT_TRUE(root.connect());
+    helics::BrokerApp parent(inproc, "--federates=0 --broker=" + root.getIdentifier());
+    ASSERT_TRUE(parent.connect());
+    helics::BrokerApp child(inproc, "--federates=0 --broker=" + parent.getIdentifier());
+    ASSERT_TRUE(child.connect());
+
+    helics::CoreApp firstCore(inproc, "--federates=0 --broker=" + child.getIdentifier());
+    helics::CoreApp secondCore(inproc, "--federates=0 --broker=" + parent.getIdentifier());
+    ASSERT_TRUE(firstCore.connect());
+    ASSERT_TRUE(secondCore.connect());
+    for (auto* core : {&firstCore, &secondCore}) {
+        ASSERT_EQ(core->query("root", "isconnected", HELICS_SEQUENCING_MODE_ORDERED), "true");
+        core->setReadyToInit();
+        EXPECT_EQ(core->query("root", "isinit", HELICS_SEQUENCING_MODE_ORDERED), "false");
+    }
+    const auto state = helics::fileops::loadJsonStr(
+        root.query("broker", "current_state", HELICS_SEQUENCING_MODE_ORDERED));
+    ASSERT_EQ(state.at("brokers").at(0).at("state"), "init_requested");
+
+    helics::Federate first("late_fed_one", firstCore);
+    helics::Federate second("late_fed_two", secondCore);
+    // Each branch has reset readiness once, while their common parent has reset it twice.
+    first.enterInitializingModeAsync();
+    ASSERT_NO_THROW(second.enterInitializingMode());
+    ASSERT_NO_THROW(first.enterInitializingModeComplete());
+    EXPECT_EQ(first.getCurrentMode(), helics::Federate::Modes::INITIALIZING);
+    EXPECT_EQ(second.getCurrentMode(), helics::Federate::Modes::INITIALIZING);
+    first.finalize();
+    second.finalize();
+}
+#endif
 
 TEST(federate, single_core_federate)
 {

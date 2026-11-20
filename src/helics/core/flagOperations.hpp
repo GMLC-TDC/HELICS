@@ -86,6 +86,8 @@ enum FilterFlags {
 
 /// @brief flags used when connecting a federate/core/broker to a federation
 enum ConnectionFlags : uint16_t {
+    /// the registration requires a new initialization request from the sending core or broker
+    reset_init_flag = 2,
     /// flag indicating that message comes from a core vs a broker
     core_flag = 3,
     /// flag indicating to use global timing (overload of indicator flag)

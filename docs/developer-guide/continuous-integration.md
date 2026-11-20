@@ -7,7 +7,7 @@ The CI configuration is defined in the repository. This page summarizes the jobs
 Pushes (except `pre-commit/*`) and pull requests targeting `main` run the primary build-and-test matrix:
 
 - Linux containers: Ubuntu 24.04 default, GCC 11, Clang 15, and Clang 18. The Ubuntu default and GCC 11 jobs enable MPI and encryption.
-- macOS 14 and macOS 15.
+- macOS 15 and macOS 26 on Intel runners.
 - Windows: Visual Studio 2022 32-bit and 64-bit, plus Visual Studio 2026 64-bit.
 
 The daily pipeline runs the full Linux test suite, a Linux build using ZeroMQ as a subproject, and a 64-bit Visual Studio 2022 build. Windows jobs use Boost 1.83.
@@ -25,7 +25,7 @@ GitHub Actions runs the following repository workflows:
 - MSYS2 builds using both MinGW and MSYS Makefiles on pull requests to `main`, relevant branch pushes, and a daily schedule.
 - Code coverage on `main` pushes and scheduled runs; pull-request coverage runs for branches whose names begin with `coverage_`.
 - Address, memory, and thread sanitizer builds on the daily schedule.
-- Scheduled benchmark and release-artifact builds, plus release packaging when a GitHub release is published.
+- Scheduled benchmark and release-artifact builds, plus release packaging when a GitHub release is published. The macOS jobs use `macos-26` on Apple silicon.
 - Docker image builds for `main`, Docker-focused branches, tags, and releases.
 - CodeQL, generated SWIG-interface updates, image compression, and release-checklist automation.
 
