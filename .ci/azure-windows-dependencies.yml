@@ -32,11 +32,13 @@ steps:
 
   - bash: |
       set -e
+      # GNU tar interprets backslash escapes in its -C argument.
+      boost_dir=$(cygpath -u "$BOOST_ROOT")
       archive=$(mktemp)
       trap 'rm -f -- "$archive"' EXIT
       curl --fail --location --output "$archive" "$BOOST_URL"
-      mkdir -p "$BOOST_ROOT"
-      tar -xjf "$archive" -C "$BOOST_ROOT" --strip-components=1
-      test -s "$BOOST_ROOT/boost/version.hpp"
+      mkdir -p "$boost_dir"
+      tar -xjf "$archive" -C "$boost_dir" --strip-components=1
+      test -s "$boost_dir/boost/version.hpp"
     condition: and(succeeded(), ne(variables.BOOST_CACHE_RESTORED, 'true'))
     displayName: Install Boost
