@@ -25,6 +25,7 @@ Everything within a major version number should be code compatible (with the exc
 - Fixed an initialization stall when a federate joined a core that had already reported itself ready while empty.
 - Preserve the configured broker connection timeout when converting it to milliseconds.
 - Fixed the release build workflow so Windows and macOS release packages are built again; the retired `windows-2019` runners left jobs waiting until they timed out, and build failures could pass without producing a package.
+- Fixed a Windows C++ shared app library build failure caused by an incomplete cloning filter type.
 - Limit bundled ZeroMQ and HELICS C shared library exports on Linux to their public APIs, preventing static C++ runtime symbols from colliding with other libraries in the same process.
 - Hide statically linked C++ runtime symbols in optional Linux C++ shared libraries while keeping their public C++ API exported.
 
