@@ -22,6 +22,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ### Fixed
 
+- Fixed a timing stall when federates requested `HELICS_TIME_MAXTIME` while a dependency still reported their last granted time.
 - Fixed an initialization stall when a federate joined a core that had already reported itself ready while empty.
 - Preserve the configured broker connection timeout when converting it to milliseconds.
 - Fixed the release build workflow so Windows and macOS release packages are built again; the retired `windows-2019` runners left jobs waiting until they timed out, and build failures could pass without producing a package.

@@ -65,6 +65,8 @@ jobs:
     variables:
       BOOST_ROOT: $(Pipeline.Workspace)/ci-libs/boost
       BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.83.0/boost_1_83_0.tar.bz2/download
+      # Bypass the tar subprocess when saving the cache on Windows.
+      AZP_CACHING_CONTENT_FORMAT: Files
 
     steps:
       # -----------------------

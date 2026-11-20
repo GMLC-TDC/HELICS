@@ -41,6 +41,8 @@ The [section on federates](./federates.md) addressed the data-exchange responsib
 
 HELICS co-simulations end under one of two conditions: when all federates have been granted the time of `HELICS_TIME_MAXTIME` or when all federates have notified the broker (via their core) that they are terminating. The termination of the federates triggers a cascade of terminations throughout the federation: once all the federates associated with a core have terminated, the core itself terminates and once all cores associated with a broker have terminated, the broker itself terminates. This concludes the co-simulation and leaves the original models, configuration files, executing simulators, and results files in place for review.
 
+An interruptible federate that requests `HELICS_TIME_MAXTIME` may first receive an earlier grant for pending data. To drain those updates before shutdown, process the data at each earlier grant and request `HELICS_TIME_MAXTIME` again.
+
 ## Timing Configuration Options
 
 Managing the timing of federate co-simulation is one of the most important and often challenging aspects of co-simulation. It is not uncommon for a federation to require that certain federates run at particular times or after certain other federates. HELICS provides a wide variety of timing parameters that can be configured for each federate (see the "Timing" section of the [Configuration Options Reference](../../references/configuration_options_reference.md#timing-options)).
