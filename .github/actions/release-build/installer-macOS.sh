@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # This uses bash variable substitution in a few places
 # 1. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
 
@@ -6,11 +7,11 @@
 unset VCPKG_ROOT
 
 # GitHub's macOS runners may come with extra untrusted taps we do not use.
-brew untap aws/tap azure/bicep || true
+brew untap --force aws/tap azure/bicep || true
 
 brew install swig boost
 mkdir build && cd build || exit
-cmake -DCMAKE_BUILD_TYPE=Release -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_JAVA_INTERFACE=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_APP_EXECUTABLES=ON -DHELICS_BUILD_APP_LIBRARY=ON -DBUILD_TESTING=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" ..
+cmake -DCMAKE_BUILD_TYPE=Release -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_JAVA_INTERFACE=ON -DHELICS_DISABLE_WEBSERVER=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_APP_EXECUTABLES=ON -DHELICS_BUILD_APP_LIBRARY=ON -DBUILD_TESTING=OFF -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" ..
 cmake --build . --config Release
 cpack_dir="$(command -v cmake)"
 cpack_dir="${cpack_dir%/cmake}"

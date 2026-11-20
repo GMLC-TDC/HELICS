@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # This uses bash variable substitution in a few places
 # 1. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
 
@@ -6,7 +7,7 @@
 unset VCPKG_ROOT
 
 # GitHub's macOS runners may come with extra untrusted taps we do not use.
-brew untap aws/tap azure/bicep || true
+brew untap --force aws/tap azure/bicep || true
 
 brew install swig boost
 mkdir build && cd build || exit

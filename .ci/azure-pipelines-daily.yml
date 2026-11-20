@@ -7,6 +7,13 @@ schedules:
       include:
         - main
 
+parameters:
+  - name: windowsBuildJobLimit
+    displayName: Windows build job limit (0 uses the runner CPU count)
+    type: number
+    default: 4
+    values: [0, 4]
+
 jobs:
   - job: Linux
     strategy:
@@ -26,16 +33,12 @@ jobs:
     steps:
       - bash: |
           unset VCPKG_ROOT
-          if [[ "$TEST_CONFIG" == "ci" ]]; then
-            source scripts/setup-filter-test-backtrace.sh
-          fi
           source scripts/setup-helics-ci-options.sh
           mkdir -p build && cd build
           ../scripts/ci-build.sh
         env:
           MAKEFLAGS: "-j 4"
           CMAKE_GENERATOR: "Unix Makefiles"
-          TEST_CONFIG: $[variables['test_config']]
           USE_SWIG: "true"
           ZMQ_SUBPROJECT: $[variables['zmq_subproject']]
           ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]
@@ -67,23 +70,7 @@ jobs:
       # -----------------------
       # Install dependencies
       # -----------------------
-      - task: Cache@2
-        continueOnError: true
-        inputs:
-          path: $(BOOST_ROOT)
-          key: '"boost-1.83"'
-          cacheHitVar: BOOST_CACHE_RESTORED
-        displayName: Restore Boost cache
-      - bash: |
-          set -e
-          work_dir=$(mktemp -d)
-          cd "$work_dir"
-          curl --fail --location --output "download.tar.bz2" "$BOOST_URL"
-          tar xfj "download.tar.bz2"
-          mkdir -p "$BOOST_ROOT"
-          cp -r boost_*/* "$BOOST_ROOT"
-        condition: and(succeeded(), ne(variables.BOOST_CACHE_RESTORED, 'true'))
-        displayName: Install Boost
+      - template: azure-windows-dependencies.yml
       - bash: swig -version
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
         displayName: Show swig version
@@ -98,7 +85,12 @@ jobs:
         displayName: Show environment info
       - task: CMake@1
         inputs:
-          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=$(enablePackageBuild) -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=$(buildExamples) -DHELICS_DISABLE_VCPKG=ON -DHELICS_EMBEDDED_DEBUG_INFO=external $(extraFlags) ..
+          cmakeArgs: >-
+            -A $(vsArch) -DBOOST_INSTALL_PATH="$(BOOST_ROOT)"
+            -DHELICS_ENABLE_SUBMODULE_UPDATE=OFF -DHELICS_ENABLE_SWIG=ON
+            -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=$(enablePackageBuild)
+            -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=$(buildExamples)
+            -DHELICS_DISABLE_VCPKG=ON -DHELICS_EMBEDDED_DEBUG_INFO=external $(extraFlags) ..
         displayName: "Configure HELICS"
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
@@ -112,10 +104,18 @@ jobs:
       # Build HELICS
       # -----------------------
       - bash: |
-          export CMAKE_BUILD_PARALLEL_LEVEL="${NUMBER_OF_PROCESSORS:-8}"
-          cmake --build . --parallel "$CMAKE_BUILD_PARALLEL_LEVEL" --config Release
+          runner_cpus=${NUMBER_OF_PROCESSORS:-8}
+          build_jobs=$runner_cpus
+          if (( WINDOWS_BUILD_JOB_LIMIT > 0 && WINDOWS_BUILD_JOB_LIMIT < runner_cpus )); then
+            build_jobs=$WINDOWS_BUILD_JOB_LIMIT
+          fi
+          echo "Building with $build_jobs jobs on $runner_cpus logical CPUs"
+          TIMEFORMAT='Release build wall time: %3R seconds'
+          time cmake --build . --parallel "$build_jobs" --config Release
         displayName: "Build HELICS"
         workingDirectory: build
+        env:
+          WINDOWS_BUILD_JOB_LIMIT: "${{ parameters.windowsBuildJobLimit }}"
 
       # -----------------------
       # Package HELICS

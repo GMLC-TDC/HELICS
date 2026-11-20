@@ -13,6 +13,10 @@ docs/xml
 docs/latex
 vcpkg_installed/
 
+# Local issue reproducers
+/.codex_issue_*/
+/local_issue_reproducers/
+
 #=============================================================================
 # Generic ignores
 #=============================================================================
@@ -252,7 +256,6 @@ tags
 .project
 # End of https://www.gitignore.io/api/c++,c,python
 /build/Download/libzmq
-/local_issue_reproducers/issue2841_windows/
 
 ### MATLAB ###
 *.mex*

@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../application_api/Endpoints.hpp"
+#include "../application_api/Filters.hpp"
 #include "../application_api/Subscriptions.hpp"
 #include "helicsApp.hpp"
 
@@ -19,8 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-class CloningFilter;
-
 namespace apps {
     /** class designed to capture data points from a set of subscriptions or endpoints*/
     class HELICS_CXX_EXPORT Tracer: public App {

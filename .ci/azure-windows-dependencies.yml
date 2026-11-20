@@ -1,0 +1,44 @@
+steps:
+  - bash: |
+      submodules=(
+        ThirdParty/concurrency
+        ThirdParty/containers
+        ThirdParty/fmtlib
+        ThirdParty/googletest
+        ThirdParty/libzmq
+        ThirdParty/networking
+        ThirdParty/spdlog
+        ThirdParty/toml
+        ThirdParty/units
+        ThirdParty/utilities
+      )
+      if [[ " $HELICS_CMAKE_EXTRA_FLAGS " != *" -DHELICS_DISABLE_ASIO=ON "* ]]; then
+        submodules+=(ThirdParty/asio)
+      fi
+      git submodule update --init --checkout --depth 1 --jobs 4 -- "${submodules[@]}"
+    displayName: Fetch pinned submodules
+    workingDirectory: $(Build.SourcesDirectory)
+    env:
+      HELICS_CMAKE_EXTRA_FLAGS: $(extraFlags)
+
+  - task: Cache@2
+    continueOnError: true
+    inputs:
+      path: $(BOOST_ROOT)
+      key: '"boost-1.83"'
+      cacheHitVar: BOOST_CACHE_RESTORED
+      saveOnPartialSuccess: true
+    displayName: Restore Boost cache
+
+  - bash: |
+      set -e
+      # GNU tar interprets backslash escapes in its -C argument.
+      boost_dir=$(cygpath -u "$BOOST_ROOT")
+      archive=$(mktemp)
+      trap 'rm -f -- "$archive"' EXIT
+      curl --fail --location --output "$archive" "$BOOST_URL"
+      mkdir -p "$boost_dir"
+      tar -xjf "$archive" -C "$boost_dir" --strip-components=1
+      test -s "$boost_dir/boost/version.hpp"
+    condition: and(succeeded(), ne(variables.BOOST_CACHE_RESTORED, 'true'))
+    displayName: Install Boost

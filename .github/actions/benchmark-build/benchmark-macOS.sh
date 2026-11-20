@@ -16,7 +16,7 @@ if [ -f .gitmodules ]; then
 fi
 
 # GitHub's macOS runners may come with extra untrusted taps we do not use.
-brew untap aws/tap azure/bicep || true
+brew untap --force aws/tap azure/bicep || true
 
 brew install boost
 mkdir build && cd build || exit
