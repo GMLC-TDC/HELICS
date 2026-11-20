@@ -33,16 +33,12 @@ jobs:
     steps:
       - bash: |
           unset VCPKG_ROOT
-          if [[ "$TEST_CONFIG" == "ci" ]]; then
-            source scripts/setup-filter-test-backtrace.sh
-          fi
           source scripts/setup-helics-ci-options.sh
           mkdir -p build && cd build
           ../scripts/ci-build.sh
         env:
           MAKEFLAGS: "-j 4"
           CMAKE_GENERATOR: "Unix Makefiles"
-          TEST_CONFIG: $[variables['test_config']]
           USE_SWIG: "true"
           ZMQ_SUBPROJECT: $[variables['zmq_subproject']]
           ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]

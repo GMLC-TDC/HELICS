@@ -50,7 +50,6 @@ jobs:
     steps:
       - bash: |
           unset VCPKG_ROOT
-          source scripts/setup-filter-test-backtrace.sh
           source scripts/setup-helics-ci-options.sh
           mkdir -p build && cd build
           ../scripts/ci-build.sh
