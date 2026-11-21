@@ -52,8 +52,9 @@ TEST_P(filter_single_type_test, message_filter_registration)
 {
     const auto* coreType = GetParam();
     const auto checkpoint = [coreType](const char* stage) {
-        std::fprintf(stderr, "[message_filter_registration:%s] %s\n", coreType, stage);
-        std::fflush(stderr);
+        static_cast<void>(
+            std::fprintf(stderr, "[message_filter_registration:%s] %s\n", coreType, stage));
+        static_cast<void>(std::fflush(stderr));
     };
     auto broker = AddBroker(coreType, 2);
 

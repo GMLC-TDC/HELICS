@@ -25,7 +25,7 @@ void printCrashTrace(int signalNumber)
     ::backtrace_symbols_fd(frames, count, STDERR_FILENO);
 
     // SA_RESETHAND restores the default action, preserving the fatal signal for CTest.
-    ::raise(signalNumber);
+    static_cast<void>(::raise(signalNumber));
 }
 
 void enableCrashTrace()
@@ -38,7 +38,7 @@ void enableCrashTrace()
         if (::sigaction(signalNumber, nullptr, &previous) == 0 && previous.sa_handler == SIG_DFL) {
             struct sigaction action{};
             action.sa_handler = printCrashTrace;
-            ::sigemptyset(&action.sa_mask);
+            static_cast<void>(::sigemptyset(&action.sa_mask));
             action.sa_flags = static_cast<int>(SA_RESETHAND | SA_NODEFER);
             static_cast<void>(::sigaction(signalNumber, &action, nullptr));
         }
@@ -57,5 +57,9 @@ struct globalTestConfig: public ::testing::Environment {
     virtual void TearDown() override { helics::cleanupHelicsLibrary(); }
 };
 
-// register the global setup and teardown structure
-::testing::Environment* const foo_env = ::testing::AddGlobalTestEnvironment(new globalTestConfig);
+int main(int argc, char* argv[])
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    ::testing::AddGlobalTestEnvironment(new globalTestConfig);
+    return RUN_ALL_TESTS();
+}
