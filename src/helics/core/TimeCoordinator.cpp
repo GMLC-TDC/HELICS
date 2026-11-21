@@ -863,6 +863,20 @@ static inline Time checkAdd(Time val, Time increment)
 
 void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
 {
+    const bool terminalRequest = time_requested >= cTerminationTime;
+    const bool useUpstreamTiming = !globalTime && (info.event_triggered || terminalRequest);
+    const bool boundTerminalTiming =
+        !globalTime && terminalRequest && iterating == IterationRequest::NO_ITERATIONS;
+    // A peer can still report our last grant while we are waiting for MAXTIME. Advertising
+    // that grant back can leave both peers waiting. A non-iterative grant must advance,
+    // so the earliest output is the next legal grant plus the output delay.
+    const auto earliestOutputTime =
+        boundTerminalTiming ? checkAdd(getNextPossibleTime(), info.outputDelay) : timeZero;
+    const auto applyOutputFloor = [earliestOutputTime](ActionMessage& request) {
+        request.Te = std::max(request.Te, earliestOutputTime);
+        request.Tdemin = std::max(request.Tdemin, earliestOutputTime);
+    };
+
     ActionMessage upd(CMD_TIME_REQUEST);
     upd.source_id = mSourceId;
     upd.actionTime = time_next;
@@ -875,23 +889,16 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
     } else if (time_requested > time_next) {
         setActionFlag(upd, interrupted_flag);
     }
-    upd.Te = checkAdd(time_exec, info.outputDelay);
-    if (!globalTime && (info.event_triggered || time_requested >= cTerminationTime)) {
-        upd.Te = std::min(upd.Te, checkAdd(upstream.Te, info.outputDelay));
-        if (upd.Te < timeZero) {
-            upd.Te = timeZero;
-        }
-        upd.actionTime = std::min(upd.actionTime, upd.Te);
-    }
-    upd.Tdemin = std::min(checkAdd(upstream.Te, info.outputDelay), upd.Te);
-    if (!globalTime && (info.event_triggered || time_requested >= cTerminationTime)) {
-        upd.Tdemin = std::min(upd.Tdemin, checkAdd(upstream.minDe, info.outputDelay));
-        if (upd.Tdemin < timeZero) {
-            upd.Tdemin = timeZero;
-        }
-        if (upd.Tdemin < upd.actionTime) {
-            upd.actionTime = upd.Tdemin;
-        }
+    const auto localEventTime = checkAdd(time_exec, info.outputDelay);
+    const auto firstEventTime = std::min(localEventTime, checkAdd(upstream.Te, info.outputDelay));
+    upd.Te = localEventTime;
+    upd.Tdemin = firstEventTime;
+    if (useUpstreamTiming) {
+        upd.Te = firstEventTime;
+        upd.Tdemin = std::min(firstEventTime, checkAdd(upstream.minDe, info.outputDelay));
+        applyOutputFloor(upd);
+        // Tdemin includes the earliest event (Te), so it also bounds the advertised next time.
+        upd.actionTime = std::min(upd.actionTime, upd.Tdemin);
     }
     upd.setExtraData(upstream.minFed.baseValue());
 
@@ -906,22 +913,22 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
     if (triggered) {
         setActionFlag(upd, destination_target);
     }
-    auto check = checkAndSendTimeRequest(upd, upstream.minFed);
-    if (check.first) {
-        if (check.second) {
-            if (upstream.minFed.isValid()) {
-                upd.dest_id = upstream.minFed;
-                upd.setExtraData(GlobalFederateId{}.baseValue());
-                upd.setExtraDestData(upstream.responseSequenceCounter);
-                if (!globalTime && (info.event_triggered || time_requested >= cTerminationTime)) {
-                    upd.Te = checkAdd(time_exec, info.outputDelay);
-                    upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt, info.outputDelay));
-                }
-                upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
-                sendMessageFunction(upd);
-            }
+    const auto [changed, skippedMinFed] = checkAndSendTimeRequest(upd, upstream.minFed);
+    if (changed && skippedMinFed && upstream.minFed.isValid()) {
+        // Use the alternate event time so this dependency does not receive its own event
+        // time back. The same local output bound applies to these replacement fields.
+        upd.dest_id = upstream.minFed;
+        upd.setExtraData(GlobalFederateId{}.baseValue());
+        upd.setExtraDestData(upstream.responseSequenceCounter);
+        if (useUpstreamTiming) {
+            upd.Te = std::min(localEventTime, checkAdd(upstream.TeAlt, info.outputDelay));
         }
-    } else if (triggerFed.isValid()) {
+        upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
+        if (boundTerminalTiming) {
+            applyOutputFloor(upd);
+        }
+        sendMessageFunction(upd);
+    } else if (!changed && triggerFed.isValid()) {
         upd.dest_id = triggerFed;
         const auto* dep = dependencies.getDependencyInfo(triggerFed);
         if (dep->dependent) {
