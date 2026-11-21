@@ -63,6 +63,15 @@ add_executable(
                           ${common_test_sources}
 )
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    include(CheckCXXSymbolExists)
+    check_cxx_symbol_exists(backtrace_symbols_fd "execinfo.h" HELICS_TEST_HAVE_BACKTRACE)
+    if(HELICS_TEST_HAVE_BACKTRACE)
+        target_compile_definitions(filterTranslatorTests PRIVATE HELICS_TEST_CRASH_TRACE)
+        target_link_options(filterTranslatorTests PRIVATE -rdynamic)
+    endif()
+endif()
+
 set(testExecutables applicationApiTests valueFederateTests messageFederateTests
                     filterTranslatorTests
 )
