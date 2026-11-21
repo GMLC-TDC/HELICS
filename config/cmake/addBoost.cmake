@@ -11,8 +11,13 @@ show_variable(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PA
 mark_as_advanced(BOOST_INSTALL_PATH)
 
 set(BOOST_MINIMUM_VERSION 1.83)
-set(boost_roots ${Boost_ROOT} $ENV{Boost_ROOT} ${BOOST_ROOT} $ENV{BOOST_ROOT}
-                ${BOOST_INSTALL_PATH} $ENV{BOOST_INSTALL_PATH}
+set(boost_roots
+    ${Boost_ROOT}
+    $ENV{Boost_ROOT}
+    ${BOOST_ROOT}
+    $ENV{BOOST_ROOT}
+    ${BOOST_INSTALL_PATH}
+    $ENV{BOOST_INSTALL_PATH}
 )
 list(FILTER boost_roots EXCLUDE REGEX "(^$|-NOTFOUND$)")
 
@@ -74,9 +79,8 @@ endforeach()
 
 if(NOT Boost_NO_BOOST_CMAKE)
     find_package(
-        Boost ${BOOST_MINIMUM_VERSION} QUIET CONFIG
-        COMPONENTS ${BOOST_REQUIRED_LIBRARIES}
-        HINTS ${boost_package_hints}
+        Boost ${BOOST_MINIMUM_VERSION} QUIET CONFIG COMPONENTS ${BOOST_REQUIRED_LIBRARIES} HINTS
+                                                               ${boost_package_hints}
     )
 endif()
 
@@ -94,8 +98,9 @@ if(NOT Boost_FOUND AND NOT BOOST_REQUIRED_LIBRARIES)
         HINTS ${boost_roots}
         PATH_SUFFIXES include
     )
-    if(EXISTS "${Boost_INCLUDE_DIR}/boost/version.hpp"
-       AND EXISTS "${Boost_INCLUDE_DIR}/boost/config.hpp")
+    if(EXISTS "${Boost_INCLUDE_DIR}/boost/version.hpp" AND EXISTS
+                                                           "${Boost_INCLUDE_DIR}/boost/config.hpp"
+    )
         file(STRINGS "${Boost_INCLUDE_DIR}/boost/version.hpp" boost_version_line
              REGEX "^#define BOOST_VERSION [0-9]+"
         )
@@ -104,12 +109,16 @@ if(NOT Boost_FOUND AND NOT BOOST_REQUIRED_LIBRARIES)
             math(EXPR Boost_VERSION_MAJOR "${Boost_VERSION_MACRO} / 100000")
             math(EXPR Boost_VERSION_MINOR "${Boost_VERSION_MACRO} / 100 % 1000")
             math(EXPR Boost_VERSION_PATCH "${Boost_VERSION_MACRO} % 100")
-            set(Boost_VERSION "${Boost_VERSION_MAJOR}.${Boost_VERSION_MINOR}.${Boost_VERSION_PATCH}")
+            set(Boost_VERSION
+                "${Boost_VERSION_MAJOR}.${Boost_VERSION_MINOR}.${Boost_VERSION_PATCH}"
+            )
 
             if(Boost_VERSION VERSION_GREATER_EQUAL BOOST_MINIMUM_VERSION)
                 if(NOT TARGET Boost::headers)
                     add_library(Boost::headers INTERFACE IMPORTED)
-                    target_include_directories(Boost::headers SYSTEM INTERFACE "${Boost_INCLUDE_DIR}")
+                    target_include_directories(
+                        Boost::headers SYSTEM INTERFACE "${Boost_INCLUDE_DIR}"
+                    )
                 endif()
                 if(NOT TARGET Boost::boost)
                     add_library(Boost::boost INTERFACE IMPORTED)
@@ -127,9 +136,9 @@ endif()
 if(NOT Boost_FOUND)
     message(
         FATAL_ERROR
-        "Could not find Boost ${BOOST_MINIMUM_VERSION} or newer. "
-        "Set BOOST_INSTALL_PATH to the Boost installation directory or Boost_DIR to the "
-        "directory containing BoostConfig.cmake."
+            "Could not find Boost ${BOOST_MINIMUM_VERSION} or newer. "
+            "Set BOOST_INSTALL_PATH to the Boost installation directory or Boost_DIR to the "
+            "directory containing BoostConfig.cmake."
     )
 endif()
 
