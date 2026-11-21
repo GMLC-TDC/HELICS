@@ -11,24 +11,36 @@ Everything within a major version number should be code compatible (with the exc
 
 ## Unreleased
 
-### Changed
+## [3.7.1][] - 2026-11-22
 
-- Lowered the default queued value buffer warning and backpressure threshold from 100 MiB to 50 MiB. The urgent threshold is 100 MiB, and capacity is restored below 25 MiB by default.
-- Release packages: the Windows installers and shared libraries are now built with Visual Studio 2026, and the `msvc2019` package is replaced by an `msvc2026` package (the `msvc2022` package is unchanged). The Windows and Linux release builds use Boost 1.92.0. The macOS installer no longer includes the embedded web server, which is planned for removal.
+This patch adds backpressure for queued value updates, fixes broker initialization and timeout handling, and updates release builds.
 
 ### Added
 
-- Added internal receiver-to-publisher buffers-at-capacity and buffer-capacity-restored messages for queued future values. Capacity messages carry the receiver's granted time and an advisory or urgent level, and are omitted for declared return publication or endpoint connections. Publishers hold later time grants when they are eight steps ahead for advisory pressure or four steps ahead for urgent pressure, until capacity is restored. Without a configured period or meaningful time delta, the step is inferred from recent grants or the pending request.
+- Added backpressure to limit memory growth from queued future value updates. Receivers report their granted time in advisory or urgent notices to publishers without a declared return publication or endpoint connection. A publisher holds its next time grant when it is at least eight time steps ahead of the reported time for an advisory notice or four for an urgent notice. HELICS uses the configured period or time delta to measure the gap and falls back to recent grants or the pending request when needed. The hold is released when the receiver reports that capacity is restored.
+
+### Changed
+
+- Lowered the default `value_buffer_warning` threshold from 100 MiB to 50 MiB. With the default setting, urgent backpressure begins at 100 MiB and clears below 25 MiB. Set `value_buffer_warning` to `0` to disable both warnings and backpressure.
+- Aligned CMake policy support through 4.5 across the main build, standalone builds, and package tests. The minimum CMake version is 3.22.
+- Updated bundled Asio to 1.39.0 and fmt to 12.2.1. Windows and Linux release builds use Boost 1.92.0.
+- Windows installers and shared libraries now use Visual Studio 2026. The MSVC archives are available as `msvc2022` and `msvc2026`, with `msvc2026` replacing `msvc2019`.
 
 ### Fixed
 
 - Fixed a timing stall when federates requested `HELICS_TIME_MAXTIME` while a dependency still reported their last granted time.
 - Fixed an initialization stall when a federate joined a core that had already reported itself ready while empty.
-- Preserve the configured broker connection timeout when converting it to milliseconds.
-- Fixed the release build workflow so Windows and macOS release packages are built again; the retired `windows-2019` runners left jobs waiting until they timed out, and build failures could pass without producing a package.
+- Fixed the broker connection monitor to honor the configured timeout when converting it to milliseconds.
+- Fixed Boost discovery on Windows with recent CMake versions, including Boost 1.92 binary packages and header-only installations.
+- Fixed standalone test and benchmark configurations so they generate their intended targets.
+- Restored Windows and macOS release builds by updating the runner images. The workflow now fails when a build or upload fails or an expected package is missing.
 - Fixed a Windows C++ shared app library build failure caused by an incomplete cloning filter type.
-- Limit bundled ZeroMQ and HELICS C shared library exports on Linux to their public APIs, preventing static C++ runtime symbols from colliding with other libraries in the same process.
-- Hide statically linked C++ runtime symbols in optional Linux C++ shared libraries while keeping their public C++ API exported.
+- Restricted exports from bundled ZeroMQ and the HELICS C shared library on Linux to their public APIs to prevent statically linked C++ runtime symbols from colliding with other libraries in the same process.
+- Hid statically linked C++ runtime symbols in optional Linux C++ shared libraries while preserving their public C++ API exports.
+
+### Removed
+
+- Removed the embedded web server from the macOS installer ahead of its planned removal from HELICS.
 
 ## [3.7.0][] - 2026-08-25
 
@@ -576,3 +588,4 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 [3.6.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.6.0
 [3.6.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.6.1
 [3.7.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.7.0
+[3.7.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.7.1

@@ -8,24 +8,20 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 show_variable(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PATH}")
-
 mark_as_advanced(BOOST_INSTALL_PATH)
 
-if(WIN32 AND NOT UNIX_LIKE)
+set(BOOST_MINIMUM_VERSION 1.83)
+set(boost_roots
+    ${Boost_ROOT}
+    $ENV{Boost_ROOT}
+    ${BOOST_ROOT}
+    $ENV{BOOST_ROOT}
+    ${BOOST_INSTALL_PATH}
+    $ENV{BOOST_INSTALL_PATH}
+)
+list(FILTER boost_roots EXCLUDE REGEX "(^$|-NOTFOUND$)")
 
-    if(MSVC_VERSION GREATER_EQUAL 1930)
-        if(CMAKE_SIZE_OF_VOID_P EQUAL 4)
-            set(BOOST_MSVC_LIB_PATH lib32-msvc-14.3)
-        else()
-            set(BOOST_MSVC_LIB_PATH lib64-msvc-14.3)
-        endif()
-    else()
-        if(CMAKE_SIZE_OF_VOID_P EQUAL 4)
-            set(BOOST_MSVC_LIB_PATH lib32-msvc-14.2)
-        else()
-            set(BOOST_MSVC_LIB_PATH lib64-msvc-14.2)
-        endif()
-    endif()
+if(WIN32 AND NOT UNIX_LIKE AND NOT boost_roots)
     set(boost_versions
         boost_1_92_0
         boost_1_91_0
@@ -54,97 +50,62 @@ if(WIN32 AND NOT UNIX_LIKE)
         D:/Libraries
     )
 
-    # create an empty list
-    list(APPEND boost_paths "")
-    mark_as_advanced(BOOST_INSTALL_PATH)
-    foreach(boostver ${boost_versions})
-        foreach(dir ${poss_prefixes})
-            if(IS_DIRECTORY ${dir}/${boostver})
-                if(EXISTS ${dir}/${boostver}/boost/version.hpp)
-                    list(APPEND boost_paths ${dir}/${boostver})
-                endif()
+    foreach(boostver IN LISTS boost_versions)
+        foreach(dir IN LISTS poss_prefixes)
+            if(EXISTS "${dir}/${boostver}/boost/version.hpp")
+                list(APPEND boost_roots "${dir}/${boostver}")
             endif()
         endforeach()
     endforeach()
-    message(STATUS "${boost_paths}")
-    find_path(
-        BOOST_TEST_PATH
-        NAMES boost/version.hpp
-        HINTS ENV BOOST_INSTALL_PATH
-        PATHS ${BOOST_INSTALL_PATH} ${boost_paths}
-    )
-    if(BOOST_TEST_PATH)
-        if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
-            find_path(
-                BOOST_CMAKE_PATH
-                NAMES BoostConfig.cmake
-                PATHS ${BOOST_TEST_PATH}/${BOOST_MSVC_LIB_PATH}/cmake
-                PATH_SUFFIXES
-                    Boost-1.91.0
-                    Boost-1.90.0
-                    Boost-1.89.0
-                    Boost-1.88.0
-                    Boost-1.87.0
-                    Boost-1.86.0
-                    Boost-1.85.0
-                    Boost-1.84.0
-                    Boost-1.83.0
-            )
-            set(Boost_ROOT ${BOOST_CMAKE_PATH})
+endif()
+list(REMOVE_DUPLICATES boost_roots)
+
+set(boost_package_hints)
+foreach(boost_root IN LISTS boost_roots)
+    list(APPEND boost_package_hints "${boost_root}")
+    if(MSVC AND NOT UNIX_LIKE)
+        math(EXPR boost_arch "${CMAKE_SIZEOF_VOID_P} * 8")
+        if(NOT BOOST_REQUIRED_LIBRARIES)
+            # The MSVC binary packages under the same root share their headers.
+            file(GLOB boost_msvc_paths "${boost_root}/lib${boost_arch}-msvc-*/cmake")
+            list(APPEND boost_package_hints ${boost_msvc_paths})
+        elseif(MSVC_VERSION GREATER_EQUAL 1930)
+            list(APPEND boost_package_hints "${boost_root}/lib${boost_arch}-msvc-14.3/cmake")
         else()
-            set(Boost_ROOT ${BOOST_TEST_PATH})
+            list(APPEND boost_package_hints "${boost_root}/lib${boost_arch}-msvc-14.2/cmake")
         endif()
-    endif(BOOST_TEST_PATH)
-endif()
-# Minimum version of Boost required for building a project
-
-if(NOT Boost_ROOT)
-    message(STATUS "Boost root not found ${Boost_ROOT}")
-    if(BOOST_INSTALL_PATH)
-        set(Boost_ROOT "${BOOST_INSTALL_PATH}")
-    elseif($ENV{BOOST_INSTALL_PATH})
-        set(Boost_ROOT "$ENV{BOOST_INSTALL_PATH}")
-    else()
-        set(Boost_ROOT "$ENV{BOOST_ROOT}")
     endif()
-endif()
+endforeach()
 
-if(NOT BOOST_ROOT)
-    set(BOOST_ROOT ${Boost_ROOT})
-    message(STATUS "setting BOOST_ROOT ${BOOST_ROOT}")
-endif()
-
-hide_variable(BOOST_TEST_PATH)
-
-if(NOT BOOST_REQUIRED_LIBRARIES)
-    set(BOOST_REQUIRED_LIBRARIES)
-endif()
-
-set(BOOST_MINIMUM_VERSION 1.83)
-
-if(BOOST_REQUIRED_LIBRARIES)
-    find_package(Boost ${BOOST_MINIMUM_VERSION} QUIET COMPONENTS ${BOOST_REQUIRED_LIBRARIES})
-else()
-    find_package(Boost ${BOOST_MINIMUM_VERSION} QUIET)
-endif()
-
-if(NOT Boost_FOUND)
-    message(STATUS "in boost not found looking in ${Boost_ROOT} and ${BOOST_ROOT}")
-    find_path(Boost_INCLUDE_DIR NAMES boost/version.hpp boost/config.hpp PATHS ${BOOST_ROOT}
-                                                                               ${Boost_ROOT}
+if(NOT Boost_NO_BOOST_CMAKE)
+    find_package(
+        Boost ${BOOST_MINIMUM_VERSION} QUIET CONFIG COMPONENTS ${BOOST_REQUIRED_LIBRARIES} HINTS
+                                                               ${boost_package_hints}
     )
-    message(STATUS "boost Include dir = ${Boost_INCLUDE_DIR}")
-    if(Boost_INCLUDE_DIR)
+endif()
 
-        set(version_file ${Boost_INCLUDE_DIR}/boost/version.hpp)
-        if(EXISTS "${version_file}")
-            file(STRINGS "${version_file}" contents REGEX "#define BOOST_(LIB_)?VERSION ")
-            if(contents MATCHES "#define BOOST_VERSION ([0-9]+)")
-                set(Boost_VERSION_MACRO "${CMAKE_MATCH_1}")
-            endif()
-            if(contents MATCHES "#define BOOST_LIB_VERSION \"([0-9_]+)\"")
-                set(Boost_LIB_VERSION "${CMAKE_MATCH_1}")
-            endif()
+if(NOT Boost_FOUND AND CMAKE_VERSION VERSION_LESS 3.30)
+    if(NOT BOOST_ROOT AND boost_roots)
+        list(GET boost_roots 0 BOOST_ROOT)
+    endif()
+    find_package(Boost ${BOOST_MINIMUM_VERSION} QUIET MODULE COMPONENTS ${BOOST_REQUIRED_LIBRARIES})
+endif()
+
+if(NOT Boost_FOUND AND NOT BOOST_REQUIRED_LIBRARIES)
+    find_path(
+        Boost_INCLUDE_DIR
+        NAMES boost/version.hpp
+        HINTS ${boost_roots}
+        PATH_SUFFIXES include
+    )
+    if(EXISTS "${Boost_INCLUDE_DIR}/boost/version.hpp" AND EXISTS
+                                                           "${Boost_INCLUDE_DIR}/boost/config.hpp"
+    )
+        file(STRINGS "${Boost_INCLUDE_DIR}/boost/version.hpp" boost_version_line
+             REGEX "^#define BOOST_VERSION [0-9]+"
+        )
+        if(boost_version_line MATCHES "^#define BOOST_VERSION ([0-9]+)")
+            set(Boost_VERSION_MACRO "${CMAKE_MATCH_1}")
             math(EXPR Boost_VERSION_MAJOR "${Boost_VERSION_MACRO} / 100000")
             math(EXPR Boost_VERSION_MINOR "${Boost_VERSION_MACRO} / 100 % 1000")
             math(EXPR Boost_VERSION_PATCH "${Boost_VERSION_MACRO} % 100")
@@ -152,25 +113,37 @@ if(NOT Boost_FOUND)
                 "${Boost_VERSION_MAJOR}.${Boost_VERSION_MINOR}.${Boost_VERSION_PATCH}"
             )
 
-            message(STATUS "Boost VERSION ${Boost_VERSION_MACRO}")
+            if(Boost_VERSION VERSION_GREATER_EQUAL BOOST_MINIMUM_VERSION)
+                if(NOT TARGET Boost::headers)
+                    add_library(Boost::headers INTERFACE IMPORTED)
+                    target_include_directories(
+                        Boost::headers SYSTEM INTERFACE "${Boost_INCLUDE_DIR}"
+                    )
+                endif()
+                if(NOT TARGET Boost::boost)
+                    add_library(Boost::boost INTERFACE IMPORTED)
+                    target_link_libraries(Boost::boost INTERFACE Boost::headers)
+                endif()
+                set(Boost_INCLUDE_DIRS "${Boost_INCLUDE_DIR}")
+                set(Boost_VERSION_STRING "${Boost_VERSION}")
+                set(Boost_MINOR_VERSION "${Boost_VERSION_MINOR}")
+                set(Boost_FOUND ON)
+            endif()
         endif()
-        if(Boost_VERSION VERSION_GREATER_EQUAL ${BOOST_MINIMUM_VERSION})
-            add_library(Boost::headers INTERFACE IMPORTED)
-            set_target_properties(
-                Boost::headers PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
-                                          "${Boost_INCLUDE_DIR}"
-            )
-            add_library(Boost::boost INTERFACE IMPORTED)
-            set_target_properties(Boost::boost PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)
-
-            set(Boost_FOUND ON)
-            message(STATUS "Setting boost found to true")
-        endif()
-
     endif()
 endif()
+
 if(NOT Boost_FOUND)
-    message(FATAL_ERROR " Unable to find BOOST library")
+    message(
+        FATAL_ERROR
+            "Could not find Boost ${BOOST_MINIMUM_VERSION} or newer. "
+            "Set BOOST_INSTALL_PATH to the Boost installation directory or Boost_DIR to the "
+            "directory containing BoostConfig.cmake."
+    )
 endif()
+
+set(Boost_INCLUDE_DIR "${Boost_INCLUDE_DIRS}")
+message(STATUS "Found Boost ${Boost_VERSION_STRING}: ${Boost_INCLUDE_DIRS}")
+
 # Minimum version of Boost required for building test suite
 set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})

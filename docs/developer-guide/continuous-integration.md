@@ -12,6 +12,8 @@ Pushes (except `pre-commit/*`) and pull requests targeting `main` run the primar
 
 The daily pipeline runs the full Linux test suite, a Linux build using ZeroMQ as a subproject, and a 64-bit Visual Studio 2022 build. Windows jobs use Boost 1.83.
 
+The filter registration test prints flushed checkpoints around asynchronous finalization and cleanup. On Linux systems with `execinfo.h`, `filterTranslatorTests` also prints the crashing thread's native backtrace to standard error on a fatal signal. CTest includes this output in its failure log. The test handler uses the default signal action after printing and preserves handlers already installed by sanitizers. Stack capture is best effort if the process memory or stack is damaged.
+
 ## CircleCI
 
 For pull requests and branches other than `pre-commit/*`, CircleCI runs install/package checks plus GCC 14, Clang 18, and Clang 18 with C++23. Scheduled jobs on `main` also run OpenSUSE Tumbleweed, a no-ZeroMQ configuration, and an ARM64 build. Benchmarks run three times weekly.

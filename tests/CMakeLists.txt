@@ -25,7 +25,9 @@ if(hasParent)
     endif(NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
 else()
-    cmake_minimum_required(VERSION 3.22...3.31)
+    cmake_minimum_required(VERSION 3.22...4.5)
+    project(HELICS LANGUAGES NONE)
+    include(CTest)
 
     set(HELICS_BUILD_TESTS ON CACHE INTERNAL "")
     set(HELICS_BUILD_JAVA_INTERFACE OFF CACHE INTERNAL "")

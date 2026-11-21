@@ -52,8 +52,9 @@ TEST_P(filter_single_type_test, message_filter_registration)
 {
     const auto* coreType = GetParam();
     const auto checkpoint = [coreType](const char* stage) {
-        std::fprintf(stderr, "[message_filter_registration:%s] %s\n", coreType, stage);
-        std::fflush(stderr);
+        static_cast<void>(
+            std::fprintf(stderr, "[message_filter_registration:%s] %s\n", coreType, stage));
+        static_cast<void>(std::fflush(stderr));
     };
     auto broker = AddBroker(coreType, 2);
 
@@ -87,8 +88,11 @@ TEST_P(filter_single_type_test, message_filter_registration)
     filt4.addSourceTarget("filter0/fout");
     EXPECT_TRUE(filt4.getHandle() != filt3.getHandle());
     checkpoint("filters and endpoints registered");
+    checkpoint("starting message federate finalizeAsync");
     mFed->finalizeAsync();
+    checkpoint("message federate finalizeAsync returned; starting filter federate finalize");
     fFed->finalize();
+    checkpoint("filter federate finalize returned; completing message federate finalization");
     mFed->finalizeComplete();
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     checkpoint("federates finalized");
