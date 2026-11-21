@@ -9,7 +9,7 @@ Windows installers are available with the different [releases](https://github.co
 - Microsoft Visual C++ 2019 version 16.10 or newer (MS Build Tools also works)
 - CMake 3.22 or newer
 - git
-- Boost 1.83 or newer (needs to have boost cmake configuration)
+- Boost headers from version 1.83 or newer
 - MS-MPI v8 or newer (if MPI support is needed)
 
 ## Setup for Visual Studio
@@ -115,9 +115,10 @@ more up-to-date on the latest version of CMake than this guide.
 To avoid problems when building later, the target architecture and Visual
 Studio version should match the version of the Boost libraries you are using.
 
-If you installed Boost into the root of the C or D drives with the
-default location (or the `BOOST_INSTALL_PATH` environment variable has been set), CMake should automatically detect their location. Otherwise the
-location will need to be manually given to CMake through `Boost_INCLUDE_DIR`. This should be used if the Boost version is new and not known to HELICS or you want to be explicit about which boost folder to use.
+HELICS searches common installation locations on the C and D drives. To select a different
+installation, set `BOOST_INSTALL_PATH` as a CMake cache or environment variable. You can also
+set `Boost_DIR` to the directory containing `BoostConfig.cmake`, or set `Boost_INCLUDE_DIR`
+to the directory containing `boost/version.hpp` when using the header-only fallback.
 NOTE: CMake 3.14 and later separate the architecture into a separate field for the generator
 
 A basic call with `cmake` using Visual Studio 2022 on a 64bit Windows machine and installing to a folder called `install` inside the repository would be:

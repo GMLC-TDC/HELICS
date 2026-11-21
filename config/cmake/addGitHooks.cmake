@@ -7,7 +7,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cmake_minimum_required(VERSION 3.4...3.28)
 set(CLANG_FORMAT_MIN_VERSION "7.0")
 
 function(set_git_hooks_enabled)

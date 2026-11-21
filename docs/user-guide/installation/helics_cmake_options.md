@@ -54,7 +54,7 @@ Options effect the connection of libraries used in HELICS and how they are linke
 - `STATIC_STANDARD_LIB`: \[Default=""\] link the standard library as a static library for no additional C++ system dependencies (recognized values are `default`, `static`, and `dynamic`, anything else is treated the same as `default`)
 - `HELICS_ENABLE_SWIG`: \[Default=OFF\] Conditional option if `HELICS_BUILD_MATLAB_INTERACE` or `HELICS_BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used. This enables swig usage in cases where it would not otherwise be necessary.
 - `HELICS_ENABLE_GIT_HOOKS`: install a git hook to check clang format before a push
-- `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake. So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.
+- `Boost_NO_BOOST_CMAKE` \[Default=OFF\] Skips Boost package configuration files. Set this to `ON` to use headers from `BOOST_INSTALL_PATH` when a system `BoostConfig.cmake` would otherwise select a different installation.
 - `HELICS_DISABLE_C_SHARED_LIB`: \[Default=OFF\] Turns off building of the HELICS C shared library. May be used for building apps that only use the (modern) C++ shared library. Using the C++98 wrapper requires the C shared library.
 
 #### ZeroMQ related Options

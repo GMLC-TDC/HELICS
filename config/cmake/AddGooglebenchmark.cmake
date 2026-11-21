@@ -19,7 +19,7 @@ set(HAVE_POSIX_REGEX OFF CACHE INTERNAL "")
 set(HAVE_GNU_POSIX_REGEX OFF CACHE INTERNAL "")
 
 add_subdirectory(
-    ${CMAKE_SOURCE_DIR}/ThirdParty/benchmark ${CMAKE_BINARY_DIR}/ThirdParty/benchmarks
+    "${PROJECT_SOURCE_DIR}/ThirdParty/benchmark" "${PROJECT_BINARY_DIR}/ThirdParty/benchmarks"
     EXCLUDE_FROM_ALL
 )
 
