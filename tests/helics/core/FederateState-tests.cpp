@@ -15,6 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <future>
 #include <memory>
+#include <string>
+#include <string_view>
 
 struct FederateStateTests: public ::testing::Test {
     FederateStateTests():
@@ -274,6 +276,43 @@ TEST_F(FederateStateTests, basic_processmessage)
     }
     return (update) ? 1 : 0;
     */
+}
+
+TEST_F(FederateStateTests, subscriptions_query_keeps_processing_lock)
+{
+    using namespace helics;
+    fs->interfaces().createInput(InterfaceHandle(0), "ipt1", "type", "units", 0);
+
+    bool lockReleased{false};
+    fs->setQueryCallback(
+        [this, &lockReleased](std::string_view queryStr) -> std::string {
+            if (queryStr != "lock_check") {
+                return {};
+            }
+            // this runs inside the federate processing loop so the lock must still be held
+            if (fs->try_lock()) {
+                lockReleased = true;
+                fs->unlock();
+            }
+            return "true";
+        },
+        1);
+
+    ActionMessage query(CMD_QUERY);
+    query.payload = "subscriptions";
+    fs->addAction(query);
+    query.payload = "lock_check";
+    fs->addAction(query);
+    fs->addAction(ActionMessage(CMD_INIT_GRANT));
+
+    EXPECT_EQ(fs->enterInitializingMode(IterationRequest::NO_ITERATIONS),
+              IterationResult::NEXT_STEP);
+    EXPECT_FALSE(lockReleased);
+
+    // processQuery takes and releases the lock itself
+    EXPECT_EQ(fs->processQuery("subscriptions"), "[]");
+    EXPECT_TRUE(fs->try_lock());
+    fs->unlock();
 }
 
 TEST_F(FederateStateTests, pubsub)

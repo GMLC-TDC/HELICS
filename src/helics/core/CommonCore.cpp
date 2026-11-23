@@ -2738,15 +2738,20 @@ std::string CommonCore::federateQuery(const FederateState* fed,
             return filteredEndpointQuery(fed);
         }
     }
-    auto resultString = generateInterfaceQueryResults(queryStr,
-                                                      loopHandles,
-                                                      fed->global_id,
-                                                      [](nlohmann::json& /*unused*/) {});
+    // this can be called from outside the core processing loop so use the protected handles
+    // instead of loopHandles
+    auto resultString = handles.read([queryStr, fed](const auto& hand) {
+        return generateInterfaceQueryResults(queryStr,
+                                             hand,
+                                             fed->global_id,
+                                             [](nlohmann::json& /*unused*/) {});
+    });
     if (!resultString.empty()) {
         return resultString;
     }
     if (queryStr == "interfaces") {
-        auto json = generateInterfaceConfig(loopHandles, fed->global_id);
+        auto json = handles.read(
+            [fed](const auto& hand) { return generateInterfaceConfig(hand, fed->global_id); });
         json["name"] = fed->getIdentifier();
         return fileops::generateJsonString(json);
     }

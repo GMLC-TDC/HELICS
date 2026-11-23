@@ -2911,7 +2911,6 @@ std::string FederateState::processQueryActual(std::string_view query) const
             }
         }
         ipts.unlock();
-        unlock();
         auto str = subs.str();
         if (str.back() == ';') {
             str.pop_back();
