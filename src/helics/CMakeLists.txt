@@ -9,10 +9,9 @@
 
 include(GenerateExportHeader)
 
-option(
-    HELICS_BUILD_APP_LIBRARY
-    "Build the optional C++ apps library and enable apps in builds without the C shared library"
-    ON
+option(HELICS_BUILD_APP_LIBRARY
+       "Build the optional C++ apps library and enable apps in builds without the C shared library"
+       ON
 )
 
 cmake_dependent_option(

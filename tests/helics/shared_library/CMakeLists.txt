@@ -70,7 +70,8 @@ target_compile_definitions(
 )
 
 target_compile_definitions(
-    shared-library-tests PRIVATE "-DAPP_TEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../apps/test_files/\""
+    shared-library-tests
+    PRIVATE "-DAPP_TEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../apps/test_files/\""
 )
 
 add_test(NAME shared-library-tests COMMAND shared-library-tests)
