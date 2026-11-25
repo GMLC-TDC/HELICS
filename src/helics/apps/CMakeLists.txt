@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if(HELICS_BUILD_APP_LIBRARY)
+if(HELICS_BUILD_APP_LIBRARY OR NOT HELICS_DISABLE_C_SHARED_LIB)
 
     cmake_dependent_advanced_option(
         HELICS_DISABLE_WEBSERVER
@@ -167,7 +167,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
     endif(HELICS_BUILD_APP_EXECUTABLES)
 
-    if(HELICS_BUILD_CXX_SHARED_LIB)
+    if(HELICS_BUILD_CXX_SHARED_LIB AND HELICS_BUILD_APP_LIBRARY)
         add_library(
             helicscpp-apps SHARED ../helics_apps.hpp ${helics_apps_library_files}
                                   ${helics_apps_public_headers} ${helics_apps_private_headers}
@@ -237,4 +237,4 @@ if(HELICS_BUILD_APP_LIBRARY)
         endif()
     endif()
 
-endif(HELICS_BUILD_APP_LIBRARY)
+endif()

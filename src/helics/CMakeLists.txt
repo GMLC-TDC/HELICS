@@ -11,7 +11,7 @@ include(GenerateExportHeader)
 
 option(
     HELICS_BUILD_APP_LIBRARY
-    "Build helics application library (a static library containing objects for broker, player, recorder, and helics_apps"
+    "Build the optional C++ apps library and enable apps in builds without the C shared library"
     ON
 )
 
@@ -19,7 +19,7 @@ cmake_dependent_option(
     HELICS_BUILD_APP_EXECUTABLES
     "Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
     ON
-    "HELICS_BUILD_APP_LIBRARY;CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
+    "(HELICS_BUILD_APP_LIBRARY OR NOT HELICS_DISABLE_C_SHARED_LIB);CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
     OFF
 )
 
@@ -60,12 +60,11 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     )
 endif()
 
-if(HELICS_BUILD_APP_LIBRARY)
-    add_subdirectory(apps)
-    if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-        set_target_properties(helics_apps PROPERTIES FOLDER helics)
-    endif()
-endif(HELICS_BUILD_APP_LIBRARY)
+add_subdirectory(apps)
+
+if(TARGET HELICS::apps AND NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    set_target_properties(helics_apps PROPERTIES FOLDER helics)
+endif()
 
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_api_library)

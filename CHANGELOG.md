@@ -11,6 +11,10 @@ Everything within a major version number should be code compatible (with the exc
 
 ## Unreleased
 
+### Changed
+
+- The C shared library now always includes the full HELICS apps API, including `helicsAppFree` and `helicsAppDestroy` in shared-library-only packages used by matHELICS. Set `HELICS_BUILD_APP_EXECUTABLES=OFF` to omit the standalone tools.
+
 ## [3.7.1][] - 2026-11-22
 
 This patch adds backpressure for queued value updates, fixes broker initialization and timeout handling, and updates release builds.
@@ -37,7 +41,6 @@ This patch adds backpressure for queued value updates, fixes broker initializati
 - Fixed a Windows C++ shared app library build failure caused by an incomplete cloning filter type.
 - Restricted exports from bundled ZeroMQ and the HELICS C shared library on Linux to their public APIs to prevent statically linked C++ runtime symbols from colliding with other libraries in the same process.
 - Hid statically linked C++ runtime symbols in optional Linux C++ shared libraries while preserving their public C++ API exports.
-- Export `helicsAppFree` and `helicsAppDestroy` from the C shared library when it is built without the apps library. They were declared in `helics.h` but missing from the shared library, so shared-only packages failed to link against them. The build now fails if a function declared in `helicsApps.h` is not defined by the app sources.
 
 ### Removed
 

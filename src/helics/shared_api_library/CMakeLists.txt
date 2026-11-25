@@ -28,40 +28,9 @@ set(helicsShared_sources
     TranslatorExport.cpp
     helicsCallbacks.cpp
     helicsData.cpp
+    helicsAppsExport.cpp
     internal/api_objects.h
 )
-
-if(TARGET HELICS::apps)
-    list(APPEND helicsShared_sources helicsAppsExport.cpp)
-else()
-    list(APPEND helicsShared_sources helicsAppsExportNull.cpp)
-endif()
-
-# Every function declared in helicsApps.h must be defined by both app sources. Otherwise a build
-# without the apps library ships a header that declares symbols the shared library does not export.
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/helicsApps.h helicsAppsHeaderText)
-string(REGEX MATCHALL "HELICS_EXPORT[^;]*[ \t*](helicsApp[A-Za-z]*)[ \t]*\\(" helicsAppDeclarations
-             "${helicsAppsHeaderText}"
-)
-set(helicsAppDeclNames "")
-foreach(helicsAppDecl IN LISTS helicsAppDeclarations)
-    string(REGEX REPLACE ".*[ \t*](helicsApp[A-Za-z]*)[ \t]*\\(.*" "\\1" helicsAppDeclName
-                         "${helicsAppDecl}"
-    )
-    list(APPEND helicsAppDeclNames ${helicsAppDeclName})
-endforeach()
-list(REMOVE_DUPLICATES helicsAppDeclNames)
-foreach(helicsAppSource helicsAppsExport.cpp helicsAppsExportNull.cpp)
-    file(READ ${CMAKE_CURRENT_SOURCE_DIR}/${helicsAppSource} helicsAppSourceText)
-    foreach(helicsAppDeclName IN LISTS helicsAppDeclNames)
-        if(NOT helicsAppSourceText MATCHES "\n[A-Za-z][^\n[(]* ${helicsAppDeclName}[(]")
-            message(
-                FATAL_ERROR
-                    "${helicsAppSource} does not define ${helicsAppDeclName}, which is declared in helicsApps.h"
-            )
-        endif()
-    endforeach()
-endforeach()
 
 include(GenerateExportHeader)
 
@@ -142,11 +111,7 @@ target_include_directories(
 set_target_properties(helics PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR})
 
 set_target_properties(helics PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden)
-target_link_libraries(helics PRIVATE helics_application_api)
-if(TARGET HELICS::apps)
-    target_link_libraries(helics PRIVATE HELICS::apps)
-endif()
-target_link_libraries(helics PRIVATE compile_flags_target)
+target_link_libraries(helics PRIVATE helics_application_api HELICS::apps compile_flags_target)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(helics PUBLIC -Wno-documentation)
