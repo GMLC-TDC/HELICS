@@ -37,6 +37,7 @@ This patch adds backpressure for queued value updates, fixes broker initializati
 - Fixed a Windows C++ shared app library build failure caused by an incomplete cloning filter type.
 - Restricted exports from bundled ZeroMQ and the HELICS C shared library on Linux to their public APIs to prevent statically linked C++ runtime symbols from colliding with other libraries in the same process.
 - Hid statically linked C++ runtime symbols in optional Linux C++ shared libraries while preserving their public C++ API exports.
+- Export `helicsAppFree` and `helicsAppDestroy` from the C shared library when it is built without the apps library. They were declared in `helics.h` but missing from the shared library, so shared-only packages failed to link against them. The build now fails if a function declared in `helicsApps.h` is not defined by the app sources.
 
 ### Removed
 

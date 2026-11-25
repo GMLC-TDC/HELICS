@@ -75,3 +75,12 @@ HelicsBool helicsAppIsActive(HelicsApp app)
 {
     return HELICS_FALSE;
 }
+
+// Without the apps library no HelicsApp can be created, so there is nothing to free.
+void helicsAppFree(HelicsApp /*app*/)
+{
+}
+
+void helicsAppDestroy(HelicsApp /*app*/)
+{
+}
