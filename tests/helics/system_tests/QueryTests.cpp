@@ -18,12 +18,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include <algorithm>
+#include <atomic>
+#include <chrono>
 #include <exception>
+#include <future>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
 #include <thread>
 #include <utility>
+#include <vector>
 
 struct query: public FederateTestFixture, public ::testing::Test {};
 
@@ -844,6 +849,67 @@ TEST_F(query, data_flow_graph_concurrent)
     EXPECT_EQ(fed2["publications"][0]["targets"].size(), 1U);
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
+    core = nullptr;
+    vFed1->finalize();
+    vFed2->finalize();
+    helics::cleanupHelicsLibrary();
+}
+
+// queries on a federate from other threads while it registers interfaces and advances time
+TEST_F(query, concurrent_federate_queries)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    auto core = vFed1->getCorePointer();
+    const std::string fedName = vFed1->getName();
+    std::atomic<bool> done{false};
+    auto queryLoop = [&core, &fedName, &done](const std::vector<std::string>& queries) {
+        int count{0};
+        while (!done.load()) {
+            for (const auto& queryStr : queries) {
+                auto res = core->query(fedName, queryStr, HELICS_SEQUENCING_MODE_FAST);
+                if (!res.empty()) {
+                    ++count;
+                }
+                // leave the federate room to take its own processing lock
+                std::this_thread::sleep_for(std::chrono::microseconds(200));
+            }
+        }
+        return count;
+    };
+    auto interfaceQueries =
+        std::async(std::launch::async,
+                   queryLoop,
+                   std::vector<std::string>{"subscriptions", "inputs", "input_details"});
+    auto timeQueries =
+        std::async(std::launch::async,
+                   queryLoop,
+                   std::vector<std::string>{"current_time", "dependencies", "global_time"});
+
+    constexpr int interfaceCount{10};
+    for (int ii = 0; ii < interfaceCount; ++ii) {
+        const auto index = std::to_string(ii);
+        vFed1->registerGlobalInput<double>("ipt" + index);
+        auto& pub = vFed2->registerGlobalPublication<double>("pub" + index);
+        pub.addTarget("ipt" + index);
+    }
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    for (helics::Time reqTime = 1.0; reqTime <= 100.0; reqTime += 1.0) {
+        vFed1->requestTimeAsync(reqTime);
+        vFed2->requestTime(reqTime);
+        EXPECT_EQ(vFed1->requestTimeComplete(), reqTime);
+    }
+    done.store(true);
+    EXPECT_GT(interfaceQueries.get(), 0);
+    EXPECT_GT(timeQueries.get(), 0);
+
+    auto subs = core->query(fedName, "subscriptions", HELICS_SEQUENCING_MODE_FAST);
+    EXPECT_EQ(std::count(subs.begin(), subs.end(), ':'), interfaceCount);
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
