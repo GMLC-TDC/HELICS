@@ -1538,6 +1538,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 routeMessage(command);
                 // break;
             }
+            unknownHandles.clearHandle(command.getSource());
             handles.removeHandle(command.getSource());
             break;
         case CMD_ADD_DEPENDENCY:
@@ -3189,6 +3190,9 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
     auto uHandles = unknownHandles.checkForEndpoints(key);
     for (const auto& target : uHandles) {
         const auto* iface = handles.findHandle(target.first);
+        if (iface == nullptr) {
+            continue;
+        }
         auto destFlags = target.second;
         if (iface->handleType != InterfaceType::FILTER) {
             destFlags = toggle_flag(destFlags, destination_target);
@@ -3223,6 +3227,9 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
         uHandles = unknownHandles.checkForReconnectionEndpoints(key);
         for (const auto& target : uHandles) {
             const auto* iface = handles.findHandle(target.first);
+            if (iface == nullptr) {
+                continue;
+            }
             auto destFlags = target.second;
             if (iface->handleType != InterfaceType::FILTER) {
                 destFlags = toggle_flag(destFlags, destination_target);

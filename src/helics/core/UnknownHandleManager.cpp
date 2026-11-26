@@ -353,7 +353,7 @@ void UnknownHandleManager::clearFilter(const std::string& newFilter)
 // TODO(PT):  When move to C++20 use std::erase_if
 // remove_if doesn't work since this is used on maps
 template<typename ContainerT, typename PredicateT>
-void maperase_if(ContainerT& items, const PredicateT& predicate)
+static void maperase_if(ContainerT& items, const PredicateT& predicate)
 {
     for (auto it = items.begin(); it != items.end();) {
         if (predicate(*it)) {
@@ -362,6 +362,19 @@ void maperase_if(ContainerT& items, const PredicateT& predicate)
             ++it;
         }
     }
+}
+
+void UnknownHandleManager::clearHandle(GlobalHandle handle)
+{
+    auto clearCall = [handle](const auto& entry) { return entry.second.first == handle; };
+    maperase_if(unknown_publications, clearCall);
+    maperase_if(unknown_endpoints, clearCall);
+    maperase_if(unknown_filters, clearCall);
+    maperase_if(unknown_inputs, clearCall);
+    maperase_if(reconnectable_publications, clearCall);
+    maperase_if(reconnectable_endpoints, clearCall);
+    maperase_if(reconnectable_filters, clearCall);
+    maperase_if(reconnectable_inputs, clearCall);
 }
 
 void UnknownHandleManager::clearFederateUnknowns(GlobalFederateId gid)

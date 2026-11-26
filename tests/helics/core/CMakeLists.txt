@@ -24,6 +24,7 @@ set(core_test_sources
     TimeDependenciesTests.cpp
     CoreOperationsTests.cpp
     HandleManagerTests.cpp
+    UnknownHandleManagerTests.cpp
 )
 
 if(NOT HELICS_DISABLE_ASIO)
