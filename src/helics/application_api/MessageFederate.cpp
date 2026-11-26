@@ -338,7 +338,7 @@ bool MessageFederate::hasMessage() const
 bool MessageFederate::hasMessage(const Endpoint& ept) const
 {
     if (currentMode >= Modes::INITIALIZING) {
-        return mfManager->hasMessage(ept);
+        return MessageFederateManager::hasMessage(ept);
     }
     return false;
 }
@@ -346,7 +346,7 @@ bool MessageFederate::hasMessage(const Endpoint& ept) const
 uint64_t MessageFederate::pendingMessageCount(const Endpoint& ept) const
 {
     if (currentMode >= Modes::INITIALIZING) {
-        return mfManager->pendingMessageCount(ept);
+        return MessageFederateManager::pendingMessageCount(ept);
     }
     return 0;
 }
@@ -370,7 +370,7 @@ std::unique_ptr<Message> MessageFederate::getMessage()
 std::unique_ptr<Message> MessageFederate::getMessage(const Endpoint& ept)
 {
     if (currentMode >= Modes::INITIALIZING) {
-        return mfManager->getMessage(ept);
+        return MessageFederateManager::getMessage(ept);
     }
     return nullptr;
 }
@@ -399,11 +399,12 @@ void MessageFederate::setMessageNotificationCallback(
 {
     mfManager->setEndpointNotificationCallback(callback);
 }
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 void MessageFederate::setMessageNotificationCallback(
     const Endpoint& ept,
     const std::function<void(Endpoint& ept, Time)>& callback)
 {
-    mfManager->setEndpointNotificationCallback(ept, callback);
+    MessageFederateManager::setEndpointNotificationCallback(ept, callback);
 }
 
 /** get a count of the number endpoints registered*/

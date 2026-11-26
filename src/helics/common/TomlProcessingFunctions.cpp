@@ -14,6 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <string>
+#include <utility>
 
 namespace helics::fileops {
 
@@ -44,17 +46,22 @@ static std::invalid_argument tomlParseError(const toml::parse_error& error)
 
 toml::table loadToml(const std::string& tomlString)
 {
+    std::ifstream file;
     if (tomlString.size() > 128) {
         try {
             return loadTomlStr(tomlString);
         }
         catch (const std::invalid_argument&) {
-            // A long string can also be a filename.
+            file.open(tomlString, std::ios_base::binary);
+            if (!file.is_open()) {
+                throw;
+            }
         }
-    }
-    std::ifstream file(tomlString, std::ios_base::binary);
-    if (!file.is_open()) {
-        return loadTomlStr(tomlString);
+    } else {
+        file.open(tomlString, std::ios_base::binary);
+        if (!file.is_open()) {
+            return loadTomlStr(tomlString);
+        }
     }
 
     try {

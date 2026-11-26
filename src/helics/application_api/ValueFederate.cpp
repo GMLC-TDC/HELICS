@@ -545,14 +545,16 @@ void ValueFederate::publishJSON(const std::string& jsonString)
     }
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 bool ValueFederate::isUpdated(const Input& inp) const
 {
-    return vfManager->hasUpdate(inp);
+    return ValueFederateManager::hasUpdate(inp);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 Time ValueFederate::getLastUpdateTime(const Input& inp) const
 {
-    return vfManager->getLastUpdateTime(inp);
+    return ValueFederateManager::getLastUpdateTime(inp);
 }
 
 void ValueFederate::updateTime(Time newTime, Time oldTime)
@@ -678,10 +680,11 @@ void ValueFederate::setInputNotificationCallback(std::function<void(Input&, Time
     vfManager->setInputNotificationCallback(std::move(callback));
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 void ValueFederate::setInputNotificationCallback(Input& inp,
                                                  std::function<void(Input&, Time)> callback)
 {
-    vfManager->setInputNotificationCallback(inp, std::move(callback));
+    ValueFederateManager::setInputNotificationCallback(inp, std::move(callback));
 }
 
 int ValueFederate::getPublicationCount() const
@@ -699,8 +702,9 @@ void ValueFederate::clearUpdates()
     vfManager->clearUpdates();
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 void ValueFederate::clearUpdate(const Input& inp)
 {
-    vfManager->clearUpdate(inp);
+    ValueFederateManager::clearUpdate(inp);
 }
 }  // namespace helics
