@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "core-exceptions.hpp"
 
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 namespace helics::fileops {
@@ -21,10 +22,9 @@ namespace helics::fileops {
 template<class brkX>
 void makeConnectionsToml(brkX* brk, const std::string& file)
 {
-    toml::value uVal;
     static_assert(std::is_base_of<Broker, brkX>::value || std::is_base_of<Core, brkX>::value,
                   "broker must be Core or broker");
-    toml::value doc;
+    toml::table doc;
     try {
         doc = loadToml(file);
     }
@@ -32,13 +32,11 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
         throw(helics::InvalidParameter(ia.what()));
     }
 
-    auto conns = toml::find_or(doc, "connections", uVal);
-    if (!conns.is_empty()) {
-        auto& connArray = conns.as_array();
-        for (const auto& conn : connArray) {
-            if (conn.is_array()) {
-                auto& connAct = conn.as_array();
-                brk->dataLink(connAct[0].as_string(), connAct[1].as_string());
+    if (const auto* connArray = getTomlArray(doc, "connections")) {
+        for (const auto& conn : *connArray) {
+            if (const auto* pair = conn.as_array()) {
+                const auto [source, target] = getTomlStringPair(*pair);
+                brk->dataLink(source, target);
             } else {
                 std::string pub = getOrDefault(conn, "publication", std::string());
                 if (!pub.empty()) {
@@ -69,13 +67,11 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
             }
         }
     }
-    auto lnks = toml::find_or(doc, "links", uVal);
-    if (!lnks.is_empty()) {
-        auto& connArray = lnks.as_array();
-        for (const auto& conn : connArray) {
-            if (conn.is_array()) {
-                auto& connAct = conn.as_array();
-                brk->linkEndpoints(connAct[0].as_string(), connAct[1].as_string());
+    if (const auto* connArray = getTomlArray(doc, "links")) {
+        for (const auto& conn : *connArray) {
+            if (const auto* pair = conn.as_array()) {
+                const auto [source, target] = getTomlStringPair(*pair);
+                brk->linkEndpoints(source, target);
             } else {
                 std::string pub = getOrDefault(conn, "publication", std::string());
                 if (!pub.empty()) {
@@ -106,13 +102,11 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
             }
         }
     }
-    auto filts = toml::find_or(doc, "filters", uVal);
-    if (!filts.is_empty()) {
-        auto& filtArray = filts.as_array();
-        for (const auto& filt : filtArray) {
-            if (filt.is_array()) {
-                auto& filtAct = filt.as_array();
-                brk->addSourceFilterToEndpoint(filtAct[0].as_string(), filtAct[1].as_string());
+    if (const auto* filtArray = getTomlArray(doc, "filters")) {
+        for (const auto& filt : *filtArray) {
+            if (const auto* pair = filt.as_array()) {
+                const auto [source, target] = getTomlStringPair(*pair);
+                brk->addSourceFilterToEndpoint(source, target);
             } else {
                 std::string fname = getOrDefault(filt, "filter", std::string());
                 if (!fname.empty()) {
@@ -131,30 +125,12 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
             }
         }
     }
-    auto globals = toml::find_or(doc, "globals", uVal);
-    if (!globals.is_empty()) {
-        if (globals.is_array()) {
-            for (auto& val : globals.as_array()) {
-                brk->setGlobal(val.as_array()[0].as_string(), val.as_array()[1].as_string());
-            }
-        } else {
-            for (const auto& val : globals.as_table()) {
-                brk->setGlobal(val.first, val.second.as_string());
-            }
-        }
-    }
-    auto aliases = toml::find_or(doc, "aliases", uVal);
-    if (!aliases.is_empty()) {
-        if (aliases.is_array()) {
-            for (auto& val : aliases.as_array()) {
-                brk->addAlias(val.as_array()[0].as_string(), val.as_array()[1].as_string());
-            }
-        } else {
-            for (const auto& val : aliases.as_table()) {
-                brk->addAlias(val.first, val.second.as_string());
-            }
-        }
-    }
+    loadTomlPairs(doc, "globals", [brk](std::string_view key, std::string_view value) {
+        brk->setGlobal(key, value);
+    });
+    loadTomlPairs(doc, "aliases", [brk](std::string_view key, std::string_view value) {
+        brk->addAlias(key, value);
+    });
 }
 
 template<class brkX>

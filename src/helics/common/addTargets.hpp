@@ -15,30 +15,26 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 template<typename Callable>
-bool addTargets(const toml::value& section, std::string targetName, Callable callback)
+bool addTargets(const toml::node& section, std::string targetName, Callable callback)
 {
     bool found{false};
-    toml::value uval;
-    // There should probably be a static_assert here but there isn't a nice type trait to check that
-    auto targets = toml::find_or(section, targetName, uval);
-    if (!targets.is_empty()) {
-        if (targets.is_array()) {
-            auto& targetArray = targets.as_array();
-            for (const auto& target : targetArray) {
-                callback(static_cast<const std::string&>(target.as_string()));
+    const toml::node_view view{section};
+    if (const auto targets = view[targetName]) {
+        if (const auto* array = targets.as_array()) {
+            for (const auto& target : *array) {
+                callback(fileops::getTomlString(target));
             }
         } else {
-            callback(static_cast<const std::string&>(targets.as_string()));
+            callback(fileops::getTomlString(*targets.node()));
         }
         found = true;
     }
     if (targetName.back() == 's') {
         targetName.pop_back();
-        std::string target;
-        target = toml::find_or(section, targetName, target);
-        if (!target.empty()) {
+        const auto* target = view[targetName].as_string();
+        if (target != nullptr && !target->get().empty()) {
             found = true;
-            callback(target);
+            callback(target->get());
         }
     }
     return found;
@@ -86,7 +82,7 @@ void addTargetVariations(const Block& section,
     }
 }
 
-void processOptions(const toml::value& section,
+void processOptions(const toml::node& section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction);
@@ -99,7 +95,7 @@ void processOptions(const nlohmann::json& section,
 void loadTags(const nlohmann::json& section,
               const std::function<void(std::string_view, std::string_view)>& tagAction);
 
-void loadTags(const toml::value& section,
+void loadTags(const toml::node& section,
               const std::function<void(std::string_view, std::string_view)>& tagAction);
 
 }  // namespace helics

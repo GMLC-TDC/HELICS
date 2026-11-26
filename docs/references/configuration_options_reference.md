@@ -14,7 +14,7 @@ Generally, there are three ways in which a co-simulation can be configured and a
 
 1. Using direct API calls in the federate source code.
 2. Using command-line switches/flags while beginning execution of the federate
-3. Using a JSON configuration file (and calling helicsCreateValueFederateFromConfig, helicsCreateMessageFederateFromConfig, or helicsCreateComboFederateFromConfig)
+3. Using a JSON or TOML configuration file with `helicsCreateValueFederateFromConfig`, `helicsCreateMessageFederateFromConfig`, or `helicsCreateCombinationFederateFromConfig`.
 
 Not all configuration options are available in all three forms but often they are. For example, it is not possible (nor convenient) to configure a publication for a federate from the command line but it is possible to do so with the JSON config file and with API calls.
 

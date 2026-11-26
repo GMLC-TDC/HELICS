@@ -622,6 +622,17 @@ TEST_P(valuefed_link_file, dual_transfer_broker_link_file)
     EXPECT_TRUE(res);
 }
 
+TEST_F(valuefed, malformed_toml_connection_pairs)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto fed = GetFederateAs<helics::ValueFederate>(0);
+
+    EXPECT_THROW(brokers[0]->makeConnections(R"(connections = [["pub"]])"),
+                 helics::InvalidParameter);
+    EXPECT_THROW(fed->getCorePointer()->makeConnections(R"(aliases = [["pub", 42]])"),
+                 helics::InvalidParameter);
+}
+
 TEST_F(valuefed, dual_transfer_broker_link_json_string)
 {
     SetupTest<helics::ValueFederate>("test", 2);

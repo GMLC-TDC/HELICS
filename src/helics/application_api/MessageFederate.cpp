@@ -291,7 +291,7 @@ void MessageFederate::registerMessageInterfacesJsonDetail(const fileops::JsonBuf
 
 void MessageFederate::registerMessageInterfacesToml(const std::string& tomlString)
 {
-    toml::value doc;
+    toml::table doc;
     try {
         doc = fileops::loadToml(tomlString);
     }
@@ -301,13 +301,8 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
     bool defaultGlobal = false;
     fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
     const bool defaultTargeted = fileops::getOrDefault(doc, "targeted", false);
-    if (fileops::isMember(doc, "endpoints")) {
-        auto& epts = toml::find(doc, "endpoints");
-        if (!epts.is_array()) {
-            throw(helics::InvalidParameter("endpoints section in toml file must be an array"));
-        }
-        auto& eptArray = epts.as_array();
-        for (auto& ept : eptArray) {
+    if (const auto* eptArray = fileops::getTomlArray(doc, "endpoints")) {
+        for (const auto& ept : *eptArray) {
             auto eptName = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
             const bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
@@ -317,13 +312,8 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
             loadOptions(this, ept, epObj);
         }
     }
-    if (fileops::isMember(doc, "datasinks")) {
-        auto& epts = toml::find(doc, "datasinks");
-        if (!epts.is_array()) {
-            throw(helics::InvalidParameter("datasinks section in toml file must be an array"));
-        }
-        auto& eptArray = epts.as_array();
-        for (auto& ept : eptArray) {
+    if (const auto* eptArray = fileops::getTomlArray(doc, "datasinks")) {
+        for (const auto& ept : *eptArray) {
             auto key = fileops::getName(ept);
             Endpoint& epObj = registerDataSink(key);
 
@@ -348,7 +338,7 @@ bool MessageFederate::hasMessage() const
 bool MessageFederate::hasMessage(const Endpoint& ept) const
 {
     if (currentMode >= Modes::INITIALIZING) {
-        return mfManager->hasMessage(ept);
+        return MessageFederateManager::hasMessage(ept);
     }
     return false;
 }
@@ -356,7 +346,7 @@ bool MessageFederate::hasMessage(const Endpoint& ept) const
 uint64_t MessageFederate::pendingMessageCount(const Endpoint& ept) const
 {
     if (currentMode >= Modes::INITIALIZING) {
-        return mfManager->pendingMessageCount(ept);
+        return MessageFederateManager::pendingMessageCount(ept);
     }
     return 0;
 }
@@ -380,7 +370,7 @@ std::unique_ptr<Message> MessageFederate::getMessage()
 std::unique_ptr<Message> MessageFederate::getMessage(const Endpoint& ept)
 {
     if (currentMode >= Modes::INITIALIZING) {
-        return mfManager->getMessage(ept);
+        return MessageFederateManager::getMessage(ept);
     }
     return nullptr;
 }
@@ -409,11 +399,12 @@ void MessageFederate::setMessageNotificationCallback(
 {
     mfManager->setEndpointNotificationCallback(callback);
 }
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 void MessageFederate::setMessageNotificationCallback(
     const Endpoint& ept,
     const std::function<void(Endpoint& ept, Time)>& callback)
 {
-    mfManager->setEndpointNotificationCallback(ept, callback);
+    MessageFederateManager::setEndpointNotificationCallback(ept, callback);
 }
 
 /** get a count of the number endpoints registered*/

@@ -75,9 +75,9 @@ JSON for Modern C++ is used for parsing json files. The single file header and f
 
 CLI11 is a command line parser used throughout HELICS. Several modification used and tested in HELICS have been merged upstream. The project was created by [Henry Schreiner](https://github.com/henryiii). CLI11 is available under a [3-Clause BSD](https://github.com/CLIUtils/CLI11/blob/master/LICENSE) license.
 
-### [toml11](https://github.com/ToruNiina/toml11)
+### [toml++](https://github.com/marzer/tomlplusplus)
 
-toml11 is a C\++11 header-only TOML parser/encoder depending only on the C++ standard library. Compatible with the latest version of TOML v1.0.0. toml11 is licensed under the [MIT](https://github.com/ToruNiina/toml11/blob/master/LICENSE) license. HELICS includes it through a submodule of a library [fork](https://github.com/GMLC-TDC/toml11) until the changes can be merged upstream.
+HELICS uses toml++ by Mark Gillard as a header-only TOML parser through the `ThirdParty/tomlplusplus` submodule. Its [MIT license](ThirdParty/tomlplusplus/LICENSE) is included in the installed third-party licenses.
 
 ### [GridDyn](https://github.com/LLNL/GridDyn)
 

@@ -357,10 +357,9 @@ void ValueFederate::registerValueInterfacesJsonDetail(const fileops::JsonBuffer&
 void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
 {
     using fileops::getOrDefault;
-    using fileops::isMember;
     using fileops::replaceIfMember;
 
-    toml::value doc;
+    toml::table doc;
     try {
         doc = fileops::loadToml(tomlString);
     }
@@ -370,13 +369,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     bool defaultGlobal = false;
     replaceIfMember(doc, "defaultglobal", defaultGlobal);
 
-    if (isMember(doc, "publications")) {
-        auto& pubs = toml::find(doc, "publications");
-        if (!pubs.is_array()) {
-            throw(helics::InvalidParameter("publications section in toml file must be an array"));
-        }
-        auto& pubArray = pubs.as_array();
-        for (const auto& pub : pubArray) {
+    if (const auto* pubArray = fileops::getTomlArray(doc, "publications")) {
+        for (const auto& pub : *pubArray) {
             auto name = fileops::getName(pub);
 
             Publication* pubObj = &vfManager->getPublication(name);
@@ -399,16 +393,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
             addTargetVariations(pub, "destination", "targets", addDestTarget);
         }
     }
-    if (isMember(doc, "subscriptions")) {
-        auto& subs = toml::find(doc, "subscriptions");
-        if (!subs.is_array()) {
-            // this line is tested in the publications section so not really necessary to check
-            // again since it is an expensive test
-            throw(helics::InvalidParameter(
-                "subscriptions section in toml file must be an array"));  // LCOV_EXCL_LINE
-        }
-        auto& subArray = subs.as_array();
-        for (const auto& sub : subArray) {
+    if (const auto* subArray = fileops::getTomlArray(doc, "subscriptions")) {
+        for (const auto& sub : *subArray) {
             auto name = fileops::getName(sub);
             bool skipNameTarget{false};
             if (name.empty()) {
@@ -437,14 +423,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
             addTargetVariations(sub, "source", "targets", addDestTarget);
         }
     }
-    if (isMember(doc, "inputs")) {
-        auto& ipts = toml::find(doc, "inputs");
-        if (!ipts.is_array()) {
-            throw(helics::InvalidParameter(
-                "inputs section in toml file must be an array"));  // LCOV_EXCL_LINE
-        }
-        auto& iptArray = ipts.as_array();
-        for (const auto& ipt : iptArray) {
+    if (const auto* iptArray = fileops::getTomlArray(doc, "inputs")) {
+        for (const auto& ipt : *iptArray) {
             auto name = fileops::getName(ipt);
 
             Input* inp = &vfManager->getInput(name);
@@ -565,14 +545,16 @@ void ValueFederate::publishJSON(const std::string& jsonString)
     }
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 bool ValueFederate::isUpdated(const Input& inp) const
 {
-    return vfManager->hasUpdate(inp);
+    return ValueFederateManager::hasUpdate(inp);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 Time ValueFederate::getLastUpdateTime(const Input& inp) const
 {
-    return vfManager->getLastUpdateTime(inp);
+    return ValueFederateManager::getLastUpdateTime(inp);
 }
 
 void ValueFederate::updateTime(Time newTime, Time oldTime)
@@ -698,10 +680,11 @@ void ValueFederate::setInputNotificationCallback(std::function<void(Input&, Time
     vfManager->setInputNotificationCallback(std::move(callback));
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 void ValueFederate::setInputNotificationCallback(Input& inp,
                                                  std::function<void(Input&, Time)> callback)
 {
-    vfManager->setInputNotificationCallback(inp, std::move(callback));
+    ValueFederateManager::setInputNotificationCallback(inp, std::move(callback));
 }
 
 int ValueFederate::getPublicationCount() const
@@ -719,8 +702,9 @@ void ValueFederate::clearUpdates()
     vfManager->clearUpdates();
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) Public API.
 void ValueFederate::clearUpdate(const Input& inp)
 {
-    vfManager->clearUpdate(inp);
+    ValueFederateManager::clearUpdate(inp);
 }
 }  // namespace helics

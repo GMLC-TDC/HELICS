@@ -275,8 +275,8 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/units)
     endif()
 
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/include/toml11/value.hpp")
-        submod_update(ThirdParty/toml)
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/tomlplusplus/include/toml++/toml.hpp")
+        submod_update(ThirdParty/tomlplusplus)
     endif()
 
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/spdlog/CMakeLists.txt")
@@ -314,21 +314,15 @@ if(NOT HELICS_DISABLE_BOOST)
 endif()
 
 # -------------------------------------------------------------
-# TOML11  add the TOML interpreter
+# TOML interpreter
 # -------------------------------------------------------------
-if(NOT TARGET toml11::toml11)
-    set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
-    set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
-    set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
-    set(toml11_INSTALL OFF CACHE INTERNAL "")
-
-    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
-        add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL SYSTEM)
-    else()
-        add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
-    endif()
-    hide_variable(TOML11_USE_UNRELEASED_TOML_FEATURES)
-    hide_variable(TOML11_PRECOMPILE)
+if(NOT TARGET tomlplusplus::tomlplusplus)
+    set(tomlplusplus_BUILD_LIB OFF)
+    set(tomlplusplus_INSTALL OFF)
+    set(tomlplusplus_REGENERATE OFF)
+    set(tomlplusplus_UNRELEASED_FEATURES OFF)
+    set(TOMLPLUSPLUS_BUILD_MODULES OFF)
+    add_subdirectory(ThirdParty/tomlplusplus EXCLUDE_FROM_ALL)
 endif()
 
 # -------------------------------------------------------------
@@ -516,7 +510,7 @@ target_include_directories(
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
 )
 
-target_link_libraries(helics_base INTERFACE toml11::toml11)
+target_link_libraries(helics_base INTERFACE $<BUILD_INTERFACE:tomlplusplus::tomlplusplus>)
 
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)
@@ -722,8 +716,8 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE"
     "units"
     "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
-    "toml11"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
+    "toml++"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/tomlplusplus/LICENSE"
     "GMLC Utilities"
     "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
     "GMLC Networking"

@@ -20,9 +20,6 @@
 [submodule "ThirdParty/spdlog"]
     path = ThirdParty/spdlog
     url = ../../gabime/spdlog.git
-[submodule "ThirdParty/toml"]
-	path = ThirdParty/toml
-	url = ../../ToruNiina/toml11
 [submodule "ThirdParty/networking"]
 	path = ThirdParty/networking
 	url = ../../GMLC-TDC/networking.git
@@ -36,3 +33,6 @@
 [submodule "ThirdParty/benchmark"]
 	path = ThirdParty/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "ThirdParty/tomlplusplus"]
+	path = ThirdParty/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus.git

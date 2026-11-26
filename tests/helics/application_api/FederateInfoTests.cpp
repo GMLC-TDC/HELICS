@@ -298,6 +298,35 @@ TEST(federateInfo, loadinfoPropsToml)
     EXPECT_THROW(helics::loadFederateInfo("\"loglevel\"=\"unknown\""), helics::InvalidIdentifier);
 }
 
+TEST(federateInfo, tomlTimeProperties)
+{
+    using namespace std::chrono_literals;
+
+    helics::FederateInfo fedInfo;
+    fedInfo.loadInfoFromToml(R"(
+        period = 01:02:03.456789123
+        time_delta = 2
+        input_delay = { value = 1.5, unit = "ms" }
+        output_delay = { value = "125", units = "ms" }
+    )",
+                             false);
+
+    EXPECT_EQ(fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_PERIOD, helics::timeZero),
+              helics::Time(1h + 2min + 3s + 456789123ns));
+    EXPECT_EQ(fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_DELTA, helics::timeZero),
+              helics::Time(2s));
+    EXPECT_EQ(fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_INPUT_DELAY, helics::timeZero),
+              helics::Time(1500us));
+    EXPECT_EQ(fedInfo.checkTimeProperty(HELICS_PROPERTY_TIME_OUTPUT_DELAY, helics::timeZero),
+              helics::Time(125ms));
+}
+
+TEST(federateInfo, invalidTomlSyntax)
+{
+    helics::FederateInfo fedInfo;
+    EXPECT_THROW(fedInfo.loadInfoFromToml("period = 1\nperiod = 2"), helics::InvalidParameter);
+}
+
 TEST(federateInfo, initString)
 {
     helics::FederateInfo fedInfo;
