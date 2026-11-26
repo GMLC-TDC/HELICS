@@ -1571,8 +1571,7 @@ void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& 
 }
 
 template<class INTERFACE>
-static void
-    loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::node& data, bool strict)
+static void loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::node& data, bool strict)
 {
     const auto props = toml::node_view{data}["properties"];
     if (!props) {
