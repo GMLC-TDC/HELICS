@@ -11,6 +11,10 @@ Everything within a major version number should be code compatible (with the exc
 
 ## Unreleased
 
+### Changed
+
+- The C shared library now always includes the full HELICS apps API, including `helicsAppFree` and `helicsAppDestroy` in shared-library-only packages used by matHELICS. Set `HELICS_BUILD_APP_EXECUTABLES=OFF` to omit the standalone tools.
+
 ### Fixed
 
 - Fixed data races when a federate is queried from a thread other than the one running it. The `subscriptions` query released the federate's processing lock while the federate could still be using it, and federate interface queries such as `inputs` and `publications` read the core's internal handle table from outside the core thread.

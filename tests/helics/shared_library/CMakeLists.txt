@@ -28,11 +28,8 @@ set(c_shared_library_test_sources
     commandInterfaceTests.cpp
     miscApiTests.cpp
     CallbackFederateTests.cpp
+    appTests.cpp
 )
-
-if(TARGET HELICS::apps)
-    list(APPEND c_shared_library_test_sources appTests.cpp)
-endif()
 
 set(cpp_shared_library_test_sources
     cpptestFixtures.cpp
@@ -72,12 +69,10 @@ target_compile_definitions(
     shared-library-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
 )
 
-if(TARGET HELICS::apps)
-    target_compile_definitions(
-        shared-library-tests
-        PRIVATE "-DAPP_TEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../apps/test_files/\""
-    )
-endif()
+target_compile_definitions(
+    shared-library-tests
+    PRIVATE "-DAPP_TEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../apps/test_files/\""
+)
 
 add_test(NAME shared-library-tests COMMAND shared-library-tests)
 

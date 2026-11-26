@@ -3,8 +3,8 @@
 ## Main Options
 
 - `CMake_INSTALL_PREFIX`: CMake variable listing where to install the files
-- `HELICS_BUILD_APP_LIBRARY` : \[Default=ON\] Tell HELICS to build the helics apps shared library
-- `HELICS_BUILD_APP_EXECUTABLES` : \[Default=ON\] Build some executables associated with the apps
+- `HELICS_BUILD_APP_LIBRARY` : \[Default=ON\] Enable the optional C++ apps shared library when `HELICS_BUILD_CXX_SHARED_LIB` is on. In builds with `HELICS_DISABLE_C_SHARED_LIB=ON`, this option also controls whether the static apps library is built. The C shared library always includes apps support, and its `helicsAppEnabled()` function returns `HELICS_TRUE`.
+- `HELICS_BUILD_APP_EXECUTABLES` : \[Default=ON for standalone HELICS builds with apps support\] Build the standalone tools, including `helics_broker`, `helics_player`, and `helics_app`. Set this to `OFF` to omit these tools.
 - `HELICS_BUILD_BENCHMARKS` : \[Default=OFF\] Build some timing benchmarks associated with HELICS
 - `HELICS_BUILD_CXX_SHARED_LIB` : \[Default=OFF\] Build C++ shared libraries of the Application API C++ interface to HELICS and if `HELICS_BUILD_APP_LIBRARY` is also enabled another C++ shared library with the APP library
 - `HELICS_BUILD_EXAMPLES` : \[Default=OFF\] Build a few select examples using HELICS, this is mostly for testing purposes. The main examples repo is [here](https://github.com/GMLC-TDC/HELICS-Examples)

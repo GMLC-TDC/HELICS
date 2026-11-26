@@ -20,7 +20,7 @@ on:
         default: ''
   schedule:
     - cron: '15 09 * * *' # Run in the early hours of the morning (UTC)
-  # Test mode: build (but never upload) everything when the release build scripts change
+  # Test representative packages when release build files change
   pull_request:
     branches: [ main ]
     paths:
@@ -101,7 +101,8 @@ jobs:
 # Build MSVC archives
 #####################################
   build-windows-msvc:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.target.os }}
+    name: Build ${{ matrix.target.os }} ${{ matrix.target.arch }} MSVC Archive
     if: (github.event_name != 'workflow_dispatch') || (contains(github.event.inputs.packages, 'msvc') || contains(github.event.inputs.packages, 'everything'))
     timeout-minutes: 120
     strategy:
@@ -109,15 +110,20 @@ jobs:
       fail-fast: false
       matrix:
         # windows-2019 (VS 2019) runner image was retired; VS 2026 replaces it
-        os: [windows-2022, windows-2025-vs2026]
-        arch: [x64]
-        include:
-          - os: windows-2022
+        event: ['${{ github.event_name }}']
+        target:
+          - &msvc2022
+            os: windows-2022
+            arch: x64
             cmake_gen: 'Visual Studio 17 2022'
             msvc_ver: 'msvc2022'
           - os: windows-2025-vs2026
+            arch: x64
             cmake_gen: 'Visual Studio 18 2026'
             msvc_ver: 'msvc2026'
+        exclude:
+          - event: pull_request
+            target: *msvc2022
     steps:
     - name: Determine fetch depth
       id: determine_fd
@@ -151,9 +157,9 @@ jobs:
     # Compile HELICS and create the installer
     - name: Build installer
       env:
-        BUILD_ARCH: ${{ matrix.arch }}
-        BUILD_GEN: ${{ matrix.cmake_gen }}
-        MSVC_VER: ${{ matrix.msvc_ver }}
+        BUILD_ARCH: ${{ matrix.target.arch }}
+        BUILD_GEN: ${{ matrix.target.cmake_gen }}
+        MSVC_VER: ${{ matrix.target.msvc_ver }}
       shell: bash
       run: ./.github/actions/release-build/msvc-${{ runner.os }}.sh
         
@@ -169,7 +175,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v7
       with:
-        name: ${{ matrix.os }}-msvc-installers
+        name: ${{ matrix.target.os }}-msvc-installers
         path: artifact
         if-no-files-found: error
         
@@ -177,23 +183,24 @@ jobs:
 # Build installers
 #####################################
   build-installers:
-    runs-on: ${{ matrix.os }}
-    name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
+    runs-on: ${{ matrix.target.os }}
+    name: Build ${{ matrix.target.os }} ${{ matrix.target.arch }} ${{ matrix.target.cpack_gen }} Installer
     if: (github.event_name != 'workflow_dispatch') || (contains(github.event.inputs.packages, 'installer') || contains(github.event.inputs.packages, 'everything'))
     timeout-minutes: 120
     strategy:
       # Keep building the other packages when one fails so a release gets every asset that can be built
       fail-fast: false
       matrix:
-        id: [windows-x64, windows-x86, macos-universal2, linux-x64, linux-aarch64]
-        include:
+        event: ['${{ github.event_name }}']
+        target:
           - id: windows-x64
             os: windows-2025-vs2026
             arch: x64
             cpack_gen: NSIS;ZIP
             cmake_gen: 'Visual Studio 18 2026'
             msvc_ver: 'msvc2026'
-          - id: windows-x86
+          - &installer_windows_x86
+            id: windows-x86
             os: windows-2025-vs2026
             arch: x86
             cpack_gen: ZIP
@@ -209,10 +216,16 @@ jobs:
             os: ubuntu-latest
             arch: x64
             cpack_gen: TGZ
-          - id: linux-aarch64
+          - &installer_linux_aarch64
+            id: linux-aarch64
             os: ubuntu-24.04-arm
             arch: aarch64
             cpack_gen: TGZ
+        exclude:
+          - event: pull_request
+            target: *installer_windows_x86
+          - event: pull_request
+            target: *installer_linux_aarch64
 
     steps:
     - name: Determine fetch depth
@@ -250,11 +263,11 @@ jobs:
     - name: Build installer
       if: runner.os != 'Linux'
       env:
-        BUILD_ARCH: ${{ matrix.arch }}
-        BUILD_GEN: ${{ matrix.cmake_gen }}
-        MSVC_VER: ${{ matrix.msvc_ver }}
-        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos_target_ver }}
-        CPACK_GEN: ${{ matrix.cpack_gen }}
+        BUILD_ARCH: ${{ matrix.target.arch }}
+        BUILD_GEN: ${{ matrix.target.cmake_gen }}
+        MSVC_VER: ${{ matrix.target.msvc_ver }}
+        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.target.macos_target_ver }}
+        CPACK_GEN: ${{ matrix.target.cpack_gen }}
       shell: bash
       run: ./.github/actions/release-build/installer-${{ runner.os }}.sh
  
@@ -263,8 +276,8 @@ jobs:
       uses: ./.github/actions/linux-release-builder
       with:
         script: ./.github/actions/release-build/installer-${{ runner.os }}.sh
-        cpack_gen: ${{ matrix.cpack_gen }}
-        arch: ${{ matrix.arch }}
+        cpack_gen: ${{ matrix.target.cpack_gen }}
+        arch: ${{ matrix.target.arch }}
 
     - name: Check Linux installer exports
       if: runner.os == 'Linux'
@@ -283,7 +296,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v7
       with:
-        name: ${{ matrix.id }}-installers
+        name: ${{ matrix.target.id }}-installers
         path: artifact
         if-no-files-found: error
       
@@ -291,17 +304,18 @@ jobs:
 # Build shared libraries
 #####################################
   build-sharedlibs:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.target.os }}
     if: (github.event_name != 'workflow_dispatch') || (contains(github.event.inputs.packages, 'sharedlib') || contains(github.event.inputs.packages, 'everything'))
-    name: Build ${{ matrix.os }} ${{ matrix.arch }} Shared Library
+    name: Build ${{ matrix.target.os }} ${{ matrix.target.arch }} Shared Library
     timeout-minutes: 120
     strategy:
       # Keep building the other packages when one fails so a release gets every asset that can be built
       fail-fast: false
       matrix:
-        id: [windows-x86, windows-x64, macos-universal2, ubuntu-x64, ubuntu-aarch64]
-        include:
-          - id: windows-x86
+        event: ['${{ github.event_name }}']
+        target:
+          - &sharedlib_windows_x86
+            id: windows-x86
             os: windows-2025-vs2026
             arch: x86
             cmake_gen: 'Visual Studio 18 2026'
@@ -318,9 +332,15 @@ jobs:
           - id: ubuntu-x64
             os: ubuntu-latest
             arch: x64
-          - id: ubuntu-aarch64
+          - &sharedlib_linux_aarch64
+            id: ubuntu-aarch64
             os: ubuntu-24.04-arm
             arch: aarch64
+        exclude:
+          - event: pull_request
+            target: *sharedlib_windows_x86
+          - event: pull_request
+            target: *sharedlib_linux_aarch64
 
     steps:
     - name: Determine fetch depth
@@ -358,10 +378,10 @@ jobs:
     - name: Build shared library
       if: runner.os != 'Linux'
       env:
-        BUILD_ARCH: ${{ matrix.arch }}
-        BUILD_GEN: ${{ matrix.cmake_gen }}
-        MSVC_VER: ${{ matrix.msvc_ver }}
-        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos_target_ver }}
+        BUILD_ARCH: ${{ matrix.target.arch }}
+        BUILD_GEN: ${{ matrix.target.cmake_gen }}
+        MSVC_VER: ${{ matrix.target.msvc_ver }}
+        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.target.macos_target_ver }}
       shell: bash
       run: ./.github/actions/release-build/shared-library-${{ runner.os }}.sh
     
@@ -370,7 +390,7 @@ jobs:
       uses: ./.github/actions/linux-release-builder
       with:
         script: ./.github/actions/release-build/shared-library-${{ runner.os }}.sh
-        arch: ${{ matrix.arch }}
+        arch: ${{ matrix.target.arch }}
 
     - name: Check Linux shared library exports
       if: runner.os == 'Linux'
@@ -389,7 +409,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v7
       with:
-        name: ${{ matrix.id }}-sharedlib-installers
+        name: ${{ matrix.target.id }}-sharedlib-installers
         path: artifact
         if-no-files-found: error
         

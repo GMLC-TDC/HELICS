@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 // select an incorrect app
 TEST(app_tests, load_error)
 {
+    EXPECT_EQ(helicsAppEnabled(), HELICS_TRUE);
     auto err = helicsErrorInitialize();
 
     helicsCreateApp("testApp", "whatever", NULL, NULL, &err);

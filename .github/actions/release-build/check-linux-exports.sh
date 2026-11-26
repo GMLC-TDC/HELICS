@@ -36,10 +36,12 @@ fi
 
 tar -xOzf "$archive" "$helics_library" >"$temporary/libhelics.so"
 nm -D --defined-only "$temporary/libhelics.so" | awk '{ print $NF }' >"$temporary/exports"
-if ! grep -qx helicsGetVersion "$temporary/exports"; then
-    echo "helicsGetVersion is missing from $archive" >&2
-    exit 1
-fi
+for symbol in helicsGetVersion helicsAppEnabled helicsCreateApp helicsAppFree helicsAppDestroy; do
+    if ! grep -qx "$symbol" "$temporary/exports"; then
+        echo "$symbol is missing from $archive" >&2
+        exit 1
+    fi
+done
 if grep -Ev '^helics[A-Za-z0-9_]+$' "$temporary/exports" >"$temporary/unexpected"; then
     echo "unexpected libhelics exports in $archive:" >&2
     head -n 20 "$temporary/unexpected" >&2
@@ -59,6 +61,7 @@ import sys
 helics = ctypes.CDLL(sys.argv[1])
 helics.helicsGetVersion.restype = ctypes.c_char_p
 assert helics.helicsGetVersion()
+assert helics.helicsAppEnabled() == 1, "HELICS apps support is disabled"
 PY
 
 echo "$archive: public ZeroMQ and HELICS APIs exported; libhelics loads"

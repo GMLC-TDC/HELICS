@@ -28,14 +28,9 @@ set(helicsShared_sources
     TranslatorExport.cpp
     helicsCallbacks.cpp
     helicsData.cpp
+    helicsAppsExport.cpp
     internal/api_objects.h
 )
-
-if(TARGET HELICS::apps)
-    list(APPEND helicsShared_sources helicsAppsExport.cpp)
-else()
-    list(APPEND helicsShared_sources helicsAppsExportNull.cpp)
-endif()
 
 include(GenerateExportHeader)
 
@@ -116,11 +111,7 @@ target_include_directories(
 set_target_properties(helics PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR})
 
 set_target_properties(helics PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden)
-target_link_libraries(helics PRIVATE helics_application_api)
-if(TARGET HELICS::apps)
-    target_link_libraries(helics PRIVATE HELICS::apps)
-endif()
-target_link_libraries(helics PRIVATE compile_flags_target)
+target_link_libraries(helics PRIVATE helics_application_api HELICS::apps compile_flags_target)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(helics PUBLIC -Wno-documentation)
