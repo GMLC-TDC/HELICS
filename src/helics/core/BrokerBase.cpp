@@ -480,9 +480,8 @@ void BrokerBase::loadInfoFromJson(const std::string& jsonString, bool runArgPars
 
 void BrokerBase::loadInfoFromToml(const std::string& tomlString, bool runArgParser)
 {
-    toml::value doc;
     try {
-        doc = fileops::loadToml(tomlString);
+        fileops::loadToml(tomlString);
     }
     catch (const std::invalid_argument& iarg) {
         throw(helics::InvalidParameter(iarg.what()));

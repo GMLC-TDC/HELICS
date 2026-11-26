@@ -967,7 +967,7 @@ void FederateInfo::loadJsonConfig(const fileops::JsonBuffer& jsonBuf)
 
 void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgParser)
 {
-    toml::value doc;
+    toml::table doc;
     try {
         doc = fileops::loadToml(tomlString);
     }

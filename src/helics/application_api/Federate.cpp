@@ -1570,88 +1570,51 @@ void Federate::registerConnectorInterfacesJsonDetail(const fileops::JsonBuffer& 
     }
 }
 
-static void arrayPairProcess(toml::value doc,
-                             const std::string& key,
-                             const std::function<void(std::string_view, std::string_view)>& pairOp)
-{
-    using fileops::isMember;
-    if (isMember(doc, key)) {
-        auto& info = toml::find(doc, key);
-        if (info.is_array()) {
-            for (auto& val : info.as_array()) {
-                pairOp(static_cast<std::string_view>(val.as_array()[0].as_string()),
-                       static_cast<std::string_view>(val.as_array()[1].as_string()));
-            }
-        } else {
-            for (const auto& val : info.as_table()) {
-                pairOp(val.first, static_cast<std::string_view>(val.second.as_string()));
-            }
-        }
-    }
-}
-
 template<class INTERFACE>
 static void
-    loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::value& data, bool strict)
+    loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::node& data, bool strict)
 {
-    static constexpr std::string_view errorMessage =
-        R"(interface properties require "name" and "value" fields)";
-    if (fileops::isMember(data, "properties")) {
-        const auto& props = toml::find(data, "properties");
-        if (props.is_array()) {
-            const auto& propArray = props.as_array();
-            for (const auto& prop : propArray) {
-                std::string propname;
-                propname = toml::find_or(prop, "name", propname);
-                const toml::value uVal;
-                const auto& propval = toml::find_or(prop, "value", uVal);
+    const auto props = toml::node_view{data}["properties"];
+    if (!props) {
+        return;
+    }
 
-                if ((propname.empty()) || (propval.is_empty())) {
-                    if (strict) {
-                        fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
-
-                        throw(InvalidParameter(errorMessage));
-                    }
-                    fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
-                    continue;
-                }
-                if (propval.is_floating()) {
-                    iface.set(propname, propval.as_floating());
-                } else {
-                    iface.setString(propname, static_cast<std::string_view>(propval.as_string()));
-                }
+    const auto loadProperty = [fed, &iface, strict](const toml::node& prop) {
+        const toml::node_view view{prop};
+        const auto name = view["name"].value_or(std::string_view{});
+        const auto value = view["value"];
+        if (name.empty() || !value) {
+            static constexpr std::string_view errorMessage =
+                R"(interface properties require "name" and "value" fields)";
+            if (strict) {
+                fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
+                throw InvalidParameter(errorMessage);
             }
-        } else {
-            std::string propname;
-            propname = toml::find_or(props, "name", propname);
-            const toml::value uVal;
-            const auto& propval = toml::find_or(props, "value", uVal);
-
-            if ((propname.empty()) || (propval.is_empty())) {
-                if (strict) {
-                    fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
-
-                    throw(InvalidParameter(errorMessage));
-                }
-                fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
-            } else {
-                if (propval.is_floating()) {
-                    iface.set(propname, propval.as_floating());
-                } else {
-                    iface.setString(propname, static_cast<std::string_view>(propval.as_string()));
-                }
-            }
+            fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
+            return;
         }
+        if (const auto* number = value.as_floating_point()) {
+            iface.set(name, number->get());
+        } else {
+            iface.setString(name, fileops::getTomlString(*value.node()));
+        }
+    };
+
+    if (const auto* array = props.as_array()) {
+        for (const auto& prop : *array) {
+            loadProperty(prop);
+        }
+    } else {
+        loadProperty(*props.node());
     }
 }
 
 void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
 {
     using fileops::getOrDefault;
-    using fileops::isMember;
     using fileops::replaceIfMember;
 
-    toml::value doc;
+    toml::table doc;
     try {
         doc = fileops::loadToml(tomlString);
     }
@@ -1661,13 +1624,8 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
     bool defaultGlobal = false;
     replaceIfMember(doc, "defaultglobal", defaultGlobal);
 
-    if (isMember(doc, "filters")) {
-        auto& filts = toml::find(doc, "filters");
-        if (!filts.is_array()) {
-            throw(helics::InvalidParameter("filters section in toml file must be an array"));
-        }
-        auto& filtArray = filts.as_array();
-        for (const auto& filt : filtArray) {
+    if (const auto* filtArray = fileops::getTomlArray(doc, "filters")) {
+        for (const auto& filt : *filtArray) {
             const std::string key = getOrDefault(filt, "name", emptyStr);
             const bool cloningflag = getOrDefault(filt, "cloning", false);
             const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
@@ -1701,13 +1659,8 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             loadPropertiesToml(this, filter, filt, strictConfigChecking);
         }
     }
-    if (isMember(doc, "translators")) {
-        auto& transs = toml::find(doc, "translators");
-        if (!transs.is_array()) {
-            throw(helics::InvalidParameter("translators section in toml file must be an array"));
-        }
-        auto& transArray = transs.as_array();
-        for (const auto& trans : transArray) {
+    if (const auto* transArray = fileops::getTomlArray(doc, "translators")) {
+        for (const auto& trans : *transArray) {
             const std::string key = getOrDefault(trans, "name", emptyStr);
 
             std::string ttype = getOrDefault(trans, "type", std::string("custom"));
@@ -1771,24 +1724,10 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             loadPropertiesToml(this, translator, trans, strictConfigChecking);
         }
     }
-    if (isMember(doc, "globals")) {
-        auto& globals = toml::find(doc, "globals");
-        if (globals.is_array()) {
-            for (auto& val : globals.as_array()) {
-                setGlobal(static_cast<std::string_view>(val.as_array()[0].as_string()),
-                          static_cast<std::string_view>(val.as_array()[1].as_string()));
-            }
-        } else {
-            for (const auto& val : globals.as_table()) {
-                setGlobal(val.first, static_cast<std::string_view>(val.second.as_string()));
-            }
-        }
-    }
-
-    arrayPairProcess(doc, "globals", [this](std::string_view key, std::string_view val) {
+    fileops::loadTomlPairs(doc, "globals", [this](std::string_view key, std::string_view val) {
         setGlobal(key, val);
     });
-    arrayPairProcess(doc, "aliases", [this](std::string_view key, std::string_view val) {
+    fileops::loadTomlPairs(doc, "aliases", [this](std::string_view key, std::string_view val) {
         addAlias(key, val);
     });
 

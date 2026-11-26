@@ -8,7 +8,7 @@ steps:
         ThirdParty/libzmq
         ThirdParty/networking
         ThirdParty/spdlog
-        ThirdParty/toml
+        ThirdParty/tomlplusplus
         ThirdParty/units
         ThirdParty/utilities
       )

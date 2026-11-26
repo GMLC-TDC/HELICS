@@ -13,6 +13,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ### Changed
 
+- Replaced the bundled toml11 parser with toml++ for TOML configuration files and strings.
 - The C shared library now always includes the full HELICS apps API, including `helicsAppFree` and `helicsAppDestroy` in shared-library-only packages used by matHELICS. Set `HELICS_BUILD_APP_EXECUTABLES=OFF` to omit the standalone tools.
 
 ### Fixed

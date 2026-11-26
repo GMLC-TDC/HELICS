@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "addTargets.hpp"
 
+#include "../core/core-exceptions.hpp"
 #include "JsonProcessingFunctions.hpp"
 #include "TomlProcessingFunctions.hpp"
 
@@ -21,25 +22,28 @@ namespace helics {
 
 using fileops::JsonAsString;
 
-void processOptions(const toml::value& section,
+void processOptions(const toml::node& section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction)
 {
-    const auto& table = section.as_table();
-    for (const auto& telement : table) {
-        if (telement.second.is_array() || telement.second.is_table()) {
+    const auto* table = section.as_table();
+    if (table == nullptr) {
+        throw InvalidParameter("expected a TOML table for options");
+    }
+    for (const auto& [key, value] : *table) {
+        if (value.is_array() || value.is_table()) {
             continue;
         }
-        const int32_t index = optionConversion(telement.first);
+        const int32_t index = optionConversion(std::string(key.str()));
         if (index >= 0) {
             int32_t val = -1;
-            if (telement.second.is_boolean()) {
-                val = telement.second.as_boolean() ? 1 : 0;
-            } else if (telement.second.is_integer()) {
-                val = telement.second.as_integer();
+            if (const auto* boolean = value.as_boolean()) {
+                val = boolean->get() ? 1 : 0;
+            } else if (const auto* integer = value.as_integer()) {
+                val = static_cast<int32_t>(integer->get());
             } else {
-                val = valueConversion(telement.second.as_string());
+                val = valueConversion(fileops::getTomlString(value));
             }
             optionAction(index, val);
         }
@@ -119,25 +123,24 @@ void loadTags(const nlohmann::json& section,
     }
 }
 
-void loadTags(const toml::value& section,
+void loadTags(const toml::node& section,
               const std::function<void(std::string_view, std::string_view)>& tagAction)
 {
-    if (section.contains("tags")) {
-        auto tagValue = section.at("tags");
-        if (tagValue.is_array()) {
-            for (std::size_t ii = 0; ii < tagValue.size(); ++ii) {
-                auto tagPair = getTagPair(tagValue[ii]);
+    if (const auto tags = toml::node_view{section}["tags"]) {
+        if (const auto* array = tags.as_array()) {
+            for (const auto& entry : *array) {
+                auto tagPair = getTagPair(entry);
                 if (!tagPair.first.empty()) {
                     tagAction(tagPair.first, tagPair.second);
                 }
             }
         } else {
-            auto tagPair = getTagPair(tagValue);
+            auto tagPair = getTagPair(*tags.node());
             if (!tagPair.first.empty()) {
                 tagAction(tagPair.first, tagPair.second);
-            } else if (tagValue.is_table()) {
-                for (auto& values : tagValue.as_table()) {
-                    tagAction(values.first, fileops::tomlAsString(values.second));
+            } else if (const auto* table = tags.as_table()) {
+                for (const auto& [name, value] : *table) {
+                    tagAction(name.str(), fileops::tomlAsString(value));
                 }
             }
         }
