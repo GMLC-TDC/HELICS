@@ -100,6 +100,52 @@ TEST_P(filter_single_type_test, message_filter_registration)
     checkpoint("full disconnect complete");
 }
 
+/** Closing a filter must cancel its pending connections without affecting live filters. */
+TEST_P(filter_single_type_test, message_filter_closed_pending_target)
+{
+    auto broker = AddBroker(GetParam(), 2);
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed = GetFederateAs<helics::MessageFederate>(1);
+    auto& closedFilter = fFed->registerFilter("closed_source");
+    closedFilter.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    closedFilter.addSourceTarget("late_source");
+    auto& closedClone = fFed->registerCloningFilter("closed_destination");
+    closedClone.setOption(HELICS_HANDLE_OPTION_RECONNECTABLE);
+    closedClone.addDestinationTarget("late_destination");
+    auto& liveFilter = helics::make_filter(helics::FilterTypes::DELAY, fFed.get(), "live");
+    liveFilter.addSourceTarget("late_source");
+    liveFilter.set("delay", 0.5);
+
+    auto core = fFed->getCorePointer();
+    // Ordered queries ensure the broker sees the requests and closures before the endpoints.
+    ASSERT_EQ(core->query("root", "isconnected", HELICS_SEQUENCING_MODE_ORDERED), "true");
+    core->closeHandle(closedFilter.getHandle());
+    core->closeHandle(closedClone.getHandle());
+    ASSERT_EQ(core->query("root", "isconnected", HELICS_SEQUENCING_MODE_ORDERED), "true");
+
+    auto& source = mFed->registerGlobalEndpoint("late_source");
+    auto& destination = mFed->registerGlobalEndpoint("late_destination");
+    fFed->enterExecutingModeAsync();
+    mFed->enterExecutingMode();
+    fFed->enterExecutingModeComplete();
+
+    source.sendTo("test", "late_destination");
+    fFed->requestTimeAsync(1.0);
+    mFed->requestTime(1.0);
+    fFed->requestTimeComplete();
+    auto message = destination.getMessage();
+    ASSERT_TRUE(message);
+    EXPECT_EQ(message->data.to_string(), "test");
+    EXPECT_EQ(message->time, 0.5);
+
+    mFed->finalizeAsync();
+    fFed->finalize();
+    mFed->finalizeComplete();
+}
+
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
 simulation

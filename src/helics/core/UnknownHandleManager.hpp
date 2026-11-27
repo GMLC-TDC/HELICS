@@ -113,6 +113,8 @@ class UnknownHandleManager {
 
     /** specify a found source filter*/
     void clearFilter(const std::string& newFilter);
+    /** clear pending and reconnectable targets belonging to a closed interface*/
+    void clearHandle(GlobalHandle handle);
     /** clear all unknowns belonging to a certain federate*/
     void clearFederateUnknowns(GlobalFederateId id);
     /** clear unknowns if callback is true*/
