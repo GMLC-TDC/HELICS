@@ -99,14 +99,14 @@ std::vector<CLI::ConfigItem>
         if (prefix.size() > maximumLayers) {
             return results;
         }
-        for (auto& fld : json.items()) {
+        for (const auto& field : json.items()) {
             auto copy_prefix = prefix;
             if (!name.empty()) {
                 if (name != mPromoteSection) {
                     copy_prefix.push_back(name);
                 }
             }
-            auto sub_results = fromConfigInternal(fld.value(), fld.key(), copy_prefix);
+            auto sub_results = fromConfigInternal(field.value(), field.key(), copy_prefix);
             results.insert(results.end(), sub_results.begin(), sub_results.end());
         }
     } else if (!name.empty()) {
