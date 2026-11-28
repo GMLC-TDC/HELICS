@@ -62,21 +62,22 @@ The following JSON file configures a combination federate with both value and me
 {
   "name": "plant",
   "core_type": "inproc",
-  "core": {"logfile": "plant.log"},
-  "broker": {"auto": true, "initstring": "--federates=1"},
+  "core": { "logfile": "plant.log" },
+  "broker": { "auto": true, "initstring": "--federates=1" },
   "period": 1,
   "grant_timeout": "10 s",
-  "publications": [
-    {"key": "temperature", "type": "double", "unit": "degC"}
-  ],
+  "publications": [{ "key": "temperature", "type": "double", "unit": "degC" }],
   "inputs": [
-    {"key": "reading", "type": "double", "unit": "degC", "targets": ["plant/temperature"]}
+    {
+      "key": "reading",
+      "type": "double",
+      "unit": "degC",
+      "targets": ["plant/temperature"]
+    }
   ],
-  "endpoints": [
-    {"name": "events", "tags": {"role": "monitoring"}}
-  ],
+  "endpoints": [{ "name": "events", "tags": { "role": "monitoring" } }],
   "datasinks": [
-    {"name": "temperature_sink", "subscriptions": ["plant/temperature"]}
+    { "name": "temperature_sink", "subscriptions": ["plant/temperature"] }
   ]
 }
 ```
@@ -218,13 +219,13 @@ The federate accepts `broker` or `broker_address` as a string. To group broker s
 
 On the federate command line, pass a comma-separated list of names, for example `--flags=source_only,-strict_config_checking`. A leading minus disables a named flag. In a JSON or TOML federate file, prefer explicit keys with Boolean values. Interface flag lists use the syntax in [Interface metadata and options](#interface-metadata-and-options). If the application exposes the federate parser, use `--config` or `--config-file` to load settings from an INI, JSON, or TOML file.
 
-| Federate setting | Default | Effect |
-| --- | --- | --- |
-| `strict_config_checking` | `true` | Report invalid filter and translator definitions as errors. Set to `false` to log warnings and skip those definitions. |
-| `json` | `false` | Use JSON serialization for core communications. The named flag `use_json_serialization` is also recognized. Set `json` when configuring a new core from the federate. |
-| `debugging` | `false` | Pass debugging mode to the newly created core. See the core and broker timeout options below. |
-| `allow_remote_control`, `disable_remote_control` | `true`, `false` | Control whether the federate responds to remote operations such as disconnect. |
-| `single_thread_federate` | `false` | Use single-threaded federate operation. Call the federate from a single thread when enabling this flag. |
+| Federate setting                                 | Default         | Effect                                                                                                                                                                |
+| ------------------------------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `strict_config_checking`                         | `true`          | Report invalid filter and translator definitions as errors. Set to `false` to log warnings and skip those definitions.                                                |
+| `json`                                           | `false`         | Use JSON serialization for core communications. The named flag `use_json_serialization` is also recognized. Set `json` when configuring a new core from the federate. |
+| `debugging`                                      | `false`         | Pass debugging mode to the newly created core. See the core and broker timeout options below.                                                                         |
+| `allow_remote_control`, `disable_remote_control` | `true`, `false` | Control whether the federate responds to remote operations such as disconnect.                                                                                        |
+| `single_thread_federate`                         | `false`         | Use single-threaded federate operation. Call the federate from a single thread when enabling this flag.                                                               |
 
 The named flags `delay_init_entry` and `enable_init_entry` are core controls. Use the core API to hold and release initialization. The parser also recognizes `single_thread_core` and `multi_thread_core` as federate flag names. Core transport and threading are selected through the core type.
 
@@ -856,16 +857,16 @@ When an interface requests a target it tries to find a match in the federation. 
 
 ## Federate configuration sections
 
-| Key | Meaning |
-| --- | --- |
-| `defaultglobal` | Default name visibility for publications, named inputs, endpoints, filters, and translators. Defaults to `false`. Set `global` on an individual interface to override it. |
-| `interfaces` | In JSON, put `publications`, `subscriptions`, `inputs`, `endpoints`, `datasinks`, `filters`, and `translators` inside this object or at the same level as `name`. If `interfaces` is present, registration reads the lists inside it. In TOML use top-level arrays of tables. |
-| `helics` | In JSON, group HELICS configuration in a `helics` object to use a file that also contains simulator settings. |
-| `core` | When creating a core from a federate file, HELICS reads core initialization options from the JSON `core` object or TOML `[core]` table. A scalar `core` setting selects a core type or name. |
-| `globals` | Set broker-visible global values. Use an object/table of string values, or an array of `[name, value]` pairs. |
-| `aliases` | Add alternate names for registered interfaces. Use an object/table mapping original interface names to aliases, or an array of `[interface, alias]` pairs. This also works for endpoints, filters, and translators. |
-| `potential_interfaces` | In JSON, declare interfaces for the [Connector](apps/Connector.md) to request during initialization. Supports `publications`, `inputs`, `endpoints`, `filters`, `translators`, and `datasinks`. |
-| `potential_interface_templates` | In JSON, declare Connector templates such as `publication_templates`, `input_templates`, or `endpoint_templates`. The same template lists can appear inside `potential_interfaces`. See [Connector](apps/Connector.md) for the template syntax. |
+| Key                             | Meaning                                                                                                                                                                                                                                                                       |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaultglobal`                 | Default name visibility for publications, named inputs, endpoints, filters, and translators. Defaults to `false`. Set `global` on an individual interface to override it.                                                                                                     |
+| `interfaces`                    | In JSON, put `publications`, `subscriptions`, `inputs`, `endpoints`, `datasinks`, `filters`, and `translators` inside this object or at the same level as `name`. If `interfaces` is present, registration reads the lists inside it. In TOML use top-level arrays of tables. |
+| `helics`                        | In JSON, group HELICS configuration in a `helics` object to use a file that also contains simulator settings.                                                                                                                                                                 |
+| `core`                          | When creating a core from a federate file, HELICS reads core initialization options from the JSON `core` object or TOML `[core]` table. A scalar `core` setting selects a core type or name.                                                                                  |
+| `globals`                       | Set broker-visible global values. Use an object/table of string values, or an array of `[name, value]` pairs.                                                                                                                                                                 |
+| `aliases`                       | Add alternate names for registered interfaces. Use an object/table mapping original interface names to aliases, or an array of `[interface, alias]` pairs. This also works for endpoints, filters, and translators.                                                           |
+| `potential_interfaces`          | In JSON, declare interfaces for the [Connector](apps/Connector.md) to request during initialization. Supports `publications`, `inputs`, `endpoints`, `filters`, `translators`, and `datasinks`.                                                                               |
+| `potential_interface_templates` | In JSON, declare Connector templates such as `publication_templates`, `input_templates`, or `endpoint_templates`. The same template lists can appear inside `potential_interfaces`. See [Connector](apps/Connector.md) for the template syntax.                               |
 
 ### Interface metadata and options
 
@@ -1157,13 +1158,13 @@ Defines the default destination for a message sent from this endpoint.
 
 ### Endpoint targets and filters
 
-| Key | Effect |
-| --- | --- |
-| `source_endpoints`, `source_targets` | Connect sending endpoints to this endpoint. |
-| `destination_endpoints`, `destination_targets` | Connect this endpoint to receiving endpoints. |
-| `subscriptions`, `source_inputs` | Subscribe the endpoint to publication updates, which it receives as messages. |
-| `filters`, `source_filters` | Attach filters to messages sent from this endpoint. |
-| `destination_filters`, `destFilters` | Attach filters to messages delivered to this endpoint. |
+| Key                                            | Effect                                                                        |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- |
+| `source_endpoints`, `source_targets`           | Connect sending endpoints to this endpoint.                                   |
+| `destination_endpoints`, `destination_targets` | Connect this endpoint to receiving endpoints.                                 |
+| `subscriptions`, `source_inputs`               | Subscribe the endpoint to publication updates, which it receives as messages. |
+| `filters`, `source_filters`                    | Attach filters to messages sent from this endpoint.                           |
+| `destination_filters`, `destFilters`           | Attach filters to messages delivered to this endpoint.                        |
 
 To give an endpoint another name, use the federate-level `aliases` mapping.
 
@@ -1619,29 +1620,29 @@ Pass these options to the core or broker constructor, or to the broker executabl
 
 Use a time with units, such as `"15 s"`. Unitless values are interpreted as milliseconds. See [Timeouts](../user-guide/advanced_topics/timeouts.md) for how the timers interact.
 
-| Option | Effect |
-| --- | --- |
-| `--tick` | Interval between heartbeat checks. Defaults to 5 s. |
-| `--timeout` | General connection and communication timeout. |
-| `--network_timeout` | Time to wait for a broker connection. |
-| `--query_timeout` | Time to wait for a query response. Defaults to 15 s. |
-| `--grant_timeout` | Time to wait for a grant before triggering diagnostic action. |
-| `--error_delay`, `--error_timeout` | Delay before terminating after an error. |
-| `--max_cosim_duration` | Wall-clock limit for an active co-simulation, checked on broker or core ticks. |
-| `--disable_timer`, `--no_tick` | Disable timeout checks driven by the tick timer. |
-| `--debugging` | Enable `--slow_responding` and `--disable_timer` together. |
+| Option                             | Effect                                                                         |
+| ---------------------------------- | ------------------------------------------------------------------------------ |
+| `--tick`                           | Interval between heartbeat checks. Defaults to 5 s.                            |
+| `--timeout`                        | General connection and communication timeout.                                  |
+| `--network_timeout`                | Time to wait for a broker connection.                                          |
+| `--query_timeout`                  | Time to wait for a query response. Defaults to 15 s.                           |
+| `--grant_timeout`                  | Time to wait for a grant before triggering diagnostic action.                  |
+| `--error_delay`, `--error_timeout` | Delay before terminating after an error.                                       |
+| `--max_cosim_duration`             | Wall-clock limit for an active co-simulation, checked on broker or core ticks. |
+| `--disable_timer`, `--no_tick`     | Disable timeout checks driven by the tick timer.                               |
+| `--debugging`                      | Enable `--slow_responding` and `--disable_timer` together.                     |
 
 ### Core and broker connection files
 
 Use `helicsCoreMakeConnections` or `helicsBrokerMakeConnections` to load interface connections from JSON or TOML. A file path passed directly as the core or broker initialization argument can also contain these sections. The names must match registered interfaces, including any federate prefix.
 
-| Key | Entries |
-| --- | --- |
-| `connections` | Arrays of `[publication, input]` pairs, or objects/tables naming a `publication` and `targets`, an `input` and `sources`, or an `endpoint` and its `sources` and/or `targets`. |
-| `links` | Arrays of `[source_endpoint, destination_endpoint]` pairs. The same named-entry forms as in `connections` are also accepted. |
-| `filters` | Arrays of `[filter, source_endpoint]` pairs, or objects/tables naming a `filter` with `source_endpoints` (or `endpoints`) and/or `dest_endpoints`. |
-| `globals`, `aliases` | Name-to-value mappings or lists of pairs, as in [Federate configuration sections](#federate-configuration-sections). |
-| `tags` | Core metadata in JSON. See [Interface metadata and options](#interface-metadata-and-options) for supported JSON forms. |
+| Key                  | Entries                                                                                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `connections`        | Arrays of `[publication, input]` pairs, or objects/tables naming a `publication` and `targets`, an `input` and `sources`, or an `endpoint` and its `sources` and/or `targets`. |
+| `links`              | Arrays of `[source_endpoint, destination_endpoint]` pairs. The same named-entry forms as in `connections` are also accepted.                                                   |
+| `filters`            | Arrays of `[filter, source_endpoint]` pairs, or objects/tables naming a `filter` with `source_endpoints` (or `endpoints`) and/or `dest_endpoints`.                             |
+| `globals`, `aliases` | Name-to-value mappings or lists of pairs, as in [Federate configuration sections](#federate-configuration-sections).                                                           |
+| `tags`               | Core metadata in JSON. See [Interface metadata and options](#interface-metadata-and-options) for supported JSON forms.                                                         |
 
 The named connection entries accept a string or an array under the plural key, or a single string under its singular form. The `destEndpoints` and `sourceEndpoints` spellings are also accepted in filter entries.
 
@@ -1649,13 +1650,13 @@ The named connection entries accept a string or an array under the plural key, o
 
 These parsers also read the following environment variables.
 
-| Scope | Variables |
-| --- | --- |
-| Federate | `HELICS_CORE_TYPE`, `HELICS_CORE_INIT_STRING`, `HELICS_LOG_LEVEL` |
-| Broker/core type selection | `HELICS_CORE_TYPE` |
-| Broker and core | `HELICS_BROKER_KEY`, `HELICS_BROKER_LOG_LEVEL` |
-| Network broker and core | `HELICS_BROKER_ADDRESS`, `HELICS_BROKER_PORT`, `HELICS_LOCAL_PORT`, `HELICS_BROKER_INIT`, `HELICS_CONNECTION_ADDRESS`, `HELICS_CONNECTION_PORT` |
-| Federate and network broker/core | `HELICS_ENCRYPTION`, `HELICS_ENCRYPTION_CONFIG` |
+| Scope                            | Variables                                                                                                                                       |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Federate                         | `HELICS_CORE_TYPE`, `HELICS_CORE_INIT_STRING`, `HELICS_LOG_LEVEL`                                                                               |
+| Broker/core type selection       | `HELICS_CORE_TYPE`                                                                                                                              |
+| Broker and core                  | `HELICS_BROKER_KEY`, `HELICS_BROKER_LOG_LEVEL`                                                                                                  |
+| Network broker and core          | `HELICS_BROKER_ADDRESS`, `HELICS_BROKER_PORT`, `HELICS_LOCAL_PORT`, `HELICS_BROKER_INIT`, `HELICS_CONNECTION_ADDRESS`, `HELICS_CONNECTION_PORT` |
+| Federate and network broker/core | `HELICS_ENCRYPTION`, `HELICS_ENCRYPTION_CONFIG`                                                                                                 |
 
 ## Network
 
@@ -1810,12 +1811,12 @@ For transports that use them, `connection_address` and `connection_port` supply 
 
 ### Transport-specific options
 
-| Transport | Option | Effect |
-| --- | --- | --- |
-| `mpi` | `--broker_rank` or `--rank` | MPI rank of the parent broker. |
-| `mpi` | `--broker_tag` or `--tag` | MPI tag of the parent broker. |
-| `tcp_ss` | `--connections` | List of other TCP addresses for this core or broker to connect to. |
-| `tcp_ss` | `--no_outgoing_connection` | Disable outgoing TCP connections. |
+| Transport | Option                      | Effect                                                             |
+| --------- | --------------------------- | ------------------------------------------------------------------ |
+| `mpi`     | `--broker_rank` or `--rank` | MPI rank of the parent broker.                                     |
+| `mpi`     | `--broker_tag` or `--tag`   | MPI tag of the parent broker.                                      |
+| `tcp_ss`  | `--connections`             | List of other TCP addresses for this core or broker to connect to. |
+| `tcp_ss`  | `--no_outgoing_connection`  | Disable outgoing TCP connections.                                  |
 
 Network parsers also accept `broker_init` as an alias for `broker_init_string` and read `HELICS_BROKER_INIT` through that alias. The network `local_port` accepts `auto` for automatic allocation and `os` to request OS allocation where the transport supports it.
 

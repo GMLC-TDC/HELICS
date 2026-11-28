@@ -146,9 +146,8 @@ TEST(callbackFederateConfig, tomlCoreBrokerAndStopTime)
     EXPECT_EQ(fed.getTimeProperty(HELICS_PROPERTY_TIME_STOPTIME), 3.0);
 
     helics::Time lastGrant = helics::timeZero;
-    fed.setTimeRequestReturnCallback([&lastGrant](auto granted, bool /*iterating*/) {
-        lastGrant = granted;
-    });
+    fed.setTimeRequestReturnCallback(
+        [&lastGrant](auto granted, bool /*iterating*/) { lastGrant = granted; });
     fed.setNextTimeIterativeCallback([](auto grant) {
         if (grant.grantedTime >= 4.0) {
             return std::make_pair(helics::Time::maxVal(),
