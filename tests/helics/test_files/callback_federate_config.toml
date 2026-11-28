@@ -1,0 +1,12 @@
+name = "callback_config_federate"
+core_type = "test"
+period = 1
+stop_time = "3 s"
+
+[broker]
+auto = true
+initstring = "--federates=1"
+
+[core]
+name = "callback_config_core"
+force_logging_flush = true

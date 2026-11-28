@@ -10,7 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 
 #include <memory>
+#include <sstream>
 #include <string>
+#include <toml++/toml.hpp>
 #include <utility>
 #include <vector>
 
@@ -62,6 +64,27 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
             throw(CLI::FileError(errs));
         }
     }
+    if (mTomlFile && !section().empty()) {
+        try {
+            auto config = toml::parse(input);
+            auto selected = config.at_path(section());
+            if (selected.is_array() && configIndex >= 0) {
+                selected = selected[static_cast<std::size_t>(configIndex)];
+            }
+            if (const auto* table = selected.as_table()) {
+                // Apply the CLI formatter's depth limit relative to the selected table.
+                std::stringstream contents;
+                contents << *table;
+                CLI::ConfigBase formatter = *this;
+                formatter.section({});
+                return formatter.from_config(contents);
+            }
+            return {};
+        }
+        catch (const toml::parse_error& err) {
+            throw(CLI::FileError(std::string(err.description())));
+        }
+    }
     return ConfigBase::from_config(input);
 }
 
@@ -76,14 +99,14 @@ std::vector<CLI::ConfigItem>
         if (prefix.size() > maximumLayers) {
             return results;
         }
-        for (auto& fld : json.items()) {
+        for (const auto& field : json.items()) {
             auto copy_prefix = prefix;
             if (!name.empty()) {
                 if (name != mPromoteSection) {
                     copy_prefix.push_back(name);
                 }
             }
-            auto sub_results = fromConfigInternal(fld.value(), fld.key(), copy_prefix);
+            auto sub_results = fromConfigInternal(field.value(), field.key(), copy_prefix);
             results.insert(results.end(), sub_results.begin(), sub_results.end());
         }
     } else if (!name.empty()) {
@@ -135,6 +158,8 @@ HelicsConfigJSON* addJsonConfig(CLI::App* app)
     app->get_config_ptr()->check([fmtr](const std::string& filename) {
         if (CLI::ExistingFile(filename).empty()) {
             fmtr->skipJson(!fileops::hasJsonExtension(filename));
+            const auto extension = filename.substr(filename.find_last_of('.') + 1);
+            fmtr->setTomlFile(extension == "toml" || extension == "TOML");
         }
         return std::string{};
     });

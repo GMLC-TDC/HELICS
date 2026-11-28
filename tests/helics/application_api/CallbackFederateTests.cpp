@@ -39,20 +39,23 @@ TEST_F(callbackFed, initialize)
 {
     SetupTest<helics::CallbackFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
-    int cb{0};
-    vFed1->setInitializeCallback([&cb]() {
-        ++cb;
+    int callbackCount{0};
+    vFed1->setInitializeCallback([&callbackCount]() {
+        ++callbackCount;
         return helics::IterationRequest::HALT_OPERATIONS;
     });
 
-    auto v = std::make_shared<std::promise<int>>();
-    auto vfut = v->get_future();
-    vFed1->setCosimulationTerminatedCallback([v = std::move(v)]() { v->set_value(5); });
+    auto terminationPromise = std::make_shared<std::promise<int>>();
+    auto vfut = terminationPromise->get_future();
+    vFed1->setCosimulationTerminatedCallback(
+        [terminationPromise = std::move(terminationPromise)]() {
+            terminationPromise->set_value(5);
+        });
 
     vFed1->enterInitializingMode();
 
     auto res = vfut.get();
-    EXPECT_EQ(cb, 1);
+    EXPECT_EQ(callbackCount, 1);
     EXPECT_EQ(res, 5);
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
 }
@@ -62,20 +65,23 @@ TEST_F(callbackFed, execute)
 {
     SetupTest<helics::CallbackFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
-    int cb{0};
+    int callbackCount{0};
 
-    vFed1->setExecutingEntryCallback([&cb]() { ++cb; });
+    vFed1->setExecutingEntryCallback([&callbackCount]() { ++callbackCount; });
     vFed1->setNextTimeIterativeCallback([](auto /*t*/) {
         return std::make_pair(helics::Time::maxVal(), helics::IterationRequest::HALT_OPERATIONS);
     });
-    auto v = std::make_shared<std::promise<int>>();
-    auto vfut = v->get_future();
-    vFed1->setCosimulationTerminatedCallback([v = std::move(v)]() { v->set_value(5); });
+    auto terminationPromise = std::make_shared<std::promise<int>>();
+    auto vfut = terminationPromise->get_future();
+    vFed1->setCosimulationTerminatedCallback(
+        [terminationPromise = std::move(terminationPromise)]() {
+            terminationPromise->set_value(5);
+        });
 
     vFed1->enterInitializingMode();
 
     auto res = vfut.get();
-    EXPECT_EQ(cb, 1);
+    EXPECT_EQ(callbackCount, 1);
     EXPECT_EQ(res, 5);
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
 }
@@ -91,16 +97,19 @@ TEST_F(callbackFed, timeSteps)
     vFed1->setTimeRequestEntryCallback(
         [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
-    vFed1->setNextTimeIterativeCallback([](auto t) {
-        if (t.grantedTime >= 3.0) {
+    vFed1->setNextTimeIterativeCallback([](auto grant) {
+        if (grant.grantedTime >= 3.0) {
             return std::make_pair(helics::Time::maxVal(),
                                   helics::IterationRequest::HALT_OPERATIONS);
         }
-        return std::make_pair(t.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
+        return std::make_pair(grant.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
     });
-    auto v = std::make_shared<std::promise<int>>();
-    auto vfut = v->get_future();
-    vFed1->setCosimulationTerminatedCallback([v = std::move(v)]() { v->set_value(7); });
+    auto terminationPromise = std::make_shared<std::promise<int>>();
+    auto vfut = terminationPromise->get_future();
+    vFed1->setCosimulationTerminatedCallback(
+        [terminationPromise = std::move(terminationPromise)]() {
+            terminationPromise->set_value(7);
+        });
 
     vFed1->enterInitializingMode();
 
@@ -124,9 +133,12 @@ TEST_F(callbackFed, timeStepsPeriodMax)
     vFed1->setTimeRequestEntryCallback(
         [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
-    auto v = std::make_shared<std::promise<int>>();
-    auto vfut = v->get_future();
-    vFed1->setCosimulationTerminatedCallback([v = std::move(v)]() { v->set_value(8); });
+    auto terminationPromise = std::make_shared<std::promise<int>>();
+    auto vfut = terminationPromise->get_future();
+    vFed1->setCosimulationTerminatedCallback(
+        [terminationPromise = std::move(terminationPromise)]() {
+            terminationPromise->set_value(8);
+        });
 
     vFed1->enterInitializingMode();
 
@@ -137,6 +149,32 @@ TEST_F(callbackFed, timeStepsPeriodMax)
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
 }
 
+TEST(callbackFederateConfig, tomlCoreBrokerAndStopTime)
+{
+    helics::CallbackFederate fed(std::string(TEST_DIR) + "callback_federate_config.toml");
+    auto core = fed.getCorePointer();
+    EXPECT_EQ(core->getIdentifier(), "callback_config_core");
+    EXPECT_TRUE(core->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_FORCE_LOGGING_FLUSH));
+    EXPECT_EQ(fed.getTimeProperty(HELICS_PROPERTY_TIME_STOPTIME), 3.0);
+
+    helics::Time lastGrant = helics::timeZero;
+    fed.setTimeRequestReturnCallback(
+        [&lastGrant](auto granted, bool /*iterating*/) { lastGrant = granted; });
+    fed.setNextTimeIterativeCallback([](auto grant) {
+        if (grant.grantedTime >= 4.0) {
+            return std::make_pair(helics::Time::maxVal(),
+                                  helics::IterationRequest::HALT_OPERATIONS);
+        }
+        return std::make_pair(grant.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
+    });
+
+    std::promise<helics::Time> stopped;
+    auto stopTime = stopped.get_future();
+    fed.setCosimulationTerminatedCallback([&]() { stopped.set_value(lastGrant); });
+    fed.enterInitializingMode();
+    EXPECT_EQ(stopTime.get(), 3.0);
+}
+
 // test that an error return in the init call routes properly
 TEST_F(callbackFed, errorInit)
 {
@@ -144,10 +182,12 @@ TEST_F(callbackFed, errorInit)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     vFed1->setInitializeCallback([]() { return helics::IterationRequest::ERROR_CONDITION; });
 
-    auto v = std::make_shared<std::promise<int>>();
-    auto vfut = v->get_future();
+    auto errorPromise = std::make_shared<std::promise<int>>();
+    auto vfut = errorPromise->get_future();
     vFed1->setErrorHandlerCallback(
-        [v = std::move(v)](int code, std::string_view /*message*/) { v->set_value(code); });
+        [errorPromise = std::move(errorPromise)](int code, std::string_view /*message*/) {
+            errorPromise->set_value(code);
+        });
 
     vFed1->enterInitializingMode();
 
@@ -165,11 +205,12 @@ TEST_F(callbackFed, initException)
     vFed1->setInitializeCallback(
         []() -> helics::IterationRequest { throw std::runtime_error("ETEST"); });
 
-    auto v = std::make_shared<std::promise<std::string>>();
-    auto vfut = v->get_future();
-    vFed1->setErrorHandlerCallback([v = std::move(v)](int /*code*/, std::string_view message) {
-        v->set_value(std::string(message));
-    });
+    auto errorPromise = std::make_shared<std::promise<std::string>>();
+    auto vfut = errorPromise->get_future();
+    vFed1->setErrorHandlerCallback(
+        [errorPromise = std::move(errorPromise)](int /*code*/, std::string_view message) {
+            errorPromise->set_value(std::string(message));
+        });
 
     vFed1->enterInitializingMode();
 
@@ -190,18 +231,20 @@ TEST_F(callbackFed, timeStepError)
     vFed1->setTimeRequestEntryCallback(
         [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
-    vFed1->setNextTimeIterativeCallback([](auto t) {
-        if (t.grantedTime >= 3.0) {
+    vFed1->setNextTimeIterativeCallback([](auto grant) {
+        if (grant.grantedTime >= 3.0) {
             return std::make_pair(helics::Time::maxVal(),
                                   helics::IterationRequest::ERROR_CONDITION);
         }
-        return std::make_pair(t.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
+        return std::make_pair(grant.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
     });
-    auto v = std::make_shared<std::promise<int>>();
-    auto vfut = v->get_future();
+    auto errorPromise = std::make_shared<std::promise<int>>();
+    auto vfut = errorPromise->get_future();
 
     vFed1->setErrorHandlerCallback(
-        [v = std::move(v)](int code, std::string_view /*message*/) { v->set_value(code); });
+        [errorPromise = std::move(errorPromise)](int code, std::string_view /*message*/) {
+            errorPromise->set_value(code);
+        });
 
     vFed1->enterInitializingMode();
 
@@ -224,18 +267,19 @@ TEST_F(callbackFed, timeStepException)
     vFed1->setTimeRequestEntryCallback(
         [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
-    vFed1->setNextTimeIterativeCallback([](auto t) {
-        if (t.grantedTime >= 3.0) {
+    vFed1->setNextTimeIterativeCallback([](auto grant) {
+        if (grant.grantedTime >= 3.0) {
             throw std::runtime_error("ETEST");
         }
 
-        return std::make_pair(t.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
+        return std::make_pair(grant.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
     });
-    auto v = std::make_shared<std::promise<std::string>>();
-    auto vfut = v->get_future();
-    vFed1->setErrorHandlerCallback([v = std::move(v)](int /*code*/, std::string_view message) {
-        v->set_value(std::string(message));
-    });
+    auto errorPromise = std::make_shared<std::promise<std::string>>();
+    auto vfut = errorPromise->get_future();
+    vFed1->setErrorHandlerCallback(
+        [errorPromise = std::move(errorPromise)](int /*code*/, std::string_view message) {
+            errorPromise->set_value(std::string(message));
+        });
 
     vFed1->enterInitializingMode();
 
@@ -257,22 +301,22 @@ TEST_F(callbackFed, timeSteps2Fed)
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 3.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed2->registerGlobalPublication<double>("pub2");
-    auto& s1 = vFed1->registerSubscription("pub2");
-    auto& s2 = vFed2->registerSubscription("pub1");
-    s1.setDefault(0.3);
-    s2.setDefault(0.4);
-    std::vector<double> v1;
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed2->registerGlobalPublication<double>("pub2");
+    auto& sub1 = vFed1->registerSubscription("pub2");
+    auto& sub2 = vFed2->registerSubscription("pub1");
+    sub1.setDefault(0.3);
+    sub2.setDefault(0.4);
+    std::vector<double> receivedValues1;
 
     vFed1->setTimeRequestReturnCallback([&](auto time, bool /*unused*/) {
-        p1.publish(18.7 + static_cast<double>(time));
-        v1.push_back(s1.getValue<double>());
+        pub1.publish(18.7 + static_cast<double>(time));
+        receivedValues1.push_back(sub1.getValue<double>());
     });
-    std::vector<double> v2;
+    std::vector<double> receivedValues2;
     vFed2->setTimeRequestReturnCallback([&](auto time, bool /*unused*/) {
-        p2.publish(23.7 + static_cast<double>(time));
-        v2.push_back(s2.getValue<double>());
+        pub2.publish(23.7 + static_cast<double>(time));
+        receivedValues2.push_back(sub2.getValue<double>());
     });
 
     auto term1 = std::make_shared<std::promise<int>>();
@@ -292,17 +336,17 @@ TEST_F(callbackFed, timeSteps2Fed)
     EXPECT_EQ(res2, 10);
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
     EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
-    ASSERT_EQ(v1.size(), 4);
-    EXPECT_DOUBLE_EQ(v1[0], 0.3);
-    EXPECT_DOUBLE_EQ(v1[1], 23.7);
-    EXPECT_DOUBLE_EQ(v1[2], 24.7);
-    EXPECT_DOUBLE_EQ(v1[3], 25.7);
+    ASSERT_EQ(receivedValues1.size(), 4);
+    EXPECT_DOUBLE_EQ(receivedValues1[0], 0.3);
+    EXPECT_DOUBLE_EQ(receivedValues1[1], 23.7);
+    EXPECT_DOUBLE_EQ(receivedValues1[2], 24.7);
+    EXPECT_DOUBLE_EQ(receivedValues1[3], 25.7);
 
-    ASSERT_EQ(v2.size(), 4);
-    EXPECT_DOUBLE_EQ(v2[0], 0.4);
-    EXPECT_DOUBLE_EQ(v2[1], 18.7);
-    EXPECT_DOUBLE_EQ(v2[2], 19.7);
-    EXPECT_DOUBLE_EQ(v2[3], 20.7);
+    ASSERT_EQ(receivedValues2.size(), 4);
+    EXPECT_DOUBLE_EQ(receivedValues2[0], 0.4);
+    EXPECT_DOUBLE_EQ(receivedValues2[1], 18.7);
+    EXPECT_DOUBLE_EQ(receivedValues2[2], 19.7);
+    EXPECT_DOUBLE_EQ(receivedValues2[3], 20.7);
 }
 
 TEST_F(callbackFed, 100Fed_nosan)
@@ -315,9 +359,9 @@ TEST_F(callbackFed, 100Fed_nosan)
         fed->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 120.0);
         fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         fed->registerPublication<double>("p1");
-        auto& s1 = fed->registerSubscription(std::string("fed") +
-                                             std::to_string((ii < 99) ? ii + 1 : 0) + "/p1");
-        s1.setDefault(0.7);
+        auto& subscription = fed->registerSubscription(
+            std::string("fed") + std::to_string((ii < 99) ? ii + 1 : 0) + "/p1");
+        subscription.setDefault(0.7);
 
         fed->setTimeRequestReturnCallback([fed, ii, &vals](auto time, bool /*unused*/) {
             fed->getPublication(0).publish(static_cast<double>(ii) + static_cast<double>(time));
@@ -344,9 +388,9 @@ TEST_F(callbackFed, 1000Fed_ci_skip_nosan)
         fed->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 25.0);
         fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         fed->registerPublication<double>("p1");
-        auto& s1 = fed->registerSubscription(
+        auto& subscription = fed->registerSubscription(
             std::string("fed") + std::to_string((ii < (fedCount - 1)) ? ii + 1 : 0) + "/p1");
-        s1.setDefault(0.7);
+        subscription.setDefault(0.7);
 
         fed->setTimeRequestReturnCallback([fed, ii, &vals](auto time, bool /*unused*/) {
             fed->getPublication(0).publish(static_cast<double>(ii) + static_cast<double>(time));
@@ -368,36 +412,36 @@ TEST_F(callbackFed, timeSteps2FedIterruption)
     auto vFed2 = GetFederateAs<helics::CallbackFederate>(1);
     vFed1->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 18.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 18.0);
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& p2 = vFed2->registerGlobalPublication<double>("pub2");
-    auto& s1 = vFed1->registerSubscription("pub2");
-    auto& s2 = vFed2->registerSubscription("pub1");
-    s1.setDefault(0.3);
-    s2.setDefault(0.4);
-    std::vector<double> v1;
-    std::vector<helics::Time> t1;
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed2->registerGlobalPublication<double>("pub2");
+    auto& sub1 = vFed1->registerSubscription("pub2");
+    auto& sub2 = vFed2->registerSubscription("pub1");
+    sub1.setDefault(0.3);
+    sub2.setDefault(0.4);
+    std::vector<double> receivedValues1;
+    std::vector<helics::Time> grantTimes1;
 
     vFed1->setTimeRequestReturnCallback([&](auto time, bool /*unused*/) {
         static bool trigger = false;
         if (trigger) {
-            p1.publish(22.1 + static_cast<double>(time));
+            pub1.publish(22.1 + static_cast<double>(time));
         } else {
-            v1.push_back(s1.getValue<double>());
+            receivedValues1.push_back(sub1.getValue<double>());
         }
-        t1.push_back(time);
+        grantTimes1.push_back(time);
         trigger = !trigger;
     });
 
-    std::vector<double> v2;
-    std::vector<helics::Time> t2;
+    std::vector<double> receivedValues2;
+    std::vector<helics::Time> grantTimes2;
     vFed2->setTimeRequestReturnCallback([&](auto time, bool /*unused*/) {
         static bool trigger = false;
         if (trigger) {
-            p2.publish(98.7 + static_cast<double>(time));
+            pub2.publish(98.7 + static_cast<double>(time));
         } else {
-            v2.push_back(s2.getValue<double>());
+            receivedValues2.push_back(sub2.getValue<double>());
         }
-        t2.push_back(time);
+        grantTimes2.push_back(time);
         trigger = !trigger;
     });
 
@@ -406,8 +450,8 @@ TEST_F(callbackFed, timeSteps2FedIterruption)
     auto term2 = std::make_shared<std::promise<int>>();
     auto vfut2 = term2->get_future();
 
-    vFed1->setNextTimeCallback([](helics::Time v) { return 1.1 * v + 1.0; });
-    vFed2->setNextTimeCallback([](helics::Time v) { return 1.5 * v + 1.5; });
+    vFed1->setNextTimeCallback([](helics::Time time) { return 1.1 * time + 1.0; });
+    vFed2->setNextTimeCallback([](helics::Time time) { return 1.5 * time + 1.5; });
 
     vFed1->setCosimulationTerminatedCallback(
         [term1 = std::move(term1)]() { term1->set_value(11); });
@@ -420,10 +464,10 @@ TEST_F(callbackFed, timeSteps2FedIterruption)
 
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
     EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
-    ASSERT_GT(t2.size(), 8);
-    EXPECT_EQ(t2[1], 1.0);
-    ASSERT_GT(t1.size(), 8);
-    EXPECT_EQ(t1[1], 1.0);
-    EXPECT_GT(t1[2], 1.0);
-    EXPECT_LT(t1[2], 1.1);
+    ASSERT_GT(grantTimes2.size(), 8);
+    EXPECT_EQ(grantTimes2[1], 1.0);
+    ASSERT_GT(grantTimes1.size(), 8);
+    EXPECT_EQ(grantTimes1[1], 1.0);
+    EXPECT_GT(grantTimes1[2], 1.0);
+    EXPECT_LT(grantTimes1[2], 1.1);
 }

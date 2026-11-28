@@ -18,6 +18,8 @@ Everything within a major version number should be code compatible (with the exc
 
 ### Fixed
 
+- Federate TOML configuration files now support `[core]` and `[broker]` sections, matching JSON configuration files.
+- Callback federates now honor the `stop_time` configured at creation.
 - Fixed an intermittent broker crash when an endpoint registered after a filter targeting it had closed. Closing an interface now clears its pending and reconnectable target requests.
 - Fixed data races when a federate is queried from a thread other than the one running it. The `subscriptions` query released the federate's processing lock while the federate could still be using it, and federate interface queries such as `inputs` and `publications` read the core's internal handle table from outside the core thread.
 

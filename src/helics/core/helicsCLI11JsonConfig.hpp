@@ -22,6 +22,7 @@ class HelicsConfigJSON: public CLI::ConfigBase {
 
     /// skip checking the JSON and go directly to the TOML processing
     void skipJson(bool skj = true) { mSkipJson = skj; }
+    void setTomlFile(bool tomlFile) { mTomlFile = tomlFile; }
     /// if the specified section isn't available use the root section
     void fallbackToDefault(bool ftd = true) { mFallbackToDefault = ftd; }
     /// throw if the json processing produces errors
@@ -30,6 +31,7 @@ class HelicsConfigJSON: public CLI::ConfigBase {
 
   private:
     bool mSkipJson{false};
+    bool mTomlFile{false};
     bool mFallbackToDefault{false};
     bool mThrowJsonErrors{true};
     std::string mPromoteSection;

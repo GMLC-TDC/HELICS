@@ -25,6 +25,24 @@ TEST(federateInfo, constructor1)
     EXPECT_EQ(fedInfo.defName, "fedInfo");
 }
 
+TEST(federateInfo, tomlBrokerSection)
+{
+    const auto fedInfo = helics::loadFederateInfo(R"(
+[broker]
+name = "named_broker"
+host = "127.0.0.1"
+port = 23000
+key = "test_key"
+auto = true
+initstring = "--federates=2"
+)");
+    EXPECT_EQ(fedInfo.broker, "127.0.0.1");
+    EXPECT_EQ(fedInfo.brokerPort, 23000);
+    EXPECT_EQ(fedInfo.key, "test_key");
+    EXPECT_TRUE(fedInfo.autobroker);
+    EXPECT_EQ(fedInfo.brokerInitString, "--federates=2");
+}
+
 TEST(federateInfo, constructor2)
 {
     std::vector<std::string> args{"constructor2",
