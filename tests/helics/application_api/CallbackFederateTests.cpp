@@ -137,6 +137,33 @@ TEST_F(callbackFed, timeStepsPeriodMax)
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
 }
 
+TEST(callbackFederateConfig, tomlCoreBrokerAndStopTime)
+{
+    helics::CallbackFederate fed(std::string(TEST_DIR) + "callback_federate_config.toml");
+    auto core = fed.getCorePointer();
+    EXPECT_EQ(core->getIdentifier(), "callback_config_core");
+    EXPECT_TRUE(core->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_FORCE_LOGGING_FLUSH));
+    EXPECT_EQ(fed.getTimeProperty(HELICS_PROPERTY_TIME_STOPTIME), 3.0);
+
+    helics::Time lastGrant = helics::timeZero;
+    fed.setTimeRequestReturnCallback([&lastGrant](auto granted, bool /*iterating*/) {
+        lastGrant = granted;
+    });
+    fed.setNextTimeIterativeCallback([](auto grant) {
+        if (grant.grantedTime >= 4.0) {
+            return std::make_pair(helics::Time::maxVal(),
+                                  helics::IterationRequest::HALT_OPERATIONS);
+        }
+        return std::make_pair(grant.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
+    });
+
+    std::promise<helics::Time> stopped;
+    auto stopTime = stopped.get_future();
+    fed.setCosimulationTerminatedCallback([&]() { stopped.set_value(lastGrant); });
+    fed.enterInitializingMode();
+    EXPECT_EQ(stopTime.get(), 3.0);
+}
+
 // test that an error return in the init call routes properly
 TEST_F(callbackFed, errorInit)
 {

@@ -993,6 +993,21 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
         [](const std::string& value) { return getOptionValue(value); },
         [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
 
+    if (const auto* brokerConfig = doc["broker"].as_table()) {
+        fileops::replaceIfMember(*brokerConfig, "name", broker);
+        fileops::replaceIfMember(*brokerConfig, "host", broker);
+        fileops::replaceIfMember(*brokerConfig, "initstring", brokerInitString);
+        fileops::replaceIfMember(*brokerConfig, "key", key);
+        fileops::replaceIfMember(*brokerConfig, "auto", autobroker);
+        if (const auto port = (*brokerConfig)["port"]) {
+            if (const auto value = port.value<int>()) {
+                brokerPort = *value;
+            } else {
+                throw(InvalidParameter("broker port must be an integer"));
+            }
+        }
+    }
+
     if (runArgParser) {
         auto app = makeCLIApp();
         app->allow_extras();

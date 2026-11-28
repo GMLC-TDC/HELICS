@@ -100,6 +100,7 @@ Federate::Federate(Federate&& fed) noexcept
     coreObject = std::move(fed.coreObject);
     fed.coreObject = CoreFactory::getEmptyCore();
     mCurrentTime = fed.mCurrentTime;
+    mStopTime = fed.mStopTime;
     nameSegmentSeparator = fed.nameSegmentSeparator;
     strictConfigChecking = fed.strictConfigChecking;
     observerMode = fed.observerMode;
@@ -117,6 +118,7 @@ Federate& Federate::operator=(Federate&& fed) noexcept
     coreObject = std::move(fed.coreObject);
     fed.coreObject = CoreFactory::getEmptyCore();
     mCurrentTime = fed.mCurrentTime;
+    mStopTime = fed.mStopTime;
     nameSegmentSeparator = fed.nameSegmentSeparator;
     strictConfigChecking = fed.strictConfigChecking;
     asyncCallInfo = std::move(fed.asyncCallInfo);
@@ -232,6 +234,7 @@ void Federate::registerFederate(const FederateInfo& fedInfo)
 
     nameSegmentSeparator = fedInfo.separator;
     strictConfigChecking = fedInfo.checkFlagProperty(defs::Flags::STRICT_CONFIG_CHECKING, true);
+    mStopTime = fedInfo.checkTimeProperty(defs::Properties::STOPTIME, Time::maxVal());
 
     useJsonSerialization = fedInfo.useJsonSerialization;
     observerMode = fedInfo.observer;
